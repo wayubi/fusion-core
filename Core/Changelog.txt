@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-30-04: Added Athena @where command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @jumpto command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @jump command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @who command to ALBGM. [Trihan]

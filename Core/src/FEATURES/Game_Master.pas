@@ -184,6 +184,7 @@ var
     function command_athena_who(tc : TChara; str : String) : String;
     function command_athena_jump(tc : TChara; str : String) : String;
     function command_athena_jumpto(tc : TChara; str : String) : String;
+    function command_athena_where(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -506,6 +507,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc.ID, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
             else if ( (copy(str, 1, length('jumpto')) = 'jumpto') and (check_level(tc.ID, GM_ATHENA_JUMPTO)) ) then error_msg := command_athena_jumpto(tc, str)
             else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
+            else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_ATHENA_WHERE)) ) then error_msg := command_athena_where(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2906,6 +2908,39 @@ Called when we're shutting down the server *only*
             mapmove (tc1.socket, tc1.map, tc1.point);
 
             Result := 'GM_ATHENA_JUMPTO success. Jumped to ' + tc1.Name;
+        end;
+
+        sl.Free;
+    end;
+
+    function command_athena_where(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        str2 : String;
+        tc1 : TChara;
+        i, w : Integer;
+    begin
+        Result := 'GM_ATHENA_WHERE activated.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count > 1 then Exit;
+
+        str2 := '';
+        for i := 1 to (sl.Count - 1) do begin
+            str2 := str2 + ' ' + sl.Strings[i];
+        end;
+        str2 := Trim(str2);
+
+        if (CharaName.Indexof(str2) <> -1) then begin
+            tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
+            str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+
+            w := Length(str) + 4;
+            WFIFOW (0, $009a);
+            WFIFOW (2, w);
+            WFIFOS (4, str, w - 4);
+            tc.socket.sendbuf(buf, w);
         end;
 
         sl.Free;
