@@ -224,6 +224,7 @@ begin
         IDTableDB.Sorted := true;
 
 	SkillDB := TIntList32.Create;
+  SkillDBName := TStringList.Create;
 	PlayerName := TStringList.Create;
 	PlayerName.CaseSensitive := True;
 	Player := TIntList32.Create;
@@ -800,6 +801,7 @@ begin
   IDTableDB.Free;
         SlaveDBName.Free;
 	SkillDB.Free;
+  SkillDBName.Free;
 	PlayerName.Free;
 	Player.Free;
 	CharaName.Free;
@@ -1087,6 +1089,7 @@ begin
 	ts.ATKPer := 100;
 	ts.DEFPer := 100;
 	ts.DmgTick := 0;
+  ts.Status := 'IDLE_ST';
 
 	for j := 0 to 31 do begin
 		ts.EXPDist[j].CData := nil;
@@ -1281,6 +1284,7 @@ begin
 	for i := 0 to 4 do
         ts.HealthTick[i] := 0;
 	ts.isLooting := False;
+  ts.Status := 'IDLE_ST';
 
 
 	ts.SpawnTick := Tick;
@@ -2018,6 +2022,7 @@ begin
                       ts.ATarget := ID;
 				              ts.AData := tc;
 				              ts.isLooting := False;
+                    
 				              ts.ATick := Tick + aMotion;
                     end;
 
@@ -2140,6 +2145,7 @@ var
 	ts1       :TMob;
 	tn        :TNPC;
 begin
+  //CalculateSkillIf(tm, ts, Tick);
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -2968,6 +2974,8 @@ begin
 		ts.ATarget := 0;
 		ts.ATick := Tick + ts.Data.ADelay;
 		ts.isLooting := False;
+    ts.Status := 'IDLE_ST';
+
 	end;
 end;
 
@@ -12272,7 +12280,7 @@ begin
 									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
 									//dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									//dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
-                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, tn.MData.Data.AISkill, Tick);
+                  MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
 
 									if dmg[0] < 1 then dmg[0] := 1;
 
@@ -12306,7 +12314,7 @@ begin
                                                         $86:    {Lord of Vermillion Damage}
 							begin
 								//if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, tn.MData.Data.AISkill, Tick);
+                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
                                                                         dmg[0] := dmg[0] * tMonster.Data.Param[3];
                                                                         if dmg[0] > 15000 then dmg[0] := 15000;
 									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
@@ -13111,7 +13119,7 @@ begin
 						$86: //LoV
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix * tl.Data1[tn.MUseLV] div 100;
+									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
 									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
@@ -13612,6 +13620,8 @@ begin
 					if (j <> 0) then begin
 					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
+            Status := 'MOVEITEM_ST';
+            //CalculateSkillIf(tm, ts, Tick);
 						ATarget := tn.ID;
 						ATick := Tick;
 
@@ -14888,11 +14898,12 @@ begin
                                                                                 tk := tc.Skill[CastingMonster.NowSkill];
 
                                                                                 //if Boolean(MMode and $02) then begin
-                                                                                MobSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
+                                                                                MobSkills(tm, CastingMonster, Tick);
                                                                                 //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
-                                                                                MobFieldSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
-                                                                                MobStatSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
-                                        
+                                                                                MobFieldSkills(tm, CastingMonster, Tick);
+                                                                                MobStatSkills(tm, CastingMonster, Tick);
+                                                                                CastingMonster.SkillWaitTick := Tick + CastingMonster.Data.WaitTick;
+
                                                                                 //end else if Boolean(MMode and $01) then begin
                                                                                 //pcnt := 0;
 
@@ -15527,6 +15538,7 @@ begin
                     PetDB.Clear;
                     MapInfo.Clear;
                     SkillDB.Clear;
+                    SkillDBName.Clear; 
                     GSkillDB.Clear;
                     SlaveDBName.Clear;
                     PharmacyDB.Clear;

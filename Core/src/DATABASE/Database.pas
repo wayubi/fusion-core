@@ -992,6 +992,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
 			end;
 		end;
 		SkillDB.AddObject(tl.ID, tl);
+    SkillDBName.AddObject(tl.IDC, tl);
 	end;
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d skill(s) database loaded.', [SkillDB.Count]));

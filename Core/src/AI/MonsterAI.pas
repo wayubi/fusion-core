@@ -9,14 +9,17 @@ uses
         procedure MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
         procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
         procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-        procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
-        procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
-        procedure MobStatSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
-        procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-        procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
-        procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI:TMobAIDB; i:integer; Tick:cardinal);
-        
+        procedure MobSkills(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure MobFieldSkills(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal);
+        procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; k:integer);
+        procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
+
         procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBAegis; Tick:Cardinal);
+        procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
 
         procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
         procedure PetDamageProcess(tm:TMap; ts:TMob; tc:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True);
@@ -43,10 +46,11 @@ var
 	tn:TNPC;
 	sl:TStringList;
 begin
-  TempNewAIProcedures(tm, ts, Tick);
+  //if ts.Data.Loaded = false then TempNewAIProcedures(tm, ts, Tick);
+
 	sl := TStringList.Create;
 	with ts do begin
-                MobSkillCalc(tm,ts,Tick);
+                //MobSkillCalc(tm,ts,Tick);
 
 		if (ts.Stat1 <> 0) and (Data.Range1 > 0) then begin
 			pcnt := 0;
@@ -323,18 +327,18 @@ begin
         // that the chance occurs in a random order.
         //for j := 0 to 7 do begin
                 i := Random(8);
-                if tsAI.Skill[i] <> 0 then begin
+                if ts.MSKill <> 0 then begin
                         if tsAI.PercentChance[i] > Random(100) then begin
                                 //DebugOut.Lines.Add('Success');
 
-                                MonsterCastTime(tm, ts, tsAI, i, Tick);
-                                ts.NowSkill := tsAI.Skill[i];
-                                ts.NowSkillLv := tsAI.SkillLv[i];
+                                MonsterCastTime(tm, ts, Tick);
+                                ts.NowSkill := ts.MSKill;
+                                ts.NowSkillLv := ts.MSKill;
                                 ts.SkillSlot := i;
                                 ts.AI := tsAI;
                                 ts.Mode := 3;
                                 {MobSkills(tm, ts, tsAI, Tick, i);
-                                //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
+                                //if tc.Skill[ts.MSKill].Data.SType = 2 then
                                 MobFieldSkills(tm, ts, tsAI, Tick, i);
                                 MobStatSkills(tm, ts, tsAI, Tick, i);}
                                 //Break;
@@ -346,7 +350,8 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+//procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+procedure MobSkills(tm:TMap; ts:TMob; Tick:cardinal);
 var
         b       :integer;
         tc      :TChara;
@@ -357,20 +362,21 @@ begin
 
         //for i := 0 to 3 do begin
         tc := ts.AData;
+        if tc <> nil then begin
+    		  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
+          else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
+          else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
+    		  else j := 1;
+        end;
 
-    		if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
-                else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
-                else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
-    		else j := 1;
-
-        case tsAI.Skill[i] of
-                //dmg[0] := dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data1[tsAI.SkillLV[i]];
+        case ts.MSkill of
+                //dmg[0] := dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data1[ts.MSKill];
                 5:      {Bash}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[ts.MLevel] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
                 11,13,14,19,20:
@@ -385,27 +391,27 @@ begin
                                 //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
                                 //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
                                 {Unsure about magic calculations so just using the attack calc algorithm [Darkhelmet]}
-                                MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                                MobSkillDamageCalc(tm, tc, ts, Tick);
                                 if dmg[0] < 1 then dmg[0] := 1;
-                                dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
-                                dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data2[tsAI.SkillLV[i]];
+                                dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSkill].Data.Element][j] div 100;
+                                dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data2[ts.MSKill];
 
                                 if dmg[0] < 0 then dmg[0] := 0;
-                                SendMSkillAttack(tm, tc, ts, tsAI, Tick, tc.Skill[tsAI.Skill[i]].Data.Data2[tsAI.SkillLV[i]], i);
+                                SendMSkillAttack(tm, tc, ts, Tick, tc.Skill[ts.MSKill].Data.Data2[ts.MSKill]);
                         end;
                 15:     {Frost Driver}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
 
                         //dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * ( MUseLV + 100 ) div 100;
                         //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
                         //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
                         if dmg[0] < 1 then dmg[0] := 1;
-                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
+                        dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSKill].Data.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                         //Send Packets
-			SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+			SendMSkillAttack(tm, tc, ts, Tick, 1);
                                         {if (ts.Data.race <> 1) and (ts.Data.MEXP = 0) and (dmg[0] <> 0)then begin
                                                 if Random(1000) < tl.Data1[MUseLV] * 10 then begin
                                                         ts.nStat := 2;
@@ -423,7 +429,7 @@ begin
                         if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
 
                         WFIFOW( 0, $011a);
-                        WFIFOW( 2, tsAI.Skill[i]);
+                        WFIFOW( 2, ts.MSKill);
                         WFIFOW( 4, dmg[0]);
                         WFIFOL( 6, ts.ID);
                         WFIFOL(10, ts.ID);
@@ -433,25 +439,25 @@ begin
 
                 46:     {Double Strafe}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 2;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 2);
                 end;
 
                 56:     {Pierce}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[56].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
+                        dmg[0] := dmg[0] * tc.Skill[56].Data.Data1[ts.MSKill] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 2);
                 end;
                 57:     {Brandish Spear}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[ts.MSKill] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         if (dmg[0] > 0) then begin
                                 SetLength(bb, 6);
                                 bb[0] := 6;
@@ -478,10 +484,10 @@ begin
 
                 136:    {Sonic Blows}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 8;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 8, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 8);
                 end;
 
                 148:    {Charge Arrow}
@@ -504,13 +510,13 @@ begin
                         end;
 
                         //Damage Calculations
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                         //Send Attack
                         // Colus, 20040129: Should be an MSkill
                         //SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
 
                         //Successful Damage
                         if (dmg[0] > 0) then begin
@@ -539,25 +545,25 @@ begin
 
                 170:    {Npc- Critical}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[ts.MSKill] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
                 171:    {Npc-combo hit}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 3;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 3, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 3);
                 end;
 
                 173:    {Self Destruction}
                 begin
                         dmg[0] := ts.HP;
                         if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         ts.HP := 0;
                         WFIFOW( 0, $0080);
 	                WFIFOL( 2, ts.ID);
@@ -570,7 +576,7 @@ begin
                 begin
                         dmg[0] := ts.HP;
                         if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         ts.HP := 0;
                         WFIFOW( 0, $0080);
 	                WFIFOL( 2, ts.ID);
@@ -581,10 +587,10 @@ begin
 
                 176:    {Posion Attack}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        //dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        //dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[ts.MSKill] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         tc.isPoisoned := True;
                         tc.PoisonTick := tick + 15000;
                         tc.Stat2 := 1;
@@ -593,10 +599,10 @@ begin
 
                 177:    {Blind Attack}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
 
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         tc.isBlind := True;
                         tc.Stat2 := 16;
                         tc.BlindTick := tick + 15000;
@@ -606,10 +612,10 @@ begin
 
                 178:    {Silence Attack}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
 
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts , Tick, 1);
 
                         tc.isSilenced := True;
                         tc.SilencedTick := Tick + 15000;
@@ -626,62 +632,72 @@ begin
                 184,185,186,187,188,189,190:    {Elemental Attacks}
                 begin
                         //ts.Element := 1;  // Water
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
+                        dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSKill].Data.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                         //ts.Element := ts.Data.Element;
                 end;
 
                 191:    {Telekenesis Attack}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        //dmg[0] := dmg[0] * tc.Skill[191].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        //dmg[0] := dmg[0] * tc.Skill[191].Data.Data1[ts.MSKill] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
 
                 192:    {Magical Attack}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] + tc.DEF1 + tc.DEF2;
                         dmg[0] := dmg[0] - tc.MDEF1 - tc.MDEF2;
-                        dmg[0] := dmg[0] * tc.Skill[192].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[192].Data.Data1[ts.MLevel] div 100;
                         if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
+
+                197:  {NPC Emotion}
+                  begin
+                    j := Random(31) + 1;
+
+                    WFIFOW(0, $00c0);
+                    WFIFOL(2, ts.ID);
+                    WFIFOB(6, j);
+                    SendBCmd(tm, ts.Point, 7);
+                  end;
 
                 199:    {Blood Drain}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 2;
                         ts.HP := ts.HP + dmg[0];
                         if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
                 200:    {Energy Drain}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        //dmg[0] := dmg[0] * tc.Skill[200].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        //dmg[0] := dmg[0] * tc.Skill[200].Data.Data1[ts.MSKill] div 100;
                         if dmg[0] > 0 then begin
                                 tc.SP := tc.SP - (dmg[0] div 4);
                                 if tc.SP < 0 then tc.SP := 0;
                         end;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
 
                 end;
 
                 202:    {Dark Breath}
                 begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
         end;
 
@@ -691,7 +707,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+procedure MobFieldSkills(tm:TMap; ts:TMob; Tick:cardinal);
 var
         tl  :TSkillDB;
         sl  :TStringList;
@@ -706,7 +722,7 @@ begin
 
         //for i := 0 to 3 do begin
                 tc := ts.AData;
-                case tsAI.Skill[i] of
+                case ts.MSKill of
                         83:     {Meteor}
                         begin
                                 AttackData := ts.AData;
@@ -718,14 +734,14 @@ begin
                                 ts.IsCasting := true;
                                 tn := SetSkillUnit(tm, ts.ID, xy, Tick, $88, 0, 3000, nil, ts);
 
-                                tn.MSkill := tsAI.Skill[i];
-                                tn.MUseLV := tsAI.SkillLV[i];
+                                tn.MSkill := ts.MSKill;
+                                tn.MUseLV := ts.MSKill;
 
-                                for j := 1 to tc.Skill[83].Data.Data2[tsAI.SkillLV[i]] do begin;
+                                for j := 1 to tc.Skill[83].Data.Data2[ts.MLevel] do begin;
                                         WFIFOW( 0, $0117);
-                                        WFIFOW( 2, tsAI.Skill[i]);
+                                        WFIFOW( 2, ts.MSKill);
                                         WFIFOL( 4, ts.ID);
-                                        WFIFOW( 8, tsAI.SkillLV[i]);
+                                        WFIFOW( 8, ts.MLevel);
                                         WFIFOW(10, (AttackData.Point.X - 4 + Random(12)));
                                         WFIFOW(12, (AttackData.Point.Y - 4 + Random(12)));
                                         WFIFOL(14, 1);
@@ -746,13 +762,13 @@ begin
                                 //Create Graphics and Set NPC
                                 tn := SetSkillUnit(tm, ts.ID, xy, Tick, $86, 0, 3000, nil, ts);
 
-                                tn.MSkill := tsAI.Skill[i];
-                                tn.MUseLV := tsAI.SkillLV[i];
+                                tn.MSkill := ts.MSKill;
+                                tn.MUseLV := ts.MLevel;
 
                                 WFIFOW( 0, $0117);
-                                WFIFOW( 2, tsAI.Skill[i]);
+                                WFIFOW( 2, ts.MSKill);
                                 WFIFOL( 4, ts.ID);
-                                WFIFOW( 8, tsAI.SkillLV[i]);
+                                WFIFOW( 8, ts.MLevel);
                                 WFIFOW(10, (AttackData.Point.X));
                                 WFIFOW(12, (AttackData.Point.Y));
                                 WFIFOL(14, 1);
@@ -762,7 +778,7 @@ begin
         //end;
 end;
 //------------------------------------------------------------------------------
-procedure MobStatSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
 
 var
 ProcessType     :Byte;
@@ -770,7 +786,7 @@ ProcessType     :Byte;
 begin
 with ts do begin
         ProcessType := 0;
-        case tsAI.Skill[i] of
+        case ts.MSKill of
                 51:     {Hide}
                 begin
                         ProcessType := 1;
@@ -787,7 +803,7 @@ with ts do begin
                         begin
                                 //Packet Process
                                 WFIFOW( 0, $011a);
-                                WFIFOW( 2, tsAI.Skill[i]);
+                                WFIFOW( 2, ts.MSKill);
                                 WFIFOW( 4, dmg[0]);
                                 WFIFOL( 6, ts.ID);
                                 WFIFOL(10, ID);
@@ -797,14 +813,14 @@ with ts do begin
                 1:  //Skills Like Power Maximize
                         begin
                                 WFIFOW( 0, $011a);
-                                WFIFOW( 2, tsAI.Skill[i]);
-                                WFIFOW( 4, tsAI.SkillLv[i]);
+                                WFIFOW( 2, ts.MSKill);
+                                WFIFOW( 4, ts.MLevel);
                                 WFIFOL( 6, ts.ID);
                                 WFIFOL(10, ts.ID);
                                 WFIFOB(14, 1);
                                 SendBCmd(tm, ts.Point, 15);
 
-                                if (tsAI.Skill[i] = 51) then begin
+                                if (ts.MSKill = 51) then begin
 
                                         if ts.Hidden = true then begin
                                                 ts.Hidden := false;
@@ -842,7 +858,7 @@ with ts do begin
                                         end;
                                 end;}
 
-                                if (tsAI.Skill[i] = 114) then begin
+                                if (ts.MSKill = 114) then begin
                                         DebugOut.Lines.Add('Monster Casts Power Maximize');
                                         {if tc1.Option = 32 then begin
 						//tc1.Option := tc1.Optionkeep;
@@ -862,7 +878,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal);
         var
 	i,j,k     :integer;
 	miss      :boolean;
@@ -1154,7 +1170,7 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
+procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; k:integer);
 
 begin
 //R 01de <skill ID>.w <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1>.l <param2>.w <param3>.w <type>.B
@@ -1170,7 +1186,7 @@ begin
         if tc.HP - dmg[0] > 0 then tc.HP := tc.HP - dmg[0];  //Subtract Damage.
         if tc.HP < 0 then tc.HP := 0;
         WFIFOW( 0, $01de);
-	WFIFOW( 2, tsAI.Skill[i]);
+	WFIFOW( 2, ts.MSkill);
 	WFIFOL( 4, ts.ID);
 	WFIFOL( 8, tc.ID);
 	WFIFOL(12, Tick);
@@ -1179,7 +1195,7 @@ begin
         WFIFOL(16, ts.Data.dMotion);
 	WFIFOL(20, tc.aMotion);
 	WFIFOL(24, dmg[0]);
-	WFIFOW(28, tsAI.SkillLV[i]);
+	WFIFOW(28, ts.MLevel);
 	WFIFOW(30, k);
         WFIFOB(32, 8);
 	//else               WFIFOB(32, 8);
@@ -1187,7 +1203,7 @@ begin
 	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
-procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI   :TMobAIDB; i:integer; Tick:cardinal);
+procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
 var
         //tl     :TSkillDB;
         tc      :TChara;
@@ -1196,10 +1212,10 @@ begin
 
         tc := ts.AData;
 
-        //with Skill[tsAI.Skill[i]] do begin
+        //with Skill[ts.MSKill] do begin
 
-        j := tc.Skill[tsAI.Skill[i]].Data.CastTime1 + tc.Skill[tsAI.Skill[i]].Data.CastTime2 * tsAI.SkillLv[i];
-        if j < tc.Skill[tsAI.Skill[i]].Data.CastTime3  then j := tc.Skill[tsAI.Skill[i]].Data.CastTime3;
+        j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
+        if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
 
         ts.MTick := Tick + cardinal(j);
         //j := j * tc.MCastTimeFix div 100;
@@ -1210,8 +1226,8 @@ begin
                 WFIFOL( 6, ts.ATarget);
                 WFIFOW(10, 0);
                 WFIFOW(12, 0);
-                WFIFOW(14, tsAI.Skill[i]); //SkillID
-                WFIFOL(16, tc.Skill[tsAI.Skill[i]].Data.Element); //Element
+                WFIFOW(14, ts.MSKill); //SkillID
+                WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
                 WFIFOL(20, j);
                 SendBCmd(tm, ts.Point, 24);
                 ts.MMode := 1;
@@ -1229,8 +1245,14 @@ procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
 var
   tsAI2 :TMobAIDBAegis;
   j,k,m     :integer;
+  sl    :TStringList;
 
 begin
+  sl := TStringList.Create;
+  sl.Delimiter := ',';
+  sl.Clear;
+
+  ts.Data.SkillCount := 0;
   {
   Monster Data: RAYDRIC BERSERK_ST NPC_DARKNESSATTACK 3 200 0 7500 0 0 0
 Monster Data: RAYDRIC RUSH_ST NPC_EMOTION 1 15 0 10000 0 0 0
@@ -1253,11 +1275,11 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
     IF_SKILLUSE
     IF_SLAVENUM
   }
-       // by Eliot : Sorry for doing this but i had to comment out the debugs, they lag like hell.
+
   //j := MobAIDBAegis.IndexOf(ts.Number);
   //k := j;
   //j := MobAIDBAegis.IndexOf(ts.Name);
-//  DebugOut.Lines.Add(ts.Name);
+  //DebugOut.Lines.Add(ts.Name);
   for m := 0 to MobAIDBAegis.Count do begin
     if MobAIDBAegis.IndexOf(m) <> -1 then begin
     //while (j > 0) do begin
@@ -1266,73 +1288,184 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
       //DebugOut.Lines.Add(IntToStr(j));
       if (lowercase(ts.Name) = lowercase(tsAI2.Name)) then begin
 
-        //DebugOut.Lines.Add('Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
-       // DebugOut.Lines.Add('----------------------------');
-     //   DebugOut.Lines.Add('Skill: ' + tsAI2.SkillID);
+        sl.Add(IntToStr(m));
+        ts.Data.SkillLocations := sl.DelimitedText;
+        ts.Data.SkillCount := ts.Data.SkillCount + 1;
 
-      //  DebugOut.Lines.Add('Requires monster is in ' + tsAI2.Status + ' status');
+        //DebugOut.Lines.Add('Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
+        //DebugOut.Lines.Add('----------------------------');
+        //DebugOut.Lines.Add('Skill: ' + tsAI2.SkillID);
+
+        //DebugOut.Lines.Add('Requires monster is in ' + tsAI2.Status + ' status');
 
         if tsAI2.Dispel = 'NO_DISPEL' then begin
-      //    DebugOut.Lines.Add('Cannot be broken when attacked.');
+        //  DebugOut.Lines.Add('Cannot be broken when attacked.');
         end else
-     //     DebugOut.Lines.Add('Can be broken when attacked.');
+        //  DebugOut.Lines.Add('Can be broken when attacked.');
 
         ///////////If Conditions Begin////////////////
         if tsAI2.IfState = 'IF_COMRADECONDITION' then begin
-      //    DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);
+        //  DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_COMRADEHP' then begin
-      //    DebugOut.Lines.Add('Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
+        //  DebugOut.Lines.Add('Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
         end;
         if tsAI2.IfState = 'IF_CONDITION' then begin
-      //    DebugOut.Lines.Add('Only active if monster is: ' + tsAI2.IfCond);
+        //  DebugOut.Lines.Add('Only active if monster is: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HIDING' then begin
-      //    DebugOut.Lines.Add('Monster Must Be Hiding');
+        //  DebugOut.Lines.Add('Monster Must Be Hiding');
         end;
         if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
-      //    DebugOut.Lines.Add('Enemy Must be Magic Locked');
+        //  DebugOut.Lines.Add('Enemy Must be Magic Locked');
         end;
         if tsAI2.IfState = 'IF_RANGEATTACKED' then begin
-       //   DebugOut.Lines.Add('Enemy Must be Range Attacked');
+        //  DebugOut.Lines.Add('Enemy Must be Range Attacked');
         end;
         if tsAI2.IfState = 'IF_RUDEATTACK' then begin
-      //    DebugOut.Lines.Add('Enemy Must be Rude Attacked');
+        //  DebugOut.Lines.Add('Enemy Must be Rude Attacked');
         end;
         if tsAI2.IfState = 'IF_SKILLUSE' then begin
-      //    DebugOut.Lines.Add('Skill ' + tsAI2.IfCond + ' Triggers this');
+        //  DebugOut.Lines.Add('Skill ' + tsAI2.IfCond + ' Triggers this');
         end;
         if tsAI2.IfState = 'IF_SLAVENUM' then begin
-      //    DebugOut.Lines.Add('Slave Count Must be at least: ' + tsAI2.IfCond);
+        //  DebugOut.Lines.Add('Slave Count Must be at least: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HP' then begin
-       //   DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+        //  DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
         end;
 
         if tsAI2.IfState = 'IF_ENEMYCOUNT' then
           begin
-      //      DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
+            //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
           end;
         ///////////If Conditions End////////////////
-       // DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
-      //  DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
-      //  DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
-       // DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
-     //   DebugOut.Lines.Add('----Next Skill----');
-        //k := k + 1;
+        {
+        DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
+        //DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
+        DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
+        DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
+        DebugOut.Lines.Add('----Next Skill----');
+        }
+
       end;
       //j := j -1;
       //if k = 0 then break;
     end;
   end;
- // DebugOut.Lines.Add('----------------------------');
- // DebugOut.Lines.Add('Done');
- // DebugOut.Lines.Add('----------------------------');
- // DebugOut.Lines.Add('');
- // DebugOut.Lines.Add('');
+  ts.Data.Loaded := true;
+
+  {
+  DebugOut.Lines.Add('Locations of skills: ' + ts.Data.SkillLocations );
+  DebugOut.Lines.Add('Locations of skills: ' + sl.DelimitedText );
+  DebugOut.Lines.Add('Done');
+  DebugOut.Lines.Add('----------------------------');
+  DebugOut.Lines.Add('');
+  DebugOut.Lines.Add('');
+  sl.Clear;
+  }
 end;
 
 //------------------------------------------------------------------------------
+procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
+var
+  sl:TStringList;
+  i,j:integer;
+  HPCount:integer;
+  tsAI2 :TMobAIDBAegis;
+
+begin
+  sl := TStringList.Create;
+  sl.Clear;
+  sl.Delimiter := ',';
+  sl.DelimitedText := ts.Data.SkillLocations;
+  i :=  ts.Data.SkillCount;
+  while i > 0 do begin
+    i := i - 1;
+    j := StrToInt(sl.Strings[i]);
+    tsAI2 := MobAIDBAegis.Objects[MobAIDBAegis.IndexOf(j)] as TMobAIDBAegis;
+    if tsAI2.IfState = 'IF_HP' then begin
+      //if ts.Data.DebugFlag = false then begin
+        //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' of the ' + ts.Name + ' has an if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+        HPCount := ts.HP * 1000 div (Integer(ts.Data.HP) * 10);
+        //DebugOut.Lines.Add('Monster''''s hp percent is ' + IntToStr(HPCount));
+
+        if HPCount > StrToInt(tsAI2.IfCond) then
+          //DebugOut.Lines.Add('If Statement passes as false')
+        else begin
+          //DebugOut.Lines.Add('If Statement passes as true');
+          CheckSkill(tm, ts, tsAI2, Tick);
+        end;
+
+      //end;
+    end else if tsAI2.IfState = 'IF_HIDING' then begin
+      if ts.Hidden = true then CheckSkill(tm, ts, tsAI2, Tick);
+    end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
+
+    end else
+      CheckSkill(tm, ts, tsAI2, Tick);
+
+    ts.Data.DebugFlag := true;
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBAegis; Tick:Cardinal);
+var
+  TempSkill:TSkillDB;
+begin
+  //if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) then begin
+  if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
+    TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
+    ts.MSkill := TempSkill.ID;
+    ts.MLevel := tsAI2.SkillLV;
+    ts.CastTime := tsAI2.Cast_Time;
+    ts.Data.WaitTick := tsAI2.Cool_Time;
+    ts.Mode := 3;
+    NewMonsterCastTime(tm, ts, Tick);
+    //MobSkills(tm, ts, Tick);
+    //DebugOut.Lines.Add('Percent Passes');
+  end;
+end;
+//------------------------------------------------------------------------------
+
+procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
+var
+        tc      :TChara;
+        j      :integer;
+begin
+
+        tc := ts.AData;
+
+        //j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
+        //if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
+        j := ts.CastTime;
+        ts.MTick := Tick + cardinal(j);
+        
+        if (j > 0) then begin
+                //Send Packets
+                WFIFOW( 0, $013e);
+                WFIFOL( 2, ts.ID);
+                WFIFOL( 6, ts.ATarget);
+                WFIFOW(10, 0);
+                WFIFOW(12, 0);
+                WFIFOW(14, ts.MSKill); //SkillID
+                WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
+                WFIFOL(20, j);
+                SendBCmd(tm, ts.Point, 24);
+                ts.MMode := 1;
+                ts.ATick := Tick + cardinal(j);
+        end else begin
+                //ârè•Ç»Çµ
+                ts.MMode := 1;
+                ts.ATick := Tick;
+        end;
+
+end;
+
+//------------------------------------------------------------------------------
+
 procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
 var
   i1,j1,k1:integer;

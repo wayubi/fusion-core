@@ -260,6 +260,11 @@ type TMobDB = class
 	isLoot      :boolean; //Mode &  2 : ルート
 	isLink      :boolean; //Mode &  8 : リンク
 	AISkill     :TMobAIDB;
+  SkillLocations :string;  //Gives a list of where the monsters skills are located
+  SkillCount  :integer;
+  WaitTick :integer;
+  Loaded  :boolean;
+  DebugFlag :boolean;
 {追加ココまで}
 end;
 //------------------------------------------------------------------------------
@@ -373,12 +378,18 @@ type TMob = class(TLiving)
   isCasting   :boolean;
   Stolen      :cardinal;
 
+  Status  :string;  //Lists the monsters Current status
+  MSkill  :integer;
+  MLevel  :integer;
+
         Hidden     :boolean;
 
         AnkleSnareTick :cardinal;  //Tracks how long ankle snare lasts
 
         MPoint        :rPoint;
 	MTick         :cardinal;
+  CastTime  :integer;
+  SkillWaitTick :cardinal;
 
         NowSkill        :integer;
         NowSkillLv      :integer;
@@ -1414,6 +1425,7 @@ var
   MArrowDB   :TIntList32;
   IDTableDB  :TIntList32;
 	SkillDB    :TIntList32;
+  SkillDBName:TStringlist;
 	Player     :TIntList32;
 	PlayerName :TStringList;
 	Chara      :TIntList32;
