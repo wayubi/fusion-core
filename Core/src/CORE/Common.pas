@@ -4525,6 +4525,7 @@ procedure SendPetMove(Socket: TCustomWinSocket; tc:TChara; target:TPoint );
 var
         tn:TNPC;
         tpe:TPet;
+        spd:word;
 begin
         if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
                 tpe := tc.PetData;
@@ -4533,7 +4534,14 @@ begin
 	        ZeroMemory(@buf[0], 60);
 					WFIFOW( 0, $007b);
 	        WFIFOL( 2, tn.ID );
-	        WFIFOW( 6, tc.Speed);
+
+          // Colus, 20040222: Slow down the pet when actually moving
+          if (tn.Path[tn.ppos] and 1) = 0 then begin
+      			spd := tc.Speed;
+      		end else begin
+      			spd := tc.Speed * 140 div 100;
+      		end;
+	        WFIFOW( 6, spd);
 	        WFIFOW(14, tpe.JID);
                 WFIFOW(16, 20 ); // “ä
                 WFIFOW(20, tpe.Accessory);
