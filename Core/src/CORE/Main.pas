@@ -1796,9 +1796,20 @@ begin
 			dmg[4] := 2;
 			dmg[5] := 8;
                 end else if tatk then begin
-                        dmg[0] := dmg[0] * DAFix div 100;
-			dmg[4] := 3;
+                        //dmg[0] := dmg[0] * DAFix div 100;
+			//dmg[4] := 3;
 			dmg[5] := 8;
+                        tc.MTarget := tc.ATarget;
+                        ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+                        if ts = nil then Exit;
+                        if ts.HP = 0 then Exit;
+                        tc.MTargetType := 0;
+                        tc.AData := ts;
+                        tc.MSkill := 263;
+                        tc.MUseLV := Skill[263].Lv;
+                        //DecSP(tc, MSkill, MUseLV);
+                        SkillEffect(tc, Tick);
+
                         tc.Skill[263].Tick := Tick + cardinal(2) * 1000;
 		end else begin
 			dmg[4] := 1;
@@ -4751,7 +4762,7 @@ begin
 			//射程チェック
 			if (abs(tc.Point.X - ts.Point.X) <= tl.Range) and (abs(tc.Point.Y - ts.Point.Y) <= tl.Range) then begin
 			end else begin
-				if MTick + 500 < Tick then begin
+				if tc.MTick + 500 < Tick then begin
 					MMode := 4;
 					Exit;
 				end;
@@ -5263,6 +5274,21 @@ begin
                                                         tc.SP := tc.MAXSP;
                                         end;
                                 end;}
+
+                                263:   {Triple Blows}
+                                begin
+                                        if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
+                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
+                                                if dmg[0] < 0 then dmg[0] := 0;
+                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 3);
+                                                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                StatCalc1(tc, ts, Tick);
+                                        end else begin
+                                                MMode := 4;
+                                                Exit;
+                                        end;
+                                end;
+
                                 264:   {Body Relocation}
                                 begin
                                         if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin

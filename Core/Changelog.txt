@@ -2,6 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-03-04: Fixed Triple Blows [Darkhelmet]
 - 01-02-04: Added Loading of Pharmacy's Database [Darkhelmet]
 - 01-02-04: Fixed Bug - Monster Skills Made Some area effects crash [Darkhelmet]
 - 01-02-04: Fixed Combo's Now Non Targeting [Darkhelmet]
