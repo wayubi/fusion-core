@@ -867,7 +867,10 @@ begin
 			sl.DelimitedText := str;
 			j := StrToInt(sl[0]);
 			if j = 0 then continue;
+
+            if ItemDB.IndexOf(j) = -1 then Continue;
 			i := ItemDB.IndexOf(j);
+
 			if i <> -1 then begin
 				td := ItemDB.Objects[i] as TItemDB;
 				with td do begin
