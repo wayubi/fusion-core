@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-22-04: Fixed #569 - Hunters at far enough range can attack monster w/o counterattack. [AlexKreuz]
 - 06-22-04: Fixed #938 - Double Click in Arrow for Equip (client limitation, use F12 hotkeys). [AlexKreuz]
 - 06-22-04: Fixed #963 - M/F registeration conflict. Multiple account creation with same username. [AlexKreuz] 
 - 06-22-04: Accidentally put vit instead of agi. [Trihan]

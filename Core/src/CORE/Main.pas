@@ -3189,9 +3189,18 @@ begin
 		xy := ts.Point;
     ts.CanFindTarget := true;
 		{ Alex: Monster searching for attack path towards player - checks attackrange over cliffs and sightrange w/o cliffs. }
-		if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
-		( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin
-			if (ts.ATarget = 0) or (ts.isActive) then begin
+
+        
+		{if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
+		( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin}
+
+
+        { Alex: Retaliatory attack. Monster should definitely be able to return fire if he is being attacked. }
+        if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
+		( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) ) then begin
+
+
+			if (ts.ATarget = 0) or (ts.isActive	) then begin
 				ts.ATarget := tc.ID;
 
 				ts.AData := tc;
@@ -8552,7 +8561,7 @@ begin
 			
 			ARangeFlag := true;
 			
-		end else if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) then begin
+		end else if (abs(ts.Point.X - tc1.Point.X) > 20) or (abs(ts.Point.Y - tc1.Point.Y) > 20) then begin
 		{ Player is outside monster's range }
 			
 			UpdateMonsterLocation(tm, ts);
