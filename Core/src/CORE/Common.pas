@@ -1998,6 +1998,7 @@ begin
                         //tc.Option := 6;
                         tc.Option := tc.Option or 6;
                 end;
+
                 if Skill[280].Tick > Tick then begin
 			WElement[0] := 3;
 			WElement[1] := 3;
@@ -3973,6 +3974,11 @@ begin
 
         if tc.SpRedAmount > 0 then SPAmount := SPAmount - (tc.Skill[SkillID].Data.SP[LV] * tc.SPRedAmount div 100);
 
+        if tc.Autocastactive = true then begin
+                SPAmount := SPAmount * 2 div 3;
+                Autocastactive := false;
+        end;
+        
         //Golden Thief Bug Card
         if tc.NoTarget then SPAmount := SPAmount * 2;
         {if tc.LessSP then begin

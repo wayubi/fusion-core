@@ -1895,6 +1895,7 @@ begin
 
                 if (tc.Skill[279].Tick > Tick) and (Skill[279].Lv > 0) then begin     {Auto Cast}
                   if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
+                        Autocastactive := true;
                     tc.MTarget := tc.ATarget;
                     ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
                     if ts.HP = 0 then Exit;
@@ -3538,9 +3539,11 @@ begin
                         if tc.Skill[279].Tick > Tick then begin     {Auto Cast}
                                 try
                                 if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
+                                        Autocastactive := true;
                                         tc.MTarget := tc.ATarget;
+                                        tc1 := tm.CList.IndexOfObject(tc.MTarget) as TChara;
                                         if tc1.HP = 0 then Exit;
-                                        tc.MTargetType := 0;
+                                        tc.MTargetType := 1;
                                         tc.AData := tc1;
                     i1 := tc.Skill[279].Effect1;
                     if (i1 > 0) then j1 := tc.Skill[i1].Lv;
