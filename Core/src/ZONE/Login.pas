@@ -151,57 +151,55 @@ var
 	count     : Integer;
 	addtxt    : TextFile;
 	txt       : TextFile;
-        option_mf : string;
+	option_mf : string;
 	Idx       : Integer;
 	//index used for freeing player/playername lists
 begin
-  Result := False;
-           DataSave();
+	Result := False;
+	DataSave;
 
-           sv1PacketProcessTo(Socket,w,userid,userpass);
-           AssignFile(addtxt, AppPath + 'addplayer.txt');
-           AssignFile(txt, AppPath + 'player.txt');
-       	  if not FileExists(AppPath + 'player.txt') then begin
-                   Rewrite(txt);
-                   Writeln(txt, '##Weiss.PlayerData.0x0002');
-          end else
-          begin
-            Append(txt);
-          end;
-          if FileExists(AppPath + 'addplayer.txt') then
-          begin
-            Reset(addtxt);
-            count := 1;
+	sv1PacketProcessTo(Socket,w,userid,userpass);
+	AssignFile(addtxt, AppPath + 'addplayer.txt');
+	AssignFile(txt, AppPath + 'player.txt');
+	if not FileExists(AppPath + 'player.txt') then begin
+		Rewrite(txt);
+		Writeln(txt, '##Weiss.PlayerData.0x0002');
+	end else begin
+		Append(txt);
+	end;
+	if FileExists(AppPath + 'addplayer.txt') then begin
+		Reset(addtxt);
+		count := 1;
 
-            if (Option_Username_MF = True) then begin
-                option_mf := copy(userid, length(userid) - 1, 2);
-                userid := copy(userid, 0, length(userid) - 2);
+		if (Option_Username_MF = True) then begin
+			option_mf := copy(userid, length(userid) - 1, 2);
+			userid := copy(userid, 0, length(userid) - 2);
 
-                if (option_mf = '_M') then begin
-                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',1,-@-,0,,,,,,,,,');
-                end else if (option_mf = '_F') then begin
-                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',0,-@-,0,,,,,,,,,');
-                end;
-                
-                Writeln(txt, '0');
-                inc(count);
-            end
+			if (option_mf = '_M') then begin
+				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',1,-@-,0,,,,,,,,,');
+			end else if (option_mf = '_F') then begin
+				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',0,-@-,0,,,,,,,,,');
+			end;
 
-            else begin
-                while not SeekEof(addtxt) do begin
-                        Readln(addtxt,userdata);
-                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
-                        Writeln(txt, '0');
-                        inc(count);
-                end;
-            end;
+			Writeln(txt, '0');
+			inc(count);
+		end
 
-            Flush(txt);  { テキストが実際にファイルに書き込まれたことを確かめる }
-            CloseFile(txt);
+		else begin
+			while not SeekEof(addtxt) do begin
+				Readln(addtxt,userdata);
+				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
+				Writeln(txt, '0');
+				inc(count);
+			end;
+		end;
 
-            Rewrite(addtxt);
-            Flush(addtxt);  { テキストが実際にファイルに書き込まれたことを確かめる }
-						CloseFile(addtxt);
+		Flush(txt);  { テキストが実際にファイルに書き込まれたことを確かめる }
+		CloseFile(txt);
+
+		Rewrite(addtxt);
+		Flush(addtxt);  { テキストが実際にファイルに書き込まれたことを確かめる }
+		CloseFile(addtxt);
 
 
 		{ChrstphrR 2004/04/25 - Clear's are unsafe
@@ -216,14 +214,14 @@ begin
 		for Idx := Player.Count-1 downto 0 do
 			if Assigned(Player.Objects[Idx]) then
 				(Player.Objects[Idx] AS TPlayer).Free;
-            Player.Clear;
+		Player.Clear;
 		PlayerName.Clear;
 
 		PlayerDataLoad;
 
-						//CharaName.Clear;
-            //Chara.Clear;
-            //PartyNameList.Clear;
+		//CharaName.Clear;
+		//Chara.Clear;
+		//PartyNameList.Clear;
 {氏{箱追加}
 		//SummonMobList.Clear;//ChrstphrR - safe 2004/04/26
 		//SummonIOBList.Clear;//Safe 2004/04/26
@@ -232,19 +230,19 @@ begin
 		//SummonIGBList.Clear;//Safe 2004/04/26
 {氏{箱追加ココまで}
 {NPCイベント追加}
-						//ServerFlag.Clear;
-						//MapInfo.Clear;
+		//ServerFlag.Clear;
+		//MapInfo.Clear;
 {NPCイベント追加ココまで}
 {ギルド機能追加}
-						//GuildList.Clear;
+		//GuildList.Clear;
 {ギルド機能追加ココまで}
-            //PetList.Clear;
-            //DataLoad();
+		//PetList.Clear;
+		//DataLoad();
 
 		if PlayerName.IndexOf(userid) = -1 then Exit;
-						sv1PacketProcessSub(Socket,w,userid,userpass);
-            Result := True;
-         end;
+		sv1PacketProcessSub(Socket,w,userid,userpass);
+			Result := True;
+	end;
 end;
 //==============================================================================
 // ログインサーバーパケット処理
@@ -252,11 +250,28 @@ procedure sv1PacketProcess(Socket: TCustomWinSocket);
 var{ChrstphrR - 2004/04/25 - removed unused variables}
 	w         :word;
 	l         :longword;
+	len       :integer;
 	userid    :string;
 	userpass  :string;
 begin
-	if Socket.ReceiveLength >= 55 then begin
-		Socket.ReceiveBuf(buf, Socket.ReceiveLength);
+	{ChrstphrR - 2004/04/28 - brought back the Len variable, out of concern
+	it may be causing the Unable-to-connect to the Login Server Eliotsan's users
+	had observed -- notes from the helpfile seem to back this :P
+
+	Call ReceiveLength to determine the amount of information to read over
+	the socket connection in response to an asynchronous read notification.
+
+	Note: ReceiveLength is not guaranteed to be accurate
+	for streaming socket connections.
+
+	From ReceiveBuf notes...
+	Note:	While the ReceiveLength method can return an estimate of the size of
+	buffer required to retrieve information from the socket, the number of bytes
+	it returns is not necessarily accurate.
+	}
+	len := Socket.ReceiveLength;
+	if len >= 55 then begin
+		Socket.ReceiveBuf(buf, len);
 		if (buf[0] = $64) and (buf[1] = $0) then begin
 			RFIFOL(2, l);
 			//DebugOut.Lines.Add('ver1 ' + IntToStr(l));
@@ -267,29 +282,29 @@ begin
 			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then begin
-                          if Load_Accounts(userid) then begin
-          sv1PacketProcessSub(Socket,w,userid,userpass);
-			  end else begin
-          ZeroMemory(@buf[0],23);
-				  WFIFOW( 0, $006a);
+				if Load_Accounts(userid) then begin
+					sv1PacketProcessSub(Socket,w,userid,userpass);
+				end else begin
+					ZeroMemory(@buf[0],23);
+					WFIFOW( 0, $006a);
 					WFIFOB( 2, 0);//Unregistered ID
-				  Socket.SendBuf(buf, 23);
-			  end;
+					Socket.SendBuf(buf, 23);
+				end;
 			end else begin
 				if PlayerName.IndexOf(userid) > -1 then begin
-                                //DebugOut.Lines.Add ('User Exists');
-                                //DebugOut.Lines.Add ('ID: '+inttostr(id));
-                                sv1PacketProcessSub(Socket,w,userid,userpass);
-			end else begin
-                                //DebugOut.Lines.Add ('New User');
+					//DebugOut.Lines.Add ('User Exists');
+					//DebugOut.Lines.Add ('ID: '+inttostr(id));
+					sv1PacketProcessSub(Socket,w,userid,userpass);
+				end else begin
+					//DebugOut.Lines.Add ('New User');
 					if not sv1PacketProcessAdd(Socket,w,userid,userpass) then begin
-                                ZeroMemory(@buf[0],23);
-				WFIFOW( 0, $006a);
+						ZeroMemory(@buf[0],23);
+						WFIFOW( 0, $006a);
 						WFIFOB( 2, 0);//Unregistered ID
-				Socket.SendBuf(buf, 23);
-                          end;
+						Socket.SendBuf(buf, 23);
+					end;
+				end;
 			end;
-		end;
 		end;//if buf[0]&buf[1]
 	end;//if SRL>=55...
 end;//sv1PacketProcess()
