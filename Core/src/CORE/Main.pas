@@ -2618,6 +2618,8 @@ begin
 		miss := boolean((Random(100) >= i) and (not crit));
 		//DAチェック
 		if NOT miss and (Arms = 0) and (SkillPer = 0) and (Random(100) < DAPer) then begin
+      tatk := false;
+      datk := false;
 			if Skill[263].Lv > 0 then tatk := true;
 			if Skill[48].Lv > 0 then datk := true;
 			crit := false;
