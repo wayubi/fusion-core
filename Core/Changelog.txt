@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-10-05: Fixed global npc broadcasting of plain blue messages. [Tsusai]
 - 01-10-05: Uncapped #hcolor. [Tsusai]
 - 01-07-05: Added Icewall Cap modifier to weiss.ini. [AlexKreuz]
 - 01-07-05: Added Firewall Cap modifier to weiss.ini. [AlexKreuz]

@@ -790,7 +790,7 @@ begin
             begin
                 l := tn.Script[tc.ScriptStep].Data3[0];
                 str := tn.Script[tc.ScriptStep].Data1[0] + chr(0);
-                if ((l < 101) or (l > 300)) then begin
+                if (l > 100) and (l < 301) then begin
                     //Global Broadcasting
                     for i := 0 to CharaName.Count - 1 do begin
                         tc1 := CharaName.Objects[i] as TChara;
