@@ -1105,7 +1105,14 @@ begin
 	{ChrstphrR 2004/04/27 -- I'm pretty sure this cleans up the 4k a bare Delphi
 	app leaks because code in the RTL that Borland hasn't fixed - Bravo!}
 
-	ScriptList.Free; //CR only stores strings, ergo safe as is.
+
+    { Alex: This is really bizarre. The scriptlist is created on form create
+      thus freeing it at this point should not give an access violation.
+      Oh well, I'll put the try-except-end around it just to prevent crashes. }
+    try
+    	ScriptList.Free; //CR only stores strings, ergo safe as is.
+    except
+    end;
 
 	{ChrstphrR 2004/04/27 - My apologies for such dirty fixes to the lists ...
 	Objects[] of a TSL or TIL are not freed up on Clear or Free, so the following
