@@ -176,6 +176,7 @@ var
     function command_athena_die(tc : TChara) : String;
     function command_athena_jobchange(tc : TChara; str : String) : String;
     function command_athena_hide(tc : TChara) : String;
+    function command_athena_option(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -486,6 +487,7 @@ Called when we're shutting down the server *only*
 			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc.ID, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
             else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc.ID, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
+            else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2665,6 +2667,48 @@ Called when we're shutting down the server *only*
         tc.Stat1 := 0;
         tc.Stat2 := 0;
         tc.Option := i;
+    end;
+
+    function command_athena_option(tc : TChara; str : String) : String;
+    var
+        tm : TMap;
+        sl : TStringList;
+        i, ii, j, k, w : Integer;
+    begin
+        Result := 'GM_ATHENA_OPTION failure.';
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 4 then Exit;
+
+        val(sl.Strings[1], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[2], j, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[3], k, ii);
+        if ii <> 0 then Exit;
+
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, i);
+        WFIFOW(8, j);
+        WFIFOW(10, k);
+        WFIFOB(12, 0);
+        SendBCmd(tm, tc.Point, 13);
+        tc.Stat1 := i;
+        tc.Stat2 := j;
+        tc.Option := k;
+
+        Result := 'GM_ATHENA_OPTION success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
+
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+
+        sl.Free;
     end;
       
     function command_athena_help(tc : TChara) : String;

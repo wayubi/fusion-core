@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-30-04: Added Athena @option command to ALBGM. [Trihan]
 - 06-29-04: Added Athena @hide command to ALBGM. [Trihan]
 - 06-29-04: Added Athena @jobchange command to ALBGM. [Trihan]
 - 06-29-04: Fixed JCon Account Delete to also delete Characters, Parties, Guilds. [AlexKreuz]
