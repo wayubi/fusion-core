@@ -8926,7 +8926,7 @@ begin
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
           end;
-        1:      //added by The Harbinger -- darkWeiss version
+        1:
 					begin
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
@@ -8935,28 +8935,38 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
+
             if (tc1.MSkill = 51) then begin
-            if tc1.Option = 6 then begin
-						tc1.Option := tc1.Optionkeep;
-            SkillTick := tc1.Skill[MSkill].Tick;
-            SkillTickID := MSkill;
-            tc1.SP := tc1.SP + 10;
-            tc1.Hidden := false;
-            if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
-            CalcStat(tc1, Tick);
-						end else begin
-              tc1.Optionkeep := tc1.Option;
-							tc1.Option := 6;
-              tc1.Hidden := true;
-						end;
-            WFIFOW(0, $0119);
-						WFIFOL(2, tc1.ID);
-						WFIFOW(6, tc1.Stat1);
-						WFIFOW(8, tc1.Stat2);
-						WFIFOW(10, tc1.Option);
-						WFIFOB(12, 0);
-						SendBCmd(tm, tc1.Point, 13);
+              if tc1.Option = 6 then begin
+	    					tc1.Option := tc1.Optionkeep;
+                SkillTick := tc1.Skill[MSkill].Tick;
+                SkillTickID := MSkill;
+                tc1.SP := tc1.SP + 10;
+                tc1.Hidden := false;
+                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                CalcStat(tc1, Tick);
+              end else begin
+                // Required to place Hide on a timer.
+						    tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
+
+    						if SkillTick > tc1.Skill[MSkill].Tick then begin
+							    SkillTick := tc1.Skill[MSkill].Tick;
+							    SkillTickID := MSkill;
+    						end;
+
+                tc1.Optionkeep := tc1.Option;
+                tc1.Option := 6;
+                tc1.Hidden := true;
+              end;
+              WFIFOW(0, $0119);
+    					WFIFOL(2, tc1.ID);
+    					WFIFOW(6, tc1.Stat1);
+    					WFIFOW(8, tc1.Stat2);
+    					WFIFOW(10, tc1.Option);
+    					WFIFOB(12, 0);
+    					SendBCmd(tm, tc1.Point, 13);
             end;
+
             if (tc1.MSkill = 143) then begin
             if tc1.Sit = 1 then begin
 						tc1.Sit := 3;
@@ -11906,14 +11916,22 @@ begin
           
 						51,135: //ハイド、クローキング
 							begin
-								Option := Option and $F4;
-								WFIFOW(0, $0119);
-								WFIFOL(2, tc.ID);
-								WFIFOW(6, 0);
-								WFIFOW(8, 0);
-								WFIFOW(10, tc.Option);
-								WFIFOB(12, 0);
-								SendBCmd(tm, tc.Point, 13);
+                // AlexKreuz: Changed to expire Hide Skill
+                if tc.Option = 6 then begin
+	    					  tc.Option := tc.Optionkeep;
+                  SkillTick := tc.Skill[SkillTickID].Tick;
+                  tc.SP := tc.SP + 10;
+                  tc.Hidden := false;
+                  if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+                  CalcStat(tc, Tick);
+                  WFIFOW(0, $0119);
+        					WFIFOL(2, tc.ID);
+        					WFIFOW(6, tc.Stat1);
+    		    			WFIFOW(8, tc.Stat2);
+    				    	WFIFOW(10, tc.Option);
+        					WFIFOB(12, 0);
+        					SendBCmd(tm, tc.Point, 13);
+                end;
 							end;
                                                 261:    {Call Spirits}
                                                         begin
