@@ -4510,6 +4510,13 @@ begin
                                                         end;
 						end;
 
+                                        254:    {Grand Cross}
+                                        begin
+                                                tc.MPoint.X := tc.Point.X;
+                                                tc.MPoint.Y := tc.Point.Y;
+                                        end;
+
+
                                         285:    {Volcano}
                                         begin
                                                 xy.X := MPoint.X;
@@ -4722,7 +4729,7 @@ begin
 				        Exit;
                                 end;
                         end;
-                        if (ts = nil) or (ts.HP = 0) then begin
+                        if (ts = nil) or (ts.HP = 0) and (tc.MSkill <> 254) then begin
 				MSkill := 0;
 				MUseLv := 0;
 				MMode := 0;
@@ -4928,17 +4935,20 @@ begin
                                 end;
                                 254:    {Grand Cross}
                                 begin
+                                        tc.MPoint.X := tc.Point.X;
+                                        tc.MPoint.Y := tc.Point.Y;
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-                                        j := 3;
-		       		        if dmg[0] < 0 then
-                                                dmg[0] := 0;
+
+				//end;
                                         //属性攻撃での回復は未実装
                                         //パケ送信
-				       	SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-			                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-                                                StatCalc1(tc, ts, Tick);
-		       			xy := ts.Point;
-		      			//ダメージ算出2
+				       	//SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+			                //if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                        //        StatCalc1(tc, ts, Tick);
+		       			//xy := ts.Point;
+		      			//ダメージ算出
+                                        xy.X := tc.Point.X;
+                                        xy.Y := tc.Point.Y;
 		     			sl.Clear;
 		    			for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
 		   				for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
@@ -4957,11 +4967,56 @@ begin
 						for k1 := 0 to sl.Count - 1 do begin
 							ts1 := sl.Objects[k1] as TMob;
 							DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-                                                        j := 1;
-							if dmg[0] < 0 then
-                                                                dmg[0] := 0;
-                                                        SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 6);
-		        				//SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+                                                        j := 3;
+                                                        SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j);
+							if tc.HP > dmg[0] then begin
+					                        tc.HP := tc.HP - (dmg[0] * 100 div 200);
+					                        if dmg[0] <> 0 then begin
+						                        tc.DmgTick := Tick + tc.dMotion div 2;
+                                                                        {Colus, 20031216: Cancel casting timer on hit.
+                                                                                Also, phen card handling.}
+                                                                        if tc.NoCastInterrupt = False then begin
+                                                                                tc.MMode := 0;
+                                                                                tc.MTick := 0;
+                                                                                WFIFOW(0, $01b9);
+                                                                                WFIFOL(2, tc.ID);
+                                                                                SendBCmd(tm, tc.Point, 6);
+                                                                        end;
+                                                                        {Colus, 20031216: end cast-timer cancel}
+					                        end;
+
+				                        end else begin
+
+					                        tc.HP := 0;
+					                        WFIFOW( 0, $0080);
+					                        WFIFOL( 2, tc.ID);
+					                        WFIFOB( 6, 1);
+					                        SendBCmd(tm, tc.Point, 7);
+					                        tc.Sit := 1;
+
+                                                                i := (100 - DeathBaseLoss);
+                                                                tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
+                                                                i := (100 - DeathJobLoss);
+                                                                tc.JobEXP := Round(tc.JobEXP * (i / 100));
+
+                                                                SendCStat1(tc, 1, $0001, tc.BaseEXP);
+                                                                SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+					                        tc.pcnt := 0;
+					                        if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
+						                ATarget := 0;
+                                                                ts.ARangeFlag := false;
+					                end;
+
+					                WFIFOW( 0, $00b0);
+					                WFIFOW( 2, $0005);
+					                WFIFOL( 4, tc.HP);
+					                tc.Socket.SendBuf(buf, 8);
+					                ATick := ATick + ts.Data.ADelay;
+
+                                                        //SendCStat1(tc, 0, 5, tc.HP);
+                                                        //SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 3, 6);
+		        				SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], j);
 							if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
                 	       					StatCalc1(tc, ts1, Tick); {追加}
                                                 end;
@@ -6774,6 +6829,11 @@ begin
                                                 end else begin
                                                 Exit;
                                                 end;
+                                        end;
+                                254:  {Grand Cross}
+                                        begin
+                                                tc.MTargetType := 0;
+                                                SkillEffect(tc, Tick);
                                         end;
                                 255:  //Devotion
 					begin
@@ -11319,6 +11379,7 @@ begin
             end;
 {Colus, 20031216: end cast-timer cancel}
 					end;
+
 				end else begin
 					//キャラ死亡
 					tc1.HP := 0;
