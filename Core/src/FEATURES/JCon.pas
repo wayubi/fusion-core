@@ -11,6 +11,7 @@ uses
     procedure JCon_Accounts_Clear();
     procedure JCon_Accounts_Save();
     procedure JCon_Accounts_Delete();
+    procedure JCon_Accounts_Chara_Delete(str : String);
 
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
@@ -54,15 +55,25 @@ uses
 	    frmMain.Edit6.Text := AccountItem.Mail;
         frmMain.ComboBox18.ItemIndex := -1;
         frmMain.ComboBox18.ItemIndex := AccountItem.Banned;
-	    frmMain.Edit8.Text := AccountItem.CName[0];
-    	frmMain.Edit9.Text := AccountItem.CName[1];
-	    frmMain.Edit10.Text := AccountItem.CName[2];
-    	frmMain.Edit11.Text := AccountItem.CName[3];
-	    frmMain.Edit12.Text := AccountItem.CName[4];
-    	frmMain.Edit13.Text := AccountItem.CName[5];
-	    frmMain.Edit14.Text := AccountItem.CName[6];
-    	frmMain.Edit15.Text := AccountItem.CName[7];
-	    frmMain.Edit16.Text := AccountItem.CName[8];
+
+        if AccountItem.CName[0] <> '' then frmMain.Button7.Caption := AccountItem.CName[0]
+        else frmMain.Button7.Caption := '';
+        if AccountItem.CName[1] <> '' then frmMain.Button8.Caption := AccountItem.CName[1]
+        else frmMain.Button8.Caption := '';
+        if AccountItem.CName[2] <> '' then frmMain.Button9.Caption := AccountItem.CName[2]
+        else frmMain.Button9.Caption := '';
+        if AccountItem.CName[3] <> '' then frmMain.Button10.Caption := AccountItem.CName[3]
+        else frmMain.Button10.Caption := '';
+        if AccountItem.CName[4] <> '' then frmMain.Button11.Caption := AccountItem.CName[4]
+        else frmMain.Button11.Caption := '';
+        if AccountItem.CName[5] <> '' then frmMain.Button12.Caption := AccountItem.CName[5]
+        else frmMain.Button12.Caption := '';
+        if AccountItem.CName[6] <> '' then frmMain.Button13.Caption := AccountItem.CName[6]
+        else frmMain.Button13.Caption := '';
+        if AccountItem.CName[7] <> '' then frmMain.Button14.Caption := AccountItem.CName[7]
+        else frmMain.Button14.Caption := '';
+        if AccountItem.CName[8] <> '' then frmMain.Button15.Caption := AccountItem.CName[8]
+        else frmMain.Button15.Caption := '';
     end;
 
 
@@ -74,15 +85,15 @@ uses
     	frmMain.ComboBox15.Text := '';
 	    frmMain.Edit6.Clear;
     	frmMain.ComboBox18.Text := '';
-	    frmMain.Edit8.Clear;
-    	frmMain.Edit9.Clear;
-	    frmMain.Edit10.Clear;
-    	frmMain.Edit11.Clear;
-	    frmMain.Edit12.Clear;
-    	frmMain.Edit13.Clear;
-	    frmMain.Edit14.Clear;
-    	frmMain.Edit15.Clear;
-	    frmMain.Edit16.Clear;
+        frmMain.Button7.Caption := '';
+        frmMain.Button8.Caption := '';
+        frmMain.Button9.Caption := '';
+        frmMain.Button10.Caption := '';
+        frmMain.Button11.Caption := '';
+        frmMain.Button12.Caption := '';
+        frmMain.Button13.Caption := '';
+        frmMain.Button14.Caption := '';
+        frmMain.Button15.Caption := '';
     end;
 
 
@@ -113,7 +124,7 @@ uses
     	    AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
         	AccountItem.Mail := frmMain.Edit6.Text;
 	        AccountItem.Banned := frmMain.ComboBox18.ItemIndex;
-		    DataSave();
+		    DataSave(True);
         end else begin
 
         	for i := 0 to PlayerName.Count - 1 do begin
@@ -134,7 +145,7 @@ uses
 	        AccountItem.Mail := frmMain.Edit6.Text;
     		PlayerName.InsertObject(i, AccountItem.Name, AccountItem);
     		Player.AddObject(AccountItem.ID, AccountItem);
-	        DataSave();
+	        DataSave(True);
     	    frmMain.Button3.Click;
         end;
 
@@ -145,46 +156,103 @@ uses
     var
     	tp : TPlayer;
         tpe : TPet;
-        i, j : Integer;
+        i, j, k : Integer;
     begin
-    	if (frmMain.Edit3.Text = '') then begin
-        	Exit;
-        end else begin
-        	tp := PlayerName.Objects[PlayerName.IndexOf(frmMain.Edit3.Text)] as TPlayer;
 
-            for i := 0 to 8 do begin
-            	if assigned(tp.CData[i]) then begin
-                    leave_party(tp.CData[i]);
-                    leave_guild(tp.CData[i]);
+    	for k := 0 to frmMain.ListBox1.Count - 1 do begin
+        	if frmMain.ListBox1.Selected[k] then begin
 
-                    { I'm leaving pets out for now. They're whacked }
-		            {for j := 0 to PetList.Count - 1 do begin
-        		    	if PetList.IndexOf(j) <> -1 then begin
-		                	tpe := PetList.IndexOfObject(j) as TPet;
-                		    if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
+            	tp := frmMain.listbox1.Items.Objects[k] as TPlayer;
+
+                if (assigned(tp)) then begin
+		            for i := 0 to 8 do begin
+        		    	if assigned(tp.CData[i]) then begin
+                		    leave_party(tp.CData[i]);
+		                    leave_guild(tp.CData[i]);
+
+        	    	        //I'm leaving pets out for now. They're whacked
+		    	    	    //for j := 0 to PetList.Count - 1 do begin
+		        		    //	if PetList.IndexOf(j) <> -1 then begin
+				            //    	tpe := PetList.IndexOfObject(j) as TPet;
+        		        	//	    if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
+        				    //    end;
+		        		    //end;
+
+                            if (CharaName.IndexOf(tp.CData[i].Name) <> -1) then begin
+			                    CharaName.Delete(CharaName.IndexOf(tp.CData[i].Name));
+    			                Chara.Delete(Chara.IndexOf(tp.CData[i].CID));
+                            end;
         		        end;
-		            end;}
+            		end;
 
-                    CharaName.Delete(CharaName.IndexOf(tp.CData[i].Name));
-                    Chara.Delete(Chara.IndexOf(tp.CData[i].CID));
-                end;
+		            if (IDTableDB.IndexOf(tp.ID) <> -1) then begin
+        		    	IDTableDB.Delete(IDTableDB.IndexOf(tp.ID));
+		            end;
+
+	    	        if (GM_Access_DB.IndexOf(tp.ID) <> -1) then begin
+    		        	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
+	        	    end;
+
+		        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
+		            Player.Delete(Player.IndexOf(tp.ID));
+		        end;
             end;
-
-            if (IDTableDB.IndexOf(tp.ID) <> -1) then begin
-            	IDTableDB.Delete(IDTableDB.IndexOf(tp.ID));
-            end;
-
-            if (GM_Access_DB.IndexOf(tp.ID) <> -1) then begin
-            	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
-            end;
-
-        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
-            Player.Delete(Player.IndexOf(tp.ID));
         end;
 
+        JCon_Accounts_Clear();
         JCon_Accounts_Load();
-        DataSave();
-        frmMain.Button3.Click;
+        DataSave(True);
+
+    end;
+
+    procedure JCon_Accounts_Chara_Delete(str : String);
+    var
+    	tc : TChara;
+        tp : TPlayer;
+        i : Integer;
+    begin
+        if (Charaname.IndexOf(str) = -1) then Exit;
+    	tc := charaname.objects[charaname.indexof(str)] as TChara;
+
+        tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+        if (not assigned(tp)) then Exit;
+
+        for i := 0 to 8 do begin
+        	if (tp.CName[i] = tc.Name) then begin
+            	tp.CName[i] := '';
+                tp.CData[i] := nil;
+
+                case i of
+                	0: frmMain.Button7.Caption := '';
+                    1: frmMain.Button8.Caption := '';
+                    2: frmMain.Button9.Caption := '';
+                    3: frmMain.Button10.Caption := '';
+                    4: frmMain.Button11.Caption := '';
+                    5: frmMain.Button12.Caption := '';
+                    6: frmMain.Button13.Caption := '';
+                    7: frmMain.Button14.Caption := '';
+                    8: frmMain.Button15.Caption := '';
+                end;
+
+                Break;
+            end;
+        end;
+
+    	leave_party(tc);
+        leave_guild(tc);
+
+        { I'm leaving pets out for now. They're whacked }
+        {for j := 0 to PetList.Count - 1 do begin
+        	if PetList.IndexOf(j) <> -1 then begin
+            	tpe := PetList.IndexOfObject(j) as TPet;
+                if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
+            end;
+        end;}
+
+        CharaName.Delete(CharaName.IndexOf(tc.Name));
+        Chara.Delete(Chara.IndexOf(tc.CID));
+
+        DataSave(True);
     end;
 
 

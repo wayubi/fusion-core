@@ -12,7 +12,7 @@ uses
 		procedure DatabaseLoad(Handle:HWND);
 		procedure DataLoad();
 		procedure PlayerDataLoad();
-		procedure DataSave();
+		procedure DataSave(forced : Boolean = False);
 //==============================================================================
 
 
@@ -2748,7 +2748,7 @@ begin
 end;
 //------------------------------------------------------------------------------
 // データ保存
-procedure DataSave();
+procedure DataSave(forced : Boolean = False);
 var
 	i   : Integer;
 	j   : Integer;
@@ -2782,7 +2782,7 @@ begin
 		tp := PlayerName.Objects[i] as TPlayer;
 		tp.Saved := 0;
 	end;
-	if PlayerName.Count > 0 then begin
+	if (PlayerName.Count > 0) or (forced) then begin
 		AssignFile(txt, AppPath + 'player.txt');
 		Rewrite(txt);
 		Writeln(txt, '##Weiss.PlayerData.0x0003');
@@ -2836,7 +2836,7 @@ begin
 	end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player Saved');
 
-	if CharaName.Count <> 0 then begin
+	if (CharaName.Count <> 0) or (forced) then begin
 		AssignFile(txt, AppPath + 'chara.txt');
 		Rewrite(txt);
 		Writeln(txt, '##Weiss.CharaData.0x0002');
@@ -2990,7 +2990,7 @@ begin
 {NPCイベント追加}
 	//サーバ共有フラグ保存
 
-  if ServerFlag.Count <> 0 then begin
+  if (ServerFlag.Count <> 0) or (forced) then begin
   	AssignFile(txt, AppPath + 'status.txt');
 	  Rewrite(txt);
   	Writeln(txt, '##Weiss.StatusData.0x0002');
@@ -3019,7 +3019,7 @@ begin
 {NPCイベント追加ココまで}
 
 {パーティー機能追加}
-  	if CastleList.Count <> 0 then begin
+  	if (CastleList.Count <> 0) or (forced) then begin
     	AssignFile(txt, AppPath + 'gcastle.txt');
     	Rewrite(txt);
     	Writeln(txt, '##Weiss.GCastleData.0x0002');
@@ -3046,7 +3046,7 @@ begin
     end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle Saved');
 
-    if partynamelist.Count <> 0 then begin
+    if (partynamelist.Count <> 0) or (forced) then begin
     	AssignFile(txt, AppPath + 'party.txt');
     	Rewrite(txt);
     	Writeln(txt, '##Weiss.PartyData.0x0002');
@@ -3067,7 +3067,7 @@ begin
 {パーティー機能追加ココまで}
 
 {ギルド機能追加}
-	if guildlist.Count <> 0 then begin
+	if (guildlist.Count <> 0) or (forced) then begin
     	AssignFile(txt, AppPath + 'guild.txt');
     	Rewrite(txt);
     	Writeln(txt, '##Weiss.GuildData.0x0002');
@@ -3149,7 +3149,7 @@ begin
 {ギルド機能追加ココまで}
 
 //Cute Pet Load Start
-	if petlist.Count <> 0 then begin
+	if (petlist.Count <> 0) or (forced) then begin
     	AssignFile(txt, AppPath + 'pet.txt');
     	Rewrite(txt);
     	Writeln( txt, '##Weiss.PetData.0x0002' );

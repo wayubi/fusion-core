@@ -3882,10 +3882,10 @@ end;
 		//--------------------------------------------------------------------------
 		$013f: // GM SUMMONS
 			begin
-      str := RFIFOS(2, 24);
-      RFIFOW(2, w);
-      parse_commands (tc, '/S'+str);
-      end;
+				str := RFIFOS(2, 24);
+				RFIFOW(2, w);
+				parse_commands (tc, '/S'+str);
+			end;
 		//--------------------------------------------------------------------------
 		$0143: //NPC‰ï˜b‚ÅInputNumber“ü—Í
 			begin

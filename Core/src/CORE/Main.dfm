@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 624
-  Top = 555
+  Left = 238
+  Top = 608
   Width = 408
   Height = 518
   Caption = '#33'
@@ -940,9 +940,9 @@ object frmMain: TfrmMain
       object Label7: TLabel
         Left = 8
         Top = 248
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 1:'
+        Caption = 'Delete Character 1:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -953,9 +953,9 @@ object frmMain: TfrmMain
       object Label8: TLabel
         Left = 136
         Top = 248
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 2:'
+        Caption = 'Delete Character 2:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -966,9 +966,9 @@ object frmMain: TfrmMain
       object Label9: TLabel
         Left = 264
         Top = 248
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 3:'
+        Caption = 'Delete Character 3:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -979,9 +979,9 @@ object frmMain: TfrmMain
       object Label10: TLabel
         Left = 8
         Top = 288
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 4:'
+        Caption = 'Delete Character 4:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -992,9 +992,9 @@ object frmMain: TfrmMain
       object Label11: TLabel
         Left = 136
         Top = 288
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 5:'
+        Caption = 'Delete Character 5:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -1005,9 +1005,9 @@ object frmMain: TfrmMain
       object Label12: TLabel
         Left = 264
         Top = 288
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 6:'
+        Caption = 'Delete Character 6:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -1018,9 +1018,9 @@ object frmMain: TfrmMain
       object Label13: TLabel
         Left = 8
         Top = 328
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 7:'
+        Caption = 'Delete Character 7:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -1031,9 +1031,9 @@ object frmMain: TfrmMain
       object Label14: TLabel
         Left = 136
         Top = 328
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 8:'
+        Caption = 'Delete Character 8:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -1044,9 +1044,9 @@ object frmMain: TfrmMain
       object Label15: TLabel
         Left = 264
         Top = 328
-        Width = 69
+        Width = 109
         Height = 18
-        Caption = 'Character 9:'
+        Caption = 'Delete Character 9:'
         Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -1078,6 +1078,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ItemHeight = 18
+        MultiSelect = True
         ParentFont = False
         TabOrder = 0
         OnClick = ListBox1Click
@@ -1137,130 +1138,13 @@ object frmMain: TfrmMain
         ParentFont = False
         TabOrder = 4
       end
-      object Edit8: TEdit
-        Left = 8
-        Top = 264
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 5
-      end
-      object Edit9: TEdit
-        Left = 136
-        Top = 264
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 6
-      end
-      object Edit10: TEdit
-        Left = 264
-        Top = 264
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 7
-      end
-      object Edit11: TEdit
-        Left = 8
-        Top = 304
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 8
-      end
-      object Edit12: TEdit
-        Left = 136
-        Top = 304
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 9
-      end
-      object Edit13: TEdit
-        Left = 264
-        Top = 304
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 10
-      end
-      object Edit14: TEdit
-        Left = 8
-        Top = 344
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 11
-      end
-      object Edit15: TEdit
-        Left = 136
-        Top = 344
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 12
-      end
-      object Edit16: TEdit
-        Left = 264
-        Top = 344
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 13
-      end
       object Button3: TButton
         Left = 8
         Top = 376
         Width = 75
         Height = 25
         Caption = '&Clear'
-        TabOrder = 14
+        TabOrder = 5
         OnClick = Button3Click
       end
       object Button4: TButton
@@ -1269,7 +1153,7 @@ object frmMain: TfrmMain
         Width = 75
         Height = 25
         Caption = '&Save'
-        TabOrder = 15
+        TabOrder = 6
         OnClick = Button4Click
       end
       object Button6: TButton
@@ -1278,7 +1162,7 @@ object frmMain: TfrmMain
         Width = 75
         Height = 25
         Caption = '&Delete'
-        TabOrder = 16
+        TabOrder = 7
         OnClick = Button6Click
       end
       object ComboBox15: TComboBox
@@ -1287,7 +1171,7 @@ object frmMain: TfrmMain
         Width = 121
         Height = 26
         ItemHeight = 18
-        TabOrder = 17
+        TabOrder = 8
         Items.Strings = (
           'Female'
           'Male')
@@ -1298,10 +1182,82 @@ object frmMain: TfrmMain
         Width = 121
         Height = 26
         ItemHeight = 18
-        TabOrder = 18
+        TabOrder = 9
         Items.Strings = (
           'No'
           'Yes')
+      end
+      object Button7: TButton
+        Left = 8
+        Top = 264
+        Width = 121
+        Height = 25
+        TabOrder = 10
+        OnClick = Button7Clic
+      end
+      object Button8: TButton
+        Left = 136
+        Top = 264
+        Width = 121
+        Height = 25
+        TabOrder = 11
+        OnClick = Button8Click
+      end
+      object Button9: TButton
+        Left = 264
+        Top = 264
+        Width = 121
+        Height = 25
+        TabOrder = 12
+        OnClick = Button9Click
+      end
+      object Button10: TButton
+        Left = 8
+        Top = 304
+        Width = 121
+        Height = 25
+        TabOrder = 13
+        OnClick = Button10Click
+      end
+      object Button11: TButton
+        Left = 136
+        Top = 304
+        Width = 121
+        Height = 25
+        TabOrder = 14
+        OnClick = Button11Click
+      end
+      object Button12: TButton
+        Left = 264
+        Top = 304
+        Width = 121
+        Height = 25
+        TabOrder = 15
+        OnClick = Button12Click
+      end
+      object Button13: TButton
+        Left = 8
+        Top = 344
+        Width = 121
+        Height = 25
+        TabOrder = 16
+        OnClick = Button13Click
+      end
+      object Button14: TButton
+        Left = 136
+        Top = 344
+        Width = 121
+        Height = 25
+        TabOrder = 17
+        OnClick = Button14Click
+      end
+      object Button15: TButton
+        Left = 264
+        Top = 344
+        Width = 121
+        Height = 25
+        TabOrder = 18
+        OnClick = Button15Click
       end
     end
   end

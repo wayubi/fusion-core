@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-02-04: Added Multi-Account deletion to JCon Accounts. [AlexKreuz]
+- 07-02-04: Added Character deletion to JCon Accounts. [AlexKreuz]
 - 07-02-04: Converted Aegis /item and /monster commands to ALBGM. [AlexKreuz & Trihan]
 - 07-01-04: Converted Aegis /b, /bb, /nb commands to ALBGM. [AlexKreuz]
 - 07-01-04: #897 - No recovery when weight is over 50%. [AlexKreuz]

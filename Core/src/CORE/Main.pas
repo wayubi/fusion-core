@@ -59,23 +59,14 @@ type
     Label5: TLabel;
     Edit6: TEdit;
     Label6: TLabel;
-    Edit8: TEdit;
     Label7: TLabel;
     Label8: TLabel;
-    Edit9: TEdit;
     Label9: TLabel;
-    Edit10: TEdit;
-    Edit11: TEdit;
     Label10: TLabel;
-    Edit12: TEdit;
     Label11: TLabel;
-    Edit13: TEdit;
     Label12: TLabel;
-    Edit14: TEdit;
     Label13: TLabel;
-    Edit15: TEdit;
     Label14: TLabel;
-    Edit16: TEdit;
     Label15: TLabel;
     Label16: TLabel;
     Button3: TButton;
@@ -179,6 +170,15 @@ type
     Button6: TButton;
     ComboBox15: TComboBox;
     ComboBox18: TComboBox;
+    Button7: TButton;
+    Button8: TButton;
+    Button9: TButton;
+    Button10: TButton;
+    Button11: TButton;
+    Button12: TButton;
+    Button13: TButton;
+    Button14: TButton;
+    Button15: TButton;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -259,6 +259,15 @@ type
     procedure Save1Click(Sender: TObject);
     procedure Backup1Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button7Clic(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
+    procedure Button11Click(Sender: TObject);
+    procedure Button12Click(Sender: TObject);
+    procedure Button13Click(Sender: TObject);
+    procedure Button14Click(Sender: TObject);
+    procedure Button15Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -10967,6 +10976,51 @@ end;
 procedure TfrmMain.Button6Click(Sender: TObject);
 begin
 	JCon_Accounts_Delete();
+end;
+
+procedure TfrmMain.Button7Clic(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button7.Caption);
+end;
+
+procedure TfrmMain.Button8Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button8.Caption);
+end;
+
+procedure TfrmMain.Button9Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button9.Caption);
+end;
+
+procedure TfrmMain.Button10Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button10.Caption);
+end;
+
+procedure TfrmMain.Button11Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button11.Caption);
+end;
+
+procedure TfrmMain.Button12Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button12.Caption);
+end;
+
+procedure TfrmMain.Button13Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button13.Caption);
+end;
+
+procedure TfrmMain.Button14Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button14.Caption);
+end;
+
+procedure TfrmMain.Button15Click(Sender: TObject);
+begin
+	JCon_Accounts_Chara_Delete(frmMain.Button15.Caption);
 end;
 
 procedure TfrmMain.Button5Click(Sender: TObject);
