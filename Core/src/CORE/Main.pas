@@ -2443,10 +2443,17 @@ var
 begin
 	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
 
-	if Dmg = 0 then begin  //Miss, no damage
+  if Dmg = 0 then begin  //Miss, no damage
 		Result := False;
 		Exit;
-	end;
+	end else begin
+    // AlexKreuz: Hidden character unhides when they
+    // get hit.
+    if tc1.Skill[51].Tick > Tick then begin
+      tc1.Skill[51].Tick := Tick;
+      tc1.SkillTick := Tick;
+    end;
+  end;
 
 	if (tc1.Stat1 <> 0) then tc1.BodyTick := Tick + tc.aMotion;
 

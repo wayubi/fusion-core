@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-19-03: Thief SKill -> Hide now expires when receiving area damage. (#82) [AlexKreuz]
 - 12-19-03: Thief Skill -> Hide now expires on timer. [AlexKreuz]
 - 12-19-03: Bonus STR will now count towards MaxWeight. (#65) [AlexKreuz]
 - 12-19-03: Updated Fire Wall, now covers only 3 tiles regardless of orientation [Colus]
