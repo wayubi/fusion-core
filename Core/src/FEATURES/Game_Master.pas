@@ -172,6 +172,7 @@ var
     function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_kami(tc : TChara; str : String) : String;
     function command_athena_alive(tc : TChara) : String;
+    function command_athena_kill(tc: TChara; str : String) : String;
     function command_athena_die(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
@@ -479,6 +480,7 @@ Called when we're shutting down the server *only*
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc.ID, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc.ID, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
             else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
+            else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
 			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
@@ -2502,6 +2504,48 @@ Called when we're shutting down the server *only*
         WFIFOL(2, tc.ID);
         WFIFOW(6, 100);
         SendBCmd(tm, tc.Point, 8);
+    end;
+
+    function command_athena_kill(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_ATHENA_KILL failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        sl := TStringList.Create;
+        sl.DelimitedText := str;
+
+        if sl.Count <> 2 then Exit;
+
+        str := '';
+        for i := 1 to (sl.Count - 1) do begin
+            str := str + ' ' + sl.Strings[i];
+        end;
+        str := Trim(str);
+
+        if (CharaName.Indexof(str) <> -1) then begin
+            tc := charaname.objects[charaname.indexof(str)] as TChara;
+
+            if (tc.Login = 2) then begin
+                tc.Sit := 1;
+                tc.HP := 0;
+                SendCStat1(tc, 0, 5, tc.HP);
+                WFIFOW( 0, $0080);
+                WFIFOL( 2, tc.ID);
+                WFIFOB( 6, 1);
+                SendBCmd(tm, tc.Point, 7);
+
+                Result := 'GM_ATHENA_KILL success. ' + tc.name + ' has killed ' + tc.name + '.';
+            end else begin
+                Result := Result + tc.Name + ' is not online.';
+            end;
+        end else begin
+            Result := Result + sl.Strings[1] + ' is not a valid character name.';
+        end;
+        sl.Free;
     end;
 
     function command_athena_die(tc : TChara) : String;
