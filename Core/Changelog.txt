@@ -1,3 +1,4 @@
+- 04-24-04: Rolled back Darkhelmets changes about Monster skills. Crashed the server.    [Eliot]
 - 04-24-04: Some Memory Leaks in Map and substructures fixed. [ChrstphrR]
 - 04-24-04: Removed buf2 - unused static variable 32k in size. [ChrstphrR]
 - 04-24-04: Got back old Water Ball routines, because new way of doing that didnt work [Eliot]

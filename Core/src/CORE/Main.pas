@@ -1262,7 +1262,7 @@ begin
 	if ts.Data.isDontMove then
 		ts.MoveWait := $FFFFFFFF
 	else
-    ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
+	ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
 	ts.Speed := ts.Data.Speed;
 	ts.ATarget := 0;
 	ts.ARangeFlag := false;
@@ -1270,7 +1270,7 @@ begin
 	ts.DEFPer := 100;
 	ts.DmgTick := 0;
   ts.Status := 'IDLE_ST';
-  if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
+ // if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);  // Commented out because of the crashing - Eliot
 	for j := 0 to 31 do begin
 		ts.EXPDist[j].CData := nil;
 		ts.EXPDist[j].Dmg := 0;
@@ -7888,8 +7888,8 @@ begin
 
 				86: // Water Ball
 					begin
-			{k := tl.Data2[MUseLV];    //I commented this out because this fix rendered WB unusable - Eliot
-
+			k := tl.Data2[MUseLV];   
+			b := 0;
             for j1 := (tc.Point.Y - k)  to (tc.Point.Y + k) do begin
               for i1 := (tc.Point.X - k) to (tc.Point.X + k) do begin
 				if (tm.gat[i1][j1] = 3) then b := 1;
@@ -7902,7 +7902,7 @@ begin
               tc.MPoint.X := 0;
               tc.MPoint.Y := 0;
               exit;
-			end; }
+			end;
 
             tc.Skill[86].Tick := Tick;
                                                 k := tl.Data1[MUseLV];
@@ -7911,7 +7911,7 @@ begin
             DamageOverTime(tm, tc, Tick, 86, MUseLV, k);
 
 			//for m := 0 to k - 1 do begin
-			if dmg[1] <> 0 then begin        // I uncommented this out because with this WB works - Eliot
+			{if dmg[1] <> 0 then begin        // I uncommented this out because with this WB works - Eliot
 														dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
                                                         dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
 														dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
@@ -7951,7 +7951,7 @@ begin
                                                                         DamageProcess1(tm, tc, ts1, dmg[0], Tick)
                                                                 end;
                                                         end;
-			  end;
+			  end; }
             //end;
 					end;
 				93: //ÉÇÉìÉXÉ^Å[èÓïÒ
@@ -15116,7 +15116,7 @@ begin
 
     86: // Water Ball
     begin
-      ts := tv as TMob;
+	  ts := tv as TMob;
       with tc do begin
               MSkill := 86;
               MUseLV := useLV;
