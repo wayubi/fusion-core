@@ -12468,17 +12468,6 @@ begin
 						MoveTick := Tick;
 						tgtPoint := xy;
 
-                                                j := 0;
-					        repeat
-						        //xy.X := tc1.Point.X + Random(3) - 1;
-						        //xy.Y := tc1.Point.Y + Random(3) - 1;
-						        //if xy.X <= 0 then xy.X := 1;
-						        //if xy.X >= tm.Size.X - 1 then xy.X := tm.Size.X - 2;
-						        //if xy.Y <= 0 then xy.Y := 1;
-						        //if xy.Y >= tm.Size.Y - 1 then xy.Y := tm.Size.Y - 2;
-						        if ( (tm.gat[tgtPoint.X][tgtPoint.Y] <> 1) and (tm.gat[tgtPoint.X][tgtPoint.Y] <> 5) ) then break;
-						        Inc(j);
-					        until (j = 100);
 						SendMMove(tc1.Socket, ts, Point, tgtPoint, tc1.ver2);
                                                 if (ts = nil) or (tc1 = nil) then exit;
 						SendBCmd(tm, ts.Point, 58, tc1, True);
