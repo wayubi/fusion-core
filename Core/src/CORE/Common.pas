@@ -370,8 +370,10 @@ type TSkillDB = class
 	Range2     :byte;
 	Icon       :word;
 	Job        :array[0..23] of boolean;
+	ReqJID1      :byte;
 	ReqSkill1   :array[0..9] of word;
 	ReqLV1      :array[0..9] of word;
+	ReqJID2      :byte;
 	ReqSkill2   :array[0..9] of word;
 	ReqLV2      :array[0..9] of word;
 end;
@@ -3102,10 +3104,12 @@ begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
 		if (not (tc.Skill[i].Data.Job[tc.JID]) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
+
 		WFIFOW( 0+37*j+4, i);
 		WFIFOW( 2+37*j+4, tc.Skill[i].Data.SType);
 		WFIFOW( 4+37*j+4, 0);
 		WFIFOW( 6+37*j+4, tc.Skill[i].Lv);
+
 		if tc.Skill[i].Lv <> 0 then
 			WFIFOW( 8+37*j+4, tc.Skill[i].Data.SP[tc.Skill[i].Lv])
 		else
@@ -3122,14 +3126,14 @@ begin
 		end else if (tc.Skill[i].Data.MasterLV <> 0) then begin
 			b := 1;
 			for k := 0 to 4 do begin
-				if (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
+                if (tc.Skill[i].Data.ReqJID1 = tc.JID) and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
 					b := 0;
 					continue;
 				end;
 			end;
       if (b <> 0) then begin
         for k := 0 to 4 do begin
-				if (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
+                    if (tc.Skill[i].Data.ReqJID2 = tc.JID) and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
 					b := 0;
 					continue;
 				end;
