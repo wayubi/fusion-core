@@ -1,6 +1,12 @@
 --------------------------------------------------------------------------------
-Fusion 1.210 - February 28th, 2004
+Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
+- 03-13-04: Added StealMultiplier (works as percentage, default 100). [Colus]
+- 03-13-04: Removed saying of Cloaking! when you succeed at it.[Colus]
+- 03-13-04: Corrected minor bug in view packets. [Colus]
+- 03-13-04: Fixed Sniper skills to actually do damage. [Colus]
+- 03-13-04: Added error messages and weapon parsing to Lord Knight skills. [Colus]
+- 03-13-04: Removed #icon and #unicon commands for release. [Colus]
 - 03-13-04: Cosmetic Changes. [AlexKreuz]
 - 03-13-04: Removed Talkie Box server outputs. Less Lag. [AlexKreuz]
 - 03-13-04: FusionSQL -> Fixed Double Logins Bug. [AlexKreuz]
