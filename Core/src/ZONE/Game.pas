@@ -2181,6 +2181,9 @@ end;
 		//--------------------------------------------------------------------------
 		$00a7: //Item Use
 			begin
+
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
 {チャットルーム機能追加}
 				//入室中のアイテム使用無効
 				if (tc.ChatRoomID <> 0) then continue;
@@ -2260,33 +2263,31 @@ end;
                                                                         end;
    // Tumy
    Dec(tc.Item[w].Amount);
-   //WFIFOW( 0, $00a8); this old pecket kro 3.0 change 
-   //WFIFOW( 2, w); 
-   //WFIFOW( 4, tc.Item[w].Amount); 
-   //WFIFOB( 6, 1); 
-   //Socket.SendBuf(buf, 7); 
-   //030316追加 Cardinal 
    if tc.Item[w].Amount = 0 then tc.Item[w].ID := 0; 
    tc.Weight := tc.Weight - td.Weight; 
-   //アイテム数減少 
+
+   // {Alex: Reduce Number of Items}
    WFIFOW( 0, $00af); 
    WFIFOW( 2, w); 
    WFIFOW( 4, 1); 
                      Socket.SendBuf(buf, 6); 
-   //重量減少 
+
+   // {Alex: Update Weight Display}
    WFIFOW( 0, $00b0); 
    WFIFOW( 2, $0018); 
    WFIFOL( 4, tc.Weight);
    Socket.SendBuf(buf, 8);
-   // spr effect potion by tumy {packet 01c8 <index>W <id use item>W <charid>l <fail>b}
-   {Colus, 20040116: This packet was all messed up...put in the proper values.}
+
+   // {Alex: Displays Effect}
    WFIFOW( 0, $01c8);
    WFIFOW( 2, w);
    WFIFOW( 4, td.ID);
    WFIFOL( 6, l);
    WFIFOW( 10, tc.Item[w].Amount);
    WFIFOB( 12, 1);
-   Socket.SendBuf(buf, 13); 
+   //Socket.SendBuf(buf, 13);
+   SendBCmd(tm, tc.Point, 13);
+
                      b := 1;
                      // Tumy
 							end;
