@@ -1,3 +1,7 @@
+- 05-31-04: Switched GM Command, #option to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #whois to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #speed to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #monster to ALBGM system. [AlexKreuz]
 - 05-30-04: Minor ALBGM cleanup and optimization. [AlexKreuz]
 - 05-30-04: Fixed Non-ALBGM commands broke. [AlexKreuz]
 - 05-29-04: Switched GM Command, #changeskill to ALBGM system. [AlexKreuz]

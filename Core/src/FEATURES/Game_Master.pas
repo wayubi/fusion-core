@@ -110,6 +110,10 @@ var
     function command_statall(tc : TChara) : String;
     function command_zeny(tc : TChara; str : String) : String;
     function command_changeskill(tc : TChara; str : String) : String;
+    function command_monster(tc : TChara; str : String) : String;
+    function command_speed(tc : TChara; str : String) : String;
+    function command_whois(tc : TChara) : String;
+    function command_option(tc : TChara; str : String) : String;
 
 implementation
 
@@ -296,6 +300,10 @@ implementation
         else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
         else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
         else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
+        else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
+        else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
+        else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
+        else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -304,7 +312,6 @@ implementation
 
     function check_level(id : Integer; cmd : Integer) : Boolean;
     var
-        GM_Access : TGM_Table;
         idx : Integer;
         tGM : TGM_Table;
     begin
@@ -426,8 +433,6 @@ implementation
     end;
 
     function command_save(tc : TChara) : String;
-    var
-        str : String;
     begin
         Result := 'GM_SAVE Activated';
 
@@ -918,7 +923,7 @@ implementation
             SendCStat1(tc, 0, $000c, tc.SkillPoint);
             Result := 'GM_SKILLPOINT Sucess. Skill Point amount set to ' + IntToStr(i) + '.';
         end else begin
-            Result := Result + ' Skill Point amount out of range {0-1001}.';
+            Result := Result + ' Skill Point amount out of range [0-1001].';
         end;
     end;
 
@@ -993,10 +998,10 @@ implementation
                     Result := Result + ' subtracted.';
                 end;
             end else begin
-                Result := Result + ' Zeny on hand amount out of range {0-2147483647).';
+                Result := Result + ' Zeny on hand amount out of range [0-2147483647].';
             end;
         end else begin
-            Result := Result + ' Zeny amount out of range {-2147483647-2147483647).';
+            Result := Result + ' Zeny amount out of range [-2147483647-2147483647].';
         end;
     end;
 
@@ -1027,13 +1032,301 @@ implementation
 
                 Result := 'GM_CHANGESKILL Success. Skill ' + IntToStr(i) + ' set to ' + IntToStr(j) + '.';
             end else begin
-                Result := Result + ' Skill selection out of range. {1-157,210-' + IntToStr(MAX_SKILL_NUMBER) + '}.';
+                Result := Result + ' Skill selection out of range [1-157,210-' + IntToStr(MAX_SKILL_NUMBER) + '].';
             end;
         end else begin
             Result := Result + ' Incomplete information.';
         end;
 
         sl.Free;
+    end;
+
+    function command_monster(tc : TChara; str : String) : String;
+    var
+        ts, ts1 : TMob;
+        tm : TMap;
+        h, i, j, k, l : Integer;
+        sl : TStringList;
+        tss : TSlaveDB;
+    begin
+        Result := 'GM_MONSTER Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 9, 256);
+        if sl.Count = 2 then begin
+            if (MobDBName.IndexOf(sl.Strings[0]) <> -1) then begin
+                Val(sl.Strings[1], j, k);
+
+                if(j >= 1) and (j <= 20) then begin
+                    for l := 1 to j do begin
+                        tm := tc.MData;
+
+                        ts := TMob.Create;
+                        ts.Data := MobDBName.Objects[MobDBName.IndexOf(sl.Strings[0])] as TMobDB;
+                        ts.ID := NowMobID;
+                        Inc(NowMobID);
+                        ts.Name := ts.Data.JName;
+                        ts.JID := ts.Data.ID;
+                        ts.Map := tc.Map;
+                        ts.Data.isLink :=false;
+                        ts.Point.X := tc.Point.X + Random(2) - 1;
+                        ts.Point.Y := tc.Point.Y + Random(2) - 1;
+                        ts.Dir := Random(8);
+                        ts.HP := ts.Data.HP;
+                        ts.Speed := ts.Data.Speed;
+                        ts.SpawnDelay1 := $7FFFFFFF;
+                        ts.SpawnDelay2 := 0;
+                        ts.SpawnType := 0;
+                        ts.SpawnTick := 0;
+                        if ts.Data.isDontMove then ts.MoveWait := $FFFFFFFF
+                        else ts.MoveWait := timeGetTime;
+                        ts.ATarget := 0;
+                        ts.ATKPer := 100;
+                        ts.DEFPer := 100;
+                        ts.DmgTick := 0;
+                        ts.Element := ts.Data.Element;
+
+                        if (SummonMonsterName = true) then ts.Name := ts.Data.JName
+                        else ts.Name := 'Summon Monster';
+
+                        if (SummonMonsterExp = false) then begin
+                            ts.Data.MEXP := 0;
+                            ts.Data.EXP := 0;
+                            ts.Data.JEXP := 0;
+                        end;
+
+                        if (SummonMonsterAgo = true) then ts.isActive := true
+						else ts.isActive := ts.Data.isActive;
+
+                        ts.MoveWait := timeGetTime();
+
+                        for j := 0 to 31 do begin
+                            ts.EXPDist[j].CData := nil;
+                            ts.EXPDist[j].Dmg := 0;
+                        end;
+
+						if ts.Data.MEXP <> 0 then begin
+                            for j := 0 to 31 do begin
+                                ts.MVPDist[j].CData := nil;
+                                ts.MVPDist[j].Dmg := 0;
+                            end;
+                            ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100;
+                        end;
+
+                        ts.isSummon := True;
+                        ts.EmperiumID := 0;
+
+                        tm.Mob.AddObject(ts.ID, ts);
+                        tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+
+                        SendMData(tc.Socket, ts);
+                        SendBCmd(tm,ts.Point,41,tc,False);
+
+                        Result := 'GM_MONSTER Success. ' + ts.Name + ' summoned at ' + tm.Name + ' (' + IntToStr(ts.Point.X) + ',' + IntToStr(ts.Point.Y) + ')';
+
+                        if (SummonMonsterMob = true) then begin
+                            k := SlaveDBName.IndexOf(sl.Strings[0]);
+                            if (k <> -1) then begin
+                                ts.isLeader := true;
+
+                                tss := SlaveDBName.Objects[k] as TSlaveDB;
+                                if sl.Strings[0] = tss.Name then begin
+                                    h := tss.TotalSlaves;
+                                    ts.SlaveCount := h;
+									repeat
+                                        for i := 0 to 4 do begin
+                                            if (tss.Slaves[i] <> -1) and (h <> 0) then begin
+                                                ts1 := TMob.Create;
+                                                ts1.Data := MobDBName.Objects[tss.Slaves[i]] as TMobDB;
+                                                ts1.ID := NowMobID;
+                                                ts.Slaves[h] := ts1.ID;
+                                                Inc(NowMobID);
+                                                ts1.Name := ts1.Data.JName;
+                                                ts1.JID := ts1.Data.ID;
+                                                ts1.LeaderID := ts.ID;
+                                                ts1.Data.isLink := false;
+                                                ts1.Map := ts.Map;
+                                                ts1.Point := ts.Point;
+                                                ts1.Dir := ts.Dir;
+                                                ts1.HP := ts1.Data.HP;
+
+                                                if ts.Data.Speed < ts1.Data.Speed then ts1.Speed := ts.Data.Speed
+												else ts1.Speed := ts1.Data.Speed;
+
+                                                ts1.SpawnDelay1 := $7FFFFFFF;
+                                                ts1.SpawnDelay2 := 0;
+                                                ts1.SpawnType := 0;
+                                                ts1.SpawnTick := 0;
+
+                                                if ts1.Data.isDontMove then ts1.MoveWait := $FFFFFFFF
+                                                else ts1.MoveWait := ts.MoveWait;
+                                                ts1.ATarget := 0;
+                                                ts1.ATKPer := 100;
+                                                ts1.DEFPer := 100;
+                                                ts1.DmgTick := 0;
+                                                ts1.Element := ts1.Data.Element;
+                                                ts1.isActive := false;
+
+                                                for j := 0 to 31 do begin
+                                                    ts1.EXPDist[j].CData := nil;
+                                                    ts1.EXPDist[j].Dmg := 0;
+                                                end;
+
+                                                if ts1.Data.MEXP <> 0 then begin
+                                                    for j := 0 to 31 do begin
+                                                        ts1.MVPDist[j].CData := nil;
+                                                        ts1.MVPDist[j].Dmg := 0;
+                                                    end;
+                                                    ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100;
+                                                end;
+
+                                                tm.Mob.AddObject(ts1.ID, ts1);
+                                                tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
+
+                                                ts1.isSummon := true;
+                                                ts1.isSlave := true;
+                                                ts1.EmperiumID := 0;
+
+                                                SendMData(tc.Socket, ts1);
+                                                SendBCmd(tm,ts1.Point,41,tc,False);
+
+                                                h := h - 1;
+                                            end;
+										end;
+									until (h <= 0);
+								end;
+							end;
+						end;
+					end;
+				end else begin
+                    Result := Result + ' Quantity out of range [0-20].';
+                end;
+			end;
+		end else begin
+            Result := Result + ' Incomplete information.';
+        end;
+
+        sl.Free;
+	end;
+
+    function command_speed(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+    begin
+        Result := 'GM_SPEED Failure.';
+
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if (sl.count = 2) then begin
+            if (strtoint(sl.Strings[1]) >= 25) and (strtoint(sl.Strings[1]) <= 1000) then begin
+                Result := 'GM_SPEED Success. Speed changed from ' + IntToStr(tc.Speed);
+                str := 'Walking speed is now ' + sl.Strings[1];
+                tc.DefaultSpeed := strtoint(sl.strings[1]);
+                CalcStat(tc);
+                SendCStat1(tc, 0, 0, tc.Speed);
+                Result := Result + ' to ' + IntToStr(tc.Speed) + '.';
+            end else begin
+                Result := Result + ' Speed out of range [25-1000].';
+            end;
+        end else begin
+            Result := Result + ' Incomplete information.';
+        end;
+
+        sl.Free;
+    end;
+
+    function command_whois(tc : TChara) : String;
+    var
+        str2 : String;
+        tc1 : TChara;
+        i : Integer;
+    begin
+        Result := 'GM_WHOIS Failure.';
+
+        str2 := 'Online Users: ';
+        for i := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                if str2 = 'Online Users: ' then begin
+                    str2 := str2 + tc1.Name;
+                end else begin
+                    str2 := str2 + ',' + tc1.Name;
+                end;
+            end;
+        end;
+
+        Result := 'GM_WHOIS Success. ' + str2 + '.';
+    end;
+
+    function command_option(tc : TChara; str : String) : String;
+    var
+        //sl : TStringList;
+        //i, j, k, ii : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_OPTION Success.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        if Copy(str, 8, 5) = 'sight' then begin
+            tc.Option := tc.Option or 1;
+            Result := Result + ' Sight activated.';
+        end else if Copy(str, 8, 6) = 'ruwach' then begin
+            tc.Option := tc.Option or 8192;
+            Result := Result + ' Ruwach activated.';
+        end else if ((tc.JID IN [ 5, 10, 18, 23 ]) OR (tc.JID = 4006) OR (tc.JID = 4011) OR (tc.JID = 4019)) AND (Copy(str, 8, 4) = 'cart') then begin
+            tc.Option := tc.Option or 8;
+            SendCart(tc);
+            Result := Result + ' Cart activated.';
+        end else if (((tc.JID = 11) OR (tc.JID = 4012)) AND (Copy(str, 8, 6) = 'falcon')) then begin
+            tc.Option := tc.Option or $10;
+            Result := Result + ' Falcon activated.';
+        end else if ((tc.JID IN [ 7, 14 ]) OR (tc.JID = 4008) OR (tc.JID = 4014) OR (tc.JID = 4015) OR (tc.JID = 4023 )) AND ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then begin
+            tc.Option := tc.Option or $20;
+            Result := Result + ' Peco activated.';
+        end else if Copy(str, 8, 3) = 'off' then begin
+            tc.Option := 0;
+            Result := Result + ' Options turned off.';
+        end else begin
+            Result := 'GM_OPTION Failure. Make sure you are the correct job type.';
+        end;
+        UpdateOption(tm, tc);
+
+        {
+
+        Athena Option Command
+
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        if (sl.count = 4) then begin
+            val(sl.Strings[1], i, ii);
+            if ii <> 0 then Exit;
+            val(sl.Strings[2], j, ii);
+            if ii <> 0 then Exit;
+            val(sl.Strings[3], k, ii);
+            if ii <> 0 then Exit;
+    
+            WFIFOW(0, $0119);
+            WFIFOL(2, tc.ID);
+            WFIFOW(6, i);
+            WFIFOW(8, j);
+            WFIFOW(10, k);
+            WFIFOB(12, 0);
+            SendBCmd(tm, tc.Point, 13);
+            tc.Stat1 := i;
+            tc.Stat2 := j;
+            tc.Option := k;
+
+            Result := 'GM_OPTION Success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
+        end else begin
+            Result := Result + ' Incomplete information.';
+        end;}
+
+        //sl.Free;
     end;
 
 end.
