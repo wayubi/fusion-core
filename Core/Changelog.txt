@@ -1,3 +1,4 @@
+- 06-03-04: Skills - Finished organzining player vs monster. [Darkhelmet]
 - 06-02-04: Skills - FindTargetsInAttackRange added to help with Skills overhaul [ChrstphrR]
 - 06-02-04: Skill_Constants - Added new file to project [ChrstphrR]
 - 06-02-04: Skills - Started a massive reorganizing project. [Darkhelmet]
