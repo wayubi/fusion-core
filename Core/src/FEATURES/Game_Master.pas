@@ -116,6 +116,7 @@ var
     GM_ATHENA_QUESTSKILL : Byte;
     GM_ATHENA_LOSTSKILL : Byte;
     GM_ATHENA_MODEL : Byte;
+    GM_ATHENA_ITEM : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -232,6 +233,7 @@ var
     function command_athena_questskill(tc : TChara; str : String) : String;
     function command_athena_lostskill(tc : TChara; str : String) : String;
     function command_athena_model(tc : TChara; str : String) : String;
+    function command_athena_item(tc : TChara; str : String) : String;
 
 implementation
 
@@ -354,6 +356,7 @@ implementation
         GM_ATHENA_QUESTSKILL := StrToIntDef(sl.Values['ATHENA_QUESTSKILL'], 1);
         GM_ATHENA_LOSTSKILL := StrToIntDef(sl.Values['ATHENA_LOSTSKILL'], 1);
         GM_ATHENA_MODEL := StrToIntDef(sl.Values['ATHENA_MODEL'], 1);
+        GM_ATHENA_ITEM := StrToIntDef(sl.Values['ATHENA_ITEM'], 1);
 
         sl.Free;
         ini.Free;
@@ -481,6 +484,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_QUESTSKILL', IntToStr(GM_ATHENA_QUESTSKILL));
         ini.WriteString('Athena GM Commands', 'ATHENA_LOSTSKILL', IntToStr(GM_ATHENA_LOSTSKILL));
         ini.WriteString('Athena GM Commands', 'ATHENA_MODEL', IntToStr(GM_ATHENA_MODEL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_ITEM', IntToStr(GM_ATHENA_ITEM));
 
         ini.Free;
 
@@ -612,6 +616,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('questskill')) = 'questskill') and (check_level(tc.ID, GM_ATHENA_QUESTSKILL)) ) then error_msg := command_athena_questskill(tc, str)
             else if ( (copy(str, 1, length('lostskill')) = 'lostskill') and (check_level(tc.ID, GM_ATHENA_LOSTSKILL)) ) then error_msg := command_athena_lostskill(tc, str)
             else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc.ID, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
+            else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -4413,6 +4418,116 @@ Called when we're shutting down the server *only*
             UpdateLook(tm, tc, 6, i, 0, true);
             UpdateLook(tm, tc, 7, i, 0, true);
             Result := 'GM_ATHENA_MODEL Success.';
+        end;
+    end;
+
+    function command_athena_item(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        td : TItemDB;
+        i, j, k : Integer;
+        itemname : String;
+    begin
+        Result := 'GM_ATHENA_ITEM Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+        itemname := sl.Strings[0];
+
+        if sl.Count = 2 then begin
+
+            if ItemDBName.IndexOf(itemname) <> -1 then begin
+
+                td := ItemDBName.Objects[ItemDBName.IndexOf(itemname)] as TItemDB;
+
+                Val(sl[1], j, k);
+
+                if k <> 0 then Exit;
+
+                if (j <= 0) or (j > 30000) then Exit;
+
+                if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
+                    k := SearchCInventory(tc, i, td.IEquip);
+
+                    if k <> 0 then begin
+                        if tc.Item[k].Amount + j > 30000 then Exit;
+                        if td.IEquip then j := 1;
+
+                        tc.Item[k].ID := td.ID;
+                        tc.Item[k].Amount := tc.Item[k].Amount + j;
+                        tc.Item[k].Equip := 0;
+                        tc.Item[k].Identify := 1;
+                        tc.Item[k].Refine := 0;
+                        tc.Item[k].Attr := 0;
+                        tc.Item[k].Card[0] := 0;
+                        tc.Item[k].Card[1] := 0;
+                        tc.Item[k].Card[2] := 0;
+                        tc.Item[k].Card[3] := 0;
+                        tc.Item[k].Data := td;
+
+                        tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
+                        SendCStat1(tc, 0, $0018, tc.Weight);
+
+                        SendCGetItem(tc, k, j);
+                        Result := 'GM_ATHENA_ITEM Success.' + inttostr(j) + ' ' + itemname + ' spawned.' ;;
+                    end;
+                end
+
+                else begin
+                    WFIFOW( 0, $00a0);
+                    WFIFOB(22, 2);
+                    tc.Socket.SendBuf(buf, 23);
+                end;
+            end
+
+            else begin
+                Val(sl[0], i, k);
+
+                if k <> 0 then Exit;
+                if ItemDB.IndexOf(i) = -1 then Exit;
+
+                Val(sl[1], j, k);
+
+                if k <> 0 then Exit;
+                if (j <= 0) or (j > 30000) then Exit;
+
+                td := ItemDB.IndexOfObject(i) as TItemDB;
+
+                if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
+                    k := SearchCInventory(tc, i, td.IEquip);
+
+                    if k <> 0 then begin
+                        if tc.Item[k].Amount + j > 30000 then Exit;
+                        if td.IEquip then j := 1;
+
+                        tc.Item[k].ID := i;
+                        tc.Item[k].Amount := tc.Item[k].Amount + j;
+                        tc.Item[k].Equip := 0;
+                        tc.Item[k].Identify := 1;
+                        tc.Item[k].Refine := 0;
+                        tc.Item[k].Attr := 0;
+                        tc.Item[k].Card[0] := 0;
+                        tc.Item[k].Card[1] := 0;
+                        tc.Item[k].Card[2] := 0;
+                        tc.Item[k].Card[3] := 0;
+                        tc.Item[k].Data := td;
+
+                        tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
+                        SendCStat1(tc, 0, $0018, tc.Weight);
+
+                        SendCGetItem(tc, k, j);
+                        Result := 'GM_ATHENA_ITEM Success.';
+                    end;
+                end
+
+                else begin
+                    WFIFOW( 0, $00a0);
+                    WFIFOB(22, 2);
+                    tc.Socket.SendBuf(buf, 23);
+                end;
+            end;
+
+            sl.Free;
         end;
     end;
 end.
