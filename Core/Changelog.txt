@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-04-04: Cleaned up and reworked data clearing on server close. [AlexKreuz]
 - 09-02-04: Account with no characters minus first account, could not log in. [AlexKreuz]
 - 09-02-04: #77 - Set proper directory creation for GM logs. Stops crash. [AlexKreuz]
 - 09-02-04: #76 - Logging in with non primary account corrupted database. [AlexKreuz]

@@ -1031,6 +1031,260 @@ begin
 
 	{ Mitch: Doesnt hurt to make sure the tray icon was deleted }
 	Shell_notifyIcon(NIM_DELETE, @TrayIcon);
+
+
+    //---- We need to clear this memory in a CLEAN way once and for all ----//
+    if ScriptList.Count > 0 then ScriptList.Free;
+
+    if ItemDB.Count > 0 then begin
+        for Idx := 0 to ItemDB.Count - 1 do begin
+            if assigned(ItemDB.Objects[Idx]) then
+                ItemDB.Objects[Idx].Free;
+        end;
+        ItemDB.Free;
+    end;
+    if ItemDBName.Count > 0 then ItemDBName.Free;
+
+    if MaterialDB.Count > 0 then begin
+        for Idx := 0 to MaterialDB.Count - 1 do begin
+            if assigned(MaterialDB.Objects[Idx]) then
+                MaterialDB.Objects[Idx].Free;
+        end;
+        MaterialDB.Free;
+    end;
+
+    if MobDB.Count > 0 then begin
+        for Idx := 0 to MobDB.Count - 1 do begin
+            if assigned(MobDB.Objects[Idx]) then
+                MobDB.Objects[Idx].Free;
+        end;
+        MobDB.Free;
+    end;
+    if MobDBName.Count > 0 then MobDBName.Free;
+
+    if MArrowDB.Count > 0 then begin
+        for Idx := 0 to MArrowDB.Count - 1 do begin
+            if assigned(MArrowDB.Objects[Idx]) then
+                MArrowDB.Objects[Idx].Free;
+        end;
+        MArrowDB.Free;
+    end;
+
+    if WarpDatabase.Count > 0 then begin
+        for Idx := 0 to WarpDatabase.Count - 1 do begin
+            if assigned(WarpDatabase.Objects[Idx]) then
+                WarpDatabase.Objects[Idx].Free;
+        end;
+        WarpDatabase.Free;
+    end;
+
+    if MobAIDB.Count > 0 then MobAIDB.Free;
+
+    if MobAIDBFusion.Count > 0 then begin
+        for Idx := 0 to MobAIDBFusion.Count - 1 do begin
+            if assigned(MobAIDBFusion.Objects[Idx]) then
+                MobAIDBFusion.Objects[Idx].Free;
+        end;
+        MobAIDBFusion.Free;
+    end;
+
+    if GlobalVars.Count > 0 then GlobalVars.Free;
+
+    if IDTableDB.Count > 0 then begin
+        for Idx := 0 to IDTableDB.Count - 1 do begin
+            if assigned(IDTableDB.Objects[Idx]) then
+                IDTableDB.Objects[Idx].Free;
+        end;
+        IDTableDB.Free;
+    end;
+
+    if SlaveDBName.Count > 0 then begin
+        for Idx := 0 to SlaveDBName.Count - 1 do begin
+            if assigned(SlaveDBName.Objects[Idx]) then
+                SlaveDBName.Objects[Idx].Free;
+        end;
+        SlaveDBName.Free;
+    end;
+
+    if SkillDB.Count > 0 then begin
+        for Idx := 0 to SkillDB.Count - 1 do begin
+            if assigned(SkillDB.Objects[Idx]) then
+                SkillDB.Objects[Idx].Free;
+        end;
+        SkillDB.Free;
+    end;
+    if SkillDBName.Count > 0 then SkillDBName.Free;
+
+    if Player.Count > 0 then begin
+        for Idx := 0 to Player.Count - 1 do begin
+            if assigned(Player.Objects[Idx]) then
+                Player.Objects[Idx].Free;
+        end;
+        Player.Free;
+    end;
+    if PlayerName.Count > 0 then PlayerName.Free;
+
+    if Chara.Count > 0 then begin
+        for Idx := 0 to Chara.Count - 1 do begin
+            if assigned(Chara.Objects[Idx]) then
+                Chara.Objects[Idx].Free;
+        end;
+        Chara.Free;
+    end;
+    if CharaName.Count > 0 then CharaName.Free;
+    if CharaPID.Count > 0 then CharaPID.Free;
+
+    if ChatRoomList.Count > 0 then begin
+        for Idx := 0 to ChatRoomList.Count - 1 do begin
+            if assigned(ChatRoomList.Objects[Idx]) then
+                ChatRoomList.Objects[Idx].Free;
+        end;
+        ChatRoomList.Free;
+    end;
+
+    if PartyNameList.Count > 0 then begin
+        for Idx := 0 to PartyNameList.Count - 1 do begin
+            if assigned(PartyNameList.Objects[Idx]) then
+                PartyNameList.Objects[Idx].Free;
+        end;
+        PartyNameList.Free;
+    end;
+
+    if CastleList.Count > 0 then begin
+        for Idx := 0 to CastleList.Count - 1 do begin
+            if assigned(CastleList.Objects[Idx]) then
+                CastleList.Objects[Idx].Free;
+        end;
+        CastleList.Free;
+    end;
+
+    if TerritoryList.Count > 0 then begin
+        for Idx := 0 to TerritoryList.Count - 1 do begin
+            if assigned(TerritoryList.Objects[Idx]) then
+                TerritoryList.Objects[Idx].Free;
+        end;
+        TerritoryList.Free;
+    end;
+
+    if EmpList.Count > 0 then begin
+        for Idx := 0 to EmpList.Count - 1 do begin
+            if assigned(EmpList.Objects[Idx]) then
+                EmpList.Objects[Idx].Free;
+        end;
+        EmpList.Free;
+    end;
+
+    if PetDB.Count > 0 then begin
+        for Idx := 0 to PetDB.Count - 1 do begin
+            if assigned(PetDB.Objects[Idx]) then
+                PetDB.Objects[Idx].Free;
+        end;
+        PetDB.Free;
+    end;
+
+    if PetList.Count > 0 then begin
+        for Idx := 0 to PetList.Count - 1 do begin
+            if assigned(PetList.Objects[Idx]) then
+                PetList.Objects[Idx].Free;
+        end;
+        PetList.Free;
+    end;
+
+    if VenderList.Count > 0 then begin
+        for Idx := 0 to VenderList.Count - 1 do begin
+            if assigned(VenderList.Objects[Idx]) then
+                VenderList.Objects[Idx].Free;
+        end;
+        VenderList.Free;
+    end;
+
+    if DealingList.Count > 0 then begin
+        for Idx := 0 to DealingList.Count - 1 do begin
+            if assigned(DealingList.Objects[Idx]) then
+                DealingList.Objects[Idx].Free;
+        end;
+        DealingList.Free;
+    end;
+
+    if SummonMobList.Count > 0 then SummonMobList.Free;
+    if SummonMobListMVP.Count > 0 then SummonMobListMVP.Free;
+
+    if SummonIOBList.Count > 0 then SummonIOBList.Free;
+    if SummonIOVList.Count > 0 then SummonIOVList.Free;
+    if SummonICAList.Count > 0 then SummonICAList.Free;
+    if SummonIGBList.Count > 0 then SummonIGBList.Free;
+    if SUmmonIOWBList.Count > 0 then SummonIOWBList.Free;
+
+    if ServerFlag.Count > 0 then ServerFlag.Free;
+
+    if GuildList.Count > 0 then begin
+        for Idx := 0 to GuildList.Count - 1 do begin
+            if assigned(GuildList.Objects[Idx]) then
+                GuildList.Objects[Idx].Free;
+        end;
+        GuildList.Free;
+    end;
+
+    if GSkillDB.Count > 0 then begin
+        for Idx := 0 to GSkillDB.Count - 1 do begin
+            if assigned(GSkillDB.Objects[Idx]) then
+                GSkillDB.Objects[Idx].Free;
+        end;
+        GSkillDB.Free;
+    end;
+
+    if Map.Count > 0 then begin
+        for Idx := 0 to Map.Count - 1 do begin
+            if assigned(Map.Objects[Idx]) then
+                Map.Objects[Idx].Free;
+        end;
+        Map.Free;
+    end;
+
+    if MapInfo.Count > 0 then begin
+        for Idx := 0 to MapInfo.Count - 1 do begin
+            if assigned(MapInfo.Objects[Idx]) then
+                MapInfo.Objects[Idx].Free;
+        end;
+        MapInfo.Free;
+    end;
+
+    if MapList.Count > 0 then begin
+        for Idx := 0 to MapList.Count - 1 do begin
+            if assigned(MapList.Objects[Idx]) then
+                MapList.Objects[Idx].Free;
+        end;
+        MapList.Free;
+    end;
+    //---- The rest is the dirty shit commented out in case I need it ----//
+
+
+
+
+
+	{SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
+	SummonMobListMVP.Free;} {CR - empty list 2004/04/23 - leaving be}
+
+	{ChrstphrR 2004/04/26 -- Summon???Lists cleaned up here by converting them to
+	TStringLists -- now instead of using a TIntList32 that was:
+	- storing an integer the same number as the index of the nodes in Integers[]
+	- storing a string in a TObject (think, tossing a dime into a fridge)
+	- failing to free the strings AND the Objects when cleaning up...
+	Now we have a semi-inefficient StringLists that are used for random item
+	generation when someone uses a Old Blue Box, etc.  This is a compromise data
+	structure until I make them equivalent to the TRandList derived objects that
+	TSummonMobList is.
+	}
+	{SummonIOBList.Free; //Changed to TStringList
+	SummonIOVList.Free; //" " "
+	SummonICAList.Free; //" " "
+	SummonIGBList.Free; //" " "
+	SummonIOWBList.Free;//" " "}
+{氏{箱追加ココまで}
+{NPCイベント追加}
+	//ServerFlag.Free;//Strings Only List - safe as is.
+
+
 	{ChrstphrR 2004/04/27 -- I'm pretty sure this cleans up the 4k a bare Delphi
 	app leaks because code in the RTL that Borland hasn't fixed - Bravo!}
 
@@ -1038,10 +1292,10 @@ begin
     { Alex: This is really bizarre. The scriptlist is created on form create
       thus freeing it at this point should not give an access violation.
       Oh well, I'll put the try-except-end around it just to prevent crashes. }
-    try
+    {try
     	ScriptList.Free; //CR only stores strings, ergo safe as is.
     except
-    end;
+    end;}
 
 	{ChrstphrR 2004/04/27 - My apologies for such dirty fixes to the lists ...
 	Objects[] of a TSL or TIL are not freed up on Clear or Free, so the following
@@ -1052,7 +1306,7 @@ begin
 	list of objects. Pure StringLists / IntLists are just free'd and are marked
 	explicitly.}
 
-	for Idx := ItemDB.Count - 1 downto 0 do begin
+	{for Idx := ItemDB.Count - 1 downto 0 do begin
         try
             if Assigned(ItemDB.Objects[Idx]) then (ItemDB.Objects[Idx] AS TItemDB).Free;
         except
@@ -1065,124 +1319,128 @@ begin
 	    ItemDBName.Free;
     except
         on EAccessViolation do ;
-    end;
+    end;}
 
 {アイテム製造追加}
-	for Idx := MaterialDB.Count-1 downto 0 do
+
+
+
+	{for Idx := MaterialDB.Count-1 downto 0 do
 		if Assigned(MaterialDB.Objects[Idx]) then
 			(MaterialDB.Objects[Idx] AS TMaterialDB).Free;
 	MaterialDB.Free;
+
 {アイテム製造追加ココまで}
-	for Idx := MobDB.Count-1 downto 0 do
+	{for Idx := MobDB.Count-1 downto 0 do
 		if Assigned(MobDB.Objects[Idx]) then
 			(MobDB.Objects[Idx] AS TMobDB).Free;
 	MobDB.Free;
-	MobDBName.Free;
+	MobDBName.Free;}
 
-	for Idx := MArrowDB.Count-1 downto 0 do
+	{for Idx := MArrowDB.Count-1 downto 0 do
 		if Assigned(MArrowDB.Objects[Idx]) then
 			(MArrowDB.Objects[Idx] AS TMArrowDB).Free;
-	MArrowDB.Free;
+	MArrowDB.Free;}
 
-	for Idx := WarpDatabase.Count-1 downto 0 do
+	{for Idx := WarpDatabase.Count-1 downto 0 do
 		if Assigned(WarpDatabase.Objects[Idx]) then
 			(WarpDatabase.Objects[Idx] AS TWarpDatabase).Free;
-	WarpDatabase.Free;
+	WarpDatabase.Free;}
 
-	MobAIDB.Free; //CR - Empty list.
+	//MobAIDB.Free; //CR - Empty list.
 
-	for Idx := MobAIDBFusion.Count-1 downto 0 do
+	{for Idx := MobAIDBFusion.Count-1 downto 0 do
 		if Assigned(MobAIDBFusion.Objects[Idx]) then
 			(MobAIDBFusion.Objects[Idx] AS TMobAIDBFusion).Free;
-	MobAIDBFusion.Free;
+	MobAIDBFusion.Free;}
 
-	GlobalVars.Free;
+	//GlobalVars.Free;
 	//PharmacyDB.Free;
 
-	for Idx := IDTableDB.Count-1 downto 0 do
+	{for Idx := IDTableDB.Count-1 downto 0 do
 		if Assigned(IDTableDB.Objects[Idx]) then
 			(IDTableDB.Objects[Idx] AS TIDTbl).Free;
-	IDTableDB.Free;
+	IDTableDB.Free;}
 
-	for Idx := SlaveDBName.Count-1 downto 0 do
+	{for Idx := SlaveDBName.Count-1 downto 0 do
 		if Assigned(SlaveDBName.Objects[Idx]) then
 			(SlaveDBName.Objects[Idx] AS TSlaveDB).Free;
-	SlaveDBName.Free;
+	SlaveDBName.Free;}
 
 	//CR - both of these are the same count, same objects - free objects on one
 	// and leave the other objects[] list alone - only free the object once!! :)
-	for Idx := SkillDB.Count-1 downto 0 do
+	{for Idx := SkillDB.Count-1 downto 0 do
 		if Assigned(SkillDB.Objects[Idx]) then
 			(SkillDB.Objects[Idx] AS TSkillDB).Free;
 	SkillDB.Free;
-	SkillDBName.Free;
+	SkillDBName.Free;}
 
-	for Idx := Player.Count-1 downto 0 do
+	{for Idx := Player.Count-1 downto 0 do
 		if Assigned(Player.Objects[Idx]) then
 			(Player.Objects[Idx] AS TPlayer).Free;
 	Player.Free;
-	PlayerName.Free;
+	PlayerName.Free;}
 
-	for Idx := Chara.Count-1 downto 0 do
+	{for Idx := Chara.Count-1 downto 0 do
 		if Assigned(Chara.Objects[Idx]) then
 			(Chara.Objects[Idx] AS TChara).Free;
 	Chara.Free;
 	CharaName.Free;
-	CharaPID.Free;
+	CharaPID.Free;}
 {チャットルーム機能追加}
-	for Idx := ChatRoomList.Count-1 downto 0 do
+	{for Idx := ChatRoomList.Count-1 downto 0 do
 		if Assigned(ChatRoomList.Objects[Idx]) then
 			(ChatRoomList.Objects[Idx] AS TChatRoom).Free;
-	ChatRoomList.Free;
+	ChatRoomList.Free;}
 {チャットルーム機能追加ココまで}
 {パーティー機能追加}
-	for Idx := PartyNameList.Count-1 downto 0 do
+	{for Idx := PartyNameList.Count-1 downto 0 do
 		if Assigned(PartyNameList.Objects[Idx]) then
 			(PartyNameList.Objects[Idx] AS TParty).Free;
-	PartyNameList.Free;
+	PartyNameList.Free;}
 
-	for Idx := CastleList.Count-1 downto 0 do
+	{for Idx := CastleList.Count-1 downto 0 do
 		if Assigned(CastleList.Objects[Idx]) then
 			(CastleList.Objects[Idx] AS TCastle).Free;
-	CastleList.Free;
+	CastleList.Free;}
 
-	for Idx := TerritoryList.Count-1 downto 0 do
+	{for Idx := TerritoryList.Count-1 downto 0 do
 		if Assigned(TerritoryList.Objects[Idx]) then
 			(TerritoryList.Objects[Idx] AS TTerritoryDB).Free;
-	TerritoryList.Free;
+	TerritoryList.Free;}
 
-	for Idx := EmpList.Count-1 downto 0 do
+	{for Idx := EmpList.Count-1 downto 0 do
 		if Assigned(EmpList.Objects[Idx]) then
 			(EmpList.Objects[Idx] AS TEmp).Free;
-	EmpList.Free;
+	EmpList.Free;}
 {パーティー機能追加ココまで}
 {キューペット}
-	for Idx := PetDB.Count-1 downto 0 do
+	{for Idx := PetDB.Count-1 downto 0 do
 		if Assigned(PetDB.Objects[Idx]) then
 			(PetDB.Objects[Idx] AS TPetDB).Free;
-	PetDB.Free;
+	PetDB.Free;}
 
-	for Idx := PetList.Count-1 downto 0 do
+	{for Idx := PetList.Count-1 downto 0 do
 		if Assigned(PetList.Objects[Idx]) then
 			(PetList.Objects[Idx] AS TPet).Free;
-	PetList.Free;
+	PetList.Free;}
 {キューペットここまで}
 {露店スキル追加}
-	for Idx := VenderList.Count-1 downto 0 do
+	{for Idx := VenderList.Count-1 downto 0 do
 		if Assigned(VenderList.Objects[Idx]) then
 			(VenderList.Objects[Idx] AS TVender).Free;
-	VenderList.Free;
+	VenderList.Free;}
 {露店スキル追加ココまで}
 {取引機能追加}
 
-	for Idx := DealingList.Count-1 downto 0 do
+	{for Idx := DealingList.Count-1 downto 0 do
 		if Assigned(DealingList.Objects[Idx]) then
 			(DealingList.Objects[Idx] AS TDealings).Free;
-	DealingList.Free;
+	DealingList.Free;}
 {取引機能追加ココまで}
 {氏{箱追加}
-	SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
-	SummonMobListMVP.Free; {CR - empty list 2004/04/23 - leaving be}
+	{SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
+	SummonMobListMVP.Free;} {CR - empty list 2004/04/23 - leaving be}
 
 	{ChrstphrR 2004/04/26 -- Summon???Lists cleaned up here by converting them to
 	TStringLists -- now instead of using a TIntList32 that was:
@@ -1194,36 +1452,36 @@ begin
 	structure until I make them equivalent to the TRandList derived objects that
 	TSummonMobList is.
 	}
-	SummonIOBList.Free; //Changed to TStringList
+	{SummonIOBList.Free; //Changed to TStringList
 	SummonIOVList.Free; //" " "
 	SummonICAList.Free; //" " "
 	SummonIGBList.Free; //" " "
-	SummonIOWBList.Free;//" " "
+	SummonIOWBList.Free;//" " "}
 {氏{箱追加ココまで}
 {NPCイベント追加}
-	ServerFlag.Free;//Strings Only List - safe as is.
+	//ServerFlag.Free;//Strings Only List - safe as is.
 
 {NPCイベント追加ココまで}
 {ギルド機能追加}
-	for Idx := GuildList.Count-1 downto 0 do
+	{for Idx := GuildList.Count-1 downto 0 do
 		if Assigned(GuildList.Objects[Idx]) then
 			(GuildList.Objects[Idx] AS TGuild).Free;
-	GuildList.Free;
+	GuildList.Free;}
 
 	//Static list loaded up at beginning, need to free properly at the end.
-	for Idx := GSkillDB.Count-1 downto 0 do
+	{for Idx := GSkillDB.Count-1 downto 0 do
 		if Assigned(GSkillDB.Objects[Idx]) then
 			(GSkillDB.Objects[Idx] AS TSkillDB).Free;
-	GSkillDB.Free;
+	GSkillDB.Free;}
 {ギルド機能追加ココまで}
 	{ChrstphrR 2004/04/23 - Runtime list, Map list is filled up as characters
 	move about in the game}
-	for Idx := Map.Count-1 downto 0 do
+	{for Idx := Map.Count-1 downto 0 do
 		if Assigned(Map.Objects[Idx]) then
 			(Map.Objects[Idx] AS TMap).Free;
-	Map.Free;
+	Map.Free;}
 
-	for Idx := MapInfo.Count-1 downto 0 do
+	{for Idx := MapInfo.Count-1 downto 0 do
 		if Assigned(MapInfo.Objects[Idx]) then
 			(MapInfo.Objects[Idx] AS MapTbl).Free;
 	MapInfo.Free;
@@ -1231,7 +1489,7 @@ begin
 	for Idx := MapList.Count-1 downto 0 do
 		if Assigned(MapList.Objects[Idx]) then
 			(MapList.Objects[Idx] AS TMapList).Free;
-	MapList.Free;
+	MapList.Free;}
 end;//proc TfrmMain.FormCloseQuery()
 //------------------------------------------------------------------------------
 
