@@ -1267,375 +1267,409 @@ Begin(* Proc sv3PacketProcess() *)
 					SL := TStringList.Create;
 					SL.DelimitedText := Copy(str, 8, 256);
 					try
-					Val(sl.Strings[sl.Count - 2], i, k);
-					if k <> 0 then continue;
+						Val(SL[SL.Count - 2], i, k);
+						if k <> 0 then continue;
 
-    Val(sl.Strings[sl.Count - 1], j, k);
-    if k <> 0 then continue;
-  
-    if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
-      ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
-      if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
+						Val(SL[SL.Count - 1], j, k);
+						if k <> 0 then continue;
 
-      for k := 0 to sl.Count - 4 do begin
-        s := s + ' ' + sl.Strings[k];
-        s := Trim(s);
-      end;
-  
-      if CharaName.Indexof(s) <> -1 then begin
-        tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-        if tc1.Login = 2 then begin
-          SendCLeave(tc1, 2);
-          tc1.tmpMap := sl.Strings[sl.Count - 3];
-          xy.X := i;
-          xy.Y := j;
-          tc1.Point := xy;
-          MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-        end
-        else begin
-          tc1.Map := sl.Strings[sl.Count - 3];
-          tc1.Point.X := i;
-          tc1.Point.Y := j;
+						if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
+							ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
+							if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
+
+							for k := 0 to sl.Count - 4 do begin
+								s := s + ' ' + sl.Strings[k];
+								s := Trim(s);
+							end;
+
+							if CharaName.Indexof(s) <> -1 then begin
+								tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+								if tc1.Login = 2 then begin
+				          SendCLeave(tc1, 2);
+				          tc1.tmpMap := sl.Strings[sl.Count - 3];
+				          //CRW  Point() does same as temp var here...
+				          tc1.Point := Point(i,j);
+				          MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
+				        end else begin
+					        tc1.Map := sl.Strings[sl.Count - 3];
+					        tc1.Point := Point(i,j);
+					      end;//if-else
+					    end;//if CharaName else
+						end;//if Maplist.IndexOf
+					finally
+						SL.Free();
+					end;//try-finally
+				end //GM cmd #banish
+
+				else if (Copy(str, 1, 4) = 'ban ') then begin
+					s := Copy(str, 5, 256);
+					s := Trim(s);
+
+					try
+				    if CharaName.Indexof(s) <> -1 then begin
+				      tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+				      tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
+				      if tp1.Banned = 0 then begin
+				        str := tc.Name +' has banned ' + s;
+				        tp1.Banned := 1;
+				      end else begin
+				        str := tc.Name +' has un-banned ' + s;
+				        tp1.Banned := 0;
+				      end;
+
+				      { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
+				      w := Length(str) + 4;
+				      WFIFOW (0, $009a);
+				      WFIFOW (2, w);
+				      WFIFOS (4, str, w - 4);
+
+				      tc.socket.sendbuf(buf, w);
+				      if tc1.Login = 2 then begin
+					      tc1.socket.sendbuf(buf, w);
+					    end;
+				    end;//if CharaName
+				  finally
+				  end;//try-finally
+				end //GM cmd #ban
+
+			else if (Copy(str, 1, 5) = 'kick ') then begin
+				s := Copy(str, 6, 256);
+				s := Trim(s);
+
+				try
+			    if CharaName.Indexof(s) <> -1 then begin
+				    tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+				    if tc1.Login = 2 then begin
+			        tc1.Socket.Close;
+
+			        { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
+			        str := tc.Name +' has kicked ' + s;
+			        w := Length(str) + 4;
+			        WFIFOW (0, $009a);
+			        WFIFOW (2, w);
+			        WFIFOS (4, str, w - 4);
+			        tc.socket.sendbuf(buf, w);
+				    end;
+			    end;
+			  finally
+				end;
+			end //GM cmd #kick
+
+			else if (Copy(str, 1, 4) = 'job ') AND ((DebugCMD and $0010) <> 0) AND
+							(tid.ChangeJob = 1) then
+			begin
+			{修正} {Lit. "Correction"}
+        if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ノービスからは出来ない
+        begin
+          //職業変更  Lit. "Occupation modification"
+          Val(Copy(str, 5, 256), i, k);
+          if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
+            // Colus, 20040203: Added unequip of items when you #job
+            for  j := 1 to 100 do begin
+              if tc.Item[j].Equip = 32768 then begin
+                tc.Item[j].Equip := 0;
+                WFIFOW(0, $013c);
+                WFIFOW(2, 0);
+                tc.Socket.SendBuf(buf, 4);
+              end else if tc.Item[j].Equip <> 0 then begin
+                WFIFOW(0, $00ac);
+                WFIFOW(2, j);
+                WFIFOW(4, tc.Item[j].Equip);
+                tc.Item[j].Equip := 0;
+                WFIFOB(6, 1);
+                tc.Socket.SendBuf(buf, 7);
+              end;
+            end;
+
+            // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+            for j := 1 to MAX_SKILL_NUMBER do begin
+              if tc.Skill[j].Data.Icon <> 0 then begin
+                if tc.Skill[j].Tick >= timeGetTime() then begin
+                  //DebugOut.Lines.Add('(Icon Removed');
+                  UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
+                end;
+              end;
+              tc.Skill[j].Tick := timeGetTime();
+              tc.Skill[j].Effect1 := 0;
+            end;
+
+            //tc.SkillPoint := 0;
+            if (i > LOWER_JOB_END) then begin
+              i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+              tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+            end else begin
+              tc.ClothesColor := 0; // Reset the clothes color to the default value.
+            end;
+
+            tc.JID := i; // Set the JID to the corrected value.
+            //ステータス再計算
+
+            //オプション初期化
+            if (tc.Option <> 0) then begin
+              tc.Option := 0;
+              //見た目変更
+              WFIFOW(0, $0119);
+              WFIFOL(2, tc.ID);
+              WFIFOW(6, 0);
+              WFIFOW(8, 0);
+              WFIFOW(10, tc.Option);
+              WFIFOB(12, 0);
+              SendBCmd(tc.MData, tc.Point, 13);
+            end;
+            // Colus, 20040203: Don't need two of these, do we?
+            //SendCStat(tc);
+            CalcStat(tc);
+            SendCStat(tc, true); // Add the true to recalc sprites
+            SendCSkillList(tc);
+            // Colus, 20040303: Using newer packet to allow upper job changes
+            WFIFOW(0, $01d7);
+            WFIFOL(2, tc.ID);
+            WFIFOB(6, 0);
+            WFIFOW(7, i);
+            WFIFOW(9, 0);
+            SendBCmd(tm, tc.Point, 11);
+          end;
         end;
-      end;
-  
-    end;
-  finally
-  sl.Free();
-  end;
-end
+      end //GM cmd #job
 
-else if (Copy(str, 1, 4) = 'ban ') then begin
-  s := Copy(str, 5, 256);
-  s := Trim(s);
+      else if (Copy(str, 1, 5) = 'icon ') and ((DebugCMD and $0040) <> 0) then begin
+        // Set the specified icon
+        Val(Copy(str, 6, 256), i, k);
 
-  try
-    if CharaName.Indexof(s) <> -1 then begin
-      tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-      tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
-      if tp1.Banned = 0 then begin
-        str := tc.Name +' has banned ' + s;
-        tp1.Banned := 1;
-      end
-      else begin
-        str := tc.Name +' has un-banned ' + s;
-        tp1.Banned := 0;
-      end;
-
-      { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
-      w := Length(str) + 4;
-      WFIFOW (0, $009a);
-      WFIFOW (2, w);
-      WFIFOS (4, str, w - 4);
-
-      tc.socket.sendbuf(buf, w);
-      if tc1.Login = 2 then begin
-        tc1.socket.sendbuf(buf, w);
-      end;
-    end;
-  finally
-  end
-end
-
-else if (Copy(str, 1, 5) = 'kick ') then begin
-  s := Copy(str, 6, 256);
-  s := Trim(s);
-
-  try
-    if CharaName.Indexof(s) <> -1 then begin
-      tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-      if tc1.Login = 2 then begin
-        tc1.Socket.Close;
-
-        { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
-        str := tc.Name +' has kicked ' + s;
-        w := Length(str) + 4;
-        WFIFOW (0, $009a);
-        WFIFOW (2, w);
-        WFIFOS (4, str, w - 4);
-        tc.socket.sendbuf(buf, w);
-      end;
-    end;
-  finally
-end;
-
-					end else if (Copy(str, 1, 4) = 'job ') and ((DebugCMD and $0010) <> 0) and (tid.ChangeJob = 1) then begin
-{修正}
-            if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ノービスからは出来ない
-            begin
-						//職業変更
-							Val(Copy(str, 5, 256), i, k);
-              if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
-                // Colus, 20040203: Added unequip of items when you #job
-            		for  j := 1 to 100 do begin
-					        if tc.Item[j].Equip = 32768 then begin
-                    tc.Item[j].Equip := 0;
-					          WFIFOW(0, $013c);
-				            WFIFOW(2, 0);
-					          tc.Socket.SendBuf(buf, 4);
-					        end else if tc.Item[j].Equip <> 0 then begin
-					          WFIFOW(0, $00ac);
-					          WFIFOW(2, j);
-					          WFIFOW(4, tc.Item[j].Equip);
-					          tc.Item[j].Equip := 0;
-					          WFIFOB(6, 1);
-					          tc.Socket.SendBuf(buf, 7);
-                  end;
-                end;
-
-                // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
-                for j := 1 to MAX_SKILL_NUMBER do begin
-                  if tc.Skill[j].Data.Icon <> 0 then begin
-                    if tc.Skill[j].Tick >= timeGetTime() then begin
-  						        //DebugOut.Lines.Add('(Icon Removed');
-                      UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
-                    end;
-                  end;
-                  tc.Skill[j].Tick := timeGetTime();
-                  tc.Skill[j].Effect1 := 0;
-					      end;
-
-            					//tc.SkillPoint := 0;
-                      if (i > LOWER_JOB_END) then begin
-                        i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-  											tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
-                      end else begin
-                        tc.ClothesColor := 0; // Reset the clothes color to the default value.
-                      end;
-
-						        	tc.JID := i; // Set the JID to the corrected value.
-											//ステータス再計算
-
-											//オプション初期化
-											if (tc.Option <> 0) then begin
-												tc.Option := 0;
-												//見た目変更
-												WFIFOW(0, $0119);
-												WFIFOL(2, tc.ID);
-												WFIFOW(6, 0);
-												WFIFOW(8, 0);
-												WFIFOW(10, tc.Option);
-												WFIFOB(12, 0);
-												SendBCmd(tc.MData, tc.Point, 13);
-											end;
-                      // Colus, 20040203: Don't need two of these, do we?
-											//SendCStat(tc);
-											CalcStat(tc);
-                      SendCStat(tc, true); // Add the true to recalc sprites
-											SendCSkillList(tc);
-                      // Colus, 20040303: Using newer packet to allow upper job changes
-											WFIFOW(0, $01d7);
-											WFIFOL(2, tc.ID);
-						        	WFIFOB(6, 0);
-											WFIFOW(7, i);
-                      WFIFOW(9, 0);
-											SendBCmd(tm, tc.Point, 11);
-										end;
-                end;
-					end else if (Copy(str, 1, 5) = 'icon ') and ((DebugCMD and $0040) <> 0) then begin
-            // Set the specified icon
-						Val(Copy(str, 6, 256), i, k);
-
-						if (k = 0) then begin
-            for j := i to i do begin
+        if (k = 0) then begin
+          for j := i to i do begin
             UpdateIcon(tm, tc, j, 1);
-            end;
-						end;
-					end else if (Copy(str, 1, 7) = 'unicon ') and ((DebugCMD and $0040) <> 0) then begin
-            // Set the specified icon
-						Val(Copy(str, 8, 256), i, k);
+          end;
+        end;
+      end //GM cmd #icon
+      else if (Copy(str, 1, 7) = 'unicon ') and ((DebugCMD and $0040) <> 0) then begin
+        // Set the specified icon
+        Val(Copy(str, 8, 256), i, k);
 
-						if (k = 0) then begin
-            for j := i to i do begin
+        if (k = 0) then begin
+          for j := i to i do begin
             UpdateIcon(tm, tc, j, 0);
+          end;
+        end;
+{修正ココまで} {Lit. "To correction coconut"}
+      end //GM cmd #unicon
+
+      else if (Copy(str, 1, 7) = 'ccolor ') AND ((DebugCMD AND $0040) <> 0) AND
+      				(tid.ChangeColorStyle = 1) then
+			begin
+        //服の色変更
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 77) then begin
+          tc.ClothesColor := i;
+          WFIFOW(0, $00c3);
+          WFIFOL(2, tc.ID);
+          WFIFOB(6, 7);
+          WFIFOB(7, i);
+          SendBCmd(tm, tc.Point, 8);
+        end;
+      end //GM cmd #ccolor
+
+{髪色変更追加} {Lit. "Color modification of clothes"}
+      else if (Copy(str, 1, 7) = 'hcolor ') AND
+      				(tid.ChangeColorStyle = 1) then
+			begin
+        //髪の色変更
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 8) then begin
+          tc.HairColor := i;
+          WFIFOW(0, $00c3);
+          WFIFOL(2, tc.ID);
+          WFIFOB(6, 6);
+          WFIFOB(7, i);
+          SendBCmd(tm, tc.Point, 8);
+        end;
+
+      end else if (Copy(str, 1, 7) = 'hstyle ') and (tid.ChangeColorStyle = 1) then begin
+        //髪の色変更
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 19) then begin
+          tc.Hair := i;
+          WFIFOW(0, $00c3);
+          WFIFOL(2, tc.ID);
+          WFIFOB(6, 1);
+          WFIFOB(7, i);
+          SendBCmd(tm, tc.Point, 8);
+        end;
+      end //GM cmd #hstyle
+
+      else if (Copy(str, 1, 3) = 'die') AND ((DebugCMD AND $0080) <> 0) AND
+      				(tid.KillDieAlive = 1) then
+			begin
+        //自殺
+        tc.HP := 0;
+        tc.Sit := 1;
+        SendCStat1(tc, 0, 5, tc.HP);
+        WFIFOW(0, $0080);
+        WFIFOL(2, tc.ID);
+        WFIFOB(6, 1);
+        Socket.SendBuf(buf, 7);
+        WFIFOW( 0, $0080);
+        WFIFOL( 2, tc.ID);
+        WFIFOB( 6, 1);
+        SendBCmd(tm, tc.Point, 7);
+      end //GM cmd #die
+
+      else if (Copy(str, 1, 5) = 'alive') and ((DebugCMD and $0100) <> 0) and (tid.KillDieAlive =1 ) then begin
+        //生き返り
+        tc.HP := tc.MAXHP;
+        tc.SP := tc.MAXSP;
+        tc.Sit := 3;
+        SendCStat1(tc, 0, 5, tc.HP);
+        SendCStat1(tc, 0, 7, tc.SP);
+        WFIFOW( 0, $0148);
+        WFIFOL( 2, tc.ID);
+        WFIFOW( 6, 100);
+        SendBCmd(tm, tc.Point, 8);
+      {end else if (Copy(str, 1, 5) = 'noday') then begin
+        if tc.noday = false then
+					tc.noday := true
+        else if tc.noday = true then
+          tc.noday := false;}
+      end //GM cmd #alive
+
+      else if (Copy(str, 1, 5) = 'item ') AND ((DebugCMD AND $0200) <> 0) AND
+      				(tid.ItemSummon = 1) then
+			begin
+        //アイテム作成
+				//CRW 2004/04/07th -- added try-finally for safety.
+        SL := TStringList.Create;
+        SL.DelimitedText := Copy(str, 6, 256);
+        try
+	        if SL.Count = 2 then begin
+  	        Val(SL[0], i, k);
+    	      if k <> 0 then continue;
+      	    if ItemDB.IndexOf(i) = -1 then continue;
+	          Val(SL[1], j, k);
+  	        if k <> 0 then continue;
+    	      if (j <= 0) or (j > 30000) then continue;
+	          td := ItemDB.IndexOfObject(i) as TItemDB;
+  	        if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
+    	        k := SearchCInventory(tc, i, td.IEquip);
+      	      if k <> 0 then begin
+	              if tc.Item[k].Amount + j > 30000 then continue;
+  	            if td.IEquip then j := 1;
+    	          //アイテム追加
+      	        tc.Item[k].ID := i;
+        	      tc.Item[k].Amount := tc.Item[k].Amount + j;
+	              tc.Item[k].Equip := 0;
+  	            tc.Item[k].Identify := 1;
+    	          tc.Item[k].Refine := 0;
+      	        tc.Item[k].Attr := 0;
+	              tc.Item[k].Card[0] := 0;
+  	            tc.Item[k].Card[1] := 0;
+    	          tc.Item[k].Card[2] := 0;
+      	        tc.Item[k].Card[3] := 0;
+        	      tc.Item[k].Data := td;
+	              //重量追加
+  	            tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
+    	          SendCStat1(tc, 0, $0018, tc.Weight);
+
+	              //アイテムゲット通知
+  	            SendCGetItem(tc, k, j);
+    	        end;
+	          end else begin
+  	          //重量オーバー
+    	        WFIFOW( 0, $00a0);
+      	      WFIFOB(22, 2);
+	            Socket.SendBuf(buf, 23);
+  	        end;
+    	    end;
+        finally
+	        SL.Free();
+        end;//try-finally
+			end //GM cmd #item
+
+      else if (Copy(str, 1, 7) = 'option ') AND ((DebugCMD AND $0400) <> 0) AND
+      				(tid.ChangeOption = 1) then
+			begin
+        if Copy(str, 8, 5) = 'sight' then begin
+          tc.Option := tc.Option or 1;
+        end else if Copy(str, 8, 6) = 'ruwach' then begin
+          tc.Option := tc.Option or 8192;
+        end
+        //CRW 2004/04/07th - Set math increased code clarity.
+        else if (tc.JID IN [ 5, 10, 18, 23, 4006, 4011, 4019]) AND
+                (Copy(str, 8, 4) = 'cart') then
+        begin
+        //else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 23) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
+          tc.Option := tc.Option or 8;
+					//カートデータ送信
+{追加}		SendCart(tc);
+        end else if (tc.JID IN [ 11, 4012 ]) AND (Copy(str, 8, 6) = 'falcon')) then begin
+          tc.Option := tc.Option or $10;
+        end
+        else if (tc.JID IN [ 7, 14, 4008, 4014, 4015, 4023 ]) AND
+        				((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then
+        begin
+          tc.Option := tc.Option or $20;
+        end else if Copy(str, 8, 3) = 'off' then begin
+          tc.Option := 0;
+        end else begin
+          tc.Option := tc.Option or (StrToInt(Copy(str, 8, 6)));
+        end;
+        UpdateOption(tm, tc);
+
+      end else if (Copy(str, 1, 7) = 'refine ') and ((DebugCMD and $0800) <> 0) and (tid.Refine = 1)  then begin
+        //装備中の武器防具を精錬
+        Val(Copy(str, 8, 256), j, k);
+        if (k <> 0) or (j < 0) or (j > 10) then continue;
+        for i := 1 to 100 do begin
+          with tc.Item[i] do begin
+	          if (ID <> 0) AND (Amount <> 0) AND Data.IEquip AND (Equip <> 0) then
+            begin
+          	  tc.Item[i].Refine := Byte(j);
+        	    WFIFOW(0, $0188);
+      	      WFIFOW(2, 0);
+    	        WFIFOW(4, i);
+  	          WFIFOW(6, word(j));
+	            Socket.SendBuf(buf, 8);
             end;
-						end;
-{修正ココまで}
-					end else if (Copy(str, 1, 7) = 'ccolor ') and ((DebugCMD and $0040) <> 0)  and (tid.ChangeColorStyle = 1) then begin
-						//服の色変更
-						Val(Copy(str, 8, 256), i, k);
-						if (k = 0) and (i >= 0) and (i <= 77) then begin
-							tc.ClothesColor := i;
-							WFIFOW(0, $00c3);
-							WFIFOL(2, tc.ID);
-							WFIFOB(6, 7);
-							WFIFOB(7, i);
-							SendBCmd(tm, tc.Point, 8);
-						end;
-{髪色変更追加}
-					end else if (Copy(str, 1, 7) = 'hcolor ') and (tid.ChangeColorStyle = 1) then begin
-						//髪の色変更
-						Val(Copy(str, 8, 256), i, k);
-						if (k = 0) and (i >= 0) and (i <= 8) then begin
-							tc.HairColor := i;
-							WFIFOW(0, $00c3);
-							WFIFOL(2, tc.ID);
-							WFIFOB(6, 6);
-							WFIFOB(7, i);
-							SendBCmd(tm, tc.Point, 8);
-						end;
+          end;
+        end;//for
+        WFIFOW(0, $019b);
+        WFIFOL(2, tc.ID);
+        WFIFOL(6, 3);
+        SendBCmd(tm, tc.Point, 10, tc);
+        CalcStat(tc);
+        SendCStat(tc);
+      end else if (Copy(str, 1, 5) = 'unit ') and ((DebugCMD and $1000) <> 0) and (tid.AutoRawUnit = 1) then begin
+        //スキル効能地表示テスト
+        Val(Copy(str, 6, 256), j, k);
+        if (k <> 0) or (j < 0) or (j > 999) then continue;
+        SetSkillUnit(tm, tc.ID, Point(tc.Point.X + 1, tc.Point.Y - 1), timeGetTime(), j, 1, 10000);
 
-          end else if (Copy(str, 1, 7) = 'hstyle ') and (tid.ChangeColorStyle = 1) then begin
-						//髪の色変更
-						Val(Copy(str, 8, 256), i, k);
-						if (k = 0) and (i >= 0) and (i <= 19) then begin
-							tc.Hair := i;
-							WFIFOW(0, $00c3);
-							WFIFOL(2, tc.ID);
-							WFIFOB(6, 1);
-							WFIFOB(7, i);
-							SendBCmd(tm, tc.Point, 8);
-						end;
-
-					end else if (Copy(str, 1, 3) = 'die') and ((DebugCMD and $0080) <> 0) and (tid.KillDieAlive = 1) then begin
-						//自殺
-						tc.HP := 0;
-						tc.Sit := 1;
-						SendCStat1(tc, 0, 5, tc.HP);
-						WFIFOW(0, $0080);
-						WFIFOL(2, tc.ID);
-						WFIFOB(6, 1);
-						Socket.SendBuf(buf, 7);
-                                                WFIFOW( 0, $0080);
-                                                WFIFOL( 2, tc.ID);
-                                                WFIFOB( 6, 1);
-                                                SendBCmd(tm, tc.Point, 7);
-					end else if (Copy(str, 1, 5) = 'alive') and ((DebugCMD and $0100) <> 0) and (tid.KillDieAlive =1 ) then begin
-						//生き返り
-						tc.HP := tc.MAXHP;
-						tc.SP := tc.MAXSP;
-						tc.Sit := 3;
-						SendCStat1(tc, 0, 5, tc.HP);
-						SendCStat1(tc, 0, 7, tc.SP);
-						WFIFOW( 0, $0148);
-						WFIFOL( 2, tc.ID);
-						WFIFOW( 6, 100);
-						SendBCmd(tm, tc.Point, 8);
-                                        {end else if (Copy(str, 1, 5) = 'noday') then begin
-                                                if tc.noday = false then
-						        tc.noday := true
-                                                else if tc.noday = true then
-                                                        tc.noday := false;}
-					end else if (Copy(str, 1, 5) = 'item ') and ((DebugCMD and $0200) <> 0) and (tid.ItemSummon = 1) then begin
-						//アイテム作成
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 6, 256);
-						if sl.Count = 2 then begin
-							Val(sl.Strings[0], i, k);
-							if k <> 0 then continue;
-							if ItemDB.IndexOf(i) = -1 then continue;
-							Val(sl.Strings[1], j, k);
-							if k <> 0 then continue;
-							if (j <= 0) or (j > 30000) then continue;
-							td := ItemDB.IndexOfObject(i) as TItemDB;
-							if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
-								k := SearchCInventory(tc, i, td.IEquip);
-								if k <> 0 then begin
-									if tc.Item[k].Amount + j > 30000 then continue;
-									if td.IEquip then j := 1;
-									//アイテム追加
-									tc.Item[k].ID := i;
-									tc.Item[k].Amount := tc.Item[k].Amount + j;
-									tc.Item[k].Equip := 0;
-									tc.Item[k].Identify := 1;
-									tc.Item[k].Refine := 0;
-									tc.Item[k].Attr := 0;
-									tc.Item[k].Card[0] := 0;
-									tc.Item[k].Card[1] := 0;
-									tc.Item[k].Card[2] := 0;
-									tc.Item[k].Card[3] := 0;
-									tc.Item[k].Data := td;
-									//重量追加
-									tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
-									SendCStat1(tc, 0, $0018, tc.Weight);
-
-									//アイテムゲット通知
-									SendCGetItem(tc, k, j);
-								end;
-							end else begin
-								//重量オーバー
-								WFIFOW( 0, $00a0);
-								WFIFOB(22, 2);
-								Socket.SendBuf(buf, 23);
-							end;
-						end;
-						sl.Free();
-
-					end else if (Copy(str, 1, 7) = 'option ') and ((DebugCMD and $0400) <> 0) and (tid.ChangeOption = 1) then begin
-
-						if Copy(str, 8, 5) = 'sight' then begin
-							tc.Option := tc.Option or 1;
-						end else if Copy(str, 8, 6) = 'ruwach' then begin
-							tc.Option := tc.Option or 8192;
-						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 23) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
-							tc.Option := tc.Option or 8;
-							//カートデータ送信
-{追加}				SendCart(tc);
-						end else if (((tc.JID = 11) or (tc.JID = 4012)) and (Copy(str, 8, 6) = 'falcon')) then begin
-							tc.Option := tc.Option or $10;
-						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015) or (tc.JID = 4014) or (tc.JID = 4023)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then begin
-							tc.Option := tc.Option or $20;
-						end else if Copy(str, 8, 3) = 'off' then begin
-							tc.Option := 0;
-						end else begin
-              tc.Option := tc.Option or (StrToInt(Copy(str, 8, 6)));              
-						end;
-            UpdateOption(tm, tc);
-
-					end else if (Copy(str, 1, 7) = 'refine ') and ((DebugCMD and $0800) <> 0) and (tid.Refine = 1)  then begin
-						//装備中の武器防具を精錬
-						Val(Copy(str, 8, 256), j, k);
-						if (k <> 0) or (j < 0) or (j > 10) then continue;
-						for i := 1 to 100 do begin
-							if (tc.Item[i].ID <> 0) and (tc.Item[i].Amount <> 0) and tc.Item[i].Data.IEquip and
-								 (tc.Item[i].Equip <> 0) then begin
-								tc.Item[i].Refine := byte(j);
-								WFIFOW(0, $0188);
-								WFIFOW(2, 0);
-								WFIFOW(4, i);
-								WFIFOW(6, word(j));
-								Socket.SendBuf(buf, 8);
-							end;
-						end;
-						WFIFOW(0, $019b);
-						WFIFOL(2, tc.ID);
-						WFIFOL(6, 3);
-						SendBCmd(tm, tc.Point, 10, tc);
-						CalcStat(tc);
-						SendCStat(tc);
-					end else if (Copy(str, 1, 5) = 'unit ') and ((DebugCMD and $1000) <> 0) and (tid.AutoRawUnit = 1) then begin
-						//スキル効能地表示テスト
-						Val(Copy(str, 6, 256), j, k);
-						if (k <> 0) or (j < 0) or (j > 999) then continue;
-						SetSkillUnit(tm, tc.ID, Point(tc.Point.X + 1, tc.Point.Y - 1), timeGetTime(), j, 1, 10000);
-
-					end else if (Copy(str, 1, 5) = 'stat ') and ((DebugCMD and $2000) <> 0) and (tid.ChangeOption = 1) then begin
-						//0x0119パケテスト
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 6, 256);
-						try
-							if sl.Count <> 4 then continue;
-							Val(sl.Strings[0], i, ii);
-							if ii <> 0 then continue;
-							Val(sl.Strings[1], j, ii);
-							if ii <> 0 then continue;
-							Val(sl.Strings[2], k, ii);
-							if ii <> 0 then continue;
-							Val(sl.Strings[3], l, ii);
-							if ii <> 0 then continue;
-							WFIFOW(0, $0119);
-							WFIFOL(2, tc.ID);
-							WFIFOW(6, i);
-							WFIFOW(8, j);
-							WFIFOW(10, k);
-							WFIFOB(12, l);
-							SendBCmd(tm, tc.Point, 13);
-                                                        tc.Stat1 := i;
-                                                        tc.Stat2 := j;
-                                                        tc.Option := k;
-						finally
-							sl.Free();
-						end;
+      end else if (Copy(str, 1, 5) = 'stat ') and ((DebugCMD and $2000) <> 0) and (tid.ChangeOption = 1) then begin
+        //0x0119パケテスト
+        SL := TStringList.Create;
+        SL.DelimitedText := Copy(str, 6, 256);
+        try
+          if SL.Count <> 4 then continue;
+          Val(SL[0], i, ii);
+          if ii <> 0 then continue;
+          Val(SL[1], j, ii);
+          if ii <> 0 then continue;
+          Val(SL[2], k, ii);
+          if ii <> 0 then continue;
+          Val(SL[3], l, ii);
+          if ii <> 0 then continue;
+          WFIFOW(0, $0119);
+          WFIFOL(2, tc.ID);
+          WFIFOW(6, i);
+          WFIFOW(8, j);
+          WFIFOW(10, k);
+          WFIFOB(12, l);
+          SendBCmd(tm, tc.Point, 13);
+          tc.Stat1 := i;
+          tc.Stat2 := j;
+          tc.Option := k;
+        finally
+          SL.Free;
+        end;
 					end else if (Copy(str, 1, 4) = 'raw ') and ((DebugCMD and $2000) <> 0) and (tid.AutoRawUnit = 1) then begin
 						//任意パケテスト
 						sl := TStringList.Create;
