@@ -923,10 +923,10 @@ DebugOut.Lines.Add('Monster AI database loading...');
         end;
         //if (Job1[i + LOWER_JOB_END + 1]) then DebugOut.Lines.Add(Format('Job1[%d] set',[i+LOWER_JOB_END+1]));
 			end;
-      for i := 0 to MAX_JOB_NUMBER do begin
+      {for i := 0 to MAX_JOB_NUMBER do begin
         if (Job1[i]) and (ID = 394) then
           DebugOut.Lines.Add(Format('Skill %d, job %d is set',[tl.ID, i]));
-      end;
+      end;}
 			for i := 0 to 4 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
 				ReqLV1[i] := StrToInt(sl.Strings[46+i*2]);
