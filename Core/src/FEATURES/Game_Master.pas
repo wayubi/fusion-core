@@ -98,6 +98,9 @@ var
     GM_ATHENA_OPTION : Byte;
     GM_ATHENA_STORAGE : Byte;
     GM_ATHENA_SPEED : Byte;
+    GM_ATHENA_WHOMAP3 : Byte;
+    GM_ATHENA_WHOMAP2 : Byte;
+    GM_ATHENA_WHOMAP : Byte;
     GM_ATHENA_WHO3 : Byte;
     GM_ATHENA_WHO2 : Byte;
     GM_ATHENA_WHO : Byte;
@@ -230,6 +233,9 @@ var
     function command_athena_option(tc : TChara; str : String) : String;
     function command_athena_storage(tc : TChara) : String;
     function command_athena_speed(tc : TChara; str : String) : String;
+    function command_athena_whomap3(tc : TChara; str : String) : String;
+    function command_athena_whomap2(tc : TChara; str : String) : String;
+    function command_athena_whomap(tc : TChara; str : String) : String;
     function command_athena_who3(tc : TChara; str : String) : String;
     function command_athena_who2(tc : TChara; str : String) : String;
     function command_athena_who(tc : TChara; str : String) : String;
@@ -368,6 +374,9 @@ implementation
         GM_ATHENA_OPTION := StrToIntDef(sl.Values['ATHENA_OPTION'], 1);
         GM_ATHENA_STORAGE := StrToIntDef(sl.Values['ATHENA_STORAGE'], 1);
         GM_ATHENA_SPEED := StrToIntDef(sl.Values['ATHENA_SPEED'], 1);
+        GM_ATHENA_WHOMAP3 := StrToIntDef(sl.Values['ATHENA_WHOMAP3'], 1);
+        GM_ATHENA_WHOMAP2 := StrToIntDef(sl.Values['ATHENA_WHOMAP2'], 1);
+        GM_ATHENA_WHOMAP := StrToIntDef(sl.Values['ATHENA_WHOMAP'], 1);
         GM_ATHENA_WHO3 := StrToIntDef(sl.Values['ATHENA_WHO3'], 1);
         GM_ATHENA_WHO2 := StrToIntDef(sl.Values['ATHENA_WHO2'], 1);
         GM_ATHENA_WHO := StrToIntDef(sl.Values['ATHENA_WHO'], 1);
@@ -511,6 +520,9 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_OPTION', IntToStr(GM_ATHENA_OPTION));
         ini.WriteString('Athena GM Commands', 'ATHENA_STORAGE', IntToStr(GM_ATHENA_STORAGE));
         ini.WriteString('Athena GM Commands', 'ATHENA_SPEED', IntToStr(GM_ATHENA_SPEED));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHOMAP3', IntToStr(GM_ATHENA_WHOMAP3));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHOMAP2', IntToStr(GM_ATHENA_WHOMAP2));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHOMAP', IntToStr(GM_ATHENA_WHOMAP));
         ini.WriteString('Athena GM Commands', 'ATHENA_WHO3', IntToStr(GM_ATHENA_WHO3));
         ini.WriteString('Athena GM Commands', 'ATHENA_WHO2', IntToStr(GM_ATHENA_WHO2));
         ini.WriteString('Athena GM Commands', 'ATHENA_WHO', IntToStr(GM_ATHENA_WHO));
@@ -651,6 +663,9 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
             else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
             else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc, GM_ATHENA_SPEED)) ) then error_msg := command_athena_speed(tc, str)
+            else if ( (copy(str, 1, length('whomap3')) = 'whomap3') and (check_level(tc, GM_ATHENA_WHOMAP3)) ) then error_msg := command_athena_whomap3(tc, str)
+            else if ( (copy(str, 1, length('whomap2')) = 'whomap2') and (check_level(tc, GM_ATHENA_WHOMAP2)) ) then error_msg := command_athena_whomap2(tc, str)
+            else if ( (copy(str, 1, length('whomap')) = 'whomap') and (check_level(tc, GM_ATHENA_WHOMAP)) ) then error_msg := command_athena_whomap(tc, str)
             else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
             else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
             else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
@@ -3430,6 +3445,194 @@ Called when we're shutting down the server *only*
         sl.Free;
     end;
 
+    function command_athena_whomap3(tc : TChara; str : String) : String;
+    var
+        tc1 : TChara;
+        tp : TPlayer;
+        tm : TMap;
+        i, w, matches : Integer;
+        s, party, guild : String;
+    begin
+        Result := 'GM_ATHENA_WHOMAP3 Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 9, 256);
+        s := Trim(s);
+        if (maplist.IndexOf(s) = -1) then s := tc.map;
+        if Map.IndexOf(s) <> -1 then begin
+            tm := Map.Objects[Map.IndexOf(s)] as TMap;
+            for i := 0 to tm.CList.Count - 1 do begin
+                tc1 := tm.CList.objects[i] as TChara;
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tc1.PartyName = '' then party := chr(39) + 'None' + chr(39) else party := tc1.PartyName;
+                    if tc1.GuildName = '' then guild := chr(39) + 'None' + chr(39) else guild := tc1.GuildName;
+                    if tp.AccessLevel > 0 then begin
+                        str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | Party: ' + party + ' | Guild: ' + guild;
+                    end else begin
+                        str := 'Name: ' + tc1.Name + ' | Party: ' + party + ' | Guild: ' + guild;
+                    end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
+            end;
+        end;
+        if matches = 0 then str := 'No player found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else if matches > 1 then str := IntToStr(matches) + ' players found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else str := IntToStr(matches) + ' player found in map ' + chr(39) + s + '.gat' + chr(39) + '.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHOMAP3 Success.';
+        end;
+    end;
+
+    function command_athena_whomap2(tc : TChara; str : String) : String;
+    var
+        tc1 : TChara;
+        tp : TPlayer;
+        tm : TMap;
+        i, w, matches : Integer;
+        s, job : String;
+    begin
+        Result := 'GM_ATHENA_WHOMAP2 Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 9, 256);
+        s := Trim(s);
+        if (maplist.IndexOf(s) = -1) then s := tc.map;
+        if Map.IndexOf(s) <> -1 then begin
+            tm := Map.Objects[Map.IndexOf(s)] as TMap;
+            for i := 0 to tm.CList.Count - 1 do begin
+                tc1 := tm.CList.objects[i] as TChara;
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tc1.JID = 0 then job :='Novice' else
+                    if tc1.JID = 1 then job :='Swordsman' else
+                    if tc1.JID = 2 then job :='Mage' else
+                    if tc1.JID = 3 then job :='Archer' else
+                    if tc1.JID = 4 then job :='Acolyte' else
+                    if tc1.JID = 5 then job :='Merchant' else
+                    if tc1.JID = 6 then job :='Thief' else
+                    if tc1.JID = 7 then job :='Knight' else
+                    if tc1.JID = 8 then job :='Priest' else
+                    if tc1.JID = 9 then job :='Wizard' else
+                    if tc1.JID = 10 then job :='Blacksmith' else
+                    if tc1.JID = 11 then job :='Hunter' else
+                    if tc1.JID = 12 then job :='Assassin' else
+                    if tc1.JID = 13 then job :='Knight 2' else
+                    if tc1.JID = 14 then job :='Crusader' else
+                    if tc1.JID = 15 then job :='Monk' else
+                    if tc1.JID = 16 then job :='Sage' else
+                    if tc1.JID = 17 then job :='Rogue' else
+                    if tc1.JID = 18 then job :='Alchemist' else
+                    if tc1.JID = 19 then job :='Bard' else
+                    if tc1.JID = 20 then job :='Dancer' else
+                    if tc1.JID = 21 then job :='Crusader 2' else
+                    if tc1.JID = 22 then job :='Wedding' else
+                    if tc1.JID = 23 then job :='Super Novice' else
+                    if tc1.JID = 4001 then job :='High Novice' else
+                    if tc1.JID = 4002 then job :='High Swordsman' else
+                    if tc1.JID = 4003 then job :='High Mage' else
+                    if tc1.JID = 4004 then job :='High Archer' else
+                    if tc1.JID = 4005 then job :='High Acolyte' else
+                    if tc1.JID = 4006 then job :='High Merchant' else
+                    if tc1.JID = 4007 then job :='High Thief' else
+                    if tc1.JID = 4008 then job :='Lord Knight' else
+                    if tc1.JID = 4009 then job :='High Priest' else
+                    if tc1.JID = 4010 then job :='High Wizard' else
+                    if tc1.JID = 4011 then job :='Whitesmith' else
+                    if tc1.JID = 4012 then job :='Sniper' else
+                    if tc1.JID = 4013 then job :='Assassin Cross' else
+                    if tc1.JID = 4014 then job :='Lord Knight2' else
+                    if tc1.JID = 4015 then job :='Paladin' else
+                    if tc1.JID = 4016 then job :='Champion' else
+                    if tc1.JID = 4017 then job :='Professor' else
+                    if tc1.JID = 4018 then job :='Stalker' else
+                    if tc1.JID = 4019 then job :='Creator' else
+                    if tc1.JID = 4020 then job :='Clown' else
+                    if tc1.JID = 4021 then job :='Gypsy' else
+                    if tc1.JID = 4022 then job :='Paladin 2' else
+                    job := 'Unknown Class';
+
+                    if tp.AccessLevel > 0 then begin
+                            str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                        end else begin
+                            str := 'Name: ' + tc1.Name + ' | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                        end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
+            end;
+        end;
+        if matches = 0 then str := 'No player found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else if matches > 1 then str := IntToStr(matches) + ' players found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else str := IntToStr(matches) + ' player found in map ' + chr(39) + s + '.gat' + chr(39) + '.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHOMAP2 Success.';
+        end;
+    end;
+
+    function command_athena_whomap(tc : Tchara; str : String) : String;
+    var
+        tc1 : TChara;
+        tp : TPlayer;
+        tm : TMap;
+        i, w, matches : Integer;
+        s : String;
+    begin
+        Result := 'GM_ATHENA_WHOMAP Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 8, 256);
+        s := Trim(s);
+        if (maplist.IndexOf(s) = -1) then s := tc.map;
+        if Map.IndexOf(s) <> -1 then begin
+            tm := Map.Objects[Map.IndexOf(s)] as TMap;
+            for i := 0 to tm.CList.Count - 1 do begin
+                tc1 := tm.CList.objects[i] as TChara;
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tp.AccessLevel > 0 then begin
+                        str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | Location: ' + tc1.map + '.gat ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                    end else begin
+                        str := 'Name: ' + tc1.Name + ' | Location: ' + tc1.map + '.gat ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                    end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
+            end;
+        end;
+        if matches = 0 then str := 'No player found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else if matches > 1 then str := IntToStr(matches) + ' players found in map ' + chr(39) + s + '.gat' + chr(39) + '.' else str := IntToStr(matches) + ' player found in map ' + chr(39) + s + '.gat' + chr(39) + '.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHOMAP Success.';
+        end;
+    end;
+
     function command_athena_who3(tc : Tchara; str : String) : String;
     var
         tc1 : TChara;
@@ -3545,7 +3748,7 @@ Called when we're shutting down the server *only*
                     if tp.AccessLevel > 0 then begin
                             str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
                         end else begin
-                            str := 'Name: ' + tc1.Name + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                            str := 'Name: ' + tc1.Name + ' | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
                         end;
                     w := Length(str) + 4;
                     WFIFOW (0, $009a);
