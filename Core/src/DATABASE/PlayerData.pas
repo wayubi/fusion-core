@@ -1322,6 +1322,7 @@ uses
 
     		tpe := PetList.Objects[i] as TPet;
 
+            if (tpe.Index < 1) or (tpe.Index > 100) then Continue;
 	    	if tpe.PlayerID = 0 then continue;
 
     		if tpe.CharaID = 0 then begin
