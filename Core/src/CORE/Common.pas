@@ -196,6 +196,23 @@ type TMobAIDB = class
         //SkillType       :array[0..3] of integer;
 end;
 //------------------------------------------------------------------------------
+type TMobAIDBAegis = class
+// Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
+        Number  :integer;
+        Name    :string;
+        Status  :string;
+        SkillID :string;
+        SkillLV :integer;
+        Percent :integer;
+        Casting :integer;
+        Cast_Time :integer;
+        Cool_Time :integer;
+        Dispel  :string;
+        IfState :string;
+        IfCond :string
+end;
+//------------------------------------------------------------------------------
+
 // モンスターデータベース
 //ID,Name,JName,LV,HP,EXP,JEXP,Range,ATK1,ATK2,DEF1,DEF2,MDEF1,MDEF2,HIT,FLEE,
 //Scale,Race,Ele,Mode,Speed,ADelay,aMotion,dMotion,Drop1id,Drop1per,Drop2id,
@@ -1390,6 +1407,7 @@ var
 	MobDBName  :TStringList;
         {Monster Skill Database}
         MobAIDB    :TIntList32;
+        MobAIDBAegis:TIntList32;
         PharmacyDB :TIntList32;
   SlaveDBName:TStringList;
   MArrowDB   :TIntList32;

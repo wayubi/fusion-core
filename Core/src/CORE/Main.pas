@@ -202,6 +202,9 @@ begin
 
         MobAIDB := TIntList32.Create;
         MobAIDB.Sorted := true;
+        
+        MobAIDBAegis:= TIntList32.Create;
+        MobAIDBAegis.Sorted := true;
 
         PharmacyDB := TIntList32.Create;
         PharmacyDB.Sorted := true;

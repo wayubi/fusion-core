@@ -1,4 +1,5 @@
 
+- 03-28-04: Added Loading of the Aegis Monster SKills Database [Darkhelmet]
 - 03-25-04: Removed LOV/Storm Gust double divide error and damage error [Eliot]
 - 03-25-04: Fixed Sonic Blow PVP stacking bug [Eliot]
 - 03-25-04: Fixed Sonic Blow Stacking Bug and delay [Eliot]

@@ -58,6 +58,7 @@ var
 {NPCイベント追加ココまで}
 	tb  :TMobDB;
 	tsAI :TMobAIDB;
+  tsAI2 :TMobAIDBAegis;
 
       //  tPharm  :TPharmacyDB;  {Pharmacy's Database}
   tt  :TTerritoryDB;
@@ -728,6 +729,49 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	DebugOut.Lines.Add(Format('-> Total %d monster(s) skills loaded.', [MobAIDB.Count]));
 	Application.ProcessMessages;
 
+  {Aegis Monster Skills Load}
+
+  DebugOut.Lines.Add('Aegis Monster AI database loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\NpcAddSkillInfo.txt');
+	Reset(txt);
+	Readln(txt, str);
+  j := 1;
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+    sl.Delimiter := ' ';
+		sl.DelimitedText := str;
+    for i := sl.Count to 9 do
+			sl.Add('0');
+		for i := 0 to 9 do
+			if (sl.Strings[i] = '') then sl.Strings[i] := '0';
+
+    tsAI2 := TMobAIDBAegis.Create;
+    if (sl.Strings[0] <> '//') and (sl.Strings[0] <> '') then begin
+		  with tsAI2 do begin
+
+      Number  := j;
+      tsAI2.Name    := sl.Strings[0];
+      tsAI2.Status  := sl.Strings[1];
+      tsAI2.SkillID := sl.Strings[2];
+      tsAI2.SkillLV := StrToInt(sl.Strings[3]);
+      tsAI2.Percent := StrToInt(sl.Strings[4]);
+      //tsAI2.Casting := StrToInt(sl.Strings[5]);
+      tsAI2.Cast_Time := StrToInt(sl.Strings[5]);
+      tsAI2.Cool_Time := StrToInt(sl.Strings[6]);
+      tsAI2.Dispel := sl.Strings[7];
+      tsAI2.IfState := sl.Strings[8];
+      tsAI2.IfCond := sl.Strings[9];
+      j := j + 1;
+      //DebugOut.Lines.Add(Format('%d', [j]));
+      MobAIDB.AddObject(tsAI2.Number, tsAI2);
+      end;
+    end;
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDB.Count]));
+	Application.ProcessMessages;
 
 {Summon Monster List}
 	DebugOut.Lines.Add('Summon Monster List loading...');
@@ -738,6 +782,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	sl.Clear;
 	while not eof(txt) do begin
 		Readln(txt, str);
+    sl.Delimiter := ',';
 		sl.DelimitedText := str;
 		k := StrToInt(sl.Strings[1]);
 		if (MobDBName.IndexOf(sl.Strings[0]) <> -1) and (k > 0) then begin
