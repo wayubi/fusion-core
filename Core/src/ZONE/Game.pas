@@ -52,6 +52,7 @@ var
 	weight    :cardinal;
   c         :cardinal;
 	b         :byte;
+  b1        :byte;
 	len       :integer;
 	str       :string;
   str2      :string;
@@ -399,7 +400,7 @@ begin
          }
 				//ƒpƒ‰ƒ[ƒ^
 				CalcStat(tc);
-				SendCStat(tc);
+				SendCStat(tc, true);
 
 				//ƒAƒCƒeƒ€ƒf[ƒ
 				WFIFOW(0, $00a3);
@@ -2726,6 +2727,7 @@ end;
 				if (tc.ParamBase[w] < 100) and (tc.StatusPoint >= tc.ParamUp[w]) then begin
 					Inc(tc.ParamBase[w]);
 					b := tc.ParamBase[w];
+          b1 := tc.ParamUp[w];  // Save temp value to compare later
 					Dec(tc.StatusPoint, tc.ParamUp[w]);
 				end else begin
 					b := 0;
@@ -2739,11 +2741,20 @@ end;
                                                   
 					SendCStat(tc);
 					CalcStat(tc);
+
+          {Colus, 20030113: Update points-to-level up display if needed}
+          if (tc.ParamUp[w] > b1) then begin
+            WFIFOW(0, $00be);
+            WFIFOW(2, 32 + w);
+            WFIFOB(4, tc.ParamUp[w]);
+            Socket.SendBuf(buf, 5);
+          end;
 				end else begin
 					WFIFOB(4, 1);
 					WFIFOB(5, tc.ParamBase[w]);//C³‰ÓŠ
 					Socket.SendBuf(buf, 6);
 				end;
+
 			end;
 		//--------------------------------------------------------------------------
 		$00bf: //ƒGƒ‚[ƒVƒ‡ƒ“
