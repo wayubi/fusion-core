@@ -113,6 +113,7 @@ var
     GM_ATHENA_DEX : Byte;
     GM_ATHENA_LUK : Byte;
     GM_ATHENA_SPIRITBALL : Byte;
+    GM_ATHENA_QUESTSKILL : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -227,6 +228,7 @@ var
     function command_athena_dex(tc : TChara; str : String) : String;
     function command_athena_luk(tc : TChara; str : String) : String;
     function command_athena_spiritball(tc : TChara; str : String) : String;
+    function command_athena_questskill(tc : TChara; str : String) : String;
 
 implementation
 
@@ -346,6 +348,7 @@ implementation
         GM_ATHENA_DEX := StrToIntDef(sl.Values['ATHENA_DEX'], 1);
         GM_ATHENA_LUK := StrToIntDef(sl.Values['ATHENA_LUK'], 1);
         GM_ATHENA_SPIRITBALL := StrToIntDef(sl.Values['ATHENA_SPIRITBALL'], 1);
+        GM_ATHENA_QUESTSKILL := StrToIntDef(sl.Values['ATHENA_QUESTSKILL'], 1);
 
         sl.Free;
         ini.Free;
@@ -470,6 +473,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_DEX', IntToStr(GM_ATHENA_DEX));
         ini.WriteString('Athena GM Commands', 'ATHENA_LUK', IntToStr(GM_ATHENA_LUK));
         ini.WriteString('Athena GM Commands', 'ATHENA_SPIRITBALL', IntToStr(GM_ATHENA_SPIRITBALL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_QUESTSKILL', IntToStr(GM_ATHENA_QUESTSKILL));
 
         ini.Free;
 
@@ -598,6 +602,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('dex')) = 'dex') and (check_level(tc.ID, GM_ATHENA_DEX)) ) then error_msg := command_athena_dex(tc, str)
             else if ( (copy(str, 1, length('luk')) = 'luk') and (check_level(tc.ID, GM_ATHENA_LUK)) ) then error_msg := command_athena_luk(tc, str)
             else if ( (copy(str, 1, length('spiritball')) = 'spiritball') and (check_level(tc.ID, GM_ATHENA_SPIRITBALL)) ) then error_msg := command_athena_spiritball(tc, str)
+            else if ( (copy(str, 1, length('questskill')) = 'questskill') and (check_level(tc.ID, GM_ATHENA_QUESTSKILL)) ) then error_msg := command_athena_questskill(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -4336,6 +4341,21 @@ Called when we're shutting down the server *only*
             tc.spiritSpheres := i;
             UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
             Result := 'GM_ATHENA_SPIRITBALL Success.';
+        end;
+    end;
+
+    function command_athena_questskill(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+    begin
+        Result := 'GM_ATHENA_QUESTSKILL Failure.';
+
+        Val(Copy(str, 12, 256), i, k);
+
+        if (k = 0) and (i >= 144) and (i <= 157) then begin
+            tc.Skill[i].Lv := 1;
+            SendCSkillList(tc);
+            Result := 'GM_ATHENA_QUESTSKILL Success.';
         end;
     end;
 end.
