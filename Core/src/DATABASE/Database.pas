@@ -1674,6 +1674,7 @@ begin
     try
         ScriptList.Clear;
     except
+        ScriptList := TStringList.Create;
     end;
 
 	for i := 0 to sl1.Count - 1 do begin

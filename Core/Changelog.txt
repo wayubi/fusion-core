@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-20-04: Accessing undefined ScriptList in database caused crash. [AlexKreuz]
 - 08-18-04: Added Option_Mob_Spawn_Rate to Weiss.INI. Control amount of mob spawns. [AlexKreuz]
 - 08-18-04: Added Cold Bolt to PSS. [Trihan]
 - 08-18-04: Added Soul Strike to PSS. [Trihan]
