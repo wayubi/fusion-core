@@ -5528,15 +5528,15 @@ begin
                                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
                                                         tc.SP := 0;
-                                                        dmg[0] := dmg[0] *(8 + MAXSP div 100) + 250;
+                                                        dmg[0] := dmg[0] *(8 + SP div 100) + 250 + (tc.Skill[271].Lv * 150);
                                                         dmg[0] := dmg[0] + j;
                                                         if dmg[0] < 0 then begin
                                                                 dmg[0] := 0;
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
 
-                                                        SetLength(bb, 4);
-                                                        bb[0] := 4;
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
 
@@ -5567,6 +5567,7 @@ begin
                                                 end;
                                         end;
                                 end;
+
                                 272:   {Chain Combo Effect}
                                 begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
@@ -8299,16 +8300,19 @@ begin
                                                 ProcessType := 3;
                                                 spiritSpheres := spiritSpheres - 5;
                                         end;
-                                271:   //Extremity Fist
+
+                                271:    {Extremity Fist}
+                                begin
                                                 if tc.Skill[270].Tick > Tick then begin
                                                         if spiritSpheres = 5 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-                                                        dmg[0] := (tc.Skill[271].Data.Data1[MUseLV] * dmg[0]) div 100;
                                                         spbonus := tc.SP;
                                                         tc.SP := 0;
-                                                        dmg[0] := dmg[0] + spbonus;
+                                                        dmg[0] := dmg[0] *(8 + SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] + j;
                                                         if dmg[0] < 0 then begin
-                                                                dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                                                                dmg[0] := 0;
+                                                                //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
                                                         SetLength(bb, 6);
                                                         bb[0] := 6;
@@ -8332,6 +8336,7 @@ begin
                                                         tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
+
                                                         {20031223, Colus: Cancel Explosion Spirits after Ashura
                                                          Ashura's tick will control SP lockout time}
                                                         tc.Skill[271].Tick := Tick + 300000;
@@ -8339,9 +8344,10 @@ begin
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
                                                         SendCStat(tc);                                                        
-                                                        end;
-                                                        
                                                 end;
+                                        end;
+                                end;
+                                
                                 266:  //Investigate
                                                 if spiritSpheres <> 0 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
