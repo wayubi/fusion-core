@@ -868,7 +868,7 @@ Called when we're shutting down the server *only*
         end
 
         else begin
-            Result := Result + ' Invalid input. Format is <item ID> <quantity>.';
+            Result := Result + ' Insufficient input. Format is <item ID> <quantity>.';
         end;
         sl.Free;
     end;
@@ -956,86 +956,107 @@ Called when we're shutting down the server *only*
         end
 
         else begin
-            Result := Result + ' Invalid input. Format is <mode> (1 = auto attack, 2 = auto skill, 4 = auto loot, 16 = auto move) [skill ID] [skill level].';
+            Result := Result + ' Insufficient input. Format is <mode> (1 = auto attack, 2 = auto skill, 4 = auto loot, 16 = auto move) [skill ID] [skill level].';
         end;
         sl.Free;
     end;
 
     function command_hcolor(tc : TChara; str : String) : String;
     var
+        s : String;
         colour, k : Integer;
     begin
         Result := 'GM_HCOLOR Failure.';
 
-        if str <> '' then begin
-        Val(Copy(str, 8, 256), colour, k);
-        if k = 0 then begin
-            if (colour >= 0) and (colour <= 8) then begin
-                Result := 'GM_HCOLOR Success.';
-                tc.HairColor := colour;
-                UpdateLook(tc.MData, tc, 6, colour, 0, true);
+        s := Copy(str, 8, 256);
+
+        if s <> '' then begin
+            Val(Copy(str, 8, 256), colour, k);
+            if k = 0 then begin
+                if (colour >= 0) and (colour <= 8) then begin
+                    Result := 'GM_HCOLOR Success.';
+                    tc.HairColor := colour;
+                    UpdateLook(tc.MData, tc, 6, colour, 0, true);
+                end
+
+                else begin
+                    Result := Result + ' Colour must be in range [0-8].';
+                end;
             end
 
             else begin
-                Result := Result + ' Colour must be in range [0-8].';
+                Result := Result + ' Colour must be a valid integer.';
             end;
         end
 
         else begin
-            Result := Result + ' Colour must be a valid integer.';
-        end;
-        end
-
-        else begin
-            Result := Result + ' Please enter a colour number.';
+            Result := Result + ' Insufficient input. Format is <color number> (In range 0-8).';
         end;
     end;
 
     function command_ccolor(tc : TChara; str : String) : String;
     var
+        s : String;
         colour, k : Integer;
     begin
         Result := 'GM_CCOLOR Failure.';
 
-        Val(Copy(str, 8, 256), colour, k);
-        if k = 0 then begin
-            if (colour >= 0) and (colour <= 4) then begin
-                Result := 'GM_CCOLOR Success.';
-                tc.ClothesColor := colour;
-                UpdateLook(tc.MData, tc, 7, colour, 0, true);
+        s := Copy(str, 8, 256);
+
+        if s <> '' then begin
+            Val(Copy(str, 8, 256), colour, k);
+            if k = 0 then begin
+                if (colour >= 0) and (colour <= 4) then begin
+                    Result := 'GM_CCOLOR Success.';
+                    tc.ClothesColor := colour;
+                    UpdateLook(tc.MData, tc, 7, colour, 0, true);
+                end
+
+                else begin
+                    Result := Result + ' Colour must be in range [0-4].';
+                end;
             end
 
             else begin
-                Result := Result + ' Colour must be in range [0-4].';
+                Result := Result + ' Colour must be a valid integer.';
             end;
         end
 
         else begin
-            Result := Result + ' Colour must be a valid integer.';
+            Result := Result + ' Insufficient input. Format is <clothes colour> (In range 0-4).';
         end;
     end;
 
     function command_hstyle(tc : TChara; str : String) : String;
     var
+        s : String;
         style, k : Integer;
     begin
         Result := 'GM_HSTYLE Failure.';
 
-        Val(Copy(str, 8, 256), style, k);
-        if k = 0 then begin
-            if (style >= 0) and (style <= 20) then begin
-                Result := 'GM_HSTYLE Success.';
-                tc.Hair := style;
-                UpdateLook(tc.MData, tc, 1, style, 0, true);
+        s := Copy(str, 8, 256);
+
+        if s <> '' then begin
+            Val(Copy(str, 8, 256), style, k);
+            if k = 0 then begin
+                if (style >= 0) and (style <= 20) then begin
+                    Result := 'GM_HSTYLE Success.';
+                    tc.Hair := style;
+                    UpdateLook(tc.MData, tc, 1, style, 0, true);
+                end
+
+                else begin
+                    Result := Result + ' Style must be in range [0-20].';
+                end;
             end
 
             else begin
-                Result := Result + ' Style must be in range [0-20].';
+                Result := Result + ' Style must be a valid integer.';
             end;
         end
 
         else begin
-            Result := Result + ' Style must be a valid integer.';
+            Result := Result + ' Insufficient input. Format is <hairstyle> (In range 0-20).';
         end;
     end;
 
@@ -1048,26 +1069,31 @@ Called when we're shutting down the server *only*
 
         s := Copy(str, 6, 256);
         if s <> '' then begin
-        if (CharaName.Indexof(s) <> -1) then begin
-            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            if (CharaName.Indexof(s) <> -1) then begin
+                tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
 
-            if (tc1.Login = 2) then begin
-                tc1.HP := 0;
-                tc1.Sit := 1;
-                SendCStat1(tc1, 0, 5, tc1.HP);
+                if (tc1.Login = 2) then begin
+                    tc1.HP := 0;
+                    tc1.Sit := 1;
+                    SendCStat1(tc1, 0, 5, tc1.HP);
 
-                WFIFOW( 0, $0080);
-                WFIFOL( 2, tc1.ID);
-                WFIFOB( 6, 1);
-                SendBCmd(tc1.MData, tc1.Point, 7);
+                    WFIFOW( 0, $0080);
+                    WFIFOL( 2, tc1.ID);
+                    WFIFOB( 6, 1);
 
-                Result := 'GM_KILL Success. ' + s + ' has been killed.';
-            end else begin
-                Result := Result + ' ' + s + ' is not logged in.';
+                    SendBCmd(tc1.MData, tc1.Point, 7);
+
+                    Result := 'GM_KILL Success. ' + s + ' has been killed.';
+                end
+
+                else begin
+                    Result := Result + ' ' + s + ' is not logged in.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' ' + s + ' is an invalid character name.';
             end;
-        end else begin
-            Result := Result + ' ' + s + ' is an invalid character name.';
-        end;
         end
 
         else begin
@@ -1080,19 +1106,28 @@ Called when we're shutting down the server *only*
         s : String;
         tc1 : TChara;
     begin
-        Result := 'GM_GOTO Success.';
+        Result := 'GM_GOTO Failure.';
 
         s := Copy(str, 6, 256);
-        if CharaName.Indexof(s) <> -1 then begin
-            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-            if (tc.Hidden = false) then SendCLeave(tc, 2);
-            tc.tmpMap := tc1.Map;
-            tc.Point := tc1.Point;
-            MapMove(tc.Socket, tc1.Map, tc1.Point);
 
-            Result := 'GM_GOTO Success. ' + tc.Name + ' warped to ' + s + '.';
-        end else begin
-            Result := 'GM_GOTO Failure. ' + s + ' is an invalid character name.';
+        if s <> '' then begin
+            if CharaName.Indexof(s) <> -1 then begin
+                tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+                if (tc.Hidden = false) then SendCLeave(tc, 2);
+                tc.tmpMap := tc1.Map;
+                tc.Point := tc1.Point;
+                MapMove(tc.Socket, tc1.Map, tc1.Point);
+
+                Result := 'GM_GOTO Success. ' + tc.Name + ' warped to ' + s + '.';
+            end
+
+            else begin
+                Result := Result + ' ' + s + ' is an invalid character name.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient input. Format is <charname>.';
         end;
     end;
 
@@ -1101,27 +1136,37 @@ Called when we're shutting down the server *only*
         s : String;
         tc1 : TChara;
     begin
-        Result := 'GM_SUMMON Success.';
+        Result := 'GM_SUMMON Failure.';
 
         s := Copy(str, 8, 256);
-        if CharaName.Indexof(s) <> -1 then begin
-            Result := 'GM_SUMMON Success. ' + s + ' warped to ' + tc.Name + '.';
-            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
 
-            if (tc1.Login = 2) then begin
-                SendCLeave(tc1, 2);
-                tc1.Map := tc.Map;
-                tc1.Point := tc.Point;
-                MapMove(tc1.Socket, tc.Map, tc.Point);
-            end else begin
-                tc1.Map := tc.Map;
-                tc1.Point := tc.Point;
+        if s <> '' then begin
+            if CharaName.Indexof(s) <> -1 then begin
+                Result := 'GM_SUMMON Success. ' + s + ' warped to ' + tc.Name + '.';
+                tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
 
-                Result := Result + ' But ' + s + ' is offline.';
+                if (tc1.Login = 2) then begin
+                    SendCLeave(tc1, 2);
+                    tc1.Map := tc.Map;
+                    tc1.Point := tc.Point;
+                    MapMove(tc1.Socket, tc.Map, tc.Point);
+                end
+
+                else begin
+                    tc1.Map := tc.Map;
+                    tc1.Point := tc.Point;
+
+                    Result := Result + ' But ' + s + ' is offline.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' ' + s + ' is an invalid character name.';
             end;
+        end
 
-        end else begin
-            Result := 'GM_SUMMON Failure. ' + s + ' is an invalid character name.';
+        else begin
+            Result := Result + ' Insufficient input. Format is <charname>.';
         end;
     end;
 
