@@ -1936,6 +1936,11 @@ begin
                 if (tc.Skill[284].Lv <> 0) and (ts.Data.Race = 9) then begin
                         dmg[0] := dmg[0] + (dmg[0] * tc.Skill[284].Data.Data1[tc.Skill[284].Lv] div 100);
                 end;
+                //Beast Bane
+                if (tc.Skill[126].Lv <> 0) and (ts.Data.Race = 2) then begin
+                 dmg[0] := dmg[0] + ATK[0][5];
+                 ATK[0][5]:= tc.Skill[126].Data.Data1[tc.Skill[126].Lv]
+                 end;
 
 		if Arms = 1 then exit;
 		//ダブルアタック

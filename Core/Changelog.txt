@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-14-04: Fixed Beat bane not giving bonus damage [Oatmeal]
 - 02-14-04: Fixed Triple blow delay  [Oatmeal]
 - 02-14-04: Fixed Guild Skill bug (#382) [beita]
 - 02-14-04: Added Combo delay for combos, needs delay time for Triple blow [Oatmeal]
