@@ -4771,6 +4771,7 @@ begin
 				w := 4;
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
+				  if UseSQL then GetCharaData(Member[i].ID);
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin
 						WFIFOL(w      , tc1.ID);
