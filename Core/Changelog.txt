@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 01-08-04: Added Cast time for monsters.  Cast is before skill though.  [Darhelmet]
 - 01-07-04: Added AutoSave option to Weiss.ini (Integer in seconds). [AlexKreuz]
 - 01-06-04: Updated Steal and Snatcher [Colus]
 - 01-06-04: Fixed Venom Dust [Darkhelmet]

@@ -14,6 +14,7 @@ uses
         procedure MobStatSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
+        procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI:TMobAIDB; i:integer; Tick:cardinal);
 
         function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Player Attacking Player}
         function DamageProcess3(tm:TMap; ts:TMob; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
@@ -311,6 +312,7 @@ begin
                 if tsAI.Skill[i] <> 0 then begin
                         if tsAI.PercentChance[i] > Random(200) then begin
                                 //DebugOut.Lines.Add('Success');
+                                MonsterCastTime(tm, ts, tsAI, i, Tick);
                                 MobSkills(tm, ts, tsAI, Tick, i);
                                 //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
                                 MobFieldSkills(tm, ts, tsAI, Tick, i);
@@ -993,7 +995,43 @@ begin
 	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
+procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI   :TMobAIDB; i:integer; Tick:cardinal);
+var
+        //tl     :TSkillDB;
+        tc      :TChara;
+        j      :integer;
+begin
 
+        tc := ts.AData;
+
+        //with Skill[tsAI.Skill[i]] do begin
+
+        j := tc.Skill[tsAI.Skill[i]].Data.CastTime1 + tc.Skill[tsAI.Skill[i]].Data.CastTime2 * tsAI.SkillLv[i];
+        if j < tc.Skill[tsAI.Skill[i]].Data.CastTime3  then j := tc.Skill[tsAI.Skill[i]].Data.CastTime3;
+
+        //j := j * tc.MCastTimeFix div 100;
+        if (j > 0) then begin
+                //Send Packets
+                WFIFOW( 0, $013e);
+                WFIFOL( 2, ts.ID);
+                WFIFOL( 6, ts.ATarget);
+                WFIFOW(10, 0);
+                WFIFOW(12, 0);
+                WFIFOW(14, tsAI.Skill[i]); //SkillID
+                WFIFOL(16, tc.Skill[tsAI.Skill[i]].Data.Element); //Element
+                WFIFOL(20, j);
+                SendBCmd(tm, ts.Point, 24);
+                ts.MMode := 1;
+                ts.ATick := Tick + cardinal(j);
+        end else begin
+                //ârè•Ç»Çµ
+                ts.MMode := 1;
+                ts.ATick := Tick;
+        end;
+       
+end;
+
+//------------------------------------------------------------------------------
 
 function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
