@@ -10267,7 +10267,6 @@ begin
 {追加:119}
 						$84: //マグヌス
 							begin
-              DebugOut.Lines.Add(Format('Element %d Race %d', [ts1.Element,ts1.Data.Race]));
 								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) then begin
 									//ダメージ算出
 									dmg[0] := tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1) * tn.CData.MATKFix div 100;
