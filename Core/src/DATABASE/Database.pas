@@ -2985,270 +2985,281 @@ begin
 
 {NPCイベント追加}
 	//サーバ共有フラグ保存
-	AssignFile(txt, AppPath + 'status.txt');
-	Rewrite(txt);
-	Writeln(txt, '##Weiss.StatusData.0x0002');
-	sl.Clear;
-	sl.Add('0');
-	cnt := 0;
-	for j := 0 to ServerFlag.Count - 1 do begin
-		if (Copy(ServerFlag[j], 1, 1) = '\') then begin
-			ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
-			if ((Copy(ServerFlag[j], 1, 1) <> '@') and (Copy(ServerFlag[j], 1, 2) <> '$@'))
-			and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
-				sl.Add(ServerFlag[j]);
-				Inc(cnt);
-			end;
-		end;
-	end;
-	sl.Strings[0] := IntToStr(cnt);
-	writeln(txt, sl.DelimitedText);
-	CloseFile(txt);
+
+  if ServerFlag.Count <> 0 then begin
+  	AssignFile(txt, AppPath + 'status.txt');
+	  Rewrite(txt);
+  	Writeln(txt, '##Weiss.StatusData.0x0002');
+	  sl.Clear;
+  	sl.Add('0');
+	  cnt := 0;
+  	for j := 0 to ServerFlag.Count - 1 do begin
+	  	if (Copy(ServerFlag[j], 1, 1) = '\') then begin
+			  ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
+		  	if ((Copy(ServerFlag[j], 1, 1) <> '@') and (Copy(ServerFlag[j], 1, 2) <> '$@'))
+  			and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
+	  			sl.Add(ServerFlag[j]);
+		  		Inc(cnt);
+			  end;
+  		end;
+	  end;
+  	sl.Strings[0] := IntToStr(cnt);
+	  writeln(txt, sl.DelimitedText);
+  	CloseFile(txt);
+  end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Status Saved');
 {NPCイベント追加ココまで}
 
 {パーティー機能追加}
-	AssignFile(txt, AppPath + 'gcastle.txt');
-	Rewrite(txt);
-	Writeln(txt, '##Weiss.GCastleData.0x0002');
-	for i := 0 to CastleList.Count - 1 do begin
-		tgc := CastleList.Objects[i] as TCastle;
-		sl.Clear;
-		with tgc do begin
-			sl.Add(Name);
-			sl.Add(IntToStr(GID));
-			sl.Add(GName);
-			sl.Add(GMName);
-			sl.Add(IntToStr(GKafra));
-			sl.Add(IntToStr(EDegree));
-			sl.Add(IntToStr(ETrigger));
-			sl.Add(IntToStr(DDegree));
-			sl.Add(IntToStr(DTrigger));
-			for j := 0 to 7 do begin
-			sl.Add(IntToStr(GuardStatus[j]));
-			end;
-		end;
-		writeln(txt, sl.DelimitedText);
-	end;
-	CloseFile(txt);
+  	if CastleList.Count <> 0 then begin
+    	AssignFile(txt, AppPath + 'gcastle.txt');
+    	Rewrite(txt);
+    	Writeln(txt, '##Weiss.GCastleData.0x0002');
+    	for i := 0 to CastleList.Count - 1 do begin
+    		tgc := CastleList.Objects[i] as TCastle;
+    		sl.Clear;
+    		with tgc do begin
+    			sl.Add(Name);
+    			sl.Add(IntToStr(GID));
+    			sl.Add(GName);
+    			sl.Add(GMName);
+    			sl.Add(IntToStr(GKafra));
+    			sl.Add(IntToStr(EDegree));
+    			sl.Add(IntToStr(ETrigger));
+    			sl.Add(IntToStr(DDegree));
+    			sl.Add(IntToStr(DTrigger));
+    			for j := 0 to 7 do begin
+    			sl.Add(IntToStr(GuardStatus[j]));
+    			end;
+    		end;
+    		writeln(txt, sl.DelimitedText);
+    	end;
+    	CloseFile(txt);
+    end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle Saved');
 
-	AssignFile(txt, AppPath + 'party.txt');
-	Rewrite(txt);
-	Writeln(txt, '##Weiss.PartyData.0x0002');
-	for i := 0 to PartyNameList.Count - 1 do begin
-		tpa := PartyNameList.Objects[i] as TParty;
-		sl.Clear;
-		with tpa do begin
-			sl.Add(Name);
-			for j := 0 to 11 do begin
-				sl.Add(IntToStr(MemberID[j]));
-			end;
-		end;
-		writeln(txt, sl.DelimitedText);
-	end;
-	CloseFile(txt);
+    if partynamelist.Count <> 0 then begin
+    	AssignFile(txt, AppPath + 'party.txt');
+    	Rewrite(txt);
+    	Writeln(txt, '##Weiss.PartyData.0x0002');
+    	for i := 0 to PartyNameList.Count - 1 do begin
+    		tpa := PartyNameList.Objects[i] as TParty;
+    		sl.Clear;
+    		with tpa do begin
+    			sl.Add(Name);
+    			for j := 0 to 11 do begin
+    				sl.Add(IntToStr(MemberID[j]));
+    			end;
+    		end;
+    		writeln(txt, sl.DelimitedText);
+    	end;
+    	CloseFile(txt);
+    end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
 {パーティー機能追加ココまで}
 
 {ギルド機能追加}
-	AssignFile(txt, AppPath + 'guild.txt');
-	Rewrite(txt);
-	Writeln(txt, '##Weiss.GuildData.0x0002');
-	for i := 0 to GuildList.Count - 1 do begin
-		tg := GuildList.Objects[i] as TGuild;
-		with tg do begin
-			//基本情報
-			sl.Clear;
-			sl.Add(IntToStr(ID));
-			sl.Add(Name);
-			sl.Add(IntToStr(LV));
-			sl.Add(IntToStr(EXP));
-			sl.Add(IntToStr(GSkillPoint));
-			sl.Add(Notice[0]);
-			sl.Add(Notice[1]);
-			sl.Add(Agit);
-			sl.Add(IntToStr(Emblem));
-			sl.Add(IntToStr(Present));
-			sl.Add(IntToStr(DisposFV));
-			sl.Add(IntToStr(DisposRW));
-			writeln(txt, sl.DelimitedText);
-			//メンバー情報
-			sl.Clear;
-			for j := 0 to 35 do begin
-				sl.Add(IntToStr(MemberID[j]));
-				sl.Add(IntToStr(MemberPos[j]));
-				sl.Add(IntToStr(MemberEXP[j]));
-			end;
-			writeln(txt, sl.DelimitedText);
-			//職位情報
-			sl.Clear;
-			for j := 0 to 19 do begin
-				sl.Add(PosName[j]);
-				if (PosInvite[j] = true) then sl.Add('1') else sl.Add('0');
-				if (PosPunish[j] = true) then sl.Add('1') else sl.Add('0');
-				sl.Add(IntToStr(PosEXP[j]));
-			end;
-			writeln(txt, sl.DelimitedText);
-			//スキル情報
-			sl.Clear;
-			sl.Add('0');
-			cnt := 0;
-			for j := 10000 to 10004 do begin
-				if GSkill[j].Lv <> 0 then begin
-					sl.Add(IntToStr(j));
-					sl.Add(IntToStr(GSkill[j].Lv));
-					Inc(cnt);
-				end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-			//追放者リスト、同盟・敵対リスト
-			sl.Clear;
-			sl.Add(IntToStr(GuildBanList.Count));
-			sl.Add(IntToStr(RelAlliance.Count));
-			sl.Add(IntToStr(RelHostility.Count));
-			for j := 0 to GuildBanList.Count - 1 do begin
-				tgb := GuildBanList.Objects[j] as TGBan;
-				sl.Add(tgb.Name);
-				sl.Add(tgb.AccName);
-				sl.Add(tgb.Reason);
-			end;
-			for j := 0 to RelAlliance.Count - 1 do begin
-				tgl := RelAlliance.Objects[j] as TGRel;
-				sl.Add(IntToStr(tgl.ID));
-				sl.Add(tgl.GuildName);
-			end;
-			for j := 0 to RelHostility.Count - 1 do begin
-				tgl := RelHostility.Objects[j] as TGRel;
-				sl.Add(IntToStr(tgl.ID));
-				sl.Add(tgl.GuildName);
-			end;
-			writeln(txt, sl.DelimitedText);
-		end;
-	end;
-	CloseFile(txt);
+	if guildlist.Count <> 0 then begin
+    	AssignFile(txt, AppPath + 'guild.txt');
+    	Rewrite(txt);
+    	Writeln(txt, '##Weiss.GuildData.0x0002');
+    	for i := 0 to GuildList.Count - 1 do begin
+    		tg := GuildList.Objects[i] as TGuild;
+    		with tg do begin
+    			//基本情報
+    			sl.Clear;
+    			sl.Add(IntToStr(ID));
+    			sl.Add(Name);
+    			sl.Add(IntToStr(LV));
+    			sl.Add(IntToStr(EXP));
+    			sl.Add(IntToStr(GSkillPoint));
+    			sl.Add(Notice[0]);
+    			sl.Add(Notice[1]);
+    			sl.Add(Agit);
+    			sl.Add(IntToStr(Emblem));
+    			sl.Add(IntToStr(Present));
+    			sl.Add(IntToStr(DisposFV));
+    			sl.Add(IntToStr(DisposRW));
+    			writeln(txt, sl.DelimitedText);
+    			//メンバー情報
+    			sl.Clear;
+    			for j := 0 to 35 do begin
+    				sl.Add(IntToStr(MemberID[j]));
+    				sl.Add(IntToStr(MemberPos[j]));
+    				sl.Add(IntToStr(MemberEXP[j]));
+    			end;
+    			writeln(txt, sl.DelimitedText);
+    			//職位情報
+    			sl.Clear;
+    			for j := 0 to 19 do begin
+    				sl.Add(PosName[j]);
+    				if (PosInvite[j] = true) then sl.Add('1') else sl.Add('0');
+    				if (PosPunish[j] = true) then sl.Add('1') else sl.Add('0');
+    				sl.Add(IntToStr(PosEXP[j]));
+    			end;
+    			writeln(txt, sl.DelimitedText);
+    			//スキル情報
+    			sl.Clear;
+    			sl.Add('0');
+    			cnt := 0;
+    			for j := 10000 to 10004 do begin
+    				if GSkill[j].Lv <> 0 then begin
+    					sl.Add(IntToStr(j));
+    					sl.Add(IntToStr(GSkill[j].Lv));
+    					Inc(cnt);
+    				end;
+    			end;
+    			sl.Strings[0] := IntToStr(cnt);
+    			writeln(txt, sl.DelimitedText);
+    			//追放者リスト、同盟・敵対リスト
+    			sl.Clear;
+    			sl.Add(IntToStr(GuildBanList.Count));
+    			sl.Add(IntToStr(RelAlliance.Count));
+    			sl.Add(IntToStr(RelHostility.Count));
+    			for j := 0 to GuildBanList.Count - 1 do begin
+    				tgb := GuildBanList.Objects[j] as TGBan;
+    				sl.Add(tgb.Name);
+    				sl.Add(tgb.AccName);
+    				sl.Add(tgb.Reason);
+    			end;
+    			for j := 0 to RelAlliance.Count - 1 do begin
+    				tgl := RelAlliance.Objects[j] as TGRel;
+    				sl.Add(IntToStr(tgl.ID));
+    				sl.Add(tgl.GuildName);
+    			end;
+    			for j := 0 to RelHostility.Count - 1 do begin
+    				tgl := RelHostility.Objects[j] as TGRel;
+    				sl.Add(IntToStr(tgl.ID));
+    				sl.Add(tgl.GuildName);
+    			end;
+    			writeln(txt, sl.DelimitedText);
+    		end;
+    	end;
+    	CloseFile(txt);
+    end;
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
 {ギルド機能追加ココまで}
 
 //Cute Pet Load Start
-	AssignFile(txt, AppPath + 'pet.txt');
-	Rewrite(txt);
-	Writeln( txt, '##Weiss.PetData.0x0002' );
-	z := 0;
-	//Reset Pet Saves to prevent Dupes
-	for i := 0 to PetList.Count - 1 do begin
-		tpe := PetList.Objects[i] as TPet;
-		tpe.Saved := 0;
-	end;
-
-	for i := 0 to Player.Count - 1 do begin
-		tp := Player.Objects[i] as TPlayer;
-
-		for j := 1 to 100 do begin
-			with tp.Kafra.Item[j] do begin
-				if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-					for k := 0 to PetList.Count - 1 do begin
-						//k := Card[2] + Card[3] * $10000;
-						if (PetList.IndexOf( k ) <> -1)  then begin
-							tpe := PetList.IndexOfObject( k ) as TPet;
-							if tpe.Saved = 0 then begin
-								sl.Clear;
-								sl.Add( IntToStr( tpe.PlayerID ) );
-								sl.Add( IntToStr( tpe.CharaID ) );
-								sl.Add( IntToStr( tpe.Cart ) ); // Cart
-								sl.Add( IntToStr( tpe.Index ) ); // Index
-								sl.Add( IntToStr( tpe.Incubated ) );
-								sl.Add( IntToStr( tpe.PetID ) ); // PetID
-								sl.Add( IntToStr( tpe.JID ) );
-								sl.Add( tpe.Name );
-								sl.Add( IntToStr( tpe.Renamed ) );
-								sl.Add( IntToStr( tpe.LV ) );
-								sl.Add( IntToStr( tpe.Relation  ) );
-								sl.Add( IntToStr( tpe.Fullness  ) );
-								sl.Add( IntToStr( tpe.Accessory ) );
-								tpe.Saved := 1;
-								z := j;
-								Writeln( txt, sl.DelimitedText );
-							end;
-						end;
-					end;
-				end;
-			end;
-		end;
-
-		for m := 0 to 8 do begin;
-			if tp.CData[m] <> nil then begin
-			//for i := 0 to Chara.Count - 1 do begin
-				//tc := Chara.Objects[i] as TChara;
-				tc := tp.CData[m];
-				for j := 1 to 100 do begin
-					with tc.Item[j] do begin
-						if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-							//k := Card[2] + Card[3] * $10000;
-							for k := 0 to PetList.Count - 1 do begin
-								if (PetList.IndexOf( k ) <> -1) then begin
-									tpe := PetList.IndexOfObject( k ) as TPet;
-										if tpe.Saved = 0 then begin
-											sl.Clear;
-											sl.Add( IntToStr( tpe.PlayerID ) );
-											sl.Add( IntToStr( tpe.CharaID ) );
-											sl.Add( IntToStr( tpe.Cart ) ); // Cart
-											sl.Add( IntToStr( tpe.Index ) ); // Index
-											sl.Add( IntToStr( tpe.Incubated ) );
-											sl.Add( IntToStr( tpe.PetID ) ); // PetID
-											sl.Add( IntToStr( tpe.JID ) );
-											sl.Add( tpe.Name );
-											sl.Add( IntToStr( tpe.Renamed ) );
-											sl.Add( IntToStr( tpe.LV ) );
-											sl.Add( IntToStr( tpe.Relation  ) );
-											sl.Add( IntToStr( tpe.Fullness  ) );
-											sl.Add( IntToStr( tpe.Accessory ) );
-											Writeln(txt, sl.DelimitedText);
-											tpe.Saved := 1;
-											z := j;
-										end;
-									end;
-								end;
-							end;
-						end;
-
-
-					//for j := 1 to 100 do begin
-						with tc.Cart.Item[j] do begin
-							if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-								//k := Card[2] + Card[3] * $10000;
-								for k := 0 to PetList.Count - 1 do begin
-									if (PetList.IndexOf( k ) <> -1) then begin
-										if tpe.Saved = 0 then begin
-											tpe := PetList.IndexOfObject( k ) as TPet;
-											sl.Clear;
-											sl.Add( IntToStr( tpe.PlayerID ) );
-											sl.Add( IntToStr( tpe.CharaID ) );
-											sl.Add( IntToStr( tpe.Cart ) ); // Cart
-											sl.Add( IntToStr( tpe.Index ) ); // Index
-											sl.Add( IntToStr( tpe.Incubated ) );
-											sl.Add( IntToStr( tpe.PetID ) ); // PetID
-											sl.Add( IntToStr( tpe.JID ) );
-											sl.Add( tpe.Name );
-											sl.Add( IntToStr( tpe.Renamed ) );
-											sl.Add( IntToStr( tpe.LV ) );
-											sl.Add( IntToStr( tpe.Relation  ) );
-											sl.Add( IntToStr( tpe.Fullness  ) );
-											sl.Add( IntToStr( tpe.Accessory ) );
-											tpe.Saved := 1;
-											z := j;
-											Writeln( txt, sl.DelimitedText );
-										end;
-									end;
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
-		end;
-		CloseFile(txt);
+	if petlist.Count <> 0 then begin
+    	AssignFile(txt, AppPath + 'pet.txt');
+    	Rewrite(txt);
+    	Writeln( txt, '##Weiss.PetData.0x0002' );
+    	z := 0;
+    	//Reset Pet Saves to prevent Dupes
+    	for i := 0 to PetList.Count - 1 do begin
+    		tpe := PetList.Objects[i] as TPet;
+    		tpe.Saved := 0;
+    	end;
+    
+    	for i := 0 to Player.Count - 1 do begin
+    		tp := Player.Objects[i] as TPlayer;
+    
+    		for j := 1 to 100 do begin
+    			with tp.Kafra.Item[j] do begin
+    				if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
+    					for k := 0 to PetList.Count - 1 do begin
+    						//k := Card[2] + Card[3] * $10000;
+    						if (PetList.IndexOf( k ) <> -1)  then begin
+    							tpe := PetList.IndexOfObject( k ) as TPet;
+    							if tpe.Saved = 0 then begin
+    								sl.Clear;
+    								sl.Add( IntToStr( tpe.PlayerID ) );
+    								sl.Add( IntToStr( tpe.CharaID ) );
+    								sl.Add( IntToStr( tpe.Cart ) ); // Cart
+    								sl.Add( IntToStr( tpe.Index ) ); // Index
+    								sl.Add( IntToStr( tpe.Incubated ) );
+    								sl.Add( IntToStr( tpe.PetID ) ); // PetID
+    								sl.Add( IntToStr( tpe.JID ) );
+    								sl.Add( tpe.Name );
+    								sl.Add( IntToStr( tpe.Renamed ) );
+    								sl.Add( IntToStr( tpe.LV ) );
+    								sl.Add( IntToStr( tpe.Relation  ) );
+    								sl.Add( IntToStr( tpe.Fullness  ) );
+    								sl.Add( IntToStr( tpe.Accessory ) );
+    								tpe.Saved := 1;
+    								z := j;
+    								Writeln( txt, sl.DelimitedText );
+    							end;
+    						end;
+    					end;
+    				end;
+    			end;
+    		end;
+    
+    		for m := 0 to 8 do begin;
+    			if tp.CData[m] <> nil then begin
+    			//for i := 0 to Chara.Count - 1 do begin
+    				//tc := Chara.Objects[i] as TChara;
+    				tc := tp.CData[m];
+    				for j := 1 to 100 do begin
+    					with tc.Item[j] do begin
+    						if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
+    							//k := Card[2] + Card[3] * $10000;
+    							for k := 0 to PetList.Count - 1 do begin
+    								if (PetList.IndexOf( k ) <> -1) then begin
+    									tpe := PetList.IndexOfObject( k ) as TPet;
+    										if tpe.Saved = 0 then begin
+    											sl.Clear;
+    											sl.Add( IntToStr( tpe.PlayerID ) );
+    											sl.Add( IntToStr( tpe.CharaID ) );
+    											sl.Add( IntToStr( tpe.Cart ) ); // Cart
+    											sl.Add( IntToStr( tpe.Index ) ); // Index
+    											sl.Add( IntToStr( tpe.Incubated ) );
+    											sl.Add( IntToStr( tpe.PetID ) ); // PetID
+    											sl.Add( IntToStr( tpe.JID ) );
+    											sl.Add( tpe.Name );
+    											sl.Add( IntToStr( tpe.Renamed ) );
+    											sl.Add( IntToStr( tpe.LV ) );
+    											sl.Add( IntToStr( tpe.Relation  ) );
+    											sl.Add( IntToStr( tpe.Fullness  ) );
+    											sl.Add( IntToStr( tpe.Accessory ) );
+    											Writeln(txt, sl.DelimitedText);
+    											tpe.Saved := 1;
+    											z := j;
+    										end;
+    									end;
+    								end;
+    							end;
+    						end;
+    
+    
+    					//for j := 1 to 100 do begin
+    						with tc.Cart.Item[j] do begin
+    							if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
+    								//k := Card[2] + Card[3] * $10000;
+    								for k := 0 to PetList.Count - 1 do begin
+    									if (PetList.IndexOf( k ) <> -1) then begin
+    										if tpe.Saved = 0 then begin
+    											tpe := PetList.IndexOfObject( k ) as TPet;
+    											sl.Clear;
+    											sl.Add( IntToStr( tpe.PlayerID ) );
+    											sl.Add( IntToStr( tpe.CharaID ) );
+    											sl.Add( IntToStr( tpe.Cart ) ); // Cart
+    											sl.Add( IntToStr( tpe.Index ) ); // Index
+    											sl.Add( IntToStr( tpe.Incubated ) );
+    											sl.Add( IntToStr( tpe.PetID ) ); // PetID
+    											sl.Add( IntToStr( tpe.JID ) );
+    											sl.Add( tpe.Name );
+    											sl.Add( IntToStr( tpe.Renamed ) );
+    											sl.Add( IntToStr( tpe.LV ) );
+    											sl.Add( IntToStr( tpe.Relation  ) );
+    											sl.Add( IntToStr( tpe.Fullness  ) );
+    											sl.Add( IntToStr( tpe.Accessory ) );
+    											tpe.Saved := 1;
+    											z := j;
+    											Writeln( txt, sl.DelimitedText );
+    										end;
+    									end;
+    								end;
+    							end;
+    						end;
+    					end;
+    				end;
+    			end;
+    		end;
+    		CloseFile(txt);
+        end;
 
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet Saved');
 //Cute Pet Load End
