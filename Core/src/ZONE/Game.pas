@@ -3444,7 +3444,7 @@ end;
 				//パケ送信
 				WFIFOW( 0, $00f4);
 				WFIFOW( 2, j);
-				WFIFOL( 4, tp.Kafra.Item[j].Amount);
+				WFIFOL( 4, w2);//tp.Kafra.Item[j].Amount
 				WFIFOW( 8, tp.Kafra.Item[j].ID);
 				WFIFOB(10, tp.Kafra.Item[j].Identify);
 				WFIFOB(11, tp.Kafra.Item[j].Attr);
@@ -3519,13 +3519,15 @@ end;
         				SendCGetItem(tc, j, w2);
 				        //倉庫のアイテム数減少
 			        	Dec(tp.Kafra.Item[w1].Amount, w2);
-		        		if tp.Kafra.Item[w1].Amount = 0 then tp.Kafra.Item[w1].ID := 0;
+		        		if tp.Kafra.Item[w1].Amount = 0 then begin
+                  tp.Kafra.Item[w1].ID := 0;
+                  Dec(tp.Kafra.Count);
+                end;
 	        			WFIFOW( 0, $00f6);
         				WFIFOW( 2, w1);
 				        WFIFOL( 4, l);
 			        	Socket.SendBuf(buf, 8);
 		        		//倉庫アイテム数変更
-	        			Dec(tp.Kafra.Count);
         				WFIFOW(0, $00f2);
 				        WFIFOW(2, tp.Kafra.Count);
 			        	WFIFOW(4, 100);
