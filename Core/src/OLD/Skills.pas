@@ -174,7 +174,7 @@ Begin
         called before any tests for target type are made
         the reason being that one skill function should
         be used for both types of targets. }
-        parse_skills(tc);
+        parse_skills(tc, Tick);
 
 
 		if MTargetType = 0 then begin //Target is a monster
@@ -231,29 +231,7 @@ Begin
 
 
 
-				{ Alex: This is the test skill. We'll base the new structure
-                on this for now. So we'll disable this section. }
-				{Swordman Skills Player vs monster begin}
-				{6:  {Provoke}
-					{begin
-						ts.ATarget := tc.ID;
-						ts.ARangeFlag := false;
-						ts.AData := tc;
-						//Send graphical packet
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, MSkill);
-						WFIFOW( 4, MUseLV);
-						WFIFOL( 6, MTarget);
-						WFIFOL(10, ID);
-						if ts.Data.Race <> 1 then begin
-							WFIFOB(14, 1);
-							ts.ATKPer := word(tl.Data1[MUseLV]);
-							ts.DEFPer := word(tl.Data2[MUseLV]);
-						end else begin
-							WFIFOB(14, 0);
-						end;
-						SendBCmd(tm, ts.Point, 15);
-					end;}
+
 				7:  {Magnum Break}
 					begin
 						//Calculate the Damage the Skill Does
@@ -2436,10 +2414,9 @@ Begin
 				{CODE-ERROR: You have got to be joking...}
 				{Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
 					abort for the skills which require certain weapon types.}
-				5,42,46,316,324:
+				5,42,316,324:
 				{ 5   : Bash
 					42  : Mammonite
-					46  : Double Stafing
 					316 : Musical Strike
 					324 : Throw Arrow}
 				begin
@@ -2457,17 +2434,6 @@ Begin
 							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 						end else begin
 							//DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-							SendSkillError(tc, 6);
-							tc.MMode := 4;
-							Exit;
-						end;
-					end;
-
-					if (MSkill = 46) then begin       {Double Strafing}
-						if (Weapon = 11) then begin
-							dmg[0] := dmg[0] * 2;
-							j := 2;
-						end else begin
 							SendSkillError(tc, 6);
 							tc.MMode := 4;
 							Exit;
@@ -4734,7 +4700,7 @@ Begin
 						tc.MTick := Tick + 1000;
 						tc.Skill[MSkill].Tick := Tick + cardinal(2) * 1000;
 					end;
-			5,42,46,253,316,324: //バッシュ、メマー、DS、ピアース、SB
+			5,42,253,316,324: //バッシュ、メマー、DS、ピアース、SB
 				begin
 
 					j := 1;
@@ -4758,16 +4724,7 @@ Begin
 						end;
 					end;
 
-					if (MSkill = 46) then begin //DSは2連撃
-						if (Weapon = 11) then begin
-							dmg[0] := dmg[0] * 2;
-							j := 2;
-						end else begin
-							SendSkillError(tc, 6);
-							MMode := 4;
-							exit;
-						end;
-					end else if MSkill = 56 then begin //ピアースはts.Data.Scale + 1回hit
+					if MSkill = 56 then begin //ピアースはts.Data.Scale + 1回hit
 						j := 1;
 						dmg[0] := dmg[0] * j;
 					end else if MSkill = 253 then begin
@@ -4806,24 +4763,7 @@ Begin
 							frmMain.StatCalc2(tc, tc1, Tick);
 					end;
 
-            { Alex: This is the test skill. We'll base the new structure
-            on this for now. So we'll disable this section. }
-			{6: // PVP Provoke
-				{begin
-					frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					tc1.ATarget := tc.ID;
-					tc1.AData := tc;
-					//パケ送信
-					WFIFOW( 0, $011a);
-					WFIFOW( 2, MSkill);
-					WFIFOW( 4, MUseLV);
-					WFIFOL( 6, MTarget);
-					WFIFOL(10, ID);
-					WFIFOB(14, 0);
-					tc1.DamageFixS[1] := word(tl.Data1[MUseLV]); // ATK Increase upon the medium size to ease the pain.
-					tc1.DEF1 := word(tl.Data2[MUseLV]) * tc1.DEF1 div 100;
-					SendBCmd(tm, tc1.Point, 15);
-				end;}
+
 			7: //MB、アローシャワー、グリム
 				begin
 					//ダメージ算出1

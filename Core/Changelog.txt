@@ -1,3 +1,5 @@
+- 06-05-04: Switched skill [AC_DOUBLE] to PSS system. [AlexKreuz]
+- 06-05-04: Switched skill [SM_PROVOKE] to PSS system. [AlexKreuz]
 - 06-05-04: Player_Skills - Added Skill Double Strafing. [Darkhelmet]
 - 06-05-04: Added Skill Failure error checking to PSS. [AlexKreuz]
 - 06-05-04: Testing of PSS using SM_PROVOKE. [AlexKreuz]
