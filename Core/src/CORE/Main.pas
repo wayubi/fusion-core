@@ -10747,11 +10747,10 @@ begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-							if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin  //edited by The Harbinger -- darkWeiss Version
-
-              if (tc1.Sit <> 1) or (tc1.Option < 64) then begin
+							if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
+							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
 								sl.AddObject(IntToStr(tc1.ID), tc1);
-              end;
+							    end;
 							end;
 						end;
 					end;

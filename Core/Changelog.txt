@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-26-03: Monsters dont attack through walls anymore. [AlexKreuz]
 - 12-26-03: Added MaxUsers Exception for GM Type Accounts. [AlexKreuz]
 - 12-26-03: Updated GAT Type Map reading algorithm. [AlexKreuz]
 - 12-26-03: Finger Offensive can not be shot through wall anymore. [AlexKreuz]
