@@ -2613,23 +2613,26 @@ end;
 				end;
 
                                 // Tumy
-				CalcStat(tc); 
-{èCê≥}   SendCSkillList(tc); 
-                                        if (tc.Item[w1].Data.IType = 4) then begin 
-                                        WFIFOW(0, $01d7); 
-                                        WFIFOL(2, tc.ID); 
-                                        WFIFOB(6, 2); 
-                                        WFIFOW(7, tc.Item[w1].Data.id); 
-                                        WFIFOW(9, tc.Shield); 
-                                        Socket.SendBuf(buf, 11); 
-                                        end; 
+				CalcStat(tc);
+{èCê≥}  SendCSkillList(tc);
+        {Colus, 20040114: Moved sprite processing to SendCStat call}
+{
+                                        if (tc.Item[w1].Data.IType = 4) then begin
+
+                                        WFIFOW(0, $01d7);
+                                        WFIFOL(2, tc.ID);
+                                        WFIFOB(6, 2);
+                                        WFIFOW(7, tc.Item[w1].Data.id);
+                                        WFIFOW(9, tc.Shield);
+                                        Socket.SendBuf(buf, 11);
+                                        end;
                                         if tc.Item[w1].Data.IType = 5 then begin 
                                            WFIFOW(0, $00c3);  // real packet is 01d7 not sand this pk 
       WFIFOL(2, tc.ID); 
                               WFIFOB(6, 8); 
                               WFIFOB(7, tc.Item[w1].Data.view); 
                               Socket.SendBuf(buf, 8); 
-                                        end; 
+                                        end;  }
             SendCStat(tc, true);
             // Tumy
 
@@ -2658,23 +2661,24 @@ end;
                                WFIFOB(6, 1);
                                Socket.SendBuf(buf, 7);
                             end;
-                                if (tc.Item[w].Data.IType = 4) then begin 
-                                WFIFOW(0, $01d7); 
-                                WFIFOL(2, tc.ID); 
-                                WFIFOB(6, 2); 
-                                WFIFOW(7, 0); 
-                                WFIFOW(9, tc.Shield); 
-                                Socket.SendBuf(buf, 11); 
-                                end; 
-                                if (tc.Item[w].Data.IType = 5) then begin 
-                                WFIFOW(0, $00c3); 
-                                WFIFOL(2, tc.ID); 
-                                WFIFOB(6, 8); 
-                                WFIFOB(7, 0); 
-                                Socket.SendBuf(buf, 8); 
+        {Colus, 20040114: Moved sprite processing to SendCStat call}
+{                                if (tc.Item[w].Data.IType = 4) then begin
+                                WFIFOW(0, $01d7);
+                                WFIFOL(2, tc.ID);
+                                WFIFOB(6, 2);
+                                WFIFOW(7, 0);
+                                WFIFOW(9, tc.Shield);
+                                Socket.SendBuf(buf, 11);
                                 end;
-
-            CalcStat(tc); 
+                                if (tc.Item[w].Data.IType = 5) then begin
+                                WFIFOW(0, $00c3);
+                                WFIFOL(2, tc.ID);
+                                WFIFOB(6, 8);
+                                WFIFOB(7, 0);
+                                Socket.SendBuf(buf, 8);
+                                end;
+ }
+            CalcStat(tc);
             SendCStat(tc, true);
             // Tumy
 

@@ -634,6 +634,7 @@ type TChara = class
 	Param         :array[0..5] of word;
 	ParamUp       :array[0..5] of word;
 	WeaponType    :array[0..1] of word; //右手左手それぞれの武器のタイプ
+  WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
 {追加}
 	WeaponLv      :array[0..1] of word; //それぞれの武器レベル
 {追加ココまで}
@@ -1720,6 +1721,12 @@ begin
 						if Item[i].Equip = $20 then Side := 1;
 						ATK[Side][1] := Item[i].Data.ATK;
 						WeaponType[Side] := Item[i].Data.View;
+            {Colus, 20040114: Set weapon sprite for this hand}
+ 						WeaponSprite[Side] := Item[i].Data.ID;
+            if (Side = 1) then begin
+              Shield := 0;
+            end;
+            
 						if Item[i].Refine > 0 then begin
 							case Item[i].Data.wLV of
 							1:		j := 2;
@@ -1741,7 +1748,10 @@ begin
 						end else if (Item[i].Equip and 1) <> 0 then begin //頭下段
 							Head3 := Item[i].Data.View;
 						end else if (Item[i].Equip and 32) <> 0 then begin //盾
-							Shield := Item[i].Data.View;
+              {Colus, 20040114: Set shield sprite and reset weapon sprite}
+							// Shield := Item[i].Data.View;
+ 							Shield := Item[i].Data.ID;
+   						WeaponSprite[1] := 0;
 						end;
 						if Item[i].Refine > 0 then begin
 							DEF1 := DEF1 + Item[i].Refine;
@@ -1974,6 +1984,9 @@ begin
 		Range := 0;
 		WeaponType[0] := 0;
 		WeaponType[1] := 0;
+    {Colus, 20040114: Initialize weapon sprites}
+ 		WeaponSprite[0] := 0;
+		WeaponSprite[1] := 0;
 		Arrow := 0;
 		Head1 := 0;
 		Head2 := 0;
@@ -2878,16 +2891,21 @@ if View then begin
       WFIFOB(6, 5);
       WFIFOB(7, tc.Head2);
       tc.Socket.SendBuf(buf, 8);
-      WFIFOB(6, 8);
-      WFIFOB(7, tc.Shield);
-      tc.Socket.SendBuf(buf, 8); // patket change for view Shield
-     { New weapon sprite display packet?  Not working for us yet.
+      //WFIFOB(6, 8);
+      //WFIFOB(7, tc.Shield);
+      //tc.Socket.SendBuf(buf, 8); // patket change for view Shield
+
+      {Colus, 20040114: Using new weapon sprite display packet.}
       WFIFOW(0, $01d7);
       WFIFOL(2, tc.ID);
       WFIFOB(6, 2);
-      WFIFOW(7, tc.Weapon);
-      WFIFOW(9, tc.Shield);
-      tc.Socket.SendBuf(buf, 11);}
+      WFIFOW(7, tc.WeaponSprite[0]);
+      if (tc.Shield <> 0) then begin
+        WFIFOW(9, tc.Shield);
+      end else begin
+        WFIFOW(9, tc.WeaponSprite[1]);
+      end;
+      tc.Socket.SendBuf(buf, 11);
 end;
 // Tumy
 

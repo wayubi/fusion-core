@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
-Fusion 1.209 - January ??. 20003
+Fusion 1.209 - January ??. 2003
 --------------------------------------------------------------------------------
+- 01-14-04: Fixed new weapon sprites appearing on map load. [Colus]
 - 01-13-04: Updated DirMove algorithm. [Colus]
 - 01-13-04: Restored/corrected previous IW behavior until pathing is updated [Colus]
 - 01-13-04: Readded Savian's sprite fix (nonfunctional b/c of other code) [Colus]
