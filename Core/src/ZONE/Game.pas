@@ -747,7 +747,25 @@ end;
 					//#で始まるコマンド(主にでばぐ用)
           tid := IDTableDB.Objects[h] as TIDTbl;
 
-					if (Copy(str, 1, 4) = 'save') and ((DebugCMD and $0001) <> 0) and (tid.SaveReturn = 1) then begin
+
+// NEW GM COMMANDS
+if (Copy(str, 1, 8) = 'greaper') then begin
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, 0);
+        WFIFOW(8, 2);
+        WFIFOW(10, 64);
+        WFIFOB(12, 0);
+        SendBCmd(tm, tc.Point, 13);
+        tc.Stat1 := 0;
+        tc.Stat2 := 2;
+        tc.Option := 64;
+end
+// NEW GM COMMANDS
+
+
+
+					else if (Copy(str, 1, 4) = 'save') and ((DebugCMD and $0001) <> 0) and (tid.SaveReturn = 1) then begin
 						//現在地をセーブする
 						tc.SaveMap := tc.Map;
 						tc.SavePoint.X := tc.Point.X;
@@ -1577,6 +1595,9 @@ end;
 							WFIFOW(10, k);
 							WFIFOB(12, l);
 							SendBCmd(tm, tc.Point, 13);
+                                                        tc.Stat1 := i;
+                                                        tc.Stat2 := j;
+                                                        tc.Option := k;
 						finally
 							sl.Free();
 						end;
