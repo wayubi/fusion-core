@@ -767,6 +767,9 @@ type TChara = class
         Crusader      :Pointer;
         Autocastactive :Boolean;
         noday         :Boolean;
+
+        noSPRecovery  :Boolean;   {Player Cannot Recover SP}
+
         LastSong      :integer;   {Last Song a Bard Cast}
         LastSongLV    :integer;   {Level of last song a Bard Cast}
         InField       :boolean;   {Determine if a player is in a skill field}

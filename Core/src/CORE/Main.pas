@@ -9330,7 +9330,7 @@ begin
 				end;
 			end;
 			//SPŽ©“®‰ñ•œ
-			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) then begin
+			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (tc.noSPRecovery = False) then begin
 				if SP <> MAXSP then begin
 					for j := 1 to (Tick - SPTick) div SPDelay[3 - Sit] do begin
 						Inc(SP);
