@@ -1578,7 +1578,7 @@ var
 	//ele_db
 	ElementTable    :array[0..9] of array[0..99] of integer;
 
-	mm              :array[0..30] of array[0..30] of rSearchMap;
+	mm              :array[0..60] of array[0..60] of rSearchMap;
 
 	buf             :array[0..32767] of byte;
 //  buf2            :array[0..32767] of byte;{ChrstphrR 2004/04/24 - not used!}
