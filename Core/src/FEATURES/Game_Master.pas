@@ -775,28 +775,28 @@ Called when we're shutting down the server *only*
     end;
 
     function command_alive(tc : TChara) : String;
-    var
-        tm : TMap;
     begin
         Result := 'GM_ALIVE Success.';
 
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tc.HP := tc.MAXHP;
         tc.SP := tc.MAXSP;
         tc.Sit := 3;
+
         SendCStat1(tc, 0, 5, tc.HP);
         SendCStat1(tc, 0, 7, tc.SP);
+
         WFIFOW(0, $0148);
         WFIFOL(2, tc.ID);
         WFIFOW(6, 100);
-        SendBCmd(tm, tc.Point, 8);
+
+        SendBCmd(tc.MData, tc.Point, 8);
     end;
 
     function command_item(tc : TChara; str : String) : String;
     var
         sl : TStringList;
         td : TItemDB;
-        i, j, k : Integer;
+        item, quantity, k : Integer;
     begin
         Result := 'GM_ITEM Failure.';
 
@@ -804,52 +804,70 @@ Called when we're shutting down the server *only*
         sl.DelimitedText := Copy(str, 6, 256);
 
         if sl.Count = 2 then begin
-            Val(sl[0], i, k);
+            Val(sl[0], item, k);
 
-            if k <> 0 then Exit;
-            if ItemDB.IndexOf(i) = -1 then Exit;
+            if k = 0 then begin
+                if ItemDB.IndexOf(item) <> -1 then begin
+                    Val(sl[1], quantity, k);
 
-            Val(sl[1], j, k);
+                    if k = 0 then begin
+                        if (quantity > 0) or (quantity <= 30000) then begin
+                            td := ItemDB.IndexOfObject(item) as TItemDB;
 
-            if k <> 0 then Exit;
-            if (j <= 0) or (j > 30000) then Exit;
+                            if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(quantity) then begin
+                                k := SearchCInventory(tc, item, td.IEquip);
 
-            td := ItemDB.IndexOfObject(i) as TItemDB;
+                                if k <> 0 then begin
+                                    if tc.Item[k].Amount + quantity > 30000 then begin
+                                        quantity := 30000 - tc.Item[k].Amount;
+                                    end;
+                                    if td.IEquip then quantity := 1;
+                                    tc.Item[k].ID := item;
+                                    tc.Item[k].Amount := tc.Item[k].Amount + quantity;
+                                    tc.Item[k].Equip := 0;
+                                    tc.Item[k].Identify := 1;
+                                    tc.Item[k].Refine := 0;
+                                    tc.Item[k].Attr := 0;
+                                    tc.Item[k].Card[0] := 0;
+                                    tc.Item[k].Card[1] := 0;
+                                    tc.Item[k].Card[2] := 0;
+                                    tc.Item[k].Card[3] := 0;
+                                    tc.Item[k].Data := td;
+                                    tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(quantity);
+                                    SendCStat1(tc, 0, $0018, tc.Weight);
+                                    SendCGetItem(tc, k, quantity);
+                                    Result := 'GM_ITEM Success.';
+                                end;
+                            end
 
-            if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
-                k := SearchCInventory(tc, i, td.IEquip);
+                            else begin
+                                Result := Result + ' Creating this many items would make you overweight.';
+                            end;
+                        end
 
-                if k <> 0 then begin
-                    if tc.Item[k].Amount + j > 30000 then Exit;
-                    if td.IEquip then j := 1;
+                        else begin
+                            Result := Result + ' Quantity must be from 1-30000.';
+                        end;
+                    end
 
-                    tc.Item[k].ID := i;
-                    tc.Item[k].Amount := tc.Item[k].Amount + j;
-                    tc.Item[k].Equip := 0;
-                    tc.Item[k].Identify := 1;
-                    tc.Item[k].Refine := 0;
-                    tc.Item[k].Attr := 0;
-                    tc.Item[k].Card[0] := 0;
-                    tc.Item[k].Card[1] := 0;
-                    tc.Item[k].Card[2] := 0;
-                    tc.Item[k].Card[3] := 0;
-                    tc.Item[k].Data := td;
+                    else begin
+                        Result := Result + ' Quantity must be a valid integer.';
+                    end;
+                end
 
-                    tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
-                    SendCStat1(tc, 0, $0018, tc.Weight);
-
-                    SendCGetItem(tc, k, j);
-                    Result := 'GM_ITEM Success.';
+                else begin
+                    Result := Result + ' Item does not exist.';
                 end;
             end
 
             else begin
-                WFIFOW( 0, $00a0);
-                WFIFOB(22, 2);
-                tc.Socket.SendBuf(buf, 23);
+                Result := Result + ' Item ID must be a valid integer.';
             end;
-        end;
+        end
 
+        else begin
+            Result := Result + ' Invalid input. Format is <item ID> <quantity>.';
+        end;
         sl.Free;
     end;
 
