@@ -2,10 +2,10 @@ object frmMain: TfrmMain
   Left = 325
   Top = 248
   Width = 608
-  Height = 373
+  Height = 368
   Caption = 's'
   Color = clCream
-  Constraints.MaxHeight = 373
+  Constraints.MaxHeight = 368
   Constraints.MaxWidth = 608
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -30,7 +30,7 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 295
+    Top = 300
     Width = 600
     Height = 19
     Color = clCream
@@ -2389,7 +2389,7 @@ object frmMain: TfrmMain
             Top = 56
             Width = 41
             Height = 26
-            ItemHeight = 0
+            ItemHeight = 18
             TabOrder = 4
           end
           object CheckBox2: TCheckBox
