@@ -8,11 +8,11 @@ uses
 
     procedure PD_Load_Characters_Parse(UID : String = '*');
 
-    procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
-    procedure PD_Load_Characters_Memos(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
-    procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
-    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
-    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    procedure PD_Load_Characters_Memos(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
 
 implementation
 
@@ -64,13 +64,14 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters --------------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     var
+        path : String;
         i : Integer;
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
     
             if (UID = '*') then begin
                 tc := TChara.Create;
@@ -143,6 +144,9 @@ implementation
                 Chara.AddObject(tc.CID, tc);
             end;
 
+            if tc.CID < 100001 then tc.CID := tc.CID + 100001;
+            if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
+
         end;
 
         for i := 0 to 8 do begin
@@ -162,8 +166,9 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters Warp Memo Points ---------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Memos(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Memos(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     var
+        path : String;
         i, j : Integer;
         tc : TChara;
     begin
@@ -172,7 +177,7 @@ implementation
             if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
 
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             { -- Begin - Retrieve and assign values to character. -- }
             for j := 0 to 2 do begin
@@ -192,8 +197,9 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters Skills -------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     var
+        path : String;
         i, j, k : Integer;
         tc : TChara;
     begin
@@ -213,7 +219,7 @@ implementation
                 tc.Skill[tc.Plag].Plag := True;
             end;
 
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             { -- Begin - Retrieve and assign values to character. -- }
             for j := 0 to retrieve_length(path) do begin
@@ -238,8 +244,9 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters Inventory ----------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     var
+        path : String;
         i : Integer;
         tc : TChara;
     begin
@@ -248,7 +255,7 @@ implementation
             if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
 
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             retrieve_inventories(path, tc.Item);
 
@@ -262,8 +269,9 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters Cart ---------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     var
+        path : String;
         i : Integer;
         tc : TChara;
     begin
@@ -272,7 +280,7 @@ implementation
             if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
 
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             retrieve_inventories(path, tc.Cart.Item);
 

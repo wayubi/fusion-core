@@ -17,7 +17,7 @@ uses
     {Shared}
     SysUtils,
     {Fusion}
-    Common, SQLData, FusionSQL, PlayerData;
+    Common, SQLData, FusionSQL, Database, PlayerData;
 
 //==============================================================================
 // 関数定義
@@ -364,9 +364,16 @@ begin
 				if UseSQL then SaveCharaData(tc);
 				CharaName.AddObject(tc.Name, tc);
 				Chara.AddObject(tc.CID, tc);
+
 				RFIFOB(32, b);
 				tp.CName[b] := tc.Name;
 				tp.CData[b] := tc;
+
+                // Enable / Disable to save.
+                tp.Login := 1;
+                DataSave();
+                tp.Login := 0;
+                // TP should be disconnected at this point.
 
 				//キャラデータ送信
 				with tc do begin

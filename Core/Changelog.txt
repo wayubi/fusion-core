@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-27-04: Characters didnt save if created then canceled without logging in. [AlexKreuz]
+- 08-27-04: REED path errors. [AlexKreuz]
 - 08-27-04: #63 - Logging in to char select, cancel and login again broke account. [AlexKreuz]
 - 08-27-04: REED multi-player errors prevented startup. [AlexKreuz]
 - 08-27-04: #58 - WAC Did Not Add Emails. [AlexKreuz]
