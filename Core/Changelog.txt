@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-15-04: REED: Parties. Added invalid directory type loading protection. [AlexKreuz]
 - 09-15-04: REED: Major restructure to R.E.E.D Party Loading System. [AlexKreuz]
 - 09-12-04: Undid non-pvp skill fix. Fix allowed characters to attack each other in NoPVP mode. [AlexKreuz]
 - 09-12-04: Fixed the Sight link to Sight Rasher. [BieL®]

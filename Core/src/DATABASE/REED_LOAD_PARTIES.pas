@@ -62,7 +62,7 @@ implementation
 
         for i := 0 to resultlist.Count - 1 do begin
 
-            tpa := select_load_party(UID, tp, StrToInt(resultlist[i]));
+            tpa := select_load_party(UID, tp, reed_convert_type(resultlist[i], 0, -1));
             if not assigned(tpa) then Continue;
 
             if (UID <> '*') then
