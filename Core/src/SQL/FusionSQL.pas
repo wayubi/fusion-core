@@ -423,14 +423,18 @@ var
 begin
         Result := False;
 
-        query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''';
-        //OR MemberID1 OR MemberID2 OR MemberID3 OR MemberID4 OR MemberID5 OR MemberID6 OR MemberID7 OR MemberID8 OR MemberID9 OR MemberID10 OR MemberID11);
+        query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''' + ' OR MemberID2 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID3 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID4 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID5 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID6 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID7 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID8 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID9 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID10 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID11 = '+ '''' + inttostr(GID) + '''';
         if (MySQL_Query (query)) then begin
                 if SQLDataSet.FieldByName('Name').IsNull then begin
                 end else begin
                         tpa := TParty.Create;
                         with tpa do begin
                                 Name := (SQLDataSet.FieldValues['Name']);
+                                if assigned (PartyNameList) then begin
+                                        if (PartyNameList.IndexOf(tpa.Name) <> -1) then begin
+                                                tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
+                                        end;
+                                end;
                                 EXPShare := StrToInt(SQLDataSet.FieldValues['EXPShare']);
                                 ITEMShare := StrToInt(SQLDataSet.FieldValues['ITEMShare']);
                                 MemberID[0] := StrToInt(SQLDataSet.FieldValues['MemberID0']);
