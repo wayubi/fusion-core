@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-06-04: Fixed WHO2 using the GM's stats. [Tsusai]
 - 12-05-04: Fixed pet caused database error when not hatched but in inventory. [AlexKreuz]
 - 12-05-04: Fixed pet undefined errors. [AlexKreuz]
 - 12-05-04: Disabled mercenaries. No mercenary database provided in the CVS. [AlexKreuz]

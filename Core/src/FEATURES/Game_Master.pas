@@ -4187,9 +4187,9 @@ Called when we're shutting down the server *only*
                     job := 'Unknown Class';
 
                     if tp.AccessLevel > 0 then begin
-                            str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                            str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | BLvl: ' + IntToStr(tc1.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc1.JobLV) + ')';
                         end else begin
-                            str := 'Name: ' + tc1.Name + ' | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                            str := 'Name: ' + tc1.Name + ' | BLvl: ' + IntToStr(tc1.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc1.JobLV) + ')';
                         end;
                     w := Length(str) + 4;
                     WFIFOW (0, $009a);
