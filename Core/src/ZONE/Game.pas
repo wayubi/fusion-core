@@ -3119,43 +3119,33 @@ Begin(* Proc sv3PacketProcess() *)
 									11: //青箱
 										begin
 											if (SummonIOBList.Count > 0) then begin
-												l := Random(SummonIOBList.Count);
-												tsmn := SummonIOBList.Objects[l] as TSummon;
-												str := tsmn.Name;
+												str := SummonIOBList[Random(SummonIOBList.Count)];
 											end;
 										end;
 									12: //紫箱
 										begin
 											if (SummonIOVList.Count > 0) then begin
-												l := Random(SummonIOVList.Count);
-												tsmn := SummonIOVList.Objects[l] as TSummon;
-												str := tsmn.Name;
+												str := SummonIOVList[Random(SummonIOVList.Count)];
 											end;
 										end;
 									13: //カード帖
 										begin
 											if (SummonICAList.Count > 0) then begin
-												l := Random(SummonICAList.Count);
-												tsmn := SummonICAList.Objects[l] as TSummon;
-												str := tsmn.Name;
+												str := SummonICAList[Random(SummonICAList.Count)];
 											end;
 										end;
 									14: //プレ箱
 										begin
 											if (SummonIGBList.Count > 0) then begin
-												l := Random(SummonIGBList.Count);
-												tsmn := SummonIGBList.Objects[l] as TSummon;
-												str := tsmn.Name;
+												str := SummonIGBList[Random(SummonIGBList.Count)];
 											end;
 										end;
-                  200:  //New --- Old Weapon Box
-                    begin
-                      if (SummonIOWBList.Count > 0) then begin
-                        l := Random(SummonIOWBList.Count);
-                        tsmn := SummonIOWBList.Objects[l] as TSummon;
-                        str := tsmn.Name;
-                      end;
-                    end;
+									200:  //New --- Old Weapon Box
+										begin
+											if (SummonIOWBList.Count > 0) then begin
+												str := SummonIOWBList[Random(SummonIOWBList.Count)];
+											end;
+										end;
 									end;
 
 
