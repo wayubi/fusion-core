@@ -1699,6 +1699,11 @@ begin
 			Manner        := StrToInt(sl.Strings[14]);
 
 			HP            := StrToInt(sl.Strings[15]);
+
+                        if (HP < 0) then begin
+                                HP := 0;
+                        end;
+
 			SP            := StrToInt(sl.Strings[16]);
 			DefaultSpeed  := StrToInt(sl.Strings[17]);
 			Hair          := StrToInt(sl.Strings[18]);
@@ -2419,6 +2424,10 @@ begin
 
 				sl.Add(IntToStr(Karma));
 				sl.Add(IntToStr(Manner));
+
+                                if (HP < 0) then begin
+                                        HP := 0;
+                                end;
 
 				sl.Add(IntToStr(HP));
 				sl.Add(IntToStr(SP));
