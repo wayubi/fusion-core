@@ -371,13 +371,25 @@ begin
 
 	sl1 := TStringList.Create;
 	sl1.Delimiter := '.';
-	sl1.DelimitedText := sl.Values['IP'];
+
+
+	sl1.DelimitedText := sl.Values['WAN_IP'];
 	if sl1.Count = 4 then begin
-		ServerIP := cardinal(inet_addr(PChar(sl.Values['IP'])));
+        WAN_IP := (sl.Values['WAN_IP']);
 	end else begin
-		ServerIP := cardinal(inet_addr('127.0.0.1'));
-		//ServerIP := $0100007f;
+        WAN_IP := '127.0.0.1';
 	end;
+    WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
+
+    sl1.DelimitedText := sl.Values['LAN_IP'];
+	if sl1.Count = 4 then begin
+        LAN_IP := (sl.Values['LAN_IP']);
+	end else begin
+        LAN_IP := '127.0.0.1';
+	end;
+    LAN_ADDR := cardinal(inet_addr(PChar(LAN_IP)));
+
+
 	if sl.IndexOfName('Name') > -1 then begin
 		ServerName := sl.Values['Name'];
 	end else begin

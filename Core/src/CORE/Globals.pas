@@ -37,6 +37,8 @@ uses
 
     procedure backup_txt_database();
 
+    function uselan(in_ip : String) : Boolean;
+
 implementation
 
 uses
@@ -456,6 +458,40 @@ uses
                 debugout.Lines.Add('Unable to create backup file. Check your folder.');
             end;
         end;
+    end;
+
+
+    function uselan(in_ip : String) : Boolean;
+    var
+        sl : TStringList;
+    begin
+        Result := False;
+
+        sl := TStringList.Create;
+        sl.Delimiter := '.';
+        sl.DelimitedText := in_ip;
+
+        { ------------------------------------------- }
+        { Private IP Addresses                        }
+        { ------------------------------------------- }
+        { 192.168.0.0 - 192.168.255.255               }
+        { 172.16.0.0 - 172.31.255.255                 }
+        { 10.0.0.0 - 10.255.255.255                   }
+        { 127.0.0.1                                   }
+        { ------------------------------------------- }
+        { http://www.duxcw.com/faq/network/privip.htm }
+        { ------------------------------------------- }
+
+        if (sl.DelimitedText = '127.0.0.1') then
+            Result := True
+        else if (sl.Strings[0] = '10') then
+            Result := True
+        else if ( (sl.Strings[0] = '192') and (sl.Strings[1] = '168') ) then
+            Result := True
+        else if ( (sl.Strings[0] = '172') and (StrToInt(sl.Strings[1]) >= 16) and (StrToInt(sl.Strings[1]) <= 31) ) then
+            Result := True;
+
+        FreeAndNil(sl);
     end;
 
 end.

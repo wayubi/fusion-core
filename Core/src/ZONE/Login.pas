@@ -17,7 +17,7 @@ uses
     {Shared}
     Classes, SysUtils,
     {Fusion}
-    Common, Database, SQLData, FusionSQL, PlayerData;
+    Common, Database, SQLData, FusionSQL, PlayerData, Globals;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -120,7 +120,10 @@ begin
 			WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
 			WFIFOW(44, 0);
 			WFIFOB(46, APlayer.Gender); //sex 0=F 1=M
-			WFIFOL(47, ServerIP);
+
+            if uselan(APlayer.IP) then WFIFOL(47, LAN_ADDR)
+            else WFIFOL(47, WAN_ADDR);
+
 			WFIFOW(51, sv2port);
 			WFIFOS(53, ServerName, 20);
 			WFIFOW(73, NowUsers);

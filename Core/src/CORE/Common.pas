@@ -1465,7 +1465,12 @@ const
 var
 	AppPath              :string;
 
-	ServerIP             :cardinal;
+    WAN_IP : String;
+    WAN_ADDR : Cardinal;
+    LAN_IP : String;
+    LAN_ADDR : Cardinal;
+
+
 	ServerName           :string;
 	DefaultNPCID         :cardinal;
 	sv1port              :word;

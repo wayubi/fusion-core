@@ -17,7 +17,7 @@ uses
     {Shared}
     SysUtils,
     {Fusion}
-    Common, SQLData, FusionSQL, Database, PlayerData;
+    Common, SQLData, FusionSQL, Database, PlayerData, Globals;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -216,7 +216,10 @@ begin
                 WFIFOW(0, $0071);
                 WFIFOL(2, tc.CID);
                 WFIFOS(6, tc.Map + '.rsw', 24);
-                WFIFOL(22, ServerIP);
+
+                if uselan(tp.IP) then WFIFOL(22, LAN_ADDR)
+                else WFIFOL(22, WAN_ADDR);
+
                 WFIFOW(26, sv3port);
                 Socket.SendBuf(buf, 28);
             end;

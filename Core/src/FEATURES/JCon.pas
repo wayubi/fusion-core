@@ -283,7 +283,7 @@ uses
 
     procedure JCon_INI_Server_Load();
     begin
-		frmMain.Edit17.Text := inet_ntoa(in_addr(ServerIP));
+		frmMain.Edit17.Text := WAN_IP;
 		frmMain.Edit18.Text := ServerName;
 	    frmMain.Edit19.Text := IntToStr(DefaultNPCID);
     	frmMain.Edit20.Text := IntToStr(sv1port);
@@ -318,7 +318,8 @@ uses
     var
 		i : Integer;
 	begin
-		ServerIP := cardinal(inet_addr(PChar(frmMain.Edit17.Text)));
+        WAN_IP := PChar(frmMain.Edit17.Text);
+		WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
 		ServerName := frmMain.Edit18.Text;
     	DefaultNPCID := StrToInt(frmMain.Edit19.Text);
 
