@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-23-04: Fixed Numerous Guild Crashes.  [Darkhelmet]
 - 02-22-04: Updated Pets need an accessory to use skills. [Darkhelmet]
 - 02-22-04: Updated Pet Skills. [Darkhelmet]
 - 02-22-04: Updated pet movement speed. [Colus]

@@ -958,11 +958,13 @@ begin
 
       GetPlayerData('', tc.ID);
 
-			tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
-			tp.CID[tc.CharaNumber] := tc.CID;
-			tp.CName[tc.CharaNumber] := tc.Name;
-			tp.CData[tc.CharaNumber] := tc;
-			tp.CData[tc.CharaNumber].Gender := tp.Gender;
+      if Player.IndexOf(tc.ID) <> -1 then begin
+			  tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+			  tp.CID[tc.CharaNumber] := tc.CID;
+			  tp.CName[tc.CharaNumber] := tc.Name;
+			  tp.CData[tc.CharaNumber] := tc;
+			  tp.CData[tc.CharaNumber].Gender := tp.Gender;
+      end;
 			{读取宠物资料}
 			GetPetData(tc.ID);
 			{读取人物工会资料}
@@ -1458,7 +1460,7 @@ begin
 	    tg := GuildList.Objects[k] as TGuild;
   	  for i := 0 to 35 do begin
 		    if (tg.MemberID[i] <> 0) AND (tg.MemberID[i] <> tc.CID) then begin
-				  if Chara.IndexOf(tg.MemberID[i]) = -1 then begin
+				  if (Chara.IndexOf(tg.MemberID[i]) = -1) and (tg.MemberID[i] <> 0) then begin
 			      GetCharaData(tg.MemberID[i]);
 					end;
         end;

@@ -5585,7 +5585,7 @@ begin
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
                     if tg.Member[i] <> nil then begin
-				  if UseSQL then GetCharaData(tg.Member[i].ID);
+				  if UseSQL then GetCharaData(tg.Member[i].CID);
                     end;
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin
@@ -5697,9 +5697,11 @@ begin
 		if tg.MemberID[i] = 0 then break;
 		if Chara.IndexOf(tg.MemberID[i]) = -1 then break;
 		tc1 := tg.Member[i];
+    if tc1 <> nil then begin
 		if tc1.Login <> 2 then continue;
-		if (tc.ID = tc1.ID) and (AvoidSelf = true) then continue;
-		tc1.Socket.SendBuf(buf, PacketLen);
+		  if (tc.ID = tc1.ID) and (AvoidSelf = true) then continue;
+		  tc1.Socket.SendBuf(buf, PacketLen);
+    end;
 	end;
 end;
 //------------------------------------------------------------------------------
