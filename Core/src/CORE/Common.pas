@@ -2939,9 +2939,9 @@ var
 begin
 	ZeroMemory(@buf[0], 54);
 	if Use0079 then begin
-		WFIFOW(0, $0079);
+		WFIFOW(0, $01d9); //0079->01d9
 	end else begin
-		WFIFOW(0, $0078);
+		WFIFOW(0, $01d8); //0078->01d8
 	end;
 	WFIFOL( 2, tc.ID);
 	WFIFOW( 6, tc.Speed);
@@ -2952,9 +2952,9 @@ begin
 	WFIFOW(12, tc.Option);
 	WFIFOW(14, tc.JID);
 	WFIFOW(16, tc.Hair);
-	WFIFOW(18, tc.Weapon);
-	WFIFOW(20, tc.Head3);
-	WFIFOW(22, tc.Shield);
+	WFIFOW(18, tc.WeaponSprite[0]); // Weapon->WeaponSprite[0];
+	WFIFOW(20, tc.WeaponSprite[1]); // Head3->WeaponSprite[1];
+	WFIFOW(22, tc.Head3); // Shield -> Head3
 	WFIFOW(24, tc.Head1);
 	WFIFOW(26, tc.Head2);
 	WFIFOW(28, tc.HairColor);
@@ -3044,7 +3044,7 @@ var
 begin
 	//DebugOut.Lines.Add(Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
 	ZeroMemory(@buf[0], 60);
-	WFIFOW( 0, $007b);
+	WFIFOW( 0, $01da);  // 007b -> 01da
 	WFIFOL( 2, tc.ID);
 	WFIFOW( 6, tc.Speed);
 {’Ç‰Á}
@@ -3054,10 +3054,10 @@ begin
 	WFIFOW(12, tc.Option);
 	WFIFOW(14, tc.JID);
 	WFIFOW(16, tc.Hair);
-	WFIFOW(18, tc.Weapon);
-	WFIFOW(20, tc.Head3);
-	WFIFOL(22, timeGetTime());
-	WFIFOW(26, tc.Shield);
+	WFIFOW(18, tc.WeaponSprite[0]);  // Weapon->WeaponSprite[0]
+	WFIFOW(20, tc.WeaponSprite[1]); //Head3->WeaponSprite[1]
+	WFIFOW(22, tc.Head3); // time -> Shield
+	WFIFOL(24, timeGetTime()); // Shield -> time
 	WFIFOW(28, tc.Head1);
 	WFIFOW(30, tc.Head2);
 	WFIFOW(32, tc.HairColor);

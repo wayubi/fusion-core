@@ -12250,7 +12250,7 @@ begin
 			WFIFOM2(50, ts.Point, ts.Point);
 			WFIFOB(56, 5);
 			WFIFOB(57, 5);
-			SendBCmd(tm,ts.Point,58,nil,True);
+			SendBCmd(tm,ts.Point,60,nil,True);    // Length 58->60
 		end;
 	end;
 	//ó‘Ô•Ï‰»2
