@@ -1761,31 +1761,51 @@ Called when we're shutting down the server *only*
 
     function command_zeny(tc : TChara; str : String) : String;
     var
-        i, k : Integer;
+        value, k : Integer;
+        s : String;
     begin
         Result := 'GM_ZENY Failure.';
 
-        Val(Copy(str, 6, 256), i, k);
-        if (k = 0) and (i >= -2147483647) and (i <= 2147483647) then begin
-            if (tc.Zeny + i <= 2147483647) and (tc.Zeny + i >= 0) then begin
-                tc.Zeny := tc.Zeny + i;
-                SendCStat1(tc, 1, $0014, tc.Zeny);
+        s := Copy(str, 6, 256);
 
-                Result := 'GM_ZENY Success. ' + IntToStr(abs(i)) + ' Zeny';
-                if (i = 0) then begin
-                    tc.Zeny := i;
-                    Result := Result + ' set.';
-                end else
-                if (i > 0) then begin
-                    Result := Result + ' added.';
-                end else if (i < 0) then begin
-                    Result := Result + ' subtracted.';
+        if s <> '' then begin
+
+            Val(Copy(str, 6, 256), value, k);
+            if k = 0 then begin
+                if (value >= -2147483647) and (value <= 2147483647) then begin
+                    if (tc.Zeny + value <= 2147483647) and (tc.Zeny + value >= 0) then begin
+                        tc.Zeny := tc.Zeny + value;
+                    end
+
+                    else begin
+                        if tc.Zeny + value > 214748364 then begin
+                            tc.Zeny := 214748364;
+                        end
+
+                        else begin
+                            tc.Zeny := 0;
+                        end;
+                        value := value - tc.Zeny;
+                    end;
+                    SendCStat1(tc, 1, $0014, tc.Zeny);
+                    Result := 'GM_ZENY Success. ' + IntToStr(abs(value)) + ' Zeny ';
+                    if value = 0 then Result := Result + 'set (no change).'
+                    else if value > 0 then Result := Result + 'added.'
+                    else if value < 0 then Result := Result + 'subtracted.';
+                end
+
+                else begin
+                    Result := Result + ' Supplied value is outwith valid range. <-2147483647-2147483647>.';
                 end;
-            end else begin
-                Result := Result + ' Zeny on hand amount out of range [0-2147483647].';
+            end
+
+            else begin
+                Result := Result + ' Supplied value must be a valid integer.';
             end;
-        end else begin
-            Result := Result + ' Zeny amount out of range [-2147483647-2147483647].';
+        end
+
+        else begin
+            Result := Result + ' Insufficient data. Format is <amount to change zeny by>.';
         end;
     end;
 

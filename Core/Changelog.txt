@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-01-04: Cleaned up the structure of #zeny. [Trihan]
 - 11-01-04: Cleaned up the structure of #superstats. [Trihan]
 - 11-01-04: Cleaned up the structure of #statall. [Trihan]
 - 11-01-04: Cleaned up the structure of #skillall. [Trihan]
