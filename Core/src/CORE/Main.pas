@@ -2768,7 +2768,7 @@ begin
                 //Grace Time Handling
                 GraceTick := Tick;
                 if tc1.GraceTick > Tick then Exit;
-                
+
 		i := HIT + HITFix - tc1.FLEE1 + 80;
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
@@ -2899,9 +2899,10 @@ begin
 					m := tc1.DEF1 * 75 div 100;
 				end else begin
 					dmg[3] := tc1.Param[2];
-					m := tc1.DEF1 + tc1.DEF2 + tc1.DEF3;
+					m := tc1.DEF2 + tc1.DEF3;
 				end;
-				dmg[3] := dmg[3] + Random((dmg[3] div 20) * (dmg[3] div 20)); //Def+DefBonus
+				dmg[3] := dmg[3] + Random((dmg[3] div 20) * (dmg[3] div 20)); //VitDefBonus
+        dmg[0] := dmg[0] - (dmg[0] * tc1.DEF1 div 100); //Correct Armor Defense Bonus
 				if (AMode <> 8) then begin //AC
 					//オート_バーサーク
 					if (tc.Skill[146].Lv <> 0) and ((tc.HP  / tc.MAXHP) * 100 <= 25) then dmg[0] := (dmg[0] * (100 - (m * tc1.DAPer div 100)) div 100) * word(tc.Skill[6].Data.Data1[10]) div 100 - dmg[3]
