@@ -491,6 +491,12 @@ begin
                 end else begin
                         Option_MaxUsers := 100;
                 end;
+                if sl.IndexOfName('Option_AutoSave') <> -1 then begin
+                        Option_AutoSave := StrToInt(sl.Values['Option_AutoSave']);
+                end else begin
+                        Option_AutoSave := 600;
+                end;
+
         sl.Clear;
 
 	ini.ReadSectionValues('Option', sl);
@@ -576,6 +582,7 @@ begin
 	if AutoStart then PostMessage(cmdStart.Handle, BM_CLICK, 0, 0);
 {U0x003b}
 	DBsaveTimer.Enabled := True;
+    DBSaveTimer.Interval := Option_AutoSave * 1000;
 {U0x003bÉRÉRÇ‹Ç≈}
 end;
 //------------------------------------------------------------------------------
@@ -645,6 +652,7 @@ begin
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
+        ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
         // Fusion INI Lines
         
 	ini.Free;
@@ -12945,7 +12953,7 @@ end;
 procedure TfrmMain.DBsaveTimerTimer(Sender: TObject);
 begin
 	DataSave();
-	//DebugOut.Lines.Add('5 Mins save');
+	//DebugOut.Lines.Add('Data Saved');
 end;
 
 //==============================================================================

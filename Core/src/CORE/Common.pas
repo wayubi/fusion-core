@@ -1340,6 +1340,7 @@ MapGMsg           :string;
 // Fusion INI Declarations
 Option_PVP        :boolean;
 Option_MaxUsers   :word;
+Option_AutoSave   :word;
 // Fusion INI Declarations
 
 

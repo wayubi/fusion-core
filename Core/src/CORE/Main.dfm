@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 350
-  Top = 212
+  Left = 254
+  Top = 257
   Width = 691
   Height = 435
   Caption = 'c'
@@ -64,7 +64,7 @@ object frmMain: TfrmMain
     Left = 144
     Top = 5
     Width = 409
-    Height = 23
+    Height = 24
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
