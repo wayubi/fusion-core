@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-01-04: Cleaned up the structure of #skillpoint. [Trihan]
 - 11-01-04: Cleaned up the structure of #changestat. [Trihan]
 - 11-01-04: Cleaned up the structure of #jlevel. [Trihan]
 - 11-01-04: Cleaned up the structure of #blevel. [Trihan]

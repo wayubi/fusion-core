@@ -1658,17 +1658,37 @@ Called when we're shutting down the server *only*
 
     function command_skillpoint(tc : TChara; str : String) : String;
     var
-        i, k : Integer;
+        newpoints, k : Integer;
+        s : String;
     begin
         Result := 'GM_SKILLPOINT Failure.';
 
-        Val(Copy(str, 12, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 1001) then begin
-            tc.SkillPoint := i;
-            SendCStat1(tc, 0, $000c, tc.SkillPoint);
-            Result := 'GM_SKILLPOINT Sucess. Skill Point amount set to ' + IntToStr(i) + '.';
-        end else begin
-            Result := Result + ' Skill Point amount out of range [0-1001].';
+        s := Copy(str, 12, 256);
+
+        if s <> '' then begin
+
+            Val(Copy(str, 12, 256), newpoints, k);
+            if k = 0 then begin
+                if (newpoints >= 0) and (newpoints <= 1001) then begin
+                    tc.SkillPoint := newpoints;
+
+                    SendCStat1(tc, 0, $000c, tc.SkillPoint);
+
+                    Result := 'GM_SKILLPOINT Success. Skill Point amount set to ' + IntToStr(newpoints) + '.';
+                end
+
+                else begin
+                    Result := Result + ' Supplied value is out of valid range <0-1001>.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' Supplied value must be a valid integer.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient data. Format is <new value>.';
         end;
     end;
 
