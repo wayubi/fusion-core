@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-18-04: Deleting non-existant account caused crash. [AlexKreuz]
 - 08-18-04: Conversion errors due to type mismatch caused crash in JCon. [AlexKreuz]
 - 08-18-04: Disconnecting offline character in JCon caused crash. [AlexKreuz]
 - 08-18-04: Calculating PVP rank after clearing all characters from map caused crash. [AlexKreuz]

@@ -207,8 +207,10 @@ uses
     		        	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
 	        	    end;
 
-		        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
-		            Player.Delete(Player.IndexOf(tp.ID));
+                    if PlayerName.IndexOf(tp.Name) <> -1 then
+    		        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
+                    if Player.IndexOf(tp.ID) <> -1 then
+    		            Player.Delete(Player.IndexOf(tp.ID));
 		        end;
             end;
         end;
