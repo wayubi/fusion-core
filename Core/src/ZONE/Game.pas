@@ -251,10 +251,18 @@ begin
 				tc.MData := tm;
 				if CharaPID.IndexOf(tc.ID) = -1 then CharaPID.AddObject(tc.ID, tc);
 
-        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+                                mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 				//マップに自分が居ることを記録
 				tm.CList.AddObject(tc.ID, tc);
 				tm.Block[tc.Point.X div 8][tc.Point.Y div 8].CList.AddObject(tc.ID, tc);
+
+                                //Grace Time
+                                if mi.PvPG = true then begin
+                                        tc.GraceTick := timeGetTime() + 15000;
+                                end else begin
+                                        tc.GraceTick := timeGetTime() + 5000;
+                                end;
+
 
 				//生き返り処理
 				if tc.Sit = 1 then tc.Sit := 3;

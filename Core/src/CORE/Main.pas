@@ -501,6 +501,17 @@ begin
                 end else begin
                         Option_WelcomeMsg := True;
                 end;
+                if sl.IndexOfName('Option_GraceTime') <> -1 then begin
+                        Option_GraceTime := StrToInt(sl.Values['Option_GraceTime']);
+                end else begin
+                        Option_GraceTime := 5000;
+                end;
+                if sl.IndexOfName('Option_GraceTime_PvPG') <> -1 then begin
+                        Option_GraceTime_PvPG := StrToInt(sl.Values['Option_Option_GraceTime_PvPG']);
+                end else begin
+                        Option_GraceTime_PvPG := 15000;
+                end;
+
 
         sl.Clear;
 
@@ -1660,6 +1671,7 @@ var
         td    :TItemDB;
 begin
 	with tc do begin
+                GraceTick := Tick;
 
   if (ts.isEmperium) then begin
     j := GuildList.IndexOf(GuildID);
@@ -2244,6 +2256,10 @@ var
         tatk  :boolean;
 begin
 	with tc do begin
+                //Grace Time Handling
+                GraceTick := Tick;
+                if tc1.GraceTick > Tick then Exit;
+                
 		i := HIT + HITFix - tc1.FLEE1 + 80;
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
@@ -2477,8 +2493,8 @@ begin
 			end;
 		end;
 	end;
+        
 	if (ts.HP > 0) then begin
-                if (ts.AnkleSnareTick > Tick) then Exit;
 		//ターゲット設定
 		if (EnableMonsterKnockBack) then begin
 			ts.pcnt := 0;
@@ -11097,7 +11113,7 @@ begin
 								
 							end;
 
-							$91:    {Ankle Snare Trapping Code}
+                                                $91:    {Ankle Snare Trapping Code}
 							begin
 								if tn.Count <> 0 then begin
                                                                         if not flag then Break; //踏んでない
@@ -11110,6 +11126,7 @@ begin
 								//end;
                                                                         ts1.AnkleSnareTick := tn.Tick;
 									tn.Tick := Tick + tn.Count * 10000;
+                                                                        tn.Count := 0;
 									//ts1.DmgTick := Tick + tn.Count * 10000;
 									ts1.Point.X := tn.Point.X;
 									ts1.Point.Y := tn.Point.Y;
@@ -11392,7 +11409,6 @@ begin
         end;
       end;
 
-
 		if (ATarget = 0) then begin
 			//if Data.isActive then begin
 
@@ -11555,7 +11571,7 @@ begin
                                                 exit;
                                         end;
 					with ts do begin
-			if (Data.isDontMove) or (HP = 0) or (ts.Stat1 <> 0) then begin
+			if (Data.isDontMove) or (HP = 0) or (ts.Stat1 <> 0) or (ts.AnkleSnareTick > Tick) then begin
 							Inc(a);
 							continue;
 						end;
@@ -11779,6 +11795,7 @@ begin
 	with ts do begin
                 tc2 := nil;
 		tc1 := AData;
+                if tc1.GraceTick > Tick then exit;
                 if tc1.Skill[255].Tick > Tick then begin
                         tc2 := tc1.Crusader;
                         if (tc2.Login <> 2) and (tc1 <> tc2) then begin

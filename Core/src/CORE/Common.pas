@@ -794,6 +794,8 @@ type TChara = class
         Autocastactive :Boolean;
         noday         :Boolean;
 
+        GraceTick     :Cardinal;  {Characters Grace period for not getting hit}
+
         AnkleSnareTick :cardinal; {How long a character is trapped in ankle snare}
 
         PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
@@ -1362,6 +1364,8 @@ Option_PVP        :boolean;
 Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_WelcomeMsg :boolean;
+Option_GraceTime  :cardinal;
+Option_GraceTime_PvPG :cardinal;
 // Fusion INI Declarations
 
 
@@ -3487,6 +3491,9 @@ begin
 	Result := 0;
 	tm := tc.MData;
 	with tc do begin
+                //Reset Grace Tick
+                GraceTick := Tick;
+                
                 if tc.isSilenced then begin
                         SilenceCharacter(tm, tc, Tick);
                         Exit;
@@ -3558,6 +3565,9 @@ begin
 	Result := 0;
 	tm := tc.MData;
 	with tc do begin
+                //Reset Grace Tick
+                GraceTick := Tick;
+
                 if tc.isSilenced then begin
                         SilenceCharacter(tm, tc, Tick);
                         Exit;

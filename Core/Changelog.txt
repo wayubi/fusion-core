@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 ---------------------------------------------------------------------------------
+
+- 01-13-04: Implemented Grace Time.  [Darkhelmet]	
+	Weiss.ini entries
+	Option_GraceTime=5000
+	Option_GraceTime_PvPG=15000
 - 01-13-04: Added Ankle Snare PvP.  [Darkhelmet]
 - 01-13-04: Fixed a problem with the map load packet.  [Colus]
 - 01-13-04: Prevent Saving of Negative HP. Fixed Crash. [AlexKreuz]
