@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-25-04: Area Effects no longer attack caster in PvP. [Darkhelmet]
 - 01-24-04: Fixed Ruwatch / Sight unhide Hidden Enemies. [AlexKreuz]
 - 01-24-04: Fixed Pneuma stops Shield Boomerang. [AlexKreuz]
 - 01-24-04: Fixed Pneuma stops Spear Boomerang. [AlexKreuz]

@@ -10729,7 +10729,8 @@ begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
-                        case tn.JID of
+                                    if tc2 <> tn.CData then begin
+                                        case tn.JID of
                                                 $74://ブラストマイン発動
 							begin
 								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
@@ -10750,7 +10751,7 @@ begin
 								SendBCmd(tm, tn.Point, 33);
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
-{:119}
+
 						{//$7f: //ファイアーウォール
 							begin
 								//ダメージ算出
@@ -11121,6 +11122,7 @@ begin
 							end;}
 {:119}
                                                 end;
+                                            end;
                                         end;
                                 end;
                         end;
