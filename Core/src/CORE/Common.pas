@@ -1679,6 +1679,7 @@ Option_MOTD_File   : string; //File for reading MOTD entries
 Option_GM_Logs     :Boolean;
 
 Option_Enable_WAC : Boolean;
+Option_Enable_ISCS : Boolean;
 Option_Minimize_Tray : Boolean;
 Option_Pet_Capture_Rate :word;
 Option_Mob_Spawn_Rate : word;

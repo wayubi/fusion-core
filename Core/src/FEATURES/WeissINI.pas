@@ -96,6 +96,7 @@ uses
         ini.WriteString('Fusion', 'Option_Mob_Spawn_Rate', InttoStr(Option_Mob_Spawn_Rate));
         ini.WriteString('Fusion', 'Option_Minimize_Tray', BoolToStr(Option_Minimize_Tray));
         ini.WriteString('Fusion', 'Option_Enable_WAC', BoolToStr(Option_Enable_WAC));
+        ini.WriteString('Fusion', 'Option_Enable_ISCS', BoolToStr(Option_Enable_ISCS));
         // Fusion INI Lines
 
         // MySQL Server Lines

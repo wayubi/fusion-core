@@ -896,6 +896,16 @@ begin
         Option_Enable_WAC := False;
     end;
 
+    if sl.IndexOfName('Option_Enable_ISCS') > -1 then begin
+        try
+            Option_Enable_ISCS := StrToBool(sl.Values['Option_Enable_ISCS']);
+        except
+            on EConvertError do Option_Enable_ISCS := True;
+        end;
+    end else begin
+        Option_Enable_ISCS := True;
+    end;
+
     if sl.IndexOfName('Option_Minimize_Tray') > -1 then begin
         try
             Option_Minimize_Tray := StrToBool(sl.Values['Option_Minimize_Tray']);
@@ -1168,7 +1178,7 @@ begin
     end;
 
 
-    frmMain.ConnecttoISCS1Click(self);
+    if (Option_Enable_ISCS) then frmMain.ConnecttoISCS1Click(self);
     if (Option_Enable_WAC) then begin
         create_wac();
         EnableWebAccountCreator1.Caption := 'Disable Web Account Creator';
@@ -11437,12 +11447,16 @@ procedure TfrmMain.ConnecttoISCS1Click(Sender: TObject);
 begin
     if not (ISCS_ON) then begin
         ConnecttoISCS1.Caption := 'Disconnect from ISCS';
+        Option_Enable_ISCS := True;
         iscs_console_connect();
+        debugout.Lines.Add('- Inter-Server Communication System Activated -');
     end
 
     else begin
         ConnecttoISCS1.Caption := 'Connect to ISCS';
+        Option_Enable_ISCS := False;
         iscs_console_disconnect();
+        debugout.Lines.Add('- Inter-Server Communication System Deactivated -');
     end;
 end;
 
