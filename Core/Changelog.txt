@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-18-04: OnTouch FUNCTIONAL. [Tsusai]
+- 10-18-04: Added NPC header modification for OnTouch. Need char move modification. [Tsusai]
 - 10-18-04: NPC Set logic fix. [Tsusai]
 - 10-18-04: NPC Set can modify STR, AGI, VIT, etc. [Tsusai]
 - 10-18-04: Reactivated and fixed NPC set option. [Tsusai]

@@ -1188,6 +1188,8 @@ public
 	ScriptInitD  :Boolean; //OnInit実行済フラグ
 	ScriptInitMS :integer;
 
+    OnTouch :Boolean;
+
 	ChatRoomID  :cardinal; //チャットルームID
 	Enable      :Boolean; //有効スイッチ
 {アジト機能追加}
@@ -8298,10 +8300,14 @@ Begin
 
 					<NPCName>  ::= <OneWordName> | "<OneOrMoreWordName>"
 					<IDToken>  ::= <SpriteID>,'{'
+                    or if wanting OnTouch
+                    <IDToken>  ::= <SpriteID>,<X Range>,<Y Range>'{'
 
 					Valid SpriteIDs can be found in the tables on
 					http://www.geocities.co.jp/SiliconValley-Bay/1174/npce.html
-					*)
+                    or http://kalen.s79.xrea.com/npc/npc.shtml
+                    *)
+
 					tn := TNPC.Create;
 					tn.ID := NowNPCID;
 					Inc(NowNPCID);
@@ -8320,10 +8326,34 @@ Begin
 
 					SL1.DelimitedText := SL[3];
 					//SL1 is now the IDToken - 2 comma separated params - check count
-					if (SL1.Count <> 2) AND (SL1[2] <> '{') then begin
+					{if (SL1.Count <> 2) AND (SL1[2] <> '{') then begin
 						ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
 						Exit; // Safe - 2004/04/21
-					end;
+					end;}
+
+                    //Now supports OnTouch header.  - Tsusai
+                    if (SL1.Count = 2) then begin //Regular header
+                        if (SL1[1] <> '{') then begin
+                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+                            Exit; // Safe - 2004/10/19
+                        end else begin
+                            tn.OnTouch := false;
+                        end;
+                    end else if (SL1.Count = 4) then begin //OnTouch Header
+                        if (SL1[3] <> '{') then begin
+                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+                            Exit; // Safe - 2004/10/19
+                        end else begin
+                            tn.OnTouch := True;
+                            tn.WarpSize.X  := StrToInt(SL1[1]);
+                            tn.WarpSize.Y  := StrToInt(SL1[2]);
+                        end;
+                    end else begin //else if the scriptor was dumb
+                        ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+                        Exit; // Safe - 2004/10/19
+                    end;
+
+
 
 					// Colus, 20040503: Making it work in a 'proper' fashion.  We DO need it,
 					// but we'll handle negative values in a better manner.
@@ -9880,7 +9910,14 @@ Begin
 					if tn.ScriptLabel <> '' then tm.NPCLabel.AddObject(tn.ScriptLabel, tn);
 					tm.NPC.AddObject(tn.ID, tn);
 					tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
-					tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8);
+                    if NOT tn.OnTouch then tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8)
+                    else begin //Assuming this might have something to do with the area
+                        for j := tn.Point.Y - tn.WarpSize.Y to tn.Point.Y + tn.WarpSize.Y do begin
+    						for i := tn.Point.X - tn.WarpSize.X to tn.Point.X + tn.WarpSize.X do begin
+    							tm.gat[i][j] := (tm.gat[i][j] or $8); {this is from WARP.  Shop has $fe instead of $8}
+    						end;
+    					end;
+                    end;
 
 {d$0100fix5よりココまで}
 	// モンスター ----------------------------------------------------------------

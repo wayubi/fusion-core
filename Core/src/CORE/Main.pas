@@ -4222,7 +4222,7 @@ with tc do begin
 
                             if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
                             (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
-                            
+
                                 if (tc.Skill[144].Lv = 0) then HPTick := Tick;
 
                                 HPRTick := Tick - 500;
@@ -4232,12 +4232,31 @@ with tc do begin
                                 Map := tn.WarpMap;
                                 Point := tn.WarpPoint;
                                 MapMove(Socket, Map, Point);
-                                
+
                                 NextPoint := Point;
                                 Result := True;
                                 Exit;
                             end;
                         end;
+
+                        if (tn.CType = NPC_TYPE_SCRIPT) and (tn.Enable = true) and (tn.OnTouch = true) then begin
+
+                            if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
+                            (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
+                                tc.TalkNPCID := tn.ID;
+                                tc.ScriptStep := 0;
+                                tc.AMode := 3;
+                                if (tc.Option and 6 <> 0) then begin
+                                    tc.Option := tc.Option and $FFF9;
+                                    //å©ÇΩñ⁄ïœçX  Lit. "The eye modification which you saw"
+                                    UpdateOption(tm, tc);
+                                end;
+                                tc.AData := tn;
+                                NPCScript(tc);
+                            end;
+                        end;
+
+
                     end;
                 end;
             end;
@@ -10439,7 +10458,7 @@ don't uncomment.
                     Break;
                 end;
             end;
-        end; 
+        end;
 
         }
 
