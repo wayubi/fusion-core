@@ -1,3 +1,5 @@
+- 05-30-04: Minor ALBGM cleanup and optimization. [AlexKreuz]
+- 05-30-04: Fixed Non-ALBGM commands broke. [AlexKreuz]
 - 05-29-04: Switched GM Command, #changeskill to ALBGM system. [AlexKreuz]
 - 05-29-04: Switched GM Command, #zeny to ALBGM system. [AlexKreuz]
 - 05-29-04: Switched GM Command, #statall to ALBGM system. [AlexKreuz]

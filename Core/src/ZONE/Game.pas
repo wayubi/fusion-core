@@ -736,7 +736,6 @@ Begin(* Proc sv3PacketProcess() *)
                 // Temporary Code to implement new GM System
                 if (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
                     parse_commands (tc, str);
-                    str := ''; { Temporarily included to cancel out text message }
                 end;
                 // Temporary Code to implement new GM System
 
