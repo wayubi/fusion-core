@@ -476,7 +476,18 @@ begin
 					                tc.Socket.SendBuf(buf, 7);
 					        end;
 					end;
-                                        //ÉWÉáÉuïœçX
+
+                    if (tc.Option <> 0) then begin
+                        tc.Option := 0;
+                        WFIFOW(0, $0119);
+                        WFIFOL(2, tc.ID);
+                        WFIFOW(6, 0);
+                        WFIFOW(8, 0);
+                        WFIFOW(10, tc.Option);
+                        WFIFOB(12, 0);
+                        SendBCmd(tc.MData, tc.Point, 13);
+                    end;
+
 					tc.JID := tn.Script[tc.ScriptStep].Data3[0];
 					tc.JobEXP := 0;
 					tc.ClothesColor := 0;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Fixed NPC Jobchange didn't reset options bug. [AlexKreuz]
 - 01-22-04: Added hidden warp support [Colus]
 - 01-22-04: Corrected Snatching with bow weapons [Colus]
 - 01-22-04: Fixed dead char gains party share exp bug. [AlexKreuz]
