@@ -8799,6 +8799,29 @@ begin
                 tn.Script[k].Data1[3] := LowerCase(sl1.Strings[3]);
                 tn.Script[k].Data1[4] := LowerCase(sl1.Strings[4]);
                 Inc(k);
+
+    end else if str = 'addskillpoints' then begin //----- 68 Add Skill Point
+        if sl1.Count <> 1 then begin
+            DebugOut.Lines.Add(Format('%s %.4d: [Add Skill Point] function error', [ScriptPath, lines]));
+            exit;
+        end;
+        SetLength(tn.Script, k + 1);
+        tn.Script[k].ID := 68;
+        SetLength(tn.Script[k].Data3, 1);
+        tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+        Inc(k);
+    end else if str = 'addstatpoints' then begin //---- 69 Add Stat Point
+        if sl1.Count <> 1 then begin
+            DebugOut.Lines.Add(Format('%s %.4d: [Add Stat Point] function error', [ScriptPath, lines]));
+            exit;
+        end;
+        SetLength(tn.Script, k + 1);
+        tn.Script[k].ID := 69;
+        SetLength(tn.Script[k].Data3, 1);
+        tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+        Inc(k);
+
+
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [script] function error', [ScriptPath, lines]));

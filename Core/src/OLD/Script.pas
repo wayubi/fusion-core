@@ -1785,6 +1785,23 @@ begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
 					end;
 				end;
+
+
+
+    68: // addskillpoints
+        begin
+            tc.SkillPoint := tc.SkillPoint + tn.Script[tc.ScriptStep].Data3[0];
+            SendCSkillList(tc);
+            Inc(tc.ScriptStep);
+        end;
+    69: // addstatpoints
+        begin
+            tc.StatusPoint := tc.StatusPoint + tn.Script[tc.ScriptStep].Data3[0];
+            SendCStat(tc);
+            Inc(tc.ScriptStep);
+        end;
+
+
 {NPCイベント追加ココまで}
 			end;
     Inc(cnt);

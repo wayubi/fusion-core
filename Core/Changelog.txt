@@ -1,3 +1,5 @@
+- 04-16-04: Added 'addstatpoints' script command. [AlexKreuz]
+- 04-16-04: Added 'addskillpoints' script command. [AlexKreuz]
 - 04-15-04: Updated Water Ball PvM to use new DOT procedure. [Colus]
 - 04-15-04: Added DamageOverTime function (in testing phase). [Colus]
 - 04-15-04: Added eventmob NPC Command. 
