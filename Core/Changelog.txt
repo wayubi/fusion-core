@@ -2,6 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-02-04: Fixed Combo's Now Non Targeting [Darkhelmet]
 - 01-02-04: Added Assassain Skill Cloaking [Darkhelmet]
 - 01-02-04: Added Monster Skill Lord of Vermillion [Darkhelmet]
 - 01-02-04: Added Monster Skill Meteor [Darkhelmet]

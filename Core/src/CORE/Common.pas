@@ -780,7 +780,10 @@ type TChara = class
         Autocastactive :Boolean;
         noday         :Boolean;
 
+        PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
+
         isCloaked     :Boolean;   {Says if Cloaking is Active}
+        CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
 
         noHPRecovery  :Boolean;   {Player Cannot Recover HP}
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}

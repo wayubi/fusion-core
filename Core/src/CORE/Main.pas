@@ -4736,7 +4736,7 @@ begin
 				        Exit;
                                 end;
                         end;
-                        if (ts = nil) or (ts.HP = 0) and (tc.MSkill <> 254) then begin
+                        if (ts = nil) or (ts.HP = 0) and (PassiveAttack = False) then begin
 				MSkill := 0;
 				MUseLv := 0;
 				MMode := 0;
@@ -4942,6 +4942,7 @@ begin
                                 end;
                                 254:    {Grand Cross}
                                 begin
+                                        PassiveAttack := false;
                                         DamageProcessed := false;
                                         NoCastInterrupt := true;
                                         tc.MPoint.X := tc.Point.X;
@@ -5350,46 +5351,67 @@ begin
                                                 end;
                                         end;
                                 end;
-                                273:    {Combo Finish}
+                                272:   {Chain Combo Effect}
                                 begin
-                                        if Skill[272].Tick > Tick then begin
-                                                if (tc.Weapon = 12) then begin
-	        					xy.X := ts.Point.X - Point.X;
-		        				xy.Y := ts.Point.Y - Point.Y;
-			        			if abs(xy.X) > abs(xy.Y) * 3 then begin
-				        			//â°å¸Ç´
-					        		if xy.X > 0 then
-                                                                        b := 6
+                                        ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                        if ts = nil then Exit;
+                                        ts.IsEmperium := False;
+                                        tc.AData := ts;
+                                        PassiveAttack := False;
+                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                        tc.Skill[MSkill].Tick := Tick + 5000;
+                                        
+                                        //tc.MTick := Tick + 2000;
+
+                                end;
+
+                                273:    {Combo Finish Effect}
+                                        begin
+                                                PassiveAttack := False;
+                                                ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                                if ts = nil then Exit;
+                                                ts.IsEmperium := False;
+			                        tc.AData := ts;
+                                                xy.X := ts.Point.X - Point.X;
+                                                xy.Y := ts.Point.Y - Point.Y;
+                                                if abs(xy.X) > abs(xy.Y) * 3 then begin
+                                                        //â°å¸Ç´
+                                                        if xy.X > 0 then
+                                                                b := 6
+                                                        else
+                                                                b := 2;
+                                                end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+                                                        //ècå¸Ç´
+                                                        if xy.Y > 0 then
+                                                                b := 0
+                                                        else
+                                                                b := 4;
+                                                end else begin
+                                                        if xy.X > 0 then begin
+                                                                if xy.Y > 0 then
+                                                                        b := 7
                                                                 else
-                                                                        b := 2;
-							end
-                                                        else if abs(xy.Y) > abs(xy.X) * 3 then begin
-								//ècå¸Ç´
-								if xy.Y > 0 then
-                                                                        b := 0
-                                                                else
-                                                                        b := 4;
-                                                        end else begin
-                                                                if xy.X > 0 then begin
-									if xy.Y > 0 then
-                                                                                b := 7
-                                                                        else
-                                                                                b := 5;
+                                                                        b := 5;
 							end else begin
-									if xy.Y > 0 then
-                                                                                b := 1
-                                                                        else
-                                                                                b := 3;
+                                                                if xy.Y > 0 then
+                                                                        b := 1
+                                                                else
+                                                                        b := 3;
 							end;
 						end;
-						//íeÇ´îÚÇŒÇ∑ëŒè€Ç…ëŒÇ∑ÇÈÉ_ÉÅÅ[ÉWÇÃåvéZ
+
+						//Damage Calculations
 						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						if dmg[0] < 0 then
-                                                        dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-						//ÉpÉPëóêM
+                                                        dmg[0] := 0; //Negative Damage
+						//Send Attack Packets
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 
-						//ÉmÉbÉNÉoÉbÉNèàóù
+						//Knockback
 						if (dmg[0] > 0) then begin
 							SetLength(bb, 6);
 							bb[0] := 6;
@@ -5413,27 +5435,10 @@ begin
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
-                                                end else begin
-                                                        MMode := 4;
-                                                        Exit;
-                                                end;
+
                                                 tc.MTick := Tick + 2000;
                                         end;
-                                end;
-                                272:   {Chain Combo}
-                                begin
-                                       if Skill[263].Tick > Tick then begin
-                                               tc1 := tc;
-                                               DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-                                               if dmg[0] < 0 then begin
-                                                       dmg[0] := 0; //Negative Damage
-                                               end;
-                                               SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
-                                               DamageProcess1(tm, tc, ts, dmg[0], Tick);
-                                               tc1.Skill[MSkill].Tick := Tick + 5000;
-                                               tc.MTick := Tick + 2000;
-                                       end;
-                                end;
+
                                 266:    {Investigate}
                                 begin
                                         if spiritSpheres <> 0 then begin
@@ -6845,6 +6850,7 @@ begin
                                 254:  {Grand Cross}
                                         begin
                                                 NoCastInterrupt := true;
+                                                PassiveAttack := True;
                                                 tc.MTargetType := 0;
                                                 SkillEffect(tc, Tick);
                                         end;
@@ -6902,6 +6908,30 @@ begin
                                                 end else begin
                                                         exit;
                                                 end;
+                                 272:   {Chain Combo Setup}
+                                        begin
+                                                if (Skill[263].Tick > Tick) and (Skill[272].Tick < Tick) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                        PassiveAttack := True;
+                                                        tc.MTargetType := 0;
+                                                        SkillEffect(tc, Tick);
+                                                end else begin
+                                                        MMode := 4;
+                                                        Exit;
+                                                end;
+                                        end;
+
+                                 273:   {Combo Finish Setup}
+                                        begin
+                                                if (Skill[272].Tick > Tick) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                        PassiveAttack := True;
+                                                        tc.MTargetType := 0;
+                                                        SkillEffect(tc, Tick);
+                                                end else begin
+                                                        MMode := 4;
+                                                        Exit;
+                                                end;
+
+                                        end;
                                 //End Monk Skills
 
                                 //Sage
@@ -7399,6 +7429,8 @@ begin
                                                 for j := - 1 to 1 do begin
                                                         if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
                                                                 tc.isCloaked := true;
+                                                                tc.Optionkeep := tc.Option;
+                                                                tc.Option := 6;
                                                                 k := 1;
                                                         end;
                                                 end;
@@ -9482,7 +9514,7 @@ var
   xy:TPoint;
   sl:TStringList;
   tl:TSkillDB;
-  i1,j1,k1:integer;
+  i1,j1,k1,k:integer;
   tm:TMap;
 begin
 	with tc do begin
@@ -9529,7 +9561,7 @@ begin
                         tc.InField := false;
                 end;
 
-                if tc.isCloaked then begin
+                if tc.isCloaked then begin  {Cloaking}
                         tm := tc.MData;
 
                         xy.X := tc.Point.X;
@@ -9547,8 +9579,8 @@ begin
                                         //        SkillTickID := MSkill;
                                         //end;
 
-                                        tc.Optionkeep := tc.Option;
-                                        tc.Option := 6;
+                                        //tc.Optionkeep := tc.Option;
+                                        //tc.Option := 6;
                                         tc.Hidden := true;
 
                                         CalcStat(tc, Tick);
@@ -9559,7 +9591,7 @@ begin
                                         WFIFOW(8, tc.Stat2);
                                         WFIFOW(10, tc.Option);
                                         WFIFOB(12, 0);
-                                        SendBCmd(tm, tc.Point, 13)
+                                        SendBCmd(tm, tc.Point, 13);
                                         k := 1;
                                 end;
                         end;
@@ -9567,12 +9599,24 @@ begin
                         if k <> 1 then begin
                                 tc.Skill[MSkill].Tick := Tick;
                                 tc.Option := tc.Optionkeep;
-                                SkillTick := tc.Skill[MSkill].Tick;
-                                SkillTickID := MSkill;
-                                tc.SP := tc1.SP + 10;
+                                //SkillTick := tc.Skill[MSkill].Tick;
+                                //SkillTickID := MSkill;
                                 tc.Hidden := false;
                                 tc.isCloaked := false;
+                                CalcStat(tc, Tick);
+                                WFIFOW(0, $0119);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Stat1);
+                                WFIFOW(8, tc.Stat2);
+                                WFIFOW(10, tc.Option);
+                                WFIFOB(12, 0);
+                                SendBCmd(tm, tc.Point, 13);
                         end;
+                end;
+
+                if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) > Tick) then begin
+                        if tc.SP > 1 then tc.SP := tc.SP - 1;
+                        CloakTick := Tick;
                 end;
 
       {Colus, 20031223: Added check for Ashura recovery period.}
@@ -12176,7 +12220,7 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if (tc.MMode = 0) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0)) and (tc.SongTick < Tick) then begin
+					if (tc.MMode = 0) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
 						//í«â¡à⁄ìÆ
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
