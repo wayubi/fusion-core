@@ -176,6 +176,8 @@ var
     function command_aegis_nb(str : String) : String;
     function command_aegis_item(tc : TChara; str : String) : String;
     function command_aegis_monster(tc : Tchara; str : String) : String;
+    function command_aegis_resetstate(tc : TChara; str : String) : String;
+    function command_aegis_resetskill(tc : Tchara; str : String) : String;
 
     function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_kami(tc : TChara; str : String) : String;
@@ -281,6 +283,7 @@ implementation
         GM_AEGIS_BB := StrToIntDef(sl.Values['AEGIS_BB'], 1);
         GM_AEGIS_ITEM := StrToIntDef(sl.Values['AEGIS_ITEM'], 1);
         GM_AEGIS_MONSTER := StrToIntDef(sl.Values['AEGIS_MONSTER'], 1);
+        GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_HIDE := StrToIntDef(sl.Values['AEGIS_HIDE'], 1);
         GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_RESETSKILL := StrToIntDef(sl.Values['AEGIS_RESETSKILL'], 1);
@@ -554,8 +557,10 @@ Called when we're shutting down the server *only*
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc. ID, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
-            else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level (tc.ID, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
-            else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level (tc.ID, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
+            else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
+            else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 0) and (check_level (tc.ID, GM_AEGIS_RESETSTATE)) ) then error_msg := command_aegis_resetstate(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 1) and (check_level (tc.ID, GM_AEGIS_RESETSKILL)) ) then error_msg := command_aegis_resetskill(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2802,6 +2807,47 @@ Called when we're shutting down the server *only*
                 end;
             end;
         end;
+    end;
+
+    function command_aegis_resetstate(tc : TChara; str : String) : String;
+    var
+        i : Integer;
+    begin
+        for i := 0 to 5 do begin
+            tc.ParamBase[i] := 1;
+        end;
+        tc.StatusPoint := 48;
+        for i := 1 to tc.BaseLV - 1 do begin
+            tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+        end;
+        CalcStat(tc);
+        SendCStat(tc);
+    end;
+
+    function command_aegis_resetskill(tc : Tchara; str : String) : String;
+    var
+        i, j : Integer;
+    begin
+        j := 0;
+        for i := 2 to MAX_SKILL_NUMBER do begin
+            j := j + tc.Skill[i].Lv;
+            if not tc.Skill[i].Card then
+                tc.Skill[i].Lv := 0;
+        end;
+        if (tc.Plag <> 0) then begin
+            tc.Skill[tc.Plag].Plag := false;
+            tc.Skill[tc.Plag].Lv := 0;
+            tc.Plag := 0;
+            tc.PLv := 0;
+        end;
+        if tc.JID = 0 then begin
+        end else begin
+            tc.skillpoint := j;
+        end;
+
+        SendCSkillList(tc);
+        CalcStat(tc);
+        SendCStat(tc);
     end;
 
     function command_athena_alive(tc : TChara) : String;

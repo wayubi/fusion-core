@@ -4921,115 +4921,42 @@ end;
 			end;
 {アイテム製造追加ココまで}
 		//--------------------------------------------------------------------------
-		$0197: //GMコマンド /resetstate /resetskill(将来的にはGMチェックを入れる)
-			begin
-                           {GMかチェック}
-                           tp := tc.PData;
-      h := IDTableDB.IndexOf(tc.ID);
-      if (h <> -1) then begin
-      tid := IDTableDB.Objects[h] as TIDTbl;
-
-				RFIFOW(2, w);
-
-				if (w = 0) and (tid.ChangeStatSkill = 1) then begin// Resetstate
-					for i := 0 to 5 do begin
-						tc.ParamBase[i] := 1;
-					end;
-					//Lv1時の基本ポイント48をまず与える
-					tc.StatusPoint := 48;
-					//現在レベルまでのステータスポイント計算を逐一行う
-					//ここはもっと上手い方法があると思いますが私には無理(;´Д`)
-					for i := 1 to tc.BaseLV - 1 do begin
-						tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-				end;
-          CalcStat(tc);
-          SendCStat(tc);
-					end;
-					//各種ステータスを再計算し、クライアントに変更を通知
-					CalcStat(tc);
-
-				if (w = 1) and (tid.ChangeStatSkill = 1) then begin // ResetSkill
-
-                                        j := 0;
-					for i := 2 to MAX_SKILL_NUMBER do begin
-                                                j := j + tc.Skill[i].Lv;
-            if not tc.Skill[i].Card then
-							tc.Skill[i].Lv := 0;
-					end;
-          if (tc.Plag <> 0) then begin
-          tc.Skill[tc.Plag].Plag := false;
-          tc.Skill[tc.Plag].Lv := 0;
-          tc.Plag := 0;
-          tc.PLv := 0;
-          end;
-					if tc.JID = 0 then begin
-                                        end else begin
-                                                tc.skillpoint := j;
-                                        end;
-
-					SendCSkillList(tc);
-          CalcStat(tc);
-          SendCStat(tc);
-				end;
-{追加ココまで}
-				//if w = 1 then begin // ResetSkill(スキルポイント再分配)の処理
-
-				//	//減らしたポイント記録用にjを0にする
-				//	j := 0;
-				//	//スキルレベルを0にし、減らしたポイントをjに加えていく
-				//	for i := 1 to 157 do begin
-				//		if (tc.Skill[i].Lv <> 0) then begin
-				//			j := j + tc.Skill[i].Lv;
-				//			tc.Skill[i].Lv := 0;
-				//		end;
-				//	end;
-				//		tc.SkillPoint := j;
-
-				//	//スキル送信
-				//	//スキル計算系の関数ができたらそっちに飛ばす
-				//	//現在はスキルを全部真っ白にするだけ
-
-				//	WFIFOW( 0, $010f);
-				//	WFIFOW( 2, 4);
-				//	Socket.SendBuf(buf, 4);
-
-				//	//スキルポイントの変更を通知
-				//	SendCStat(tc);
-				//end;
-                                               //スキルポイントの変更を通知
-						SendCStat(tc);
-			end;
-								end;
+		$0197: //GM Resets
+    begin
+        RFIFOW(2, w);
+        str := IntToStr(w);
+        parse_commands(tc, '/R'+str);
+    end;
 		//--------------------------------------------------------------------------
-		$019d: //GMハイドコマンド
-			begin    
-                           {GMかチェック}
-                           tp := tc.PData;
-      h := IDTableDB.IndexOf(tc.ID);
-      if (h <> -1) then begin
-      tid := IDTableDB.Objects[h] as TIDTbl;
-      if (tid.ChangeOption = 1) then begin
-				tm := tc.MData;
+		$019d: //GM Hide
+    begin
 
-				if (tc.Option and 64 = 0) then begin
-					tc.Option := tc.Option or 64;
-          tc.Hidden := true;
-				end else begin
-					tc.Option := tc.Option and $FFBF;
-          tc.Hidden := false;
-				end;
+        tp := tc.PData;
+        h := IDTableDB.IndexOf(tc.ID);
+        if (h <> -1) then begin
+            tid := IDTableDB.Objects[h] as TIDTbl;
+            if (tid.ChangeOption = 1) then begin
+                tm := tc.MData;
+
+                if (tc.Option and 64 = 0) then begin
+                    tc.Option := tc.Option or 64;
+                    tc.Hidden := true;
+                end else begin
+                    tc.Option := tc.Option and $FFBF;
+                    tc.Hidden := false;
+                end;
 
 
-				WFIFOW(0, $0119);
-				WFIFOL(2, tc.ID);
-				WFIFOW(6, 0);
-				WFIFOW(8, 0);
-				WFIFOW(10, tc.Option);
-				WFIFOB(12, 0);
-				SendBCmd(tm, tc.Point, 13);
-                           end;
-			end;
-			end;
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, 0);
+                WFIFOW(10, tc.Option);
+                WFIFOB(12, 0);
+                SendBCmd(tm, tc.Point, 13);
+            end;
+        end;
+    end;
 		//--------------------------------------------------------------------------
 {キューペット}
 		$019f: // ペットテイミング スロット停止
