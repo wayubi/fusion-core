@@ -11,7 +11,7 @@ uses
 	List32;
 
 const
-	RELEASE_VERSION = '1.212';
+	RELEASE_VERSION = '1.211';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
@@ -4359,18 +4359,21 @@ begin
 		WFIFOW(0, $00a5);
 		j := 0;
 		for i := 1 to 100 do begin
-			if (tp.Kafra.Item[i].ID <> 0) and not tp.Kafra.Item[i].Data.IEquip then begin
-				WFIFOW( 4 +j*10, i);
-				WFIFOW( 6 +j*10, tp.Kafra.Item[i].Data.ID);
-				WFIFOB( 8 +j*10, tp.Kafra.Item[i].Data.IType);
-				WFIFOB( 9 +j*10, tp.Kafra.Item[i].Identify);
-				WFIFOW(10 +j*10, tp.Kafra.Item[i].Amount);
-				if tp.Kafra.Item[i].Data.IType = 10 then
-					WFIFOW(12 +j*10, 32768)
-				else
-					WFIFOW(12 +j*10, 0);
-				Inc(j);
-				Inc(cnt);
+
+			if (tp.Kafra.Item[i].ID <> 0) then begin
+                if (not tp.Kafra.Item[i].Data.IEquip) then begin
+    				WFIFOW( 4 +j*10, i);
+	    			WFIFOW( 6 +j*10, tp.Kafra.Item[i].Data.ID);
+		    		WFIFOB( 8 +j*10, tp.Kafra.Item[i].Data.IType);
+			    	WFIFOB( 9 +j*10, tp.Kafra.Item[i].Identify);
+				    WFIFOW(10 +j*10, tp.Kafra.Item[i].Amount);
+    				if tp.Kafra.Item[i].Data.IType = 10 then
+	    				WFIFOW(12 +j*10, 32768)
+		    		else
+			    		WFIFOW(12 +j*10, 0);
+				    Inc(j);
+    				Inc(cnt);
+                end;
 			end;
 		end;
 		WFIFOW(2, 4+j*10);
@@ -4379,27 +4382,29 @@ begin
 		WFIFOW(0, $00a6);
 		j := 0;
 		for i := 1 to 100 do begin
-			if (tp.Kafra.Item[i].ID <> 0) and tp.Kafra.Item[i].Data.IEquip then begin
-				WFIFOW( 4 +j*20, i);
-				WFIFOW( 6 +j*20, tp.Kafra.Item[i].Data.ID);
-				WFIFOB( 8 +j*20, tp.Kafra.Item[i].Data.IType);
-				WFIFOB( 9 +j*20, tp.Kafra.Item[i].Identify);
-				with tp.Kafra.Item[i].Data do begin
-					if (tc.JID = 12) and (IType = 4) and (Loc = 2) and
-						 ((View = 1) or (View = 2) or (View = 6)) then
-						WFIFOW(10 +j*20, 34)
-					else
-						WFIFOW(10 +j*20, Loc);
-				end;
-				WFIFOW(12 +j*20, tp.Kafra.Item[i].Equip);
-				WFIFOB(14 +j*20, tp.Kafra.Item[i].Attr);
-				WFIFOB(15 +j*20, tp.Kafra.Item[i].Refine);
-				WFIFOW(16 +j*20, tp.Kafra.Item[i].Card[0]);
-				WFIFOW(18 +j*20, tp.Kafra.Item[i].Card[1]);
-				WFIFOW(20 +j*20, tp.Kafra.Item[i].Card[2]);
-				WFIFOW(22 +j*20, tp.Kafra.Item[i].Card[3]);
-				Inc(j);
-				Inc(cnt);
+			if (tp.Kafra.Item[i].ID <> 0) then begin
+                if (tp.Kafra.Item[i].Data.IEquip) then begin
+    				WFIFOW( 4 +j*20, i);
+	    			WFIFOW( 6 +j*20, tp.Kafra.Item[i].Data.ID);
+		    		WFIFOB( 8 +j*20, tp.Kafra.Item[i].Data.IType);
+			    	WFIFOB( 9 +j*20, tp.Kafra.Item[i].Identify);
+				    with tp.Kafra.Item[i].Data do begin
+    					if (tc.JID = 12) and (IType = 4) and (Loc = 2) and
+	    					 ((View = 1) or (View = 2) or (View = 6)) then
+		    				WFIFOW(10 +j*20, 34)
+			    		else
+				    		WFIFOW(10 +j*20, Loc);
+    				end;
+	    			WFIFOW(12 +j*20, tp.Kafra.Item[i].Equip);
+		    		WFIFOB(14 +j*20, tp.Kafra.Item[i].Attr);
+			    	WFIFOB(15 +j*20, tp.Kafra.Item[i].Refine);
+				    WFIFOW(16 +j*20, tp.Kafra.Item[i].Card[0]);
+    				WFIFOW(18 +j*20, tp.Kafra.Item[i].Card[1]);
+	    			WFIFOW(20 +j*20, tp.Kafra.Item[i].Card[2]);
+		    		WFIFOW(22 +j*20, tp.Kafra.Item[i].Card[3]);
+			    	Inc(j);
+				    Inc(cnt);
+                end;
 			end;
 		end;
 		WFIFOW(2, 4+j*20);
