@@ -316,6 +316,7 @@ type TMob = class
   NPCID       :Cardinal; //取り巻き用
 {NPCイベント追加}
 	Event       :cardinal;
+        isCasting   :boolean;
 {NPCイベント追加ココまで}
 	constructor Create;
 	destructor Destroy; override;
@@ -1401,7 +1402,7 @@ Option_MaxUsers   :word;
 {キューペットここまで}
 //------------------------------------------------------------------------------
     //地点スキル
-		function  SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil):TNPC;
+		function  SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil):TNPC;
 		procedure DelSkillUnit(tm:TMap; tn:TNPC);
 //------------------------------------------------------------------------------
     //所持アイテム
@@ -3930,7 +3931,7 @@ begin
 end;
 {キューペットここまで}
 //------------------------------------------------------------------------------
-function SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil):TNPC;
+function SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil):TNPC;
 var
 	tn :TNPC;
 begin
@@ -3945,6 +3946,7 @@ begin
 	tn.Tick := Tick + STime;
 	tn.Count := SCount;
 	tn.CData := tc;
+        tn.MData := ts;
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 

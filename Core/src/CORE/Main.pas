@@ -5315,8 +5315,8 @@ begin
                                                                 //魔法攻撃での回復は未実装
                                                         end;
                                                         
-                                                        SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        SetLength(bb, 4);
+                                                        bb[0] := 4;
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
 
@@ -9569,6 +9569,7 @@ var
 	i2,j2,k2:integer;
         p1,p2:integer;
 	tc1:TChara;
+        tMonster:TMob;
 	ts1:TMob;
         tc2:TChara;
 	tl	:TSkillDB;
@@ -9669,6 +9670,8 @@ begin
 			end;
 
 			tc1 := tn.CData;
+                        tMonster := tn.MData;
+
 			tl := SkillDB.IndexOfObject(tn.MSkill) as TSkillDB;
 			if tl <> nil then begin
 				m := tl.Range2;
@@ -9692,6 +9695,89 @@ begin
 				end;
 			end;
 			end;
+                        if tMonster.isCasting then begin
+                                if sl2.Count <> 0 then begin
+                                        for c1 := 0 to sl2.Count - 1 do begin
+                                                tc2 := sl2.Objects[c1] as TChara;
+                                                case tn.JID of
+                                                        $88: //Meteor
+							begin
+								//if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									//dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									//dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
+                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, tn.MData.Data.AISkill, Tick);
+
+									if dmg[0] < 1 then dmg[0] := 1;
+
+									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+
+                                                                        //Packet Process
+									WFIFOW( 0, $01de);
+									WFIFOW( 2, 83);
+									WFIFOL( 4, tn.ID);
+									WFIFOL( 8, tc2.ID);
+									WFIFOL(12, Tick);
+									WFIFOL(16, tMonster.Data.aMotion);
+									WFIFOL(20, tc2.dMotion);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
+
+                                                                        //SendMSkillAttack(tm, tc2, tn.MData, tn.MData.Data.AISkill, Tick, 1, 1);
+									DamageProcess3(tm, tn.MData, tc2, dmg[0], Tick);
+
+									if c1 = (sl2.Count -1) then begin
+										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										if tn.Count = 3 then tn.Tick := Tick
+									end;
+								//end;
+                                                        end;
+
+                                                        $86:    {Lord of Vermillion Damage}
+							begin
+								//if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, tn.MData.Data.AISkill, Tick);
+                                                                        dmg[0] := dmg[0] * tMonster.Data.Param[3];
+                                                                        if dmg[0] > 15000 then dmg[0] := 15000;
+									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									dmg[0] := dmg[0] - tc2.Param[3]; //Magic Defence
+									if dmg[0] < 1 then dmg[0] := 1;
+									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+									//Packet Process
+									WFIFOW( 0, $01de);
+									WFIFOW( 2, 83);
+									WFIFOL( 4, tn.ID);
+									WFIFOL( 8, tc2.ID);
+									WFIFOL(12, Tick);
+									WFIFOL(16, tMonster.Data.aMotion);
+									WFIFOL(20, tc2.dMotion);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
+
+									DamageProcess3(tm, tn.MData, tc2, dmg[0], Tick);
+
+									if c1 = (sl2.Count -1) then begin
+										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										if tn.Count = 3 then tn.Tick := Tick
+									end;
+								//end;
+							end;
+                                                end;  //End Case
+                                        //tMonster.IsCasting := false;
+                                        //Exit;
+                                        end;
+                                end;
+                        end;
 
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
@@ -9844,7 +9930,7 @@ begin
                                 end;
                         end;
                         end;
-                        if mi.PvP = true then begin
+                        if (mi.PvP = true) then begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
@@ -10257,7 +10343,7 @@ begin
 			end;
 
 			end;
-			if sl.Count <> 0 then begin
+			if (sl.Count <> 0) and (tMonster.isCasting = false) then begin
 				for c := 0 to sl.Count - 1 do begin
 					ts1 := sl.Objects[c] as TMob;
 
