@@ -594,7 +594,16 @@ end;
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
 	ini :TIniFile;
+    sr	:TSearchRec;
 begin
+
+    if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
+        repeat
+            DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
+        until FindNext(sr) <> 0;
+        FindClose(sr);
+    end;
+
 	if ServerRunning then begin
 		cmdStop.Enabled := false;
 		CancelFlag := true;

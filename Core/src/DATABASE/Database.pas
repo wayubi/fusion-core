@@ -2331,18 +2331,7 @@ var
 	tgb :TGBan;
 	tgl :TGRel;
 {ギルド機能追加ココまで}
-    sr	:TSearchRec;
 begin
-
-
-    if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
-        repeat
-            DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
-        until FindNext(sr) <> 0;
-        FindClose(sr);
-    end;
-
-    //rmDir(AppPath+'map\tmpFiles');
 
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';

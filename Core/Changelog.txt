@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 01-12-04: Fixed AF2 Support. Can now use AF2 Maps. [AlexKreuz]
 - 01-12-04: Fixed Extremity Fist Crash in PvP Mode. [AlexKreuz]
 - 01-12-04: Fixed Extremity Fist Calculations. [AlexKreuz]
 - 01-12-04: Added Graffiti and Talkie Box (incomplete). [Colus]
