@@ -1263,47 +1263,6 @@ Begin(* Proc sv3PacketProcess() *)
 						end;
 					// NEW GM COMMANDS
 
-					end else if (Copy(str, 1, 7) = 'blevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
-						Val(Copy(str, 8, 256), i, k);
-						if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc.BaseLV) then begin
-
-							//if (i >= 100) and (tc.ParamBase[2] >= 111) then begin
-							//tc.ParamBase[2] := 110;
-							//end;
-
-							if tc.BaseLV > i then begin
-								tc.BaseLV := i;
-
-								for i := 0 to 5 do begin
-									tc.ParamBase[i] := 1;
-								end;//for
-								tc.StatusPoint := 48;
-								for i := 1 to tc.BaseLV - 1 do begin
-									tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-								end;//for
-
-							end else begin
-								w3 := tc.BaseLV;
-								tc.BaseLV := i;
-								for i := w3 to tc.BaseLV - 1 do begin
-									tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-								end;//for
-							end;//if-else
-
-							tc.BaseEXP := tc.BaseNextEXP - 1;
-							tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
-							CalcStat(tc);
-							SendCStat(tc);
-							SendCStat1(tc, 0, $000b, tc.BaseLV);
-							SendCStat1(tc, 0, $0009, tc.StatusPoint);
-							SendCStat1(tc, 1, $0001, tc.BaseEXP);
-						end;        //Kyuubi - Glevel Command  Under Development
-					//end else if (Copy(str,1, 7) = 'glevel ') and (tc.GuildID) then begin
-					//
-					//ChrstphR - 2004/04/19 - fix the build --
-					//Error was "Operator not applicable to this operand type -
-					//No WORD type can be treated like a boolean.
-					//
 					end else if (Copy(str,1, 7) = 'glevel ') and (GuildList.IndexOf(tc.GuildID) > -1) then begin
                   j := GuildList.IndexOf(tc.GuildID);
                   tg := GuildList.Objects[j] as TGuild;
@@ -1322,67 +1281,6 @@ Begin(* Proc sv3PacketProcess() *)
                   SendGuildInfo(tc, 0, true);
                   SendGuildInfo(tc, 1, true);
                     end;
-          end else if (Copy(str, 1, 7) = 'jlevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
-						//スピード変更
-						Val(Copy(str, 8, 256), i, k);
-						if (k = 0) and (i >= 1) and (i <= 99) then begin
-							tc.JobLV := i;
-
-							for i := 1 to MAX_SKILL_NUMBER do begin
-							  if not tc.Skill[i].Card then
-									tc.Skill[i].Lv := 0;
-							end;
-                            if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
-							else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
-							else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
-							SendCSkillList(tc);
-
-							tc.JobEXP := tc.JobNextEXP - 1;
-							if tc.JID < 13 then begin
-								j := (tc.JID + 5) div 6 + 1;
-							end else begin
-								j := 3;
-							end;//if else
-							tc.JobNextEXP := ExpTable[j][tc.JobLV];
-
-							CalcStat(tc);
-							SendCStat(tc);
-							SendCStat1(tc, 0, $0037, tc.JobLV);
-							SendCStat1(tc, 0, $000c, tc.SkillPoint);
-							SendCStat1(tc, 1, $0002, tc.JobEXP);
-						end;
-
-          end else if (Copy(str, 1, 11) = 'skillpoint ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
-						Val(Copy(str, 12, 256), i, k);
-						if (k = 0) and (i >= 0) and (i <= 1001) then begin
-            tc.SkillPoint := i;
-            SendCStat1(tc, 0, $000c, tc.SkillPoint);
-            end;
-
-          end else if (Copy(str, 1, 11) = 'changestat ') and ((DebugCMD and $0004) <> 0) and (tid.ChangeStatSkill = 1) then begin
-						SL := TStringList.Create;
-						SL.DelimitedText := Copy(str, 12, 256);
-						try
-							if SL.Count = 2 then begin
-								Val(SL[0], i, k); //CRW - default index in StringList is Strings
-								if(i >= 0) and (i <= 5) then begin
-									Val(SL[1], j, k);
-									if(j >= 1) and (j <= 99) then begin
-
-			              //if (i = 2) and (j >= 111) and (tc.BaseLV >= 100) then begin
-			              //  j := 110 - tc.Bonus[2];
-			              //end;
-
-										tc.ParamBase[i] := j;
-			              CalcStat(tc);
-			              SendCStat(tc);
-			              SendCStat1(tc, 0, $0009, tc.StatusPoint);
-									end;
-								end;
-							end;
-						finally
-							SL.Free();
-						end;
 
 					end
 					else if (Copy(str, 1, 6) = 'speed ') AND

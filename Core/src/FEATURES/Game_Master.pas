@@ -102,6 +102,10 @@ var
     function command_warp(tc : TChara; str : String) : String;
     function command_banish(str : String) : String;
     function command_job(tc : TChara; str : String) : String;
+    function command_blevel(tc : TChara; str : String) : String;
+    function command_jlevel(tc : TChara; str : String) : String;
+    function command_changestat(tc : TChara; str : String) : String;
+    function command_skillpoint(tc : TChara; str : String) : String;
 
 implementation
 
@@ -118,7 +122,7 @@ implementation
         if sl.IndexOfName('ALIVE') > -1 then GM_ALIVE := StrToInt(sl.Values['ALIVE']) else GM_ALIVE := 1;
         if sl.IndexOfName('ITEM') > -1 then GM_ITEM := StrToInt(sl.Values['ITEM']) else GM_ITEM := 1;
         if sl.IndexOfName('SAVE') > -1 then GM_SAVE := StrToInt(sl.Values['SAVE']) else GM_SAVE := 1;
-        if sl.IndexOfName('RETURN') > -1 then GM_SAVE := StrToInt(sl.Values['RETURN']) else GM_RETURN := 1;
+        if sl.IndexOfName('RETURN') > -1 then GM_RETURN := StrToInt(sl.Values['RETURN']) else GM_RETURN := 1;
         if sl.IndexOfName('DIE') > -1 then GM_DIE := StrToInt(sl.Values['DIE']) else GM_DIE := 1;
         if sl.IndexOfName('AUTO') > -1 then GM_AUTO := StrToInt(sl.Values['AUTO']) else GM_AUTO := 1;
         if sl.IndexOfName('HCOLOR') > -1 then GM_HCOLOR := StrToInt(sl.Values['HCOLOR']) else GM_HCOLOR := 1;
@@ -130,6 +134,10 @@ implementation
         if sl.IndexOfName('WARP') > -1 then GM_WARP := StrToInt(sl.Values['WARP']) else GM_WARP := 1;
         if sl.IndexOfName('BANISH') > -1 then GM_BANISH := StrToInt(sl.Values['BANISH']) else GM_BANISH := 1;
         if sl.IndexOfName('JOB') > -1 then GM_JOB := StrToInt(sl.Values['JOB']) else GM_JOB := 1;
+        if sl.IndexOfName('BLEVEL') > -1 then GM_BLEVEL := StrToInt(sl.Values['BLEVEL']) else GM_BLEVEL := 1;
+        if sl.IndexOfName('JLEVEL') > -1 then GM_JLEVEL := StrToInt(sl.Values['JLEVEL']) else GM_JLEVEL := 1;
+        if sl.IndexOfName('CHANGESTAT') > -1 then GM_CHANGESTAT := StrToInt(sl.Values['CHANGESTAT']) else GM_CHANGESTAT := 1;
+        if sl.IndexOfName('SKILLPOINT') > -1 then GM_SKILLPOINT := StrToInt(sl.Values['SKILLPOINT']) else GM_SKILLPOINT := 1;
 
         sl.Free;
         ini.Free;
@@ -156,6 +164,10 @@ implementation
         ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
         ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
         ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
+        ini.WriteString('Fusion GM Commands', 'BLEVEL', IntToStr(GM_BLEVEL));
+        ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
+        ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
+        ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
 
         ini.Free;
     end;
@@ -182,6 +194,10 @@ implementation
         else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
         else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
         else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
+        else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
+        else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
+        else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
+        else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -227,6 +243,8 @@ implementation
 
         str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
         logfile.Add(str);
+
+        CreateDir('logs');
         logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
         logfile.Free;
     end;
@@ -631,10 +649,10 @@ implementation
                     i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
                     tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
                 end else begin
-                    tc.ClothesColor := 0; // Reset the clothes color to the default value.
+                    tc.ClothesColor := 0;
                 end;
 
-                tc.JID := i; // Set the JID to the corrected value.
+                tc.JID := i;
 
                 if (tc.Option <> 0) then begin
                     tc.Option := 0;
@@ -658,6 +676,151 @@ implementation
             end else begin
                 Result := Result + ' Job ID is out of range.';
             end;
+        end;
+    end;
+
+    function command_blevel(tc : TChara; str : String) : String;
+    var
+        i, k, w3 : Integer;
+        oldlevel : Integer;
+    begin
+        Result := 'GM_BLEVEL Failure.';
+
+        oldlevel := tc.BaseLV;
+        Val(Copy(str, 8, 256), i, k);
+
+        if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc.BaseLV) then begin
+            if tc.BaseLV > i then begin
+                tc.BaseLV := i;
+
+                for i := 0 to 5 do begin
+                    tc.ParamBase[i] := 1;
+                end;
+
+                tc.StatusPoint := 48;
+
+                for i := 1 to tc.BaseLV - 1 do begin
+                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                end;
+            end
+
+            else begin
+                w3 := tc.BaseLV;
+                tc.BaseLV := i;
+
+                for i := w3 to tc.BaseLV - 1 do begin
+                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                end;
+            end;
+
+            tc.BaseEXP := tc.BaseNextEXP - 1;
+            tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+
+            CalcStat(tc);
+            SendCStat(tc);
+            SendCStat1(tc, 0, $000b, tc.BaseLV);
+            SendCStat1(tc, 0, $0009, tc.StatusPoint);
+            SendCStat1(tc, 1, $0001, tc.BaseEXP);
+
+            Result := 'GM_BLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.BaseLV) + '.';
+        end else begin
+            Result := Result + ' Incomplete information or level out of range.';
+        end;
+    end;
+
+    function command_jlevel(tc : TChara; str : String) : String;
+    var
+        i, j, k : Integer;
+        oldlevel : Integer;
+    begin
+        Result := 'GM_JLEVEL Failure.';
+
+        oldlevel := tc.JobLV;
+        Val(Copy(str, 8, 256), i, k);
+
+        if (k = 0) and (i >= 1) and (i <= 99) and (i <> tc.JobLV) then begin
+            tc.JobLV := i;
+
+            for i := 1 to MAX_SKILL_NUMBER do begin
+                if not tc.Skill[i].Card then tc.Skill[i].Lv := 0;
+            end;
+
+            if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
+            else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
+            else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
+
+            SendCSkillList(tc);
+
+            tc.JobEXP := tc.JobNextEXP - 1;
+
+            if tc.JID < 13 then begin
+                j := (tc.JID + 5) div 6 + 1;
+            end else begin
+                j := 3;
+            end;
+
+            tc.JobNextEXP := ExpTable[j][tc.JobLV];
+
+            CalcStat(tc);
+            SendCStat(tc);
+            SendCStat1(tc, 0, $0037, tc.JobLV);
+            SendCStat1(tc, 0, $000c, tc.SkillPoint);
+            SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+
+            Result := 'GM_JLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
+        end else begin
+            Result := Result + ' Incomplete information or level out of range.';
+        end;
+    end;
+
+    function command_changestat(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k : Integer;
+    begin
+        Result := 'GM_CHANGESTAT Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 12, 256);
+
+        if (sl.Count = 2) then begin
+            Val(sl[0], i, k);
+
+            if(i >= 0) and (i <= 5) then begin
+                Val(sl[1], j, k);
+
+                if(j >= 1) and (j <= 99) then begin
+                    tc.ParamBase[i] := j;
+                    CalcStat(tc);
+                    SendCStat(tc);
+                    SendCStat1(tc, 0, $0009, tc.StatusPoint);
+
+                    Result := 'GM_CHANGESTAT Success. Stat ' + IntToStr(i) + ' changed to ' + IntToStr(j) + '.';
+                end;
+            end else begin
+                Result := Result + ' Incorrect stat index number.';
+            end;
+        end else begin
+            Result := Result + ' Incomplete information.';
+        end;
+
+        sl.Free;
+    end;
+
+    function command_skillpoint(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+    begin
+        Result := 'GM_SKILLPOINT Failure.';
+
+        Val(Copy(str, 12, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 1001) then begin
+            tc.SkillPoint := i;
+            SendCStat1(tc, 0, $000c, tc.SkillPoint);
+            Result := 'GM_SKILLPOINT Sucess. Skill Point amount set to ' + IntToStr(i) + '.';
+        end else begin
+            Result := Result + ' Skill Point amount out of range {0-1001}.';
         end;
     end;
 
