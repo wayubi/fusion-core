@@ -1894,20 +1894,37 @@ begin
 		end;
 
                 if (tc.Skill[279].Tick > Tick) and (Skill[279].Lv > 0) then begin     {Auto Cast}
-                                if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
-                                        tc.MTarget := tc.ATarget;
-			                        ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-			                                if ts.HP = 0 then Exit;
-                                                tc.MTargetType := 0;
-			                        tc.AData := ts;
-			                                if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) then begin
+                  if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
+                    tc.MTarget := tc.ATarget;
+                    ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+                    if ts.HP = 0 then Exit;
+                    tc.MTargetType := 0;
+                    tc.AData := ts;
+                    if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) then begin
 
-				                        ts.ATarget := ID;
-				                        ts.AData := tc;
-				                        ts.isLooting := False;
-				                        ts.ATick := Tick + aMotion;
-			                                end;
+                      ts.ATarget := ID;
+				              ts.AData := tc;
+				              ts.isLooting := False;
+				              ts.ATick := Tick + aMotion;
+                    end;
 
+                    i := Skill[279].Effect1;
+                    if (i > 0) then j := Skill[i].Lv;
+                    // What level can you use?
+                    {case i of
+                      11:
+                        begin
+                        end;
+                      14,19,20,13:
+                        begin
+                        end;
+                      17:
+                        begin
+                        end;
+                      15:
+                        begin
+                        end;
+                    end;}
                                         {Basing On Level to determine able spells}
                                         if Skill[279].Lv = 1 then i := 1;
                                         if Skill[279].Lv <= 4 then i := 2;
@@ -7476,6 +7493,16 @@ begin
                                         end;
                                 279:    {Autocast}
                                         begin
+                                          ZeroMemory(@buf[0], 30);
+                                          WFIFOW(0, $01cd);
+                                          if tc.Skill[11].Lv > 0 then WFIFOL(2, 11);
+                                          if (tc.Skill[14].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(6, 14);
+                                          if (tc.Skill[19].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(10, 19);
+                                          if (tc.Skill[20].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(14, 20);
+                                          if (tc.Skill[13].Lv > 0) and (tc.Skill[279].Lv > 4) then WFIFOL(18, 13);
+                                          if (tc.Skill[17].Lv > 0) and (tc.Skill[279].Lv > 7) then WFIFOL(22, 17);
+                                          if (tc.Skill[15].Lv > 0) and (tc.Skill[279].Lv > 9) then WFIFOL(26, 15);
+                                          tc.Socket.SendBuf(buf, 30);
                                                 tc1 := tc;
                                                 ProcessType := 3;
                                         end;

@@ -7213,8 +7213,21 @@ end;
 				WFIFOS(6, tv.Title, 80);
 				SendBCmd(tc.MData, tc.Point, 86, tc);
 			end;
+//--------------------------------------------------------------------------
+
+		$01ce: // Choose AutoCast spell
+      begin
+        RFIFOL(2, l); // This is the ID of the skill chosen.
+
+        // INFO: This choice is the skill that must be used in autocast.
+        // Instead of choosing a random skill when attacking, use this
+        // spell to the possible level available.
+
+        tc.Skill[279].Effect1 := l;
+      end;
 {露店スキル追加ココまで}
-		end;	end;
+		end;
+  end;
 end;
 //==============================================================================
 end.
