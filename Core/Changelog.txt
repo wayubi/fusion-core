@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-07-05: Added Icewall Cap modifier to weiss.ini. [AlexKreuz]
+- 01-07-05: Added Firewall Cap modifier to weiss.ini. [AlexKreuz]
 - 01-06-05: Guild folders not in Int format caused crash on guildid retrieval. [AlexKreuz]
 - 01-06-05: Readded support for set baselevel (hopefully improved). [Tsusai]
 - 01-06-05: Bug tracing in retrieve_inventories. Missing data in "identify" column. [AlexKreuz]

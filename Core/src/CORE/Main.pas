@@ -1032,6 +1032,17 @@ begin
                         Option_PVP_XPLoss := True;
                 end;
 
+    if sl.IndexOfName('Option_FireWall_Cap') > -1 then begin
+                        Option_FireWall_Cap := StrToInt(sl.Values['Option_FireWall_Cap']);
+                end else begin
+                        Option_FireWall_Cap := 3;
+                end;
+    if sl.IndexOfName('Option_IceWall_Cap') > -1 then begin
+                        Option_IceWall_Cap := StrToInt(sl.Values['Option_IceWall_Cap']);
+                end else begin
+                        Option_IceWall_Cap := 3;
+                end;
+
     if sl.IndexOfName('Option_Packet_Out') > -1 then begin
         try
             Option_Packet_Out := StrToBool(sl.Values['Option_Packet_Out']);
@@ -5396,6 +5407,7 @@ begin
 				xy.X := MPoint.X;
 				xy.Y := MPoint.Y;
 				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+                IceWallCount := IceWallCount + 1;
 				tn.CData  := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
@@ -5406,12 +5418,14 @@ begin
 
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+                IceWallCount := IceWallCount + 1;
 				tn.CData  := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
 
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+                IceWallCount := IceWallCount + 1;
 				tn.CData  := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
@@ -5422,12 +5436,14 @@ begin
 
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+                IceWallCount := IceWallCount + 1;
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
 
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+                IceWallCount := IceWallCount + 1;
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;

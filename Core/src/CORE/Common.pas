@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = '1.212 Y - R.E.E.D RC2 Release';
+	RELEASE_VERSION = '1.212 Z - R.E.E.D RC3 Release';
     MAXINTEGER = 2147483647;
 
 	// Colus, 20040304: Let's see if this is truly global scope.
@@ -682,8 +682,13 @@ TMap = class;    //forward declaration - MData " " "
 
 TChara = class(TLiving)
     private
+
     fFireWallCount : Byte;
+    fIceWallCount : Byte;
+
     procedure SetFirewallCount( Value : Byte );
+    procedure SetIceWallCount( Value : Byte );
+
     public
 	// Control Variables
 	Socket        :TCustomWinSocket;
@@ -1042,6 +1047,10 @@ TChara = class(TLiving)
     property FireWallCount : Byte
     read   fFireWallCount
     write  SetFireWallCount;
+
+    property IceWallCount : Byte
+    read fIceWallCount
+    write SetIceWallCount;
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
@@ -1722,6 +1731,9 @@ Option_Font_Color : string;
 Option_Font_Size : integer;
 Option_Font_Face : string;
 Option_Font_Style : string;
+
+Option_FireWall_Cap : Byte;
+Option_IceWall_Cap : Byte;
 
 Option_Packet_Out : Boolean;
 // Fusion INI Declarations
@@ -4789,7 +4801,12 @@ begin
 		if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin
 			tl := tc.Skill[tc.MSkill].Data;
 
-            if (tc.MSkill = 18) and (FireWallCount = 9) then begin
+            if (tc.MSkill = 18) and (FireWallCount = (Option_FireWall_Cap * 3)) then begin
+                SendSkillError(tc, 0);
+                Exit;
+            end;
+
+            if (tc.MSkill = 87) and (IceWallCount = (Option_IceWall_Cap * 5)) then begin
                 SendSkillError(tc, 0);
                 Exit;
             end;
@@ -5636,6 +5653,9 @@ begin
   // Icewall terrain change
 
   if (tn.JID = $8D) then begin
+    tc := tn.CData;
+    tc.IceWallCount := tc.IceWallCount - 1;
+
     tm.gat[tn.Point.X][tn.Point.Y] := 0;
 
     WFIFOW(0, $0192);
@@ -10961,10 +10981,20 @@ begin
 if Value > 128 then
     fFireWallCount := 0;
 
-    if Value >= 9 then
-        fFireWallCount := 9
+    if Value >= (Option_FireWall_Cap * 3) then
+        fFireWallCount := (Option_FireWall_Cap * 3)
     else
         fFireWallCount := Value;
+end;
+
+procedure TChara.SetIceWallCount( Value : Byte );
+begin
+    if Value > 128 then fIceWallCount := 0;
+
+    if Value >= (Option_IceWall_Cap * 5) then
+        fIceWallCount := (Option_IceWall_Cap * 5)
+    else
+        fIceWallCount := Value;
 end;
 
 

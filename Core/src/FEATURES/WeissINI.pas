@@ -101,6 +101,8 @@ uses
         ini.WriteString('Fusion', 'Option_Enable_ISCS', BoolToStr(Option_Enable_ISCS));
         ini.WriteString('Fusion', 'Option_Use_UPnP', BoolToStr(Option_Use_UPnP));
         ini.WriteString('Fusion', 'Option_Packet_Out', BoolToStr(Option_Packet_Out));
+        ini.WriteString('Fusion', 'Option_FireWall_Cap', IntToStr(Option_FireWall_Cap));
+        ini.WriteString('Fusion', 'Option_IceWall_Cap', IntToStr(Option_IceWall_Cap));
         // Fusion INI Lines
 
         // MySQL Server Lines
