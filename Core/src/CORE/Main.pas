@@ -1070,7 +1070,7 @@ begin
 	if UseSQL then
 		SQLDataSave
 	else
-		DataSave(true);
+		DataSave(false);
 
 	{ Mitch: Doesnt hurt to make sure the tray icon was deleted }
 	Shell_notifyIcon(NIM_DELETE, @TrayIcon);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-22-04: Removed Comprehensive Save from shutdown. Faster. [AlexKreuz]
 - 07-22-04: Character Variables duplicated. Major instability + lag. [AlexKreuz]
 - 07-22-04: Added dynamic error reporting to Inventory, Storage, Cart. [AlexKreuz]
 - 07-22-04: I'm tired .. fixed silly command in one file. Compile Error. [AlexKreuz]
