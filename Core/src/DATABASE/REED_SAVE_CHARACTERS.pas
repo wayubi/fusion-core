@@ -12,9 +12,14 @@ uses
     procedure PD_Save_Characters_Memos(tc : TChara; datafile : TStringList);
     procedure PD_Save_Characters_Skills(tc : TChara; datafile : TStringList);
     procedure PD_Save_Characters_Inventory(tc : TChara; datafile : TStringList);
+    procedure PD_Save_Characters_Cart(tc : TChara; datafile : TStringList);
+    procedure PD_Save_Characters_Variables(tc : TChara; datafile : TStringList);
 
 implementation
 
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Parse --------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Characters_Parse(forced : Boolean = False);
     var
         datafile : TStringList;
@@ -50,11 +55,24 @@ implementation
             pfile := 'Inventory.txt';
             PD_Save_Characters_Inventory(tc, datafile);
             reed_savefile(tc.CID, datafile, path, pfile);
+
+            pfile := 'Cart.txt';
+            PD_Save_Characters_Cart(tc, datafile);
+            reed_savefile(tc.CID, datafile, path, pfile);
+
+            pfile := 'Variables.txt';
+            PD_Save_Characters_Variables(tc, datafile);
+            reed_savefile(tc.CID, datafile, path, pfile);
         end;
 
         FreeAndNil(datafile);
     end;
+    { ------------------------------------------------------------------------------------- }
 
+    
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Basic --------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Characters_Basic(tc : TChara; datafile : TStringList);
     begin
         datafile.Add('NAM : ' + tc.Name);
@@ -118,7 +136,12 @@ implementation
         datafile.Add('GID : ' + IntToStr(tc.GuildID));
         datafile.Add('PID : ' + IntToStr(tc.PartyID));
     end;
+    { ------------------------------------------------------------------------------------- }
 
+    
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Memos --------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Characters_Memos(tc : TChara; datafile : TStringList);
     var
         i : Integer;
@@ -129,7 +152,12 @@ implementation
             datafile.Add('M'+IntToStr(i+1)+'Y : ' + IntToStr(tc.MemoPoint[i].Y));
         end;
     end;
+    { ------------------------------------------------------------------------------------- }
 
+    
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Skills -------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Characters_Skills(tc : TChara; datafile : TStringList);
     var
         i, j : Integer;
@@ -159,10 +187,43 @@ implementation
             datafile.Add(str);
         end;
     end;
+    { ------------------------------------------------------------------------------------- }
 
+    
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Inventory ----------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Characters_Inventory(tc : TChara; datafile : TStringList);
     begin
         compile_inventories(datafile, tc.Item);
     end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Cart----------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Save_Characters_Cart(tc : TChara; datafile : TStringList);
+    begin
+        compile_inventories(datafile, tc.Cart.Item);
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Save Characters Variables ----------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Save_Characters_Variables(tc : TChara; datafile : TStringList);
+    var
+        k : Integer;
+    begin
+        for k := 0 to tc.Flag.Count - 1 do begin
+            if ((Copy(tc.Flag.Names[k], 1, 1) <> '@') and (Copy(tc.Flag.Names[k], 1, 2) <> '$@'))
+            and ((tc.Flag.Values[tc.Flag.Names[k]] <> '0') and (tc.Flag.Values[tc.Flag.Names[k]] <> '')) then begin
+                datafile.Add(tc.Flag.Strings[k]);
+            end;
+        end;
+    end;
+    { ------------------------------------------------------------------------------------- }
 
 end.

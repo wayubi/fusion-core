@@ -39,11 +39,6 @@ uses
     { Character Data - Basic Data }
     procedure PD_Delete_Characters(tc : TChara);
 
-    { Character Data - Cart Data }
-    procedure PD_Save_Characters_Cart(forced : Boolean = False);
-
-    { Character Data - Variables Data }
-    procedure PD_Save_Characters_Variables(forced : Boolean = False);
 
     { Character Data - Pets Data }
     procedure PD_Save_Characters_Pets(forced : Boolean = False);
@@ -130,8 +125,6 @@ uses
         PD_Save_Accounts_Parse(forced);
         PD_Save_Characters_Parse(forced);
 
-        PD_Save_Characters_Cart(forced);
-        PD_Save_Characters_Variables(forced);
         PD_Save_Characters_Pets(forced);
 
         PD_Save_Parties_Members(forced);
@@ -275,172 +268,6 @@ uses
         DataSave();
     end;
 
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Cart Data -------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Cart(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j, k, l : Integer;
-        str : String;
-        len : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then continue;
-
-
-                datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
-                datafile.Add('---------------------------------------------------------------------------------------------------------');
-
-                for k := 1 to 100 do begin
-        	        if tc.Cart.Item[k].ID <> 0 then begin
-    	            	str := ' ';
-
-    					len := length(IntToStr(tc.Cart.Item[k].ID));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Cart.Item[k].ID);
-    	                str := str + ' : ';
-
-    	                len := length(IntToStr(tc.Cart.Item[k].Amount));
-                    	for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Cart.Item[k].Amount);
-    	                str := str + ' : ';
-
-	        	        len := length(IntToStr(tc.Cart.Item[k].Equip));
-        	        	for l := 0 to (3 - len) - 1 do begin
-    	        	    	str := str + ' ';
-	        	        end;
-                	    str := str + IntToStr(tc.Cart.Item[k].Equip);
-            	        str := str + ' : ';
-
-        	            str := str + IntToStr(tc.Cart.Item[k].Identify);
-    	                str := str + ' : ';
-    
-                	    len := length(IntToStr(tc.Cart.Item[k].Refine));
-            	        for l := 0 to (2 - len) - 1 do begin
-        	            	str := str + ' ';
-    	                end;
-                	    str := str + IntToStr(tc.Cart.Item[k].Refine);
-            	        str := str + ' : ';
-        	            str := str + IntToStr(tc.Cart.Item[k].Attr);
-    	                str := str + ' : ';
-    
-        	            len := length(IntToStr(tc.Cart.Item[k].Card[0]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Cart.Item[k].Card[0]);
-    	                str := str + ' : ';
-
-        	            len := length(IntToStr(tc.Cart.Item[k].Card[1]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Cart.Item[k].Card[1]);
-    	                str := str + ' : ';
-    
-        	            len := length(IntToStr(tc.Cart.Item[k].Card[2]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Cart.Item[k].Card[2]);
-    	                str := str + ' : ';
-    
-            	        len := length(IntToStr(tc.Cart.Item[k].Card[3]));
-        	            for l := 0 to (5 - len) - 1 do begin
-    	                	str := str + ' ';
-                    	end;
-                	    str := str + IntToStr(tc.Cart.Item[k].Card[3]);
-            	        str := str + ' : ';
-
-                        str := str + tc.Cart.Item[k].Data.Name;
-    
-        	            datafile.Add(str);
-    	            end;
-                end;
-
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Cart.txt');
-                	//debugout.Lines.Add(tp.Name + ' character cart data saved.');
-            	except
-            		DebugOut.Lines.Add('Character cart data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Variables Data --------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Variables(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j, k : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then continue;
-
-                for k := 0 to tc.Flag.Count - 1 do begin
-                	if ((Copy(tc.Flag.Names[k], 1, 1) <> '@') and (Copy(tc.Flag.Names[k], 1, 2) <> '$@'))
-                    and ((tc.Flag.Values[tc.Flag.Names[k]] <> '0') and (tc.Flag.Values[tc.Flag.Names[k]] <> '')) then begin
-                    	datafile.Add(tc.Flag.Strings[k]);
-                    end;
-                end;
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Variables.txt');
-                	//debugout.Lines.Add(tp.Name + ' character variables data saved.');
-            	except
-            		DebugOut.Lines.Add('Character variables data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
 
 
     { -------------------------------------------------------------------------------- }
