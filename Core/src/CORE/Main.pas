@@ -83,7 +83,6 @@ type
     Label16: TLabel;
     Button3: TButton;
     Button4: TButton;
-    MinimizetoTray1: TMenuItem;
     PageControl2: TPageControl;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
@@ -130,7 +129,53 @@ type
     ComboBox6: TComboBox;
     ComboBox7: TComboBox;
     ComboBox8: TComboBox;
+    ComboBox16: TComboBox;
+    Button2: TButton;
+    Edit37: TEdit;
+    Edit38: TEdit;
+    Edit39: TEdit;
+    Edit40: TEdit;
+    Edit42: TEdit;
+    Label43: TLabel;
+    Label44: TLabel;
+    Label45: TLabel;
+    Label49: TLabel;
+    Label50: TLabel;
+    Label51: TLabel;
+    Label52: TLabel;
+    Label53: TLabel;
+    Label55: TLabel;
+    Label56: TLabel;
+    Label57: TLabel;
+    Label58: TLabel;
+    Label59: TLabel;
+    ComboBox17: TComboBox;
     Label38: TLabel;
+    Label54: TLabel;
+    Label39: TLabel;
+    Edit27: TEdit;
+    Label40: TLabel;
+    Edit28: TEdit;
+    Label41: TLabel;
+    Edit43: TEdit;
+    Label42: TLabel;
+    Label46: TLabel;
+    Edit44: TEdit;
+    Label47: TLabel;
+    Edit45: TEdit;
+    Edit32: TEdit;
+    Edit33: TEdit;
+    Edit34: TEdit;
+    Edit35: TEdit;
+    ComboBox9: TComboBox;
+    ComboBox10: TComboBox;
+    ComboBox11: TComboBox;
+    ComboBox12: TComboBox;
+    ComboBox13: TComboBox;
+    Control1: TMenuItem;
+    MinimizetoTray2: TMenuItem;
+    Label48: TLabel;
+    ComboBox14: TComboBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -199,7 +244,6 @@ type
     procedure Stop1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
-    procedure MinimizetoTray1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -207,6 +251,9 @@ type
     procedure Button5Click(Sender: TObject);
 
     procedure PriorityUpdate(prioramount : Integer);
+    procedure PageControl2Change(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure MinimizetoTray2Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -10806,13 +10853,7 @@ begin
 	frmMain.Close;
 end;
 
-procedure TfrmMain.Save1Click(Sender: TObject);
-begin
-    DataSave();
-    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
-end;
-
-procedure TfrmMain.MinimizetoTray1Click(Sender: TObject);
+procedure TfrmMain.MinimizetoTray2Click(Sender: TObject);
 begin
     //Add Icon to System Tray
                 TrayIcon.cbSize := SizeOf(TrayIcon);
@@ -10830,6 +10871,12 @@ begin
                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
                 //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
                 // (Don't ToolWindows don't show in taskbar by default)
+end;
+
+procedure TfrmMain.Save1Click(Sender: TObject);
+begin
+    DataSave();
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
 end;
 
 procedure TfrmMain.PageControl1Change(Sender: TObject);
@@ -10860,6 +10907,20 @@ end;
 procedure TfrmMain.Button5Click(Sender: TObject);
 begin
 	JCon_INI_Server_Save();
+end;
+
+procedure TfrmMain.PageControl2Change(Sender: TObject);
+begin
+	if (TabSheet4.Showing) then begin
+    	JCon_INI_Server_Load();
+    end else if (TabSheet5.Showing) then begin
+    	JCon_INI_Game_Load();
+    end;
+end;
+
+procedure TfrmMain.Button2Click(Sender: TObject);
+begin
+	JCon_INI_Game_Save();
 end;
 
 end.

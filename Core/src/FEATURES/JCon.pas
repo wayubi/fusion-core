@@ -14,6 +14,9 @@ uses
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
 
+    procedure JCon_INI_Game_Load();
+    procedure JCon_INI_Game_Save();
+
 implementation
 
 uses
@@ -122,8 +125,6 @@ uses
 
 
     procedure JCon_INI_Server_Load();
-    var
-    	idx : Integer;
     begin
 		frmMain.Edit17.Text := inet_ntoa(in_addr(ServerIP));
 		frmMain.Edit18.Text := ServerName;
@@ -151,6 +152,7 @@ uses
         frmMain.ComboBox7.ItemIndex := abs(StrToInt(BoolToStr(Timer)));
 
         frmMain.ComboBox8.ItemIndex := Priority;
+        frmMain.ComboBox17.ItemIndex := abs(StrToInt(BoolToStr(EnableLowerClassDyes)));
     end;
 
 
@@ -210,6 +212,68 @@ uses
 
         Priority := frmMain.ComboBox8.ItemIndex;
         frmMain.PriorityUpdate(Priority);
+        EnableLowerClassDyes := StrToBool(IntToStr(abs(frmMain.ComboBox17.ItemIndex)));
+
+		weiss_ini_save();
+    end;
+
+    procedure JCon_INI_Game_Load();
+    begin
+    	frmMain.Edit42.Text := IntToStr(BaseExpMultiplier);
+        frmMain.Edit37.Text := IntToStr(JobExpMultiplier);
+        frmMain.Edit38.Text := IntToStr(ItemDropMultiplier);
+
+        frmMain.Edit39.Text := IntToStr(StealMultiplier);
+        frmMain.Edit40.Text := IntToStr(Option_Pet_Capture_Rate);
+
+        frmMain.ComboBox16.ItemIndex := abs(StrToInt(BoolToStr(DisableLevelLimit)));
+        frmMain.ComboBox9.ItemIndex := abs(StrToInt(BoolToStr(DisableEquipLimit)));
+        frmMain.ComboBox10.ItemIndex := abs(StrToInt(BoolToStr(EnablePetSkills)));
+        frmMain.ComboBox11.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP)));
+        frmMain.ComboBox12.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_Steal)));
+        frmMain.ComboBox13.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_XPLoss)));
+
+        frmMain.Edit35.Text := IntToStr(DefaultZeny);
+        frmMain.Edit43.Text := IntToStr(DefaultItem1);
+        frmMain.Edit44.Text := IntToStr(DefaultItem2);
+        frmMain.Edit27.Text := DefaultMap;
+        frmMain.Edit28.Text := IntToStr(DefaultPoint_X);
+        frmMain.Edit45.Text := IntToStr(DefaultPoint_Y);
+
+        frmMain.Edit32.Text := IntToStr(DeathBaseLoss);
+        frmMain.Edit33.Text := IntToStr(DeathJobLoss);
+        frmMain.Edit34.Text := IntToStr(Option_PartyShare_Level);
+        frmMain.ComboBox14.ItemIndex := abs(StrToInt(BoolToStr(DisableSkillLimit)));
+
+    end;
+
+    procedure JCon_INI_Game_Save();
+    begin
+        BaseExpMultiplier := StrToInt(frmMain.Edit42.Text);
+        JobExpMultiplier := StrToInt(frmMain.Edit37.Text);
+        ItemDropMultiplier := StrToInt(frmMain.Edit38.Text);
+
+        StealMultiplier := StrToInt(frmMain.Edit39.Text);
+        Option_Pet_Capture_Rate := StrToInt(frmMain.Edit40.Text);
+
+        DisableLevelLimit := StrToBool(IntToStr(abs(frmMain.ComboBox16.ItemIndex)));
+        DisableEquipLimit := StrToBool(IntToStr(abs(frmMain.ComboBox9.ItemIndex)));
+        EnablePetSkills := StrToBool(IntToStr(abs(frmMain.ComboBox10.ItemIndex)));
+        Option_PVP := StrToBool(IntToStr(abs(frmMain.ComboBox11.ItemIndex)));
+        Option_PVP_Steal := StrToBool(IntToStr(abs(frmMain.ComboBox12.ItemIndex)));
+        Option_PVP_XPLoss := StrToBool(IntToStr(abs(frmMain.ComboBox13.ItemIndex)));
+
+        DefaultZeny := StrToInt(frmMain.Edit35.Text);
+        DefaultItem1 := StrToInt(frmMain.Edit43.Text);
+        DefaultItem2 := StrToInt(frmMain.Edit44.Text);
+        DefaultMap := frmMain.Edit27.Text;
+        DefaultPoint_X := StrToInt(frmMain.Edit28.Text);
+        DefaultPoint_Y := StrToInt(frmMain.Edit45.Text);
+
+        DeathBaseLoss := StrToInt(frmMain.Edit32.Text);
+        DeathJobLoss := StrToInt(frmMain.Edit33.Text);
+        Option_PartyShare_Level := StrToInt(frmMain.Edit34.Text);
+        DisableSkillLimit := StrToBool(IntToStr(abs(frmMain.ComboBox14.ItemIndex)));
 
 		weiss_ini_save();
     end;

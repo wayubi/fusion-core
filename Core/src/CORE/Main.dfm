@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 297
-  Top = 125
+  Left = 609
+  Top = 183
   Width = 408
   Height = 518
   Caption = '#33'
@@ -39,7 +39,6 @@ object frmMain: TfrmMain
       item
         Width = 300
       end>
-    SimplePanel = False
   end
   object PageControl1: TPageControl
     Left = 0
@@ -56,7 +55,6 @@ object frmMain: TfrmMain
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
-    TabIndex = 0
     TabOrder = 1
     OnChange = PageControl1Change
     object TabSheet1: TTabSheet
@@ -159,8 +157,8 @@ object frmMain: TfrmMain
         Height = 412
         ActivePage = TabSheet4
         Align = alClient
-        TabIndex = 0
         TabOrder = 0
+        OnChange = PageControl2Change
         object TabSheet4: TTabSheet
           Caption = 'Server Options'
       object Label17: TLabel
@@ -309,6 +307,13 @@ object frmMain: TfrmMain
             Width = 41
             Height = 18
             Caption = 'Priority'
+          end
+          object Label38: TLabel
+            Left = 132
+            Top = 312
+            Width = 103
+            Height = 18
+            Caption = 'Enable Lower Dyes'
           end
           object Edit17: TEdit
             Left = 4
@@ -502,16 +507,351 @@ object frmMain: TfrmMain
               'Below Normal'
               'Low')
           end
+          object ComboBox17: TComboBox
+            Left = 132
+            Top = 328
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 22
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
         end
         object TabSheet5: TTabSheet
           Caption = 'Game Options'
           ImageIndex = 1
-          object Label38: TLabel
-            Left = 152
-            Top = 176
+          object Label43: TLabel
+            Left = 4
+            Top = 272
+            Width = 111
+            Height = 18
+            Caption = 'Base Death Exp Loss'
+          end
+          object Label44: TLabel
+            Left = 132
+            Top = 272
+            Width = 106
+            Height = 18
+            Caption = 'Job Death Exp Loss'
+          end
+          object Label45: TLabel
+            Left = 260
+            Top = 272
+            Width = 96
+            Height = 18
+            Caption = 'Party Share Level'
+          end
+          object Label49: TLabel
+            Left = 4
+            Top = 96
+            Width = 100
+            Height = 18
+            Caption = 'Disable Level Limit'
+          end
+          object Label50: TLabel
+            Left = 260
+            Top = 96
+            Width = 89
+            Height = 18
+            Caption = 'Enable Pet Skills'
+          end
+          object Label51: TLabel
+            Left = 4
+            Top = 136
+            Width = 59
+            Height = 18
+            Caption = 'Enable PvP'
+          end
+          object Label52: TLabel
+            Left = 132
+            Top = 96
+            Width = 102
+            Height = 18
+            Caption = 'Disable Equip Limit'
+          end
+          object Label53: TLabel
+            Left = 132
+            Top = 136
+            Width = 90
+            Height = 18
+            Caption = 'Enable PvP Steal'
+          end
+          object Label55: TLabel
+            Left = 132
+            Top = 48
+            Width = 96
+            Height = 18
+            Caption = 'Pet Capture Rate'
+          end
+          object Label56: TLabel
+            Left = 4
+            Top = 48
+            Width = 104
+            Height = 18
+            Caption = 'Steal Success Rate'
+          end
+          object Label57: TLabel
+            Left = 260
+            Top = 8
+            Width = 111
+            Height = 18
+            Caption = 'Item Drop Multiplier'
+          end
+          object Label58: TLabel
+            Left = 132
+            Top = 8
+            Width = 100
+            Height = 18
+            Caption = 'Job Exp Multiplier'
+          end
+          object Label59: TLabel
+            Left = 4
+            Top = 8
+            Width = 105
+            Height = 18
+            Caption = 'Base Exp Multiplier'
+          end
+          object Label54: TLabel
+            Left = 260
+            Top = 136
+            Width = 109
+            Height = 18
+            Caption = 'Enable PvP Exp Loss'
+          end
+          object Label47: TLabel
+            Left = 260
+            Top = 224
+            Width = 83
+            Height = 18
+            Caption = 'Default Y Point'
+          end
+          object Label39: TLabel
+            Left = 4
+            Top = 184
         Width = 70
         Height = 18
-        Caption = 'Coming Soon'
+            Caption = 'Default Zeny'
+          end
+          object Label40: TLabel
+            Left = 4
+            Top = 224
+            Width = 66
+            Height = 18
+            Caption = 'Default Map'
+          end
+          object Label41: TLabel
+            Left = 132
+            Top = 224
+            Width = 83
+            Height = 18
+            Caption = 'Default X Point'
+          end
+          object Label42: TLabel
+            Left = 132
+            Top = 184
+            Width = 87
+            Height = 18
+            Caption = 'Default Weapon'
+          end
+          object Label46: TLabel
+            Left = 260
+            Top = 184
+            Width = 76
+            Height = 18
+            Caption = 'Default Armor'
+          end
+          object Label48: TLabel
+            Left = 4
+            Top = 312
+            Width = 93
+            Height = 18
+            Caption = 'Disable Skill Limit'
+          end
+          object ComboBox16: TComboBox
+            Left = 4
+            Top = 112
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 5
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object Button2: TButton
+            Left = 260
+            Top = 328
+            Width = 75
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 20
+            OnClick = Button2Click
+          end
+          object Edit37: TEdit
+            Left = 132
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 1
+          end
+          object Edit38: TEdit
+            Left = 260
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 2
+          end
+          object Edit39: TEdit
+            Left = 4
+            Top = 64
+            Width = 121
+            Height = 26
+            TabOrder = 3
+          end
+          object Edit40: TEdit
+            Left = 132
+            Top = 64
+            Width = 121
+            Height = 26
+            TabOrder = 4
+          end
+          object Edit42: TEdit
+            Left = 4
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 0
+          end
+          object Edit27: TEdit
+            Left = 4
+            Top = 240
+            Width = 121
+            Height = 26
+            TabOrder = 14
+          end
+          object Edit28: TEdit
+            Left = 132
+            Top = 240
+            Width = 121
+            Height = 26
+            TabOrder = 15
+          end
+          object Edit43: TEdit
+            Left = 132
+            Top = 200
+            Width = 121
+            Height = 26
+            TabOrder = 12
+          end
+          object Edit44: TEdit
+            Left = 260
+            Top = 200
+            Width = 121
+            Height = 26
+            TabOrder = 13
+          end
+          object Edit45: TEdit
+            Left = 260
+            Top = 240
+            Width = 121
+            Height = 26
+            TabOrder = 16
+          end
+          object Edit34: TEdit
+            Left = 260
+            Top = 288
+            Width = 121
+            Height = 26
+            TabOrder = 19
+          end
+          object Edit32: TEdit
+            Left = 4
+            Top = 288
+            Width = 121
+            Height = 26
+            TabOrder = 17
+          end
+          object Edit33: TEdit
+            Left = 132
+            Top = 288
+            Width = 121
+            Height = 26
+            TabOrder = 18
+          end
+          object Edit35: TEdit
+            Left = 4
+            Top = 200
+            Width = 121
+            Height = 26
+            TabOrder = 11
+          end
+          object ComboBox9: TComboBox
+            Left = 132
+            Top = 112
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 6
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox10: TComboBox
+            Left = 260
+            Top = 112
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 7
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox11: TComboBox
+            Left = 4
+            Top = 152
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 8
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox12: TComboBox
+            Left = 132
+            Top = 152
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 9
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox13: TComboBox
+            Left = 260
+            Top = 152
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 10
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox14: TComboBox
+            Left = 4
+            Top = 328
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 21
+            Items.Strings = (
+              'No'
+              'Yes')
       end
     end
       end
@@ -1031,9 +1371,12 @@ object frmMain: TfrmMain
         Caption = 'S&top'
         OnClick = Stop1Click
       end
-      object MinimizetoTray1: TMenuItem
-        Caption = 'Minimize to &Tray'
-        OnClick = MinimizetoTray1Click
+    end
+    object Control1: TMenuItem
+      Caption = 'Control'
+      object MinimizetoTray2: TMenuItem
+        Caption = 'Minimize to Tray'
+        OnClick = MinimizetoTray2Click
       end
     end
   end
