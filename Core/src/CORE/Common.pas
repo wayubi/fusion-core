@@ -435,6 +435,10 @@ type TMob = class(TLiving)
         NoDispel        :boolean;
         Mode           :integer;
         Burned          :boolean;
+  SkillType :integer; // 1 = No target needed
+                      // 2 = Area Effect
+                      // 3 = Target Skill
+                      // 4 = Support skill
 
 {NPCイベント追加ココまで}
 	constructor Create;
@@ -3383,6 +3387,7 @@ begin
   ts.AData := nil;
   ts.AMode := 0;
   //ts.Free;
+  j := 1;
   if l <> -1 then begin
     repeat
       xy.X := Random(tm.Size.X - 2) + 1;
@@ -6114,6 +6119,7 @@ var
 	tdl	:TDealings;
 begin
 	if (tc.DealingID <> 0) then begin
+    l := 0;
 		i := DealingList.IndexOf(tc.DealingID);
 		if (i <> -1) then begin
 			tdl := DealingList.Objects[i] as TDealings;

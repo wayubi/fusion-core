@@ -1083,7 +1083,11 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv1ClientRead(Sender: TObject; Socket: TCustomWinSocket);
 begin
+  try
 	sv1PacketProcess(Socket);
+  except
+    exit;
+  end;
 end;
 //==============================================================================
 
@@ -1266,7 +1270,7 @@ begin
 	ts.DEFPer := 100;
 	ts.DmgTick := 0;
   ts.Status := 'IDLE_ST';
-
+  if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
 	for j := 0 to 31 do begin
 		ts.EXPDist[j].CData := nil;
 		ts.EXPDist[j].Dmg := 0;
@@ -1335,6 +1339,7 @@ if (MonsterMob = true) then begin
 					ts1.JID := ts1.Data.ID;
           ts1.LeaderID := ts.ID;
           ts1.Data.isLink := false;
+          ts1.Status := 'IDLE_ST';
 					ts1.Map := ts.Map;
 					ts1.Point.X := ts.Point.X;
 					ts1.Point.Y := ts.Point.Y;
@@ -1460,7 +1465,7 @@ begin
 	for i := 0 to 4 do
         ts.HealthTick[i] := 0;
 	ts.isLooting := False;
-  ts.Status := 'IDLE_ST';
+  ts.Status := 'DEAD_ST';
 
 
 	ts.SpawnTick := Tick;
@@ -2327,7 +2332,7 @@ var
 	ts1       :TMob;
 	tn        :TNPC;
 begin
-  //CalculateSkillIf(tm, ts, Tick);
+  CalculateSkillIf(tm, ts, Tick);
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -2923,7 +2928,8 @@ begin
                 WFIFOL(2, ts.ID);
                 SendBCmd(tm, ts.Point, 6);
         end;
-	ts.Status := 'RUSH_ST';
+	ts.Status := 'BESERK_ST';
+  CalculateSkillIf(tm, ts, Tick);
   // Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
     // Dmg := Dmg * 2;  // Done in the DamageCalc functions
@@ -14066,7 +14072,7 @@ begin
 					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
             Status := 'MOVEITEM_ST';
-            //CalculateSkillIf(tm, ts, Tick);
+            CalculateSkillIf(tm, ts, Tick);
 						ATarget := tn.ID;
 						ATick := Tick;
 
@@ -14245,7 +14251,8 @@ begin
 
 	k := 0;
 	with ts do begin
-
+    ts.Status := 'RMOVE_ST';
+    CalculateSkillIf(tm, ts, Tick);
         //if (tm.gat[ts.Point.X][ts.Point.Y] <> 0) then continue;
 		if (path[ppos] and 1) = 0 then begin
 			spd := Speed;
@@ -14387,6 +14394,8 @@ begin
 				tc1.Skill[255].Tick := Tick;
 			end;
 		end;
+
+    ts.Status := 'RUSH_ST';
 
 		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Option and 64 <> 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race <> 4) and (ts.Data.Race <> 6) and (ts.Data.MEXP = 0))) ) and (ts.isLooting = false) then begin
 		{ Stops attack if target is dead, not logged in, or hidden }
@@ -15426,8 +15435,8 @@ begin
                                                               if CastingMonster <> nil then begin
                                                                 if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
                                                                         if (tc.HP > 0) and (CastingMonster.Stat2 <> 4) then begin
-                                                                                tl := tc.Skill[CastingMonster.NowSkill].Data;
-                                                                                tk := tc.Skill[CastingMonster.NowSkill];
+                                                                                tl := tc.Skill[CastingMonster.MSkill].Data;
+                                                                                tk := tc.Skill[CastingMonster.MSkill];
 
                                                                                 //if Boolean(MMode and $02) then begin
                                                                                 MobSkills(tm, CastingMonster, Tick);
