@@ -127,6 +127,7 @@ var
     GM_ATHENA_MODEL : Byte;
     GM_ATHENA_ITEM2 : Byte;
     GM_ATHENA_ITEM : Byte;
+    GM_ATHENA_DOOM : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -250,6 +251,7 @@ var
     function command_athena_model(tc : TChara; str : String) : String;
     function command_athena_item2(tc : TChara; str : String) : String;
     function command_athena_item(tc : TChara; str : String) : String;
+    function command_athena_doom(tc : TChara) : String;
 
 implementation
 
@@ -379,6 +381,7 @@ implementation
         GM_ATHENA_MODEL := StrToIntDef(sl.Values['ATHENA_MODEL'], 1);
         GM_ATHENA_ITEM2 := StrToIntDef(sl.Values['ATHENA_ITEM2'], 1);
         GM_ATHENA_ITEM := StrToIntDef(sl.Values['ATHENA_ITEM'], 1);
+        GM_ATHENA_DOOM := StrToIntDef(sl.Values['ATHENA_DOOM'], 1);
 
         sl.Free;
         ini.Free;
@@ -513,6 +516,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_MODEL', IntToStr(GM_ATHENA_MODEL));
         ini.WriteString('Athena GM Commands', 'ATHENA_ITEM2', IntToStr(GM_ATHENA_ITEM2));
         ini.WriteString('Athena GM Commands', 'ATHENA_ITEM', IntToStr(GM_ATHENA_ITEM));
+        ini.WriteString('Athena GM Commands', 'ATHENA_DOOM', IntToStr(GM_ATHENA_DOOM));
 
         ini.Free;
 
@@ -644,6 +648,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
             else if ( (copy(str, 1, length('item2')) = 'item2') and (check_level(tc, GM_ATHENA_ITEM2)) ) then error_msg := command_athena_item2(tc, str)
             else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
+            else if ( (copy(str, 1, length('doom')) = 'doom') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_doom(tc)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -4805,6 +4810,31 @@ Called when we're shutting down the server *only*
             end;
 
             sl.Free;
+        end;
+    end;
+
+function command_athena_doom(tc : Tchara) : String;
+    var
+        tc1 : TChara;
+        tm : TMap;
+        i, w : Integer;
+        debug : String;
+       begin
+        Result := 'GM_ATHENA_DOOM Success.';
+        for i := 0 to CharaName.Count do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+            if tc1.PData.Accesslevel = 0 then begin
+                debug := 'The user ' + tc1.Name + ' has been killed.';
+                w := Length(debug) + 4;
+               tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+                CharaDie(tm, tc1, 1);
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, debug, w - 4);
+                tc.socket.sendbuf(buf, w);
+                end;
+            end;
         end;
     end;
 end.
