@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-02-05: Reindented game.pas; Added Clown/Gypsy support to party handling. [Tsusai]
 - 01-02-05: Added #email [password] [new_email] ALBGM command. [AlexKreuz]
 - 01-01-05: Packet exchange access violation on character moving. [AlexKreuz]
 - 01-01-05: Undefined map blocks on packet sends to players caused crash. [AlexKreuz]
