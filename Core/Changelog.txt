@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-25-04: GuildID retrieval w/o guilds caused crash. [AlexKreuz]
 - 12-25-04: But #2: Improper loading of guild ids caused guilds to be out of sync. [AlexKreuz]
 - 12-25-04: Guild member outside of party caused Pre-Link crash. [AlexKreuz]
 - 12-25-04: Fixed broadcast handling using the broadcast procedure & scripts. [Tsusai]
