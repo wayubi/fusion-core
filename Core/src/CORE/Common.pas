@@ -342,6 +342,15 @@ type TMob = class
 
         AnkleSnareTick :cardinal;  //Tracks how long ankle snare lasts
 
+        MPoint        :rPoint;
+	MTick         :cardinal;
+
+        NowSkill        :integer;
+        NowSkillLv      :integer;
+        SkillSlot       :integer;
+        AI              :Pointer;
+        Mode           :integer;
+
 {NPCイベント追加ココまで}
 	constructor Create;
 	destructor Destroy; override;

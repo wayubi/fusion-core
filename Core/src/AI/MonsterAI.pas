@@ -310,16 +310,26 @@ begin
         // Colus, 20030129: Changes random(7) to 8 for that last skill.
         // QUESTION: Why is this outer loop here?  Do you _really_ want to
         // (potentially) fire multiple skills off at once?
+
+        // Darkhelmet, that would be my crappy chance system.  the loop is there
+        // to go through each of the nine skills.  it is then randomized to ensure
+        // that the chance occurs in a random order.
         //for j := 0 to 7 do begin
                 i := Random(8);
                 if tsAI.Skill[i] <> 0 then begin
-                        if tsAI.PercentChance[i] > Random(200) then begin
+                        if tsAI.PercentChance[i] > Random(100) then begin
                                 //DebugOut.Lines.Add('Success');
+
                                 MonsterCastTime(tm, ts, tsAI, i, Tick);
-                                MobSkills(tm, ts, tsAI, Tick, i);
+                                ts.NowSkill := tsAI.Skill[i];
+                                ts.NowSkillLv := tsAI.SkillLv[i];
+                                ts.SkillSlot := i;
+                                ts.AI := tsAI;
+                                ts.Mode := 3;
+                                {MobSkills(tm, ts, tsAI, Tick, i);
                                 //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
                                 MobFieldSkills(tm, ts, tsAI, Tick, i);
-                                MobStatSkills(tm, ts, tsAI, Tick, i);
+                                MobStatSkills(tm, ts, tsAI, Tick, i);}
                                 //Break;
                         end;
                         //end else DebugOut.Lines.Add('Fail');
@@ -1180,6 +1190,7 @@ begin
         j := tc.Skill[tsAI.Skill[i]].Data.CastTime1 + tc.Skill[tsAI.Skill[i]].Data.CastTime2 * tsAI.SkillLv[i];
         if j < tc.Skill[tsAI.Skill[i]].Data.CastTime3  then j := tc.Skill[tsAI.Skill[i]].Data.CastTime3;
 
+        ts.MTick := Tick + cardinal(j);
         //j := j * tc.MCastTimeFix div 100;
         if (j > 0) then begin
                 //Send Packets
@@ -1199,7 +1210,7 @@ begin
                 ts.MMode := 1;
                 ts.ATick := Tick;
         end;
-       
+
 end;
 
 //------------------------------------------------------------------------------

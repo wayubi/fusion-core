@@ -13233,6 +13233,33 @@ begin
 					end;
 				end;
 				//ƒXƒLƒ‹ˆ—
+
+                                //Darkhelmet, ts isnt always defined i believe
+                                // so it does not always work.  But, this is the
+                                // correct way of doing the cast time.
+                                
+                                if (ts.MTick <= Tick) and (ts.Mode = 3) then begin
+                                        tl := tc.Skill[ts.NowSkill].Data;
+                                        tk := tc.Skill[ts.NowSkill];
+
+
+                                        //if Boolean(MMode and $02) then begin
+                                        MobSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
+                                        //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
+                                        MobFieldSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
+                                        MobStatSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
+                                        
+                                        //end else if Boolean(MMode and $01) then begin
+                                        pcnt := 0;
+
+                                        ts.MTick := Tick;
+                                        ts.Mode := 0;
+                                        //ts.MTarget := 0;
+                                end;
+
+
+
+
 				if Boolean(MMode and $03) and (MTick <= Tick) then begin
 					tl := tc.Skill[tc.MSkill].Data;
 					tk := tc.Skill[tc.MSkill];
