@@ -1288,8 +1288,73 @@ object frmMain: TfrmMain
         Top = 0
         Width = 393
         Height = 433
-        ActivePage = TabSheet9
+        ActivePage = TabSheet6
         TabOrder = 0
+        OnChange = PageControl3Change
+        object TabSheet6: TTabSheet
+          Caption = 'Online'
+          ImageIndex = 6
+          object Label95: TLabel
+            Left = 8
+            Top = 368
+            Width = 100
+            Height = 18
+            Caption = 'Name Placeholder'
+            Visible = False
+          end
+          object Label96: TLabel
+            Left = 8
+            Top = 184
+            Width = 128
+            Height = 18
+            Caption = 'Message the Character'
+          end
+          object ListBox3: TListBox
+            Left = 8
+            Top = 8
+            Width = 233
+            Height = 177
+            ItemHeight = 18
+            TabOrder = 0
+            OnClick = ListBox3Click
+          end
+          object Button17: TButton
+            Left = 264
+            Top = 8
+            Width = 97
+            Height = 25
+            Caption = 'Refresh'
+            TabOrder = 1
+            OnClick = Button17Click
+          end
+          object Button18: TButton
+            Left = 264
+            Top = 40
+            Width = 97
+            Height = 25
+            Caption = 'Kick'
+            TabOrder = 2
+            OnClick = Button18Click
+          end
+          object Edit8: TEdit
+            Left = 8
+            Top = 200
+            Width = 369
+            Height = 26
+            TabOrder = 3
+            OnKeyPress = Edit8KeyPress
+          end
+          object Button19: TButton
+            Left = 8
+            Top = 352
+            Width = 105
+            Height = 17
+            Caption = 'Send Placeholder'
+            TabOrder = 4
+            Visible = False
+            OnClick = Button19Click
+          end
+        end
         object TabSheet9: TTabSheet
           Caption = 'Stats'
           object Label61: TLabel

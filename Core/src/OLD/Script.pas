@@ -1992,7 +1992,7 @@ begin
                     l := tn.Script[tc.ScriptStep].Data3[3]; //y2
                     tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
                     for cnt := 0 to tm.CList.Count - 1 do begin
-                            tc1 := tm.CList.Objects[0] as TChara;
+                            tc1 := tm.CList.Objects[cnt] as TChara;
                             if tc1.Login = 2 then begin
                                 if (tc1.Point.X >= i) and (tc1.Point.X <= k) and (tc1.Point.Y >= j) and (tc1.Point.Y <= l) then begin
                                     SendCLeave(tc1, 2);
@@ -2002,6 +2002,7 @@ begin
                                 end;
                             end;
                     end;
+                    debugout.lines.add('[' + TimeToStr(Now) + '] i:);
                     Inc(tc.ScriptStep);
                 end;
 

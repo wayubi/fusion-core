@@ -22,6 +22,7 @@ uses
     procedure JCon_Characters_Load();
     procedure JCon_Characters_Populate();
     procedure JCon_Characters_Save();
+    procedure JCon_Characters_Online();
 
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
@@ -572,5 +573,22 @@ uses
         JCon_Characters_Load();
     end;
 
+    procedure JCon_Characters_Online();
+    var
+		i : Integer;
+    	CharacterItem : TChara;
+	begin
+
+		frmMain.ListBox3.Clear;
+
+		for i := 0 to (CharaName.Count - 1) do begin
+			CharacterItem := CharaName.Objects[i] as TChara;
+            if (CharacterItem.Login = 2) then begin
+
+    	        frmMain.listbox3.Items.AddObject(CharaName.Strings[i], CharacterItem);
+        	    frmMain.listbox3.Sorted := True;
+            end;
+	    end;
+    end;
 
 end.
