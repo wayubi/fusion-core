@@ -5888,20 +5888,6 @@ begin
 						SPRTick := Tick;
 					end;
 
-					if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
-						if SP <> MAXSP then begin
-{ãZèp229}
-							j := (3 + MAXSP * 2 div 1000) * Skill[9].Lv;
-							if SP + j > MAXSP then j := MAXSP - SP;
-							SP := SP + j;
-							WFIFOW( 0, $013d);
-							WFIFOW( 2, $0007);
-							WFIFOW( 4, j);
-							Socket.SendBuf(buf, 6);
-							SendCStat1(tc, 0, 7, SP);
-						end;
-						SPRTick := Tick;
-					end;
 				{ Ç–ÇÂÇ¡Ç∆ÇµÇΩÇÁÇ±ÇÃèàóùÇ¢ÇÈÇ©Ç‡
 				end else begin
 					HPTick := Tick;

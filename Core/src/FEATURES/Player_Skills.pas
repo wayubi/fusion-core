@@ -28,6 +28,8 @@ var
     function skill_magnum_break() : Integer;
     function skill_endure() : Integer;
 
+    function skill_sp_recovery(tc : TChara; Tick : Cardinal) : Integer;
+
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
 
 implementation
@@ -56,6 +58,7 @@ uses
         { 6} if (tc.MSkill = 6) and (effect = 0) then success := skill_provoke(tc);
         { 7} if (tc.MSkill = 7) and (effect = 0) then success := skill_magnum_break();
         { 8} if (tc.MSkill = 8) and (effect = 0) then success := skill_endure();
+        { 9} if (tc.Skill[9].Lv <> 0) and (effect = 1) then success := skill_sp_recovery(tc, Tick);
         {46} if (tc.MSkill = 46) and (effect = 0) then success := skill_double_strafe(tc, Tick);
 
         {
@@ -498,6 +501,33 @@ uses
     begin
     	SKILL_TYPE := 2;
         Result := -1;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Mage -------------------------------------- }
+    { - Job ID: 2 -------------------------------------- }
+    { - Skill Name: SP Recovery ------------------------ }
+    { - Skill ID Name: MG_SRECOVERY -------------------- }
+    { - Skill ID: 9 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_sp_recovery(tc : TChara; Tick : Cardinal) : Integer;
+    var
+    	j : Integer;
+    begin
+    	if (tc.Skill[9].Lv <> 0) and (tc.SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
+        	if tc.SP <> tc.MAXSP then begin
+            	j := (3 + tc.MAXSP * 2 div 1000) * tc.Skill[9].Lv;
+                if tc.SP + j > tc.MAXSP then j := tc.MAXSP - tc.SP;
+                tc.SP := tc.SP + j;
+                WFIFOW(0, $013d);
+                WFIFOW(2, $0007);
+                WFIFOW(4, j);
+                tc.Socket.SendBuf(buf, 6);
+                SendCStat1(tc, 0, 7, tc.SP);
+            end;
+            tc.SPRTick := Tick;
+        end;
     end;
 
 
