@@ -59,9 +59,7 @@ var{ChrstphrR - 2004/04/25 - removed unused variables}
     loggedIn  : boolean;
 	APlayer   : TPlayer;    //reference
 	PlayerIdx : Integer;
-    IPBanned  : boolean;
 begin
-    IPBanned := false;
 	if PlayerName.IndexOf(userid) > - 1 then begin
 		APlayer := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
 
