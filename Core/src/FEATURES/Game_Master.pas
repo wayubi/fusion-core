@@ -118,6 +118,9 @@ var
     function command_unit(tc : TChara; str : String) : String;
     function command_stat(tc : TChara; str : String) : String;
     function command_refine(tc : TChara; str : String) : String;
+    function command_glevel(tc : TChara; str : String) : String;
+    function command_ironical(tc : TChara) : String;
+    function command_mothball(tc : TChara) : String;
 
 implementation
 
@@ -312,6 +315,9 @@ implementation
         else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
         else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
         else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
+        else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
+        else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
+        else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -1450,6 +1456,100 @@ implementation
         SendCStat(tc);
 
         Result := 'GM_REFINE Success. Equipment refined to level ' + IntToStr(j) + '.';
+    end;
+
+    function command_glevel(tc : TChara; str : String) : String;
+    var
+        i, j, k : Integer;
+        oldlevel : Integer;
+        tg : TGuild;
+    begin
+        Result := 'GM_GLEVEL Failure.';
+
+        j := GuildList.IndexOf(tc.GuildID);
+        tg := GuildList.Objects[j] as TGuild;
+
+        oldlevel := tg.LV;
+
+        if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
+            Val(Copy(str, 8 , 256), i, k);
+            if (k = 0) and (i >= 1) and (i <= 99) then begin
+                tg.LV := i;
+                for j := 10000 to 10004 do begin
+                    tg.GSkill[j].Lv := 0;
+                end;
+
+                tg.GSkillPoint := tg.LV -1;
+                tg.EXP := tg.NextEXP -1;
+                SendGuildInfo(tc, 3, true);
+
+                tg.NextEXP := GExpTable[tg.LV];
+                SendGuildInfo(tc, 0, true);
+                SendGuildInfo(tc, 1, true);
+
+                Result := 'GM_GLEVEL Success. ' + tg.Name + ' level raised from ' + inttostr(oldlevel) + ' to ' + inttostr(i) + '.';
+            end else begin
+                Result := Result + ' Information incomplete or out of range [1-99].';
+            end;
+        end else begin
+            Result := Result + ' Guild does not exist.';
+        end;
+    end;
+
+
+    function command_ironical(tc : TChara) : String;
+    var
+        tm : TMap;
+    begin
+        Result := 'GM_IRONICAL Failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, 0);
+        WFIFOW(8, 2);
+        WFIFOW(10, 64);
+        WFIFOB(12, 0);
+        SendBCmd(tm, tc.Point, 13);
+        tc.Stat1 := 0;
+        tc.Stat2 := 2;
+        tc.Option := 64;
+
+        Result := 'GM_IRONICAL Success.';
+    end;
+
+    function command_mothball(tc : TChara) : String;
+    var
+        i, j : Integer;
+        tm : TMap;
+        tc1 : TChara;
+    begin
+        Result := 'GM_MOTHBALL Success.';
+
+        if tc.Stat2 = 16 then begin
+            Result := Result + ' Command deactivated.';
+            j := 0;
+        end else begin
+            Result := Result + ' Command activated.';
+            j := 16;
+        end;
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        for i := 0 to charaname.count - 1 do begin
+        	tc1 := charaname.objects[i] as tchara;
+        	if (tc1.login = 2) then begin
+        		WFIFOW(0, $0119);
+        		WFIFOL(2, tc1.ID);
+        		WFIFOW(6, 0);
+        		WFIFOW(8, j);
+        		WFIFOW(10, 0);
+        		WFIFOB(12, 0);
+        		SendBCmd(tm, tc1.Point, 13);
+        		tc.Stat2 := j;
+        	end;
+        end;
+
     end;
 
 end.

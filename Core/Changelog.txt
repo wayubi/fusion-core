@@ -1,3 +1,6 @@
+- 06-02-04: Switched GM Command, #MOTHBALL to ALBGM system. [AlexKreuz]
+- 06-02-04: Switched GM Command, #IRONICAL to ALBGM system. [AlexKreuz]
+- 06-02-04: Switched GM Command, #GLEVEL to ALBGM system. [AlexKreuz]
 - 06-01-04: Game.pas - Minor comment translations  [ChrstphrR]
 - 06-01-04: Game.pas - ExpShare, ItemShare changes for TParty. [ChrstphrR]
 - 06-01-04: SaveCharaData - removed unused variable [ChrstphrR]

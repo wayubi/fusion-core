@@ -1228,77 +1228,7 @@ Begin(* Proc sv3PacketProcess() *)
 					//#で始まるコマンド(主にでばぐ用)
 					tid := IDTableDB.Objects[h] as TIDTbl;
 
-
-					// NEW GM COMMANDS
-					if (Copy(str, 1, 8) = 'ironical') then begin
-						WFIFOW(0, $0119);
-						WFIFOL(2, tc.ID);
-						WFIFOW(6, 0);
-						WFIFOW(8, 2);
-						WFIFOW(10, 64);
-						WFIFOB(12, 0);
-						SendBCmd(tm, tc.Point, 13);
-						tc.Stat1 := 0;
-						tc.Stat2 := 2;
-						tc.Option := 64;
-					end
-					
-					else if (Copy(str, 1, 8) = 'mothball') then begin
-						if tc.Stat2 = 16 then j := 0
-						else j := 16;
-						
-						for i := 0 to charaname.count - 1 do begin
-							tc1 := charaname.objects[i] as tchara;
-							if (tc1.login = 2) then begin
-								WFIFOW(0, $0119);
-								WFIFOL(2, tc1.ID);
-								WFIFOW(6, 0);
-								WFIFOW(8, j);
-								WFIFOW(10, 0);
-								WFIFOB(12, 0);
-								SendBCmd(tm, tc1.Point, 13);
-								tc.Stat2 := j;
-							end;
-						end;
-					// NEW GM COMMANDS
-
-					end else if (Copy(str,1, 7) = 'glevel ') and (GuildList.IndexOf(tc.GuildID) > -1) then begin
-                  j := GuildList.IndexOf(tc.GuildID);
-                  tg := GuildList.Objects[j] as TGuild;
-                 if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
-                 Val(Copy(str, 8 , 256), i, k);
-                 if (k = 0) and (i >= 1) and (i <= 99) then begin
-                  tg.LV := i;
-                  for j := 10000 to 10004 do begin
-                  tg.GSkill[j].Lv := 0;
-                  end;  // For J
-                  tg.GSkillPoint := tg.LV -1;
-                  tg.EXP := tg.NextEXP -1;
-                  SendGuildInfo(tc, 3, true);
-                  end;
-                  tg.NextEXP := GExpTable[tg.LV];
-                  SendGuildInfo(tc, 0, true);
-                  SendGuildInfo(tc, 1, true);
-                    end;
-
-					end
-					else if (Copy(str, 1, 6) = 'speed ') AND
-									((DebugCMD and $0008) <> 0) AND (tid.ChangeStatSkill = 1) then
-					begin
-						//スピード変更
-						Val(Copy(str, 6, 256), i, k);
-						if (k = 0) AND (i >= 25) AND (i <= 1000) then begin
-							tc.DefaultSpeed := i;
-							CalcStat(tc);
-							SendCStat1(tc, 0, 0, tc.Speed);
-						end;
-
-					end
-
-
-
-
-					else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
+                if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
 						s := Copy(str, 7, 256);
 						if s = '' then begin
               //Location of self
