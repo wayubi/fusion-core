@@ -6,7 +6,7 @@ interface
 
 uses
 	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common;
+	Path, Script, Common, SQLData;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -4949,7 +4949,7 @@ end;
 				end;
 			end;
 		//--------------------------------------------------------------------------
-		$0159: //ÉMÉãÉhíEëﬁ
+		$0159: //¿Îø™π§ª·
 			begin
 				RFIFOL( 2, l);
 				str := RFIFOS(14, 40);
@@ -5067,6 +5067,7 @@ end;
 						tg.PosEXP[l] := l2;
 						tg.PosName[l] := RFIFOS(i * 40 + 20, 24);
 					end;
+					if UseSQL then SaveGuildMPosition(tg);
 					//ïœçXí ím
 					WFIFOW( 0, $0174);
 					SendGuildMCmd(tc, w, false);
@@ -5163,6 +5164,7 @@ end;
 					tc.ClassName := PosName[0];
 				end;
 				GuildList.AddObject(tg.ID, tg);
+				if UseSQL then SaveGuildMPosition(tg);
 				//DebugOut.Lines.Add(Format('GuildName %s : ID = %d : Name = %s', [tg.Name, tg.MemberID[0], tg.Member[0].Name]));
 
 				//çÏê¨ê¨å˜âûìö
@@ -6339,7 +6341,8 @@ end;
 
                                                         tpe.PlayerID := tc.ID;
                                                         tpe.CharaID := tc.CID;
-                                                        tpe.PetID := NowPetID;
+																												if UseSQL then tpe.PetID := GetNowPetID()
+                                                        else tpe.PetID := NowPetID;
                                                         tpe.JID := tmd.ID;
                                                         tpe.Name := tmd.JName;
 																												tpe.Renamed := 0;
@@ -6354,7 +6357,8 @@ end;
                                                         tc.Item[w].Card[2] := tpe.PetID mod $10000;
                                                         tc.Item[w].Card[3] := tpe.PetID div $10000;
 
-                                                        Inc( NowPetID );
+                                                        if UseSQL then SavePetData(tpe, 0, 1)
+																												else Inc( NowPetID );
                                                 end;
 
                                                 tn.Name := tpe.Name;
