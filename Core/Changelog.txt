@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
-
+- 01-07-04: Added AutoSave option to Weiss.ini (Integer in seconds). [AlexKreuz]
 - 01-06-04: Updated Steal and Snatcher [Colus]
 - 01-06-04: Fixed Venom Dust [Darkhelmet]
 - 01-04-04: Updated Combo skills damage increased by a little -[Oatmeal12345]
