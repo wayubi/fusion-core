@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-10-04: File->Exit now disconnects ISCS before closing. [Tsusai]
+- 09-10-04: Gui Tweak. [Tsusai]
 - 09-10-04: Character Tab work hopefully to Alex's specifications. [Tsusai]
 - 09-10-04: #64: Guild names with non-standard (chinese/etc) characters don't save. [AlexKreuz]
 - 09-10-04: Miscellaneous cleanup of variable declarations. [AlexKreuz]

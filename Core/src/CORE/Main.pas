@@ -11370,6 +11370,7 @@ end;
 
 procedure TfrmMain.Exit1Click(Sender: TObject);
 begin
+    if (ISCS_ON) then iscs_console_disconnect();
 	frmMain.Close;
 end;
 

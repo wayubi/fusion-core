@@ -162,7 +162,7 @@ object frmMain: TfrmMain
         Top = 0
         Width = 392
         Height = 429
-        ActivePage = TabSheet5
+        ActivePage = TabSheet4
         Align = alClient
         TabOrder = 0
         OnChange = PageControl2Change
@@ -1510,8 +1510,8 @@ object frmMain: TfrmMain
       object Label83: TLabel
         Left = 24
         Top = 288
-        Width = 23
-        Height = 17
+        Width = 15
+        Height = 18
         Caption = 'HP'
       end
       object Label82: TLabel
