@@ -4220,19 +4220,32 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure SendCLeave(tc:TChara; mode:byte);
+{ Analysis }
+    // This function physically removes the character and all of his or her
+    // dependencies from the map that he or she is on.  There are some major
+    // problems though regarding the existance of a map in the characters'
+    // dependencies.  For example, tc.MData.Name index can not resolve in
+    // MapList causing an Access Violation.  I really don't know why this happens.
+    // But for some reason, the map that the character tries to leave does not
+    // exist in the maplist.  I may simply do a try-except bypass because if
+    // the map does not exist, then the character can't possible have any
+    // dependencies on that map.
+    // - AlexKreuz (01/06/05)
 var
 	i, j, k :integer;
 	tm      :TMap;
 	tc1     :TChara;
 	mi      :MapTbl;
-{キューペット}
+{ Queue/cue pet }
 	tn      :TNPC;
     tMerc   :TMob;
-{キューペットここまで}
+{ To queue/cue pet here }
 begin
-{パーティー機能追加}
-	//位置マークの削除方法がわからなかったので
-	//マップから離れるときに(0,0)にいるという情報を送ってごまかしている
+
+
+{ Party functional addition }
+    // It meaning that deletion method of the position mark is not recognized,
+	// When leaving from the map, sending the information that (0,0) it is, you cheat
 	if tc.PartyName <> '' then begin
 		WFIFOW( 0, $0107);
 		WFIFOL( 2, tc.ID);
@@ -4242,8 +4255,8 @@ begin
 	end;
 
 
-{パーティー機能追加ココまで}
-	tc.Login := 1; //ロード中に切り替え
+{ To party functional additional coconut }
+	tc.Login := 1; // While loading change
 	tc.pcnt := 0;
 	tc.AMode := 0;
 	tc.MMode := 0;
@@ -4253,9 +4266,7 @@ begin
 	  Old Line --> tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap; }
     tm := tc.MData;
 
-    //tm.LastAction := TimeGetTime();  //Update on charcter leaving
-	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
-{キューペット}
+{ Queue/cue pet }
 	if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
 		tn := tc.PetNPC;
 
@@ -4264,7 +4275,7 @@ begin
 		WFIFOB( 6, 0 );
 		SendBCmd( tm, tn.Point, 7 ,tc);
 
-		//ペット削除
+		// Pet deletion
 		i := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
 		if i <> -1 then begin
 			tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(i);
@@ -4299,40 +4310,40 @@ begin
     end;
 
 
-	//入室中メンバーの削除処理
+	// While come awaying deletion processing
 	if (tc.ChatRoomID <> 0) then begin
 		if (mode = 2) then ChatRoomExit(tc, true)
 		else ChatRoomExit(tc);
 		tc.ChatRoomID := 0;
 	end;
-{チャットルーム機能追加ココまで}
-{露店スキル追加}
-	//露店を終了する
+{ To kyat room functional additional coconut }
+{ Street stall skill addition }
+	// It ends the street stall
 	if (tc.VenderID <> 0) then begin
 		if (mode = 2) then VenderExit(tc, true)
 		else VenderExit(tc);
 		tc.VenderID := 0;
 	end;
-{露店スキル追加ココまで}
-{取引機能追加}
+{ To street stall skill additional coconut }
+{ Transaction functional addition }
 	if (tc.DealingID <> 0) then begin
 		if (mode = 2) then CancelDealings(tc, true)
 		else CancelDealings(tc);
 		tc.DealingID := 0;
 		tc.PreDealID := 0;
 	end;
-{取引機能追加ココまで}
-{ギルド機能追加}
-	//メンバーに通知
+{ To transaction functional additional coconut }
+{ Guild functional addition }
+	// In member notification
 	WFIFOW( 0, $016d);
 	WFIFOL( 2, tc.ID);
 	WFIFOL( 6, tc.CID);
 	WFIFOL(10, 0);
 	SendGuildMCmd(tc, 14, true);
-{ギルド機能追加ココまで}
+{ To guild functional additional coconut }
 
-	if tm.Clist.IndexOf(tc.ID) <> -1 then begin //二重処理はしない
-		//ブロック処理
+	if tm.Clist.IndexOf(tc.ID) <> -1 then begin // It does not process doubly
+		// Block processing
 		WFIFOW(0, $0080);
 		WFIFOL(2, tc.ID);
 		WFIFOB(6, mode);
@@ -4366,7 +4377,20 @@ begin
 		//end;
 		//end;
 
-		//マップから自分のデータを消去
+		// From map your own data elimination
+
+
+        { Bug Tracing: 01/06/05 }
+            // I moved this code down from below the "tm := tc.MData;" line.
+            // This line causes the access violation (read the analysis).  I want
+            // to see what part of the tc.MData or tm data does not exist.  mi is
+            // not needed until the mi.PvP line below this, so if everything above
+            // works fine then we've got most of the issues solved.  If it crashes
+            // above this, then quite simply, somehow the tc.MData data was cleared
+            // - AlexKreuz (01/06/05)
+        
+        //tm.LastAction := TimeGetTime();  //Update on charcter leaving
+        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
         { Alex: You can not activate calculations that require a CList if you're
           activating the calculations after you've already deleted the CList.
