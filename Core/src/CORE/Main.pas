@@ -8201,7 +8201,8 @@ begin
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('	 Mob-Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, path[ppos-1], spd, Tick]));
 
 			//ブロック処理
-			for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
+			{ Alex: Don't know what this is for but tested fine w/o it. Performance increase. }
+			{for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
 				for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin
 
 					//プレイヤーに通知
@@ -8226,7 +8227,7 @@ begin
 						end;
 					end;
 				end;
-			end;
+			end;}
 
 			//ブロック移動
 			if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
