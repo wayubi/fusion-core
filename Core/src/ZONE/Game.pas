@@ -3182,7 +3182,7 @@ end;
 				tn := tm.NPC.IndexOfObject(tc.TalkNPCID) as TNPC;
 				if (tn.Map <> tc.Map) or (abs(tn.Point.X - tc.Point.X) > 15)
 															or (abs(tn.Point.Y - tc.Point.Y) > 15) then begin
-					//視界の外のNPCからは買えない
+					// Can't buy from NPCs on other maps/too far away
 					continue;
 				end;
 				RFIFOW(2, w);
@@ -3190,9 +3190,11 @@ end;
 				weight := 0;
 				k := -1;
 				SetLength(ww, ((w - 4) div 4), 2);
+        i1 := 0; // This is the count of actual items being bought
 				for i := 0 to ((w - 4) div 4) - 1 do begin
 					RFIFOW(4 + i*4, w1);
 					RFIFOW(6 + i*4, w2);
+          if (w1 = 0) or (w2 = 0) then continue;
 					ww[i][0] := w1;
 					ww[i][1] := w2;
 					k := -1;
@@ -3207,20 +3209,25 @@ end;
 								l := l + tn.ShopItem[j].Price * w1;
 							end;
 							weight := weight + cardinal(tn.ShopItem[j].Data.Weight) * cardinal(w1);
+              Inc(i1);
 							break;
 						end;
 					end;
 					if k = -1 then break;
 				end;
+
+        // Was anything actually bought?
+        if (i1 = 0) then continue;
+        
 				if tc.Zeny < l then begin
-					//お金が足りない
+					// Insufficient Zeny message
 					WFIFOW(0, $00ca);
-					WFIFOB(2, 1);	//1=お金が足りない 2=重量オーバー 3=アイテム最大種類数オーバー
+					WFIFOB(2, 1);
 					Socket.SendBuf(buf, 3);
-					//重量オーバー
+					{// Overweight message (should not be sent here, and isn't?)
 					WFIFOW(0, $00ca);
-					WFIFOB(2, 2);	//1=お金が足りない 2=重量オーバー 3=アイテム最大種類数オーバー
-					Socket.SendBuf(buf, 3);
+					WFIFOB(2, 2);	//1=Not enough zeny, 2=Overweight, 3=Maximum item capacity reached?
+					Socket.SendBuf(buf, 3);}
 				end else if k <> -1 then begin
 					for k := 0 to ((w - 4) div 4) - 1 do begin
 						td := nil;
@@ -3253,7 +3260,7 @@ end;
             else begin
   						j := SearchCInventory(tc, ww[k][1], td.IEquip);
   						if j <> 0 then begin
-  							//アイテム追加
+  							// Give each bought item to the character
 	  						tc.Item[j].ID := ww[k][1];
 		  					tc.Item[j].Amount := tc.Item[j].Amount + ww[k][0];
 			  				tc.Item[j].Equip := 0;
@@ -3270,29 +3277,31 @@ end;
 	  						tc.Zeny := tc.Zeny - l;
 		  					SendCGetItem(tc, j, ww[k][0]);
 
-      					//重量更新
+      					// Update weight
       			 		WFIFOW(0, $00b0);
       					WFIFOW(2, $0018);
       					WFIFOL(4, tc.Weight);
       					Socket.SendBuf(buf, 8);
-      					//所持金更新
+      					// Update zeny
       					WFIFOW(0, $00b1);
       					WFIFOW(2, $0014);
       					WFIFOL(4, tc.Zeny);
       					Socket.SendBuf(buf, 8);
-      					//取引ができました
+      					// Send buy success message
       					WFIFOW(0, $00ca);
       					WFIFOB(2, 0);
       					Socket.SendBuf(buf, 3);
   						end else begin
+                // This says something about no further processing (process time: not yet)?
   							//これ以上もてない(時の処理：未)
 	  					end;
             end;
 					end;
 				end else begin
+          // 'A cheating situation: Trying to buy from a nonexistent shop?'
 					//不正な処理（店にないものを買おうとした）
 					WFIFOW(0, $00ca);
-					WFIFOB(2, 3);  //1=お金が足りない 2=重量オーバー 3=アイテム最大種類数オーバー
+					WFIFOB(2, 3);  // 'You have reached the maximum capacity' message?
 					Socket.SendBuf(buf, 3);
 				end;
 			end;
