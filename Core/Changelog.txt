@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-16-05: Lack of script loading error handling causing crashes fixed. [Tsusai]
 - 01-15-05: Bug #63. Storage increase ignored existing items. [AlexKreuz]
 - 01-14-05: Removed weiss.ini's DefaultNPCID after research. [Tsusai]
 - 01-14-05: Empty lines in inventory.txt caused crash. [AlexKreuz]

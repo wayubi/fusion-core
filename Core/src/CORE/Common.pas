@@ -8281,6 +8281,12 @@ Begin
 	// ワープポイント Lit. "Loom Point" in Katakana ------------------------------
 				// Colus, 20040122: Added parsing for hidden warps.
 				if (SL[1] = 'warp') OR (SL[1] = 'hiddenwarp') then begin
+
+					if SL1.Count <> 3 then begin
+		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+		                            Exit;
+					end;
+
 					tn := TNPC.Create;
 					tn.ID := NowNPCID;
 					Inc(NowNPCID);
@@ -8321,6 +8327,12 @@ Begin
 					end;
 	// NPC Shop ------------------------------------------------------------------
 				end else if SL[1] = 'shop' then begin
+
+					if SL1.Count <> 3 then begin
+		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+		                            Exit;
+					end;
+
 					tn := TNPC.Create;
 					tn.ID      := NowNPCID;
 					Inc(NowNPCID);
@@ -8378,6 +8390,11 @@ Begin
 					http://www.geocities.co.jp/SiliconValley-Bay/1174/npce.html
                     or http://kalen.s79.xrea.com/npc/npc.shtml
                     *)
+
+					if SL1.Count <> 3 then begin
+		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+		                            Exit;
+					end;
 
 					tn := TNPC.Create;
 					tn.ID := NowNPCID;
