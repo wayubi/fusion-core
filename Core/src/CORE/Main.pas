@@ -554,9 +554,18 @@ begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
+    sl.Clear;
+
+    ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
+    ini.ReadSectionValues('Version', sl);
+        if not (sl.Values['VER'] = '1.212 R - R.E.E.D Beta 3 Release') then begin
+            DeleteFile(AppPath + 'weiss.ini');
+        end;
+    ini.Free;
+
 
 	ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
-	sl.Clear;
+
 	ini.ReadSectionValues('Server', sl);
 
 	sl1 := TStringList.Create;
