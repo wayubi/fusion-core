@@ -8807,8 +8807,8 @@ begin
         end;
         SetLength(tn.Script, k + 1);
         tn.Script[k].ID := 68;
-        SetLength(tn.Script[k].Data3, 1);
-        tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+        SetLength(tn.Script[k].Data1, 1);
+        tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
         Inc(k);
     end else if str = 'addstatpoints' then begin //---- 69 Add Stat Point
         if sl1.Count <> 1 then begin
@@ -8817,8 +8817,8 @@ begin
         end;
         SetLength(tn.Script, k + 1);
         tn.Script[k].ID := 69;
-        SetLength(tn.Script[k].Data3, 1);
-        tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+        SetLength(tn.Script[k].Data1, 1);
+        tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
         Inc(k);
 
 

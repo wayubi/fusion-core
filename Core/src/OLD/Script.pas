@@ -1790,13 +1790,15 @@ begin
 
     68: // addskillpoints
         begin
-            tc.SkillPoint := tc.SkillPoint + tn.Script[tc.ScriptStep].Data3[0];
+            i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
+            tc.SkillPoint := tc.SkillPoint + i;
             SendCSkillList(tc);
             Inc(tc.ScriptStep);
         end;
     69: // addstatpoints
         begin
-            tc.StatusPoint := tc.StatusPoint + tn.Script[tc.ScriptStep].Data3[0];
+            i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
+            tc.StatusPoint := tc.StatusPoint + i;
             SendCStat(tc);
             Inc(tc.ScriptStep);
         end;
