@@ -1753,7 +1753,9 @@ var
 	miss  :boolean;
 	crit  :boolean;
 	datk  :boolean;
+        Delay :integer;
         tatk  :boolean;
+
         tg    :TGuild;
         td    :TItemDB;
 begin
@@ -1778,6 +1780,8 @@ begin
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
 		dmg[6] := i;
+                Delay := (2000 - (4 * param[1]) - (2 * param[4]) - 300);
+                if Skill[263].Lv <> 0 then Monkdelay(tm, tc, Delay);
 		if Arms = 0 then begin
 			crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
 		end else begin //“ñ“—¬‰EŽè
@@ -1790,6 +1794,11 @@ begin
 			if Skill[48].Lv <> 0 then datk := true;
 			crit := false;
                         if tatk = true then datk := false;
+                         if tatk = true then Monkdelay(tm, tc, Delay);
+                        //if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
+
+                        Delay := (2000 - (4 * param[1]) - (2 * param[4]) -300);
+                        //if tatk = true then Combodelay := (1000 - (4 * param[4]));
 		end else begin
 			datk := false;
                         tatk := false;
@@ -5763,10 +5772,13 @@ begin
 
                                 263:   {Triple Blows}
                                 begin
+
                                         if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0;
                                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 3);
+                                                Monkdelay(tm, tc, Delay);
+
                                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                 StatCalc1(tc, ts, Tick);
                                         end else begin
