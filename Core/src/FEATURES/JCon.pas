@@ -10,7 +10,7 @@ uses
     {Shared}
     SysUtils, StrUtils,
     {Fusion}
-	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE;
+	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE, REED_SAVE_ACCOUNTS;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate(aType : Integer);
@@ -151,6 +151,8 @@ uses
 			AccountItem := PlayerName.Objects[PlayerName.IndexOf(frmMain.Edit3.Text)] as TPlayer;
 
 	    	for i := 0 to 8 do begin
+                if not assigned(AccountItem.CData[i]) then Continue;
+
     	    	tc := AccountItem.CData[i];
         	    if assigned(tc) then begin
 	        	    if assigned(tc.Socket) then begin
@@ -167,7 +169,8 @@ uses
         	AccountItem.Mail := frmMain.Edit6.Text;
 	        AccountItem.Banned := StrToBool(IntToStr(abs(frmMain.ComboBox18.ItemIndex)));
             AccountItem.AccessLevel := StrToInt(frmMain.Edit53.Text);
-		    DataSave(True);
+		    //DataSave(True);
+            PD_Save_Accounts_Parse(True);
         end else begin
             create_account(frmMain.Edit3.Text, frmMain.Edit4.Text, frmMain.Edit6.Text, IntToStr(frmMain.ComboBox15.ItemIndex));
     	    frmMain.Button3.Click;

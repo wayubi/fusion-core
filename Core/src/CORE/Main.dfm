@@ -1164,7 +1164,7 @@ object frmMain: TfrmMain
       object ListBox1: TListBox
         Left = 136
         Top = 24
-        Width = 129
+        Width = 121
         Height = 217
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1349,9 +1349,9 @@ object frmMain: TfrmMain
         TabOrder = 18
       end
       object ListBox9: TListBox
-        Left = 272
+        Left = 264
         Top = 24
-        Width = 57
+        Width = 65
         Height = 217
         ItemHeight = 18
         TabOrder = 19
