@@ -167,7 +167,7 @@ begin
 
                 for i := 0 to PlayerName.Count - 1 do begin
                 	tp2 := PlayerName.Objects[i] as TPlayer;
-                    if (tp2.ID <> i + 100101) then begin
+                	if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
                     	Idx := i + 100101;
                         Break;
                     end;
