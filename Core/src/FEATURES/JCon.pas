@@ -267,6 +267,8 @@ uses
 
         frmMain.ComboBox8.ItemIndex := Priority;
         frmMain.ComboBox17.ItemIndex := abs(StrToInt(BoolToStr(EnableLowerClassDyes)));
+
+        frmMain.ComboBox21.ItemIndex := abs(StrToInt(BoolToStr(Option_Use_UPnP)));
     end;
 
 
@@ -282,13 +284,7 @@ uses
 		ServerName := frmMain.Edit18.Text;
     	DefaultNPCID := StrToInt(frmMain.Edit19.Text);
 
-		if (frmMain.Edit20.Text <> frmMain.Edit21.Text) and (frmMain.Edit20.Text <> frmMain.Edit22.Text) and (frmMain.Edit21.Text <> frmMain.Edit22.Text) then begin
-		    sv1port := StrToInt(frmMain.Edit20.Text);
-    		sv2port := StrToInt(frmMain.Edit21.Text);
-		    sv3port := StrToInt(frmMain.Edit22.Text);
-    	end;
-
-	    if (frmMain.sv1.port <> sv1port) or (frmMain.sv2.port <> sv2port) or (frmMain.sv3.port <> sv3port) then begin
+	    if (frmMain.sv1.port <> StrToInt(frmMain.Edit20.Text)) or (frmMain.sv2.port <> StrToInt(frmMain.Edit21.Text)) or (frmMain.sv3.port <> StrToInt(frmMain.Edit22.Text)) then begin
 
 		    for i := 0 to frmMain.sv1.Socket.ActiveConnections - 1 do
     			frmMain.sv1.Socket.Disconnect(i);
@@ -301,6 +297,24 @@ uses
     		frmMain.sv2.Active := False;
 	    	frmMain.sv3.Active := False;
 
+            if (Option_Use_UPnP) then begin
+                destroy_upnp(sv1port);
+                destroy_upnp(sv2port);
+                destroy_upnp(sv3port);
+            end;
+
+            if (frmMain.Edit20.Text <> frmMain.Edit21.Text) and (frmMain.Edit20.Text <> frmMain.Edit22.Text) and (frmMain.Edit21.Text <> frmMain.Edit22.Text) then begin
+                sv1port := StrToInt(frmMain.Edit20.Text);
+        		sv2port := StrToInt(frmMain.Edit21.Text);
+	    	    sv3port := StrToInt(frmMain.Edit22.Text);
+            end;
+
+            if (Option_Use_UPnP) then begin
+                create_upnp(sv1port, 'Fusion Login Zone');
+                create_upnp(sv2port, 'Fusion Character Zone');
+                create_upnp(sv3port, 'Fusion Game Zone');
+            end;
+
 		    frmMain.sv1.port := sv1port;
 		    frmMain.sv2.port := sv2port;
 	    	frmMain.sv3.port := sv3port;
@@ -310,7 +324,27 @@ uses
 	    	frmMain.sv3.Active := True;
 	    end;
 
-        if (frmMain.Edit5.Text <> frmMain.Edit20.Text) and (frmMain.Edit5.Text <> frmMain.Edit21.Text) and (frmMain.Edit5.Text <> frmMain.Edit22.Text) then wacport := StrToInt(frmMain.Edit5.Text);
+        if (frmMain.Edit5.Text <> frmMain.Edit20.Text) and (frmMain.Edit5.Text <> frmMain.Edit21.Text) and (frmMain.Edit5.Text <> frmMain.Edit22.Text) then begin
+            if not ( (wacport) = (StrToInt(frmMain.Edit5.Text)) ) then begin
+                if (Option_Use_UPnP) and (Option_Enable_WAC) then destroy_upnp(wacport);
+                wacport := StrToInt(frmMain.Edit5.Text);
+                if (Option_Use_UPnP) and (Option_Enable_WAC) then create_upnp(wacport, 'Fusion Web Account Creator');
+            end;
+        end;
+
+        if not ( (Option_Use_UPnP) = (StrToBool(IntToStr(abs(frmMain.ComboBox21.ItemIndex)))) ) then begin
+            Option_Use_UPnP := StrToBool(IntToStr(abs(frmMain.ComboBox21.ItemIndex)));
+            if (Option_Use_UPnP) then begin
+                create_upnp(sv1port, 'Fusion Login Zone');
+                create_upnp(sv2port, 'Fusion Character Zone');
+                create_upnp(sv3port, 'Fusion Game Zone');
+            end else begin
+                destroy_upnp(sv1port);
+                destroy_upnp(sv2port);
+                destroy_upnp(sv3port);
+            end;
+        end;
+
         if (Option_Enable_WAC) then begin
             destroy_wac();
             create_wac();

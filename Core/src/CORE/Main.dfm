@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 374
-  Top = 490
+  Left = 265
+  Top = 182
   Width = 608
   Height = 366
   Caption = 's'
@@ -343,6 +343,13 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'W.A.C. Port'
           end
+          object Label137: TLabel
+            Left = 148
+            Top = 200
+            Width = 69
+            Height = 18
+            Caption = 'Enable UPnP'
+          end
           object Edit17: TEdit
             Left = 12
             Top = 72
@@ -557,6 +564,17 @@ object frmMain: TfrmMain
             Width = 121
             Height = 26
             TabOrder = 11
+          end
+          object ComboBox21: TComboBox
+            Left = 148
+            Top = 216
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 24
+            Items.Strings = (
+              'No'
+              'Yes')
           end
         end
         object TabSheet5: TTabSheet

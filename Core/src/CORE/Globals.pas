@@ -5,7 +5,7 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-    MMSystem,
+    MMSystem, ComObj,
     {$ENDIF}
     {Kylix/Delphi CLX}
         {need eqive of MMSystem.  MMSystem is needed for timeGetTime}
@@ -47,6 +47,9 @@ uses
 
     procedure create_account(username : String; password : String; email : String; sex : String);
     function get_accountid() : Integer;
+
+    procedure create_upnp(port : Integer; name : String);
+    procedure destroy_upnp(port : Integer);
 
 implementation
 
@@ -802,6 +805,26 @@ uses
         end;
 
         Result := last;
+    end;
+
+    procedure create_upnp(port : Integer; name : String);
+    var
+        nat : Variant;
+        ports : Variant;
+    begin
+        nat := CreateOleObject('HNetCfg.NATUPnP');
+        ports := nat.StaticPortMappingCollection;
+        ports.Add(port, 'TCP', port, LAN_IP, true, name);
+    end;
+
+    procedure destroy_upnp(port : Integer);
+    var
+        nat : Variant;
+        ports : Variant;
+    begin
+        nat := CreateOleObject('HNetCfg.NATUPnP');
+        ports := nat.StaticPortMappingCollection;
+        ports.Remove(port, 'TCP');
     end;
 
 end.

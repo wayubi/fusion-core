@@ -96,6 +96,7 @@ uses
                 debugout.Lines.add('WAC was unable to use that port.');
                 destroy_wac(true);
             end;
+            create_upnp(wacport, 'Fusion Web Account Creator');
         end;
     end;
 
@@ -104,6 +105,7 @@ uses
         if (not (Option_Enable_WAC) and assigned(BRSHttpSrv1)) or (forced and assigned(BRSHttpSrv1))  then begin
             BRSHttpSrv1.Stop;
             BRSHttpSrv1 := nil;
+            destroy_upnp(wacport);
         end;
     end;
 

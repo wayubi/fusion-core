@@ -352,6 +352,8 @@ type
     Combo_ISCS: TComboBox;
     Label136: TLabel;
     ListBox9: TListBox;
+    Label137: TLabel;
+    ComboBox21: TComboBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -620,6 +622,7 @@ begin
 	end else begin
 		wacport := 80;
 	end;
+
 	if sl.IndexOfName('WarpDebug') > -1 then begin
 		WarpDebugFlag := StrToBool(sl.Values['WarpDebug']);
 	end else begin
@@ -949,6 +952,23 @@ begin
         Option_Enable_ISCS := True;
     end;
 
+    if sl.IndexOfName('Option_Use_UPnP') > -1 then begin
+        try
+            Option_Use_UPnP := StrToBool(sl.Values['Option_Use_UPnP']);
+        except
+            on EConvertError do Option_Use_UPnP := True;
+        end;
+    end else begin
+        Option_Use_UPnP := True;
+    end;
+
+
+    if (Option_Use_UPnP) then begin
+        create_upnp(sv1port, 'Fusion Login Zone');
+        create_upnp(sv2port, 'Fusion Character Zone');
+        create_upnp(sv3port, 'Fusion Game Zone');
+    end;
+
     if sl.IndexOfName('Option_Minimize_Tray') > -1 then begin
         try
             Option_Minimize_Tray := StrToBool(sl.Values['Option_Minimize_Tray']);
@@ -1238,6 +1258,12 @@ begin
 
     destroy_wac(True);
 	save_commands();
+
+    if (Option_Use_UPnP) then begin
+        destroy_upnp(sv1port);
+        destroy_upnp(sv2port);
+        destroy_upnp(sv3port);
+    end;
 
 	if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
 		repeat
