@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-27-04: JCon: Character ID changing via Character:Stats disabled.  Read-only. [Tsusai]
 - 10-27-04: JCon: Name changing via Character:Stats disabled.  Read-only. [Tsusai]
 - 10-27-04: Commented out MapUnload from INI since it's disabled. [Tsusai]
 - 10-26-04: REED: Proper deletion of characters from character zone. [AlexKreuz]

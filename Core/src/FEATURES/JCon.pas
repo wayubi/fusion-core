@@ -417,7 +417,7 @@ uses
 
 		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
 	    frmMain.Label134.Caption := tc.Name;
-    	frmMain.Edit9.Text := IntToStr(tc.CID);
+    	frmMain.Label135.Caption := IntToStr(tc.CID);
         if (tc.JID > LOWER_JOB_END) then frmMain.Edit10.Text := IntToStr(tc.JID - UPPER_JOB_BEGIN + LOWER_JOB_END)
         else frmMain.Edit10.Text := IntToStr(tc.JID);
         frmMain.Edit14.Text := IntToStr(tc.BaseLV);
@@ -481,7 +481,6 @@ uses
             end;
         end;
 
-        tc.CID := StrToInt(frmMain.Edit9.Text);
         if StrToInt(frmMain.Edit10.Text) > LOWER_JOB_END then
             tc.JID := (StrToInt(frmMain.Edit10.Text) - LOWER_JOB_END + UPPER_JOB_BEGIN)
         else tc.JID := StrToInt(frmMain.Edit10.Text);

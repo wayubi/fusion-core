@@ -264,8 +264,6 @@ type
     Edit15: TEdit;
     Edit14: TEdit;
     Edit10: TEdit;
-    Edit7: TEdit;
-    Edit9: TEdit;
     ListBox2: TListBox;
     Edit11: TEdit;
     Edit12: TEdit;
@@ -344,6 +342,8 @@ type
     Edit80: TEdit;
     Label132: TLabel;
     Label133: TLabel;
+    Label134: TLabel;
+    Label135: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
