@@ -496,6 +496,11 @@ begin
                 end else begin
                         Option_AutoSave := 600;
                 end;
+                if sl.IndexOfName('Option_WelcomeMsg') <> -1 then begin
+                        Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
+                end else begin
+                        Option_WelcomeMsg := True;
+                end;
 
         sl.Clear;
 
@@ -653,6 +658,7 @@ begin
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
+        ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         // Fusion INI Lines
         
 	ini.Free;
@@ -3578,11 +3584,6 @@ begin
   tm := tc.MData;
 	tl := tc.Skill[tc.MSkill].Data;
         if tc.Skill[269].Tick > Tick then exit;
-
-        if tc.isSilenced then begin
-                SilenceCharacter(tm, tc, Tick);
-                Exit;
-        end;
         
 	with tc do begin
 			case MSkill of
@@ -4781,10 +4782,6 @@ begin
       5: if ((tc.MSkill <> 267) and (tc.MSkill <> 266) and (tc.MSkill <> 273) and (tc.MSkill <> 271)) then exit;
     end;
   end;
-        if tc.isSilenced then begin
-                SilenceCharacter(tm, tc, Tick);
-                Exit;
-        end;
 
 	with tc do begin
 		tm := MData;
@@ -9672,9 +9669,7 @@ begin
 								WFIFOL(10, tc1.ID);
 								WFIFOB(14, 1);
 								SendBCmd(tm, tc1.Point, 15);
-                                                                if tc.MSkill = 255 then begin
-                                                                        if tc.JID = 14 then tc1.Crusader := tc;
-                                                                end;
+                                                                if tc.JID = 14 then tc1.Crusader := tc;
 								//DebugOut.Lines.Add(Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
 								tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
 								tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;
@@ -9940,15 +9935,6 @@ begin
                                 tc.isBlind := false;
                                 tc.BlindTick := Tick;
                                 BlindCharacter(tm, tc, Tick);
-                        end;
-                end;
-
-                {Silenced Removal}
-                if tc.isSilenced = true then begin
-                        if tc.SilencedTick < Tick then begin
-                                tc.isSilenced := false;
-                                tc.SilencedTick := Tick;
-                                //SilenceCharacter(tm, tc, Tick);
                         end;
                 end;
 
@@ -11811,16 +11797,8 @@ var
 begin
 //反撃モード
 	with ts do begin
-                tc2 := nil;
 		tc1 := AData;
-                if tc1.Skill[255].Tick > Tick then begin
-                        tc2 := tc1.Crusader;
-                        if (tc2.Login <> 2) and (tc1 <> tc2) then begin
-                                tc2 := nil;
-                                tc1.Skill[255].Tick := Tick;
-                        end;
-                end;
-
+                if tc1.Skill[255].Tick > Tick then tc2 := tc1.Crusader;
 		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Hidden = true) ) and (ts.isLooting = false) then begin
 		//攻撃対象が死んでいるかログアウトしている
 			ATarget := 0;
@@ -11878,7 +11856,6 @@ begin
 						end;
 					end;
 				end;
-
 				if tc2.HP > dmg[0] then begin
 					tc2.HP := tc2.HP - dmg[0];
 					if dmg[0] <> 0 then begin
@@ -11910,7 +11887,7 @@ begin
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, tc2.HP);
 					tc2.Socket.SendBuf(buf, 8);
-                                        ts.ATick := ts.ATick + abs(ts.Data.ADelay);
+					ATick := ATick + abs(Data.ADelay);
                                 end else if tc1.Skill[255].Tick <= Tick then begin
 				DamageCalc2(tm, tc1, ts, Tick);
                                 if dmg[0] <= 0 then dmg[0] := 0;
@@ -12587,7 +12564,7 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
+					if (tc.MMode = 0) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
 						//追加移動
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
@@ -13724,7 +13701,7 @@ begin
                 //RFIFOW(2, w);
         	//str := RFIFOS(4, w - 4);
 
-                w := 87;
+                w := 200;
         	WFIFOW(0, $009a);
 	        WFIFOW(2, w);
 	        WFIFOS(4, str, w);
