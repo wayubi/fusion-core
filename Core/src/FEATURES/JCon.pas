@@ -177,7 +177,7 @@ uses
         		    	if assigned(tp.CData[i]) then begin
 
                         	if assigned(tp.CData[i].Socket) then begin
-                        		tp.CData[i].Socket.Close;
+                        		if tp.CData[i].Login <> 0 then tp.CData[i].Socket.Close;
 			                    tp.CData[i].Socket := nil;
     			            end;
 

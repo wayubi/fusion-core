@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-23-04: JCon account deletion on account not connected caused crash. [AlexKreuz]
 - 08-23-04: Bad indexing of pets in inventory caused crash. [AlexKreuz]
 - 08-23-04: Minor overhaul of REED Pets. [AlexKreuz]
 - 08-23-04: Updated PSS Endure. TC not needed as parameter. [AlexKreuz]
