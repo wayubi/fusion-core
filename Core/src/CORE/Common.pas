@@ -9946,7 +9946,7 @@ Begin
 							tn.Script[k].Data1[0] := SL1[0];
                             tn.Script[k].Data2[0] := SL1[1];
 							Inc(k);
-                        end else if str = 'areaset' then begin //------- 11 set
+                        end else if str = 'areaset' then begin //------- 85 areaset
 							SL[0] := StringReplace(SL[0], '+=', '+', []);
 							SL[0] := StringReplace(SL[0], '-=', '-', []);
 							SL[0] := StringReplace(SL[0], '*=', '*', []);
@@ -9985,7 +9985,7 @@ Begin
 								Exit; // Safe - 2004/04/21
 							end;
 							SetLength(tn.Script, k + 1);
-							tn.Script[k].ID := 11;
+							tn.Script[k].ID := 85;
 							SetLength(tn.Script[k].Data1, 3);
 							SetLength(tn.Script[k].Data3, 6);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
