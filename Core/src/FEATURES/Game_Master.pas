@@ -983,34 +983,22 @@ Called when we're shutting down the server *only*
     function command_hcolor(tc : TChara; str : String) : String;
     var
         s : String;
-        colour, k : Integer;
+        color, k : Integer;
     begin
         Result := 'GM_HCOLOR Failure.';
 
         s := Copy(str, 8, 256);
 
         if s <> '' then begin
-            Val(Copy(str, 8, 256), colour, k);
+            Val(Copy(str, 8, 256), color, k);
             if k = 0 then begin
-                if (colour >= 0) and (colour <= 8) then begin
-                    Result := 'GM_HCOLOR Success.';
-                    tc.HairColor := colour;
-                    UpdateLook(tc.MData, tc, 6, colour, 0, true);
-                end
+                Result := 'GM_HCOLOR Success.';
+                tc.HairColor := color;
+                UpdateLook(tc.MData, tc, 6, color, 0, true);
+            end else Result := Result + ' Color must be a valid integer.';
 
-                else begin
-                    Result := Result + ' Colour must be in range [0-8].';
-                end;
-            end
+        end else Result := Result + ' Insufficient input. Format is <color number>.';
 
-            else begin
-                Result := Result + ' Colour must be a valid integer.';
-            end;
-        end
-
-        else begin
-            Result := Result + ' Insufficient input. Format is <color number> (In range 0-8).';
-        end;
     end;
 
     function command_ccolor(tc : TChara; str : String) : String;
@@ -1029,16 +1017,8 @@ Called when we're shutting down the server *only*
                 Result := 'GM_CCOLOR Success.';
                 tc.ClothesColor := color;
                 UpdateLook(tc.MData, tc, 7, color, 0, true);
-            end
-
-            else begin
-                Result := Result + ' Color must be a valid integer.';
-            end;
-        end
-
-        else begin
-            Result := Result + ' Insufficient input. Format is <clothes color>.';
-        end;
+            end else Result := Result + ' Color must be a valid integer.';
+        end else Result := Result + ' Insufficient input. Format is <clothes color>.';
     end;
 
     function command_hstyle(tc : TChara; str : String) : String;
