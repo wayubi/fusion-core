@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-01-04: Fixed Fusion form again. [AlexKreuz]
+- 12-01-04: Undid dependancy of weiss.ini autoupdate on release version. [AlexKreuz]
 - 11-30-04: Checkstr can now also check case sensitive strings (==). [Tsusai]
 - 11-30-04: Added cebuPH's inputc as inputstr. [Tsusai]
 - 11-30-04: Removed madscreenshot (my bad). [Tsusai]
