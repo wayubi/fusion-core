@@ -1,6 +1,12 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 03-06-04: Added Clown/Gypsy Vulcan Arrow [Oatmeal]
+- 03-06-04: Added Assasin Cross Breaker skill [Oatmeal]
+- 03-06-04: Added Falcon Assault [Oatmeal]
+- 03-06-04: Added Paladin Skill Sacrafice [Oatmeal]
+- 03-06-04: Added Paladin Skill Presure [Oatmeal]
 - 03-06-04: Added Professor Skill HP Conversion (Values on skills arent 100% accurate). [Darkhelmet]
 - 03-06-04: Added Professor Skill Soul Change. [Darkhelmet]
 - 03-06-04: Added Professor Skill Soul Burn. [Darkhelmet]
