@@ -576,15 +576,28 @@ begin
                         tc.PoisonTick := tick + 15000;
                         PoisonCharacter(tm, tc, Tick);
                 end;
+
                 177:    {Blind Attack}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        //dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
+
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                         tc.isBlind := True;
                         tc.BlindTick := tick + 15000;
                         BlindCharacter(tm, tc, Tick);
+                end;
+
+                178:    {Silence Attack}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+
+                        tc.isSilenced := True;
+                        tc.SilencedTick := Tick + 15000;
+                        SilenceCharacter(tm, tc, Tick);
                 end;
         end;
 

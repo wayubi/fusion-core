@@ -3578,6 +3578,11 @@ begin
   tm := tc.MData;
 	tl := tc.Skill[tc.MSkill].Data;
         if tc.Skill[269].Tick > Tick then exit;
+
+        if tc.isSilenced then begin
+                SilenceCharacter(tm, tc, Tick);
+                Exit;
+        end;
         
 	with tc do begin
 			case MSkill of
@@ -4776,6 +4781,10 @@ begin
       5: if ((tc.MSkill <> 267) and (tc.MSkill <> 266) and (tc.MSkill <> 273) and (tc.MSkill <> 271)) then exit;
     end;
   end;
+        if tc.isSilenced then begin
+                SilenceCharacter(tm, tc, Tick);
+                Exit;
+        end;
 
 	with tc do begin
 		tm := MData;
@@ -9931,6 +9940,15 @@ begin
                                 tc.isBlind := false;
                                 tc.BlindTick := Tick;
                                 BlindCharacter(tm, tc, Tick);
+                        end;
+                end;
+
+                {Silenced Removal}
+                if tc.isSilenced = true then begin
+                        if tc.SilencedTick < Tick then begin
+                                tc.isSilenced := false;
+                                tc.SilencedTick := Tick;
+                                //SilenceCharacter(tm, tc, Tick);
                         end;
                 end;
 

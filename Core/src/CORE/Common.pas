@@ -801,6 +801,9 @@ type TChara = class
         isBlind       :Boolean;   {Says if a player is blind}
         BlindTick     :Cardinal;  {Tracks how long a player is Blind}
 
+        isSilenced    :Boolean;   {Says if a player is silenced}
+        SilencedTick  :Cardinal;  {Tracks how long a player is silenced}
+
         intimidateActive:Boolean; {Sets intimidate Active}
         intimidateTick:cardinal;  {Used so you can delay before you intimidate}
 
@@ -1411,6 +1414,7 @@ Option_WelcomeMsg :boolean;
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
                 procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
                 procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
+                procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
@@ -2658,6 +2662,20 @@ begin
 end;
 //------------------------------------------------------------------------------
 
+procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
+
+begin
+        tm := tc.MData;
+
+        WFIFOW(0, $00c0);
+        WFIFOL(2, tc.ID);
+        WFIFOB(6, 09);
+
+        SendBCmd(tm, tc.Point, 7);
+end;
+
+//------------------------------------------------------------------------------
+
 procedure IntimidateWarp(tm:TMap; tc:TChara);
 var
         i       :integer;
@@ -3398,6 +3416,11 @@ begin
 	Result := 0;
 	tm := tc.MData;
 	with tc do begin
+                if tc.isSilenced then begin
+                        SilenceCharacter(tm, tc, Tick);
+                        Exit;
+                end;
+
 		if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin
 			tl := tc.Skill[tc.MSkill].Data;
 
@@ -3464,6 +3487,10 @@ begin
 	Result := 0;
 	tm := tc.MData;
 	with tc do begin
+                if tc.isSilenced then begin
+                        SilenceCharacter(tm, tc, Tick);
+                        Exit;
+                end;
 		tl := tc.Skill[tc.MSkill].Data;
 
 		if (tc.SP < tl.SP[tc.MUseLV]) and (tc.ItemSkill = false) then begin
