@@ -153,6 +153,7 @@ begin
 
 		case cmd of
 		//--------------------------------------------------------------------------
+
 		$0072: //ゲーム鯖接続要求
 			begin
 				RFIFOL( 2, l);
@@ -568,7 +569,7 @@ begin
               for j := 0 to tm.CList.Count - 1 do begin
                 tc1 := tm.CList.Objects[j] as TChara;
                 WFIFOW( 0, $0199);
-                WFIFOW( 2, 1);
+                WFIFOW( 2, 3);
                 tc1.Socket.SendBuf(buf, 4);
               end;
           end;
@@ -5922,6 +5923,38 @@ end;
 
 				end;
 			end;
+      
+		//--------------------------------------------------------------------------
+    $0190: {Graffiti/Talkie Box}
+      begin
+        RFIFOW(2, w); // Level (always 1)
+        RFIFOW(4, w1); // Code: $DC for Graffiti, $7D for Talkie
+        RFIFOW(6, w2); // X
+        RFIFOW(8, w3); // Y
+
+        s := RFIFOS(10, 80);  // 78 + 2 bytes for length.
+
+        WFIFOW(0, $01c9);
+        WFIFOL(2, 0); // Should be NPC ID of the skillunit...
+        WFIFOL(6, tc.ID);
+        WFIFOW(10, w2); // Position
+        WFIFOW(12, w3);
+
+        if (w1 = $DC) then begin
+          WFIFOB(14, $b0);
+          WFIFOB(15, 1);  // fail (?)
+          WFIFOB(16, 1);  // Message display?
+        end else begin
+          WFIFOB(14, $99);
+          WFIFOB(15, 1);  // fail (?)
+          WFIFOB(16, 0);  // Do not display?
+        end;
+
+        WFIFOS(17, s, 80); // Write back the message.
+
+        Socket.SendBuf(buf, 97);
+
+      end;
 {アイテム製造追加ココまで}
 		//--------------------------------------------------------------------------
 {アイテム製造追加}
