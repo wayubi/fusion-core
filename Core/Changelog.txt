@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-27-04: Fixed #1007 - Fly/Butterfly Wings are allowed to be used under attack. [AlexKreuz]
 - 06-27-04: Fixed #1006 - User can walk all the way across the screen (30 tiles, not 15). [AlexKreuz]
 - 06-27-04: Fixed Meteor Storm for Monsters.  [Darkhelmet]
 - 06-26-04: Gungnir caused crash on bash fail. [AlexKreuz]

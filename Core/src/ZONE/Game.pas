@@ -1138,10 +1138,6 @@ Begin(* Proc sv3PacketProcess() *)
 								end;
 							2: // Fly Wings - Rewritten by AlexKreuz
 								begin
-                                	if not (check_attack_lag(tc)) then begin
-
-
-
                   if ((tc.item[w].Amount <= 0) or (tc.Sit = 1) or (tc.Option and 6 <> 0)) then exit;
 									i := MapInfo.IndexOf(tc.Map);
 									j := -1;
@@ -1170,10 +1166,8 @@ Begin(* Proc sv3PacketProcess() *)
 									        end;
                                                                         end;
                                                                 end;
-                            		end;
 							3: //蝶の羽
 								begin
-                                	if not (check_attack_lag(tc)) then begin
 
 {NPCイベント追加}                                                       if tc.item[w].Amount <= 0 then exit;
 									i := MapInfo.IndexOf(tc.Map);
@@ -1194,7 +1188,6 @@ Begin(* Proc sv3PacketProcess() *)
 {NPCイベント追加}
 									end;
 {NPCイベント追加ココまで}
-								end;
 								end;
 
 {氏{箱追加}
