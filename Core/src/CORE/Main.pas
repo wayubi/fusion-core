@@ -10908,7 +10908,7 @@ begin
 
 
       {Colus, 20031223: Added check for Ashura recovery period.}
-			{if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
+			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
 				if (HP <> MAXHP) then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
                                                 if tc.isPoisoned = True then Dec(HP)
@@ -10936,8 +10936,8 @@ begin
 				end;
 			end;
 			//SPŽ©“®‰ñ•œ
-      {Colus, 20031223: Added check for Ashura recovery period.
-			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (Skill[271].Tick < Tick) then begin
+      {Colus, 20031223: Added check for Ashura recovery period.}
+			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
 				if SP <> MAXSP then begin
 					for j := 1 to (Tick - SPTick) div SPDelay[3 - Sit] do begin
 						Inc(SP);
@@ -10951,11 +10951,11 @@ begin
 					end else begin
 						SPTick := Tick;
 				end;
-			end;  }
+			end;  
 
 			if (Sit >= 2) then begin
 
-        if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) then begin
+        if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
         if HP <> MAXHP then begin
 						j := (5 + MAXHP div 500) * Skill[260].Data.Data1[Skill[260].Lv];
 						if HP + j > MAXHP then j := MAXHP - HP;
@@ -12415,7 +12415,7 @@ begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and $46 = 0) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
+							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and 64 = 0) and ((tc1.Option and 6 = 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race = 6) or (ts.Data.Race = 4) or (ts.Data.MEXP <> 0)))) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
 							//if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
 							    //if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
 							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) then begin
@@ -12804,7 +12804,7 @@ begin
 			end;
 		end;
 		
-		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Hidden = true) ) and (ts.isLooting = false) then begin
+		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Option and 64 <> 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race <> 4) and (ts.Data.Race <> 6) and (ts.Data.MEXP = 0))) ) and (ts.isLooting = false) then begin
 		{ Stops attack if target is dead, not logged in, or hidden }
 			ATarget := 0;
 			ARangeFlag := false;
@@ -12867,6 +12867,11 @@ begin
 							if dmg[0] <> 0 then begin
 								tc2.DmgTick := Tick + tc2.dMotion div 2;
 							end;
+
+				if (tc2.Option and 6 <> 0) then begin
+                tc2.SkillTick := Tick;
+                tc2.SkillTickID := 51;
+              end;
 						end
 					
 						else begin
@@ -12890,6 +12895,10 @@ begin
 							if (tc2.AMode = 1) or (tc2.AMode = 2) then tc2.AMode := 0;
 							ATarget := 0;
 							ARangeFlag := false;
+				if (tc2.Option and 6 <> 0) then begin
+                tc2.SkillTick := Tick;
+                tc2.SkillTickID := 51;
+              end;
 						end;
 					
 						WFIFOW( 0, $00b0);
@@ -12957,6 +12966,10 @@ begin
 								end;
 								
 								{Colus, 20031216: end cast-timer cancel}
+if (tc1.Option and 6 <> 0) then begin
+                tc1.SkillTick := Tick;
+                tc1.SkillTickID := 51;
+              end;
 							end;
 						end
 						
@@ -12981,8 +12994,12 @@ begin
 							if (tc1.AMode = 1) or (tc1.AMode = 2) then tc1.AMode := 0;
 							ATarget := 0;
 							ARangeFlag := false;
-						end;
+							if (tc1.Option and 6 <> 0) then begin
+                				tc1.SkillTick := Tick;
+                				tc1.SkillTickID := 51;
+							end;
 							
+						end;
 						WFIFOW( 0, $00b0);
 						WFIFOW( 2, $0005);
 						WFIFOL( 4, tc1.HP);
