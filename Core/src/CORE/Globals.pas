@@ -286,6 +286,9 @@ uses
 	    zfile :TZip;
     	fileslist :TStringList;
 	    filename :string;
+        //R.E.E.D.
+        gamefolder :string;
+        gamedatalist :TStringList;
     begin
 	    DateSeparator      := '-';
     	TimeSeparator      := '-';
@@ -309,9 +312,21 @@ uses
 
 	    zfile.FileSpecList := fileslist;
     	zfile.Add;
+
+        //R.E.E.D
+        gamefolder := AppPath + 'gamedata';
+        zfile.AddPath := gamefolder;
+	    gamedatalist := tstringlist.Create;
+        gamedatalist.Add('*.txt');
+        zfile.AddOptions := [aoRecursive, aoFolderEntries, aoUpdate]; //include all subfolders too.
+
+	    zfile.FileSpecList := gamedatalist;
+        zfile.Add;
+
 	    zfile.Free;
 
     	fileslist.Free;
+        gamedatalist.Free;
     end;
 
 end.
