@@ -1,3 +1,5 @@
+- 04-27-04: Code Review/Comment, and Unused variable cleanup: CloseQuery [ChrstphrR]
+- 04-27-04: Code Review/Comment, and Unused variable cleanup: MonsterSpawn [ChrstphrR]
 - 04-27-04: Memory Leak, Data Structure fixes for Box items' random generator. [ChrstphrR]
 - 04-27-04: MobSkills - unallocated array at routine end [ChrstphrR]
 - 04-27-04: Index checks, CloseQuery memory leaks with 10+ global lists fixed [ChrstphrR]
