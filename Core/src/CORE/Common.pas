@@ -8981,7 +8981,7 @@ Begin
 								Exit; // Safe - 2004/04/21
 							end;
 							val(SL1[1], i, j);
-							if (j <> 0) or (i < 2) or (i > 20) then begin
+							if (j <> 0) or (i < 1) or (i > 20) then begin
 								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
 							end;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-25-04: Modified script validation of waitingroom's maxsize from 2 to 1. [Tsusai]
 - 06-25-04: Fixed #569 (Again) - Hunter range exploit. Not sure what was smoking. [AlexKreuz]
 - 06-25-04: Added Athena @skpoint command to ALBGM system. [Trihan]
 - 06-25-04: Added Athena @joblvup command to ALBGM system. [Trihan]
