@@ -1662,6 +1662,7 @@ Option_MOTD_File   : string; //File for reading MOTD entries
 
 Option_GM_Logs     :Boolean;
 
+Option_Minimize_Tray : Boolean;
 Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;

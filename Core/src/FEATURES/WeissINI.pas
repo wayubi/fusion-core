@@ -92,6 +92,7 @@ uses
         ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
         ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
         ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
+        ini.WriteString('Fusion', 'Option_Minimize_Tray', BoolToStr(Option_Minimize_Tray));
         // Fusion INI Lines
         
         // MySQL Server Lines

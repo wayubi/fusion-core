@@ -818,6 +818,18 @@ begin
 	end else begin
 		Option_Font_Style := 'B';
 	end;
+
+    if sl.IndexOfName('Option_Minimize_Tray') > -1 then begin
+        try
+            Option_Minimize_Tray := StrToBool(sl.Values['Option_Minimize_Tray']);
+        except
+            on EConvertError do Option_PVP := False;
+        end;
+    end else begin
+        Option_Minimize_Tray := False;
+    end;
+
+
 	if sl.IndexOfName('Option_Pet_Capture_Rate') > -1 then begin
                         Option_Pet_Capture_Rate := StrToInt(sl.Values['Option_Pet_Capture_Rate']);
                 end else begin
@@ -1026,6 +1038,7 @@ begin
 	SL.Free;
 
 	Show;
+
 	//ÉfÅ[É^ì«Ç›çûÇ›
 	DatabaseLoad(Handle);
 	if UseSQL then
@@ -9507,6 +9520,8 @@ begin
 
 		DelDelayNum := 0; // mf
 
+        if (Option_Minimize_Tray) then frmMain.MinimizetoTray2Click(self);
+
 		repeat
 
 			// mf
@@ -10948,6 +10963,7 @@ end;
 procedure TfrmMain.CMClickIcon(var msg: TMessage);
 begin
   if msg.lparam = WM_LBUTTONDBLCLK then begin
+        Option_Minimize_Tray := False;
         frmMain.Visible := true;
         Application.BringToFront;
         ShowWindow(Application.Handle, SW_SHOWNORMAL);
@@ -11100,6 +11116,9 @@ end;
 
 procedure TfrmMain.MinimizetoTray2Click(Sender: TObject);
 begin
+    Option_Minimize_Tray := True;
+    weiss_ini_save();
+
     //Add Icon to System Tray
                 TrayIcon.cbSize := SizeOf(TrayIcon);
                 TrayIcon.Wnd := Self.Handle;
@@ -11107,7 +11126,7 @@ begin
                 TrayIcon.uFlags := NIF_ICON or NIF_TIP or NIF_MESSAGE;
                 TrayIcon.uCallbackMessage := WM_NOTIFYICON;
                 TrayIcon.hIcon := Application.Icon.Handle;
-                TrayIcon.szTip := 'Fusion';
+                TrayIcon.szTip := RELEASE_VERSION;
                 Shell_notifyIcon(NIM_ADD, @TrayIcon);
                 frmMain.Visible := false;
                 Application.Minimize;
