@@ -7724,46 +7724,63 @@ end;
 					5: tc.Option := (tc.Option and $F877) or $0400; // Cart 5
 				end;
 				// Send the new option value.
-        UpdateOption(tm, tc);
+				UpdateOption(tm, tc);
 
-        SendCStat(tc);
+				SendCStat(tc);
 
-                        end;
+			end;
 		//--------------------------------------------------------------------------
 {露店スキル追加}
 		$01b2: //露店開設
 			begin
-				//職業＆スキルチェック
-				if (tc.JID <> 5) and (tc.JID <> 10) and (tc.JID <> 18) then continue;
-				if (tc.Skill[41].Lv = 0) then continue;
+				{ChrstphrR 2004/05/18 -- no check is made to ensure 1..12 items
+				are sent in this packet, with bots sending Shop packets out of
+				spec, server crashes can occur with 13 or more items :P~~~
+				As crummy as bots are, server crashes are the greater evil.}
 
-				//キャンセル判定
-				RFIFOB(84, b);//0=キャンセル,1=オープン
-				if (b = 0) then continue;
+				//Occupation and Skill Check - Merchant/BlackSmith/Alchemist
+				if (tc.JID <> 5) AND (tc.JID <> 10) AND (tc.JID <> 18) then Continue;
+				if (tc.Skill[41].Lv = 0) then Continue;
+
+				//Cancellation Decision
+				RFIFOB(84, b);//0= Cancel, 1= Open shop
+				if (b = 0) then Continue;
+
+				{ChrstphrR 2004/05/18 - improved error checking for packet length}
+				//Check for 2 conditions:
+				// A) the Packet Length less header must be divisible by 8
+				// B) PL less header div 8 must be a number between 1 and 12
 				RFIFOW(2, w);
-				if (w - 85 < 8) then continue;
-				tv := TVender.Create;
+				if ((w - 85) mod 8 <> 0) AND
+				((w - 85) div 8 >= 1) AND ((w - 85) div 8 <= 12) then Continue;
+				//--
 
-				//露店情報設定
-				tv.Title := RFIFOS(4, 80);//タイトル
+				TV := TVender.Create;
+
+				//Street stall information settings
+				TV.Title := RFIFOS(4, 80);//Title can be up to 79 characters
 				for j := 0 to (w - 85) div 8 - 1 do begin
 					//IDチェック
 					RFIFOW(85+j*8, w1);
 					if (tc.Cart.Item[w1].ID = 0) then begin
-						exit;
+						{ChrstphrR - Exiting early and not cleaning up is BAD
+						P.S. - original coders used an exit here because a Continue would
+						only skip out of the for loop, not the case branch.}
+						TV.Free;
+						Exit;//safe 2005/05/18
 					end;
-					tv.Idx[j] := w1;
-					//数量チェック
+					TV.Idx[j] := w1;
+					//Check Quantity
 					RFIFOW(87+j*8, w2);
 					if (w2 > tc.Cart.Item[w1].Amount) then begin
 						w2 := tc.Cart.Item[w1].Amount;
 					end;
 					tv.Amount[j] := w2;
-					//価格チェック
+					//Check Price
 					RFIFOL(89+j*8, l);//Price
-					if (l > 10000000) then l := 10000000;//価格上限(10M)
+					if (l > 10000000) then l := 10000000;//Upper limit is 10 million
 					tv.Price[j] := l;
-					//重量
+					//Weight
 					td := tc.Cart.Item[w1].Data;
 					tv.Weight[j] := td.Weight;
 					tv.Cnt := tv.Cnt + 1;
@@ -7775,7 +7792,7 @@ end;
 				tv.MaxCnt := tv.Cnt;
 				VenderList.AddObject(tv.ID, tv);
 
-				//カートからアイテム削除
+				//Delete Item from Cart while vending it.
 				for j := 0 to (w - 85) div 8 - 1 do begin
 					WFIFOW( 0, $0125);
 					WFIFOW( 2, tv.Idx[j]);
@@ -7783,7 +7800,7 @@ end;
 					Socket.SendBuf(buf, 8);
 				end;
 
-				//露店開始通知
+				//Send reply packet to Character that shop is ready.
 				w := 8 + tv.Cnt * 22;
 				WFIFOW( 0, $0136);
 				WFIFOW( 2, w);
@@ -7806,7 +7823,7 @@ end;
 				Socket.SendBuf(buf, w);
 				//DebugOut.Lines.Add(Format('VenderTitle = %s : OwnerID = %d : OwnerName = %s', [tv.Title, tc.CID, tc.Name]));
 
-				//周囲に看板通知
+				//Notify other characters that this shop is open for business now
 				WFIFOW(0, $0131);
 				WFIFOL(2, tv.ID);
 				WFIFOS(6, tv.Title, 80);
