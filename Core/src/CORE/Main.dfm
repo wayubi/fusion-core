@@ -2548,6 +2548,17 @@ object frmMain: TfrmMain
         OnClick = Characters1Click
       end
     end
+    object Help1: TMenuItem
+      Caption = '&Help'
+      object Bugtracker1: TMenuItem
+        Caption = 'Report &Bugs'
+        OnClick = Bugtracker1Click
+      end
+      object FusionHomepage1: TMenuItem
+        Caption = '&Fusion Homepage'
+        OnClick = FusionHomepage1Click
+      end
+    end
   end
   object DNSUpdateTimer: TTimer
     Enabled = False
