@@ -905,7 +905,7 @@ begin
 	Controls options that allow/supress when errors occur - these features
 	will be useful to Devs in Core/DB/Scripts, and people modifying both
 	Database and Script files for testing.}
-	ini.WriteString('Debug', 'ShowDebugErrrors', BoolToStr(ShowDebugErrors));
+	ini.WriteString('Debug', 'ShowDebugErrors', BoolToStr(ShowDebugErrors));
 
 
 	ini.Free;
@@ -16184,9 +16184,9 @@ end;
 procedure TfrmMain.DBsaveTimerTimer(Sender: TObject);
 begin
 	if UseSQL then
-	  SQLDataSave()
+		SQLDataSave()
 	else
-	DataSave();
+		DataSave();
 	//DebugOut.Lines.Add('Data Saved');
 end;
 
