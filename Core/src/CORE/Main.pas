@@ -2165,7 +2165,8 @@ begin
 
 		//カード補正
     // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
-		dmg[0] := dmg[0] * (tc.DamageFixR[1][ts.Data.Race] )div 100;
+    //        20040129: Couldn't do it this way.  Must change the card data instead...
+		dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][ts.Data.Race]) div 100;
 
     // Determine element based on status/armor type...
 
@@ -2462,6 +2463,11 @@ begin
       else if tc1.ArmorElement <> 0 then i := tc1.ArmorElement // PC's armor type
 			else i := 1;
 			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; // Damage modifier based on elements
+
+      // Colus, 20040129: Readded card effects for race/element properties.
+      //        Note that all players are demi-human (race 7).
+	  	dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][7]) div 100;
+      dmg[0] := dmg[0] * (100 - tc.DamageFixE[1][AElement]) div 100;
 
 			if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 		end else begin
@@ -12316,6 +12322,9 @@ begin
 {追加}
 					UpdatePlayerLocation(tm, tc2);
 {追加ココまで}
+
+          // Colus, 20040129: Reset Lex Aeterna here
+          tc2.Skill[78].Tick := 0;
 				end;
 				if ts.Data.MEXP <> 0 then begin
 					for c := 0 to 31 do begin
@@ -12359,6 +12368,9 @@ begin
 					WFIFOL( 4, tc2.HP);
 					tc2.Socket.SendBuf(buf, 8);
                                         ts.ATick := ts.ATick + abs(ts.Data.ADelay);
+
+
+
                                 end else if tc1.Skill[255].Tick <= Tick then begin
 				DamageCalc2(tm, tc1, ts, Tick);
                                 if dmg[0] <= 0 then dmg[0] := 0;
@@ -12383,6 +12395,9 @@ begin
 					tc1.pcnt := 0;
 {追加}
 					UpdatePlayerLocation(tm, tc1);
+
+          // Colus, 20040129: Reset Lex Aeterna here
+          tc1.Skill[78].Tick := 0;
 {追加ココまで}
 				end;
 				if ts.Data.MEXP <> 0 then begin

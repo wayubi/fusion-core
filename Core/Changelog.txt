@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+
+- 01-29-04: Updated calculation of shield card dmg (DB changes). [Colus]
+- 01-29-04: Added rest of NPC elemental attacks [Colus]
 - 01-29-04: Added 'Option_AutoBackup' Feature. Auto Backs up on Second Interval. [AlexKreuz]
 - 01-29-04: Fixed error that was given if just "-" was sent from fusion exe. [Mitch]
 - 01-29-04: Fixed tray icon. It now is removed after double-clicking on it. [Mitch]

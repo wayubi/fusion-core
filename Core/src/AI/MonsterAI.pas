@@ -307,8 +307,11 @@ var
         tc  :TChara;
 
 begin
-        for j := 0 to 7 do begin
-                i := Random(7);
+        // Colus, 20030129: Changes random(7) to 8 for that last skill.
+        // QUESTION: Why is this outer loop here?  Do you _really_ want to
+        // (potentially) fire multiple skills off at once?
+        //for j := 0 to 7 do begin
+                i := Random(8);
                 if tsAI.Skill[i] <> 0 then begin
                         if tsAI.PercentChance[i] > Random(200) then begin
                                 //DebugOut.Lines.Add('Success');
@@ -321,7 +324,7 @@ begin
                         end;
                         //end else DebugOut.Lines.Add('Fail');
                 end;
-        end;
+        //end;
 end;
 
 //------------------------------------------------------------------------------
@@ -488,7 +491,9 @@ begin
                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                         //Send Attack
-                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                        // Colus, 20040129: Should be an MSkill
+                        //SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
 
                         //Successful Damage
                         if (dmg[0] > 0) then begin
@@ -591,22 +596,21 @@ begin
                         SilenceCharacter(tm, tc, Tick);
                 end;
 
-                186:    {Fire Attack}
-                begin
-                        ts.Element := 3;  //Fire
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                        ts.Element := ts.Data.Element;
-                end;
+                // Colus, 20040129: Updated elemental attacks.  Added
+                // water, earth, poison, holy, shadow attacks.
+                // NOTE: I put the elements in the skill DB.  We don't want
+                // to change their elements back to their defaults.  The reason
+                // is that if we later implement attribute change, these skills
+                // would change them back.
 
-                187:    {Wind Attack}
+                184,185,186,187,188,189,190:    {Elemental Attacks}
                 begin
-                        ts.Element := 4;  //Wind
+                        //ts.Element := 1;  // Water
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                        ts.Element := ts.Data.Element;
+                        //ts.Element := ts.Data.Element;
                 end;
 
                 191:    {Telekenesis Attack}
@@ -1011,11 +1015,11 @@ begin
 		//dmg[0] := dmg[0] * ElementTable[AElement][ts.Data.Element] div 100; //属性相性補正
 
 		//カード補正
-    // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
-		//dmg[0] := dmg[0] * (tc.DamageFixR[1][ts.Data.Race] )div 100;
+    // Colus, 20040129: The race reduction shield cards are direct values, not 100-val.
+		//dmg[0] := dmg[0] * (100-tc.DamageFixR[1][ts.Data.Race] )div 100;
 
     // Added elemental property reduction cards...
-    //dmg[0] := dmg[0] * (tc.DamageFixE[1][ts.Element] )div 100;
+    //dmg[0] := dmg[0] * (100-tc.DamageFixE[1][ts.Element] )div 100;
 
     // Moving element determination to the separate skills...
 {    // Determine element based on status/armor type...
@@ -1136,22 +1140,27 @@ begin
 //R 01de <skill ID>.w <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1>.l <param2>.w <param3>.w <type>.B
 
   // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
-	if (tc.Skill[78].Tick > Tick) then k := k * 2; // Lex Aeterna effect
+  // Damage should be correct when it gets here.  Commented.
+	//if (tc.Skill[78].Tick > Tick) then k := k * 2; // Lex Aeterna effect
 
-        tc.HP := tc.HP - dmg[0];  //Subtract Damage
-        WFIFOW( 0, $01de);
+  // Colus, 20040129: If you aren't going to use DamageProcess3 for mob skills,
+  // then you need to have a check here so that you don't run into negative HP.
+  // Likewise you need to send the correct packets for updates, etc., right?
+
+  tc.HP := tc.HP - dmg[0];  //Subtract Damage
+  WFIFOW( 0, $01de);
 	WFIFOW( 2, tsAI.Skill[i]);
 	WFIFOL( 4, ts.ID);
 	WFIFOL( 8, tc.ID);
 	WFIFOL(12, Tick);
 	//WFIFOL(16, tc.aMotion);
 	//WFIFOL(20, ts.Data.dMotion);
-        WFIFOL(16, ts.Data.dMotion);
+  WFIFOL(16, ts.Data.dMotion);
 	WFIFOL(20, tc.aMotion);
 	WFIFOL(24, dmg[0]);
 	WFIFOW(28, tsAI.SkillLV[i]);
 	WFIFOW(30, k);
-        WFIFOB(32, 8);
+  WFIFOB(32, 8);
 	//else               WFIFOB(32, 8);
 	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
 	SendBCmd(tm, tc.Point, 33);
@@ -1290,6 +1299,13 @@ var
 	i :integer;
         w :Cardinal;
 begin
+
+  // Colus, 20040129: Reset Lex Aeterna
+	if (tc1.Skill[78].Tick > Tick) then begin
+    // Dmg := Dmg * 2;  // Done in the DamageCalc functions
+    tc1.Skill[78].Tick := 0;
+  end;
+  
 	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
 
         if Dmg = 0 then begin  //Miss, no damage
