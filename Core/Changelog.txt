@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-21-04: Cleaned up ISCS syntax. [AlexKreuz]
+- 09-21-04: Moved ISCS Channel to #fusionservers. [AlexKreuz]
 - 09-21-04: Removed weiss.ini LAN_IP field. Address retrieved automatically. [AlexKreuz]
 - 09-21-04: Added Dynamic DNS support for WAN IP. [AlexKreuz]
 - 09-20-04: Created Guild storage System. Added GSTORAGE GM Command (#gstorage). [AlexKreuz]
