@@ -763,8 +763,12 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                i := strtoint(sl.strings[2]);
-                                                j := strtoint(sl.strings[3]);
+                                                if sl.count <> 5 then continue;
+
+                                                val(sl.Strings[2], i, ii);
+                                                if ii <> 0 then continue;
+                                                val(sl.Strings[3], j, ii);
+                                                if ii <> 0 then continue;
 
                                                 if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
                                                         ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
@@ -805,8 +809,12 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                i := strtoint(sl.strings[2]);
-                                                j := strtoint(sl.strings[3]);
+                                                if sl.count <> 4 then continue;
+
+                                                val(sl.Strings[2], i, ii);
+                                                if ii <> 0 then continue;
+                                                val(sl.Strings[3], j, ii);
+                                                if ii <> 0 then continue;
 
                                                 if (maplist.IndexOf(sl.Strings[1]) <> -1) then begin
                                                         ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
@@ -824,8 +832,16 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                if (CharaName.Indexof(sl.strings[1]) <> -1) then begin
-                                                        tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
+                                                if sl.count < 2 then continue;
+
+                                                str2 := '';
+                                                for i := 1 to (sl.Count - 1) do begin
+                                                        str2 := str2 + ' ' + sl.Strings[i];
+                                                end;
+                                                str2 := Trim(str2);
+
+                                                if (CharaName.Indexof(str2) <> -1) then begin
+                                                        tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
                                                         str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
 
                                                         w := Length(str) + 4;
@@ -842,8 +858,16 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                if (CharaName.Indexof(sl.strings[1]) <> -1) then begin
-                                                        tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
+                                                if sl.count < 2 then continue;
+
+                                                str2 := '';
+                                                for i := 1 to (sl.Count - 1) do begin
+                                                        str2 := str2 + ' ' + sl.Strings[i];
+                                                end;
+                                                str2 := Trim(str2);
+
+                                                if (CharaName.Indexof(str2) <> -1) then begin
+                                                        tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
                                                         tc.tmpmap := tc1.map;
                                                         tc.point := tc1.point;
                                                         mapmove (socket, tc1.map, tc1.point);
@@ -856,8 +880,12 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                i := strtoint(sl.strings[1]);
-                                                j := strtoint(sl.strings[2]);
+                                                if sl.count <> 3 then continue;
+
+                                                val(sl.Strings[1], i, ii);
+                                                if ii <> 0 then continue;
+                                                val(sl.Strings[2], j, ii);
+                                                if ii <> 0 then continue;
 
                                                 if (maplist.IndexOf(tc.Map) <> -1) then begin
                                                         ta := maplist.objects[maplist.indexof(tc.map)] as tmaplist;
@@ -945,6 +973,8 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
+                                                if sl.count <> 2 then continue;
+
                                                 if (strtoint(sl.Strings[1]) >= 25) and (strtoint(sl.Strings[1]) <= 1000) then begin
                                                         str := 'Walking speed is now ' + sl.Strings[1];
                                                         tc.DefaultSpeed := strtoint(sl.strings[1]);
@@ -963,9 +993,231 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.Free;
                                         end
 
+                                        else if (copy(str, 1, 7) = 'storage') then begin
+                                                SendCStoreList(tc);
+                                        end
+
+                                        else if (copy(str, 1, 6) = 'option') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if sl.count <> 4 then continue;
+
+                                                val(sl.Strings[1], i, ii);
+                                                if ii <> 0 then continue;
+                                                val(sl.Strings[2], j, ii);
+                                                if ii <> 0 then continue;
+                                                val(sl.Strings[3], k, ii);
+                                                if ii <> 0 then continue;
+
+                                                WFIFOW(0, $0119);
+                                                WFIFOL(2, tc.ID);
+                                                WFIFOW(6, i);
+                                                WFIFOW(8, j);
+                                                WFIFOW(10, k);
+                                                WFIFOB(12, 0);
+                                                SendBCmd(tm, tc.Point, 13);
+                                                tc.Stat1 := i;
+                                                tc.Stat2 := j;
+                                                tc.Option := k;
+
+                                                str := 'Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
+
+                                                w := Length(str) + 4;
+                                                WFIFOW (0, $009a);
+                                                WFIFOW (2, w);
+                                                WFIFOS (4, str, w - 4);
+                                                tc.socket.sendbuf(buf, w);
+
+                                                sl.Free;
+                                        end
+
+                                        else if (copy(str, 1, 4) = 'hide') then begin
+                                                if tc.Option = 64 then i := 0
+                                                else i := 64;
+                                                WFIFOW(0, $0119);
+                                                WFIFOL(2, tc.ID);
+                                                WFIFOW(6, 0);
+                                                WFIFOW(8, 0);
+                                                WFIFOW(10, i);
+                                                WFIFOB(12, 0);
+                                                SendBCmd(tm, tc.Point, 13);
+                                                tc.Stat1 := 0;
+                                                tc.Stat2 := 0;
+                                                tc.Option := i;
+                                        end
+
+                                        else if (copy(str, 1, 9) = 'jobchange') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if sl.count <> 2 then continue;
+
+                                                val(sl.Strings[1], i, ii);
+                                                if ii <> 0 then continue;
+
+                                                if (ii = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
+                                                        // Colus, 20040203: Added unequip of items when you #job
+                                                        for  j := 1 to 100 do begin
+                                                                if tc.Item[j].Equip = 32768 then begin
+                                                                        tc.Item[j].Equip := 0;
+                                                                        WFIFOW(0, $013c);
+                                                                        WFIFOW(2, 0);
+                                                                        tc.Socket.SendBuf(buf, 4);
+                                                                end else if tc.Item[j].Equip <> 0 then begin
+                                                                        WFIFOW(0, $00ac);
+                                                                        WFIFOW(2, j);
+                                                                        WFIFOW(4, tc.Item[j].Equip);
+                                                                        tc.Item[j].Equip := 0;
+                                                                        WFIFOB(6, 1);
+                                                                        tc.Socket.SendBuf(buf, 7);
+                                                                end;
+                                                        end;
+
+                                                        // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+                                                        for j := 1 to MAX_SKILL_NUMBER do begin
+                                                                if tc.Skill[j].Data.Icon <> 0 then begin
+                                                                        if tc.Skill[j].Tick >= timeGetTime() then begin
+                                                                                //DebugOut.Lines.Add('(Icon Removed');
+                                                                                UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
+                                                                        end;
+                                                                end;
+                                                                tc.Skill[j].Tick := timeGetTime();
+                                                                tc.Skill[j].Effect1 := 0;
+                                                        end;
+
+                                                        if (i > LOWER_JOB_END) then begin
+                                                                i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                                                                tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+                                                        end else begin
+                                                                tc.ClothesColor := 0; // Reset the clothes color to the default value.
+                                                        end;
+
+                                                        tc.JID := i; // Set the JID to the corrected value.
+
+                                                        if (tc.Option <> 0) then begin
+                                                                tc.Option := 0;
+                                                                WFIFOW(0, $0119);
+                                                                WFIFOL(2, tc.ID);
+                                                                WFIFOW(6, 0);
+                                                                WFIFOW(8, 0);
+                                                                WFIFOW(10, tc.Option);
+                                                                WFIFOB(12, 0);
+                                                                SendBCmd(tc.MData, tc.Point, 13);
+                                                        end;
+
+                                                        CalcStat(tc);
+                                                        SendCStat(tc, true); // Add the true to recalc sprites
+                                                        SendCSkillList(tc);
+
+                                                        // Colus, 20040303: Using newer packet to allow upper job changes
+                                                        WFIFOW(0, $01d7);
+                                                        WFIFOL(2, tc.ID);
+                                                        WFIFOB(6, 0);
+                                                        WFIFOW(7, i);
+                                                        WFIFOW(9, 0);
+                                                        SendBCmd(tm, tc.Point, 11);
+                                                end;
+                                                
+                                                sl.Free;
+                                        end
+
+                                        else if (copy(str, 1, 3) = 'die') then begin
+                                                tc.Sit := 1;
+                                                tc.HP := 0;
+                                                SendCStat1(tc, 0, 5, tc.HP);
+                                                WFIFOW( 0, $0080);
+                                                WFIFOL( 2, tc.ID);
+                                                WFIFOB( 6, 1);
+                                                SendBCmd(tm, tc.Point, 7);
+                                        end
+
+                                        else if (copy(str, 1, 4) = 'kill') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if sl.count < 2 then continue;
+
+                                                str2 := '';
+                                                for i := 1 to (sl.Count - 1) do begin
+                                                        str2 := str2 + ' ' + sl.Strings[i];
+                                                end;
+                                                str2 := Trim(str2);
+
+                                                if (CharaName.Indexof(str2) <> -1) then begin
+                                                        tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
+
+                                                        if (tc1.Login = 2) then begin
+                                                                tc1.Sit := 1;
+                                                                tc1.HP := 0;
+                                                                SendCStat1(tc1, 0, 5, tc1.HP);
+                                                                WFIFOW( 0, $0080);
+                                                                WFIFOL( 2, tc1.ID);
+                                                                WFIFOB( 6, 1);
+                                                                SendBCmd(tm, tc1.Point, 7);
+
+                                                                str := tc.name + ' has killed ' + tc1.name + '.';
+                                                        end else begin
+                                                                str := tc1.Name + ' is not online.';
+                                                        end;
+                                                end else begin
+                                                        str := str2 + ' is not a valid character name.';
+                                                end;
+
+                                                w := Length(str) + 4;
+                                                WFIFOW (0, $009a);
+                                                WFIFOW (2, w);
+                                                WFIFOS (4, str, w - 4);
+                                                tc.socket.sendbuf(buf, w);
+
+                                                sl.Free;
+                                        end
+
+                                        else if (copy(str, 1, 5) = 'alive') then begin
+                                                tc.HP := tc.MAXHP;
+                                                tc.SP := tc.MAXSP;
+                                                tc.Sit := 3;
+                                                SendCStat1(tc, 0, 5, tc.HP);
+                                                SendCStat1(tc, 0, 7, tc.SP);
+                                                WFIFOW( 0, $0148);
+                                                WFIFOL( 2, tc.ID);
+                                                WFIFOW( 6, 100);
+                                                SendBCmd(tm, tc.Point, 8);
+                                        end
+
+                                        else if (copy(str, 1, 4) = 'kami') or (copy(str, 1, 5) = 'kamib') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if sl.count < 2 then continue;
+
+                                                str2 := '';
+                                                for i := 1 to (sl.Count - 1) do begin
+                                                        str2 := str2 + ' ' + sl.Strings[i];
+                                                end;
+                                                str2 := Trim(str2);
+
+                                                if (length(sl.Strings[0])) = 5 then begin
+                                                        str2 := 'blue' + str2;
+                                                end;
+
+                                                w := Length(str2) + 4;
+                                                WFIFOW (0, $009a);
+                                                WFIFOW (2, w);
+                                                WFIFOS (4, str2, w - 4);
+
+                                                for i := 0 to charaname.count - 1 do begin
+                                                        tc1 := charaname.objects[i] as tchara;
+                                                        if (tc1.login = 2) then begin
+                                                                tc1.socket.sendbuf(buf, w);
+                                                        end;
+                                                end;
+
+                                                sl.free;
+                                        end
+
                                         else begin
                                         end;
-                                                                                
                                 end else
                                 // Athena GM Commands Port - To Shut Them Up. Courtesy of AlexKreuz.
 
