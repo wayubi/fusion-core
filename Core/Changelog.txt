@@ -1,3 +1,4 @@
+- 03-18-04: Fixed Bug 650, range check error in damagecalc1. [Darkhelmet]
 - 03-17-04: A little more object abstraction. [Colus]
 - 03-17-04: Reactivated peco/falcon/overweight icons without lag. [Colus]
 - 03-17-04: Standardized all status update calls. [Colus]

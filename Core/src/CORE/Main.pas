@@ -1979,7 +1979,7 @@ begin
 			dmg[0] := dmg[0] * DAFix div 100 * 2;
 			dmg[4] := 2;
 			dmg[5] := 8;
-                end else if tatk then begin
+                end else if (tatk) and (tc.Skill[263].Lv > 0) then begin
                         dmg[0] := dmg[0] * (tc.Skill[263].Data.Data2[Skill[263].Lv] div 100);
 			dmg[4] := 3;
 			dmg[5] := 8;
