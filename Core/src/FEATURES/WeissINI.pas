@@ -121,6 +121,7 @@ uses
         will be useful to Devs in Core/DB/Scripts, and people modifying both
         Database and Script files for testing.}
         ini.WriteString('Debug', 'ShowDebugErrors', BoolToStr(ShowDebugErrors));
+        ini.WriteString('Debug', 'TestPacketDB', BoolToStr(ShowDebugErrors));
 
         //ini.WriteString('Toys', 'MapUnloadTime', IntToStr(MapUnloadTime));
 

@@ -17,7 +17,7 @@ uses
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
-        PacketProcesses, ISCS, WAC,
+        PacketProcesses, ISCS, WAC, Game2,
     {3rd Party Units}
     	List32, Zip, WSocket;
 
@@ -773,6 +773,9 @@ begin
 	end;
 	if sl.IndexOfName('DefaultMap') > -1 then begin
 		DefaultMap := sl.Values['DefaultMap'];
+        //Remove the extension if there is one,
+        //causes new player login crash if there is an extension. [Tsusai]
+        if AnsiPos('.', DefaultMap) <> 0 then ChangeFileExt(DefaultMap, '');
 	end else begin
 		DefaultMap := 'new_1-1';
 	end;
@@ -1186,6 +1189,12 @@ begin
 		ShowDebugErrors := StrToBool(SL.Values['ShowDebugErrors']);
 	end else begin
 		ShowDebugErrors := False;
+	end;
+
+    if SL.IndexOfName('TestPacketDB') <> -1 then begin
+		TestPacketDB := StrToBool(SL.Values['TestPacketDB']);
+	end else begin
+		TestPacketDB := False;
 	end;
 
 
@@ -1843,7 +1852,8 @@ procedure TfrmMain.sv3ClientRead(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
         try
-	        sv3PacketProcess(Socket);
+	        if TestPacketDB then NEWsv3PacketProcess(Socket)
+            else sv3PacketProcess(Socket);
         except
                 exit;
         end;

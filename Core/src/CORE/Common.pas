@@ -1646,7 +1646,8 @@ var
 	DebugOut      :TMemo;
 
 	ShowDebugErrors : Boolean;
-	{ChrstphrR - added 2004/05/09 for Debug messages for Script validation}
+    {ChrstphrR - added 2004/05/09 for Debug messages for Script validation}
+    TestPacketDB : Boolean;
 
 
 	//exp_db
