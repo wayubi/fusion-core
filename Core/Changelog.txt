@@ -40,8 +40,8 @@ Fusion 1.2.0.8 - December 25th, 2003
 - 12-16-03: Fixed Monk's Falling Pearl Petals (bug #94) [Colus]
 - 12-16-03: Fixed ItemDropDenominator variable type -> integer (bug #69) [Colus]
 --------------------------------------------------------------------------------
--Added: Whistle. [Unknown]
--Added: Apple of Idun-Bard. [Unknown]
+-Added: Whistle. [Darkhelemt]
+-Added: Apple of Idun-Bard. [Darkhelmet]
 -Added: Deluge, Valcano, Viloentgale. [Darkhelmet]
 -Added: Icons 50 % and 90 % weight,Peko, Falcon. [Darkhelmet]
 -Added: Extremity fist graphics. [Unknown]
