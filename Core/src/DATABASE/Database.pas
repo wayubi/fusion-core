@@ -1797,7 +1797,7 @@ begin
 		CloseFile(txt);
 	end else begin}
     ServerFlag.Clear;
-    if FileExists(AppPath + 'status.txt') or FileExists(AppPath + 'gamedata\servervariables.txt') then begin
+    if FileExists(AppPath + 'status.txt') or FileExists(AppPath + 'servervariables.txt') then begin
 		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Variables loading...');
         Application.ProcessMessages;
         if FileExists(AppPath + 'status.txt') then begin
@@ -1821,12 +1821,12 @@ begin
             DeleteFile(AppPath + 'status.txt');
 
         end;
-        if FileExists(AppPath + 'gamedata\servervariables.txt') then begin
+        if FileExists(AppPath + 'servervariables.txt') then begin
             svarfile := TStringList.Create;
             svarfile.QuoteChar := '"';
         	svarfile.Delimiter := ',';
             svarfile.Clear;
-            svarfile.LoadFromFile(AppPath + 'gamedata\servervariables.txt');
+            svarfile.LoadFromFile(AppPath + 'servervariables.txt');
             for i := 0 to (svarfile.Count -1) do
                 ServerFlag.Add('\' + svarfile.Strings[i]);
 
@@ -1873,7 +1873,7 @@ begin
             end;
         end;
     end;
-    deletefile(AppPath + 'gamedata\servervariables.txt');
+    deletefile(AppPath + 'servervariables.txt');
     datafile.SaveToFile(AppPath + 'gamedata\servervariables.txt');
 
     FreeAndNil(datafile);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-10-04: Changed servervars save path. [Tsusai]
 - 12-10-04: Commented out debug lines from last addon. [Tsusai]
 - 12-10-04: Recoded server variable saving and loading. [Tsusai]
 - 12-10-04: Disabled call_mercenary gm command. Includes way too many bugs. [AlexKreuz]
