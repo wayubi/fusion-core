@@ -161,12 +161,13 @@ var
     function command_charjlevel(tc : TChara; str : String) : String;
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
-    //Athena Calls
+
+    function command_athena_die(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
     function command_athena_lvup(tc : TChara; str : String) : String;
-    function command_athena_die(tc : TChara) : String;
+
 implementation
 
     procedure load_commands();
@@ -450,11 +451,11 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
         end else if gmstyle = '@' then begin
-            if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
+			if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
+            else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
             else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
-            else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2286,8 +2287,9 @@ Called when we're shutting down the server *only*
       var
         tm : TMap;
       begin
+		Result := 'GM_ATHENA_DIE Success.';
+
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        Result := 'GM_DIE_ATHENA Activated';
         tc.Sit := 1;
         tc.HP := 0;
         SendCStat1(tc, 0, 5, tc.HP);
@@ -2304,13 +2306,15 @@ Called when we're shutting down the server *only*
 	    J    : Integer;
 	    Len  : Integer;
     begin
+    	Result := 'GM_ATHENA_HELP Failure.';
+
 	    Help := TStringList.Create;
 	    try
 		    try
 			    Help.LoadFromFile( AppPath + 'help.txt' );
 		    except
 			    on EFOpenError do begin
-				    Result := 'No help file found.';
+				    Result := Result + ' No help file found.';
 			    end;
 		    end;//try-except
 
@@ -2321,12 +2325,13 @@ Called when we're shutting down the server *only*
                 // Broadcast style MOTD - 4 lines max, 195 char each
 				repeat
 					Len := Length(Help[J]);
-					if Len > 195 then
-						Help[J] := Copy(Help[J],1,195);
+					if Len > 195 then Help[J] := Copy(Help[J],1,195);
 					WFIFOW(0, $009a);
 					WFIFOS(4, Help[J], Len+1);//Len+1 -> adds null termination
 					Inc(J);
 					tc.Socket.SendBuf(buf, 200);
+
+                    Result := 'GM_ATHENA_HELP Success.';
 				until (J >= Idx);
 		    end;//if
 	    finally
