@@ -16163,11 +16163,11 @@ begin
                     MobDBName.Clear;
                     SummonMobList.Clear;
                     SummonMobListMVP.Clear;
-                    SummonIOBList.Clear;
-                    SummonIOVList.Clear;
-                    SummonICAList.Clear;
-                    SummonIGBList.Clear;
-                    SummonIOWBList.Clear;
+                    SummonIOBList.Clear;//Safe 2004/04/26
+                    SummonIOVList.Clear;//Safe 2004/04/26
+                    SummonICAList.Clear;//Safe 2004/04/26
+                    SummonIGBList.Clear;//Safe 2004/04/26
+                    SummonIOWBList.Clear;//Safe 2004/04/26
                     PetDB.Clear;
                     MapInfo.Clear;
                     SkillDB.Clear;
@@ -16775,6 +16775,7 @@ end;
 // 2) Knock monster away (ddir, bb[] 0
 // 3) Knock self forward (Ashura), ddir, bb[]0
 //    has to be tv is ts, so get dir, then orig is tc.point and you act on it
+{ChrstphrR 2004/04/28 - no memory leaks.}
 procedure TfrmMain.KnockBackLiving(tm:TMap; tc:TChara; tv:TLiving; dist:byte; ktype: byte = 0);
 var
   bb: array of byte;
@@ -16793,7 +16794,7 @@ begin
       bb[i] := 4;
     end;
   end else begin
-//    if (ktype and 2 = 0) then begin
+	//if (ktype and 2 = 0) then begin
       dx := tv.Point.X - tc.Point.X;
       dy := tv.Point.Y - tc.Point.Y;
       if abs(dx) > abs(dy) * 3 then begin
@@ -16828,12 +16829,10 @@ begin
   if (xy.X div 8 <> tv.Point.X div 8) or (xy.Y div 8 <> tv.Point.Y div 8) then begin
     if (tv is TChara) then begin
       with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
-        assert(IndexOf(tv.ID) <> -1, 'Player Delete Error');
+				Assert(IndexOf(tv.ID) <> -1, 'Player Delete Error');
         Delete(IndexOf(tv.ID));
       end;
       tm.Block[tv.Point.X div 8][tv.Point.Y div 8].Clist.AddObject(tv.ID, tv);
-
-
 
       //if (tv.pcnt <> 0) then begin DebugOut.Lines.Add('Move');
         tv.pcnt := 0;
@@ -16850,7 +16849,7 @@ begin
 
     end else if (tv is TMob) then begin
       with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-        assert(IndexOf(tv.ID) <> -1, 'Mob Delete Error');
+				Assert(IndexOf(tv.ID) <> -1, 'Mob Delete Error');
         Delete(IndexOf(tv.ID));
       end;
       tm.Block[tv.Point.X div 8][tv.Point.Y div 8].Mob.AddObject(tv.ID, tv);
@@ -16872,7 +16871,7 @@ begin
     //UpdateLivingLocation(tm, tv);
 
   end;
-end;
+end;//TfrmMain.KnockBackLiving
 
 
 end.
