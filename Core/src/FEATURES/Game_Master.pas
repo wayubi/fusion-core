@@ -917,6 +917,7 @@ Called when we're shutting down the server *only*
                         WFIFOW(2, 0);
                         tc.Socket.SendBuf(buf, 4);
                     end else if tc.Item[j].Equip <> 0 then begin
+                    	reset_skill_effects(tc);
                         WFIFOW(0, $00ac);
                         WFIFOW(2, j);
                         WFIFOW(4, tc.Item[j].Equip);
@@ -1606,6 +1607,7 @@ Called when we're shutting down the server *only*
                 if (ID <> 0) AND (Amount <> 0) AND Data.IEquip AND (Equip <> 0) then begin
 
                     tc.Item[i].Refine := Byte(j);
+                    reset_skill_effects(tc);
                     WFIFOW(0, $00ac);
                     WFIFOW(2, i);
                     WFIFOW(4, tc.Item[i].Equip);

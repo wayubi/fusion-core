@@ -39,7 +39,7 @@ uses
 	{Delphi VCL Units}
 	Windows, Classes,
 	{Fusion Units}
-	Common, Skill_Constants, Player_Skills,
+	Common, Skill_Constants, Player_Skills, Globals,
 	{3rd Party Units}
 	List32;
 
@@ -4307,6 +4307,7 @@ Begin
 									WFIFOW(2, 0);
 									tc1.Socket.SendBuf(buf, 4);
 									end else begin
+                                    reset_skill_effects(tc);
 									WFIFOW(0, $00ac);
 									WFIFOW(2, i);
 									WFIFOW(4, tc1.Item[i].Equip);
@@ -4336,6 +4337,7 @@ Begin
 								WFIFOW(2, 0);
 								tc1.Socket.SendBuf(buf, 4);
 								end else begin
+                                reset_skill_effects(tc);
 								WFIFOW(0, $00ac);
 								WFIFOW(2, i);
 								WFIFOW(4, tc1.Item[i].Equip);
@@ -4363,6 +4365,7 @@ Begin
 							WFIFOW(2, 0);
 							tc1.Socket.SendBuf(buf, 4);
 																end else begin
+                            reset_skill_effects(tc);
 							WFIFOW(0, $00ac);
 							WFIFOW(2, i);
 							WFIFOW(4, tc1.Item[i].Equip);
@@ -4390,6 +4393,7 @@ Begin
 								WFIFOW(2, 0);
 								tc1.Socket.SendBuf(buf, 4);
 								end else begin
+                                reset_skill_effects(tc);
 								WFIFOW(0, $00ac);
 								WFIFOW(2, i);
 																	WFIFOW(4, tc1.Item[i].Equip);

@@ -1583,6 +1583,7 @@ end;
 						end;
 					end;
 					if w = 0 then begin //When both 'buried' RHS is removed
+                    	reset_skill_effects(tc);
 						WFIFOW(0, $00ac);//Remove Equipment
 						WFIFOW(2, j);
 						WFIFOW(4, tc.Item[j].Equip);
@@ -1616,6 +1617,7 @@ end;
 						end;
 					end;
 					if w = 0 then begin //両方埋まってるときは右側あるいはカタールをはずす
+                    	reset_skill_effects(tc);
 						WFIFOW(0, $00ac);
 						WFIFOW(2, j);
 						WFIFOW(4, tc.Item[j].Equip);
@@ -1730,6 +1732,7 @@ end;
 						if (tc.Item[i].ID <> 0) and (tc.Item[i].Data.IEquip or (tc.Item[i].Data.IType = 10)) then begin
 							if (tc.Item[i].Equip and tc.Item[w1].Data.Loc) <> 0 then begin
 								//装備箇所重複により装備解除
+                                reset_skill_effects(tc);
 								WFIFOW(0, $00ac);
 								WFIFOW(2, i);
 								WFIFOW(4, tc.Item[i].Equip);
@@ -1786,6 +1789,7 @@ end;
 
                                 // Tumy
 				end else begin
+                				reset_skill_effects(tc);
                                WFIFOW(0, $00ac);
                                WFIFOW(2, w);
                                WFIFOW(4, tc.Item[w].Equip);

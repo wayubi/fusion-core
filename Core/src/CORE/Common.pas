@@ -1843,7 +1843,7 @@ Option_Font_Style : string;
 
 implementation
 
-uses SQLData, FusionSQL, Player_Skills;
+uses SQLData, FusionSQL, Player_Skills, Globals;
 
 procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0);
 begin
@@ -3327,12 +3327,7 @@ begin
 
   if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
 
-  for i := 1 to MAX_SKILL_NUMBER do begin
-  	if tc.Skill[i].Tick >= Tick then begin
-    	tc.Skill[i].Tick := 0;
-        tc.SkillTick := 0;
-    end;
-  end;
+  reset_skill_effects(tc);
 
   { Alex: not needed since we're doing a full check for all buffs now. }
   {if (tc.Option and 2 <> 0) then begin

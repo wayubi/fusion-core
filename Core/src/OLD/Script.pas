@@ -5,7 +5,7 @@ unit Script;
 interface
 
 uses
-	Windows, Types, SysUtils, Common, MMSystem, Classes;
+	Windows, Types, SysUtils, Common, MMSystem, Classes, Globals;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -341,6 +341,7 @@ begin
 						if j > tc.Item[k].Amount then j := tc.Item[k].Amount;
 						//ëïîıíÜÇ»ÇÁëïîıâèú
 						if tc.Item[k].Equip <> 0 then begin
+                        	reset_skill_effects(tc);
 							WFIFOW(0, $00ac);
 							WFIFOW(2, k);
 							WFIFOW(4, tc.Item[k].Equip);
@@ -463,6 +464,7 @@ begin
 					        end else
                                                 if tc.Item[i].Equip <> 0 then
                                                 begin
+                            		reset_skill_effects(tc);
 					                WFIFOW(0, $00ac);
 					                WFIFOW(2, i);
 					                WFIFOW(4, tc.Item[i].Equip);
@@ -740,6 +742,7 @@ begin
 							if (tc.Item[i].ID <> 0) and (tc.Item[i].Amount <> 0) and tc.Item[i].Data.IEquip and
 								 ((tc.Item[i].Equip and l) = l) and (tc.Item[i].Refine < 10) then begin
 								//ëïîıâèú
+                                reset_skill_effects(tc);
 								WFIFOW(0, $00ac);
 								WFIFOW(2, i);
 								WFIFOW(4, tc.Item[i].Equip);
@@ -1616,6 +1619,7 @@ begin
               WFIFOW(2, 0);
               tc.Socket.SendBuf(buf, 4);
             end else if tc.Item[j].Equip <> 0 then begin
+            	reset_skill_effects(tc);
               WFIFOW(0, $00ac);
               WFIFOW(2, j);
               WFIFOW(4, tc.Item[j].Equip);

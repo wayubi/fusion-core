@@ -9,6 +9,8 @@ uses
 
     function check_attack_lag(tc : TChara) : Boolean;
 
+    procedure reset_skill_effects(tc : TChara);
+
     procedure message_green(tc : TChara; str : String);
     procedure message_yellow(tc : TChara; str : String);
     procedure message_blue(tc : TChara; str : String);
@@ -28,6 +30,18 @@ uses
             Result := True;
             message_green(tc, 'You are being attacked. Please try again in 10 seconds.');
         end else
+    end;
+
+    procedure reset_skill_effects(tc : TChara);
+    var
+    	i : Integer;
+    begin
+    	for i := 1 to MAX_SKILL_NUMBER do begin
+        	if tc.Skill[i].Tick >= timeGetTime() then begin
+            	tc.Skill[i].Tick := 0;
+                tc.SkillTick := 0;
+            end;
+        end;
     end;
 
     procedure message_green(tc : TChara; str : String);
