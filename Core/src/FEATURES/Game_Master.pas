@@ -177,6 +177,7 @@ var
     function command_athena_jobchange(tc : TChara; str : String) : String;
     function command_athena_hide(tc : TChara) : String;
     function command_athena_option(tc : TChara; str : String) : String;
+    function command_athena_storage(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -488,6 +489,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc.ID, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
             else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc.ID, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
             else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
+            else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc.ID, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2709,6 +2711,12 @@ Called when we're shutting down the server *only*
         tc.socket.sendbuf(buf, w);
 
         sl.Free;
+    end;
+
+    function command_athena_storage(tc : TChara) : String;
+    begin
+        Result := 'GM_ATHENA_STORAGE activated.';
+        SendCStoreList(tc);
     end;
       
     function command_athena_help(tc : TChara) : String;
