@@ -1,4 +1,7 @@
 Fusion 1.2.0.8 - December ????, 2003
+
+- 12-19-03: Added Wedding and Super novice data to job db 1-[Oatmeal12345]
+- 12-19-03: Fixed Extremity Fist Calculation, max sp helps do more damage- [Oatmeal12345]
 - 12-19-03: Guild Wars Emperium took splash damage without Approval. (#79) [AlexKreuz]
 - 12-19-03: Fixed Guild Positions. Correct Members change titles now. [AlexKreuz]
 - 12-19-03: Fixed Skill Timer doesn't reset upon second use bug (#60). [AlexKreuz]
