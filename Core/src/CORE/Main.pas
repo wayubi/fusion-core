@@ -558,10 +558,21 @@ begin
                         Option_AutoBackup := 0;
                 end;
 	if sl.IndexOfName('Option_WelcomeMsg') > -1 then begin
-                        Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
-                end else begin
-                        Option_WelcomeMsg := True;
-                end;
+		Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
+	end else begin
+		Option_WelcomeMsg := True;
+	end;
+
+	Option_MOTD := StrToBoolDef(SL.Values['Option_MOTD'], False);
+	if Option_MOTD then begin
+		Option_MOTD_File := SL.Values['Option_MOTD_File'];
+		if NOT FileExists( AppPath + Option_MOTD_File ) then begin
+			//Turn off MOTD option.
+			Option_MOTD_File := '';
+			Option_MOTD := False;
+		end;
+	end;
+
 	if sl.IndexOfName('Option_GraceTime') > -1 then begin
                         Option_GraceTime := StrToInt(sl.Values['Option_GraceTime']);
                 end else begin
@@ -908,13 +919,15 @@ begin
 	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
 	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
 	ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
+	ini.WriteString('Fusion', 'Option_MOTD', BoolToStr(Option_MOTD));
+	ini.WriteString('Fusion', 'Option_MOTD_File', Option_MOTD_File);
 	ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
 	ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
 	ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
 	ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
 	ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
 	ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
-    ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
+	ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
 	// Fusion INI Lines
 
 	// MySQL Server Lines

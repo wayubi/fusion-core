@@ -1104,8 +1104,8 @@ public
 	MinLV       : Word;//Lowest level in party (of whom are online)
 	MaxLV       : Word;//Highest level in party (of whom are online)
 
-	EXP         : Cardinal; //Used for EXP distribution to members
-	JEXP        : Cardinal; //" " " " " "
+	EXP         : Cardinal; //Used for EXP distribution to members after a kill
+	JEXP        : Cardinal; // ditto, for JEXP
 	PartyBard   : array[0..2] of TChara; {Tracks Who the Party's Bard is}
 	PartyDancer : array[0..2] of TChara; {Tracks Who the Party's Dancer is}
 
@@ -1650,6 +1650,8 @@ Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_AutoBackup   :word;
 Option_WelcomeMsg :boolean;
+Option_MOTD       : Boolean;
+Option_MOTD_File  : string;
 Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
@@ -1860,6 +1862,7 @@ Option_Font_Style : string;
 {ギルド機能追加ココまで}
 //==============================================================================
 
+	Procedure SendMOTD( NewChara : TChara );
 
 
 
@@ -8010,10 +8013,10 @@ Begin
 					if WarpDebugFlag then begin
 						tn.JID := 1002;
 					end else begin
-						if SL[1] = 'warp' then
-							tn.JID := 45
-						else
-							tn.JID := 139;
+						case SL[1][1] of //First letter of 'warp'/'hiddenwarp'
+						'h' : tn.JID := 139;
+						'w' : tn.JID := 45;
+						end;
 					end;
 					tn.Map     := MapName;
 					tn.Point.X := StrToInt(SL1[1]);
@@ -9479,7 +9482,7 @@ Begin
 							end;
 							tn.ScriptLabel := LowerCase(SL1[0]);
 						end else if Copy(str,1,2) <> '//' then begin
-							{ChrstphrR 2004/05/05 - We're silenting ignoring comments
+							{ChrstphrR 2004/05/05 - We're silently ignoring comments
 							-- if we're in here, there was an invalid command.}
 							ScriptErr(SCRIPT_NONCMD_ERR, [ScriptPath, Lines, Str]);
 							Exit; // safe 2004/05/05
@@ -10213,6 +10216,8 @@ begin
 		Item[i].Free;
 	inherited;
 end;
+
+
 {追加ここまで}
 constructor TChara.Create;
 var
@@ -10226,8 +10231,23 @@ begin
 		Item[i] := TItem.Create;
 	Cart := TItemList.Create;
 	Flag := TStringList.Create;
-
 end;
+
+
+destructor TChara.Destroy;
+var
+	i :integer;
+begin
+	for i := 0 to MAX_SKILL_NUMBER do
+		Skill[i].Free;
+	for i := 1 to 100 do
+		Item[i].Free;
+	Cart.Free;
+	Flag.Free;
+
+	inherited;
+end;
+
 
 {チャットルーム機能追加}
 constructor TChatRoom.Create;
@@ -10236,6 +10256,7 @@ begin
 
 	KickList := TIntList32.Create;
 end;
+
 
 destructor TChatRoom.Destroy;
 begin
@@ -10277,20 +10298,6 @@ Begin
 	inherited;
 End;(* TeNPC.Destroy
 *-----------------------------------------------------------------------------*)
-
-
-destructor TChara.Destroy;
-var
-	i :integer;
-begin
-	for i := 0 to MAX_SKILL_NUMBER do
-		Skill[i].Free;
-	for i := 1 to 100 do
-		Item[i].Free;
-	Cart.Free;
-	Flag.Free;
-	inherited;
-end;
 
 
 constructor TPlayer.Create;
@@ -10588,6 +10595,68 @@ Begin
 		fName := Value;
 	{end;//if-else UseSQL}
 End;(* Proc TParty.SetName()
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+SendMOTD()
+
+Sends an MOTD (Message of the Day) to a newly joined user.
+Fills requirements for Feature Request #445 on the bugtracker.
+
+N.B. - To prevent massive floods of data, this routine will only send
+a maximum of 5 lines, each of max-length 195 bytes
+
+N.B. - Trickiness - a Broadcast packet won't send more than one message
+unless the packet length is a fixed 200 bytes in size, AND the string
+MUST be null-terminated. 4b header + 195b string + 1b null = 200 max size.
+
+CalledBy:
+	sv3PacketProcess ( in the 0072 branch of the cmd case statement )
+
+Pre:
+	NewChara must be a valid, non-nil Character
+	Option_MOTD already checked and is True
+	Option_MOTD_File exists.
+Post:
+	Server sends the lines from the MOTD file to the newly joined user.
+*-----------------------------------------------------------------------------*)
+Procedure SendMOTD(
+		NewChara : TChara
+	);
+Var
+	MOTD : TStringList;
+	Idx  : Integer;
+	J    : Integer;
+	Len  : Integer;
+Begin
+	//Double check preconditions with asserts...
+	Assert(NewChara <> NIL,'SendMOTD Error: NewChara is NIL.');
+	//--
+	MOTD := TStringList.Create;
+	try
+		MOTD.LoadFromFile( AppPath + Option_MOTD_File );
+		if MOTD.Count > 0 then begin
+			Idx := MOTD.Count;
+			if Idx > 4 then
+				Idx := 4;
+			J := 0;
+			WFIFOS(4, '', 200);//pre-wipe the buffer used.
+			repeat
+				Len := Length(MOTD[J]);
+				if Len > 195 then
+					MOTD[J] := Copy(MOTD[J],1,195);
+				WFIFOW(0, $009a);
+				WFIFOS(4, MOTD[J], Len+1);//Len+1 -> adds null termination
+				Inc(J);
+				NewChara.Socket.SendBuf(buf, 200);
+			until (J >= Idx);
+		end;//if
+	finally
+		MOTD.Free;
+	end;
+
+End;(* Proc SendMOTD()
 *-----------------------------------------------------------------------------*)
 
 

@@ -232,22 +232,28 @@ Begin(* Proc sv3PacketProcess() *)
 							SendGLoginInfo(tg, tc);
 						end;
 
-            //CRW -- Broadcasts Welcome Message to all Users.
-            if (Option_WelcomeMsg) then begin
-              str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
-              //CRW -- why is "w" 200 -- should it not be SizeOf(str2) ??
-              w := 200;
-              WFIFOW(0, $009a);
-              WFIFOW(2, w);
-              WFIFOS(4, str2, w-4);
-              for i := 0 to CharaName.Count - 1 do begin
-				        tc1 := CharaName.Objects[i] as TChara;
-				        if tc1.Login = 2 then begin
-                  tc1.Socket.SendBuf(buf, w);
-                end;
-              end;
-              tc.Socket.SendBuf(buf, w);
-            end;//if (Option.WelcomeMsg)
+					//CRW -- Broadcasts Welcome Message to all Users.
+					if (Option_WelcomeMsg) then begin
+						str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
+						//CRW -- why is "w" 200 -- should it not be SizeOf(str2) ??
+						w := 200;
+						WFIFOW(0, $009a);
+						WFIFOW(2, w);
+						WFIFOS(4, str2, w-4);
+						for i := 0 to CharaName.Count - 1 do begin
+							tc1 := CharaName.Objects[i] as TChara;
+							if tc1.Login = 2 then begin
+								tc1.Socket.SendBuf(buf, w);
+							end;
+						end;
+						tc.Socket.SendBuf(buf, w);
+					end;//if (Option.WelcomeMsg)
+
+					if (Option_MOTD) then begin
+						//Read each line of the MOTD, send all but blank lines.
+						//Only sent to the character joining.
+						SendMOTD(tc);
+					end;//if (Option_MOTD)
 
 {ギルド機能追加ココまで}
 					end else begin
