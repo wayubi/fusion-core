@@ -1238,7 +1238,6 @@ begin
 
     destroy_wac(True);
 	save_commands();
-    weiss_ini_save();
 
 	if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
 		repeat
@@ -1261,6 +1260,8 @@ begin
 		FormWidth := Width;
 		FormHeight := Height;
 	end;
+
+    weiss_ini_save();
 
 	if UseSQL then
 		SQLDataSave
@@ -10629,7 +10630,7 @@ var
 label ExitParse;
 begin
 
-        if ISCS_ON then begin
+        if (Combo_ISCS.ItemIndex = 1) and (ISCS_ON) then begin
             iscs_console_send(Edit1.Text);
         end else
 
@@ -11522,6 +11523,7 @@ begin
         Option_Enable_ISCS := True;
         iscs_console_connect();
         debugout.Lines.Add('- Inter-Server Communication System Activated -');
+        Combo_ISCS.ItemIndex := 1;
     end
 
     else begin
@@ -11529,6 +11531,7 @@ begin
         Option_Enable_ISCS := False;
         iscs_console_disconnect();
         debugout.Lines.Add('- Inter-Server Communication System Deactivated -');
+        Combo_ISCS.ItemIndex := 0;
     end;
 end;
 

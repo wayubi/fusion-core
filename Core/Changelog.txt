@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-06-04: ISCS send option updated. [AlexKreuz]
 - 11-06-04: Updated Account JCon page. [AlexKreuz]
 - 11-06-04: Preparing Fusion 1.213 layout and format. [AlexKreuz]
 - 11-06-04: Added NPC command "areabroadcast". [Tsusai]
