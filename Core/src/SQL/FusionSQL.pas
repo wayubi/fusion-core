@@ -783,12 +783,17 @@ end;
 function Create_Account(username: String; userpass: String; sex: integer) : Boolean;
 var
     query : string;
+    i : integer;
 begin
     query := 'select * from accounts where ID = '''+username+'''';
     if MySQL_Query(query) then begin
         if sqldataset.RecordCount = 0 then begin
-            query := 'insert into accounts values ('''', '''+username+''', '''+userpass+''', '''+inttostr(sex)+''', ''-@-'', '''', '''')';
+            query := 'select * from accounts';
+            if MySQL_Query(query) then begin
+                i := 100100 + sqldataset.RecordCount;
+                query := 'insert into accounts values ('''+inttostr(i)+''', '''+username+''', '''+userpass+''', '''+inttostr(sex)+''', ''-@-'', '''', '''')';
             MySQL_Query(query);
+            end;
         end;
     end;
 end;
