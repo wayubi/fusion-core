@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-16-04: Fixed weapon requirements/error displays for some skills [Colus]
+- 01-16-04: Updated error return values [Colus]
+- 01-16-04: New SendSkillError function (supercedes SendItemError) [Colus]
+- 01-16-04: SendItemError updated [Colus]
+- 01-16-04: Fixed flywings/teleport/warp portals while dead/hidden [Colus]
 - 01-16-04: Update to Battle Command procedure fix [Colus]
 - 01-16-04: Corrections in recovery item use packet [Colus]
 - 01-16-04: Correction in recovery item formula for Learning Potion bonus [Colus]
