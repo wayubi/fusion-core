@@ -8252,19 +8252,26 @@ begin
 
 				28:     {Heal}
 					begin
-                                                if (tc1.Sit <> 1) then begin
-						        dmg[0] := ((BaseLV + Param[3]) div 8) * tl.Data1[MUseLV];
-						        tc1.HP := tc1.HP + dmg[0];
-					        	if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
-						        SendCStat1(tc1, 0, 5, tc1.HP);
-						        ProcessType := 0;
-						        tc.MTick := Tick + 1000;
-                                                end else begin
-                                                        MMode :=4;
-                                                        Exit;
-                                                end;
-					end;
-                                
+            if (tc1.Sit <> 1) then begin
+              dmg[0] := ((BaseLV + Param[3]) div 8) * tl.Data1[MUseLV];
+              if (tc1.ArmorElement mod 20 <> 9) then begin
+                tc1.HP := tc1.HP + dmg[0];
+                if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
+                SendCStat1(tc1, 0, 5, tc1.HP);
+                ProcessType := 0;
+              end else begin
+  							SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
+  							DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                exit;                
+              end;
+
+              tc.MTick := Tick + 1000;
+            end else begin
+              MMode :=4;
+              Exit;
+              end;
+          end;
+
 				29: // Agility Up
 					begin
 						ProcessType := 3;
@@ -11317,7 +11324,7 @@ begin
                 // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
                 //        20030127: No more heals while dead
                 if ((tc.Skill[70].Tick > Tick) and (tc.HPRTick + 1000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP) and (tc.Sit <> 1)) then begin
-
+                   if (tc.ArmorElement mod 20 <> 9) then begin
                         j := Skill[70].Effect1;
 
                         tc.HP := tc.HP + j;
@@ -11343,6 +11350,14 @@ begin
                         Socket.SendBuf(buf, 8);
                         HPRTick := Tick;
                         tc.InField := false;
+                  end else begin
+                    tm := tc.MData;
+                    j := Skill[70].Effect1;
+                    SendCSkillAtk2(tm, tc, tc, Tick, j, 1);
+                    DamageProcess2(tm, tc, tc, j, Tick);
+                    HPRTick := Tick;
+                    tc.InField := false;
+                  end;
                 end;
                       if ((tc.Skill[369].Tick > Tick) and (tc.HPRTick + 2000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP) and (tc.Sit <> 1)) then begin
 
@@ -12374,9 +12389,10 @@ begin
 								end;
 							end;}
 {追加:119}
-					       {//$84:
+					       { $84:
 							begin
 									//ダメージ算出
+                  if (tc2.ArmorElement mod 20 = 9) then begin
 									dmg[0] := tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1) * tn.CData.MATKFix div 100;
 									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
@@ -12398,7 +12414,8 @@ begin
 									WFIFOB(32, 8);
 									SendBCmd(tm, tn.Point, 33);
 									DamageProcess2(tm, tn.CData, tc2, dmg[0], Tick);
-							end;}
+                  end;
+							end;  }
 {追加:119ココまで}
 						$86: //LoV
 							begin
@@ -12727,30 +12744,14 @@ begin
             $46: //Sanctuary
               begin
                 // Colus, 20031229: Check is same as ME (no undead prop, demon race)
-                if ((ts1.Element mod 20 <> 9) and (ts1.Data.Race <> 6)) then begin
-                  //ダメージ算出
-                  dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
-
-                  tn.Tick := Tick;
-                  //ダメージパケ送信
-                  ts1.HP := ts1.HP + dmg[0];
-                  if ts1.HP > ts1.Data.HP then ts1.HP := ts1.Data.HP;
-
-                  WFIFOW( 0, $011a);
-                  WFIFOW( 2, tn.MSkill);
-                  WFIFOW( 4, dmg[0]);
-                  WFIFOL( 6, ts1.ID);
-                  WFIFOL(10, tn.ID);
-                  WFIFOB(14, 1);
-                  SendBCmd(tm, ts1.Point, 15);
-
-                end else begin
+                if (tn.Tick >= Tick) and (ts1.EffectTick[3] <= Tick) then begin
+								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) then begin
                   dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
 
                   if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
                   dmg[0] := dmg[0] div 2; // Half-heal damage for undead/demon
 
-                  tn.Tick := Tick; // TODO: Don't expire on one hit?
+                  ts1.EffectTick[3] := Tick + 1000;
                   WFIFOW( 0, $01de);
                   WFIFOW( 2, $46);
                   WFIFOL( 4, tn.ID);
@@ -12764,10 +12765,31 @@ begin
                   WFIFOB(32, 6);  // Changed from 5 (bolt spell) to 6 (1-hit)
                   SendBCmd(tm, tn.Point, 33);
                   DamageProcess1(tm, tc1, ts1, dmg[0], tick);
+                end else begin
+                //if ((ts1.Element mod 20 <> 9) and (ts1.Data.Race <> 6) and (ts1.EffectTick[3] <= Tick)) then begin
+                  //DebugOut.lines.add(format('et3 %d, tick %d',[ts1.EffectTick[3], Tick]));
+                  //ダメージ算出
+                  //dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
+                  i := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
+
+                  ts1.EffectTick[3] := Tick + 1000;
+                  //ダメージパケ送信
+                  ts1.HP := ts1.HP + i; //dmg[0];
+                  if ts1.HP > ts1.Data.HP then ts1.HP := ts1.Data.HP;
+
+                  WFIFOW( 0, $011a);
+                  WFIFOW( 2, 28); // Use heal
+                  WFIFOW( 4, i); //dmg[0]);
+                  WFIFOL( 6, ts1.ID);
+                  WFIFOL(10, tn.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, ts1.Point, 15);
+
+                end;
                 end;
               end;
 
-            
+
 
 
 {:119}
@@ -12847,7 +12869,7 @@ begin
 {追加:119}
 						$84: // Damage of Magnus Exorcism
 							begin
-								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) and (tn.Tick >= Tick) then begin
+								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) and (tn.Tick >= Tick) and (ts1.EffectTick[2] <= Tick) then begin
 									//ダメージ算出
 									dmg[0] := tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1) * tn.CData.MATKFix div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
@@ -12855,8 +12877,9 @@ begin
 									if dmg[0] < 1 then dmg[0] := 1;
 									dmg[0] := dmg[0] * tn.Count;
 									dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[79].Data.Element][ts1.Element] div 100;
+                  if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;                  
 									if dmg[0] < 0 then dmg[0] := 0;
-									//tn.Tick := Tick;       // TODO: Stop expiring ME tiles on 1 hit
+									ts1.EffectTick[2] := Tick + 3000;       // TODO: Stop expiring ME tiles on 1 hit
 									//ダメージパケ送信
 									WFIFOW( 0, $01de);
 									WFIFOW( 2, 79);

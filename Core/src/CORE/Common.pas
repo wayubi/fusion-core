@@ -295,7 +295,7 @@ type TMob = class
   nStat       :Cardinal;
 	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
 	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
-	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire currently)
+	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire, 2=ME, 3=Sanct currently)
 	isLooting   :boolean;
 	Item        :array[1..10] of TItem;
 	HP          :integer;
