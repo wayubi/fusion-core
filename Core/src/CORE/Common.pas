@@ -4362,7 +4362,7 @@ begin
 				if i < Data.CastTime3 then i := Data.CastTime3;
 			end;
 			i := i * tc.MCastTimeFix div 100;
-			if (i > 0) or (tc.ItemSkill = true) then begin
+			if (i > 0) or (tc.ItemSkill = true) or (tc.MSkill = 271) then begin
 				//ârè•äJén
 				WFIFOW( 0, $013e);
 				WFIFOL( 2, tc.ID);

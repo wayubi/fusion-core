@@ -6361,8 +6361,10 @@ begin
 
                                 271:    {Extremity Fist}
                                 begin
+
                                         if tc.Skill[270].Tick > Tick then begin
-                                                if tc.spiritSpheres = 5 then begin
+                                                if (tc.Skill[271].Data.SType = 1) then begin
+                                                  if tc.spiritSpheres = 5 then begin
                                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
                                                         dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
@@ -6402,6 +6404,57 @@ begin
                                                         tc.SkillTickID := 270;
                                                         tc.SP := 0;
                                                         SendCStat(tc);
+                                                  end;
+                                                end else begin
+                                                  if tc.spiritSpheres >= 4 then begin
+                           ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                        if ts = nil then Exit;
+                                        ts.IsEmperium := False;
+                                        tc.AData := ts;
+                                        PassiveAttack := False;
+                                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                                        spbonus := tc.SP;
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] + j;
+                                                        if dmg[0] < 0 then begin
+                                                                dmg[0] := 0;
+                                                                //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                                                        end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        UpdatePlayerLocation(tm, tc);
+
+                                                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.spiritSpheres := 0;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
+                                                        tc.SP := 0;
+                                                        SendCStat(tc);
+                                                        tc.Skill[271].Data.SType := 1;
+                                                        tc.Skill[271].Data.CastTime1 := 4500;
+                                                        SendCSkillList(tc);
+                                                  end;
                                                 end;
                                         end;
                                 end;
@@ -6430,6 +6483,7 @@ begin
 
                                 end;
                                     273:  //Combo finsher
+                                    begin
                                 if tc.spiritSpheres >= 1 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                         if ts = nil then Exit;
@@ -6451,7 +6505,12 @@ begin
                                         UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                         StatCalc1(tc, ts, Tick);
                                         tc.MTick := Tick + 500;
-
+                                        if (tc.Skill[270].Tick >= Tick) then begin
+                                          tc.Skill[271].Data.SType := 4;
+                                          tc.Skill[271].Data.CastTime1 := 1;
+                                          SendCSkillList(tc);
+                                        end;
+                                end;
                                 end;
                                     371:  //Tiger Crush
                                  if tc.spiritSpheres >= 1 then begin
@@ -8209,7 +8268,7 @@ begin
                                                 tc.MTargetType := 0;
                                                 SkillEffect(tc, Tick);
                                         end;
-                                  
+
                                     
                                 255:  //Devotion
 					begin
@@ -8305,6 +8364,111 @@ begin
                                                         Exit;
                                                 end;
 
+                                        end;
+                                        271: // COLUS NEW ASHURA
+                                        begin
+                                              ts := tc.AData;
+                                              if (ts is TMob) then begin
+                                              PassiveAttack := True;
+                                                        tc.MTargetType := 0;
+                                                        SkillEffect(tc, Tick);
+                                                        exit;
+                                              end;
+                                              tc1 := tc.AData;
+                                                if tc.Skill[270].Tick > Tick then begin
+                                                  if (tc.Skill[271].Data.SType = 4) then begin
+                                                        processtype := 255;
+                                                        if tc.spiritSpheres >= 4 then begin
+
+                                                        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                                        spbonus := tc.SP;
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] + j;
+                                                        if dmg[0] < 0 then begin
+                                                                dmg[0] := 0;
+                                                                //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                                                        end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        UpdatePlayerLocation(tm, tc);
+
+                                                        SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
+                                                        DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.spiritSpheres := 0;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
+                                                        tc.SP := 0;
+                                                        SendCStat(tc);
+                                                        tc.Skill[271].Data.SType := 1;
+                                                        tc.Skill[271].Data.CastTime1 := 4500;
+                                                        SendCSkillList(tc);
+
+                                                  end;
+                                                end else if (tc.Skill[271].Data.SType = 1) then begin
+                                                       processtype := 255;
+                                                        if tc.spiritSpheres = 5 then begin
+                                                        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                                        spbonus := tc.SP;
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] + j;
+                                                        if dmg[0] < 0 then begin
+                                                                dmg[0] := 0;
+                                                                //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                                                        end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        UpdatePlayerLocation(tm, tc);
+
+                                                        SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
+                                                        DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.spiritSpheres := tc.spiritSpheres - 5;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
+                                                        tc.SP := 0;
+                                                        SendCStat(tc);
+                                                        end;
+                                                end;
+                                          end;
                                         end;
                                          371:   {Combo Finish Setup}
                                         begin
@@ -8937,7 +9101,7 @@ begin
                   for j1 := (xy.Y - j) div 8 to (xy.Y + j) div 8 do begin 
                      for i1 := (xy.X - j) div 8 to (xy.X + j) div 8 do begin 
                         for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin 
-                           if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob; 
+                           if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
                            if (abs(ts1.Point.X - xy.X) <= j) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then 
                               sl.AddObject(IntToStr(ts1.ID),ts1); 
                         end; 
@@ -9877,7 +10041,11 @@ begin
 
                                 271:    {Extremity Fist}
                                 begin
+                                  // Colus, 20040406: Right, so here are the options:
+                                  //  - If you are in Critical mode, and in a combo, you can do a self-target Ashura with 4 spheres.
+                                  //  - If you are not in a combo, you need 5 spheres and must target another person.
                                                 if tc.Skill[270].Tick > Tick then begin
+                                                  if (tc.Skill[271].Data.SType = 1) then begin
                                                         processtype := 255;
                                                         if tc.spiritSpheres = 5 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
@@ -9904,7 +10072,7 @@ begin
                                                         tc.pcnt := 0;
 
                                                         UpdatePlayerLocation(tm, tc);
-                                                        
+
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                         tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
@@ -9918,11 +10086,61 @@ begin
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
                                                         tc.SP := 0;
-                                                        SendCStat(tc);                                                        
+                                                        SendCStat(tc);
+                                                        end;
+                                                  // 4-sphere mode
+                                                  end else begin
+                                                        processtype := 255;
+                                                        if tc.spiritSpheres >= 4 then begin
+
+                                                        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                                        spbonus := tc.SP;
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] + j;
+                                                        if dmg[0] < 0 then begin
+                                                                dmg[0] := 0;
+                                                                //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                                                        end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        UpdatePlayerLocation(tm, tc);
+
+                                                        SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
+                                                        DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.spiritSpheres := 0;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
+                                                        tc.SP := 0;
+                                                        SendCStat(tc);
+                                                        tc.Skill[271].Data.SType := 1;
+                                                        tc.Skill[271].Data.CastTime1 := 4500;
+                                                        SendCSkillList(tc);
+
+                                                        end;
+                                                  end;
                                                 end;
-                                        end;
                                 end;
-                                
+
                                 266:  //Investigate
                                                 if tc.spiritSpheres <> 0 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
