@@ -13111,7 +13111,7 @@ begin
 						$86: //LoV
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix * tl.Data1[tn.MUseLV] div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
 									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;

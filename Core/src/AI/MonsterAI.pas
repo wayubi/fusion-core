@@ -1253,11 +1253,11 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
     IF_SKILLUSE
     IF_SLAVENUM
   }
-
+       // by Eliot : Sorry for doing this but i had to comment out the debugs, they lag like hell.
   //j := MobAIDBAegis.IndexOf(ts.Number);
   //k := j;
   //j := MobAIDBAegis.IndexOf(ts.Name);
-  DebugOut.Lines.Add(ts.Name);
+//  DebugOut.Lines.Add(ts.Name);
   for m := 0 to MobAIDBAegis.Count do begin
     if MobAIDBAegis.IndexOf(m) <> -1 then begin
     //while (j > 0) do begin
@@ -1267,69 +1267,69 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
       if (lowercase(ts.Name) = lowercase(tsAI2.Name)) then begin
 
         //DebugOut.Lines.Add('Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
-        DebugOut.Lines.Add('----------------------------');
-        DebugOut.Lines.Add('Skill: ' + tsAI2.SkillID);
+       // DebugOut.Lines.Add('----------------------------');
+     //   DebugOut.Lines.Add('Skill: ' + tsAI2.SkillID);
 
-        DebugOut.Lines.Add('Requires monster is in ' + tsAI2.Status + ' status');
+      //  DebugOut.Lines.Add('Requires monster is in ' + tsAI2.Status + ' status');
 
         if tsAI2.Dispel = 'NO_DISPEL' then begin
-          DebugOut.Lines.Add('Cannot be broken when attacked.');
+      //    DebugOut.Lines.Add('Cannot be broken when attacked.');
         end else
-          DebugOut.Lines.Add('Can be broken when attacked.');
+     //     DebugOut.Lines.Add('Can be broken when attacked.');
 
         ///////////If Conditions Begin////////////////
         if tsAI2.IfState = 'IF_COMRADECONDITION' then begin
-          DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);
+      //    DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_COMRADEHP' then begin
-          DebugOut.Lines.Add('Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
+      //    DebugOut.Lines.Add('Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
         end;
         if tsAI2.IfState = 'IF_CONDITION' then begin
-          DebugOut.Lines.Add('Only active if monster is: ' + tsAI2.IfCond);
+      //    DebugOut.Lines.Add('Only active if monster is: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HIDING' then begin
-          DebugOut.Lines.Add('Monster Must Be Hiding');
+      //    DebugOut.Lines.Add('Monster Must Be Hiding');
         end;
         if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
-          DebugOut.Lines.Add('Enemy Must be Magic Locked');
+      //    DebugOut.Lines.Add('Enemy Must be Magic Locked');
         end;
         if tsAI2.IfState = 'IF_RANGEATTACKED' then begin
-          DebugOut.Lines.Add('Enemy Must be Range Attacked');
+       //   DebugOut.Lines.Add('Enemy Must be Range Attacked');
         end;
         if tsAI2.IfState = 'IF_RUDEATTACK' then begin
-          DebugOut.Lines.Add('Enemy Must be Rude Attacked');
+      //    DebugOut.Lines.Add('Enemy Must be Rude Attacked');
         end;
         if tsAI2.IfState = 'IF_SKILLUSE' then begin
-          DebugOut.Lines.Add('Skill ' + tsAI2.IfCond + ' Triggers this');
+      //    DebugOut.Lines.Add('Skill ' + tsAI2.IfCond + ' Triggers this');
         end;
         if tsAI2.IfState = 'IF_SLAVENUM' then begin
-          DebugOut.Lines.Add('Slave Count Must be at least: ' + tsAI2.IfCond);
+      //    DebugOut.Lines.Add('Slave Count Must be at least: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HP' then begin
-          DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+       //   DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
         end;
 
         if tsAI2.IfState = 'IF_ENEMYCOUNT' then
           begin
-            DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
+      //      DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
           end;
         ///////////If Conditions End////////////////
-        DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
-        DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
-        DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
-        DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
-        DebugOut.Lines.Add('----Next Skill----');
+       // DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
+      //  DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
+      //  DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
+       // DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
+     //   DebugOut.Lines.Add('----Next Skill----');
         //k := k + 1;
       end;
       //j := j -1;
       //if k = 0 then break;
     end;
   end;
-  DebugOut.Lines.Add('----------------------------');
-  DebugOut.Lines.Add('Done');
-  DebugOut.Lines.Add('----------------------------');
-  DebugOut.Lines.Add('');
-  DebugOut.Lines.Add('');
+ // DebugOut.Lines.Add('----------------------------');
+ // DebugOut.Lines.Add('Done');
+ // DebugOut.Lines.Add('----------------------------');
+ // DebugOut.Lines.Add('');
+ // DebugOut.Lines.Add('');
 end;
 
 //------------------------------------------------------------------------------

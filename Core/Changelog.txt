@@ -1,3 +1,5 @@
+- 04-03-04: Fixed the LOV and SG calculations again. [Eliot]
+- 04-03-04: Removed the Debugs of monster skill descriptions, lag like hell [Eliot]
 - 04-02-04: Fixed Magic Range Check Bug. Bug #284. [AlexKreuz]
 - 04-02-04: Fixed Play Dead uses 5 SP to cancel effect. Bug #594. [AlexKreuz]
 - 04-01-04: Added to reporting of monster skills/conditions. [Darkhelmet]
