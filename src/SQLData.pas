@@ -468,7 +468,7 @@ begin
 		  tc := CharaName.Objects[i] as TChara;
 			with tc do begin
 				sl.Add(IntToStr(CID));
-				sl.Add(Name);
+				sl.Add('''' + Name + '''');
 				sl.Add(IntToStr(JID));
 				sl.Add(IntToStr(BaseLV));
 				sl.Add(IntToStr(BaseEXP));
@@ -612,10 +612,10 @@ begin
       tgc := CastleList.Objects[i] as TCastle;
       with tgc do
       begin
-			  sl.Add(Name);
+			  sl.Add('''' + Name + '''');
 			  sl.Add(IntToStr(GID));
-        sl.Add(GName);
-        sl.Add(GMName);
+        sl.Add('''' + GName + '''');
+        sl.Add('''' + GMName + '''');
         sl.Add(IntToStr(GKafra));
         sl.Add(IntToStr(EDegree));
         sl.Add(IntToStr(ETrigger));
@@ -644,7 +644,7 @@ begin
       with tpa do
       begin
 			  sl.Add(IntToStr(i + 1));
-        sl.Add(Name);
+        sl.Add('''' + Name + '''');
         sl.Add(IntToStr(EXPShare));
         sl.Add(IntToStr(ITEMShare));
 			  for j := 0 to 11 do begin
