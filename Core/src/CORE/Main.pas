@@ -2062,7 +2062,7 @@ begin
 	end;
 
 	with ts.Data do begin
-                CalcAI(tm, ts, Tick);
+                if ts.Stat2 <> 4 then CalcAI(tm, ts, Tick);
                 if ts.Hidden = true then exit;
 		i := HIT + HITFix - (tc.FLEE1 * tc.TargetedFix div 10) + 80;
 		i := i - tc.FLEE2;
@@ -5523,6 +5523,25 @@ begin
                                 end;
                                 212:    {Back Stab}
                                 if ts.Dir = tc.Dir then begin
+                                  if (tc.Option and 2 <> 0) then begin
+                                    tc.Option := tc.Option and $FFFD;
+                                    tc.Hidden := false;
+                                    tc.Skill[51].Tick := Tick;
+                                    tc.SkillTick := Tick;
+                                    tc.SkillTickID := 51;
+                                    CalcStat(tc, Tick);
+                                    WFIFOW(0, $0119);
+                                    WFIFOL(2, tc.ID);
+                                    WFIFOW(6, tc.Stat1);
+                                    WFIFOW(8, tc.Stat2);
+                                    WFIFOW(10, tc.Option);
+                                    WFIFOB(12, 0);
+                                    SendBCmd(tm, tc.Point, 13);
+                                  end else begin
+                                    SendSkillError(tc, 0);
+                                    tc.MMode := 4;
+                                    Exit;
+                                  end;
                                     DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                         if dmg[0] < 0 then dmg[0] := 0;
                                     SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
@@ -5534,7 +5553,7 @@ begin
                                         SendSkillError(tc, 0);
                                         MMode := 4;
                                         Exit;
-                                        end;
+                                end;
 
                                       
                                 {214:    {Raid}
@@ -8650,6 +8669,39 @@ begin
                                                         end;
                                                 end;
                                         end;
+                                212:    {Back Stab PvP}
+                                if tc1.Dir = tc.Dir then begin
+                                  if (tc.Option and 2 <> 0) then begin
+                                    tc.Option := tc.Option and $FFFD;
+                                    tc.Hidden := false;
+                                    tc.Skill[51].Tick := Tick;
+                                    tc.SkillTick := Tick;
+                                    tc.SkillTickID := 51;
+                                    CalcStat(tc, Tick);
+                                    WFIFOW(0, $0119);
+                                    WFIFOL(2, tc.ID);
+                                    WFIFOW(6, tc.Stat1);
+                                    WFIFOW(8, tc.Stat2);
+                                    WFIFOW(10, tc.Option);
+                                    WFIFOB(12, 0);
+                                    SendBCmd(tm, tc.Point, 13);
+                                  end else begin
+                                    SendSkillError(tc, 0);
+                                    tc.MMode := 4;
+                                    Exit;
+                                  end;
+                                  DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                  if dmg[0] < 0 then dmg[0] := 0;
+                                  SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
+                                  if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then StatCalc2(tc, tc1, Tick);
+                                  //SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
+                                  //DamageProcess3(tm, tc, tc1, dmg[0], Tick);
+                                  tc.MTick := Tick + 500;
+                                end else begin
+                                  SendSkillError(tc, 0);
+                                  MMode := 4;
+                                  Exit;
+                                end;
                                 {214:
                                         if (tc.Option = 6) then begin
                                                 DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
@@ -13520,7 +13572,7 @@ begin
 								//if CastingMonster = nil then Continue;
 
                                                                 if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
-                                                                        if tc.HP > 0 then begin
+                                                                        if (tc.HP > 0) and (CastingMonster.Stat2 <> 4) then begin
                                                                                 tl := tc.Skill[CastingMonster.NowSkill].Data;
                                                                                 tk := tc.Skill[CastingMonster.NowSkill];
 
@@ -13536,6 +13588,15 @@ begin
                                                                                 CastingMonster.MTick := Tick;
                                                                                 CastingMonster.Mode := 0;
                                                                                 //CastingMonster.MTarget := 0;
+                                                                        end else if (CastingMonster.Stat2 = 4) then begin
+                                                                          tm := tc.MData;
+
+                                                                          WFIFOW(0, $00c0);
+                                                                          WFIFOL(2, CastingMonster.ID);
+                                                                          WFIFOB(6, 09);
+
+                                                                          SendBCmd(tm, tc.Point, 7);
+
                                                                         end else begin
                                                                                 CastingMonster.MTick := 0;
                                                                                 CastingMonster.Mode := 0;
