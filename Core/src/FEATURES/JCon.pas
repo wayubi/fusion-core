@@ -10,7 +10,7 @@ uses
     {Shared}
     SysUtils,
     {Fusion}
-	Common, Database, WeissINI, Globals, Game_Master, PlayerData;
+	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate();
@@ -357,6 +357,10 @@ uses
 	    end;
 
         if (frmMain.Edit5.Text <> frmMain.Edit20.Text) and (frmMain.Edit5.Text <> frmMain.Edit21.Text) and (frmMain.Edit5.Text <> frmMain.Edit22.Text) then wacport := StrToInt(frmMain.Edit5.Text);
+        if (Option_Enable_WAC) then begin
+            destroy_wac();
+            create_wac();
+        end;
 
         UseSQL := StrToBool(IntToStr(abs(frmMain.ComboBox1.ItemIndex)));
         DBHost := frmMain.Edit24.Text;
