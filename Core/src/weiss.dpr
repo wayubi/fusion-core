@@ -17,6 +17,10 @@ uses
   Skills in 'Skills.pas',
   WeissINI in 'WeissINI.pas',
   JCon in 'JCon.pas';
+  PlayerData in 'PlayerData.pas',
+  SQLData in 'SQLData.pas',
+  FusionSQL in 'FusionSQL.pas',
+  TrimStr in 'TrimStr.pas';
 
 {$R *.res}
 

@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-22-04: Initial R.E.E.D Release. [AlexKreuz]
+- 07-22-04: Many .. Many fixes for R.E.E.D to work correctly. [AlexKreuz]
+- 07-22-04: Error in Game_Master caused compile error. [AlexKreuz]
 - 07-20-04: #mothball is now not a magical status fixer.  Any Stat2 ailements still linger. [Tsusai]
 - 07-15-04: Removed PvPN acting like PvP for simplicity with other code, now is just a mapflag. [Tsusai]
 - 07-13-04: Fixed bug in CharaDie function where HP display wasn't updated. [Trihan]

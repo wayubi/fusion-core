@@ -5,7 +5,7 @@ unit Database;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles;
+	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Globals;
 
 //==============================================================================
 // 関数定義
@@ -21,10 +21,16 @@ uses
 	Procedure LoadSummonLists;
 	Procedure LoadPetData;
 
+//==============================================================================
+// Alex: This file is a fucking mess ... Stop adding to it !
+//==============================================================================
+    procedure Load_NonREED();
+    procedure DumpMemory();
+
 implementation
 
 uses
-	Common, Game_Master, GlobalLists, Zip;
+	Common, Game_Master, GlobalLists, Zip, PlayerData;
 
 
 (*-----------------------------------------------------------------------------*
@@ -76,9 +82,6 @@ Begin
 		FileExists(AppPath + 'database\territory_db.txt') AND
 		FileExists(AppPath + 'database\summon_slave.txt') AND
 		FileExists(AppPath + 'database\make_arrow.txt') AND
-
-		FileExists(AppPath + 'database\id_table.txt') AND
-		FileExists(AppPath + 'database\gm_access.txt') AND
 
 		FileExists(AppPath + 'database\job_db1.txt') AND
 		FileExists(AppPath + 'database\job_db2.txt') AND
@@ -405,8 +408,6 @@ var
 {アイテム製造追加ココまで}
 {氏{箱追加}
 	tss : TSlaveDB;
-	tid : TIDTbl;
-    tGM : TGM_Table;
 
 	ma  : TMArrowDB;
 {氏{箱追加ココまで}
@@ -1425,72 +1426,6 @@ begin
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Make Arrow List loaded.', [j]));
 	Application.ProcessMessages;
 
-
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ID Table List loading...');
-	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\id_table.txt');
-	Reset(txt);
-	Readln(txt, str);
-	while not eof(txt) do begin
-		sl.Clear;
-		Readln(txt, str);
-		sl.DelimitedText := str;
-
-		for i := sl.Count to 16 do
-			sl.Add('0');
-		for i := 0 to 16 do
-			if (i <> 1) and (i <> 2) and (sl.Strings[i] = '') then sl.Strings[i] := '0';
-
-		tid := TIDTbl.Create;
-		with tid do begin
-			ID := StrToInt(sl.Strings[0]);
-			if (sl.Strings[1] <> '') then BroadCast := StrToInt(sl.Strings[1]);
-			if (sl.Strings[2] <> '') then ItemSummon := StrToInt(sl.Strings[2]);
-			if (sl.Strings[3] <> '') then MonsterSummon := StrToInt(sl.Strings[3]);
-			if (sl.Strings[4] <> '') then ChangeStatSkill := StrToInt(sl.Strings[4]);
-			if (sl.Strings[5] <> '') then ChangeOption := StrToInt(sl.Strings[5]);
-			if (sl.Strings[6] <> '') then SaveReturn := StrToInt(sl.Strings[6]);
-			if (sl.Strings[7] <> '') then ChangeLevel := StrToInt(sl.Strings[7]);
-			if (sl.Strings[8] <> '') then Warp := StrToInt(sl.Strings[8]);
-			if (sl.Strings[9] <> '') then Whois := StrToInt(sl.Strings[9]);
-			if (sl.Strings[10] <> '') then GotoSummonBanish := StrToInt(sl.Strings[10]);
-			if (sl.Strings[11] <> '') then KillDieAlive := StrToInt(sl.Strings[11]);
-			if (sl.Strings[12] <> '') then ChangeJob := StrToInt(sl.Strings[12]);
-			if (sl.Strings[13] <> '') then ChangeColorStyle := StrToInt(sl.Strings[13]);
-			if (sl.Strings[14] <> '') then AutoRawUnit := StrToInt(sl.Strings[14]);
-			if (sl.Strings[15] <> '') then Refine := StrToInt(sl.Strings[15]);
-			if (sl.Strings[16] <> '') then PVPControl := StrToInt(sl.Strings[16]);
-			if (sl.Strings[17] <> '') then UserControl := StrToInt(sl.Strings[17]);
-		end;
-		IDTableDB.AddObject(tid.ID,tid);
-	end;
-	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d ID Table List loaded.', [j]));
-	Application.ProcessMessages;
-
-
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'GM Access List loading...');
-	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\gm_access.txt');
-	Reset(txt);
-	Readln(txt, str);
-	while not eof(txt) do begin
-		sl.Clear;
-		Readln(txt, str);
-		sl.DelimitedText := str;
-
-		tGM := TGM_Table.Create;
-		with tGM do begin
-			ID := StrToInt(sl.Strings[0]);
-            Level := StrToInt(sl.Strings[1]);
-		end;
-        GM_Access_DB.AddObject(tGM.ID, tGM);
-	end;
-	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d GM Access List loaded.', [j]));
-	Application.ProcessMessages;
-
-
 	//ギルド経験値テーブル読み込み
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild EXP database loading...');
 	Application.ProcessMessages;
@@ -1741,144 +1676,144 @@ var
 	sl  : TStringList;
 	tp  : TPlayer;
 begin
+
+PD_PlayerData_Load();
+
+end;
+
+//------------------------------------------------------------------------------
+procedure DataLoad();
+var
+	i, j : integer;
+	txt : TextFile;
+    str : String;
+	sl  : TStringList;
+begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
 
-	//player.txt,chara.txtチェック
-	if not FileExists(AppPath + 'player.txt') then begin
-		AssignFile(txt, AppPath + 'player.txt');
+    if not FileExists(AppPath + 'addplayer.txt') then begin
+        AssignFile(txt, AppPath + 'addplayer.txt');
+        rewrite(txt);
+        closefile(txt);
+    end;
+
+	if FileExists(AppPath + 'player.txt')
+    or FileExists(AppPath + 'chara.txt')
+    or FileExists(AppPath + 'party.txt')
+    or FileExists(AppPath + 'pet.txt')
+    or FileExists(AppPath + 'gcastle.txt')
+    or FileExists(AppPath + 'guild.txt')
+    then begin
+        debugout.lines.add('Preparing One-Time Data Conversion to R.E.E.D.');
+        Load_NonREED();
+        debugout.lines.add('Conversion to R.E.E.D Initiated.');
+        DataSave(true);
+        debugout.lines.add('Conversion to R.E.E.D Completed.');
+        DumpMemory();
+        debugout.lines.add('Clearing Dynamic Memory.');
+    end;
+
+	if FileExists(AppPath + 'player.txt') then
+        DeleteFile(AppPath + 'player.txt');
+
+	if FileExists(AppPath + 'chara.txt') then
+        DeleteFile(AppPath + 'chara.txt');
+
+	if FileExists(AppPath + 'party.txt') then
+        DeleteFile(AppPath + 'party.txt');
+
+	if FileExists(AppPath + 'pet.txt') then
+        DeleteFile(AppPath + 'pet.txt');
+
+	if FileExists(AppPath + 'gcastle.txt') then
+        DeleteFile(AppPath + 'gcastle.txt');
+
+	if FileExists(AppPath + 'guild.txt') then
+        DeleteFile(AppPath + 'guild.txt');
+
+    debugout.lines.add('Loading R.E.E.D Database ... Please wait ...');
+    PD_PlayerData_Load();
+
+    { -- Server Flags -- }
+	if not FileExists(AppPath + 'status.txt') then begin
+		AssignFile(txt, AppPath + 'status.txt');
 		Rewrite(txt);
-		Writeln(txt, '##Weiss.PlayerData.0x0003');
-		Writeln(txt, '100001,test,test,0,-@-,0,,,,,,,,,');
-		Writeln(txt, '0');
-		Writeln(txt, '100002,test2,test,1,-@-,0,,,,,,,,,');
+		Writeln(txt, '##Weiss.StatusData.0x0002');
 		Writeln(txt, '0');
 		CloseFile(txt);
-	end;
-
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data loading...');
-	Application.ProcessMessages;
-	ver := 0;
-	AssignFile(txt, AppPath + 'player.txt');
-	Reset(txt);
-	Readln(txt, str);
-	if str = '##Weiss.PlayerData.0x0003' then begin
-		ver := 3;
-	end else if str = '##Weiss.PlayerData.0x0002' then begin
-		ver := 2;
-	end else if str = '##Weiss.PlayerData.0x0001' then begin
-		ver := 1;
 	end else begin
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Flag loading...');
+	Application.ProcessMessages;
+		AssignFile(txt, AppPath + 'status.txt');
 		Reset(txt);
-	end;
-	while not eof(txt) do begin
-		sl.Clear;
 		Readln(txt, str);
-		sl.DelimitedText := str;
-		if ver >= 1 then begin
-{修正}
-			if (sl.Count = 9) or (sl.Count = 15) then begin
-				tp := TPlayer.Create;
-				with tp do begin
-					ID := StrToInt(sl.Strings[0]);
-					Name := sl.Strings[1];
-					Pass := sl.Strings[2];
-					Gender := StrToInt(sl.Strings[3]);
-					Mail := sl.Strings[4];
-					Banned := StrToInt(sl.Strings[5]);
-					CName[0] := sl.Strings[6];
-					CName[1] := sl.Strings[7];
-					CName[2] := sl.Strings[8];
-					if sl.Count = 15 then begin
-						CName[3] := sl.Strings[9];
-						CName[4] := sl.Strings[10];
-						CName[5] := sl.Strings[11];
-						CName[6] := sl.Strings[12];
-						CName[7] := sl.Strings[13];
-						CName[8] := sl.Strings[14];
-					end;
-				end;
-{修正ココまで}
-				if ver >= 2 then begin
-					//アイテムロード
 					sl.Clear;
 					Readln(txt, str);
 					sl.DelimitedText := str;
 					j := StrToInt(sl.Strings[0]);
-					for i := 1 to j do begin
-						if ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1])) <> -1 then begin
-							//tc.Item[i] := TItem.Create;
-							tp.Kafra.Item[i].ID := StrToInt(sl.Strings[(i-1)*10+1]);
-							tp.Kafra.Item[i].Amount := StrToInt(sl.Strings[(i-1)*10+2]);
-							tp.Kafra.Item[i].Equip := StrToInt(sl.Strings[(i-1)*10+3]);
-							tp.Kafra.Item[i].Identify := StrToInt(sl.Strings[(i-1)*10+4]);
-							tp.Kafra.Item[i].Refine := StrToInt(sl.Strings[(i-1)*10+5]);
-							tp.Kafra.Item[i].Attr := StrToInt(sl.Strings[(i-1)*10+6]);
-							for k := 0 to 3 do begin
-								tp.Kafra.Item[i].Card[k] := StrToInt(sl.Strings[(i-1)*10+7+k]);
+		for i := 1 to j do ServerFlag.Add('\' + sl.Strings[i]);
+		CloseFile(txt);
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
+		Application.ProcessMessages;
 							end;
-							tp.Kafra.Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1]))] as TItemDB;
-						end;
-					end;
-					CalcInventory(tp.Kafra);
-				end;
-				PlayerName.AddObject(tp.Name, tp);
-				Player.AddObject(tp.ID, tp);
-			end;
-		end else begin
-			if sl.Count = 8 then begin
-				tp := TPlayer.Create;
-				with tp do begin
-					ID := StrToInt(sl.Strings[0]);
-					Name := sl.Strings[1];
-					Pass := sl.Strings[2];
-					Gender := StrToInt(sl.Strings[3]);
-					Mail := sl.Strings[4];
-					Banned := 0;
-					CName[0] := sl.Strings[5];
-					CName[1] := sl.Strings[6];
-					CName[2] := sl.Strings[7];
-				end;
-				PlayerName.AddObject(tp.Name, tp);
-				Player.AddObject(tp.ID, tp);
-			end;
-		end;
-	end;
-	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
+    { -- Server Flags -- }
+
 	Application.ProcessMessages;
 
-	if (PlayerName.Count <= 0) then Exit;
+	sl.Free;
+end;
 
-	for i := 0 to PlayerName.Count - 1 do begin
-		tp := PlayerName.Objects[i] as TPlayer;
-		tp.ver2 := 9;
-		if tp.ver2 = 9 then i1 := 8
-		else i1 := 2;
+//------------------------------------------------------------------------------
+procedure DataSave(forced : Boolean = False);
+var
+	j   : Integer;
+	cnt : Integer;
+	txt : TextFile;
+	sl  : TStringList;
+begin
 
-		for j := 0 to i1 do begin
-			if tp.CName[j] <> '' then begin
-				k := CharaName.IndexOf(tp.CName[j]);
-				if k <> -1 then begin
-					tp.CData[j] := CharaName.Objects[k] as TChara;
-					tp.CData[j].CharaNumber := j;
-					tp.CData[j].ID := tp.ID;
-					tp.CData[j].Gender := tp.Gender;
-				end else begin
-					tp.CName[j] := '';
-					tp.CData[j] := nil;
+	sl := TStringList.Create;
+	sl.QuoteChar := '"';
+	sl.Delimiter := ',';
+
+    PD_PlayerData_Save(forced);
+
+    { -- Server Flags -- }
+    if (ServerFlag.Count <> 0) or (forced) then begin
+        AssignFile(txt, AppPath + 'status.txt');
+        Rewrite(txt);
+        Writeln(txt, '##Weiss.StatusData.0x0002');
+        sl.Clear;
+        sl.Add('0');
+        cnt := 0;
+        for j := 0 to ServerFlag.Count - 1 do begin
+            if (Copy(ServerFlag[j], 1, 1) = '\') then begin
+
+            { Alex: Ok, crack control again. Putting this line here ensures that any temporary
+            variables stop working because the '\' in front is permanently removed. Bad coding. }
+            //ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
+
+            if ( copy(serverflag[j],2,1) <> '@' )
+            and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
+                sl.Add(Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1));
+                Inc(cnt);
 				end;
 			end;
 		end;
+        sl.Strings[0] := IntToStr(cnt);
+        writeln(txt, sl.DelimitedText);
+        CloseFile(txt);
 	end;
+    { -- Server Flags -- }
+    
 
 	sl.Free;
-
 end;
 //------------------------------------------------------------------------------
-// データ読み込み
-procedure DataLoad();
+
+procedure Load_NonREED();
 var
 	i,j,k :integer;
 	i1  :integer;
@@ -1903,6 +1838,9 @@ var
 	tgb :TGBan;
 	tgl :TGRel;
 {ギルド機能追加ココまで}
+
+    redo : Boolean;
+
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
@@ -1964,7 +1902,7 @@ begin
 		CloseFile(txt);
 	end else begin
 		//サーバ共有フラグ読込
-		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Flag loading...');
+		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Flag loading...');
 		Application.ProcessMessages;
 		AssignFile(txt, AppPath + 'status.txt');
 		Reset(txt);
@@ -1975,7 +1913,7 @@ begin
 		j := StrToInt(sl.Strings[0]);
 		for i := 1 to j do ServerFlag.Add('\' + sl.Strings[i]);
 		CloseFile(txt);
-		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
+		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
 		Application.ProcessMessages;
 	end;
 {NPCイベント追加ココまで}
@@ -1988,7 +1926,7 @@ begin
 	end;
 {ギルド機能追加ココまで}
 	//アカウント情報ロード
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data loading...');
 	Application.ProcessMessages;
 	ver := 0;
 	AssignFile(txt, AppPath + 'player.txt');
@@ -2014,6 +1952,9 @@ begin
 				with tp do begin
 					ID := StrToInt(sl.Strings[0]);
 					Name := sl.Strings[1];
+
+                    Name := remove_badsavechars(Name);
+
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
@@ -2029,6 +1970,11 @@ begin
 						CName[7] := sl.Strings[13];
 						CName[8] := sl.Strings[14];
 					end;
+
+                    for i := 0 to 8 do begin
+                        CName[i] := remove_badsavechars(CName[i]);
+                    end;
+
 				end;
 {修正ココまで}
 				if ver >= 2 then begin
@@ -2054,6 +2000,18 @@ begin
 					end;
 					CalcInventory(tp.Kafra);
 				end;
+
+                redo := True;
+                while (redo) do begin
+                    redo := False;
+                    for i := 0 to PlayerName.Count - 1 do begin
+                        if AnsiLowerCase(tp.Name) = AnsiLowerCase(PlayerName[i]) then begin
+                            tp.Name := tp.Name + '_';
+                            redo := True;
+                        end;
+                    end;
+                end;
+
 				PlayerName.AddObject(tp.Name, tp);
 				Player.AddObject(tp.ID, tp);
 			end;
@@ -2063,25 +2021,38 @@ begin
 				with tp do begin
 					ID := StrToInt(sl.Strings[0]);
 					Name := sl.Strings[1];
+                    Name := remove_badsavechars(Name);
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
 					Banned := 0;
-					CName[0] := sl.Strings[5];
-					CName[1] := sl.Strings[6];
-					CName[2] := sl.Strings[7];
+					CName[0] := remove_badsavechars(sl.Strings[5]);
+					CName[1] := remove_badsavechars(sl.Strings[6]);
+					CName[2] := remove_badsavechars(sl.Strings[7]);
 				end;
+
+                redo := True;
+                while (redo) do begin
+                    redo := False;
+                    for i := 0 to PlayerName.Count - 1 do begin
+                        if AnsiLowerCase(tp.Name) = AnsiLowerCase(PlayerName[i]) then begin
+                            tp.Name := tp.Name + '_';
+                            redo := True;
+                        end;
+                    end;
+                end;
+
 				PlayerName.AddObject(tp.Name, tp);
 				Player.AddObject(tp.ID, tp);
 			end;
 		end;
 	end;
 	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
 	Application.ProcessMessages;
 
 	//キャラ情報ロード
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character data loading...');
 	Application.ProcessMessages;
 	ver := 0;
 	AssignFile(txt, AppPath + 'chara.txt');
@@ -2108,7 +2079,7 @@ begin
 		tc := TChara.Create;
 		with tc do begin
 			CID           := StrToInt(sl.Strings[ 0]);
-			Name          :=          sl.Strings[ 1];
+			Name          := remove_badsavechars(sl.Strings[ 1]);
 			JID           := StrToInt(sl.Strings[ 2]);
 			// Colus, 20040305: JID becomes the 'proper' value.
 			if (JID > LOWER_JOB_END) then JID := JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
@@ -2191,7 +2162,7 @@ begin
 
 			//マップ存在チェック
 			if MapList.IndexOf(Map) = -1 then begin
-				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map "%s"', [Name, Map]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map "%s"', [Name, Map]));
 				Map := 'prontera';
 				Point.X := 158;
 				Point.Y := 189;
@@ -2199,7 +2170,7 @@ begin
 			//座標チェック
 			ta := MapList.Objects[MapList.IndexOf(Map)] as TMapList;
 			if (Point.X < 0) or (Point.X >= ta.Size.X) or (Point.Y < 0) or (Point.Y >= ta.Size.Y) then begin
-				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
 				Map := 'prontera';
 				Point.X := 158;
 				Point.Y := 189;
@@ -2207,7 +2178,7 @@ begin
 
 			//マップ存在チェック
 			if MapList.IndexOf(SaveMap) = -1 then begin
-				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap "%s"', [Name, SaveMap]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap "%s"', [Name, SaveMap]));
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
@@ -2215,7 +2186,7 @@ begin
 			//座標チェック
 			ta := MapList.Objects[MapList.IndexOf(SaveMap)] as TMapList;
 			if (SavePoint.X < 0) or (SavePoint.X >= ta.Size.X) or (SavePoint.Y < 0) or (SavePoint.Y >= ta.Size.Y) then begin
-				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
@@ -2224,7 +2195,7 @@ begin
 			for i := 0 to 2 do begin
 				//マップ存在チェック
 				if (MemoMap[i] <> '') and (MapList.IndexOf(MemoMap[i]) = -1) then begin
-					debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d "%s"', [Name, i, MemoMap[i]]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d "%s"', [Name, i, MemoMap[i]]));
 					MemoMap[i] := '';
 					MemoPoint[i].X := 0;
 					MemoPoint[i].Y := 0;
@@ -2233,7 +2204,7 @@ begin
 					ta := MapList.Objects[MapList.IndexOf(MemoMap[i])] as TMapList;
 					if (MemoPoint[i].X < 0) or (MemoPoint[i].X >= ta.Size.X) or
 						 (MemoPoint[i].Y < 0) or (MemoPoint[i].Y >= ta.Size.Y) then begin
-						debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [Name, i, MemoMap[i], ta.Size.X, ta.Size.Y, MemoPoint[i].X, MemoPoint[i].Y]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [Name, i, MemoMap[i], ta.Size.X, ta.Size.Y, MemoPoint[i].X, MemoPoint[i].Y]));
 						MemoMap[i] := '';
 						MemoPoint[i].X := 0;
 						MemoPoint[i].Y := 0;
@@ -2313,11 +2284,23 @@ begin
 			j := StrToInt(sl.Strings[0]);
 			for i := 1 to j do tc.Flag.Add(sl.Strings[i]);
 		end;
+
+        redo := True;
+        while (redo) do begin
+            redo := False;
+            for i := 0 to CharaName.Count - 1 do begin
+                if AnsiLowerCase(tc.Name) = AnsiLowerCase(CharaName[i]) then begin
+                    tc.Name := tc.Name + '_';
+                    redo := True;
+                end;
+            end;
+        end;
+
 		CharaName.AddObject(tc.Name, tc);
 		Chara.AddObject(tc.CID, tc);
 	end;
 	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d character(s) data loaded.', [CharaName.Count]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d character(s) data loaded.', [CharaName.Count]));
 	Application.ProcessMessages;
 
 	//キャラ情報&プレイヤー情報のリンク
@@ -2331,6 +2314,10 @@ begin
 		for j := 0 to i1 do begin
 			if tp.CName[j] <> '' then begin
 				k := CharaName.IndexOf(tp.CName[j]);
+                if k = -1 then begin
+                    k := CharaName.IndexOf(tp.CName[j]+'_');
+                    tp.CName[j] := tp.CName[j] + '_';
+                end;
 				if k <> -1 then begin
 					tp.CData[j] := CharaName.Objects[k] as TChara;
 					tp.CData[j].CharaNumber := j;
@@ -2346,7 +2333,7 @@ begin
 {修正ココまで}
 
 {パーティー機能追加}
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'gcastle.txt');
 	Reset(txt);
@@ -2366,10 +2353,10 @@ begin
 		if sl.Count <> 17 then continue;
 		tgc := TCastle.Create;
 		with tgc do begin
-			Name := sl.Strings[0];
+			Name := remove_badsavechars(sl.Strings[0]);
 			GID  := StrToInt(sl.Strings[1]);
-			GName:= sl.Strings[2];
-			GMName:=sl.Strings[3];
+			GName:= remove_badsavechars(sl.Strings[2]);
+			GMName:=remove_badsavechars(sl.Strings[3]);
 			GKafra:=StrToInt(sl.Strings[4]);
 			EDegree:=StrToInt(sl.Strings[5]);
 			ETrigger:=StrToInt(sl.Strings[6]);
@@ -2382,12 +2369,12 @@ begin
 		CastleList.AddObject(tgc.Name, tgc);
 	end;
 	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Castle(s) data loaded.', [CastleList.Count]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Castle(s) data loaded.', [CastleList.Count]));
 	Application.ProcessMessages;
 
 
 	//パーティー情報ロード
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Party data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Party data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'party.txt');
 	Reset(txt);
@@ -2407,7 +2394,7 @@ begin
 		if sl.Count <> 13 then continue;
 		tpa := TParty.Create;
 		with tpa do begin
-			Name := sl.Strings[0];
+			Name := remove_badsavechars(sl.Strings[0]);
 			for i := 0 to 11 do begin
 				MemberID[i] := StrToInt(sl.Strings[i+1]);
 			end;
@@ -2417,7 +2404,7 @@ begin
 		// debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name : %s.', [tpa.Name]));
 	end;
 	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));
 	Application.ProcessMessages;
 
 	//IDとプレイヤー情報のリンク
@@ -2438,7 +2425,7 @@ begin
 
 {ギルド機能追加}
 	//ギルド情報ロード
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'guild.txt');
 	Reset(txt);
@@ -2460,7 +2447,7 @@ begin
 			if sl.Count <> 12 then continue;
 			ID := StrToInt(sl.Strings[0]);
 			if (ID > NowGuildID) then NowGuildID := ID;
-			Name := sl.Strings[1];
+			Name := remove_badsavechars(sl.Strings[1]);
 			LV := StrToInt(sl.Strings[2]);
 			EXP := StrToInt(sl.Strings[3]);
 			GSkillPoint := StrToInt(sl.Strings[4]);
@@ -2520,9 +2507,9 @@ begin
 			j := StrToInt(sl.Strings[0]);
 			for i := 1 to j do begin
 				tgb := TGBan.Create;
-				tgb.Name := sl.Strings[k];
+				tgb.Name := remove_badsavechars(sl.Strings[k]);
 				Inc(k);
-				tgb.AccName := sl.Strings[k];
+				tgb.AccName := remove_badsavechars(sl.Strings[k]);
 				Inc(k);
 				tgb.Reason := sl.Strings[k];
 				Inc(k);
@@ -2534,7 +2521,7 @@ begin
 				tgl := TGRel.Create;
 				tgl.ID := StrToInt(sl.Strings[k]);
 				Inc(k);
-				tgl.GuildName := sl.Strings[k];
+				tgl.GuildName := remove_badsavechars(sl.Strings[k]);
 				Inc(k);
 				RelAlliance.AddObject(tgl.GuildName, tgl);
 			end;
@@ -2544,7 +2531,7 @@ begin
 				tgl := TGRel.Create;
 				tgl.ID := StrToInt(sl.Strings[k]);
 				Inc(k);
-				tgl.GuildName := sl.Strings[k];
+				tgl.GuildName := remove_badsavechars(sl.Strings[k]);
 				Inc(k);
 				RelHostility.AddObject(tgl.GuildName, tgl);
 			end;
@@ -2558,7 +2545,7 @@ begin
 		GuildList.AddObject(tg.ID, tg);
 	end;
 	CloseFile(txt);
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
 	Application.ProcessMessages;
 
 	//IDとプレイヤー情報のリンク
@@ -2570,7 +2557,7 @@ begin
 					k := Chara.IndexOf(MemberID[j]);
 					if k <> -1 then begin
 						tc := Chara.Objects[k] as TChara;
-						tc.GuildName := Name;
+						tc.GuildName := remove_badsavechars(Name);
 						tc.GuildID := ID;
 						tc.ClassName := PosName[MemberPos[j]];
 						tc.GuildPos := j;
@@ -2586,7 +2573,7 @@ begin
 
 {キューペット}
 
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet data loading...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'pet.txt');
 	Reset(txt);
@@ -2619,7 +2606,7 @@ begin
 				Index       := StrToInt( sl.Strings[ 3] );
 				Incubated   := StrToInt( sl.Strings[ 4] );
 				PetID       := StrToInt( sl.Strings[ 5] );
-				Name        :=           sl.Strings[ 6];
+				Name        :=           remove_badsavechars(sl.Strings[ 6]);
 				Renamed     := StrToInt( sl.Strings[ 7] );
 				Relation    := StrToInt( sl.Strings[ 8] );
 				Fullness    := StrToInt( sl.Strings[ 9] );
@@ -2640,7 +2627,7 @@ begin
 					Incubated   := StrToInt( SL[ 4] );
 					PetID       := StrToInt( SL[ 5] );
 					JID         := StrToInt( SL[ 6] );
-					Name        :=           SL[ 7];
+					Name        :=           remove_badsavechars(SL[ 7]);
 					Renamed     := StrToInt( SL[ 8] );
 					LV          := StrToInt( SL[ 9] );
 					Relation    := StrToInt( SL[10] );
@@ -2742,541 +2729,53 @@ begin
 		if NowPetID <= tpe.PetID then NowPetID := tpe.PetID + 1;
 	end;
 
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
 	Application.ProcessMessages;
 
 {キューペットここまで}
 	sl.Free;
-end;
-//------------------------------------------------------------------------------
-// データ保存
-procedure DataSave(forced : Boolean = False);
-var
-	i   : Integer;
-	j   : Integer;
-	m   : Integer;
-	z   : Integer;
-	cnt : Integer;
-	txt : TextFile;
-	sl  : TStringList;
-	tp  : TPlayer;
-	tc  : TChara;
-{パーティー機能追加}
-	tpa : TParty;
-	tgc : TCastle;
-{パーティー機能追加ココまで}
-{キューペット}
-	tpe : TPet;
-	k   : Integer;
-{キューペットここまで}
-{ギルド機能追加}
-	tg  : TGuild;
-	tgb : TGBan;
-	tgl : TGRel;
-{ギルド機能追加ココまで}
-begin
 
-	sl := TStringList.Create;
-	sl.QuoteChar := '"';
-	sl.Delimiter := ',';
-
-	for i := 0 to PlayerName.Count - 1 do begin
-		tp := PlayerName.Objects[i] as TPlayer;
-		tp.Saved := 0;
 	end;
-	if (PlayerName.Count > 0) or (forced) then begin
-		AssignFile(txt, AppPath + 'player.txt');
-		Rewrite(txt);
-		Writeln(txt, '##Weiss.PlayerData.0x0003');
-		for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-			sl.Clear;
-			if tp.Saved = 0 then begin
-				with tp do begin
-					sl.Add(IntToStr(ID));
-					sl.Add(Name);
-					sl.Add(Pass);
-					sl.Add(IntToStr(Gender));
-					sl.Add(Mail);
-					sl.Add(IntToStr(Banned));
-					sl.Add(CName[0]);
-					sl.Add(CName[1]);
-					sl.Add(CName[2]);
-					sl.Add(CName[3]);
-					sl.Add(CName[4]);
-					sl.Add(CName[5]);
-					sl.Add(CName[6]);
-					sl.Add(CName[7]);
-					sl.Add(CName[8]);
-					Saved := 1;
-				end;
-				WriteLn(txt, sl.DelimitedText);
-				//アイテムデータ保存
-				sl.Clear;
-				sl.Add('0');
-				cnt := 0;
-				for j := 1 to 100 do begin
-					if tp.Kafra.Item[j].ID <> 0 then begin
-					sl.Add(IntToStr(tp.Kafra.Item[j].ID));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Amount));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Equip));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Identify));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Refine));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Attr));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Card[0]));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Card[1]));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Card[2]));
-					sl.Add(IntToStr(tp.Kafra.Item[j].Card[3]));
-					Inc(cnt);
-				end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-			end;
-		end;
-		CloseFile(txt);
-	end;
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player Saved');
-
-	if (CharaName.Count <> 0) or (forced) then begin
-		AssignFile(txt, AppPath + 'chara.txt');
-		Rewrite(txt);
-		Writeln(txt, '##Weiss.CharaData.0x0002');
-		for i := 0 to CharaName.Count - 1 do begin
-			tc := CharaName.Objects[i] as TChara;
-			sl.Clear;
-			with tc do begin
-				sl.Add(IntToStr(CID));
-				sl.Add(Name);
-				// Colus, 20040305: JID becomes the 'proper' value.
-				j := JID;
-				if (JID > UPPER_JOB_BEGIN) then j := JID - UPPER_JOB_BEGIN + LOWER_JOB_END;
-				sl.Add(IntToStr(j));
-				sl.Add(IntToStr(BaseLV));
-				sl.Add(IntToStr(BaseEXP));
-				sl.Add(IntToStr(StatusPoint));
-				sl.Add(IntToStr(JobLV));
-				sl.Add(IntToStr(JobEXP));
-				sl.Add(IntToStr(SkillPoint));
-				sl.Add(IntToStr(Zeny));
-{修正}
-				sl.Add(IntToStr(Stat1));
-				sl.Add(IntToStr(Stat2));
-{修正ココまで}
-
-				// AlexKreuz: Added to prevent saving of Hide.
-				// Colus, 20040204: Generalized it further.
-				sl.Add(IntToStr(Option and $FFF9));
 
 
-				sl.Add(IntToStr(Karma));
-				sl.Add(IntToStr(Manner));
+    procedure DumpMemory();
+    var
+        i : Integer;
+    begin
 
-				if (HP < 0) then begin
-					HP := 0;
-				end;
-
-				sl.Add(IntToStr(HP));
-				sl.Add(IntToStr(SP));
-				sl.Add(IntToStr(DefaultSpeed));
-				sl.Add(IntToStr(Hair));
-				sl.Add(IntToStr(_2));
-				sl.Add(IntToStr(_3));
-				sl.Add(IntToStr(Weapon));
-				sl.Add(IntToStr(Shield));
-				sl.Add(IntToStr(Head1));
-				sl.Add(IntToStr(Head2));
-				sl.Add(IntToStr(Head3));
-				sl.Add(IntToStr(HairColor));
-				sl.Add(IntToStr(ClothesColor));
-
-				for j := 0 to 5 do
-					sl.Add(IntToStr(ParamBase[j]));
-				sl.Add(IntToStr(CharaNumber));
-
-				sl.Add(Map);
-				sl.Add(IntToStr(Point.X));
-				sl.Add(IntToStr(Point.Y));
-
-				sl.Add(SaveMap);
-				sl.Add(IntToStr(SavePoint.X));
-				sl.Add(IntToStr(SavePoint.Y));
-				for j := 0 to 2 do begin
-					sl.Add(MemoMap[j]);
-					sl.Add(IntToStr(MemoPoint[j].X));
-					sl.Add(IntToStr(MemoPoint[j].Y));
-				end;
-				sl.Add(IntToStr(Plag));
-				sl.Add(IntToStr(PLv));
-			end;
-			writeln(txt, sl.DelimitedText);
-			//スキルデータ保存
-			sl.Clear;
-			sl.Add('0');
-			cnt := 0;
-			for j := 1 to MAX_SKILL_NUMBER do begin
-            	try
-					if (tc.Skill[j].Lv <> 0) and (not tc.Skill[j].Card) then begin
-						sl.Add(IntToStr(j));
-						sl.Add(IntToStr(tc.Skill[j].Lv));
-						Inc(cnt);
-					end;
-                except
-                	//debugout.lines.add(tc.name + ' skill ' + inttostr(j) + ' failure.');
-                end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-			//アイテムデータ保存
-			sl.Clear;
-			sl.Add('0');
-			cnt := 0;
-			for j := 1 to 100 do begin
-				if tc.Item[j].ID <> 0 then begin
-					sl.Add(IntToStr(tc.Item[j].ID));
-					sl.Add(IntToStr(tc.Item[j].Amount));
-					sl.Add(IntToStr(tc.Item[j].Equip));
-					sl.Add(IntToStr(tc.Item[j].Identify));
-					sl.Add(IntToStr(tc.Item[j].Refine));
-					sl.Add(IntToStr(tc.Item[j].Attr));
-					sl.Add(IntToStr(tc.Item[j].Card[0]));
-					sl.Add(IntToStr(tc.Item[j].Card[1]));
-					sl.Add(IntToStr(tc.Item[j].Card[2]));
-					sl.Add(IntToStr(tc.Item[j].Card[3]));
-					Inc(cnt);
-				end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-			//カートデータ保存
-			sl.Clear;
-			sl.Add('0');
-			cnt := 0;
-			for j := 1 to 100 do begin
-				if tc.Cart.Item[j].ID <> 0 then begin
-					sl.Add(IntToStr(tc.Cart.Item[j].ID));
-					sl.Add(IntToStr(tc.Cart.Item[j].Amount));
-					sl.Add(IntToStr(tc.Cart.Item[j].Equip));
-					sl.Add(IntToStr(tc.Cart.Item[j].Identify));
-					sl.Add(IntToStr(tc.Cart.Item[j].Refine));
-					sl.Add(IntToStr(tc.Cart.Item[j].Attr));
-					sl.Add(IntToStr(tc.Cart.Item[j].Card[0]));
-					sl.Add(IntToStr(tc.Cart.Item[j].Card[1]));
-					sl.Add(IntToStr(tc.Cart.Item[j].Card[2]));
-					sl.Add(IntToStr(tc.Cart.Item[j].Card[3]));
-					Inc(cnt);
-				end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-			//フラグデータ保存
-			sl.Clear;
-			sl.Add('0');
-			cnt := 0;
-			for j := 0 to tc.Flag.Count - 1 do begin
-{NPCイベント追加}
-				if ((Copy(tc.Flag.Names[j], 1, 1) <> '@') and (Copy(tc.Flag.Names[j], 1, 2) <> '$@'))
-				and ((tc.Flag.Values[tc.Flag.Names[j]] <> '0') and (tc.Flag.Values[tc.Flag.Names[j]] <> '')) then begin
-{NPCイベント追加ココまで}
-					sl.Add(tc.Flag.Strings[j]);
-					Inc(cnt);
-				end;
-			end;
-			sl.Strings[0] := IntToStr(cnt);
-			writeln(txt, sl.DelimitedText);
-		end;
-		CloseFile(txt);
-	end;
-  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Chara Saved');
-
-{NPCイベント追加}
-	//サーバ共有フラグ保存
-
-  if (ServerFlag.Count <> 0) or (forced) then begin
-  	AssignFile(txt, AppPath + 'status.txt');
-	  Rewrite(txt);
-  	Writeln(txt, '##Weiss.StatusData.0x0002');
-	  sl.Clear;
-  	sl.Add('0');
-	  cnt := 0;
-  	for j := 0 to ServerFlag.Count - 1 do begin
-	  	if (Copy(ServerFlag[j], 1, 1) = '\') then begin
-
-        	{ Alex: Ok, crack control again. Putting this line here ensures that any temporary
-            variables stop working because the '\' in front is permanently removed. Bad coding. }
-            //ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
-
-		  	if ( copy(serverflag[j],2,1) <> '@' )
-  			and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
-	  			sl.Add(Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1));
-		  		Inc(cnt);
-			  end;
-  		end;
-	  end;
-  	sl.Strings[0] := IntToStr(cnt);
-	  writeln(txt, sl.DelimitedText);
-  	CloseFile(txt);
-  end;
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Status Saved');
-{NPCイベント追加ココまで}
-
-{パーティー機能追加}
-  	if (CastleList.Count <> 0) or (forced) then begin
-    	AssignFile(txt, AppPath + 'gcastle.txt');
-    	Rewrite(txt);
-    	Writeln(txt, '##Weiss.GCastleData.0x0002');
-    	for i := 0 to CastleList.Count - 1 do begin
-    		tgc := CastleList.Objects[i] as TCastle;
-    		sl.Clear;
-    		with tgc do begin
-    			sl.Add(Name);
-    			sl.Add(IntToStr(GID));
-    			sl.Add(GName);
-    			sl.Add(GMName);
-    			sl.Add(IntToStr(GKafra));
-    			sl.Add(IntToStr(EDegree));
-    			sl.Add(IntToStr(ETrigger));
-    			sl.Add(IntToStr(DDegree));
-    			sl.Add(IntToStr(DTrigger));
-    			for j := 0 to 7 do begin
-    			sl.Add(IntToStr(GuardStatus[j]));
-    			end;
-    		end;
-    		writeln(txt, sl.DelimitedText);
-    	end;
-    	CloseFile(txt);
-    end;
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle Saved');
-
-    if (partynamelist.Count <> 0) or (forced) then begin
-    	AssignFile(txt, AppPath + 'party.txt');
-    	Rewrite(txt);
-    	Writeln(txt, '##Weiss.PartyData.0x0002');
-    	for i := 0 to PartyNameList.Count - 1 do begin
-    		tpa := PartyNameList.Objects[i] as TParty;
-    		sl.Clear;
-    		with tpa do begin
-    			sl.Add(Name);
-    			for j := 0 to 11 do begin
-    				sl.Add(IntToStr(MemberID[j]));
-    			end;
-    		end;
-    		writeln(txt, sl.DelimitedText);
-    	end;
-    	CloseFile(txt);
-    end;
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
-{パーティー機能追加ココまで}
-
-{ギルド機能追加}
-	if (guildlist.Count <> 0) or (forced) then begin
-    	AssignFile(txt, AppPath + 'guild.txt');
-    	Rewrite(txt);
-    	Writeln(txt, '##Weiss.GuildData.0x0002');
-    	for i := 0 to GuildList.Count - 1 do begin
-    		tg := GuildList.Objects[i] as TGuild;
-    		with tg do begin
-    			//基本情報
-    			sl.Clear;
-    			sl.Add(IntToStr(ID));
-    			sl.Add(Name);
-    			sl.Add(IntToStr(LV));
-    			sl.Add(IntToStr(EXP));
-    			sl.Add(IntToStr(GSkillPoint));
-    			sl.Add(Notice[0]);
-    			sl.Add(Notice[1]);
-    			sl.Add(Agit);
-    			sl.Add(IntToStr(Emblem));
-    			sl.Add(IntToStr(Present));
-    			sl.Add(IntToStr(DisposFV));
-    			sl.Add(IntToStr(DisposRW));
-    			writeln(txt, sl.DelimitedText);
-    			//メンバー情報
-    			sl.Clear;
-    			for j := 0 to 35 do begin
-    				sl.Add(IntToStr(MemberID[j]));
-    				sl.Add(IntToStr(MemberPos[j]));
-    				sl.Add(IntToStr(MemberEXP[j]));
-    			end;
-    			writeln(txt, sl.DelimitedText);
-    			//職位情報
-    			sl.Clear;
-    			for j := 0 to 19 do begin
-    				sl.Add(PosName[j]);
-    				if (PosInvite[j] = true) then sl.Add('1') else sl.Add('0');
-    				if (PosPunish[j] = true) then sl.Add('1') else sl.Add('0');
-    				sl.Add(IntToStr(PosEXP[j]));
-    			end;
-    			writeln(txt, sl.DelimitedText);
-    			//スキル情報
-    			sl.Clear;
-    			sl.Add('0');
-    			cnt := 0;
-    			for j := 10000 to 10004 do begin
-    				if GSkill[j].Lv <> 0 then begin
-    					sl.Add(IntToStr(j));
-    					sl.Add(IntToStr(GSkill[j].Lv));
-    					Inc(cnt);
-    				end;
-    			end;
-    			sl.Strings[0] := IntToStr(cnt);
-    			writeln(txt, sl.DelimitedText);
-    			//追放者リスト、同盟・敵対リスト
-    			sl.Clear;
-    			sl.Add(IntToStr(GuildBanList.Count));
-    			sl.Add(IntToStr(RelAlliance.Count));
-    			sl.Add(IntToStr(RelHostility.Count));
-    			for j := 0 to GuildBanList.Count - 1 do begin
-    				tgb := GuildBanList.Objects[j] as TGBan;
-    				sl.Add(tgb.Name);
-    				sl.Add(tgb.AccName);
-    				sl.Add(tgb.Reason);
-    			end;
-    			for j := 0 to RelAlliance.Count - 1 do begin
-    				tgl := RelAlliance.Objects[j] as TGRel;
-    				sl.Add(IntToStr(tgl.ID));
-    				sl.Add(tgl.GuildName);
-    			end;
-    			for j := 0 to RelHostility.Count - 1 do begin
-    				tgl := RelHostility.Objects[j] as TGRel;
-    				sl.Add(IntToStr(tgl.ID));
-    				sl.Add(tgl.GuildName);
-    			end;
-    			writeln(txt, sl.DelimitedText);
-    		end;
-    	end;
-    	CloseFile(txt);
-    end;
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
-{ギルド機能追加ココまで}
-
-//Cute Pet Load Start
-	if (petlist.Count <> 0) or (forced) then begin
-    	AssignFile(txt, AppPath + 'pet.txt');
-    	Rewrite(txt);
-    	Writeln( txt, '##Weiss.PetData.0x0002' );
-    	z := 0;
-    	//Reset Pet Saves to prevent Dupes
-    	for i := 0 to PetList.Count - 1 do begin
-    		tpe := PetList.Objects[i] as TPet;
-    		tpe.Saved := 0;
-    	end;
-    
-    	for i := 0 to Player.Count - 1 do begin
-    		tp := Player.Objects[i] as TPlayer;
-    
-    		for j := 1 to 100 do begin
-    			with tp.Kafra.Item[j] do begin
-    				if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-    					for k := 0 to PetList.Count - 1 do begin
-    						//k := Card[2] + Card[3] * $10000;
-    						if (PetList.IndexOf( k ) <> -1)  then begin
-    							tpe := PetList.IndexOfObject( k ) as TPet;
-    							if tpe.Saved = 0 then begin
-    								sl.Clear;
-    								sl.Add( IntToStr( tpe.PlayerID ) );
-    								sl.Add( IntToStr( tpe.CharaID ) );
-    								sl.Add( IntToStr( tpe.Cart ) ); // Cart
-    								sl.Add( IntToStr( tpe.Index ) ); // Index
-    								sl.Add( IntToStr( tpe.Incubated ) );
-    								sl.Add( IntToStr( tpe.PetID ) ); // PetID
-    								sl.Add( IntToStr( tpe.JID ) );
-    								sl.Add( tpe.Name );
-    								sl.Add( IntToStr( tpe.Renamed ) );
-    								sl.Add( IntToStr( tpe.LV ) );
-    								sl.Add( IntToStr( tpe.Relation  ) );
-    								sl.Add( IntToStr( tpe.Fullness  ) );
-    								sl.Add( IntToStr( tpe.Accessory ) );
-    								tpe.Saved := 1;
-    								z := j;
-    								Writeln( txt, sl.DelimitedText );
-    							end;
-    						end;
-    					end;
-    				end;
-    			end;
-    		end;
-    
-    		for m := 0 to 8 do begin;
-    			if tp.CData[m] <> nil then begin
-    			//for i := 0 to Chara.Count - 1 do begin
-    				//tc := Chara.Objects[i] as TChara;
-    				tc := tp.CData[m];
-    				for j := 1 to 100 do begin
-    					with tc.Item[j] do begin
-    						if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-    							//k := Card[2] + Card[3] * $10000;
-    							for k := 0 to PetList.Count - 1 do begin
-    								if (PetList.IndexOf( k ) <> -1) then begin
-    									tpe := PetList.IndexOfObject( k ) as TPet;
-    										if tpe.Saved = 0 then begin
-    											sl.Clear;
-    											sl.Add( IntToStr( tpe.PlayerID ) );
-    											sl.Add( IntToStr( tpe.CharaID ) );
-    											sl.Add( IntToStr( tpe.Cart ) ); // Cart
-    											sl.Add( IntToStr( tpe.Index ) ); // Index
-    											sl.Add( IntToStr( tpe.Incubated ) );
-    											sl.Add( IntToStr( tpe.PetID ) ); // PetID
-    											sl.Add( IntToStr( tpe.JID ) );
-    											sl.Add( tpe.Name );
-    											sl.Add( IntToStr( tpe.Renamed ) );
-    											sl.Add( IntToStr( tpe.LV ) );
-    											sl.Add( IntToStr( tpe.Relation  ) );
-    											sl.Add( IntToStr( tpe.Fullness  ) );
-    											sl.Add( IntToStr( tpe.Accessory ) );
-    											Writeln(txt, sl.DelimitedText);
-    											tpe.Saved := 1;
-    											z := j;
-    										end;
-    									end;
-    								end;
-    							end;
-    						end;
-    
-    
-    					//for j := 1 to 100 do begin
-    						with tc.Cart.Item[j] do begin
-    							if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-    								//k := Card[2] + Card[3] * $10000;
-    								for k := 0 to PetList.Count - 1 do begin
-    									if (PetList.IndexOf( k ) <> -1) then begin
-    										if tpe.Saved = 0 then begin
-    											tpe := PetList.IndexOfObject( k ) as TPet;
-    											sl.Clear;
-    											sl.Add( IntToStr( tpe.PlayerID ) );
-    											sl.Add( IntToStr( tpe.CharaID ) );
-    											sl.Add( IntToStr( tpe.Cart ) ); // Cart
-    											sl.Add( IntToStr( tpe.Index ) ); // Index
-    											sl.Add( IntToStr( tpe.Incubated ) );
-    											sl.Add( IntToStr( tpe.PetID ) ); // PetID
-    											sl.Add( IntToStr( tpe.JID ) );
-    											sl.Add( tpe.Name );
-    											sl.Add( IntToStr( tpe.Renamed ) );
-    											sl.Add( IntToStr( tpe.LV ) );
-    											sl.Add( IntToStr( tpe.Relation  ) );
-    											sl.Add( IntToStr( tpe.Fullness  ) );
-    											sl.Add( IntToStr( tpe.Accessory ) );
-    											tpe.Saved := 1;
-    											z := j;
-    											Writeln( txt, sl.DelimitedText );
-    										end;
-    									end;
-    								end;
-    							end;
-    						end;
-    					end;
-    				end;
-    			end;
-    		end;
-    		CloseFile(txt);
+        for i := 0 to PlayerName.Count - 1 do begin
+            PlayerName.Delete(0);
         end;
 
-	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet Saved');
-//Cute Pet Load End
+        for i := 0 to Player.Count - 1 do begin
+            Player.Delete(0);
+				end;
 
-	sl.Free;
-end;
-//------------------------------------------------------------------------------
+        for i := 0 to CharaName.Count - 1 do begin
+            CharaName.Delete(0);
+		end;
+
+        for i := 0 to Chara.Count - 1 do begin
+            Chara.Delete(0);
+  		end;
+
+        for i := 0 to PetList.Count - 1 do begin
+            PetList.Delete(0);
+    	end;
+
+    	for i := 0 to PartyNameList.Count - 1 do begin
+            PartyNameList.Delete(0);
+    	end;
+
+    	for i := 0 to GuildList.Count - 1 do begin
+            GuildList.Delete(0);
+    			end;
+
+        for i := 0 to CastleList.Count - 1 do begin
+            CastleList.Delete(0);
+    		end;
+    
+    							end;
 
 
 end.

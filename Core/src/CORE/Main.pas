@@ -179,6 +179,7 @@ type
     Button13: TButton;
     Button14: TButton;
     Button15: TButton;
+    S1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -268,6 +269,7 @@ type
     procedure Button13Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
+    procedure S1Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -1001,6 +1003,7 @@ begin
 	else
 	DataLoad();
 
+
 	//MapLoad('moc_vilg00');
 	//MapLoad('moc_vilg01');
 
@@ -1067,7 +1070,7 @@ begin
 	if UseSQL then
 		SQLDataSave
 	else
-		DataSave;
+		DataSave(true);
 
 	{ Mitch: Doesnt hurt to make sure the tray icon was deleted }
 	Shell_notifyIcon(NIM_DELETE, @TrayIcon);
@@ -1409,6 +1412,9 @@ var
 
 begin
 
+    DataSave();
+
+
         // AlexKreuz: Random 10053 Bug Fix
         if Assigned(Socket.Data) then begin
 					tc := Socket.Data;
@@ -1449,6 +1455,9 @@ procedure TfrmMain.sv3ClientError(Sender: TObject;
 //	tc  :TChara;
 //	tp  :TPlayer;
 begin
+
+    DataSave();
+
 	if UseSQL then SQLDataSave();
 	if ErrorCode = 10053 then begin
     	Socket.Close;
@@ -10243,7 +10252,7 @@ begin
 
                 else if sl.strings[0] = 'save' then begin
                 // Save data
-                    DataSave();
+                    DataSave(true);
                     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
                 end
 
@@ -10936,8 +10945,13 @@ end;
 
 procedure TfrmMain.Save1Click(Sender: TObject);
 begin
-    DataSave();
+    DataSave(false);
     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
+end;
+
+procedure TfrmMain.S1Click(Sender: TObject);
+begin
+    DataSave(true);
 end;
 
 procedure TfrmMain.Backup1Click(Sender: TObject);

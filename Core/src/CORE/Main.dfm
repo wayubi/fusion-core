@@ -1331,8 +1331,12 @@ object frmMain: TfrmMain
     object Database1: TMenuItem
       Caption = 'Database'
       object Save1: TMenuItem
-        Caption = 'Save'
+        Caption = 'Online Save'
         OnClick = Save1Click
+      end
+      object S1: TMenuItem
+        Caption = 'Comprehensive Save'
+        OnClick = S1Click
       end
       object Backup1: TMenuItem
         Caption = 'Backup'

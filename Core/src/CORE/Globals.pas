@@ -12,6 +12,8 @@ uses
     procedure reset_skill_effects(tc : TChara);
     procedure remove_equipcard_skills(tc : TChara; idx : Integer);
 
+    function remove_badsavechars(str : String) : String;
+
     procedure leave_party(tc : TChara);
     procedure leave_guild(tc : TChara);
     procedure ban_guild(tc : TChara);
@@ -73,6 +75,22 @@ uses
             end;
 		end;
     end;
+
+    function remove_badsavechars(str : String) : String;
+    begin
+        str := StringReplace(str, '\', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '/', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, ':', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '*', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '?', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '<', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '>', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '|', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '"', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '.', ' ', [rfReplaceAll, rfIgnoreCase]);
+        Result := str;
+    end;
+
 
     { -------------------------------------------------------------------------------- }
     { - Beginning of processing procedures ------------------------------------------- }

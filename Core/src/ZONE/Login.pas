@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows,Classes, SysUtils, ScktComp, Common, Database, SQLData, FusionSQL;
+	Windows,Classes, SysUtils, ScktComp, Common, Database, SQLData, FusionSQL, PlayerData;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -336,7 +336,8 @@ begin
 
 			debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'User: ' + userid + ' - Pass: ' + userpass);
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
-			if UseSQL then Load_Accounts(userid);
+			if UseSQL then Load_Accounts(userid)
+            else PD_PlayerData_Load(userid);
 
             userid2 := userid;
             if (Option_Username_MF = True) then begin

@@ -6,7 +6,7 @@ interface
 
 uses
 	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals;
+	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database;
 
 //==============================================================================
 // 関数定義
@@ -83,7 +83,6 @@ Var
   ts1 : TMob;
   tss : TSlaveDB;
   ma  : TMArrowDB;
-  tid : TIDTbl;
 	ti  : TItem;
 	tk  : TSkill;
 	tl  : TSkillDB;
@@ -1790,7 +1789,7 @@ end;
 
 			end;
 		//--------------------------------------------------------------------------
-		$00b2: //リスタート、キャラセレ要求
+		$00b2: // Character Select or Return to Save.
 			begin
 				RFIFOB(2, b);
 				case b of
@@ -1805,6 +1804,9 @@ end;
 				1:
 					begin
                     	if not check_attack_lag(tc) then begin
+
+                        DataSave();
+
 						SendCLeave(Socket.Data, 2);
 
 						WFIFOW(0, $00b3);
@@ -4560,8 +4562,11 @@ end;
 		//--------------------------------------------------------------------------
 			//end;
 		//--------------------------------------------------------------------------
-		$018a: //ゲーム終了
+		$018a: // Quit Game
 			begin
+
+                DataSave();
+
 				SendCLeave(Socket.Data, 2);
 
 				WFIFOW(0, $018b);

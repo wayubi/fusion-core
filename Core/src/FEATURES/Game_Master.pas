@@ -5,11 +5,6 @@ interface
 uses
     IniFiles, Classes, SysUtils, Common, List32, MMSystem, Globals;
 
-type TGM_Table = class
-    ID : Integer;
-    Level : Byte;
-end;
-
 var
     GM_ALIVE : Byte;
     GM_ITEM : Byte;
@@ -125,7 +120,7 @@ var
     procedure save_commands();
 
     procedure parse_commands(tc : TChara; str : String);
-    function check_level(id : Integer; cmd : Integer) : Boolean;
+    function check_level(tc : TChara; cmd : Integer) : Boolean;
     procedure error_message(tc : TChara; str : String);
     procedure save_gm_log(tc : TChara; str : String);
 
@@ -492,13 +487,6 @@ Called when we're shutting down the server *only*
 
         ini.Free;
 
-        //Free up the GM Command List when program closes down.
-        for Idx := GM_Access_DB.Count-1 downto 0 do begin
-            if Assigned(GM_Access_DB.Objects[Idx]) then begin
-                (GM_Access_DB.Objects[Idx] AS TGM_Table).Free;
-            end;
-        end;
-
     End;(* Proc save_commands()
 *-----------------------------------------------------------------------------*)
 
@@ -524,133 +512,126 @@ Called when we're shutting down the server *only*
         error_msg := '';
 
         if gmstyle = '#' then begin
-            if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
-            else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
-            else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc.ID, GM_SAVE)) ) then error_msg := command_save(tc)
-            else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
-            else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
-            else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
-            else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
-            else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
-            else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
-            else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
-            else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
-            else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
-            else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
-            else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
-            else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
-            else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
-            else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
-            else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
-            else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
-            else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
-            else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
-            else if ( (copy(str, 1, length('superstats')) = 'superstats') and (check_level(tc.ID, GM_SUPERSTATS)) ) then error_msg := command_superstats(tc)
-            else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
-            else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
-            else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
-            else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
-            else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
-            else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
-            else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
-            else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
-            else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
-            else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
-            else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
-            else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
-            else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
-            else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_WHERE)) ) then error_msg := command_where(tc, str)
-            else if ( (copy(str, 1, length('revive')) = 'revive') and (check_level(tc.ID, GM_REVIVE)) ) then error_msg := command_revive(str)
-            else if ( (copy(str, 1, length('ban')) = 'ban') and (check_level(tc.ID, GM_BAN)) ) then error_msg := command_ban(str)
-            else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc.ID, GM_KICK)) ) then error_msg := command_kick(str)
-            else if ( (copy(str, 1, length('icon')) = 'icon') and (check_level(tc.ID, GM_ICON)) ) then error_msg := command_icon(tc, str)
-            else if ( (copy(str, 1, length('unicon')) = 'unicon') and (check_level(tc.ID, GM_UNICON)) ) then error_msg := command_unicon(tc, str)
-            else if ( (copy(str, 1, length('server')) = 'server') and (check_level(tc.ID, GM_SERVER)) ) then error_msg := command_server()
-            else if ( (copy(str, 1, length('pvpon')) = 'pvpon') and (check_level(tc.ID, GM_PVPON)) ) then error_msg := command_pvpon(tc)
-            else if ( (copy(str, 1, length('pvpoff')) = 'pvpoff') and (check_level(tc.ID, GM_PVPOFF)) ) then error_msg := command_pvpoff(tc)
-            else if ( (copy(str, 1, length('gpvpon')) = 'gpvpon') and (check_level(tc.ID, GM_GPVPON)) ) then error_msg := command_gpvpon(tc)
-            else if ( (copy(str, 1, length('gpvpoff')) = 'gpvpoff') and (check_level(tc.ID, GM_GPVPOFF)) ) then error_msg := command_gpvpoff(tc)
-            else if ( (copy(str, 1, length('newplayer')) = 'newplayer') and (check_level(tc.ID, GM_NEWPLAYER)) ) then error_msg := command_newplayer(str)
-            else if ( (copy(str, 1, length('pword')) = 'pword') and (check_level(tc.ID, GM_PWORD)) ) then error_msg := command_pword(tc, str)
-            else if ( (copy(str, 1, length('users')) = 'users') and (check_level(tc.ID, GM_USERS)) ) then error_msg := command_users()
-            else if ( (copy(str, 1, length('charblevel')) = 'charblevel') and (check_level(tc.ID, GM_CHARBLEVEL)) ) then error_msg := command_charblevel(tc, str)
-            else if ( (copy(str, 1, length('charjlevel')) = 'charjlevel') and (check_level(tc.ID, GM_CHARJLEVEL)) ) then error_msg := command_charjlevel(tc, str)
-            else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
-            else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
-            else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc.ID, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
+            if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc, GM_ALIVE)) ) then error_msg := command_alive(tc)
+            else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc, GM_ITEM)) ) then error_msg := command_item(tc, str)
+            else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc, GM_SAVE)) ) then error_msg := command_save(tc)
+            else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc, GM_RETURN)) ) then error_msg := command_return(tc)
+            else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_DIE)) ) then error_msg := command_die(tc)
+            else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc, GM_AUTO)) ) then error_msg := command_auto(tc, str)
+            else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
+            else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
+            else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
+            else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc, GM_KILL)) ) then error_msg := command_kill(str)
+            else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc, GM_GOTO)) ) then error_msg := command_goto(tc, str)
+            else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
+            else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc, GM_WARP)) ) then error_msg := command_warp(tc, str)
+            else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc, GM_BANISH)) ) then error_msg := command_banish(str)
+            else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc, GM_JOB)) ) then error_msg := command_job(tc, str)
+            else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
+            else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
+            else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
+            else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
+            else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
+            else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc, GM_STATALL)) ) then error_msg := command_statall(tc)
+            else if ( (copy(str, 1, length('superstats')) = 'superstats') and (check_level(tc, GM_SUPERSTATS)) ) then error_msg := command_superstats(tc)
+            else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
+            else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
+            else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
+            else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc, GM_SPEED)) ) then error_msg := command_speed(tc, str)
+            else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc, GM_WHOIS)) ) then error_msg := command_whois(tc)
+            else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc, GM_OPTION)) ) then error_msg := command_option(tc, str)
+            else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc, GM_RAW)) ) then error_msg := command_raw(tc, str)
+            else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc, GM_UNIT)) ) then error_msg := command_unit(tc, str)
+            else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc, GM_STAT)) ) then error_msg := command_stat(tc, str)
+            else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc, GM_REFINE)) ) then error_msg := command_refine(tc, str)
+            else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
+            else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
+            else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
+            else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc, GM_WHERE)) ) then error_msg := command_where(tc, str)
+            else if ( (copy(str, 1, length('revive')) = 'revive') and (check_level(tc, GM_REVIVE)) ) then error_msg := command_revive(str)
+            else if ( (copy(str, 1, length('ban')) = 'ban') and (check_level(tc, GM_BAN)) ) then error_msg := command_ban(str)
+            else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc, GM_KICK)) ) then error_msg := command_kick(str)
+            else if ( (copy(str, 1, length('icon')) = 'icon') and (check_level(tc, GM_ICON)) ) then error_msg := command_icon(tc, str)
+            else if ( (copy(str, 1, length('unicon')) = 'unicon') and (check_level(tc, GM_UNICON)) ) then error_msg := command_unicon(tc, str)
+            else if ( (copy(str, 1, length('server')) = 'server') and (check_level(tc, GM_SERVER)) ) then error_msg := command_server()
+            else if ( (copy(str, 1, length('pvpon')) = 'pvpon') and (check_level(tc, GM_PVPON)) ) then error_msg := command_pvpon(tc)
+            else if ( (copy(str, 1, length('pvpoff')) = 'pvpoff') and (check_level(tc, GM_PVPOFF)) ) then error_msg := command_pvpoff(tc)
+            else if ( (copy(str, 1, length('gpvpon')) = 'gpvpon') and (check_level(tc, GM_GPVPON)) ) then error_msg := command_gpvpon(tc)
+            else if ( (copy(str, 1, length('gpvpoff')) = 'gpvpoff') and (check_level(tc, GM_GPVPOFF)) ) then error_msg := command_gpvpoff(tc)
+            else if ( (copy(str, 1, length('newplayer')) = 'newplayer') and (check_level(tc, GM_NEWPLAYER)) ) then error_msg := command_newplayer(str)
+            else if ( (copy(str, 1, length('pword')) = 'pword') and (check_level(tc, GM_PWORD)) ) then error_msg := command_pword(tc, str)
+            else if ( (copy(str, 1, length('users')) = 'users') and (check_level(tc, GM_USERS)) ) then error_msg := command_users()
+            else if ( (copy(str, 1, length('charblevel')) = 'charblevel') and (check_level(tc, GM_CHARBLEVEL)) ) then error_msg := command_charblevel(tc, str)
+            else if ( (copy(str, 1, length('charjlevel')) = 'charjlevel') and (check_level(tc, GM_CHARJLEVEL)) ) then error_msg := command_charjlevel(tc, str)
+            else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
+            else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
+            else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
         end else if gmstyle = '@' then begin
-            if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc.ID, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
-            else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc.ID, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
-            else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
-            else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
-			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
-            else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc.ID, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
-            else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc.ID, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
-            else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
-            else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc.ID, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
-            else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_ATHENA_SPEED)) ) then error_msg := command_athena_speed(tc, str)
-            else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc.ID, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
-            else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc.ID, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
-            else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc.ID, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
-            else if ( (copy(str, 1, length('jumpto')) = 'jumpto') and (check_level(tc.ID, GM_ATHENA_JUMPTO)) ) then error_msg := command_athena_jumpto(tc, str)
-            else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
-            else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_ATHENA_WHERE)) ) then error_msg := command_athena_where(tc, str)
-            else if ( (copy(str, 1, length('rura+')) = 'rura+') and (check_level(tc.ID, GM_ATHENA_RURAP)) ) then error_msg := command_athena_rurap(tc, str)
-            else if ( (copy(str, 1, length('rura')) = 'rura') and (check_level(tc.ID, GM_ATHENA_RURA)) ) then error_msg := command_athena_rura(tc, str)
-            else if ( (copy(str, 1, length('warp+')) = 'warp+') and (check_level(tc.ID, GM_ATHENA_WARPP)) ) then error_msg := command_athena_warpp(tc, str)
-            else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
-            else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc.ID, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
-            else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc.ID, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
-            else if ( (copy(str, 1, length('h')) = 'h') and (check_level(tc.ID, GM_ATHENA_H)) ) then error_msg := command_athena_h(tc, str)
-            else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc, str)
-            else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
-			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
-            else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
-            else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
-            else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
-            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_skpoint(tc, str)
-            else if ( (copy(str, 1, length('stpoint')) = 'stpoint') and (check_level(tc.ID, GM_ATHENA_STPOINT)) ) then error_msg := command_athena_stpoint(tc, str)
-            else if ( (copy(str, 1, length('str')) = 'str') and (check_level(tc.ID, GM_ATHENA_STR)) ) then error_msg := command_athena_str(tc, str)
-            else if ( (copy(str, 1, length('agi')) = 'agi') and (check_level(tc.ID, GM_ATHENA_AGI)) ) then error_msg := command_athena_agi(tc, str)
-            else if ( (copy(str, 1, length('vit')) = 'vit') and (check_level(tc.ID, GM_ATHENA_VIT)) ) then error_msg := command_athena_vit(tc, str)
-            else if ( (copy(str, 1, length('int')) = 'int') and (check_level(tc.ID, GM_ATHENA_INT)) ) then error_msg := command_athena_int(tc, str)
-            else if ( (copy(str, 1, length('dex')) = 'dex') and (check_level(tc.ID, GM_ATHENA_DEX)) ) then error_msg := command_athena_dex(tc, str)
-            else if ( (copy(str, 1, length('luk')) = 'luk') and (check_level(tc.ID, GM_ATHENA_LUK)) ) then error_msg := command_athena_luk(tc, str)
-            else if ( (copy(str, 1, length('spiritball')) = 'spiritball') and (check_level(tc.ID, GM_ATHENA_SPIRITBALL)) ) then error_msg := command_athena_spiritball(tc, str)
-            else if ( (copy(str, 1, length('questskill')) = 'questskill') and (check_level(tc.ID, GM_ATHENA_QUESTSKILL)) ) then error_msg := command_athena_questskill(tc, str)
-            else if ( (copy(str, 1, length('lostskill')) = 'lostskill') and (check_level(tc.ID, GM_ATHENA_LOSTSKILL)) ) then error_msg := command_athena_lostskill(tc, str)
-            else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc.ID, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
-            else if ( (copy(str, 1, length('item2')) = 'item2') and (check_level(tc.ID, GM_ATHENA_ITEM2)) ) then error_msg := command_athena_item2(tc, str)
-            else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
+            if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
+            else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
+            else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
+            else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
+			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
+            else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
+            else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
+            else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
+            else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
+            else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc, GM_ATHENA_SPEED)) ) then error_msg := command_athena_speed(tc, str)
+            else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
+            else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
+            else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
+            else if ( (copy(str, 1, length('jumpto')) = 'jumpto') and (check_level(tc, GM_ATHENA_JUMPTO)) ) then error_msg := command_athena_jumpto(tc, str)
+            else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
+            else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc, GM_ATHENA_WHERE)) ) then error_msg := command_athena_where(tc, str)
+            else if ( (copy(str, 1, length('rura+')) = 'rura+') and (check_level(tc, GM_ATHENA_RURAP)) ) then error_msg := command_athena_rurap(tc, str)
+            else if ( (copy(str, 1, length('rura')) = 'rura') and (check_level(tc, GM_ATHENA_RURA)) ) then error_msg := command_athena_rura(tc, str)
+            else if ( (copy(str, 1, length('warp+')) = 'warp+') and (check_level(tc, GM_ATHENA_WARPP)) ) then error_msg := command_athena_warpp(tc, str)
+            else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
+            else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
+            else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
+            else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc, str)
+            else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
+			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
+            else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
+            else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
+            else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
+            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_skpoint(tc, str)
+            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_skpoint(tc, str)
+            else if ( (copy(str, 1, length('stpoint')) = 'stpoint') and (check_level(tc, GM_ATHENA_STPOINT)) ) then error_msg := command_athena_stpoint(tc, str)
+            else if ( (copy(str, 1, length('str')) = 'str') and (check_level(tc, GM_ATHENA_STR)) ) then error_msg := command_athena_str(tc, str)
+            else if ( (copy(str, 1, length('agi')) = 'agi') and (check_level(tc, GM_ATHENA_AGI)) ) then error_msg := command_athena_agi(tc, str)
+            else if ( (copy(str, 1, length('vit')) = 'vit') and (check_level(tc, GM_ATHENA_VIT)) ) then error_msg := command_athena_vit(tc, str)
+            else if ( (copy(str, 1, length('int')) = 'int') and (check_level(tc, GM_ATHENA_INT)) ) then error_msg := command_athena_int(tc, str)
+            else if ( (copy(str, 1, length('dex')) = 'dex') and (check_level(tc, GM_ATHENA_DEX)) ) then error_msg := command_athena_dex(tc, str)
+            else if ( (copy(str, 1, length('luk')) = 'luk') and (check_level(tc, GM_ATHENA_LUK)) ) then error_msg := command_athena_luk(tc, str)
+            else if ( (copy(str, 1, length('spiritball')) = 'spiritball') and (check_level(tc, GM_ATHENA_SPIRITBALL)) ) then error_msg := command_athena_spiritball(tc, str)
+            else if ( (copy(str, 1, length('questskill')) = 'questskill') and (check_level(tc, GM_ATHENA_QUESTSKILL)) ) then error_msg := command_athena_questskill(tc, str)
+            else if ( (copy(str, 1, length('lostskill')) = 'lostskill') and (check_level(tc, GM_ATHENA_LOSTSKILL)) ) then error_msg := command_athena_lostskill(tc, str)
+            else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
+            else if ( (copy(str, 1, length('item2')) = 'item2') and (check_level(tc, GM_ATHENA_ITEM2)) ) then error_msg := command_athena_item2(tc, str)
+            else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
         end else if gmstyle = '/' then begin
-        	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
-            else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
-            else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc. ID, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
-            else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
-            else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
-            else if ( (aegistype = 'R') and (StrToInt(str) = 0) and (check_level(tc.ID, GM_AEGIS_RESETSTATE)) ) then error_msg := command_aegis_resetstate(tc, str)
-            else if ( (aegistype = 'R') and (StrToInt(str) = 1) and (check_level(tc.ID, GM_AEGIS_RESETSKILL)) ) then error_msg := command_aegis_resetskill(tc, str)
-            else if ( (aegistype = 'H') and (check_level(tc.ID, GM_AEGIS_HIDE)) ) then error_msg := command_aegis_hide(tc)
+        	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
+            else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
+            else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
+            else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level(tc, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
+            else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level(tc, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 0) and (check_level(tc, GM_AEGIS_RESETSTATE)) ) then error_msg := command_aegis_resetstate(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 1) and (check_level(tc, GM_AEGIS_RESETSKILL)) ) then error_msg := command_aegis_resetskill(tc, str)
+            else if ( (aegistype = 'H') and (check_level(tc, GM_AEGIS_HIDE)) ) then error_msg := command_aegis_hide(tc)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
         if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
     end;
 
-    function check_level(id : Integer; cmd : Integer) : Boolean;
+    function check_level(tc : TChara; cmd : Integer) : Boolean;
     var
-        idx : Integer;
-        tGM : TGM_Table;
+        tp : TPlayer;
     begin
         Result := False;
-        idx := GM_Access_DB.IndexOf(id);
-
-        if (idx <> -1) then begin
-            tGM := GM_Access_DB.Objects[idx] as TGM_Table;
-            if ( (tGM.ID = id) and (tGM.Level >= cmd) ) then Result := True;
-        end else begin
-            if (cmd = 0) then Result := True;
-        end;
+        tp := tc.PData;
+        if tp.AccessLevel >= cmd then Result := True;
     end;
 
     procedure error_message(tc : TChara; str : String);

@@ -11,7 +11,7 @@ uses
 	List32;
 
 const
-	RELEASE_VERSION = '1.211 O';
+	RELEASE_VERSION = '1.212 A -- R.E.E.D Alpha Release';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
@@ -1023,6 +1023,8 @@ TPlayer = class
 	LoginID2      :cardinal;
 	ver2          :word;
 	Saved         :byte;
+
+    AccessLevel   :byte;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -2415,7 +2417,7 @@ begin
 
 			tg.SLV := 0;
 			for i := 0 to (tg.RegUsers - 1) do begin
-				tg.SLV := tg.SLV + tg.Member[i].BaseLV;
+                if assigned(tg.Member[i]) then tg.SLV := tg.SLV + tg.Member[i].BaseLV;
 			end;
 		end;
 

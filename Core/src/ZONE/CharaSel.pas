@@ -154,57 +154,57 @@ begin
 				end;
 			end;
 		$0066: //キャラクタ選択要求
-			begin
-				if Socket.Data = nil then exit;
-				tp := Socket.Data;
-                                {2重ログインチェック}
-                                    count := 0;
-                                    while count < 8 do
-                                    begin
-                                      if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then
-                                      begin
-                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '2重ログインされました。');
-                                        //2重ログイン
-			        	      WFIFOW( 0, $0081);
-			       	              WFIFOB( 2, 08);
-			         	      tp.CData[count].Socket.SendBuf(buf, 3);
-                                      end;
-                                      inc(count);
-                                    end;
-                                  {2重ログインチェック　ここまで}
+            begin
+                if Socket.Data = nil then exit;
+                tp := Socket.Data;
+                {2重ログインチェック}
 
-				RFIFOB(2, b);
+                count := 0;
+                while count < 8 do begin
+                    if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '2重ログインされました。');
+                        //2重ログイン
+                        WFIFOW( 0, $0081);
+                        WFIFOB( 2, 08);
+                        tp.CData[count].Socket.SendBuf(buf, 3);
+                    end;
+                    inc(count);
+                end;
+                {2重ログインチェック　ここまで}
+
+                RFIFOB(2, b);
 				if b > 4 then exit;
 
+                //if UseSQL then GetCharaPartyGuild(tp.CID[b]);
+                tc := tp.CData[b];
 
-			  //if UseSQL then GetCharaPartyGuild(tp.CID[b]);
-				if tp.CData[b] <> nil then begin
-					tc := tp.CData[b];
+                if UseSQL then Load_Parties(tc.CID);
+                if UseSQL then Load_Pets(tc.ID);
+                if UseSQL then Load_Guilds(tc.CID);
 
-                                        if UseSQL then Load_Parties(tc.CID);
-                                        if UseSQL then Load_Pets(tc.ID);
-                                        if UseSQL then Load_Guilds(tc.CID);
-{NPCイベント追加}
-					i := MapInfo.IndexOf(tc.Map);
-					j := -1;
-					if (i <> -1) then begin
-						mi := MapInfo.Objects[i] as MapTbl;
-						if (mi.noSave = true) then j := 0;
-					end;
-					if (j = 0) then begin
-						tc.Map := tc.SaveMap;
-						tc.Point.X := tc.SavePoint.X;
-						tc.Point.Y := tc.SavePoint.Y;
-					end;
-{NPCイベント追加ココまで}
-					WFIFOW(0, $0071);
-					WFIFOL(2, tc.CID);
-					WFIFOS(6, tc.Map + '.rsw', 24);
-					WFIFOL(22, ServerIP);
-					WFIFOW(26, sv3port);
-					Socket.SendBuf(buf, 28);
-				end;
-			end;
+                {NPCイベント追加}
+                i := MapInfo.IndexOf(tc.Map);
+                j := -1;
+                if (i <> -1) then begin
+                    mi := MapInfo.Objects[i] as MapTbl;
+                    if (mi.noSave = true) then j := 0;
+                end;
+                if (j = 0) then begin
+                    tc.Map := tc.SaveMap;
+                    tc.Point.X := tc.SavePoint.X;
+                    tc.Point.Y := tc.SavePoint.Y;
+                end;
+                {NPCイベント追加ココまで}
+
+                tp.Login := 1;
+
+                WFIFOW(0, $0071);
+                WFIFOL(2, tc.CID);
+                WFIFOS(6, tc.Map + '.rsw', 24);
+                WFIFOL(22, ServerIP);
+                WFIFOW(26, sv3port);
+                Socket.SendBuf(buf, 28);
+            end;
 		$0067: //キャラ作成要求
 			begin
 				if Socket.Data = nil then exit;
