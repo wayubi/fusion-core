@@ -3866,13 +3866,6 @@ begin
 			Exit;
 		end;
 
-        { Alex: reverting to 007d requires a weapon sprite fix. }
-    	if (tc.Shield <> 0) then begin
-        	UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.Shield);
-		end else begin
-			UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.WeaponSprite[1]);
-		end;        
-
 		{if (pcnt <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//ˆÚ“®’†‚ÌŽž‚ÍˆÚ“®’âŽ~
 			Sit := 3;
@@ -4060,13 +4053,6 @@ begin
 	with tc do begin
 		tc1 := AData;
 		tm := MData;
-
-        { Alex: reverting to 007d requires a weapon sprite fix. }
-    	if (tc.Shield <> 0) then begin
-        	UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.Shield);
-		end else begin
-			UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.WeaponSprite[1]);
-		end;
 
 		if tc1.HP <= 0 then begin
 			tc1.HP := 0;
@@ -8814,6 +8800,14 @@ var
 begin
 	ts := nil;
 	tm := tc.MData;
+
+        { Alex: reverting to 007d requires a weapon sprite fix. }
+    	if (tc.Shield <> 0) then begin
+        	UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.Shield);
+		end else begin
+			UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.WeaponSprite[1]);
+		end;
+
 	with tc do begin
 		if ((ATarget <> 0) or (MMode <> 0)) then begin
 			ts := AData;

@@ -601,6 +601,14 @@ Begin(* Proc sv3PacketProcess() *)
 					//攻撃
 					RFIFOL(2, l);
 					tm := tc.MData;
+
+        { Alex: reverting to 007d requires a weapon sprite fix. }
+    	if (tc.Shield <> 0) then begin
+        	UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.Shield);
+		end else begin
+			UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.WeaponSprite[1]);
+		end;
+
           //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(l));
           ////////////////////////////////////
 					//モンスター型NPC（攻撃しようとすると開始）
