@@ -3330,128 +3330,75 @@ begin
 end;}
 //------------------------------------------------------------------------------
 procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; tc1:TChara=nil);
-// Killed by player triggers for a token to be dropped... one of Krietor's Ideas
 var
-  i : integer;
-//  j : integer;
-	mi : MapTbl;
-	{item : cardinal;
-	StartI  : cardinal;
-  EndI    : cardinal;}
+    i : integer;
+    mi : MapTbl;
 begin
-  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
-  // Set Hit Points to 0
-  tc.HP := 0;
-  // Display the character as dead
-  WFIFOW( 0, $0080);
-  WFIFOL( 2, tc.ID);
-  WFIFOB( 6, 1);
-  SendBCmd(tm, tc.Point, 7);
-  // Sit = 1 lets monsters know the char is dead and the player cannot move
-  tc.Sit := 1;
+    mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
-  if (tc1 = nil) or ( (tc1 <> nil) and ( (Option_PVP_XPLoss) or (mi.PvPN = true) ) ) then begin
-      // Subtract the Experience loss from the .ini
+    // Set character's HP to 0
+    tc.HP := 0;
 
-      { Wow, major mistake on my behalf. Fatal N version. }
+    // Sit = 1. Lets monsters know the char is dead and the player cannot move
+    tc.Sit := 1;
 
-      if ( tc.BaseEXP >= (Round(tc.BaseNextEXP div 100) * DeathBaseLoss) ) then begin
-      	tc.BaseEXP := tc.BaseEXP - (Round(tc.BaseNextEXP div 100) * DeathBaseLoss);
-      end else begin
-      	tc.BaseEXP := 0;
-      end;
+    // Display the character as dead
+    WFIFOW( 0, $0080);
+    WFIFOL( 2, tc.ID);
+    WFIFOB( 6, 1);
+    SendBCmd(tm, tc.Point, 7);
 
-      if ( tc.JobEXP >= (Round(tc.JobNextEXP div 100) * DeathJobLoss) ) then begin
-      	tc.JobEXP := tc.JobEXP - (Round(tc.JobNextEXP div 100) * DeathJobLoss);
-      end else begin
-      	tc.JobEXP := 0;
-      end;
+    if (tc1 = nil) or ( (tc1 <> nil) and ( (Option_PVP_XPLoss) or (mi.PvPN = true) ) ) then begin
 
+        // Base Experience Loss from Death
+        if ( tc.BaseEXP >= (Round(tc.BaseNextEXP div 100) * DeathBaseLoss) ) then begin
+            tc.BaseEXP := tc.BaseEXP - (Round(tc.BaseNextEXP div 100) * DeathBaseLoss);
+        end else begin
+            tc.BaseEXP := 0;
+        end;
 
-      { Ghetto Harb formulas. I submitted a bug report so long ago for darkweiss.
-        But he refused to fix it, saying his calc was better.
-      i := (100 - DeathBaseLoss);
-      tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
-      i := (100 - DeathJobLoss);
-      tc.JobEXP := Round(tc.JobEXP * (i / 100));
-      }
+        // Job Experience Loss from Death
+        if ( tc.JobEXP >= (Round(tc.JobNextEXP div 100) * DeathJobLoss) ) then begin
+            tc.JobEXP := tc.JobEXP - (Round(tc.JobNextEXP div 100) * DeathJobLoss);
+        end else begin
+            tc.JobEXP := 0;
+        end;
 
+        // Update displays
         SendCStat1(tc, 1, $0001, tc.BaseEXP);
         SendCStat1(tc, 1, $0002, tc.JobEXP);
         SendCStat1(tc, 0, $0005, tc.HP);
-  end;
-
-
-  tc.pcnt := 0;
-
-  if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
-
-  reset_skill_effects(tc);
-
-  { Alex: not needed since we're doing a full check for all buffs now. }
-  {if (tc.Option and 2 <> 0) then begin
-    tc.SkillTick := Tick;
-    tc.SkillTickID := 51;
-    tc.Skill[tc.SkillTickID].Tick := Tick;
-  end;
-
-  if (tc.Option and 4 <> 0) then begin
-    tc.SkillTick := Tick;
-    tc.SkillTickID := 135;
-    tc.Skill[tc.SkillTickID].Tick := Tick;
-  end;}
-  
-  // Krietor's idea for his server, can be commented out
-  // Drop items - Only when killed by a player
-  // I'll leave this commented out on the CVS
-	{if (StartDeathDropItem <> 0) and (KilledbyP = 1) then begin
-		StartI := StartDeathDropItem;
-		EndI   := EndDeathDropItem;
-		while (StartI <= EndI) do begin
-			j := SearchCInventory(tc, StartI, false);
-			if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
-				debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
-				//UseItem(tc, j);  //Use Item Function
-				ItemDrop(tm, tc, j, 1);
-				break;
-			end;
-		StartI := StartI + 1;
-		end;
-	end;
-  { 11006,PvP_Token,"PvP Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    11007,GvG_Token,"GvG Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    11008,CTF_Token,"CTF Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-
-  // Token's will drop depending on what kind of map is there
-  // PvP maps drop pvp tokens, and so on
-  if TokenDrop then begin
-    i := MapInfo.IndexOf(tc.Map);
-    if (i <> -1) then
-      mi := MapInfo.Objects[i] as MapTbl
-    else exit;  //Safe exit call
-    if mi.PvP then begin
-      CreateGroundItem(tm, 11006, tc.Point.X + Random(3), tc.Point.Y + Random(3));
     end;
-    if mi.PvPG then begin
-      CreateGroundItem(tm, 11007, tc.Point.X + Random(3), tc.Point.Y + Random(3));
-    end;
-    if mi.CTF then begin
-      CreateGroundItem(tm, 11008, tc.Point.X + Random(3), tc.Point.Y + Random(3));
-    end;
-  end; }
 
-//  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;  //moved to the top of procedure
-  if (mi.PvP = true) and (tc1 <> nil) then begin
-    tc1.PvPPoints := tc1.PvPPoints + 1;
-    tc.PvPPoints := tc.PvPPoints - 5;
-    CalcPvPRank(tm);
-    if tc.PvPPoints < 0 then begin
-        SendCLeave(tc.Socket.Data, 2);
-        tc.Map := tc.SaveMap;
-        tc.Point := tc.SavePoint;
-        MapMove(tc.Socket, tc.Map, tc.Point);
+    // Sets movement path to nil
+    tc.pcnt := 0;
+
+    // Sets any active targets to nil
+    if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
+
+    // Clears any active effect buffs
+    reset_skill_effects(tc);
+
+    if (mi.PvP = true) and (tc1 <> nil) then begin
+        tc1.PvPPoints := tc1.PvPPoints + 1;
+        tc.PvPPoints := tc.PvPPoints - 5;
+        CalcPvPRank(tm);
+
+        {
+            Forced return to the savemap. This may hinder custom games such as
+            tournaments held.
+
+            -Alex
+
+        if tc.PvPPoints < 0 then begin
+            SendCLeave(tc.Socket.Data, 2);
+            tc.Map := tc.SaveMap;
+            tc.Point := tc.SavePoint;
+            MapMove(tc.Socket, tc.Map, tc.Point);
+        end;
+
+        }
     end;
-  end;
 
 end;
 
@@ -6175,6 +6122,7 @@ begin
         map or on the server.
 
         -Alex
+    }
 
 
         if not assigned(tm.CList.Objects[i]) then Continue;
@@ -6187,7 +6135,7 @@ begin
         WFIFOL( 6, tc1.PvPRank);
         WFIFOL( 10, tm.CList.Count);
         tc1.Socket.SendBuf(buf, 14);
-    }
+
     end;
 end;
 
