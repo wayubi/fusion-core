@@ -1394,12 +1394,15 @@ begin
 		tss := TSlaveDB.Create;
 		with tss do begin
 			Name := sl.Strings[0];
-			Slaves[0] := MobDBName.IndexOf(sl.Strings[1]);
-			Slaves[1] := MobDBName.IndexOf(sl.Strings[2]);
-			Slaves[2] := MobDBName.IndexOf(sl.Strings[3]);
-			Slaves[3] := MobDBName.IndexOf(sl.Strings[4]);
-			Slaves[4] := MobDBName.IndexOf(sl.Strings[5]);
 			TotalSlaves := StrToInt(sl.Strings[6]);
+
+            for i := 1 to 5 do begin
+                if MobDBName.IndexOf(sl.Strings[i]) = -1 then
+                    Continue
+                else
+                    Slaves[i] := MobDBName.IndexOf(sl.Strings[i]);
+            end;
+
 		end;
 		SlaveDBName.AddObject(tss.Name,tss);
 		end;
