@@ -84,11 +84,9 @@ uses
         end;
 
         if tc.MTargetType = 0 then begin
-        	ts := TMob.Create;
             ts := tc.AData;
         	SendBCmd(tm, ts.Point, 15);
         end else begin
-        	tc1 := TChara.Create;
             tc1 := tc.AData;
 	        SendBCmd(tm, tc1.Point, 15);
         end;
@@ -103,12 +101,10 @@ uses
     begin
     	if dmg[0] < 0 then dmg[0] := 0;
 		if tc.MTargetType = 0 then begin
-			ts := TMob.Create;
 			ts := tc.AData;
 			SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
 			if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then frmMain.StatCalc1(tc, ts, Tick);
 		end else begin
-			tc1 := TChara.Create;
 			tc1 := tc.AData;
 			SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
 			if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then frmMain.StatCalc2(tc, tc1, Tick);
@@ -136,11 +132,9 @@ uses
         tl := tc.Skill[tc.MSkill].Data;
 
 		if tc.MTargetType = 0 then begin
-			ts := TMob.Create;
 			ts := tc.AData;
 			frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data2[tc.MUseLV]);
 		end else begin
-			tc1 := TChara.Create;
 			tc1 := tc.AData;
 			frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data2[tc.MUseLV]);
 		end;
@@ -185,7 +179,6 @@ uses
         if ( (tc.Skill[tc.MSkill].Lv * 3 + 50) >= rand ) then begin
         	{ Provoke Successful. % chance checked. } 
 	        if tc.MTargetType = 0 then begin
-    	    	ts := TMob.Create;
     			ts := tc.AData;
 
 	    		if ( (ts.Data.Race <> 1) and (ts.Data.MEXP = 0) ) then begin
@@ -201,7 +194,6 @@ uses
 	    		end;
     	    end else begin
         		{ PvP: Provoke Successful }
-        		tc1 := TChara.Create;
 	    		tc1 := tc.AData;
     	        tc1.ATarget := tc.ID;
         	    tc1.AData := tc;
@@ -243,11 +235,9 @@ uses
 
         if (tc.Weapon = 11) then begin
         	if tc.MTargetType = 0 then begin
-            	ts := TMob.Create;
                 ts := tc.AData;
                 frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, 0);
             end else begin
-            	tc1 := TChara.Create;
                 tc1 := tc.AData;
                 frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, 0);
             end;

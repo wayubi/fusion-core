@@ -1,3 +1,4 @@
+- 06-07-04: Removed memory leaks from Player_Skills.pas. [AlexKreuz]
 - 06-05-04: Created 'process_skill_attack' procedure for PSS system. [AlexKreuz]
 - 06-05-04: Switched skill [SM_BASH] to PSS system. [AlexKreuz]
 - 06-05-04: Switched skill [AC_DOUBLE] to PSS system. [AlexKreuz]
