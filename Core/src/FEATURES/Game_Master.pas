@@ -967,6 +967,7 @@ Called when we're shutting down the server *only*
     begin
         Result := 'GM_HCOLOR Failure.';
 
+        if str <> '' then begin
         Val(Copy(str, 8, 256), colour, k);
         if k = 0 then begin
             if (colour >= 0) and (colour <= 8) then begin
@@ -982,6 +983,11 @@ Called when we're shutting down the server *only*
 
         else begin
             Result := Result + ' Colour must be a valid integer.';
+        end;
+        end
+
+        else begin
+            Result := Result + ' Please enter a colour number.';
         end;
     end;
 
@@ -1011,16 +1017,25 @@ Called when we're shutting down the server *only*
 
     function command_hstyle(tc : TChara; str : String) : String;
     var
-        tm : TMap;
-        i, k : Integer;
+        style, k : Integer;
     begin
-        Result := 'GM_HSTYLE Success.';
+        Result := 'GM_HSTYLE Failure.';
 
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) then begin
-            tc.Hair := i;
-            UpdateLook(tm, tc, 1, i, 0, true);
+        Val(Copy(str, 8, 256), style, k);
+        if k = 0 then begin
+            if (style >= 0) and (style <= 20) then begin
+                Result := 'GM_HSTYLE Success.';
+                tc.Hair := style;
+                UpdateLook(tc.MData, tc, 1, style, 0, true);
+            end
+
+            else begin
+                Result := Result + ' Style must be in range [0-20].';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Style must be a valid integer.';
         end;
     end;
 
@@ -1028,16 +1043,15 @@ Called when we're shutting down the server *only*
     var
         s : String;
         tc1 : TChara;
-        tm : TMap;
     begin
-        Result := 'GM_KILL Success.';
+        Result := 'GM_KILL Failure.';
 
         s := Copy(str, 6, 256);
+        if s <> '' then begin
         if (CharaName.Indexof(s) <> -1) then begin
             tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
 
             if (tc1.Login = 2) then begin
-                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
                 tc1.HP := 0;
                 tc1.Sit := 1;
                 SendCStat1(tc1, 0, 5, tc1.HP);
@@ -1045,14 +1059,19 @@ Called when we're shutting down the server *only*
                 WFIFOW( 0, $0080);
                 WFIFOL( 2, tc1.ID);
                 WFIFOB( 6, 1);
-                SendBCmd(tm, tc1.Point, 7);
+                SendBCmd(tc1.MData, tc1.Point, 7);
 
                 Result := 'GM_KILL Success. ' + s + ' has been killed.';
             end else begin
-                Result := 'GM_KILL Failure. ' + s + ' is not logged in.';
+                Result := Result + ' ' + s + ' is not logged in.';
             end;
         end else begin
-            Result := 'GM_KILL Failure. ' + s + ' is an invalid character name.';
+            Result := Result + ' ' + s + ' is an invalid character name.';
+        end;
+        end
+
+        else begin
+            Result := Result + ' Please enter a character name.';
         end;
     end;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-17-04: Cleaned up the structure of #hstyle and #kill, and other minor fixes. [Trihan]
 - 10-17-04: Added 'Tested & Confirmed' 9 character slot support. [AlexKreuz]
 - 10-17-04: ISCS: Moved default channel back to #Fusion. [AlexKreuz]
 - 10-16-04: REED: Optimized Castle/Parties/Guild Loading. [AlexKreuz]
