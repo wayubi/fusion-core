@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-18-04: ItemDB access violation on shutdown caused crash. [AlexKreuz]
 - 08-18-04: Fixed bug #38: PVP rank recalculated on disconnect even if PVP isn't on. [Trihan]
 - 08-17-04: Commented out old school weiss files from backup (except status.txt). [Tsusai]
 - 08-17-04: Added W.A.C. Port modification option in JCon. [Tsusai]

@@ -1163,9 +1163,13 @@ begin
 	list of objects. Pure StringLists / IntLists are just free'd and are marked
 	explicitly.}
 
-	for Idx := ItemDB.Count-1 downto 0 do
-		if Assigned(ItemDB.Objects[Idx]) then
-			(ItemDB.Objects[Idx] AS TItemDB).Free;
+	for Idx := ItemDB.Count - 1 downto 0 do begin
+        try
+            if Assigned(ItemDB.Objects[Idx]) then (ItemDB.Objects[Idx] AS TItemDB).Free;
+        except
+            on EAccessViolation do Continue;
+        end;
+    end;
 	ItemDB.Free; //CR - Frees up 1.4Mb properly on close down that is leaked.
 	ItemDBName.Free;
 
