@@ -496,11 +496,6 @@ begin
                 end else begin
                         Option_AutoSave := 600;
                 end;
-                if sl.IndexOfName('Option_WelcomeMsg') <> -1 then begin
-                        Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
-                end else begin
-                        Option_WelcomeMsg := True;
-                end;
 
         sl.Clear;
 
@@ -658,7 +653,6 @@ begin
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
-        ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         // Fusion INI Lines
         
 	ini.Free;
@@ -9669,7 +9663,9 @@ begin
 								WFIFOL(10, tc1.ID);
 								WFIFOB(14, 1);
 								SendBCmd(tm, tc1.Point, 15);
-                                                                if tc.JID = 14 then tc1.Crusader := tc;
+                                                                if tc.MSkill = 255 then begin
+                                                                        if tc.JID = 14 then tc1.Crusader := tc;
+                                                                end;
 								//DebugOut.Lines.Add(Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
 								tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
 								tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;
@@ -12564,8 +12560,9 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if (tc.MMode = 0) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
+					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
 						//’Ç‰ÁˆÚ“®
+                                                if (tc.MMode = 0) and tc.Skill[278]
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
 						if k <> 0 then begin
@@ -13701,7 +13698,7 @@ begin
                 //RFIFOW(2, w);
         	//str := RFIFOS(4, w - 4);
 
-                w := 200;
+                w := 87;
         	WFIFOW(0, $009a);
 	        WFIFOW(2, w);
 	        WFIFOS(4, str, w);
