@@ -1509,8 +1509,9 @@ Option_GraceTime_PvPG :cardinal;
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
-                function  Monkdelay(tm:TMap; tc:TChara; Delay:integer) :boolean;
-                function  Tripleblow(tm:TMap; tc:TChara; Delay:word) :boolean;
+                procedure  Monkdelay(tm:TMap; tc:TChara; Delay:integer);
+                procedure  Tripleblow(tm:TMap; tc:TChara; Delay:word);
+
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
                 function  UseItem(tc:TChara; j:integer): boolean;
@@ -4045,16 +4046,15 @@ begin
         SendBCmd(tm, tc.Point, 8);
 end;
 //-----------------------------------------------------------------------------
-function Tripleblow(tm:TMap; tc:TChara; Delay:word) :boolean;
+procedure Tripleblow(tm:TMap; tc:TChara; Delay:word);
 begin
         WFIFOW( 0, $01d2);
         WFIFOL( 2, tc.ID);
         WFIFOW( 6, Delay);
-        // Colus, 20031222: This packet only has 8 bytes, not 16!
         SendBCmd(tm, tc.Point, 8);
 end;
 //------------------------------------------------------------------------------
-function Monkdelay(tm:TMap; tc:TChara; Delay:integer) :boolean;
+procedure Monkdelay(tm:TMap; tc:TChara; Delay:integer);
 begin
         WFIFOW( 0, $01d2);
         WFIFOL( 2, tc.ID);
