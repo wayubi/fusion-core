@@ -2803,10 +2803,11 @@ end;
 function TfrmMain.DamageProcess1(tm:TMap; tc:TChara; ts:TMob; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;
 var
         {Random Variables}
-	i,j :integer;
+		i,j,b :integer;
         w :Cardinal;
         xy:TPoint;
         tg    :TGuild;
+		bb  :array of byte;
 begin
 
   // AlexKreuz: Needed to stop damage to Emperium
@@ -2839,6 +2840,11 @@ begin
 	if (ts.EffectTick[0] > Tick) then begin
     // Dmg := Dmg * 2;  // Done in the DamageCalc functions
     ts.EffectTick[0] := 0;
+  end;
+
+  {Item Skill - Fatal Blow}
+  if (tc.SpecialAttack = 2) and (ts.Data.MEXP = 0) then begin {Fatal Blow}
+    if Random(10000) < 10 then Dmg := ts.HP;
   end;
 
 	if ts.HP < Dmg then Dmg := ts.HP;

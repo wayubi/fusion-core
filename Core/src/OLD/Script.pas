@@ -1604,6 +1604,24 @@ begin
                 begin
 
                 end;}
+      63: //Remove Equipment
+        begin
+          for  j := 1 to 100 do begin
+            if tc.Item[j].Equip = 32768 then begin
+              tc.Item[j].Equip := 0;
+              WFIFOW(0, $013c);
+              WFIFOW(2, 0);
+              tc.Socket.SendBuf(buf, 4);
+            end else if tc.Item[j].Equip <> 0 then begin
+              WFIFOW(0, $00ac);
+              WFIFOW(2, j);
+              WFIFOW(4, tc.Item[j].Equip);
+              tc.Item[j].Equip := 0;
+              WFIFOB(6, 1);
+              tc.Socket.SendBuf(buf, 7);
+            end;
+          end;
+        end;
 			44: //checkstr
 				begin
 					j := tn.Script[tc.ScriptStep].Data3[2];

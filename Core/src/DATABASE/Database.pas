@@ -372,6 +372,25 @@ begin
 			end;
 			for i := 0 to MAX_SKILL_NUMBER do AddSkill[i] := 0;
 			AddSkill[StrToInt(sl.Strings[42])] := StrToInt(sl.Strings[43]);
+			case td.Effect of
+          202:  {Monster Knockback}
+            begin
+              SpecialAttack := 1; {Knockback}
+            end;
+          203:  {Splash Damage}
+            begin
+              SplashAttack := true;
+            end;
+          204:  {Splash + Knockback}
+            begin
+              SplashAttack := true; {Splash}
+              SpecialAttack := 1; {Knockback}
+            end;
+          205:  {Fatal Blow}
+            begin
+              SpecialAttack := 2; {Fatal Blow}
+            end;
+          end;
 				case ID of
 				        4115:
                                                 begin

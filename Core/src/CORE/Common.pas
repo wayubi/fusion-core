@@ -101,6 +101,11 @@ type TItemDB = class
 	DrainPer   :array[0..1] of SmallInt; // Drain chance
 	AddSkill   :array[0..MAX_SKILL_NUMBER] of Word; // Skill addition
 	SplashAttack  :boolean;          // Splash attack
+	SpecialAttack :integer;
+    {
+      1 = Knockback
+      2 = Fatal Blow, .1% chance of instantly killing monster
+    }
         WeaponSkill   :integer;
         WeaponSkillLV :integer;
         WeaponID      :integer;
@@ -802,7 +807,13 @@ type TChara = class(TLiving)
 {ïœçX}
 	DrainFix      :array[0..1] of Integer; //ãzé˚ó    0:HP 1:SP
 	DrainPer      :array[0..1] of Integer; //ãzé˚ämó¶ 0:HP 1:SP
-	SplashAttack  :boolean;                //9É}ÉXçUåÇ
+	SplashAttack  :boolean;                //Causes an Area Attack
+	SpecialAttack :integer;
+    {
+      1 = Knockback
+      2 = Fatal Blow, .1% chance of instantly killing monster
+    }
+  KnockBackSuccess  :boolean;
         WeaponSkill   :integer;
         WeaponSkillLv :integer;
         WeaponID      :integer;
@@ -1924,6 +1935,8 @@ begin
                 end;
 
 		if td.SplashAttack then SplashAttack := true;
+		if td.SpecialAttack = 1 then tc.SpecialAttack := 1;
+    	if td.SpecialAttack = 2 then tc.SpecialAttack := 2;
                 if td.NoJamstone then  NoJamstone := true;
                 if td.AnolianReflect then AnolianReflect := true;
                 if td.FullRecover then FullRecover := true;
@@ -2345,6 +2358,7 @@ begin
 		DamageFixS[2] := 100;
                 FastWalk := false;
 		SplashAttack := false;
+		SpecialAttack := 0;
                 NoJamstone := false;
                 NoCastInterrupt := false;
                 FullRecover := false;
@@ -8444,7 +8458,14 @@ begin
 								SetLength(tn.Script[k].Data3, 1);
 								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
 								Inc(k);}
-
+							end else if str = 'removeEquipment' then begin //----- 62 Remove Equipment
+                				if sl1.Count <> 0 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [Reset Equipment] function error', [ScriptPath, lines]));
+									exit;
+								end;
+                				SetLength(tn.Script, k + 1);
+                				tn.Script[k].ID := 62;
+								Inc(k);
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [script] function error', [ScriptPath, lines]));
@@ -9100,6 +9121,7 @@ Begin
   	AddSkill[J] := Source.AddSkill[J];  // Skill addition
     end;
 
+	if Specialattack > 0 then SpecialAttack := Source.SpecialAttack;
 	SplashAttack  := Source.SplashAttack;
   WeaponSkill   := Source.WeaponSkill;
   WeaponSkillLV := Source.WeaponSkillLV;

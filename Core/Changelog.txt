@@ -1,3 +1,5 @@
+- 04-10-04: Added item effects 202-205, see database.pas for documentation. [Darkhelmet]
+- 04-10-04: Added removeEquipment Script command. [Darkhelmet]
 - 04-09-04: Retranslated map load packet, trimmed some useless code/comments. [Colus]
 - 04-09-04: Added standard UpdateLook function.  Standardized all view packets. [Colus]
 - 04-09-04: Added EnableLowerClassDyes option (defaults to FALSE) [Colus]
