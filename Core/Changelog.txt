@@ -1,3 +1,4 @@
+- 03-17-04: A little more object abstraction. [Colus]
 - 03-17-04: Reactivated peco/falcon/overweight icons without lag. [Colus]
 - 03-17-04: Standardized all status update calls. [Colus]
 - 03-17-04: Sohee pet skill no longer heals you when dead (or playing dead). [Colus]

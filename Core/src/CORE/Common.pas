@@ -18,8 +18,13 @@ const
 type TLiving = class
   public
     ID      :cardinal;
+    JID     :word;
     Name    :string;
+    Map     :string;
     Point   :TPoint;
+	  ppos    :integer;
+  	pcnt    :integer;
+  	path    :array[0..999] of byte;
 end;
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -287,8 +292,8 @@ end;
 type TMob = class(TLiving)
 	//ID          :cardinal;
 	//Name        :string;
-	JID         :word;
-	Map         :string;
+	//JID         :word;
+	//Map         :string;
 	//Point       :TPoint;
 	tgtPoint    :TPoint;
   NextPoint   :TPoint;
@@ -315,9 +320,9 @@ type TMob = class(TLiving)
 	MoveWait    :cardinal;
         DeadWait    :cardinal;                  // mf
 	DmgTick     :cardinal; //ノックバック
-	ppos        :integer;
-	pcnt        :integer;
-	path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	//ppos        :integer;
+	//pcnt        :integer;
+	//path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
   AMode       :byte;
 	ATarget     :cardinal;
 	AData       :Pointer;
@@ -598,7 +603,7 @@ type TChara = class(TLiving)
 	//Name          :string;
 	Gender        :byte;
 
-	JID           :Word;
+	//JID           :Word;
 	BaseLV        :word;
 	BaseEXP       :cardinal;
 	StatusPoint   :word;
@@ -671,7 +676,7 @@ type TChara = class(TLiving)
 	CharaNumber   :byte;
 	_4            :word;
 
-	Map           :string;
+	//Map           :string;
 	//Point         :TPoint;
 	SaveMap       :string;
 	SavePoint     :TPoint;
@@ -726,11 +731,11 @@ type TChara = class(TLiving)
 	HIT           :integer;
 	FLEE1         :integer;
 	FLEE2         :integer;
-        FLEE3         :integer;
+  FLEE3         :integer;
 	Critical      :word;
 	Lucky         :word;
 	ASpeed        :word;
-        Delay         :integer;
+  Delay         :integer;
 	ADelay        :word;
 	aMotion       :word;
 	dMotion       :word;
@@ -795,9 +800,9 @@ type TChara = class(TLiving)
 	SkillTickID   :word; //次にどのスキルが切れるか
 
 	MData         :Pointer;
-	ppos          :integer;
-	pcnt          :integer;
-	path          :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	//ppos          :integer;
+	//pcnt          :integer;
+	//path          :array[0..999] of byte; //キャラの経路(向きで記録されてます)
 	NextFlag      :boolean;
 	NextPoint     :TPoint;
 	MoveTick      :cardinal;
@@ -998,10 +1003,10 @@ type TNPC = class(TLiving)
 	//ID          :cardinal;
 	//Name        :string;
 {NPCイベント追加}
-//	JID         :word;
-	JID         :integer;
+	JID         :word;
+	//JID         :integer;  // Why make it integer?
 {NPCイベント追加ココまで}
-	Map         :string;
+	//Map         :string;
   Reg         :string;
 	//Point       :TPoint;
 	Dir         :byte;
@@ -1035,7 +1040,7 @@ type TNPC = class(TLiving)
 	//skill
 	Count       :word;
 	CData       :TChara;
-        MData       :TMob;
+  MData       :TMob;
 {追加}
 	MSkill      :Word;
 {追加ココまで}
@@ -1045,9 +1050,9 @@ type TNPC = class(TLiving)
         HungryTick  :cardinal;
         NextPoint   :TPoint;
         MoveTick    :cardinal;
-        ppos        :integer;
-	pcnt        :integer;
-        path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+        //ppos        :integer;
+	//pcnt        :integer;
+        //path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
 
         //AnkleTick   :cardinal;  //How long ankle snare lasts.
 {キューペットここまで}
