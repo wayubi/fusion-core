@@ -202,7 +202,7 @@ var
     function command_athena_send(tc : TChara; str : String) : String;
     function command_athena_warpp(tc : TChara; str : String) : String;
     function command_athena_charwarp(tc : TChara; str : String) : String;
-    function command_athena_help(tc : TChara) : String;
+    function command_athena_help(tc : TChara; str : String) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
     function command_athena_lvup(tc : TChara; str : String) : String;
@@ -546,7 +546,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
             else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc.ID, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
             else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc.ID, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
-            else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
+            else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc, str)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
             else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
@@ -3594,44 +3594,38 @@ Called when we're shutting down the server *only*
         sl.Free;
     end;
 
-    function command_athena_help(tc : TChara) : String;
+    function command_athena_help(tc : TChara; str : String) : String;
     var
-	    Help : TStringList;
-	    Idx  : Integer;
-	    J    : Integer;
-	    Len  : Integer;
+    	helpfile : TStringList;
+        sl : TStringList;
+        length : Integer;
+        i : Integer;
     begin
-    	Result := 'GM_ATHENA_HELP Failure.';
+        Result := 'GM_ATHENA_HELP Failure.';
 
-	    Help := TStringList.Create;
-	    try
-		    try
-			    Help.LoadFromFile( AppPath + 'help.txt' );
-		    except
-			    on EFOpenError do begin
-				    Result := Result + ' No help file found.';
-			    end;
-		    end;//try-except
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
 
-		    if Help.Count > 0 then begin
-			    Idx := Help.Count;
-			    J := 0;
-			    WFIFOS(4, '', 400);//pre-wipe the buffer used for 200 bytes.
-                // Broadcast style MOTD - 4 lines max, 195 char each
-				repeat
-					Len := Length(Help[J]);
-					if Len > 195 then Help[J] := Copy(Help[J],1,195);
-					WFIFOW(0, $009a);
-					WFIFOS(4, Help[J], Len+1);//Len+1 -> adds null termination
-					Inc(J);
-					tc.Socket.SendBuf(buf, 200);
+        helpfile := TStringList.Create;
+        try
+            helpfile.LoadFromFile(AppPath + 'documents\help.txt');
+        except
+            on EFOpenError do begin
+                message_green(tc, 'File not accessible. Contact your server admin.');
+                Result := Result + ' File not accessible.';
+                helpfile.Free;
+                Exit;
+            end;
+        end;
 
-                    Result := 'GM_ATHENA_HELP Success.';
-				until (J >= Idx);
-		    end;//if
-	    finally
-		    Help.Free;
-	    end;
+        if helpfile.Count > 150 then length := 150 else length := helpfile.Count;
+        for i := 0 to length do begin
+            message_green(tc, helpfile[i]);
+        end;
+
+        sl.Free;
+        helpfile.Free;
+        Result := 'GM_ATHENA_HELP Success.';
     end;
 
     function command_athena_zeny(tc : TChara; str : String) : String;
