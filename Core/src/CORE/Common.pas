@@ -1424,7 +1424,7 @@ MapGMsg           :string;
 {僆僾僔儑儞娭楢偙偙傑偱}
 
 // Fusion SQL Declarations
-UseSQL            :Boolean; {是否使用数据库}
+UseSQL            :Boolean;
 DbHost            :String;
 DbUser            :String;
 DbPass            :String;

@@ -331,7 +331,7 @@ begin
 	if sl.IndexOfName('AutoStart') <> -1 then begin
 		AutoStart := StrToBool(sl.Values['AutoStart']);
 	end else begin
-		AutoStart := false;
+		AutoStart := true;
 	end;
 	if sl.IndexOfName('DisableLevelLimit') <> -1 then begin
 		DisableLevelLimit := StrToBool(sl.Values['DisableLevelLimit']);
@@ -448,12 +448,12 @@ begin
   if sl.IndexOfName('MonsterMob') <> -1 then begin
 		MonsterMob := StrToBool(sl.Values['MonsterMob']);
 	end else begin
-		MonsterMob := false;
+		MonsterMob := true;
 	end;
   if sl.IndexOfName('SummonMonsterExp') <> -1 then begin
 		SummonMonsterExp := StrToBool(sl.Values['SummonMonsterExp']);
 	end else begin
-		SummonMonsterExp := false;
+		SummonMonsterExp := true;
 	end;
     if sl.IndexOfName('SummonMonsterAgo') <> -1 then begin
 		SummonMonsterAgo := StrToBool(sl.Values['SummonMonsterAgo']);
@@ -463,12 +463,12 @@ begin
     if sl.IndexOfName('SummonMonsterName') <> -1 then begin
 		SummonMonsterName := StrToBool(sl.Values['SummonMonsterName']);
 	end else begin
-		SummonMonsterName := false;
+		SummonMonsterName := true;
 	end;
   if sl.IndexOfName('SummonMonsterMob') <> -1 then begin
 		SummonMonsterMob := StrToBool(sl.Values['SummonMonsterMob']);
 	end else begin
-		SummonMonsterMob := false;
+		SummonMonsterMob := true;
 	end;
   if sl.IndexOfName('GlobalGMsg') <> -1 then begin
 		GlobalGMsg := sl.Values['GlobalGMsg'];
@@ -480,11 +480,6 @@ begin
 		MapGMsg := sl.Values['MapGMsg'];
 	end else begin
 		MapGMsg := 'Emperium Has Been Destroyed';
-	end;
-  if sl.IndexOfName('UseSQL') <> -1 then begin
-		UseSQL := StrToBool(sl.Values['UseSQL']);
-	end else begin
-		UseSQL := false;
 	end;
         if sl.IndexOfName('Timer') <> -1 then begin
 		Timer := StrToBool(sl.Values['Timer']);
@@ -526,41 +521,50 @@ begin
                         Option_GraceTime := 5000;
                 end;
                 if sl.IndexOfName('Option_GraceTime_PvPG') <> -1 then begin
-                        Option_GraceTime_PvPG := StrToInt(sl.Values['Option_Option_GraceTime_PvPG']);
+                        Option_GraceTime_PvPG := StrToInt(sl.Values['Option_GraceTime_PvPG']);
                 end else begin
                         Option_GraceTime_PvPG := 15000;
                 end;
 
+                sl.Clear;
+                sl1.Clear;
 
-        sl.Clear;
-        sl1.Clear;
+                ini.ReadSectionValues('MySQL Server', sl);
+                if sl.IndexOfName('Option_MySQL') <> -1 then begin
+                    UseSQL := StrToBool(sl.Values['Option_MySQL']);
+                end else begin
+                    UseSQL := false;
+                end;
 
-	ini.ReadSectionValues('Database', sl); // ¶ÁÈ¡Database½Ú
-	sl1.Delimiter := '.';
-	sl1.DelimitedText := sl.Values['dbhost'];
-	if sl1.Count = 4 then begin
-		DbHost := sl.Values['dbhost'];
-	end else begin
-		DbHost := '127.0.0.1';
-  end;
-  sl1.Free;
-	if sl.IndexOfName('dbuser') <> -1 then begin
-		DbUser := sl.Values['dbuser'];
-	end else begin
-		DbUser := 'root';
-	end;
-	if sl.IndexOfName('dbpass') <> -1 then begin
-		DbPass := sl.Values['dbpass'];
-	end else begin
-		DbPass := '';
-	end;
-	if sl.IndexOfName('dbname') <> -1 then begin
-		DbName := sl.Values['dbname'];
-	end else begin
-		DbName := 'nlogin';
-	end;
+                sl1.Delimiter := '.';
+                sl1.DelimitedText := sl.Values['MySQL_Address'];
 
-        sl.clear;
+                if sl1.Count = 4 then begin
+                    DbHost := sl.Values['MySQL_Address'];
+                end else begin
+                    DbHost := '127.0.0.1';
+                end;
+                sl1.Free;
+
+                if sl.IndexOfName('MySQL_Username') <> -1 then begin
+                    DbUser := sl.Values['MySQL_Username'];
+                end else begin
+                    DbUser := 'root';
+                end;
+
+                if sl.IndexOfName('MySQL_Password') <> -1 then begin
+                    DbPass := sl.Values['MySQL_Password'];
+                end else begin
+                    DbPass := '';
+                end;
+
+                if sl.IndexOfName('MySQL_Database') <> -1 then begin
+                    DbName := sl.Values['MySQL_Database'];
+                end else begin
+                    DbName := 'FusionSQL';
+                end;
+
+                sl.clear;
 
 	ini.ReadSectionValues('Option', sl);
 
@@ -592,7 +596,7 @@ begin
 		Priority := StrToInt(sl.Values['Priority']);
 		if Priority > 5 then Priority := 3;
 	end else begin
-		Priority := 3;
+		Priority := 1;
 	end;
 	if sl.IndexOfName('GMCheck') <> -1 then begin
 		GMCheck := StrToIntDef(sl.Values['GMCheck'],0);
@@ -725,18 +729,13 @@ begin
         ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
         ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
         ini.WriteString('Server', 'MapGMsg', MapGMsg);
-  ini.WriteString('Server', 'UseSQL', BoolToStr(UseSQL));
+
 	ini.WriteString('Option', 'Left', IntToStr(FormLeft));
 	ini.WriteString('Option', 'Top', IntToStr(FormTop));
 	ini.WriteString('Option', 'Width', IntToStr(FormWidth));
 	ini.WriteString('Option', 'Height', IntToStr(FormHeight));
 	ini.WriteString('Option', 'Priority', IntToStr(Priority));
         ini.WriteString('Option', 'Priority', IntToStr(Priority));
-
-	ini.WriteString('Database', 'dbhost', DbHost);
-	ini.WriteString('Database', 'dbuser', DbUser);
-	ini.WriteString('Database', 'dbpass', DbPass);
-	ini.WriteString('Database', 'dbname', DbName);
 
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
@@ -745,6 +744,14 @@ begin
         ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
         ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         // Fusion INI Lines
+        
+        // MySQL Server Lines
+        ini.WriteString('MySQL Server', 'Option_MySQL', BoolToStr(UseSQL));
+        ini.WriteString('MySQL Server', 'MySQL_Address', DbHost);
+        ini.WriteString('MySQL Server', 'MySQL_Username', DbUser);
+        ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
+        ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
+        // MySQL Server Lines
         
 	ini.Free;
 
