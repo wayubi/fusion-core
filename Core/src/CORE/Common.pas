@@ -1646,6 +1646,7 @@ DbName            :String;
 
 // Fusion INI Declarations
 Option_PVP        :boolean;
+Option_PVP_Steal  :boolean;
 Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_AutoBackup   :word;
@@ -1753,7 +1754,7 @@ Option_Font_Style : string;
                 function  UseUsableItem(tc:TChara; w:integer) :boolean;
                 function  UpdateWeight(tc:TChara; j:integer; td:TItemDB)  :boolean;
                 function  GetMVPItem(tc1:TChara; ts:TMob; mvpitem:boolean) :boolean;
-                function  StealItem(tc:TChara; ts:TMob) :boolean;
+                function  StealItem(tc:TChara) :boolean;
 
     procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0); // Make a Living disappear
 
@@ -9741,82 +9742,165 @@ begin
 
 end;
 //------------------------------------------------------------------------------
-function StealItem(tc:TChara; ts:TMob) :boolean;
+function StealItem(tc:TChara) :boolean;
 var
-	i,k    :integer;
+	i,k, w    :integer;
 	mdrop  :array[0..7] of integer;
+    success:double;
+    weight :integer;
 	td     :TItemDB;
 	modfix :integer;
 	rand   :integer;
 	tm     :TMap;
+    ts     :TMob;
+    tc1    :TChara;
+    str      :string;
 begin
-  tm := tc.MData;
+    tc1 := tchara.Create;
+    ts := tmob.create;
 
-  // Modifier calc:
-  // adjusted drop ratio = (10 + 3*skill + cdex - mdex)% * drop
-  // This is really draconian even for high drops.  A poring drops jellopies 70%,
-  // but a normal thief rarely has a mod over 50 (steal 5, 30 dex).  So 35% just for jellopy?  Bah.
-  // So, we added a multiplier.  However: If your multiplier was negative, multiplying
-  // made it more negative!  Oh, sweet irony!
-  // Therefore the effect of the multiplier is calculated a bit differently now.
-  //
-  // Old:
-  //modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
-  //modfix := modfix * StealMultiplier div 100;
-  modfix := ((tc.Skill[50].Data.Data1[tc.Skill[50].Lv] * StealMultiplier div 100) + tc.Param[4] - ts.Data.Param[4]);
+    tc1 := nil;
+    ts := nil;
+    
+    tm := tc.MData;
 
-  // This isn't the right check!  It checks for leaders.  We have
-  // isLeader and isSlave now for that...
-  //k := SlaveDBName.IndexOf(ts.Data.Name);
-  //if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
-  if ((ts.isSlave) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
-    Result := false;
-    exit;
-  end;
-
-  for i := 0 to 7 do begin
-    mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
-    rand := Random(20000) mod 10000;
-    //DebugOut.Lines.Add(Format('Drop %d, dropid %d, modfix %d, mdrop %d, rand %d',[i,ts.Data.Drop[i].ID,modfix,mdrop[i],rand]));
-    if rand <= mdrop[i] then begin
-                                     // Graphic send
-                                     WFIFOW( 0, $011a);
-                                     WFIFOW( 2, 50);
-                                     WFIFOW( 4, 0);
-                                     WFIFOL( 6, ts.ID);
-                                     WFIFOL(10, tc.ID);
-                                     WFIFOB(14, 1);
-                                     SendBCmd(tm,ts.Point,15);
-
-                                     k := ts.Data.Drop[i].Data.ID;
-                                     td := ItemDB.IndexOfObject(k) as TItemDB;
-                                     if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
-                                      k := SearchCInventory(tc, td.ID, td.IEquip);
-                                      if k <> 0 then begin
-                                        if tc.Item[k].Amount < 30000 then begin
-                                          //アイテム追加
-                                          UpdateWeight(tc, k, td);
-
-                                          //tc.Socket.SendBuf(buf, 8);
-                                          //アイテムゲット通知
-                                          SendCGetItem(tc, k, 1);
-                                          ts.Stolen := tc.ID;
-                                          Result := true;
-                                          exit;
-
-                                        end;
-                                      end;
-                                     end else begin
-                                      // Overweight, failed to get item.
-                                      WFIFOW( 0, $00a0);
-                                      WFIFOB(22, 2);
-                                      tc.Socket.SendBuf(buf, 23);
-                                     end; {end item added}
-
+    if (tm.CList.IndexOf(tc.MTarget) <> -1) then begin
+        tc1 := tc.adata;
+    end else begin
+        ts := tc.adata;
     end;
-  end;
 
-  Result := false;
+    // Modifier calc:
+    // adjusted drop ratio = (10 + 3*skill + cdex - mdex)% * drop
+    // This is really draconian even for high drops.  A poring drops jellopies 70%,
+    // but a normal thief rarely has a mod over 50 (steal 5, 30 dex).  So 35% just for jellopy?  Bah.
+    // So, we added a multiplier.  However: If your multiplier was negative, multiplying
+    // made it more negative!  Oh, sweet irony!
+    // Therefore the effect of the multiplier is calculated a bit differently now.
+    //
+    // Old:
+    //modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
+    //modfix := modfix * StealMultiplier div 100;
+
+    modfix := ((tc.Skill[50].Data.Data1[tc.Skill[50].Lv] * StealMultiplier div 100) + tc.Param[4]);
+
+    if assigned(ts) then begin
+        modfix := modfix - ts.Data.Param[4];
+    end else if assigned (tc1) then begin
+        modfix := modfix - tc1.Param[4];
+    end;
+
+    // This isn't the right check!  It checks for leaders.  We have
+    // isLeader and isSlave now for that...
+    //k := SlaveDBName.IndexOf(ts.Data.Name);
+    //if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
+    if assigned(ts) then begin
+        if ((ts.isSlave) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
+            Result := false;
+            exit;
+        end;
+    end;
+
+    if assigned(tc1) then begin
+        for i := 1 to 100 do begin
+            if tc1.Item[i].ID <> 0 then begin
+                if tc1.Item[i].Equip <> 0 then begin
+                    modfix := modfix - tc1.param[0];
+                end;
+                weight := tc1.Item[i].Data.Weight;
+                success := muldiv(modfix, 100, weight);
+                rand := Random(20000) mod 10000;
+                if rand <= success then begin
+                    WFIFOW( 0, $011a);
+                    WFIFOW( 2, 50);
+                    WFIFOW( 4, 0);
+                    WFIFOL( 6, tc1.ID);
+                    WFIFOL(10, tc.ID);
+                    WFIFOB(14, 1);
+                    SendBCmd(tm,tc1.Point,15);
+
+                    k := tc1.item[i].ID;
+                    td := ItemDB.IndexOfObject(k) as TItemDB;
+                    if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
+                        k := SearchCInventory(tc, td.ID, td.IEquip);
+                        if k <> 0 then begin
+                            if tc.Item[k].Amount < 30000 then begin
+                                UpdateWeight(tc, k, td);
+                                SendCGetItem(tc, k, 1);
+
+                                WFIFOW( 0, $00af);
+                                WFIFOW( 2, i);
+                                WFIFOW( 4, 1);
+                                tc1.Socket.SendBuf(buf, 6);
+                                
+                                tc1.Item[i].Amount := tc1.Item[i].Amount - 1;
+                                if tc1.Item[i].Amount = 0 then tc1.Item[i].ID := 0;
+                                tc1.Weight := tc1.Weight - tc1.Item[i].Data.Weight;
+                                tc1.Socket.SendBuf(buf, 6);
+                                SendCStat1(tc, 0, $0018, tc1.Weight);
+
+                                str := tc.Name + ' stole one ' + tc1.item[i].Data.Name + ' from you.';
+                                w := length(STR) + 4;
+                                WFIFOW(0, $009a);
+                                WFIFOW(2, w);
+                                WFIFOS(4, str, w - 4);
+                                tc1.Socket.SendBuf(buf, w);
+
+                                Result := true;
+                                Exit;
+                            end;
+                        end;
+                    end else begin
+                        // Overweight, failed to get item.
+                        WFIFOW( 0, $00a0);
+                        WFIFOB(22, 2);
+                        tc.Socket.SendBuf(buf, 23);
+                    end; {end item added}
+                end;
+            end;
+        end;
+    end else
+
+    if assigned(ts) then begin
+        for i := 0 to 7 do begin
+            mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
+            rand := Random(20000) mod 10000;
+            //DebugOut.Lines.Add(Format('Drop %d, dropid %d, modfix %d, mdrop %d, rand %d',[i,ts.Data.Drop[i].ID,modfix,mdrop[i],rand]));
+            if rand <= mdrop[i] then begin
+                // Graphic send
+                WFIFOW( 0, $011a);
+                WFIFOW( 2, 50);
+                WFIFOW( 4, 0);
+                WFIFOL( 6, ts.ID);
+                WFIFOL(10, tc.ID);
+                WFIFOB(14, 1);
+                SendBCmd(tm,ts.Point,15);
+
+                k := ts.Data.Drop[i].Data.ID;
+                td := ItemDB.IndexOfObject(k) as TItemDB;
+                if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
+                    k := SearchCInventory(tc, td.ID, td.IEquip);
+                    if k <> 0 then begin
+                        if tc.Item[k].Amount < 30000 then begin
+                            UpdateWeight(tc, k, td);
+                            //tc.Socket.SendBuf(buf, 8);
+                            SendCGetItem(tc, k, 1);
+                            ts.Stolen := tc.ID;
+                            Result := true;
+                            exit;
+                        end;
+                    end;
+                end else begin
+                    // Overweight, failed to get item.
+                    WFIFOW( 0, $00a0);
+                    WFIFOB(22, 2);
+                    tc.Socket.SendBuf(buf, 23);
+                end; {end item added}
+            end;
+        end;
+    end;
+
+    Result := false;
 end;
 //------------------------------------------------------------------------------
 procedure RFIFOB(index:word; var b:byte);

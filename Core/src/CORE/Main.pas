@@ -619,6 +619,11 @@ begin
                 end else begin
                         Option_Pet_Capture_Rate := 100;
                 end;
+    if sl.IndexOfName('Option_PVP_Steal') > -1 then begin
+                        Option_PVP_Steal := StrToBool(sl.Values['Option_PVP_Steal']);
+                end else begin
+                        Option_PVP_Steal := False;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -915,6 +920,7 @@ begin
 
 	// Fusion INI Lines
 	ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
+    ini.WriteString('Fusion', 'Option_PVP_Steal', BoolToStr(Option_PVP_Steal));
 	ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
 	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
 	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
@@ -3949,7 +3955,7 @@ begin
               20040122: No more Snatching with ranged weapons.}
       {TODO: Figure out proper modification of Snatcher by Steal skill.}
       if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (tc.Weapon <> 11) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
-        StealItem(tc, ts);
+        StealItem(tc);
       end;
       SendCAttack1(tc, dmg[0], dmg[1], dmg[4], dmg[5], tm, ts, Tick);
 
@@ -5756,7 +5762,11 @@ var
   tn :TNPC;
 
 begin
-	ProcessType := 0;
+    // Alex: This should not be preset. Depending on certain skill failure
+    // such as I encountered with "Steal" this will cause the skill effect
+    // to go through even when the skill fails.  I'm not sure which skills need
+    // this, but it should be declared in the skill section, not out here.
+	ProcessType := 99;
 
   if tc.Skill[269].Tick > Tick then begin  //Check if BladeStop is active
     case tc.Skill[269].Effect1 of
@@ -5857,22 +5867,20 @@ begin
                                         tc.MPoint.Y := 0;
                                 end;}
 
-                                50:     {Steal}
+                                50: {Steal}
+                                {Colus, 20040305: Redid it all.  Again.  Using info on formulas obtained
+                                from fansites and confirmations on algorithm from disassemblers.}
                                 begin
-                                  {Colus, 20040305: Redid it all.  Again.  Using info on formulas obtained
-                                   from fansites and confirmations on algorithm from disassemblers.}
-                                  if not (StealItem(tc, ts)) then begin
-                                    SendSkillError(tc, 0);
-
-                                    tc.MMode := 4;
-                                    tc.MPoint.X := 0;
-                                    tc.MPoint.Y := 0;
-                                    DecSP(tc, 50, MUseLV);
-                                  end;
-                                  // Delay after stealing
-                                  tc.MTick := Tick + 1000;
-
-				end; {end Steal}
+                                    if not (StealItem(tc)) then begin
+                                        SendSkillError(tc, 0);
+                                        tc.MMode := 4;
+                                        tc.MPoint.X := 0;
+                                        tc.MPoint.Y := 0;
+                                        DecSP(tc, 50, MUseLV);
+                                    end;
+                                    // Delay after stealing
+                                    tc.MTick := Tick + 1000;
+                                end; {end Steal}
 
                                 250:    {Shield Charge}
                                 begin
@@ -9955,6 +9963,29 @@ begin
                                                         end;
                                                 end;
 					end;}
+
+
+                                50: {Steal}
+                                begin
+                                    if Option_PVP_Steal then begin
+                                        if not (StealItem(tc)) then begin
+                                            SendSkillError(tc, 0);
+                                            tc.MMode := 4;
+                                            tc.MPoint.X := 0;
+                                            tc.MPoint.Y := 0;
+                                            DecSP(tc, 50, MUseLV);
+                                        end;
+                                    end else begin
+                                        SendSkillError(tc, 0);
+                                        tc.MMode := 4;
+                                        tc.MPoint.X := 0;
+                                        tc.MPoint.Y := 0;
+                                        DecSP(tc, 50, MUseLV);
+                                    end;
+                                    // Delay after stealing
+                                    tc.MTick := Tick + 1000;
+                                end;
+
                                 250:    //Shield Charge
                                         begin
                                     if (tc.Shield <> 0) then begin // 20040324,Eliot: It should check if You have a shield.

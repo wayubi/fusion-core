@@ -1,3 +1,4 @@
+- 05-27-04: Added #888 - Feature Request: Option_PVP_Steal - INI option to steal from players. [AlexKreuz]
 - 05-27-04: Added Option_MOTD (0/1) to enable on the fly messages. FeatureReq #445 [ChrstphrR]
 - 05-27-04: Added Option_MOTD_File (RelativePath, 4 lines, 195char per, max) [ChrstphrR]
 - 05-27-04: SendMOTD routine - sends up to 4 lines to newly-joining Characters. [ChrstphrR]
