@@ -331,7 +331,7 @@ R 008a <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1
 	type=01 Pick up an item.  Only the IDs are used.
 	type=02 Sit.  Only src ID is used.
 	type=03 Stand.  Only src ID is used.
-	type=08 Multiple attack.
+	type=08 Multiple attack.  When param2 is 2, double attack; when param2 is 255, Triple Attack.  (Go figure.)
 	type=09 Damage without damage motion (damage while Enduring)
 	type=0a Critical attack.
 	type=0b Perfect evade.
