@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
-- 01-01-04: Added NPC areaset. [Tsusai]
+- 01-01-05: Other characters disconnecting while moving caused missend of packet. [AlexKreuz]
+- 01-01-05: Added NPC areaset. [Tsusai]
 - 12-31-04: Added Packet tracing output switch to weiss.ini. [AlexKreuz]
 - 12-31-04: Pets did not load on server restart. [AlexKreuz]
 - 12-31-04: Bug #25: Deleting character did not remove chara gamedata. [AlexKreuz]

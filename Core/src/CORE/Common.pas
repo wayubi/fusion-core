@@ -4224,8 +4224,8 @@ begin
 
 {追加ココまで}
 {修正}
-	if tc.ver2 = 9 then Socket.SendBuf(buf, 60)  //Kr?
-	else                Socket.SendBuf(buf, 58); //Jp
+	if tc.ver2 = 9 then if not (tc.Login = 0) then Socket.SendBuf(buf, 60)  //Kr?
+	else if not (tc.Login = 0) then Socket.SendBuf(buf, 58); //Jp
 {修正ココまで}
 	//WFIFOW( 0, $007f);
 	//WFIFOL( 2, timeGetTime()+1000);
