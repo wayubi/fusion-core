@@ -5,7 +5,7 @@ interface
 uses
     MMSystem, Classes, SysUtils,
     Common, SQLData,
-    Zip, List32;
+    Zip, List32, PlayerData;
 
     function check_attack_lag(tc : TChara) : Boolean;
 
@@ -78,16 +78,16 @@ uses
 
     function remove_badsavechars(str : String) : String;
     begin
-        str := StringReplace(str, '\', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '/', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, ':', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '*', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '?', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '<', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '>', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '|', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '"', ' ', [rfReplaceAll, rfIgnoreCase]);
-        str := StringReplace(str, '.', ' ', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '\', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '/', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, ':', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '*', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '?', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '<', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '>', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '|', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '"', '-', [rfReplaceAll, rfIgnoreCase]);
+        str := StringReplace(str, '.', '-', [rfReplaceAll, rfIgnoreCase]);
         Result := str;
     end;
 
@@ -235,6 +235,8 @@ uses
             tg.Member[i] := tg.Member[i + 1];
             tg.MemberPos[i] := tg.MemberPos[i + 1];
             tg.MemberEXP[i] := tg.MemberEXP[i + 1];
+            if assigned(tg.Member[i]) then
+                Dec(tg.Member[i].GuildPos);
         end;
 
         if UseSQL then DeleteGuildMember(tc1.CID,2,tgb,tg.ID);

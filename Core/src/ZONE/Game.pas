@@ -4006,8 +4006,13 @@ end;
 					Socket.SendBuf(buf, 6);
 
 					//ƒMƒ‹ƒhíœˆ—
+                    tg.Member[0] := nil;
+                    tg.MemberID[0] := 0;
+
+                    PD_Save_Guilds_Members(true);
 					if UseSQL then DeleteGuildInfo(tc.GuildID);
 					GuildList.Delete(GuildList.IndexOf(tc.GuildID));
+
 					tc.GuildID := 0;
 					tc.GuildName := '';
 					tc.ClassName := '';

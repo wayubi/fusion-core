@@ -4861,6 +4861,7 @@ Begin
 			//365:   //Magic Crusher PVP by Eliot
 			//	begin
                 // CRASH July 26, 2004 - Darkhelmet, integer overflow on line 2
+                // Who told you to set your xp rate so high XD - Alex
 					{dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100; // Calculate Attack Power - Eliot
 					dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100 - tc1.MDEF2; // Calculate Magic Defense - Eliot & added INT defence - KyuubiKitsune
 					dmg[0] := dmg[0] - tc1.Param[3];
