@@ -329,6 +329,8 @@ type TMob = class
 
         Hidden     :boolean;
 
+        AnkleSnareTick :cardinal;  //Tracks how long ankle snare lasts
+
 {NPCイベント追加ココまで}
 	constructor Create;
 	destructor Destroy; override;
@@ -792,6 +794,8 @@ type TChara = class
         Autocastactive :Boolean;
         noday         :Boolean;
 
+        AnkleSnareTick :cardinal; {How long a character is trapped in ankle snare}
+
         PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
 
         isCloaked     :Boolean;   {Says if Cloaking is Active}
@@ -952,6 +956,8 @@ type TNPC = class
         ppos        :integer;
 	pcnt        :integer;
         path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+
+        //AnkleTick   :cardinal;  //How long ankle snare lasts.
 {キューペットここまで}
 end;
 //------------------------------------------------------------------------------

@@ -181,7 +181,7 @@ begin
 
 	DebugOut := txtDebug;
 
-	Caption := ' Fusion 1.2.0.8 BETA'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
+	Caption := ' Fusion 1.2.0.9 CVS Release'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
 
 	ScriptList := TStringList.Create;
 
@@ -1136,7 +1136,7 @@ var
         str2:string;
 
 begin
-        UpdateMonsterDead(tm, ts, k);
+        UpdateMonsterDead(tm, ts, 1);
 	{WFIFOW( 0, $0080);
 	WFIFOL( 2, ts.ID);
 	WFIFOB( 6, 1);
@@ -2477,9 +2477,10 @@ begin
 			end;
 		end;
 	end;
-	if ts.HP > 0 then begin
+	if (ts.HP > 0) then begin
+                if (ts.AnkleSnareTick < Tick) then Exit;
 		//ターゲット設定
-		if EnableMonsterKnockBack then begin
+		if (EnableMonsterKnockBack) then begin
 			ts.pcnt := 0;
 			if ts.ATarget = 0 then begin
 				w := Tick + ts.Data.dMotion + tc.aMotion;
@@ -2492,7 +2493,7 @@ begin
 			if ts.ATarget = 0 then ts.ATick := Tick;
 			if ts.ATarget <> tc.ID then
 				ts.pcnt := 0
-			else if ts.pcnt <> 0 then begin
+			else if (ts.pcnt <> 0)  then begin
 				//DebugOut.Lines.Add('Monster Knockback!');
 				        SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				        SendBCmd(tm, ts.Point, 58, tc,True);
@@ -10635,29 +10636,24 @@ begin
 								SendBCmd(tm, ts1.Point, 10);
 							end;}
 
-							{//$91: //AS  - Fixed by Bellium (Crimson)
+							$91:    {Ankle Snare Trapping PVP}
 							begin
-								if tn.Count <> 0 then begin
-                if not flag then Break; //踏んでない
-								//if Random(1000) < tn.CData.Skill[117].Data.Data2[tn.Count] * 10 then begin
-									if (tc2.Stat1 <> 5) then begin
-										ts1.nstat := 5;
-										ts1.BodyTick := Tick + tc1.aMotion;
-									end;
-								//end;
+								if (tn.Count <> 0) and (tc2 <> tn.CData) then begin
+                                                                        if not flag then Break; //踏んでない
+
+                                                                        tc2.AnkleSnareTick := tn.Tick;
+
 									tn.Tick := Tick + tn.Count * 10000;
-									ts1.DmgTick := Tick + tn.Count * 10000;
-									ts1.Point.X := tn.Point.X;
-									ts1.Point.Y := tn.Point.Y;
-									ts1.pcnt := 0;
-									WFIFOW(0, $0088);
-									WFIFOL(2, ts1.ID);
-									WFIFOW(6, ts1.Point.X);
-									WFIFOW(8, ts1.Point.Y);
-									SendBCmd(tm, ts1.Point, 10);
-									if c = (sl.Count -1) then tn.Count := 0;
+									//ts1.DmgTick := Tick + tn.Count * 10000;
+									tc2.Point.X := tn.Point.X;
+									tc2.Point.Y := tn.Point.Y;
+									tc2.pcnt := 0;
+
+                                                                        UpdatePlayerLocation(tm, tc2);
+                                                                        tn.Count := 0;
+									if c = (sl2.Count -1) then tn.Count := 0;
 								end;
-							end;}
+							end;
 
 						$93: //LM
 							begin
@@ -11101,10 +11097,10 @@ begin
 								
 							end;
 
-							$91: //AS  - Fixed by Bellium (Crimson)
+							$91:    {Ankle Snare Trapping Code}
 							begin
 								if tn.Count <> 0 then begin
-                if not flag then Break; //踏んでない
+                                                                        if not flag then Break; //踏んでない
 								//if Random(1000) < tn.CData.Skill[117].Data.Data2[tn.Count] * 10 then begin
 									if (ts1.Stat1 <> 5) then begin
                                                                                 ts1.Data.Mode:= 0;
@@ -11112,8 +11108,9 @@ begin
 										ts1.BodyTick := Tick + tc1.aMotion;
 									end;
 								//end;
+                                                                        ts1.AnkleSnareTick := tn.Tick;
 									tn.Tick := Tick + tn.Count * 10000;
-									ts1.DmgTick := Tick + tn.Count * 10000;
+									//ts1.DmgTick := Tick + tn.Count * 10000;
 									ts1.Point.X := tn.Point.X;
 									ts1.Point.Y := tn.Point.Y;
 									ts1.pcnt := 0;
@@ -12530,7 +12527,7 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
+					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
 						//追加移動
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
@@ -12879,7 +12876,7 @@ begin
 											end;
 												if (j < 100) then begin
 												ppos := 0;
-												if pcnt <> 0 then begin
+												if (pcnt <> 0) and (ts.AnkleSnareTick < Tick) then begin
 													MoveTick := Tick;
 													tgtPoint := xy;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 ---------------------------------------------------------------------------------
+- 01-13-04: Added Ankle Snare PvP.  [Darkhelmet]
 - 01-13-04: Fixed a problem with the map load packet.  [Colus]
 - 01-13-04: Prevent Saving of Negative HP. Fixed Crash. [AlexKreuz]
 - 01-12-04: Fixed Weapon Bug on startup? [Savian?]
