@@ -1177,14 +1177,14 @@ end;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc1.socket.sendbuf(buf, w);
+                tc.socket.sendbuf(buf, w);
               end else begin
                 str := tc1.Name + ' located at: ' + tc1.Map + ' (' + IntToStr(tc1.Point.X) + ',' + IntToStr(tc1.Point.Y) + ')';
                 w := Length(str) + 4;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc1.socket.sendbuf(buf, w);
+                tc.socket.sendbuf(buf, w);
               end;
             end else begin
               str := 'Couldnt find player: ' + s;
