@@ -1,3 +1,4 @@
+- 04-07-04: Added Athena GM Commands - @who. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @jump. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @jumpto, @warpto. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @where. [AlexKreuz]

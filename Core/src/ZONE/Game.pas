@@ -873,6 +873,20 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.Free;
                                         end
 
+                                        else if (copy(str, 1, 3) = 'who') then begin
+                                                for i := 0 to CharaName.Count - 1 do begin
+                                                        tc1 := CharaName.Objects[i] as TChara;
+                                                        if tc1.Login = 2 then begin
+                                                                str := 'Name: ' + tc1.Name + ' -- Location: ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                                                                w := Length(str) + 4;
+                                                                WFIFOW (0, $009a);
+                                                                WFIFOW (2, w);
+                                                                WFIFOS (4, str, w - 4);
+                                                                tc.socket.sendbuf(buf, w);
+                                                        end;
+                                                end;
+                                        end
+
                                         else begin
                                         end;
                                                                                 
