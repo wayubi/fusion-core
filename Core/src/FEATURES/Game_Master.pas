@@ -170,6 +170,8 @@ var
     function command_changes(tc : TChara; str : String) : String;
 
     function command_athena_heal(tc : TChara; str : String) : String;
+    function command_athena_kami(tc : TChara; str : String) : String;
+    function command_athena_alive(tc : TChara) : String;
     function command_athena_die(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
@@ -475,6 +477,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc.ID, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc.ID, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
+            else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc.ID, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
+            else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
 			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
@@ -2373,6 +2377,46 @@ Called when we're shutting down the server *only*
         SendBCmd(tm, tc.Point, 8);
 
         Result := 'GM_ATHENA_HEAL success. HP/SP healed!';
+        sl.Free;
+    end;
+
+    function command_athena_kami(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, w : Integer;
+        str2 : String;
+    begin
+        Result := 'GM_ATHENA_KAMI failed.';
+
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if (sl.Count < 2) or (sl.Count > 3) then Exit;
+
+        str2 := '';
+        for i := 1 to (sl.Count - 1) do begin
+            str2 := str2 + ' ' + sl.Strings[i];
+        end;
+        str2 := Trim(str2);
+
+        if (length(sl.Strings[0])) = 5 then begin
+            str2 := 'blue' + str2;
+        end;
+
+        w := Length(str2) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str2, w - 4);
+
+        for i := 0 to charaname.count - 1 do begin
+            tc := charaname.objects[i] as tchara;
+            if (tc.login = 2) then begin
+                tc.socket.sendbuf(buf, w);
+            end;
+        end;
+
+        Result := 'GM_ATHENA_KAMI success.';
+        sl.free;
     end;
 
     function command_changes(tc : TChara; str : String) : String;
@@ -2430,6 +2474,23 @@ Called when we're shutting down the server *only*
         Result := 'GM_CHANGES Success.';
     end;
 
+    function command_athena_alive(tc : TChara) : String;
+    var
+        tm : TMap;
+    begin
+        Result := 'GM_ATHENA_ALIVE Activated';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        tc.HP := tc.MAXHP;
+        tc.SP := tc.MAXSP;
+        tc.Sit := 3;
+        SendCStat1(tc, 0, 5, tc.HP);
+        SendCStat1(tc, 0, 7, tc.SP);
+        WFIFOW(0, $0148);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, 100);
+        SendBCmd(tm, tc.Point, 8);
+    end;
 
     function command_athena_die(tc : TChara) : String;
     var

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-30-04: Added Athena @alive command to ALBGM. [Trihan]
 - 06-29-04: Added Athena @heal command to ALBGM. [Trihan]
 - 06-29-04: Fixed #1020 - Unknown cause of bug. Added exception handling. [AlexKreuz]
 - 06-29-04: Fixed #800 - All weapon buffs now expire on weapon unequip. [AlexKreuz]
