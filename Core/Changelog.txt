@@ -1,11 +1,12 @@
-2003-12-18: Set up CVS Server with Initial Script Import. Follow this Logging Format. [AlexKreuz]
+Fusion 1.2.0.8 - December ????, 2003
+- 12-18-03: Set up CVS Server. Follow this Log Format. [AlexKreuz]
 
 
 -----------------------------------------------------------------
 OLD FORMAT
 -----------------------------------------------------------------
 
-RESERVED FOR 1.2.0.7 & 1.2.0.8
+RESERVED FOR 1.2.0.7
 
 -----------------------------------------------------------------
 Fusion 1.2.0.6 - November 12th, 2003
