@@ -1,3 +1,4 @@
+- 05-25-04: Fixed #855 - Character stops attack when monster and character share same point. [AlexKreuz]
 - 05-23-04: Implemented the Decrease of Base DEF with Provoke skill in PVP. [KyuubiKitsune]
 - 05-22-04: Fixed Armor Defense Usage in PVP, Armor DEF now reduces the appropriate amt. [KyuubiKitsune]
 - 05-21-04: Fixed Username_M/_F to start at ID#100100. [AlexKreuz]

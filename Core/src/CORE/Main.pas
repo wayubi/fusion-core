@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL, Math;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;                      
@@ -3507,254 +3507,259 @@ end;
 //Character Moving Function
 function  TfrmMain.CharaMoving(tc:TChara;Tick:cardinal) : boolean;
 var
-        {Random Integers}
-	j,k,m,n,o :Integer;
-	spd:integer;
-	xy:TPoint;
-	dx,dy:integer;
-        i :Integer;
-	w :word;
-
-        {Class Usage}
-	tm:TMap;  //Map
-	tn:TNPC;
-	tc1:TChara;  //Player
-        tl:TSkillDB;  //Skill Database
-	ts:TMob;  //Monster
-	tcr :TChatRoom;
-
+    j,k,m,n,o : Integer;
+    spd : integer;
+    xy : TPoint;
+    dx,dy : integer;
+    i : Integer;
+    w : word;
+    tm : TMap;
+    tn : TNPC;
+    tc1 : TChara;
+    tl : TSkillDB;
+    ts : TMob;
+    tcr : TChatRoom;
 begin
-	with tc do begin
-		tm := MData;
-		if (Path[ppos] and 1) = 0 then begin
-			spd := Speed;
-		end else begin
-			spd := Speed * 140 div 100;
-		end;
-		for j := 1 to integer(Tick - MoveTick) div spd do begin
-			xy := Point;
-			Dir := Path[ppos];
-			HeadDir := 0;
-			case Path[ppos] of
-				0: begin Inc(Point.Y);              dx :=  0; dy :=  1; end;
-				1: begin Dec(Point.X);Inc(Point.Y); dx := -1; dy :=  1; end;
-				2: begin Dec(Point.X);              dx := -1; dy :=  0; end;
-				3: begin Dec(Point.X);Dec(Point.Y); dx := -1; dy := -1; end;
-				4: begin              Dec(Point.Y); dx :=  0; dy := -1; end;
-				5: begin Inc(Point.X);Dec(Point.Y); dx :=  1; dy := -1; end;
-				6: begin Inc(Point.X);              dx :=  1; dy :=  0; end;
-				7: begin Inc(Point.X);Inc(Point.Y); dx :=  1; dy :=  1; end;
-				else
-					 begin  HeadDir := 0; dx :=  0; dy :=	0; end; //本来は起こるはずがない
-			end;
-			Inc(ppos);
-			//DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
 
-			//ブロック処理1
-			for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
-				for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin //自分の居るブロックは処理する必要はない(未)
-					//NPC通知
-					for k := 0 to tm.Block[m][n].NPC.Count - 1 do begin
-						tn := tm.Block[m][n].NPC.Objects[k] as TNPC;
-						if ((dx <> 0) and (abs(xy.Y - tn.Point.Y) < 16) and (xy.X = tn.Point.X + dx * 15)) or
-						((dy <> 0) and (abs(xy.X - tn.Point.X) < 16) and (xy.Y = tn.Point.Y + dy * 15)) then begin
-							//DebugOut.Lines.Add(IntToStr(tn.Item.Identify));
-              //消滅通知
-							//DebugOut.Lines.Add(Format('		NPC %s Delete', [tn.Name]));
-							if tn.CType = 3 then begin
-								WFIFOW(0, $00a1);
-								WFIFOL(2, tn.ID);
-								Socket.SendBuf(buf, 6);
-							end else if tn.CType = 4 then begin
-								WFIFOW(0, $0120);
-								WFIFOL(2, tn.ID);
-								Socket.SendBuf(buf, 6);
-							end else begin
-								WFIFOW(0, $0080);
-								WFIFOL(2, tn.ID);
-								WFIFOB(6, 0);
-								Socket.SendBuf(buf, 7);
-							end;
-						end;
-						if ((dx <> 0) and (abs(Point.Y - tn.Point.Y) < 16) and (Point.X = tn.Point.X - dx * 15)) or
-						((dy <> 0) and (abs(Point.X - tn.Point.X) < 16) and (Point.Y = tn.Point.Y - dy * 15)) then begin
-							//出現通知
-							//DebugOut.Lines.Add(Format('		NPC %s Add', [tn.Name]));
-              //if tn.CType = 2 then begin
-              //SendNData(Socket, tn, tc.ver2);
-              //end;
-							if (tn.Enable = true) then begin
-                SendNData(Socket, tn, tc.ver2);
-								if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
-									//OnInitラベルを実行
-									//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
-									tc1 := TChara.Create;
-									tc1.TalkNPCID := tn.ID;
-									tc1.ScriptStep := tn.ScriptInitS;
-									tc1.AMode := 3;
-									tc1.AData := tn;
-									tc1.Login := 0;
-									NPCScript(tc1,0,1);
-									tn.ScriptInitD := true;
-									tc1.Free;
-								end;
-								if (tn.ChatRoomID <> 0) then begin
-									//チャットルームを表示する
-									i := ChatRoomList.IndexOf(tn.ChatRoomID);
-									if (i <> -1) then begin
-										tcr := ChatRoomList.Objects[i] as TChatRoom;
-										if (tn.ID = tcr.MemberID[0]) then begin
-											w := Length(tcr.Title);
-											WFIFOW(0, $00d7);
-											WFIFOW(2, w + 17);
-											WFIFOL(4, tcr.MemberID[0]);
-											WFIFOL(8, tcr.ID);
-											WFIFOW(12, tcr.Limit);
-											WFIFOW(14, tcr.Users);
-											WFIFOB(16, tcr.Pub);
-											WFIFOS(17, tcr.Title, w);
-											if tc.Socket <> nil then begin
-												tc.Socket.SendBuf(buf, w + 17);
-											end;
-										end;
-									end;
-								end;
-							end;
+with tc do begin
 
-						end;
-					end;
-					//プレイヤー間通知
-					for k := 0 to tm.Block[m][n].CList.Count - 1 do begin
-						tc1 := tm.Block[m][n].CList.Objects[k] as TChara;
-						if tc <> tc1 then begin //自分同士では通知しないように。
-						if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
-						((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
-							//消滅通知
-							//DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
-							WFIFOW(0, $0080);
-							WFIFOL(2, ID);
-							WFIFOB(6, 0);
-							tc1.Socket.SendBuf(buf, 7);
-							WFIFOL(2, tc1.ID);
-							Socket.SendBuf(buf, 7);
-						end;
-						if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
-						((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
-							//出現通知
-							//DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
-							SendCData(tc, tc1);
-							SendCData(tc1, tc);
+    tm := MData;
 
+    if (Path[ppos] and 1) = 0 then begin
+        spd := Speed;
+    end else begin
+        spd := Speed * 140 div 100;
+    end;
 
+    for j := 1 to integer(Tick - MoveTick) div spd do begin
+        xy := Point;
+        Dir := Path[ppos];
+        HeadDir := 0;
+        case Path[ppos] of
+            0: begin Inc(Point.Y);              dx :=  0; dy :=  1; end;
+            1: begin Dec(Point.X);Inc(Point.Y); dx := -1; dy :=  1; end;
+            2: begin Dec(Point.X);              dx := -1; dy :=  0; end;
+            3: begin Dec(Point.X);Dec(Point.Y); dx := -1; dy := -1; end;
+            4: begin              Dec(Point.Y); dx :=  0; dy := -1; end;
+            5: begin Inc(Point.X);Dec(Point.Y); dx :=  1; dy := -1; end;
+            6: begin Inc(Point.X);              dx :=  1; dy :=  0; end;
+            7: begin Inc(Point.X);Inc(Point.Y); dx :=  1; dy :=  1; end;
+        else
+            begin  HeadDir := 0; dx :=  0; dy :=	0; end; //本来は起こるはずがない
+        end;
+        Inc(ppos);
+        DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
+    
+        for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
+            for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin
+                for k := 0 to tm.Block[m][n].NPC.Count - 1 do begin
+                    tn := tm.Block[m][n].NPC.Objects[k] as TNPC;
 
-							//移動通知
-							if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
-								//DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
-								SendCMove(tc1.Socket, tc, Point, tgtPoint);
-							end;
-						end;
-					end;
-				end;
-				//モンスター通知
-				for k := 0 to tm.Block[m][n].Mob.Count - 1 do begin
-          if ((tm.Block[m][n].Mob.Objects[k] is TMob) = false) then continue;
-					ts := tm.Block[m][n].Mob.Objects[k] as TMob;
-					if ((dx <> 0) and (abs(xy.Y - ts.Point.Y) < 16) and (xy.X = ts.Point.X + dx * 15)) or
-					((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
-						//消滅通知
-						//DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
-                                                UpdateMonsterDead(tm, ts, 0);
-						{WFIFOW(0, $0080);
-						WFIFOL(2, ts.ID);
-						WFIFOB(6, 0);
-						Socket.SendBuf(buf, 7);}
-					end;
-					if ((dx <> 0) and (abs(Point.Y - ts.Point.Y) < 16) and (Point.X = ts.Point.X - dx * 15)) or
-					((dy <> 0) and (abs(Point.X - ts.Point.X) < 16) and (Point.Y = ts.Point.Y - dy * 15)) then begin
-						//出現通知
-						//DebugOut.Lines.Add(Format('		Mob %s Add', [ts.Name]));
-						SendMData(Socket, ts);
-						//移動通知
-						if (ts.pcnt <> 0) and (abs(Point.X - ts.Point.X) < 16) and (abs(Point.Y - ts.Point.Y) < 16) then begin
-				SendMMove(Socket, ts, ts.Point, ts.tgtPoint,ver2);
-						end;
-					end;
-				end;
-			end;
-		end;
+                    if ((dx <> 0) and (abs(xy.Y - tn.Point.Y) < 16) and (xy.X = tn.Point.X + dx * 15)) or
+                    ((dy <> 0) and (abs(xy.X - tn.Point.X) < 16) and (xy.Y = tn.Point.Y + dy * 15)) then begin
+                        //DebugOut.Lines.Add(IntToStr(tn.Item.Identify));
+                        DebugOut.Lines.Add(Format('		NPC %s Delete', [tn.Name]));
 
-		//ブロック移動
-		if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
-			//DebugOut.Lines.Add(Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
-			//以前のブロックのデータ消去
-			with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
-				//DebugOut.Lines.Add('BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
-				Delete(IndexOf(ID));
-			end;
-			//新しいブロックにデータ追加
-			tm.Block[Point.X div 8][Point.Y div 8].CList.AddObject(ID, tc);
-			//DebugOut.Lines.Add('		BlockMove OK');
-	end;
+                        if tn.CType = 3 then begin
+                            WFIFOW(0, $00a1);
+                            WFIFOL(2, tn.ID);
+                            Socket.SendBuf(buf, 6);
+                        end else if tn.CType = 4 then begin
+                            WFIFOW(0, $0120);
+                            WFIFOL(2, tn.ID);
+                            Socket.SendBuf(buf, 6);
+                        end else begin
+                            WFIFOW(0, $0080);
+                            WFIFOL(2, tn.ID);
+                            WFIFOB(6, 0);
+                            Socket.SendBuf(buf, 7);
+                        end;
+                    end;
+                    
+                    if ((dx <> 0) and (abs(Point.Y - tn.Point.Y) < 16) and (Point.X = tn.Point.X - dx * 15)) or
+                    ((dy <> 0) and (abs(Point.X - tn.Point.X) < 16) and (Point.Y = tn.Point.Y - dy * 15)) then begin
+                        DebugOut.Lines.Add(Format('		NPC %s Add', [tn.Name]));
 
-	if (tm.gat[Point.X][Point.Y] <> 1) and (tm.gat[Point.X][Point.Y] <> 5) then begin
-			//ワープポイントに入った
-			for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
-				for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
-					for k := 0 to tm.Block[m][n].NPC.Count - 1 do begin
-						tn := tm.Block[m][n].NPC.Objects[k] as TNPC;
+                        //if tn.CType = 2 then begin
+                            //SendNData(Socket, tn, tc.ver2);
+                        //end;
 
-						if (tn.CType = 0) and (tn.Enable = true) then begin
+                        if (tn.Enable = true) then begin
+                            SendNData(Socket, tn, tc.ver2);
+                            if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
+                                DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
+    
+                                tc1 := TChara.Create;
+                                tc1.TalkNPCID := tn.ID;
+                                tc1.ScriptStep := tn.ScriptInitS;
+                                tc1.AMode := 3;
+                                tc1.AData := tn;
+                                tc1.Login := 0;
+                                NPCScript(tc1,0,1);
+                                tn.ScriptInitD := true;
+                                tc1.Free;
+                            end;
 
-							if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
-							(abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
-								if (tc.Skill[144].Lv = 0) then HPTick := Tick;
-                                                                HPRTick := Tick - 500;
-								SPRTick := Tick;
-								pcnt := 0;
-								SendCLeave(tc, 0);
-								Map := tn.WarpMap;
-								Point := tn.WarpPoint;
-								MapMove(Socket, Map, Point);
+                            if (tn.ChatRoomID <> 0) then begin
+                                i := ChatRoomList.IndexOf(tn.ChatRoomID);
 
-								NextPoint := Point;
-								Result := True;
-								Exit;
+                                if (i <> -1) then begin
+                                    tcr := ChatRoomList.Objects[i] as TChatRoom;
 
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
+                                    if (tn.ID = tcr.MemberID[0]) then begin
+                                        w := Length(tcr.Title);
+                                        WFIFOW(0, $00d7);
+                                        WFIFOW(2, w + 17);
+                                        WFIFOL(4, tcr.MemberID[0]);
+                                        WFIFOL(8, tcr.ID);
+                                        WFIFOW(12, tcr.Limit);
+                                        WFIFOW(14, tcr.Users);
+                                        WFIFOB(16, tcr.Pub);
+                                        WFIFOS(17, tcr.Title, w);
 
-			if ppos = pcnt then begin
-				//移動完了
-				Sit := 3;
-				if (tc.Skill[144].Lv = 0) then HPTick := Tick;
-				HPRTick := Tick - 500;
-				SPRTick := Tick;
-				pcnt := 0;
-				//攻撃動作をする場合、射程チェック
-				{
-				if (AMode = 1) or (AMode = 2) then begin
-					ts := AData;
-					if (abs(Point.X - ts.Point.X) > Range) or (abs(Point.Y - ts.Point.Y) > Range) then begin
-						//射程外なら、相手の移動目標地へ移動する
-						NextFlag := true;
-						NextPoint := ts.tgtPoint;
-					end;
-				end;
-				}
-				//DebugOut.Lines.Add(Format('		Move OK', [ID]));
-				break;
-			end;
-			MoveTick := MoveTick + cardinal(spd);
-		end;
-	end;
-{追加}
-	Result := False;
-{追加ココまで}
+                                        if tc.Socket <> nil then begin
+                                            tc.Socket.SendBuf(buf, w + 17);
+                                        end;
+                                    end;
+                                end;
+                            end;
+                        end;
+    
+                    end;
+                end;
+                
+                for k := 0 to tm.Block[m][n].CList.Count - 1 do begin
+                    tc1 := tm.Block[m][n].CList.Objects[k] as TChara;
+                    
+                    if tc <> tc1 then begin
+                        if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
+                        ((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
+                            DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
+                            
+                            WFIFOW(0, $0080);
+                            WFIFOL(2, ID);
+                            WFIFOB(6, 0);
+                            tc1.Socket.SendBuf(buf, 7);
+                            WFIFOL(2, tc1.ID);
+                            Socket.SendBuf(buf, 7);
+                        end;
+    
+                        if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
+                        ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
+                            DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
+    
+                            SendCData(tc, tc1);
+                            SendCData(tc1, tc);
+                            
+                            if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
+                                DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
+    
+                                SendCMove(tc1.Socket, tc, Point, tgtPoint);
+                            end;
+                        end;
+                    end;
+                end;
+    
+                for k := 0 to tm.Block[m][n].Mob.Count - 1 do begin
+                    if ((tm.Block[m][n].Mob.Objects[k] is TMob) = false) then continue;
+                    ts := tm.Block[m][n].Mob.Objects[k] as TMob;
 
+                    if ((dx <> 0) and (abs(xy.Y - ts.Point.Y) < 16) and (xy.X = ts.Point.X + dx * 15)) or
+                    ((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
+                        DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
+                        
+                        UpdateMonsterDead(tm, ts, 0);
+                        {WFIFOW(0, $0080);
+                        WFIFOL(2, ts.ID);
+                        WFIFOB(6, 0);
+                        Socket.SendBuf(buf, 7);}
+                    end;
+
+                    if ((dx <> 0) and (abs(Point.Y - ts.Point.Y) < 16) and (Point.X = ts.Point.X - dx * 15)) or
+                    ((dy <> 0) and (abs(Point.X - ts.Point.X) < 16) and (Point.Y = ts.Point.Y - dy * 15)) then begin
+                        DebugOut.Lines.Add(Format('		Mob %s Add', [ts.Name]));
+                        
+                        SendMData(Socket, ts);
+
+                        if (ts.pcnt <> 0) and (abs(Point.X - ts.Point.X) < 16) and (abs(Point.Y - ts.Point.Y) < 16) then begin
+                            SendMMove(Socket, ts, ts.Point, ts.tgtPoint,ver2);
+                        end;
+                    end;
+                end;
+            end;
+        end;
+
+        if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
+        DebugOut.Lines.Add(Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
+
+            with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
+                //DebugOut.Lines.Add('BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
+                Delete(IndexOf(ID));
+            end;
+            
+            tm.Block[Point.X div 8][Point.Y div 8].CList.AddObject(ID, tc);
+            DebugOut.Lines.Add('		BlockMove OK');
+        end;
+
+        if (tm.gat[Point.X][Point.Y] <> 1) and (tm.gat[Point.X][Point.Y] <> 5) then begin
+            for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+                for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
+                    for k := 0 to tm.Block[m][n].NPC.Count - 1 do begin
+                        tn := tm.Block[m][n].NPC.Objects[k] as TNPC;
+
+                        if (tn.CType = 0) and (tn.Enable = true) then begin
+
+                            if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
+                            (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
+                            
+                                if (tc.Skill[144].Lv = 0) then HPTick := Tick;
+
+                                HPRTick := Tick - 500;
+                                SPRTick := Tick;
+                                pcnt := 0;
+                                SendCLeave(tc, 0);
+                                Map := tn.WarpMap;
+                                Point := tn.WarpPoint;
+                                MapMove(Socket, Map, Point);
+                                
+                                NextPoint := Point;
+                                Result := True;
+                                Exit;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+
+        if ppos = pcnt then begin
+            Sit := 3;
+
+            if (tc.Skill[144].Lv = 0) then HPTick := Tick;
+            
+            HPRTick := Tick - 500;
+            SPRTick := Tick;
+            pcnt := 0;
+
+            {
+            if (AMode = 1) or (AMode = 2) then begin
+                ts := AData;
+                if (abs(Point.X - ts.Point.X) > Range) or (abs(Point.Y - ts.Point.Y) > Range) then begin
+                    NextFlag := true;
+                    NextPoint := ts.tgtPoint;
+                end;
+            end;
+            }
+            
+            DebugOut.Lines.Add(Format('		Move OK', [ID]));
+            break;
+        end;
+        
+        MoveTick := MoveTick + cardinal(spd);
+    end;
+end;
+
+Result := False;
 end;
 //------------------------------------------------------------------------------
 //分割２
@@ -15434,6 +15439,8 @@ var
 	xy:TPoint;
         xy2:TPoint;
 	dx,dy:integer;
+    rx,ry:integer;
+    r:integer;
 	DropFlag:boolean;
 	SkillProcessType:byte;
 	sl:TStringList;
@@ -15525,6 +15532,37 @@ begin
 				if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin
 					AutoAction(tc,Tick);
 				end;
+
+
+            // This code checks to see if you are in attack mode.
+            // If you are this code will check to see if you and the mob share the same spot.
+            // If you do this code will move you to a random spot 1 tc.Range away from the mob.
+            // Purpose: Created to fix bug where you stop attacking when you and mob
+            // share same spot.
+            if (AMode = 1) or (AMode = 2) then begin
+                ts := AData;
+                if ( (ts.Point.x = tc.Point.x) and (ts.Point.y = tc.Point.Y) ) then begin
+                    //debugout.lines.add('stuck');
+                    k := 0;
+                    r := 0;
+                    while ( (k = 0) and (r < 100) ) do begin
+                        Randomize;
+                        rx := randomrange(-tc.Range,tc.Range) + tc.Point.X;
+                        Randomize;
+                        ry := randomrange(-tc.Range,tc.Range) + tc.Point.Y;
+                        k := Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, rx, ry, 1);
+                        inc(r);
+                    end;
+
+                    if ( (k <> 0) ) then begin
+                        NextFlag := true;
+                        nextpoint.X := rx;
+                        nextpoint.Y := ry;
+                    end;
+                end;
+            end;
+            // End Code: AlexKreuz
+
 
 				//Able to move
 				if (pcnt <> 0)  then begin
