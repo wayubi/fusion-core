@@ -1597,6 +1597,7 @@ var
 	//Variable Declarations
 	k,i,j,m,n:integer;
 	total:cardinal;
+    bonus:integer;
 	mvpid:integer;
 	mvpitem:boolean;
 	mvpcheck:integer;
@@ -1871,8 +1872,11 @@ begin
 			end;}
 			if not mvpitem then begin
 				//MVP経験値獲得表示 実際の加算は後でまとめて
+
+                bonus := (ts.Data.EXP * (ts.Data.MEXP + (3 * (n - 1))) * BaseExpMultiplier) div 100;
+
 				WFIFOW( 0, $010b);
-				WFIFOL( 2, ts.Data.MEXP * BaseExpMultiplier);
+				WFIFOL( 2, bonus);
 				tc1.Socket.SendBuf(buf, 6);
 			end;
 		end;
@@ -1881,25 +1885,31 @@ begin
 
 	tpaDB := TStringList.Create;
 	for i := 0 to n - 1 do begin
+
 		tc1 := ts.EXPDist[i].CData;
-		//ログアウトしている、死んでいる、別のマップにいる、いずれかの場合経験値は入らない
-		if (tc1.Login <> 2) or (tc1.Sit = 1) or (tc1.Map <> tm.Name) then
-			Continue;
-		//ベース経験値
+
+		if (tc1.Login <> 2) or (tc1.Sit = 1) or (tc1.Map <> tm.Name) then Continue;
+
 		l := 100 * Cardinal(ts.EXPDist[i].Dmg) div total;
 		l := ts.Data.EXP * l div 100;
+
+        w := 100 * Cardinal(ts.EXPDist[i].Dmg) div total;
+        w := ts.Data.JEXP * w div 100;
+
 		if n <> 1 then Inc(l);
-		if i = mvpid then l := l + ts.Data.MEXP; //MVP
+        if n <> 1 then Inc(w);
+
 		l := l * BaseExpMultiplier;
-		if tc.Skill[307].Tick > Tick then l := l * cardinal(tc.Skill[307].Effect1 div 100);
-		//ジョブ経験値
+        w := w * JobExpMultiplier;
 
-		w := ts.Data.JEXP * (cardinal(ts.EXPDist[i].Dmg) div total);
+		if (i = mvpid) and (not mvpitem) then l := l + bonus;
 
-		if n <> 1 then Inc(w);
-		if i = mvpid then w := w + ts.Data.MEXP; //MVP
-		w := w * JobExpMultiplier;
-		if tc.Skill[307].Tick > Tick then w := w * cardinal(tc.Skill[307].Effect1 div 100);
+        { Alex: MVPs Bonus XP does not give job xp }
+        //if (i = mvpid) and (not mvpitem) then w := w + ts.Data.MEXP; //MVP
+
+		if tc1.Skill[307].Tick > Tick then l := l * cardinal(tc.Skill[307].Effect1 div 100);
+		if tc1.Skill[307].Tick > Tick then w := w * cardinal(tc.Skill[307].Effect1 div 100);
+
 
 		j := GuildList.IndexOf(tc.GuildID);
 		if (j <> -1) then begin
