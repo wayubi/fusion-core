@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-23-04: R.E.E.D: Guilds being deleted on new user connect. [AlexKreuz]
 - 07-23-04: R.E.E.D: Upper classes were converting into novices. [AlexKreuz]
 - 07-23-04: PlayerDataLoad() made obsolete by R.E.E.D. [AlexKreuz]
 - 07-23-04: R.E.E.D case insensitive duplicate characters not converted. [AlexKreuz]
