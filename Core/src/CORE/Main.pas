@@ -638,6 +638,11 @@ begin
                 end else begin
                         Option_GM_Logs := False;
                 end;
+    if sl.IndexOfName('Option_PVP_XPLoss') > -1 then begin
+                        Option_PVP_XPLoss := StrToBool(sl.Values['Option_PVP_XPLoss']);
+                end else begin
+                        Option_PVP_XPLoss := True;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -938,6 +943,7 @@ begin
 	ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
     ini.WriteString('Fusion', 'Option_PVP_Steal', BoolToStr(Option_PVP_Steal));
     ini.WriteString('Fusion', 'Option_PartyShare_Level', IntToStr(Option_PartyShare_Level));
+    ini.WriteString('Fusion', 'Option_PVP_XPLoss', BoolToStr(Option_PVP_XPLoss));
 	ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
 	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
 	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
@@ -14857,7 +14863,8 @@ begin
 						end
 
 						else begin
-              CharaDie(tm, tc1, Tick, 1);
+              // CharaDie(tm, tc1, Tick, 1);  <- why 1? this is a monster.
+              CharaDie(tm, tc1, Tick);
               ATarget := 0;
 							ARangeFlag := false;
             {

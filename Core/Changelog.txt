@@ -1,3 +1,4 @@
+- 05-31-04: Added Option_PVP_XPLoss - INI option to turn off XP loss in PVP. [AlexKreuz]
 - 05-31-04: Switched GM Command, #option to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #whois to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #speed to ALBGM system. [AlexKreuz]
@@ -73,7 +74,6 @@
 - 05-22-04: Fixed Armor Defense Usage in PVP, Armor DEF now reduces the appropriate amt. [KyuubiKitsune]
 - 05-21-04: Fixed Username_M/_F to start at ID#100100. [AlexKreuz]
 - 05-21-04: Added Username_M/_F support to SQL. [AlexKreuz]
-(F1211B beta build)
 - 05-18-04: Fixed potential memory leak, and potential crash when Shop created [ChrstphrR]
 - 05-16-04: Fixed a list index error on disconnect. [Darkhelmet]
 - 05-16-04: Added a few things by Krietor's request, some commented out. [Darkhelmet]

@@ -1648,6 +1648,7 @@ DbName            :String;
 Option_PVP        :boolean;
 Option_PVP_Steal  :boolean;
 Option_PartyShare_Level :word;
+Option_PVP_XPLoss :boolean;
 
 Option_MaxUsers   :word;
 Option_AutoSave   :word;
@@ -3286,15 +3287,17 @@ begin
   // Sit = 1 lets monsters know the char is dead and the player cannot move
   tc.Sit := 1;
 
-  // Subtract the Experience loss from the .ini
-  i := (100 - DeathBaseLoss);
-  tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
-  i := (100 - DeathJobLoss);
-  tc.JobEXP := Round(tc.JobEXP * (i / 100));
+  if (KilledByP <> 1) or ( (KilledByP = 1) and (Option_PVP_XPLoss) ) then begin
+      // Subtract the Experience loss from the .ini
+      i := (100 - DeathBaseLoss);
+      tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
+      i := (100 - DeathJobLoss);
+      tc.JobEXP := Round(tc.JobEXP * (i / 100));
+      
+        SendCStat1(tc, 1, $0001, tc.BaseEXP);
+        SendCStat1(tc, 1, $0002, tc.JobEXP);
+  end;
 
-  // Updates the players experience from the experience loss
-  SendCStat1(tc, 1, $0001, tc.BaseEXP);
-  SendCStat1(tc, 1, $0002, tc.JobEXP);
 
   tc.pcnt := 0;
 
