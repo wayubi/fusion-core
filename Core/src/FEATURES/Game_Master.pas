@@ -1263,57 +1263,78 @@ Called when we're shutting down the server *only*
     function command_banish(str : String) : String;
     var
         sl : TStringList;
-        i, j, k : Integer;
+        x, y, k : Integer;
         ta : TMapList;
         tc1 : TChara;
-        s : String;
     begin
         Result := 'GM_BANISH Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 8, 256);
 
-        if (sl.Count <> 4) then begin
-            Result := Result + ' Missing information.';
-            Exit;
-        end;
+        if (sl.Count = 4) then begin
+            if MapList.IndexOf(sl.Strings[1]) <> -1 then begin
+                ta := MapList.Objects[MapList.IndexOf(sl.Strings[1])] as TMapList;
 
-        Val(sl[sl.Count - 2], i, k);
-        if k <> 0 then Exit;
+                Val(sl.Strings[2], x, k);
+                if k = 0 then begin
 
-        Val(sl[sl.Count - 1], j, k);
-        if k <> 0 then Exit;
+                    Val(sl.Strings[3], y, k);
+                    if k = 0 then begin
 
-        if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
-            ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
-            if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then Exit;
+                        if (x >= 0) and (x <= ta.Size.X) and (y >= 0) and (y <= ta.Size.Y) then begin
 
-            for k := 0 to sl.Count - 4 do begin
-                s := s + ' ' + sl.Strings[k];
-                s := Trim(s);
-            end;
+                            if CharaName.Indexof(sl.Strings[0]) <> -1 then begin
+                                tc1 := CharaName.Objects[CharaName.Indexof(sl.Strings[0])] as TChara;
 
-            if CharaName.Indexof(s) <> -1 then begin
-                tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-                Result := 'GM_BANISH Success. ' + s + ' warped to ' + ta.Name + ' (' + IntToStr(i) + ', ' + IntToStr(j) + ').';
 
-                if (tc1.Login = 2) then begin
-                    SendCLeave(tc1, 2);
-                    tc1.tmpMap := sl.Strings[sl.Count - 3];
-                    tc1.Point := Point(i,j);
-                    MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                end else begin
-                    tc1.Map := sl.Strings[sl.Count - 3];
-                    tc1.Point := Point(i,j);
-                    Result := Result + ' ' + s + ' is offline.';
+                                if (tc1.Login = 2) then begin
+                                    SendCLeave(tc1, 2);
+
+                                    tc1.tmpMap := sl.Strings[1];
+                                    tc1.Point := Point(x,y);
+
+                                    MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
+
+                                    Result := 'GM_BANISH Success. ' + sl.Strings[0] + ' warped to ' + ta.Name + ' (' + IntToStr(x) + ', ' + IntToStr(y) + ').';
+                                end
+
+                                else begin
+                                    tc1.Map := sl.Strings[1];
+                                    tc1.Point := Point(x,y);
+
+                                    Result := 'GM_BANISH Success. But ' + ' ' + sl.Strings[0] + ' is offline.';
+                                end;
+                            end
+
+                            else begin
+                                Result := Result + ' ' + sl.Strings[0] + ' is an invalid character name.';
+                            end;
+                        end
+
+                        else begin
+                            Result := Result + ' Coordinates are out of range. (0-' + IntToStr(ta.Size.X - 1) + ', 0-' + IntToStr(ta.Size.Y - 1) + ')';
+                        end;
+                    end
+
+                    else begin
+                        Result := Result + ' Y coordinate must be a valid integer.';
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' X coordinate must be a valid integer.';
                 end;
-            end else begin
-                Result := Result + ' ' + s + ' is an invalid character name.';
-            end;
-        end else begin
-            Result := 'GM_BANISH Failure. ' + sl.Strings[sl.Count - 3] + ' is not a valid map name.';
-        end;
+            end
 
+            else begin
+                Result := Result + sl.Strings[1] + ' does not exist.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient input. Format is <char name> <map> <x coordinate> <y coordinate>.';
+        end;
         sl.Free;
     end;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-28-04: Cleaned up the structure of #banish. [Trihan]
 - 10-27-04: JCon: Fixed Chara:Stat map and parameter related things. [Tsusai]
 - 10-27-04: JCon: Character ID changing via Character:Stats disabled.  Read-only. [Tsusai]
 - 10-27-04: JCon: Name changing via Character:Stats disabled.  Read-only. [Tsusai]
