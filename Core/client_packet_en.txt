@@ -27,8 +27,6 @@ Version History:
 
 2004/01/23: Added 012a, corrected some 0119 values.
 
-2004/01/25: Corrected more 0119 values.
-
 Credits:
 
 - The Japanese Athena dev team, for providing the original list.
@@ -1271,7 +1269,7 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param2=02   Curse         (x02)
 	param2=04   Silence       (x04)
 	param2=08   Confusion     (x08)
-	param2=08   Blind         (x10)
+	param2=16   Blind         (x10)
 
 	Param3 values are visual effects upon the player.
 
