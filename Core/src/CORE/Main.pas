@@ -11488,8 +11488,7 @@ begin
         WFIFOW(2, w);
         WFIFOS(4, str, w);
 
-        if (frmMain.Edit7.Text = '') then begin
-        	Exit;
+        if (frmMain.Label95.Caption= '') then Exit;
         for k := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[k] as TChara;
             if (tc1.Login = 2) and (tc1.Name = frmMain.Label95.Caption) then tc1.Socket.SendBuf(buf, w);

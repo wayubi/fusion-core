@@ -52,7 +52,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 400
     Height = 462
-    ActivePage = TabSheet1
+    ActivePage = TabSheet7
     Align = alClient
     Constraints.MinHeight = 445
     Constraints.MinWidth = 400
