@@ -1855,18 +1855,19 @@ Called when we're shutting down the server *only*
 
     function command_mothball(tc : TChara) : String;
     var
-        i, j : Integer;
+        i  : Integer;
         tm : TMap;
         tc1 : TChara;
     begin
         Result := 'GM_MOTHBALL Success.';
 
-        if tc.Stat2 = 16 then begin
+        if tc.Stat2 >= 16 then begin
             Result := Result + ' Command deactivated.';
-            j := 0;
+            tc.Stat2 := tc.Stat2 - 16;
+            if tc.Stat2 < 0 then tc.Stat2 := 0
         end else begin
             Result := Result + ' Command activated.';
-            j := 16;
+            tc.Stat2 := tc.Stat2 + 16;
         end;
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
@@ -1876,11 +1877,10 @@ Called when we're shutting down the server *only*
                 WFIFOW(0, $0119);
                 WFIFOL(2, tc1.ID);
                 WFIFOW(6, 0);
-                WFIFOW(8, j);
+                WFIFOW(8, tc.Stat2);
                 WFIFOW(10, 0);
                 WFIFOB(12, 0);
                 SendBCmd(tm, tc1.Point, 13);
-                tc.Stat2 := j;
             end;
         end;
 
