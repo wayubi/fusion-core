@@ -1,3 +1,6 @@
+--------------------------------------------------------------------------------
+ Fusion 1.212 - June 30th, 2004
+--------------------------------------------------------------------------------
 - 06-07-04: Switched skill [SM_RECOVERY] to PSS system. [AlexKreuz]
 - 06-07-04: Minor PVP pathfinding fixes. [AlexKreuz]
 - 06-07-04: Skill SM_PROVOKE now provokes PVP targets into attacking player. [AlexKreuz]
@@ -215,7 +218,9 @@
 - 05-03-04: Fixed (hopefully) the issue with invisible NPC IDs permanently.  Use -1 again. [Colus]
 - 05-01-04: Fixed stability problem regarding NPC IDs of value -1. [AlexKreuz]
 
-
+--------------------------------------------------------------------------------
+ Fusion 1.211 - April 30th, 2004
+--------------------------------------------------------------------------------
 - 04-30-04: Removed some debug statements. [Colus]
 - 04-30-04: Updated Combo Finish to monitor time to expire combo Ashura mode. [Colus]
 - 04-30-04: Updated Aqua Benedicta.  Now checks that you are on water. [Colus]
@@ -275,8 +280,7 @@
 - 04-22-04: Mapload bugfix, & Script errors show proper line number [ChrstphrR]
 - 04-20-04: Small memory leaks plugged in map load routines. [ChrstphrR]
 - 04-20-04: Dead Branch summon monster code improvments. [ChrstphrR]
-- 04-19-04: Quick Fix for Kyuubi's fix -- please check and adjust if 
-I made the wrong assumption :) [ChrstphrR]
+- 04-19-04: Quick Fix for Kyuubi's fix -- please check and adjust if I made the wrong assumption :) [ChrstphrR]
 - 04-08-04: Fixed failure to check for a guild that caused Range Error. [KyuubiKitsune]
 - 04-16-04: Fixed Bug 139 - Intimidate Skill warped MVP Monsters. [AlexKreuz]
 - 04-16-04: Fixed Bug 193 - Auto Berkserk Skill not increasing damage. [AlexKreuz]
@@ -401,7 +405,7 @@ I made the wrong assumption :) [ChrstphrR]
 - 03-16-04: Added some documentation on new options. [Colus]
 
 --------------------------------------------------------------------------------
-Fusion 1.210 - March 13th, 2004
+ Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
 - 03-15-04: Fixed some damage calcs. [Ramza]
 - 03-15-04: Fixed Abnormal HP & SP Natural Recovery Rate. [AlexKreuz]
@@ -582,7 +586,7 @@ Fusion 1.210 - March 13th, 2004
 - 02-01-04: Fixed Double-Login causes server crash & Freezes. [AlexKreuz]
 
 --------------------------------------------------------------------------------
-Fusion 1.209 - January 31st, 2004
+ Fusion 1.209 - January 31st, 2004
 --------------------------------------------------------------------------------
 - 02-01-04: Fixed #where command where it doesnt send you the location of the other player. [Mitch]
 - 01-31-04: Fixed Raid, to be used when hidden as well as Backstab. Added Skill error -[Oatmeal]
@@ -820,7 +824,7 @@ Fusion 1.209 - January 31st, 2004
 
 
 ---------------------------------------------------------------------------------
-Fusion 1.208 - December 25th, 2003
+ Fusion 1.208 - December 25th, 2003
 --------------------------------------------------------------------------------
 - 12-24-03: Fixed Bug with Blitz beat Auto Disconnecting people (bad dmg calc?). [Oatmeal12345]
 - 12-24-03: Commented out PassiveIcon function. Bandwidth Drain. [Elliot]
@@ -912,7 +916,7 @@ Fusion 1.208 - December 25th, 2003
 - 12-??-03: Fixed Drake Card adds perfect damage. [Oatmeal12345] 
 
 --------------------------------------------------------------------------------
-Fusion 1.207 - November 27th, 2003
+ Fusion 1.207 - November 27th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Bug -> Storm Gust > Caused Crash. [DarkHelmet] 
 - Fixed: Bug -> Area Effect Harmed Caster. [DarkHelmet] 
@@ -967,7 +971,7 @@ Fusion 1.207 - November 27th, 2003
 - Card: Drake-perfect damge  -[Oatmeal12345]
 
 --------------------------------------------------------------------------------
-Fusion 1.206 - November 12th, 2003
+ Fusion 1.206 - November 12th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Cart -> User Overweight Bug. [AlexKreuz]
 - Fixed: Merchant Shop -> Fatal Crash. [AlexKreuz]
@@ -1045,12 +1049,12 @@ Fusion 1.206 - November 12th, 2003
 - Created: New Map (MAP) based on DWM. [AlexKreuz]
 
 --------------------------------------------------------------------------------
-Fusion 1.205 - November 1st, 2003
+ Fusion 1.205 - November 1st, 2003
 --------------------------------------------------------------------------------
 - Fixed: Healing Items now work again. [AlexKreuz]
 
 --------------------------------------------------------------------------------
-Fusion 1.204 - November 1st, 2003
+ Fusion 1.204 - November 1st, 2003
 --------------------------------------------------------------------------------
 - Fixed: Console Command: -kick caused crash. [AlexKreuz] 
 - Fixed: 10053: Random Client Reset caused Fatal Crash. [AlexKreuz] 
@@ -1085,7 +1089,7 @@ Fusion 1.204 - November 1st, 2003
 - Updated: Monk: Finger Offensive. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.203 - October 22nd, 2003
+ Fusion 1.203 - October 22nd, 2003
 --------------------------------------------------------------------------------
 - Added: Console Command: -sql update player set gender [AlexKreuz] 
 - Added: Console Command: -sql update chara set zeny [AlexKreuz] 
@@ -1106,7 +1110,7 @@ Fusion 1.203 - October 22nd, 2003
 - Removed: Monk: Extremity Fists. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.202 - October 20th, 2003
+ Fusion 1.202 - October 20th, 2003
 --------------------------------------------------------------------------------
 - Fixed: 50% Guild Tax Bug caused Integer Overflow. [AlexKreuz] 
 - Fixed: The url to DarkWeiss home was incorrect. [AlexKreuz] 
@@ -1116,13 +1120,13 @@ Fusion 1.202 - October 20th, 2003
 - Fixed: Monk: Investigate. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.201 - October 19th, 2003
+ Fusion 1.201 - October 19th, 2003
 --------------------------------------------------------------------------------
 - Fixed: /monster command fixed. [AlexKreuz] 
 - Fixed: Monk Crash w/ Claws. [DarkHelmet] 
 
 --------------------------------------------------------------------------------
-Fusion 1.200 - October 19th, 2003
+ Fusion 1.200 - October 19th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Guild Bugs removed. [GTO] 
 - Fixed: Login Fix. [GTO] 
@@ -1155,13 +1159,13 @@ Fusion 1.200 - October 19th, 2003
 - Added: Status Bar: UpTime. [AlexKreuz] 
 
 --------------------------------------------------------------------------------
-Fusion 1.100 - October 15th, 2003
+ Fusion 1.100 - October 15th, 2003
 --------------------------------------------------------------------------------
 - Added: Server-Side Control Panel. [AlexKreuz] 
 - Added: Server-Side Command @users. [AlexKreuz] 
 
 --------------------------------------------------------------------------------
-Fusion 1.000 - October 14th, 2003
+ Fusion 1.000 - October 14th, 2003
 --------------------------------------------------------------------------------
 - Changed: GM IDs extend from 100000 - 100100. [AlexKreuz] 
 - Fixed: ccolor NPC command. [AlexKreuz] 
