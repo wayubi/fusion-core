@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 609
-  Top = 183
+  Left = 169
+  Top = 126
   Width = 408
   Height = 518
   Caption = '#33'
@@ -1309,8 +1309,8 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv1ClientDisconnect
     OnClientRead = sv1ClientRead
     OnClientError = sv1ClientError
-    Left = 12
-    Top = 528
+    Left = 20
+    Top = 192
   end
   object sv2: TServerSocket
     Active = False
@@ -1320,8 +1320,8 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv2ClientDisconnect
     OnClientRead = sv2ClientRead
     OnClientError = sv2ClientError
-    Left = 44
-    Top = 528
+    Left = 52
+    Top = 192
   end
   object sv3: TServerSocket
     Active = False
@@ -1331,31 +1331,27 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv3ClientDisconnect
     OnClientRead = sv3ClientRead
     OnClientError = sv3ClientError
-    Left = 76
-    Top = 528
+    Left = 84
+    Top = 192
   end
   object DBsaveTimer: TTimer
     Enabled = False
     Interval = 300000
     OnTimer = DBsaveTimerTimer
-    Left = 568
-    Top = 64
+    Left = 80
+    Top = 160
   end
   object BackupTimer: TTimer
     Enabled = False
     OnTimer = BackupTimerTimer
-    Left = 504
-    Top = 64
+    Left = 16
+    Top = 160
   end
   object MainMenu1: TMainMenu
-    Left = 536
-    Top = 64
+    Left = 48
+    Top = 160
     object File1: TMenuItem
       Caption = '&File'
-      object Save1: TMenuItem
-        Caption = '&Save'
-        OnClick = Save1Click
-      end
       object Exit1: TMenuItem
         Caption = 'E&xit'
         OnClick = Exit1Click
@@ -1370,6 +1366,17 @@ object frmMain: TfrmMain
       object Stop1: TMenuItem
         Caption = 'S&top'
         OnClick = Stop1Click
+      end
+    end
+    object Database1: TMenuItem
+      Caption = 'Database'
+      object Save1: TMenuItem
+        Caption = 'Save'
+        OnClick = Save1Click
+      end
+      object Backup1: TMenuItem
+        Caption = 'Backup'
+        OnClick = Backup1Click
       end
     end
     object Control1: TMenuItem

@@ -9,7 +9,7 @@ uses
 	ComCtrls,
 	{Fusion Units}
 	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
-	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon,
+	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
 	{3rd Party Units}
 	List32, Zip, Menus;
 
@@ -44,7 +44,6 @@ type
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     Exit1: TMenuItem;
-    Save1: TMenuItem;
     Server1: TMenuItem;
     Start1: TMenuItem;
     Stop1: TMenuItem;
@@ -176,6 +175,9 @@ type
     MinimizetoTray2: TMenuItem;
     Label48: TLabel;
     ComboBox14: TComboBox;
+    Database1: TMenuItem;
+    Save1: TMenuItem;
+    Backup1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -243,7 +245,6 @@ type
     procedure Start1Click(Sender: TObject);
     procedure Stop1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
-    procedure Save1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -254,6 +255,8 @@ type
     procedure PageControl2Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure MinimizetoTray2Click(Sender: TObject);
+    procedure Save1Click(Sender: TObject);
+    procedure Backup1Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -10762,37 +10765,8 @@ begin
 end;
 
 procedure TfrmMain.BackupTimerTimer(Sender: TObject);
-var
-    zfile :TZip;
-    fileslist :TStringList;
-    filename :string;
 begin
-
-    DateSeparator      := '-';
-    TimeSeparator      := '-';
-    ShortDateFormat    := 'yyyy/mm/dd';
-    LongTimeFormat    := 'hh:mm:ss';
-
-    filename := datetostr(date) + ' - ' +timetostr(time);
-
-    CreateDir('backup');
-    zfile := tzip.create(self);
-    zfile.Filename := AppPath + 'backup\' + filename + '.zip';
-
-    fileslist := tstringlist.Create;
-    fileslist.Add(AppPath + 'chara.txt');
-    fileslist.Add(AppPath + 'gcastle.txt');
-    fileslist.Add(AppPath + 'guild.txt');
-    fileslist.Add(AppPath + 'party.txt');
-    fileslist.Add(AppPath + 'pet.txt');
-    fileslist.Add(AppPath + 'player.txt');
-
-    zfile.FileSpecList := fileslist;
-    zfile.Add;
-    zfile.Free;
-
-    fileslist.Free;
-
+	backup_txt_database();
 end;
 
 // Knockback situations:
@@ -10914,6 +10888,19 @@ begin
 	frmMain.Close;
 end;
 
+
+procedure TfrmMain.Save1Click(Sender: TObject);
+begin
+    DataSave();
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
+end;
+
+procedure TfrmMain.Backup1Click(Sender: TObject);
+begin
+	backup_txt_database();
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been backed up.');
+end;
+
 procedure TfrmMain.MinimizetoTray2Click(Sender: TObject);
 begin
     //Add Icon to System Tray
@@ -10932,12 +10919,6 @@ begin
                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
                 //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
                 // (Don't ToolWindows don't show in taskbar by default)
-end;
-
-procedure TfrmMain.Save1Click(Sender: TObject);
-begin
-    DataSave();
-    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
 end;
 
 procedure TfrmMain.PageControl1Change(Sender: TObject);
