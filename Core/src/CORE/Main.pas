@@ -2009,11 +2009,12 @@ begin
 				end;
                                 if tc.Skill[308].Tick > Tick then m := 0;
 				dmg[3] := dmg[3] + Random((dmg[3] div 20) * (dmg[3] div 20)); //Def+DefBonus
+				{ This causes negative damage. Why is this here. Added correct calculations to the bottom?
 				if (AMode <> 8) then begin //AC
 					//オート_バーサーク
 					if (tc.Skill[146].Lv <> 0) and ((tc.HP  / tc.MAXHP) * 100 <= 25) then dmg[0] := (dmg[0] * (100 - (m * ts.DEFPer div 100)) div 100) * word(tc.Skill[6].Data.Data1[10]) div 100 - dmg[3]
 					else dmg[0] := dmg[0] * (100 - (m * ts.DEFPer div 100)) div 100 - dmg[3]; //プロボック修正はここ
-				end;
+				end;}
 			end;
 
 			dmg[0] := dmg[0] + ATK[Arms][3]; // 'Refining correction'
@@ -2200,7 +2201,7 @@ begin
 
                         j := SearchCInventory(tc, tc.WeaponID, true);
 
-                        if tc.SkillWeapon = false then exit;
+                if tc.SkillWeapon = true then begin
 
                         if (j <> 0) and (Random(100) < 30) and (tc.MSkill = 0) then begin
                                 tc.MTarget := tc.ATarget;
@@ -2223,6 +2224,11 @@ begin
                                 exit;
                         end;
                 if tc.SageElementEffect then dmg[0] := dmg[0] + (dmg[0] * tc.Skill[285].Data.Data1[Skill[285].EffectLV] div 100);
+                end;
+
+                if (tc.Skill[146].Lv <> 0) and ((tc.HP  / tc.MAXHP) * 100 <= 25) then begin
+                    dmg[0] := ((tc.Skill[6].Data.Data1[10] * dmg[0]) div 100);
+                end;
 
         end;
 
