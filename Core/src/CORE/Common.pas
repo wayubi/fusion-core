@@ -14,7 +14,7 @@ const
   MAX_JOB_NUMBER = 45;
   LOWER_JOB_END = 23;
   UPPER_JOB_BEGIN = 4000;
-
+  MONSTER_ATK_RANGE = 9;
 type TLiving = class
   public
     ID      :cardinal;

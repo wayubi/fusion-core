@@ -2890,8 +2890,10 @@ begin
 			ts.DmgTick := 0;
 		end;
     xy := ts.Point;
-    j := SearchPath2(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y);
-    if j <> 0 then begin
+
+    { Alex: Monster searching for attack path towards player - checks attackrange over cliffs and sightrange w/o cliffs. }
+    if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
+    ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin
         if (ts.ATarget = 0) or (ts.isActive) then begin
 		ts.ATarget := tc.ID;
 		ts.AData := tc;
@@ -3574,8 +3576,8 @@ begin
 			if ATick + ADelay - 200 < Tick then ATick := Tick - ADelay + 200;
 		end;}
 
+                {Alex: Player search for monster - Should search over cliffs, but not walls and check for range - Type 2 }
         if (Path_Finding(path, tm, Point.X, Point.Y,ts.Point.X, ts.Point.Y, 2) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
-		//if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//çUåÇ
 			if ts = nil then begin
 				AMode := 0;
@@ -12373,7 +12375,9 @@ begin
 				if sl.Count <> 0 then begin
 					j := Random(sl.Count);
 					tn := sl.Objects[j] as TNPC;
-					k := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
+//1
+                                        { Alex: Still Unknown - Pet Looting? - 1 for now }
+                                        k := Path_Finding(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y, 1);
 					if (k <> 0) then begin
 					    //if ts.Item[10].ID = 0 then begin
 						tpe.isLooting := True;
@@ -13868,9 +13872,9 @@ begin
         end;
         end;
       end;
+
 	if Status = 'RUN' then begin
       ts.ATarget := 0;
-      //ts.isActive := false;
       ts.tgtPoint.X := ts.Point.X + Random(10);
       ts.tgtPoint.Y := ts.Point.Y + Random(10);
     end;
@@ -13886,15 +13890,16 @@ begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
 							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and 64 = 0) and ((tc1.Option and 6 = 0) or ((tc1.Option and 6 <> 0) and (ts.Data.Race = 6) or (ts.Data.Race = 4) or (ts.Data.MEXP <> 0))) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
-							//if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
-							    //if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
-							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) then begin
+                                                                { Alex: Very complex. Monster searching for target. Checks for attack range over cliffs or sight range over regular terrain. }
+                                                                if ( (Path_Finding(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y, 2) <> 0) and (abs(ts.Point.X - tc1.Point.X) <= ts.Data.Range1) and (abs(ts.Point.Y - tc1.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
+                                                                ( (Path_Finding(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y, 1) <> 0) and (abs(ts.Point.X - tc1.Point.X) <= ts.Data.Range2) and (abs(ts.Point.Y - tc1.Point.Y) <= ts.Data.Range2) ) then begin
 								sl.AddObject(IntToStr(tc1.ID), tc1);
 							    end;
 							end;
 						end;
 					end;
 				end;
+
 				if sl.Count <> 0 then begin
 					//éãäEì‡ÇÃíNÇ©Ç…É^Å[ÉQÉbÉgÇíËÇﬂÇÈ
 					j := Random(sl.Count);
@@ -13906,6 +13911,7 @@ begin
 					Exit;
 				end;
 			end;
+
 			if (not isLooting) and Data.isLoot then begin
 				//ÉãÅ[ÉgÉÇÉìÉX
 				sl.Clear;
@@ -13917,16 +13923,18 @@ begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
 							if (abs(tn.Point.X - Point.X) <= 10) and (abs(tn.Point.Y - Point.Y) <= 10) then begin
-								//åÛï‚Ç…í«â¡
 								sl.AddObject(IntToStr(tn.ID), tn);
 							end;
 						end;
 					end;
 				end;
+
 				if sl.Count <> 0 then begin
 					j := Random(sl.Count);
 					tn := sl.Objects[j] as TNPC;
-					j := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
+
+                                        { Alex: Monster searching for loot - Must block cliffs and walls - Type 1 }
+                                        j := Path_Finding(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y, 1);
 					if (j <> 0) then begin
 					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
@@ -13944,14 +13952,16 @@ begin
 					Exit;
 				end;
 			end;
-		end else begin
+		end
+
+                else begin
       if (isLeader) and (isLooting = false) then begin
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
               if (tm.Block[i1][j1].Mob.Objects[k1] is TMob) then begin
 							ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-{èCê≥}				if (ts2 <> nil) or (ts2 <> ts) then begin
+                                                                if (ts2 <> nil) or (ts2 <> ts) then begin
 							if ts2.LeaderID <> ts.ID then continue;
 							if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
 								if ts2.ATarget = 0 then begin
@@ -13969,37 +13979,12 @@ begin
 			end;
 			end;
 
-
-      //if isSlave begin
-				//for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					//for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
-						//for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-							//ts2 :=  tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-{èCê≥}				//if (ts2 <> nil) or (ts2 <> ts) then begin
-							//if ts2.ID <> ts.LeaderID then continue;
-							//if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
-								//if ts2.ATarget = 0 then begin
-									//ts2.ATarget := ts.ATarget;
-									//ts2.ARangeFlag := false;
-									//ts2.AData := ts.AData;
-									//ts2.ATick := Tick;
-									//ts2.ARangeFlag := false;
-								//end;
-							//end;
-              //end;
-						//end;
-					//end;
-				//end;
-      //end;
-
-
-			//ÉäÉìÉNÉÇÉìÉXÉ^Å[
 			if Data.isLink and (not isLooting) then begin
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-{èCê≥}				if (ts2 <> nil) or (ts2 <> ts) then begin
+                                                if (ts2 <> nil) or (ts2 <> ts) then begin
 							if ts2.JID <> ts.JID then continue;
 							if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
 								if ts2.ATarget = 0 then begin
@@ -14016,7 +14001,7 @@ begin
 				end;
 			end;
 		end;
-{í«â¡ÉRÉRÇ‹Ç≈}
+
 	sl.Free;
 	end;
 end;
@@ -14546,7 +14531,11 @@ begin
 					until (j = 100);
 						
 					if j <> 100 then begin
-						pcnt := SearchAttack(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+                                                // { Alex: Monster walking towards target. May not walk over cliffs. Type 1. }
+                                                if ( (Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1) <> 0) and (abs(Point.X - xy.X) <= ts.Data.Range2) and (abs(Point.Y - xy.Y) <= ts.Data.Range2) ) then begin
+                                                        pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
+                                                end;
+
 						ts.DeadWait := Tick;
 					end;
 						
@@ -14754,7 +14743,9 @@ begin
 						X := abs(ts1.Point.X - Point.X);
 						Y := abs(ts1.Point.Y - Point.Y);
 						if (X + Y) < Cardinal(j) then begin //ãóó£Ç™àÍî‘ãﬂÇ¢
-							k := SearchPath2(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y);
+//2
+                                                        { Alex: Currently Unexplored - Type 1 for safety }
+                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
 							//íHÇËíÖÇØÇ∏éÀíˆäOÇ»ÇÁñ≥éã
 							if (k = 0) and ((X > tl.Range) or (Y > tl.Range)) then Continue;
 							j := X + Y;
@@ -14834,7 +14825,8 @@ begin
 						X := abs(ts1.Point.X - Point.X);
 						Y := abs(ts1.Point.Y - Point.Y);
 						if (X + Y) < Z then begin //ãóó£Ç™àÍî‘ãﬂÇ¢
-							k := SearchPath2(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y);
+                                                        { Alex: Currently Unexplored - Type 1 for safety }
+                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
 							//íHÇËíÖÇØÇ∏éÀíˆäOÇ»ÇÁñ≥éã
 							if (k = 0) and ((X > Range) or (Y > Range)) then Continue;
 						 	Z := X + Y;
@@ -14905,7 +14897,8 @@ begin
 						X := abs(tn1.Point.X - Point.X);
 						Y := abs(tn1.Point.Y - Point.Y);
 						if (X + Y) < Cardinal(j) then begin
-							k := SearchPath2(tc.path, tm, Point.X, Point.Y, tn1.Point.X, tn1.Point.Y);
+                                                        { Alex: Currently Unexplored - Type 1 for safety }
+                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, tn1.Point.X, tn1.Point.Y, 1);
 							if (k = 0) and ((X > 1) or (Y > 1)) then Continue;
 							j := X + Y;
 							tn := tn1;
@@ -14949,7 +14942,8 @@ begin
 				//---
 				if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
 					//pcnt := SearchPath(path, tm, Point, xy);
-				i := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+                                        { Alex: Currently Unexplored - Type 1 for safety }
+                                        i := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
 				Inc(j);
 			until (i <> 0) or (j = 100);
 			if j <> 100 then begin
@@ -15108,7 +15102,9 @@ begin
 					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) and (tc.FreezeTick < Tick) and (tc.StoneTick < Tick) then begin
 						//í«â¡à⁄ìÆ
 						AMode := 0;
-						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
+
+                                                { Alex: Currently Unexplored - Type 1 for safety }
+                                                k := Path_Finding(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y, 1);
 						if k <> 0 then begin
 							if pcnt = 0 then MoveTick := Tick;
 								pcnt := k;
@@ -15475,7 +15471,8 @@ begin
 															Break;
 														end;
 														if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
-															pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+                                                                                                                        { Alex: Currently Unexplored - Type 1 for safety }
+                                                                                                                        pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
 														Inc(j);
 													until (pcnt <> 0) or (j = 100);
 												end;
@@ -15497,7 +15494,8 @@ begin
 													end;
 													//---
 													if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
-														pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+                                                                                                                { Alex: Currently Unexplored - Type 1 for safety }
+														pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
                                                                                                                 ts.DeadWait := Tick;   // mf
 													Inc(j);
 												until (pcnt <> 0) or (j = 100);
@@ -15554,7 +15552,8 @@ begin
                                           if tpe.isLooting = false then begin
                                             // à⁄ìÆ
                                             j := 0;
-                                            k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y );
+                                            { Alex: Currently Unexplored - Type 1 for safety }
+                                            k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y, 1);
                                             if (k > 3) and (k < 15) then begin
 
                                               if Sit = 0 then begin
@@ -15570,8 +15569,8 @@ begin
                                                   xy.Y := Point.Y + Random(5) - 2;
                                                   Inc(j);
                                                 until ( xy.X <> Point.X ) or ( xy.Y <> Point.Y );
-
-                                                k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y );
+                                                { Alex: Currently Unexplored - Type 1 for safety }
+                                                k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y, 1);
                                               end;
 
                                               if k <> 0 then begin
@@ -15631,7 +15630,8 @@ begin
                                             end;
                                           end else if tpe.isLooting then begin
                                             j := 0;
-                                            k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, tn.NextPoint.X, tn.NextPoint.Y );
+                                            { Alex: Currently Unexplored - Type 1 for safety }
+                                            k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, tn.NextPoint.X, tn.NextPoint.Y, 1);
                                             if k > 1 then begin
                                               //tn.NextPoint := xy;
                                               SendPetMove( Socket, tc, tn.NextPoint );
