@@ -2269,7 +2269,11 @@ begin
 		Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
 		if Arms = 0 then begin
-			crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
+            if Weapon = 16 then begin
+                crit := boolean((SkillPer = 0) and (Random(100) < (Critical * 2) - ts.Data.LUK * 0.2));
+            end else begin
+                crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
+            end;
 		end else begin //“ñ“—¬‰EŽè
 			crit := boolean(dmg[5] = 10);
 		end;

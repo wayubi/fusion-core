@@ -2943,7 +2943,6 @@ begin
 
 		//if Weapon = 11 then Element := ArrowElement;
 		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('WElement: %d/%d', [WElement[0], WElement[1]]));
-		if Weapon = 16 then Critical := Critical * 2;
 		Inc(Range);
 		if ((MAXHP * MAXHPPer div 100) > 65535) then begin
 			MAXHP := 65535;
