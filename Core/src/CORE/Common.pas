@@ -4801,12 +4801,12 @@ begin
 		if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin
 			tl := tc.Skill[tc.MSkill].Data;
 
-            if (tc.MSkill = 18) and (FireWallCount = (Option_FireWall_Cap * 3)) then begin
+            if (tc.MSkill = 18) and (FireWallCount = (Option_FireWall_Cap * 3)) and not (Option_FireWall_Cap = 0) then begin
                 SendSkillError(tc, 0);
                 Exit;
             end;
 
-            if (tc.MSkill = 87) and (IceWallCount = (Option_IceWall_Cap * 5)) then begin
+            if (tc.MSkill = 87) and (IceWallCount = (Option_IceWall_Cap * 5))  and not (Option_IceWall_Cap = 0) then begin
                 SendSkillError(tc, 0);
                 Exit;
             end;
