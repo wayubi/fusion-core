@@ -1742,11 +1742,8 @@ var
 	i, j : integer;
 	txt : TextFile;
     str : String;
-	sl  : TStringList;
+	statusfile, svarfile  : TStringList;
 begin
-	sl := TStringList.Create;
-	sl.QuoteChar := '"';
-	sl.Delimiter := ',';
 
     if not FileExists(AppPath + 'addplayer.txt') then begin
         AssignFile(txt, AppPath + 'addplayer.txt');
@@ -1792,59 +1789,79 @@ begin
     PD_PlayerData_Load();
 
     { -- Server Flags -- }
-	if not FileExists(AppPath + 'status.txt') then begin
+	{if not FileExists(AppPath + 'status.txt') then begin
 		AssignFile(txt, AppPath + 'status.txt');
 		Rewrite(txt);
 		Writeln(txt, '##Weiss.StatusData.0x0002');
 		Writeln(txt, '0');
 		CloseFile(txt);
-	end else begin
-		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Flag loading...');
-	Application.ProcessMessages;
-		AssignFile(txt, AppPath + 'status.txt');
-		Reset(txt);
-		Readln(txt, str);
-					sl.Clear;
-					Readln(txt, str);
-					sl.DelimitedText := str;
-					j := StrToInt(sl.Strings[0]);
-		for i := 1 to j do ServerFlag.Add('\' + sl.Strings[i]);
-		CloseFile(txt);
-		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
-		Application.ProcessMessages;
-							end;
+	end else begin}
+    ServerFlag.Clear;
+    if FileExists(AppPath + 'status.txt') or FileExists(AppPath + 'gamedata\servervariables.txt') then begin
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Variables loading...');
+        Application.ProcessMessages;
+        if FileExists(AppPath + 'status.txt') then begin
+            statusfile := TStringList.Create;
+            statusfile.QuoteChar := '"';
+        	statusfile.Delimiter := ',';
+		    AssignFile(txt, AppPath + 'status.txt');
+    		Reset(txt);
+    		Readln(txt, str);
+            statusfile.Clear;
+            Readln(txt, str);
+            statusfile.DelimitedText := str;
+            j := StrToInt(statusfile.Strings[0]);
+            for i := 1 to j do ServerFlag.Add('\' + statusfile.Strings[i]);
+            CloseFile(txt);
+
+            for i := 1 to (statusfile.Count -1) do
+            debugout.Lines.Add('status.txt flag: ' + statusfile.Strings[i]);
+
+            statusfile.Free;
+            DeleteFile(AppPath + 'status.txt');
+
+        end;
+        if FileExists(AppPath + 'gamedata\servervariables.txt') then begin
+            svarfile := TStringList.Create;
+            svarfile.QuoteChar := '"';
+        	svarfile.Delimiter := ',';
+            svarfile.Clear;
+            svarfile.LoadFromFile(AppPath + 'gamedata\servervariables.txt');
+            for i := 0 to (svarfile.Count -1) do
+                ServerFlag.Add('\' + svarfile.Strings[i]);
+
+            for i := 0 to (svarfile.Count -1) do
+                debugout.Lines.Add('Server file flag: ' + svarfile.Strings[i]);
+
+            svarfile.Free;
+        end;
+
+        for i := 0 to (ServerFlag.Count -1) do
+            debugout.Lines.Add('Server flag: ' + ServerFlag.Strings[i]);
+
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Variables loaded.', [ServerFlag.Count]));
+        Application.ProcessMessages;
+    end;
+
     { -- Server Flags -- }
 
 	Application.ProcessMessages;
-
-	sl.Free;
 end;
 
 //------------------------------------------------------------------------------
 procedure DataSave(forced : Boolean = False);
 var
 	j   : Integer;
-	cnt : Integer;
 	txt : TextFile;
-	sl  : TStringList;
+    datafile : TStringList;
 begin
-
-	sl := TStringList.Create;
-	sl.QuoteChar := '"';
-	sl.Delimiter := ',';
 
     PD_PlayerData_Save(forced);
 
-    { -- Server Flags -- }
-    if (ServerFlag.Count <> 0) or (forced) then begin
-        AssignFile(txt, AppPath + 'status.txt');
-        Rewrite(txt);
-        Writeln(txt, '##Weiss.StatusData.0x0002');
-        sl.Clear;
-        sl.Add('0');
-        cnt := 0;
-        for j := 0 to ServerFlag.Count - 1 do begin
-            if (Copy(ServerFlag[j], 1, 1) = '\') then begin
+    datafile := TStringList.Create;
+    datafile.QuoteChar := '"';
+    for j := 0 to ServerFlag.Count - 1 do begin
+        if (Copy(ServerFlag[j], 1, 1) = '\') then begin
 
             { Alex: Ok, crack control again. Putting this line here ensures that any temporary
             variables stop working because the '\' in front is permanently removed. Bad coding. }
@@ -1852,19 +1869,17 @@ begin
 
             if (copy(serverflag[j],2,1) <> '@' ) and (Copy(ServerFlag[j],2,2) <> '$@' )
             and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
-                sl.Add(Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1));
-                Inc(cnt);
-				end;
-			end;
-		end;
-        sl.Strings[0] := IntToStr(cnt);
-        writeln(txt, sl.DelimitedText);
-        CloseFile(txt);
-	end;
-    { -- Server Flags -- }
-    
+                datafile.Add(Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1));
+            end;
+        end;
+    end;
+    deletefile(AppPath + 'gamedata\servervariables.txt');
+    datafile.SaveToFile(AppPath + 'gamedata\servervariables.txt');
 
-	sl.Free;
+    FreeAndNil(datafile);
+
+    { -- Server Flags -- }
+
 end;
 //------------------------------------------------------------------------------
 
