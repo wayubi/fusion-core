@@ -98,7 +98,7 @@ begin
 		else if APlayer.Pass = userpass then begin
 
 			APlayer.IP := Socket.RemoteAddress;
-			APlayer.Login := 1;
+			//APlayer.Login := 1;
 			APlayer.LoginID1 := Random($7FFFFFFF) + 1;
 			if UseSQL then APlayer.LoginID2 := Assign_AccountID()
 			else begin

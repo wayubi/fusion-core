@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-27-04: #63 - Logging in to char select, cancel and login again broke account. [AlexKreuz]
 - 08-27-04: REED multi-player errors prevented startup. [AlexKreuz]
 - 08-27-04: #58 - WAC Did Not Add Emails. [AlexKreuz]
 - 08-27-04: #55 - Discounting very expensive items caused integer overflow crash. [AlexKreuz]
