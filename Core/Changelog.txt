@@ -2,6 +2,9 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 03-11-04: Updated Basilica to show proper effect. [Colus]
+- 03-11-04: Updated packets for combo delay. [Colus]
+- 03-11-04: Corrected combo delay periods. [Colus]
 - 03-10-04: Fixed bug #594 (buying phantom items from NPC shops) [Colus]
 - 03-10-04: Removed Maximize debug, made some minor hide/cloak/MP changes. [Colus]
 - 03-09-04: Added Paladin Gospel -not done yet(only heals).[Oatmeal]
