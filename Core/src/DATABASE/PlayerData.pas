@@ -12,7 +12,9 @@ uses
     Qt, QForms, Types,
     {$ENDIF}
     {Shared}
-    Classes, SysUtils, IniFiles;
+    Classes, SysUtils, IniFiles,
+    {Fusion}
+    Common;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -37,6 +39,7 @@ uses
     { Character Data - Basic Data }
     procedure PD_Load_Characters(UID : String = '*');
     procedure PD_Save_Characters(forced : Boolean = False);
+    procedure PD_Delete_Characters(tc : TChara);
 
     { Character Data - Memo Data }
     procedure PD_Load_Characters_Memos(UID : String = '*');
@@ -101,7 +104,7 @@ uses
 implementation
 
 uses
-	Common, Game_Master, GlobalLists, Zip, TrimStr;
+	Game_Master, GlobalLists, Zip, TrimStr, Database;
 
 
     { -------------------------------------------------------------------------------- }
@@ -632,6 +635,8 @@ uses
                         tc.PLv := StrToInt( Copy(datafile[43], Pos(' : ', datafile[43]) + 3, length(datafile[43]) - Pos(' : ', datafile[43]) + 3) );
                         tc.GuildID := StrToInt( Copy(datafile[44], Pos(' : ', datafile[44]) + 3, length(datafile[44]) - Pos(' : ', datafile[44]) + 3) );
 
+                        tc.PData := tp;
+
                         for i := 0 to 8 do begin
                         	if (searchResult2.Name = tp.CName[i]) then begin
             	            	tp.CData[i] := tc;
@@ -759,6 +764,28 @@ uses
 
         datafile.Clear;
         datafile.Free;
+    end;
+
+    procedure PD_Delete_Characters(tc : TChara);
+    var
+        tp : TPlayer;
+        deldir : String;
+    begin
+        tp := tc.PData;
+
+        deldir := AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\';
+        if FileExists(deldir+'ActiveMemos.txt') then DeleteFile(deldir+'ActiveMemos.txt');
+        if FileExists(deldir+'Cart.txt') then DeleteFile(deldir+'Cart.txt');
+        if FileExists(deldir+'Character.txt') then DeleteFile(deldir+'Character.txt');
+        if FileExists(deldir+'Inventory.txt') then DeleteFile(deldir+'Inventory.txt');
+        if FileExists(deldir+'Skills.txt') then DeleteFile(deldir+'Skills.txt');
+        if FileExists(deldir+'Variables.txt') then DeleteFile(deldir+'Variables.txt');
+
+        deldir := AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\';
+        SetCurrentDir(deldir);
+        RmDir(deldir + tc.Name);
+
+        Datasave();
     end;
 
 
