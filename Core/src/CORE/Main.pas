@@ -10239,6 +10239,13 @@ begin
 									end;
 
 									ts := tm.Block[a][b].Mob.Objects[k] as TMob;
+
+                                    {Mercenary Handling}
+                                    if ts.MercID <> 0 then begin
+                                        if ts.MercMoveTick < Tick then
+                                            if (ts.OwnerID = tc.ID) and (ts.MercMoveTick < Tick) then MercenaryAI(tc, ts, tm, Tick);
+                                    end;
+                                    
 									Inc(k);
 									if ts = nil then Continue;
 									if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
@@ -10744,6 +10751,7 @@ begin
                     GSkillDB.Clear;
                     SlaveDBName.Clear;
                     //PharmacyDB.Clear;
+                    MercenariesList.Clear;
                     MobAIDB.Clear;
                     MobAIDBFusion.Clear;
                     GlobalVars.Clear;

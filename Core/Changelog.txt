@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-03-04: Revived my #call_mercenary beta/mercenary system.  (Still in Beta) [Darkhelmet]
 - 12-01-04: Removed redundant line in universal broadcast procedure. [Tsusai]
 - 12-01-04: Restructured script.pas to share procedures for similar commands. [Tsusai]
 - 12-01-04: Removed universal warp procedure. [Tsusai]

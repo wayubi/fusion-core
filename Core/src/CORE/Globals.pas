@@ -102,6 +102,9 @@ uses
         MobAIDBFusion := TIntList32.Create;
         MobAIDBFusion.Sorted := true;
 
+        MercenariesList := TStringList.Create;
+        MercenariesList.CaseSensitive := False;
+
         GlobalVars := TStringList.Create;
 
         MobDBName := TStringList.Create;

@@ -432,6 +432,7 @@ var
 	ts   : TMobDB;
 	tsAI    : TMobAIDB;
 	tsAI2   : TMobAIDBFusion;
+    tMercenary : TMercenaries;
 	twp     : TWarpDatabase;
 	tGlobal : TGlobalVars;
 
@@ -1124,6 +1125,33 @@ begin
 	end;
 	CloseFile(txt);
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Fusion monster(s) skills loaded.', [MobAIDBFusion.Count]));
+	Application.ProcessMessages;
+
+  {Mercenaries Load}
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mercenary database loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\mercenary.txt');
+	Reset(txt);
+	Readln(txt, str);
+
+
+    j := 1;
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+		sl.DelimitedText := str;
+
+        tMercenary := TMercenaries.Create;
+        if (sl.Strings[0] <> '//') and (sl.Strings[0] <> '') then begin
+            tMercenary.Name := PChar(sl.Strings[0]);
+            tMercenary.SpriteID:= StrToInt(sl.Strings[1]);
+
+            MercenariesList.AddObject(tMercenary.Name, tMercenary)
+        end;
+    end;
+
+	CloseFile(txt);
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Mercenaries loaded.', [MercenariesList.Count]));
 	Application.ProcessMessages;
 
   {Global Variables Load}

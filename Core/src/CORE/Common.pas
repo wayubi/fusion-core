@@ -411,6 +411,13 @@ rEXPDist = record
 end;
 
 //------------------------------------------------------------------------------
+
+TMercenaries = class
+    Name:   PChar;
+    SpriteID    :   integer;
+end;
+
+//------------------------------------------------------------------------------
 // モンスターデータ
 TMob = class(TLiving)
 	tgtPoint    :TPoint;
@@ -498,6 +505,13 @@ TMob = class(TLiving)
 		// 3 = Target Skill
 		// 4 = Support skill
 	CanFindTarget :boolean;
+
+    {Mercenary System}
+    MercID  :   cardinal;
+    MercName:   String;
+    OwnerID :   Cardinal;
+    OwnerName:  PChar;
+    MercMoveTick :  Cardinal;
 
 {NPCイベント追加ココまで}
 	constructor Create;
@@ -1013,6 +1027,12 @@ TChara = class(TLiving)
 
         guild_storage : Boolean;
         NPC_Touch     : Boolean; //to make sure you don't keep setting off the same npc ontouch script.
+
+    {Mercenary System}
+    mercenaryID       :cardinal;  {The ID of a character's Mercenary}
+    mercenaryHP       :integer;   {Your mercenaries Hit Points}
+    mercenaryIDName   :String;    {Your Mercenaries Monster Name}
+    mercenaryCustomName : PChar;  {Your Mercenaries Custom Name}
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1573,13 +1593,14 @@ var
 	ItemDBName :TStringList;
 	MobDB      :TIntList32;
 	MobDBName  :TStringList;
-        {Monster Skill Database}
-        MobAIDB    :TIntList32;
-        //MobAIDBAegis:TStringList;
-        MobAIDBFusion:TIntList32;
-        GlobalVars:TStringList;
-        //PharmacyDB :TIntList32;
-  SlaveDBName:TStringList;
+    {Monster Skill Database}
+    MobAIDB    :TIntList32;
+    //MobAIDBAegis:TStringList;
+    MobAIDBFusion:TIntList32;
+    MercenariesList:TStringList;
+    GlobalVars:TStringList;
+    //PharmacyDB :TIntList32;
+    SlaveDBName:TStringList;
   MArrowDB   :TIntList32;
   WarpDatabase:TStringList;
   IDTableDB  :TIntList32;
@@ -4205,6 +4226,7 @@ var
 	mi      :MapTbl;
 {キューペット}
 	tn      :TNPC;
+    tMerc   :TMob;
 {キューペットここまで}
 begin
 {パーティー機能追加}
@@ -4250,9 +4272,27 @@ begin
 		tn.Free;
 		tc.PetNPC := nil;
 	end;
-{キューペットここまで}
 
-{チャットルーム機能追加}
+    {Delete Mercenary From old map}
+    if tc.mercenaryID <> 0 then begin
+      if tm.Mob.IndexOf(tc.mercenaryID) <> -1 then begin
+        tMerc := tm.Mob.IndexOfObject(tc.mercenaryID) as TMob;
+        UpdateMonsterDead(tm, tMerc, 0);
+        i := tm.Block[tMerc.Point.X div 8][tMerc.Point.Y div 8].Mob.IndexOf(tMerc.ID);
+		if i <> -1 then begin
+			tm.Block[tMerc.Point.X div 8][tMerc.Point.Y div 8].Mob.Delete(i);
+		end;
+
+		i := tm.Mob.IndexOf( tMerc.ID );
+		if i <> -1 then begin
+			tm.Mob.Delete(i);
+		end;
+
+        tMerc.Free;
+      end;
+    end;
+
+
 	//入室中メンバーの削除処理
 	if (tc.ChatRoomID <> 0) then begin
 		if (mode = 2) then ChatRoomExit(tc, true)

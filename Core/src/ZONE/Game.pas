@@ -100,6 +100,7 @@ Var
 	tk  : TSkill;
 	tl  : TSkillDB;
 	td  : TItemDB;
+    tMerc:TMob;
 
 {アイテム製造追加}
 	tma : TMaterialDB;
@@ -494,6 +495,23 @@ Begin(* Proc sv3PacketProcess() *)
         // Set login data and send party info
 				tc.Login := 2;
 				SendPartyList(tc);
+        //Display Your Mercenary
+        if (tc.mercenaryID <> 0) then begin
+        for j := tMerc.Point.Y div 8 - 2 to tMerc.Point.Y div 8 + 2 do begin
+            for i := tMerc.Point.X div 8 - 2 to tMerc.Point.X div 8 + 2 do begin
+
+                for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
+                    tc := tm.Block[i][j].CList.Objects[k] as TChara;
+                    if tc = nil then continue;
+                    if (abs(tMerc.Point.X - tc.Point.X) < 16) and (abs(tMerc.Point.Y - tc.Point.Y) < 16) then begin
+                        SendMData(tc.Socket, tMerc);
+                        SendBCmd(tm,tMerc.Point,41,tc,False);
+                    end;
+                end;
+            end;
+        end;
+
+        end;
 
         // Find and show your active pet
         j := 0;
@@ -845,11 +863,22 @@ Begin(* Proc sv3PacketProcess() *)
 					end;
 {ギルド機能追加ココまで}
 				end else if tm.Mob.IndexOf(l) <> -1 then begin
+                    // Display the special mercenary tag
 					ts := tm.Mob.IndexOfObject(l) as TMob;
-					WFIFOW(0, $0095);
-					WFIFOL( 2, l);
-					WFIFOS( 6, ts.Name, 24);
-					Socket.SendBuf(buf, 30);
+                    if ts.MercName <> '' then begin
+                        WFIFOW(0, $0195);
+						WFIFOL( 2, l);
+						WFIFOS( 6, ts.Name, 24);
+						WFIFOS(30, 'Mercenary', 24);
+						WFIFOS(54, ts.MercName, 24);
+						WFIFOS(78, 'Level 1', 24);
+						Socket.SendBuf(buf, 102);
+                    end else begin
+					    WFIFOW(0, $0095);
+					    WFIFOL( 2, l);
+					    WFIFOS( 6, ts.Name, 24);
+					    Socket.SendBuf(buf, 30);
+                    end;
 				end else if tm.NPC.IndexOf(l) <> -1 then begin
 					tn := tm.NPC.IndexOfObject(l) as TNPC;
 					WFIFOW( 0, $0095);

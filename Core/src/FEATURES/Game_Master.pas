@@ -12,7 +12,7 @@ uses
     {Shared}
     IniFiles, Classes, SysUtils, StrUtils,
     {Fusion}
-    Common, List32, Globals, PlayerData, WeissINI, ISCS;
+    Common, List32, Globals, PlayerData, WeissINI, ISCS, MonsterAI;
 
 var
     GM_ALIVE : Byte;
@@ -139,6 +139,9 @@ var
     GM_ATHENA_KICKALL : Byte;
     GM_ATHENA_RAISE : Byte;
     GM_ATHENA_RAISEMAP : Byte;
+
+    {Darkhelmet's "Fun Stuff"}
+    GM_CALL_MERCENARY : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -274,6 +277,9 @@ var
     function command_athena_kickall(tc : TChara) : String;
     function command_athena_raise(tc : TChara) : String;
     function command_athena_raisemap(tc : TChara) : String;
+
+    {Darkhelmet Commands}
+    function command_callmercenary(tc : TChara; str : String) : String;
 
 implementation
 
@@ -416,6 +422,7 @@ implementation
         GM_ATHENA_RAISE := StrToIntDef(sl.Values['ATHENA_RAISE'], 1);
         GM_ATHENA_RAISEMAP := StrToIntDef(sl.Values['ATHENA_RAISEMAP'], 1);
 
+        GM_CALL_MERCENARY := StrToIntDef(sl.Values['CALL_MERCENARY'], 1);
         sl.Free;
         ini.Free;
 
@@ -650,6 +657,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('rcon')) = 'rcon') and (check_level(tc, GM_RCON)) ) then error_msg := command_rcon(str)
             else if ( (copy(str, 1, length('jail')) = 'jail') and (check_level(tc, GM_JAIL)) ) then error_msg := command_jail(tc, str)
             else if ( (copy(str, 1, length('unjail')) = 'unjail') and (check_level(tc, GM_UNJAIL)) ) then error_msg := command_unjail(tc, str)
+            else if ( (copy(str, 1, length('call_mercenary')) = 'call_mercenary') and (check_level(tc, GM_CALL_MERCENARY)) ) then error_msg := command_callmercenary(tc, str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
@@ -3153,6 +3161,56 @@ Called when we're shutting down the server *only*
             Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
         end;
     end;
+
+    {Darkhelmet's Call Mercenary}
+    //Syntax #call_mercenary <monstername>, <custom name>
+    function command_callmercenary(tc : TChara; str : String) : String;
+	var
+        i, j, k : Integer;
+        tMerc : TMob;
+        tm : TMap;
+        mercName : PChar;
+        customName : String;
+        sl:TStringList;
+        //tc1 : TChara;
+    begin
+      if tc.mercenaryID = 0 then begin
+        sl := TStringList.Create;
+
+        Result := 'GM_CALL_MERCENARY Failed.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if sl.Count <> 3 then Exit;
+
+        customName := sl.Strings[2];
+
+        tm := tc.MData;
+        tMerc := TMob.Create;
+
+        //mercName := PChar(Copy(str, 16, 256));
+        mercName := PChar(sl.Strings[1]);
+        mercName := PChar(uppercase(String(mercName)));
+
+        tMerc := CreateMercenary(tm, PChar(mercName), tc, tMerc, customName);
+
+        if tMerc.JID = 0 then begin
+            Result := 'GM_CALL_MERCENARY Failed.  Invalid Monster name';
+            exit;
+        end;
+
+        //UpdateMonsterLocation(tm, tMerc);
+        //SendMonsterRelocation(tm, tMerc);
+        
+        Result := 'GM_CALL_MERCENARY Success.';
+        //SendMMove( tc.Socket, tMerc, tMerc.Point, tc.Point, tc.ver2);
+
+        //SendBCmd( tm, tMerc.Point, 58, tc, True );
+        sl.Free;
+
+      end else Result := 'GM_CALL_MERCENARY Fail, you already have a mercenary';
+   	end;
 
 
     function command_aegis_b(str : String) : String;
