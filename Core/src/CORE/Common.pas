@@ -253,6 +253,7 @@ type TIDTbl = class
   ChangeColorStyle :integer;
   AutoRawUnit      :integer;
   Refine           :integer;
+  PVPControl       :integer;
 end;
 //------------------------------------------------------------------------------
 // ID,Create ID,Number Created
@@ -1003,6 +1004,9 @@ type MapTbl = class
         PvP       :Boolean;
         PvPG      :Boolean;
         noDay     :Boolean;
+
+        dbPvP     :Boolean;
+        dbPvPG    :Boolean;
 
 end;
 {NPCイベント追加ココまで}

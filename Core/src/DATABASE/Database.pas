@@ -279,7 +279,7 @@ begin
             //Bit recombination 
             for i := 0 to 23 do begin 
                jf[i] := boolean((Job and (1 shl i)) <> 0); 
-            end; 
+            end;
             //             Novice                     swordsman                mage                        archer 
             Job :=       Int64(jf[ 0]) * $0001 + Int64(jf[ 1]) * $0002 + Int64(jf[ 2]) * $0004 + Int64(jf[ 3]) * $0008; 
             //              aco                           merchant                    thief                          knight 
@@ -293,7 +293,7 @@ begin
             Job := Job or Int64(jf[15]) * $008000;  //Monk 
             Job := Job or Int64(jf[16]) * $010000;  //Sage 
             Job := Job or Int64(jf[17]) * $020000;  //Rouge
-            Job := Job or Int64(jf[18]) * $040000;  //Alchemist 
+            Job := Job or Int64(jf[18]) * $040000;  //Alchemist
             Job := Job or Int64(jf[19]) * $080000;  //Bard 
             Job := Job or Int64(jf[20]) * $100000;  //Dancer 
 
@@ -304,7 +304,7 @@ begin
 
             //Monk 
             if IType = 5 then begin //Same as aco 
-               if Boolean(Job and $0010) or Boolean(Job and $0100) then Job := Job or $8000; 
+               if Boolean(Job and $0010) or Boolean(Job and $0100) then Job := Job or $8000;
             end else if IType = 4 then begin //weapons same as aco, knuckle system 
                if Boolean(Job and $0010) then Job := Job or $8000; 
                if View = 12 then Job := Job or $8000; 
@@ -318,7 +318,7 @@ begin
             //Alchemist Same as Blacksmith 
             if Boolean(Job and $0020) or Boolean(Job and $0400) then Job := Job or $40000; 
             //Bard 
-            //Dancer 
+            //Dancer
             if IType = 5 then begin //Same defence equiptment as hunter 
                if Boolean(Job and $0008) or Boolean(Job and $0800) then Job := Job or $180000; 
             end; 
@@ -838,9 +838,12 @@ DebugOut.Lines.Add('Monster AI database loading...');
 				else if (sl[i] = 'noskill') then mi.noSkill := true
 				else if (sl[i] = 'noitem') then mi.noItem := true
 				else if (sl[i] = 'agit') then mi.Agit := true
-                                else if (sl[i] = 'pvp') then mi.PvP := true
-                                else if (sl[i] = 'pvpg') then mi.PvPG := true
+                                else if (sl[i] = 'pvp') then mi.dbPvP := true
+                                else if (sl[i] = 'pvpg') then mi.dbPvPG := true
                                 else if (sl[i] = 'noday') then mi.noday := true;
+
+                                if (mi.dbPvP = true) then mi.PvP := true;
+                                if (mi.dbPvPG = true) then mi.PvPG := true;
 
                                 if (Option_PVP = false) then begin
                                         mi.PvP := false;
@@ -1100,6 +1103,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
       if (sl.Strings[13] <> '') then ChangeColorStyle := StrToInt(sl.Strings[13]);
       if (sl.Strings[14] <> '') then AutoRawUnit := StrToInt(sl.Strings[14]);
       if (sl.Strings[15] <> '') then Refine := StrToInt(sl.Strings[15]);
+      if (sl.Strings[16] <> '') then PVPControl := StrToInt(sl.Strings[16]);
     end;
 		IDTableDB.AddObject(tid.ID,tid);
     end;
@@ -2362,6 +2366,7 @@ var
 	tgb :TGBan;
 	tgl :TGRel;
 {ギルド機能追加ココまで}
+  mi : Maptbl;
 begin
 
 	sl := TStringList.Create;
@@ -2798,6 +2803,33 @@ begin
         end;
 	CloseFile(txt);
 {キューペットここまで}
+
+  { Mitch 01-31-2004 : mapinfo_db.txt save! }
+  AssignFile(txt, AppPath + '\database\mapinfo_db.txt');
+  Rewrite(txt);
+  WriteLn(txt, 'MapName,Memo,Save,Teleport,PVP,GuildPVP');
+  for i := 0 to MapInfo.Count - 1 do begin
+    mi := MapInfo.Objects[i] as MapTbl;
+    sl.Clear;
+    sl.Add(MapInfo.Strings[i] + '.gat');
+    with mi do begin
+      if noMemo then sl.Add('nomemo');
+      if noSave then sl.Add('nosave');
+      if noPortal then sl.Add('noportal');
+      if nofly then sl.Add('nofly');
+      if nobfly then sl.Add('nobutterfly');
+      if noTele then sl.Add('noteleport');
+      if noBranch then sl.Add('nobranch');
+      if noSkill then sl.Add('noskill');
+      if noItem then sl.Add('noitem');
+      if Agit then sl.Add('agit');
+      if dbPvP then sl.Add('pvp');
+      if dbPvPG then sl.Add('pvpg');
+      if noday then sl.Add('noday');
+    end;
+    writeln(txt, sl.DelimitedText);
+  end;
+  CloseFile(txt);
 
 	sl.Free;
 end;
