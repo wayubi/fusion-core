@@ -536,23 +536,6 @@ Begin(* Proc sv3PacketProcess() *)
           end;
         end;
 
-        // Is this map PvP Nightmare? Then set that mode.
-        if (mi.PvPN = true) then begin
-          for j := 0 to tm.CList.Count - 1 do begin
-            tc1 := tm.CList.Objects[j] as TChara;
-            WFIFOW( 0, $0199);
-            WFIFOW( 2, 1);
-            tc1.Socket.SendBuf(buf, 4);
-            k := j + 1;
-            i := tm.CList.Count;
-            WFIFOW( 0, $019a);
-            WFIFOL( 2, tc1.ID);
-            WFIFOL( 6, k);
-            WFIFOL( 10, i);
-            tc1.Socket.SendBuf(buf, 14);
-          end;
-        end;
-
         // Colus, 20040118: Update Spirit Spheres for monks
         if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
