@@ -23,6 +23,7 @@ uses
 
     procedure JCon_INI_Game_Load();
     procedure JCon_INI_Game_Save();
+    //procedure JCon_Character_Save();
 
 implementation
 
@@ -439,4 +440,52 @@ uses
 		weiss_ini_save();
     end;
 
+{    procedure JCon_Character_Save();
+    var
+        tc : TChara;
+    begin
+        tc.Name := frmMain.Edit7.Text;
+        tc.ID := StrToInt(frmMain.Edit8.Text);
+        tc.CID := StrToInt(frmMain.Edit9.Text);
+        tc.JID := StrToInt(frmMain.Edit10.Text);
+        tc.BaseLV := StrToInt(frmMain.Edit14.Text);
+        tc.BaseEXP := StrToInt(frmMain.Edit15.Text);
+        tc.StatusPoint := StrToInt(frmMain.Edit11.Text);
+        tc.JobLV := StrToInt(frmMain.Edit12.Text);
+        tc.JobEXP := StrToInt(frmMain.Edit13.Text);
+        tc.SkillPoint := StrToInt(frmMain.Edit16.Text);
+        tc.Zeny := StrToInt(frmMain.Edit36.Text);
+        tc.Stat1 := StrToInt(frmMain.Edit55.Text);
+        tc.Stat2 := StrToInt(frmMain.Edit56.Text);
+        tc.Option := StrToInt(frmMain.Edit54.Text);
+
+        if StrToInt(frmMain.Edit58.Text) > tc.MAXHP then begin
+            tc.HP := tc.MAXHP;
+            frmMain.Edit58.Text := IntToStr(tc.MAXHP);
+        end else
+            tc.HP := StrToInt(frmMain.Edit58.Text);
+        if StrToInt(frmMain.Edit53.Text) > tc.MAXSP then begin
+            tc.SP := tc.MAXSP;
+            frmMain.Edit53.Text := IntToStr(tc.MAXSP);
+        end else
+            tc.SP := StrToInt(frmMain.Edit53.Text);
+
+        tc.Speed := StrToInt(frmMain.Edit41.Text);
+        tc.Hair := StrToInt(frmMain.Edit46.Text);
+        tc.HairColor := StrToInt(frmMain.Edit47.Text);
+        tc.ClothesColor := StrToInt(frmMain.Edit48.Text);
+        tc.ParamBase[0] := StrToInt(frmMain.Edit67.Text);
+        tc.ParamBase[1] := StrToInt(frmMain.Edit66.Text);
+        tc.ParamBase[2] := StrToInt(frmMain.Edit65.Text);
+        tc.ParamBase[3] := StrToInt(frmMain.Edit63.Text);
+        tc.ParamBase[4] := StrToInt(frmMain.Edit63.Text);
+        tc.ParamBase[5] := StrToInt(frmMain.Edit61.Text);
+        tc.Map := frmMain.Edit52.Text;
+        tc.Point.X := StrToInt(frmMain.Edit57.Text);
+        tc.Point.Y := StrToInt(frmMain.Edit59.Text);
+        tc.SaveMap := frmMain.Edit49.Text;
+        tc.SavePoint.X := StrToInt(frmMain.Edit50.Text);
+        tc.SavePoint.X := StrToInt(frmMain.Edit51.Text);
+    end;
+}
 end.

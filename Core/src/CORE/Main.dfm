@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 232
-  Top = 204
+  Left = 210
+  Top = 106
   Width = 408
-  Height = 518
+  Height = 535
   Caption = 's'
   Color = clCream
   Font.Charset = DEFAULT_CHARSET
@@ -26,9 +26,16 @@ object frmMain: TfrmMain
     AutoSize = False
     Caption = '('#180'-`)'
   end
+  object Label85: TLabel
+    Left = 0
+    Top = 56
+    Width = 387
+    Height = 393
+    Caption = 'Label85'
+  end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 445
+    Top = 462
     Width = 400
     Height = 19
     Color = clCream
@@ -44,7 +51,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 400
-    Height = 445
+    Height = 462
     ActivePage = TabSheet1
     Align = alClient
     Constraints.MinHeight = 445
@@ -61,12 +68,12 @@ object frmMain: TfrmMain
       Caption = 'Server Console'
       DesignSize = (
         392
-        412)
+        429)
       object txtDebug: TMemo
         Left = 0
         Top = 0
         Width = 392
-        Height = 383
+        Height = 400
         Anchors = [akLeft, akTop, akRight, akBottom]
         Color = 14071432
         Font.Charset = DEFAULT_CHARSET
@@ -81,7 +88,7 @@ object frmMain: TfrmMain
       end
       object Edit1: TEdit
         Left = 0
-        Top = 385
+        Top = 402
         Width = 392
         Height = 26
         Anchors = [akLeft, akRight, akBottom]
@@ -154,8 +161,8 @@ object frmMain: TfrmMain
         Left = 0
         Top = 0
         Width = 392
-        Height = 412
-        ActivePage = TabSheet4
+        Height = 429
+        ActivePage = TabSheet5
         Align = alClient
         TabOrder = 0
         OnChange = PageControl2Change
@@ -1272,6 +1279,534 @@ object frmMain: TfrmMain
         Height = 25
         TabOrder = 15
         OnClick = Button15Click
+      end
+    end
+    object TabSheet6: TTabSheet
+      Caption = 'Characters'
+      ImageIndex = 3
+      object PageControl3: TPageControl
+        Left = 0
+        Top = 0
+        Width = 393
+        Height = 433
+        ActivePage = TabSheet7
+        TabOrder = 0
+        object TabSheet7: TTabSheet
+          Caption = 'Settings'
+          object Label61: TLabel
+            Left = 8
+            Top = 8
+            Width = 78
+            Height = 18
+            Caption = 'Character List'
+          end
+          object Label63: TLabel
+            Left = 192
+            Top = 120
+            Width = 69
+            Height = 18
+            Caption = 'Character ID'
+          end
+          object Label64: TLabel
+            Left = 288
+            Top = 24
+            Width = 34
+            Height = 18
+            Caption = 'Job ID'
+          end
+          object Label65: TLabel
+            Left = 192
+            Top = 72
+            Width = 61
+            Height = 18
+            Caption = 'Account ID'
+          end
+          object Label67: TLabel
+            Left = 192
+            Top = 24
+            Width = 30
+            Height = 18
+            Caption = 'Name'
+          end
+          object Label62: TLabel
+            Left = 288
+            Top = 72
+            Width = 57
+            Height = 18
+            Caption = 'Base Level'
+          end
+          object Label66: TLabel
+            Left = 288
+            Top = 120
+            Width = 49
+            Height = 18
+            Caption = 'Base EXP'
+          end
+          object Label68: TLabel
+            Left = 192
+            Top = 168
+            Width = 44
+            Height = 18
+            Caption = 'Job EXP'
+          end
+          object Label69: TLabel
+            Left = 104
+            Top = 168
+            Width = 52
+            Height = 18
+            Caption = 'Job Level'
+          end
+          object Label70: TLabel
+            Left = 8
+            Top = 168
+            Width = 72
+            Height = 18
+            Caption = 'Status Points'
+          end
+          object Label71: TLabel
+            Left = 288
+            Top = 168
+            Width = 59
+            Height = 18
+            Caption = 'Skill Points'
+          end
+          object Label72: TLabel
+            Left = 8
+            Top = 216
+            Width = 27
+            Height = 18
+            Caption = 'Zeny'
+          end
+          object Label73: TLabel
+            Left = 104
+            Top = 216
+            Width = 34
+            Height = 18
+            Caption = 'Speed'
+          end
+          object Label74: TLabel
+            Left = 192
+            Top = 216
+            Width = 53
+            Height = 18
+            Caption = 'Hair Style'
+          end
+          object Label75: TLabel
+            Left = 288
+            Top = 216
+            Width = 55
+            Height = 18
+            Caption = 'Hair Color'
+          end
+          object Label76: TLabel
+            Left = 8
+            Top = 264
+            Width = 67
+            Height = 18
+            Caption = 'Cloths Color'
+          end
+          object Label77: TLabel
+            Left = 104
+            Top = 264
+            Width = 51
+            Height = 18
+            Caption = 'Save Map'
+          end
+          object Label78: TLabel
+            Left = 192
+            Top = 264
+            Width = 62
+            Height = 18
+            Caption = 'Save Map X'
+          end
+          object Label79: TLabel
+            Left = 288
+            Top = 264
+            Width = 62
+            Height = 18
+            Caption = 'Save Map Y'
+          end
+          object Edit15: TEdit
+            Left = 288
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 0
+          end
+          object Edit14: TEdit
+            Left = 288
+            Top = 88
+            Width = 49
+            Height = 26
+            TabOrder = 1
+          end
+          object Edit10: TEdit
+            Left = 288
+            Top = 40
+            Width = 49
+            Height = 26
+            TabOrder = 2
+          end
+          object Edit7: TEdit
+            Left = 192
+            Top = 40
+            Width = 49
+            Height = 26
+            TabOrder = 3
+          end
+          object Edit8: TEdit
+            Left = 192
+            Top = 88
+            Width = 49
+            Height = 26
+            TabOrder = 4
+          end
+          object Edit9: TEdit
+            Left = 192
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 5
+          end
+          object ListBox2: TListBox
+            Left = 8
+            Top = 24
+            Width = 153
+            Height = 137
+            ItemHeight = 18
+            TabOrder = 6
+          end
+          object Edit11: TEdit
+            Left = 8
+            Top = 184
+            Width = 49
+            Height = 26
+            TabOrder = 7
+          end
+          object Edit12: TEdit
+            Left = 104
+            Top = 184
+            Width = 49
+            Height = 26
+            TabOrder = 8
+          end
+          object Edit13: TEdit
+            Left = 192
+            Top = 184
+            Width = 49
+            Height = 26
+            TabOrder = 9
+          end
+          object Edit16: TEdit
+            Left = 288
+            Top = 184
+            Width = 49
+            Height = 26
+            TabOrder = 10
+          end
+          object Edit36: TEdit
+            Left = 8
+            Top = 232
+            Width = 49
+            Height = 26
+            TabOrder = 11
+          end
+          object Edit41: TEdit
+            Left = 104
+            Top = 232
+            Width = 49
+            Height = 26
+            TabOrder = 12
+          end
+          object Edit46: TEdit
+            Left = 192
+            Top = 232
+            Width = 49
+            Height = 26
+            TabOrder = 13
+          end
+          object Edit47: TEdit
+            Left = 288
+            Top = 232
+            Width = 49
+            Height = 26
+            TabOrder = 14
+          end
+          object Edit48: TEdit
+            Left = 8
+            Top = 280
+            Width = 49
+            Height = 26
+            TabOrder = 15
+          end
+          object Edit49: TEdit
+            Left = 104
+            Top = 280
+            Width = 49
+            Height = 26
+            TabOrder = 16
+          end
+          object Edit50: TEdit
+            Left = 192
+            Top = 280
+            Width = 49
+            Height = 26
+            TabOrder = 17
+          end
+          object Edit51: TEdit
+            Left = 288
+            Top = 280
+            Width = 49
+            Height = 26
+            TabOrder = 18
+          end
+          object Button16: TButton
+            Left = 136
+            Top = 344
+            Width = 81
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 19
+            OnClick = Button16Click
+          end
+        end
+        object TabSheet8: TTabSheet
+          Caption = 'Status'
+          ImageIndex = 1
+          object Label80: TLabel
+            Left = 24
+            Top = 8
+            Width = 70
+            Height = 18
+            Caption = 'Current Map'
+          end
+          object Label81: TLabel
+            Left = 112
+            Top = 8
+            Width = 45
+            Height = 18
+            Caption = 'C-Map X'
+          end
+          object Label82: TLabel
+            Left = 208
+            Top = 8
+            Width = 45
+            Height = 18
+            Caption = 'C-Map Y'
+          end
+          object Label83: TLabel
+            Left = 304
+            Top = 8
+            Width = 15
+            Height = 18
+            Caption = 'HP'
+          end
+          object Label84: TLabel
+            Left = 304
+            Top = 64
+            Width = 13
+            Height = 18
+            Caption = 'SP'
+          end
+          object Label86: TLabel
+            Left = 208
+            Top = 64
+            Width = 38
+            Height = 18
+            Caption = 'Option'
+          end
+          object Label87: TLabel
+            Left = 24
+            Top = 64
+            Width = 44
+            Height = 18
+            Caption = 'Status 1'
+          end
+          object Label88: TLabel
+            Left = 112
+            Top = 64
+            Width = 44
+            Height = 17
+            Caption = 'Status 2'
+          end
+          object Label89: TLabel
+            Left = 24
+            Top = 120
+            Width = 20
+            Height = 18
+            Caption = 'STR'
+          end
+          object Label90: TLabel
+            Left = 112
+            Top = 120
+            Width = 18
+            Height = 18
+            Caption = 'AGI'
+          end
+          object Label91: TLabel
+            Left = 208
+            Top = 120
+            Width = 17
+            Height = 18
+            Caption = 'VIT'
+          end
+          object Label92: TLabel
+            Left = 304
+            Top = 120
+            Width = 18
+            Height = 18
+            Caption = 'INT'
+          end
+          object Label93: TLabel
+            Left = 24
+            Top = 176
+            Width = 20
+            Height = 18
+            Caption = 'DEX'
+          end
+          object Label94: TLabel
+            Left = 112
+            Top = 176
+            Width = 21
+            Height = 18
+            Caption = 'LUK'
+          end
+          object Label95: TLabel
+            Left = 208
+            Top = 176
+            Width = 72
+            Height = 18
+            Caption = 'Head Equip 1'
+          end
+          object Label96: TLabel
+            Left = 304
+            Top = 176
+            Width = 72
+            Height = 18
+            Caption = 'Head Equip 2'
+          end
+          object Edit52: TEdit
+            Left = 24
+            Top = 24
+            Width = 49
+            Height = 26
+            TabOrder = 0
+          end
+          object Edit53: TEdit
+            Left = 304
+            Top = 80
+            Width = 49
+            Height = 26
+            TabOrder = 1
+          end
+          object Edit54: TEdit
+            Left = 208
+            Top = 80
+            Width = 49
+            Height = 26
+            TabOrder = 2
+          end
+          object Edit55: TEdit
+            Left = 112
+            Top = 80
+            Width = 49
+            Height = 25
+            TabOrder = 3
+          end
+          object Edit56: TEdit
+            Left = 24
+            Top = 80
+            Width = 49
+            Height = 26
+            TabOrder = 4
+          end
+          object Edit57: TEdit
+            Left = 112
+            Top = 24
+            Width = 49
+            Height = 26
+            TabOrder = 5
+          end
+          object Edit58: TEdit
+            Left = 304
+            Top = 24
+            Width = 49
+            Height = 26
+            TabOrder = 6
+          end
+          object Edit59: TEdit
+            Left = 208
+            Top = 24
+            Width = 49
+            Height = 25
+            TabOrder = 7
+          end
+          object Edit60: TEdit
+            Left = 208
+            Top = 192
+            Width = 49
+            Height = 26
+            TabOrder = 8
+          end
+          object Edit61: TEdit
+            Left = 112
+            Top = 192
+            Width = 49
+            Height = 26
+            TabOrder = 9
+          end
+          object Edit62: TEdit
+            Left = 304
+            Top = 192
+            Width = 49
+            Height = 26
+            TabOrder = 10
+          end
+          object Edit63: TEdit
+            Left = 304
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 11
+          end
+          object Edit64: TEdit
+            Left = 24
+            Top = 192
+            Width = 49
+            Height = 26
+            TabOrder = 12
+          end
+          object Edit65: TEdit
+            Left = 208
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 13
+          end
+          object Edit66: TEdit
+            Left = 112
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 14
+          end
+          object Edit67: TEdit
+            Left = 24
+            Top = 136
+            Width = 49
+            Height = 26
+            TabOrder = 15
+          end
+          object Button17: TButton
+            Left = 136
+            Top = 344
+            Width = 81
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 16
+            OnClick = Button17Click
+          end
+        end
       end
     end
   end

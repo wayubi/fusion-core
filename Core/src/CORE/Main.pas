@@ -195,6 +195,83 @@ type
     EnableWebAccountCreator1: TMenuItem;
     Label60: TLabel;
     Edit5: TEdit;
+    TabSheet6: TTabSheet;
+    ListBox2: TListBox;
+    Label61: TLabel;
+    Edit7: TEdit;
+    Edit8: TEdit;
+    Edit9: TEdit;
+    Edit10: TEdit;
+    Label63: TLabel;
+    Label64: TLabel;
+    Label65: TLabel;
+    Label67: TLabel;
+    Label62: TLabel;
+    Label66: TLabel;
+    Label68: TLabel;
+    Label69: TLabel;
+    Label70: TLabel;
+    Label71: TLabel;
+    Edit11: TEdit;
+    Edit12: TEdit;
+    Edit13: TEdit;
+    Edit14: TEdit;
+    Edit15: TEdit;
+    PageControl3: TPageControl;
+    TabSheet7: TTabSheet;
+    TabSheet8: TTabSheet;
+    Edit16: TEdit;
+    Label72: TLabel;
+    Label73: TLabel;
+    Label74: TLabel;
+    Label75: TLabel;
+    Edit36: TEdit;
+    Label76: TLabel;
+    Edit41: TEdit;
+    Edit46: TEdit;
+    Edit47: TEdit;
+    Edit48: TEdit;
+    Label77: TLabel;
+    Label78: TLabel;
+    Label79: TLabel;
+    Edit49: TEdit;
+    Edit50: TEdit;
+    Edit51: TEdit;
+    Edit52: TEdit;
+    Edit53: TEdit;
+    Edit54: TEdit;
+    Edit55: TEdit;
+    Edit56: TEdit;
+    Edit57: TEdit;
+    Edit58: TEdit;
+    Edit59: TEdit;
+    Edit60: TEdit;
+    Edit61: TEdit;
+    Edit62: TEdit;
+    Edit63: TEdit;
+    Edit64: TEdit;
+    Edit65: TEdit;
+    Edit66: TEdit;
+    Edit67: TEdit;
+    Label80: TLabel;
+    Label81: TLabel;
+    Label82: TLabel;
+    Label83: TLabel;
+    Label84: TLabel;
+    Label85: TLabel;
+    Label86: TLabel;
+    Label87: TLabel;
+    Label88: TLabel;
+    Label89: TLabel;
+    Label90: TLabel;
+    Label91: TLabel;
+    Label92: TLabel;
+    Label93: TLabel;
+    Label94: TLabel;
+    Label95: TLabel;
+    Label96: TLabel;
+    Button16: TButton;
+    Button17: TButton;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -290,7 +367,9 @@ type
     procedure S1Click(Sender: TObject);
     procedure ConnecttoISCS1Click(Sender: TObject);
     procedure EnableWebAccountCreator1Click(Sender: TObject);
-		//procedure cbxPriorityChange(Sender: TObject);
+    procedure Button16Click(Sender: TObject);
+    procedure Button17Click(Sender: TObject);
+    	//procedure cbxPriorityChange(Sender: TObject);
 
 
 	private
@@ -11346,7 +11425,11 @@ begin
 		JCon_Accounts_Load();
     end else if (TabSheet4.Showing) then begin
     	JCon_INI_Server_Load();
+    end else if (TabSheet6.Showing) then begin
+        ShowMessage('Under Development, This section does not work.');
     end;
+
+
 end;
 
 procedure TfrmMain.ListBox1Click(Sender: TObject);
@@ -11460,5 +11543,15 @@ begin
         destroy_wac();
     end;
 end;
+
+procedure TfrmMain.Button16Click(Sender: TObject);
+    begin
+        //JCon_Character_Save()
+    end;
+
+procedure TfrmMain.Button17Click(Sender: TObject);
+    begin
+        //JCon_Character_Save()
+    end;
 
 end.
