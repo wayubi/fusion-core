@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-29-04: Cleared up some variables in create_account. [Tsusai]
 - 12-29-04: Added script message variable $joblevel (like $charaname). [Tsusai]
 - 12-28-04: Undid boot performance changes. Allowed same character name. [AlexKreuz]
 - 12-25-04: GuildID retrieval w/o guilds caused crash. [AlexKreuz]

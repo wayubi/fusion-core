@@ -770,8 +770,7 @@ uses
 
     procedure create_account(username : String; password : String; email : String; sex : String);
     var
-        i : Integer;
-        tp, tp2 : TPlayer;
+        tp : TPlayer;
     begin
 
         tp := TPlayer.Create;
