@@ -29,6 +29,7 @@ uses
 		function  GetNowLoginID() : cardinal; {取得当前的帐号ID编号}
 		function  GetNowCharaID() : cardinal; {取得当前的人物ID编号}
 		function  GetNowPetID() : cardinal; {取得当前的宠物ID编号}
+		function  SaveCharaData(tc : TChara) : Boolean; {保存人物资料}
 		function  SavePetData(tpe : Tpet; PIndex: Integer; place: Integer) : Boolean; {保存宠物资料}
 		function  SaveGuildMPosition(GDID: cardinal; PosName: string; PosInvite: boolean; PosPunish: boolean; PosEXP: byte; Grade: Integer) : Boolean; {保存工会头衔资料}
 		function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean; {保存同盟、敌对工会资料}
@@ -407,8 +408,6 @@ var
   tgc :TCastle;
   tpe :TPet;
 	tg  :TGuild;
-	tgb :TGBan;
-	tgl :TGRel;
 	sl  :TStringList;
 	txt :TextFile;
 	cnt :integer;
@@ -466,116 +465,7 @@ begin
 	  for i := 0 to CharaName.Count - 1 do begin
 		  sl.Clear;
 		  tc := CharaName.Objects[i] as TChara;
-			with tc do begin
-				sl.Add(IntToStr(CID));
-				sl.Add('''' + Name + '''');
-				sl.Add(IntToStr(JID));
-				sl.Add(IntToStr(BaseLV));
-				sl.Add(IntToStr(BaseEXP));
-				sl.Add(IntToStr(StatusPoint));
-				sl.Add(IntToStr(JobLV));
-				sl.Add(IntToStr(JobEXP));
-				sl.Add(IntToStr(SkillPoint));
-				sl.Add(IntToStr(Zeny));
-				sl.Add(IntToStr(Stat1));
-				sl.Add(IntToStr(Stat2));
-        if Option = 4 then begin
-          sl.Add('0');
-        end else begin
-          sl.Add(IntToStr(Option));
-        end;
-				sl.Add(IntToStr(Karma));
-				sl.Add(IntToStr(Manner));
-				sl.Add(IntToStr(HP));
-				sl.Add(IntToStr(SP));
-				sl.Add(IntToStr(DefaultSpeed));
-				sl.Add(IntToStr(Hair));
-				sl.Add(IntToStr(_2));
-				sl.Add(IntToStr(_3));
-				sl.Add(IntToStr(Weapon));
-				sl.Add(IntToStr(Shield));
-				sl.Add(IntToStr(Head1));
-				sl.Add(IntToStr(Head2));
-				sl.Add(IntToStr(Head3));
-				sl.Add(IntToStr(HairColor));
-				sl.Add(IntToStr(ClothesColor));
-				for j := 0 to 5 do
-					sl.Add(IntToStr(ParamBase[j]));
-				sl.Add(IntToStr(CharaNumber));
-				sl.Add('''' + Map + '''');
-				sl.Add(IntToStr(Point.X));
-				sl.Add(IntToStr(Point.Y));
-				sl.Add('''' + SaveMap + '''');
-				sl.Add(IntToStr(SavePoint.X));
-				sl.Add(IntToStr(SavePoint.Y));
-        sl.Add(IntToStr(Plag));
-        sl.Add(IntToStr(PLv));
-        sl.Add(IntToStr(ID));
-				bindata := '';
-				bindata := 'GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
-				bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID';
-
-		    if not ExecuteSqlCmd(Format('REPLACE INTO Characters (%s) VALUES (%s)', [bindata, sl.DelimitedText])) then begin
-				  DebugOut.Lines.Add('*** Save Character data error.');
-				end;
-
-				{保存技能资料}
-				bindata := '';
-				for j := 1 to 336 do begin
-				  if Skill[j].Lv <> 0 then begin
-					  bindata := bindata + IntToHex(j, 4);
-					  bindata := bindata + IntToHex(Skill[j].Lv, 4);
-				  end;
-			  end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO skills (GID,skillInfo) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
-				  DebugOut.Lines.Add('*** Save Character Skill data error.');
-				end;
-
-				{保存人物身上物品资料}
-				bindata := '';
-			  for j := 1 to 100 do begin
-				  if Item[j].ID <> 0 then begin
-					  bindata := bindata + IntToHex(Item[j].ID, 4);
-					  bindata := bindata + IntToHex(Item[j].Amount, 4);
-					  bindata := bindata + IntToHex(Item[j].Equip, 4);
-					  bindata := bindata + IntToHex(Item[j].Identify, 2);
-					  bindata := bindata + IntToHex(Item[j].Refine, 2);
-					  bindata := bindata + IntToHex(Item[j].Attr, 2);
-					  bindata := bindata + IntToHex(Item[j].Card[0], 4);
-					  bindata := bindata + IntToHex(Item[j].Card[1], 4);
-					  bindata := bindata + IntToHex(Item[j].Card[2], 4);
-					  bindata := bindata + IntToHex(Item[j].Card[3], 4);
-				  end;
-			  end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO item (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
-				  DebugOut.Lines.Add('*** Save Character Item data error.');
-				end;
-
-				{保存人物手推车中物品的资料}
-				bindata := '';
-			  for j := 1 to 100 do begin
-		  		if Cart.Item[j].ID <> 0 then begin
-					  bindata := bindata + IntToHex(Cart.Item[j].ID, 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Amount, 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Equip, 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Identify, 2);
-					  bindata := bindata + IntToHex(Cart.Item[j].Refine, 2);
-					  bindata := bindata + IntToHex(Cart.Item[j].Attr, 2);
-					  bindata := bindata + IntToHex(Cart.Item[j].Card[0], 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Card[1], 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Card[2], 4);
-					  bindata := bindata + IntToHex(Cart.Item[j].Card[3], 4);
-		  		end;
-		  	end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO cartItem (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
-				  DebugOut.Lines.Add('*** Save Character CartItem data error.');
-				end;
-
-				{保存人物MEMO记录点资料}
-				if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, MemoMap[0], MemoPoint[0].X, MemoPoint[0].Y, MemoMap[1], MemoPoint[1].X, MemoPoint[1].Y, MemoMap[2], MemoPoint[2].X, MemoPoint[2].Y])) then begin
-				  DebugOut.Lines.Add('*** Save Character CartItem data error.');
-				end;
-			end;
+      SaveCharaData(tc);
 		end;
 	end;
 
@@ -624,7 +514,7 @@ begin
         for j := 0 to 7 do begin
           sl.Add(IntToStr(GuardStatus[j]));
         end;
-				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [sl.DelimitedText])) then
+				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [sl.CommaText])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Castle data error.');
 				end;
@@ -650,7 +540,7 @@ begin
 			  for j := 0 to 11 do begin
 				  sl.Add(IntToStr(MemberID[j]));
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [sl.DelimitedText])) then
+			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [sl.CommaText])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Party data error.');
 				end;
@@ -1548,4 +1438,133 @@ begin
 	Result := True;
 end;
 
+//------------------------------------------------------------------------------
+// 保存人物资料
+//------------------------------------------------------------------------------
+function  SaveCharaData(tc : TChara) : Boolean;
+var
+  bindata : String;
+	j :integer;
+	sl  :TStringList;
+begin
+  Result := False;
+	sl := TStringList.Create;
+	sl.QuoteChar := '''';
+	sl.Delimiter := ',';
+	with tc do begin
+		sl.Add(IntToStr(CID));
+		sl.Add('''' + Name + '''');
+		sl.Add(IntToStr(JID));
+		sl.Add(IntToStr(BaseLV));
+		sl.Add(IntToStr(BaseEXP));
+		sl.Add(IntToStr(StatusPoint));
+		sl.Add(IntToStr(JobLV));
+		sl.Add(IntToStr(JobEXP));
+		sl.Add(IntToStr(SkillPoint));
+		sl.Add(IntToStr(Zeny));
+		sl.Add(IntToStr(Stat1));
+		sl.Add(IntToStr(Stat2));
+    if Option = 4 then begin
+      sl.Add('0');
+    end else begin
+      sl.Add(IntToStr(Option));
+    end;
+		sl.Add(IntToStr(Karma));
+		sl.Add(IntToStr(Manner));
+		sl.Add(IntToStr(HP));
+		sl.Add(IntToStr(SP));
+		sl.Add(IntToStr(DefaultSpeed));
+		sl.Add(IntToStr(Hair));
+		sl.Add(IntToStr(_2));
+		sl.Add(IntToStr(_3));
+		sl.Add(IntToStr(Weapon));
+		sl.Add(IntToStr(Shield));
+		sl.Add(IntToStr(Head1));
+		sl.Add(IntToStr(Head2));
+		sl.Add(IntToStr(Head3));
+		sl.Add(IntToStr(HairColor));
+		sl.Add(IntToStr(ClothesColor));
+		for j := 0 to 5 do
+			sl.Add(IntToStr(ParamBase[j]));
+		sl.Add(IntToStr(CharaNumber));
+		sl.Add('''' + Map + '''');
+		sl.Add(IntToStr(Point.X));
+		sl.Add(IntToStr(Point.Y));
+		sl.Add('''' + SaveMap + '''');
+		sl.Add(IntToStr(SavePoint.X));
+		sl.Add(IntToStr(SavePoint.Y));
+    sl.Add(IntToStr(Plag));
+    sl.Add(IntToStr(PLv));
+    sl.Add(IntToStr(ID));
+		bindata := '';
+		bindata := 'GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
+		bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID';
+	  if not ExecuteSqlCmd(Format('REPLACE INTO Characters (%s) VALUES (%s)', [bindata, sl.CommaText])) then begin
+		  DebugOut.Lines.Add('*** Save Character data error.');
+			Exit;
+		end;
+
+		{保存技能资料}
+		bindata := '';
+		for j := 1 to 336 do begin
+		  if Skill[j].Lv <> 0 then begin
+			  bindata := bindata + IntToHex(j, 4);
+			  bindata := bindata + IntToHex(Skill[j].Lv, 4);
+		  end;
+	  end;
+	  if not ExecuteSqlCmd(Format('REPLACE INTO skills (GID,skillInfo) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		  DebugOut.Lines.Add('*** Save Character Skill data error.');
+			Exit;
+		end;
+
+		{保存人物身上物品资料}
+		bindata := '';
+	  for j := 1 to 100 do begin
+		  if Item[j].ID <> 0 then begin
+			  bindata := bindata + IntToHex(Item[j].ID, 4);
+			  bindata := bindata + IntToHex(Item[j].Amount, 4);
+			  bindata := bindata + IntToHex(Item[j].Equip, 4);
+			  bindata := bindata + IntToHex(Item[j].Identify, 2);
+			  bindata := bindata + IntToHex(Item[j].Refine, 2);
+			  bindata := bindata + IntToHex(Item[j].Attr, 2);
+			  bindata := bindata + IntToHex(Item[j].Card[0], 4);
+			  bindata := bindata + IntToHex(Item[j].Card[1], 4);
+			  bindata := bindata + IntToHex(Item[j].Card[2], 4);
+			  bindata := bindata + IntToHex(Item[j].Card[3], 4);
+		  end;
+	  end;
+	  if not ExecuteSqlCmd(Format('REPLACE INTO item (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		  DebugOut.Lines.Add('*** Save Character Item data error.');
+			Exit;
+		end;
+
+		{保存人物手推车中物品的资料}
+		bindata := '';
+	  for j := 1 to 100 do begin
+			if Cart.Item[j].ID <> 0 then begin
+			  bindata := bindata + IntToHex(Cart.Item[j].ID, 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Amount, 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Equip, 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Identify, 2);
+			  bindata := bindata + IntToHex(Cart.Item[j].Refine, 2);
+			  bindata := bindata + IntToHex(Cart.Item[j].Attr, 2);
+			  bindata := bindata + IntToHex(Cart.Item[j].Card[0], 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Card[1], 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Card[2], 4);
+			  bindata := bindata + IntToHex(Cart.Item[j].Card[3], 4);
+			end;
+		end;
+	  if not ExecuteSqlCmd(Format('REPLACE INTO cartItem (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
+			Exit;
+		end;
+
+		{保存人物MEMO记录点资料}
+		if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, MemoMap[0], MemoPoint[0].X, MemoPoint[0].Y, MemoMap[1], MemoPoint[1].X, MemoPoint[1].Y, MemoMap[2], MemoPoint[2].X, MemoPoint[2].Y])) then begin
+		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
+			Exit;
+		end;
+	end;
+	sl.Free;
+end;
 end.

@@ -312,6 +312,7 @@ begin
 					HP := MAXHP;
 					SP := MAXSP;
 				end;
+				if UseSQL then SaveCharaData(tc);
 				CharaName.AddObject(tc.Name, tc);
 				Chara.AddObject(tc.CID, tc);
 				RFIFOB(32, b);
@@ -376,7 +377,7 @@ begin
 							end;
 						end;
 						if UseSQL then
-						  DeleteChar(tc.ID);
+						  DeleteChar(tc.CID);
 						CharaName.Delete(i);
 						Chara.Delete(i);
 						tc.Free;
