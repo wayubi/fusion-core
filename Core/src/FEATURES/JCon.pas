@@ -117,7 +117,7 @@ uses
     	    	tc := AccountItem.CData[i];
         	    if assigned(tc) then begin
 	        	    if assigned(tc.Socket) then begin
-    	        		tc.Socket.Close;
+    	        		if tc.Login <> 0 then tc.Socket.Close;
 	                    tc.Socket := nil;
     	            end;
         	    end;
