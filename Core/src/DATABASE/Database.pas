@@ -11,7 +11,7 @@ uses
 // 関数定義
 		procedure DatabaseLoad(Handle:HWND);
 		procedure DataLoad();
-    procedure PlayerDataLoad();
+        procedure PlayerDataLoad();
 		procedure DataSave();
 //==============================================================================
 
@@ -1407,6 +1407,12 @@ begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
+
+	if not FileExists(AppPath + 'addplayer.txt') then begin
+		AssignFile(txt, AppPath + 'addplayer.txt');
+        rewrite(txt);
+        closefile(txt);
+    end;
 
 	//player.txt,chara.txtチェック
 	if not FileExists(AppPath + 'player.txt') then begin

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-24-03: Added Auto-Generating addplayer.txt file to prevent errors. [AlexKreuz]
 - 12-24-03: Added Option_MaxUsers to weiss.ini. Maximum allowed online. [AlexKreuz]
 - 12-24-03: Removed MAP & DWM compatibility (Bugs in Maps). [AlexKreuz]
 - 12-24-03: Fixed map-share conflict with AF2 Map format. [AlexKreuz]
