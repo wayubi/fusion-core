@@ -12074,7 +12074,7 @@ begin
 					CalcSkillTick(tm, tc, Tick);
 				end;
 
-                                PassiveIcons(tm, tc);
+                                //PassiveIcons(tm, tc);
 
 				//Mob&Item Process
 				tm := tc.MData;

@@ -1367,7 +1367,7 @@ Option_MaxUsers   :word;
 
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
-                procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
+                //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
@@ -2481,11 +2481,11 @@ begin
 end;
 //------------------------------------------------------------------------------
 {Display Icons for passive Events}
-procedure PassiveIcons(tm:TMap; tc:TChara);
+{procedure PassiveIcons(tm:TMap; tc:TChara);
 begin
   with tc do begin
         {Peco Peco}
-        if (tc.Skill[63].Lv <> 0) and (tc.Option = 32) then begin
+        {if (tc.Skill[63].Lv <> 0) and (tc.Option = 32) then begin
                 //DebugOut.Lines.Add('(ﬂÅÕﬂ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, tc.Skill[63].Data.Icon);
@@ -2501,7 +2501,7 @@ begin
         end;
 
         {Falcon Icon}
-        if (tc.Skill[127].Lv <> 0) and (tc.Option = 16) then begin
+        {if (tc.Skill[127].Lv <> 0) and (tc.Option = 16) then begin
                 //DebugOut.Lines.Add('(ﬂÅÕﬂ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, tc.Skill[127].Data.Icon);
@@ -2518,7 +2518,7 @@ begin
         end;
 
         {Overweight 50%}
-        if tc.Weight * 2 >= tc.MaxWeight then begin
+        {if tc.Weight * 2 >= tc.MaxWeight then begin
                 //DebugOut.Lines.Add('(ﬂÅÕﬂ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, 35);
@@ -2535,7 +2535,7 @@ begin
         end;
 
         {Overweight 90%}
-        if Weight * 100 div MaxWeight >= 90 then begin
+        {if Weight * 100 div MaxWeight >= 90 then begin
         //DebugOut.Lines.Add('(ﬂÅÕﬂ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, 36);
@@ -2551,7 +2551,7 @@ begin
                 Socket.SendBuf(buf, 9);
         end;
   end;
-end;
+end;}
 //------------------------------------------------------------------------------
 procedure SendCStat(tc:TChara; View:boolean = false);
 var
