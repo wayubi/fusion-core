@@ -827,7 +827,7 @@ begin
 
 	DebugOut.Lines.Add(format('Load Character Data From MySQL: AccountID = %d', [AID]));
 
-	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM Characters AS C ' + format('LEFT JOIN warpInfo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN item AS I ON (I.GID=C.GID) LEFT JOIN cartItem AS T ON (T.GID=C.GID) WHERE C.AID=''%d'' LIMIT 1', [AID])) then
+	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM Characters AS C ' + format('LEFT JOIN warpInfo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN item AS I ON (I.GID=C.GID) LEFT JOIN cartItem AS T ON (T.GID=C.GID) WHERE C.AID=''%d''', [AID])) then
 	begin
 	  while not SQLDataSet.Eof do
     begin
