@@ -3939,7 +3939,17 @@ begin
 	WFIFOW(0, $00b0 + Mode);
 	WFIFOW(2, DType);
 	WFIFOL(4, Value);
-	tc.Socket.SendBuf(buf, 8);
+
+    if tc.login <> 0 then begin
+    	try
+			tc.Socket.SendBuf(buf, 8);
+        except
+            //debugout.lines.add('socket not assigned');
+        end;
+    end else begin
+    	//debugout.lines.add('disconnected');
+    end;
+        
 {パーティー機能追加}
 	//ステータスの更新時にHPバーの情報も更新する
 	if (tc.PartyName <> '') and (Mode = 0) and ((DType = 5) or (DType = 6)) then begin
