@@ -15,7 +15,7 @@ const
 	BELOW_NORMAL_PRIORITY_CLASS = $4000;
 	IDLE_PRIORITY_CLASS = $40;
         WM_NOTIFYICON  = WM_USER+333;
-        htTitleBtn = htSizeLast + 1;
+		htTitleBtn = htSizeLast + 1;
 
 
 type
@@ -13086,7 +13086,7 @@ begin
 						$86: //LoV
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix * tl.Data1[tn.MUseLV] div 100;
 									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
@@ -13566,7 +13566,7 @@ begin
 						$86: //LoV
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix * tl.Data1[tn.MUseLV] div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
 									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
@@ -15120,7 +15120,7 @@ begin
   
   case skill of
 
-    86: // Water Ball
+	86: // Water Ball
     begin
       ts := tv as TMob;
       with tc do begin
@@ -15203,7 +15203,7 @@ procedure TfrmMain.cmdStartClick(Sender: TObject);
 var
         DelDelayNum     :integer;       // mf
         DelPoint        :TPoint;        // mf
-        DelCount        :integer;       // mf
+		DelCount        :integer;       // mf
 
 	i,j,k,l,m,n,a,b,c:integer;
 	i1,j1,k1:integer;
