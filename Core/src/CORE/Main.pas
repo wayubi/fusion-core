@@ -1946,7 +1946,7 @@ begin
 	end;
 
 	with ts.Data do begin
-
+                CalcAI(tm, ts, Tick);
 		i := HIT + HITFix - (tc.FLEE1 * tc.TargetedFix div 10) + 80;
 		i := i - tc.FLEE2;
 		if i < 5 then i := 5

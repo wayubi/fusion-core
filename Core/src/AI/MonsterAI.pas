@@ -33,7 +33,7 @@ var
 begin
 	sl := TStringList.Create;
 	with ts do begin
-                //MobSkillCalc(tm,ts,Tick);
+                MobSkillCalc(tm,ts,Tick);
 
 		if (ts.Stat1 <> 0) and (Data.Range1 > 0) then begin
 			pcnt := 0;
@@ -279,12 +279,16 @@ procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
 var
         tsAI :TMobAIDB;
         skillSlot :integer;
+        k    :integer;
 
 begin
-    for skillSlot := 0 to 10 do begin
-        tsAI := MobAIDB.Objects[skillSlot] as TMobAIDB;
-        if tsAI.ID = ts.Data.ID then MobSkillChance(tm, ts, tsAI, Tick);
-    end;
+        k := MobAIDB.IndexOf(ts.Data.ID);
+        if (ts.Data.ID <> 0) and (k <> -1) then begin
+    //for skillSlot := 0 to 10 do begin
+                tsAI := MobAIDB.Objects[k] as TMobAIDB;
+                MobSkillChance(tm, ts, tsAI, Tick);
+        end;
+    //end;
 end;
 //------------------------------------------------------------------------------
 
@@ -307,10 +311,12 @@ end;
 
 procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
 var
-tc  :TChara;
+        tc  :TChara;
+        i   :integer;
 begin
+        for i := 0 to 3 do begin
         tc := ts.AData;
-        case tsAI.Skill[0] of
+        case tsAI.Skill[i] of
                 28:     {Heal}
                 begin
                         dmg[0] := (ts.Data.LV + 10);
@@ -333,13 +339,24 @@ begin
                         tc.HP := tc.HP - dmg[0];
                 end;
         end;
-        WFIFOW( 0, $011a);
-        WFIFOW( 2, tsAI.Skill[0]);
-        WFIFOW( 4, dmg[0]);
-        WFIFOL( 6, tc.ID);
-        WFIFOL(10, ts.ID);
-        WFIFOB(14, 1);
-        SendBCmd(tm, tc.Point, 15);
+        WFIFOW( 0, $01de);
+	WFIFOW( 2, tsAI.Skill[i]);
+	WFIFOL( 4, ts.ID);
+	WFIFOL( 8, tc.ID);
+	WFIFOL(12, Tick);
+	//WFIFOL(16, tc.aMotion);
+	//WFIFOL(20, ts.Data.dMotion);
+        WFIFOL(16, ts.Data.dMotion);
+	WFIFOL(20, tc.aMotion);
+	WFIFOL(24, dmg[0]);
+	WFIFOW(28, tsAI.SkillLV[i]);
+	WFIFOW(30, 1);
+
+        WFIFOB(32, 6);
+	//else               WFIFOB(32, 8);
+	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+	SendBCmd(tm, tc.Point, 33);
+        end;
 
 end;
 
