@@ -413,6 +413,7 @@ type TMob = class(TLiving)
         NowSkillLv      :integer;
         SkillSlot       :integer;
         AI              :Pointer;
+        NoDispel        :boolean;
         Mode           :integer;
         Burned          :boolean;
 
@@ -1006,8 +1007,8 @@ type TParty = class
 	Member    :array[0..11] of TChara;//メンバー
 	EXP       :Cardinal; //経験値分配用
 	JEXP      :Cardinal; //経験値分配用
-  PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
-  PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
+        PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
+        PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
 end;
 {パーティー機能追加ココまで}
 //------------------------------------------------------------------------------
@@ -1414,10 +1415,12 @@ var
 {取引機能追加ココまで}
 {氏{箱追加}
 	SummonMobList :TIntList32;
+  SummonMobListMVP:TIntList32;
 	SummonIOBList :TIntList32;
 	SummonIOVList :TIntList32;
 	SummonICAList :TIntList32;
 	SummonIGBList :TIntList32;
+  SummonIOWBList:TIntList32;
 {氏{箱追加ココまで}
 {NPCイベント追加}
 	ServerFlag :TStringList;
@@ -9159,10 +9162,7 @@ Destructor TItem.Destroy;
 Begin
   inherited;
 
-// 	Data.Free;
-// CRW - TItem doesn't have responsibility for this class,
-//  treat it only as a reference, it will be freed in ItemDB
- 	Data := NIL;
+ 	Data.Free;
 End;(*- TItem.Destroy ---------------*)
 
 
@@ -9183,9 +9183,6 @@ begin
 		Item[i] := TItem.Create;
   isSummon := False;
   isLooting := False;
-
-  //CRW - nil out Pointer for AData
-  AData := NIL;
 end;
 
 destructor TMob.Destroy;

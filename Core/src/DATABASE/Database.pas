@@ -786,15 +786,25 @@ DebugOut.Lines.Add('Monster AI database loading...');
 		Readln(txt, str);
     sl.Delimiter := ',';
 		sl.DelimitedText := str;
-		k := StrToInt(sl.Strings[1]);
-		if (MobDBName.IndexOf(sl.Strings[0]) <> -1) and (k > 0) then begin
+    if (sl.Strings[0] <> 'MVP') then
+		  k := StrToInt(sl.Strings[1])
+    else if (sl.Strings[0] = 'MVP') then
+      k := StrToInt(sl.Strings[2]);
+		if (MobDBName.IndexOf(sl.Strings[0]) <> -1) and (k > 0)  and (sl.Strings[0] <> 'MVP') then begin
 			tsmn := TSummon.Create;
 			tsmn.Name := sl.Strings[0];
 			for i := 1 to k do begin
 				SummonMobList.AddObject(j, tsmn);
 				j := j + 1;
 			end;
-		end;
+		end else if (sl.Strings[0] = 'MVP') then begin
+      tsmn := TSummon.Create;
+			tsmn.Name := sl.Strings[1];
+			for i := 1 to k do begin
+				SummonMobListMVP.AddObject(j, tsmn);
+				j := j + 1;
+			end;
+    end;
 	end;
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [j]));
@@ -827,7 +837,10 @@ DebugOut.Lines.Add('Monster AI database loading...');
 			end else if (sl.Strings[0] = 'Gift_Box') then begin
 				j := SummonIGBList.Count;
 				SummonIGBList.AddObject(j, tsmn);
-			end;
+			end else if (sl.Strings[0] = 'Old_Weapon_Box') then begin
+				j := SummonIOWBList.Count;
+				SummonIOWBList.AddObject(j, tsmn);
+			end;;
 		end;
 	end;
 	CloseFile(txt);

@@ -314,8 +314,8 @@ procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
 var
         //tc:TChara;
         i   :integer;
-        j   :integer;
-        tc  :TChara;
+        //j   :integer;
+        //tc  :TChara;
 
 begin
         // Colus, 20030129: Changes random(7) to 8 for that last skill.
@@ -394,10 +394,10 @@ begin
                                 MobSkillDamageCalc(tm, tc, ts, Tick);
                                 if dmg[0] < 1 then dmg[0] := 1;
                                 dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSkill].Data.Element][j] div 100;
-                                dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data2[ts.MSKill];
+                                dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data2[ts.MLevel];
 
                                 if dmg[0] < 0 then dmg[0] := 0;
-                                SendMSkillAttack(tm, tc, ts, Tick, tc.Skill[ts.MSKill].Data.Data2[ts.MSKill]);
+                                SendMSkillAttack(tm, tc, ts, Tick, tc.Skill[ts.MSKill].Data.Data2[ts.MLevel]);
                         end;
                 15:     {Frost Driver}
                 begin
@@ -449,14 +449,14 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[56].Data.Data1[ts.MSKill] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[56].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 2);
                 end;
                 57:     {Brandish Spear}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[ts.MSKill] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                         if (dmg[0] > 0) then begin
                                 SetLength(bb, 6);
@@ -547,7 +547,7 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[ts.MSKill] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
@@ -709,13 +709,13 @@ end;
 
 procedure MobFieldSkills(tm:TMap; ts:TMob; Tick:cardinal);
 var
-        tl  :TSkillDB;
-        sl  :TStringList;
+        //tl  :TSkillDB;
+        //sl  :TStringList;
         tc  :TChara;
         j   :integer;
         AttackData :TChara;
         xy  :TPoint;
-	bb  :array of byte;
+	//bb  :array of byte;
         tn  :TNPC;
 
 begin
@@ -1300,9 +1300,10 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
 
         if tsAI2.Dispel = 'NO_DISPEL' then begin
         //  DebugOut.Lines.Add('Cannot be broken when attacked.');
+          ts.NoDispel := true;
         end else
         //  DebugOut.Lines.Add('Can be broken when attacked.');
-
+          ts.NoDispel := true;
         ///////////If Conditions Begin////////////////
         if tsAI2.IfState = 'IF_COMRADECONDITION' then begin
         //  DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);

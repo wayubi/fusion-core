@@ -155,7 +155,7 @@ var
 	sl1 :TStringList;
 	ini :TIniFile;
   PriorityClass :cardinal;
-
+  
 begin
 
 	Randomize;
@@ -254,10 +254,12 @@ begin
         PetList := TIntList32.Create;
 
 	SummonMobList := TIntList32.Create;
+  SummonMobListMVP := TIntList32.Create;
 	SummonIOBList := TIntList32.Create;
 	SummonIOVList := TIntList32.Create;
 	SummonICAList := TIntList32.Create;
 	SummonIGBList := TIntList32.Create;
+  SummonIOWBList := TIntList32.Create;
 
 	ServerFlag := TStringList.Create;
 	MapInfo    := TStringList.Create;
@@ -707,8 +709,7 @@ end;
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
 	ini :TIniFile;
-  sr	:TSearchRec;
-  Idx : Integer;
+    sr	:TSearchRec;
 begin
 
     if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
@@ -806,58 +807,24 @@ begin
 
 	ScriptList.Free;
 
-  //--
-  for Idx := ItemDB.Count-1 downto 0 do
-    begin
-    (ItemDB.Objects[Idx] AS TItemDB).Free;
-    end;
 	ItemDB.Free;
-  //--
-
 {アイテム製造追加}
 	MaterialDB.Free;
 {アイテム製造追加ココまで}
 	MobDB.Free;
-  MArrowDB.Free;
-
-  //--
-  //CRW - trying a free on this list to reduce memory leaks.
-  for Idx := WarpDatabase.Count-1 downto 0 do
-    begin
-    (WarpDatabase.Objects[Idx] AS TWarpDatabase).Free;
-    end;
-  WarpDatabase.Free;
-  //--
-
-  MobAIDB.Free;
-  MobAIDBAegis.Free;
-  PharmacyDB.Free;
+        MArrowDB.Free;
+        WarpDatabase.Free;
+        MobAIDB.Free;
+        MobAIDBAegis.Free;
+        PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
-
-  //--
-  for Idx := SkillDB.Count-1 downto 0 do
-    begin
-    (SkillDB.Objects[Idx] AS TSkillDB).Free;
-    end;
 	SkillDB.Free;
   SkillDBName.Free;
-  //--
-  for Idx := Chara.Count-1 downto 0 do
-    begin
-    (Chara.Objects[Idx] AS TChara).Free;
-    end;
-  Chara.Free;
-	CharaName.Free;
-  //--
-  for Idx := Player.Count-1 downto 0 do
-    begin
-    (Player.Objects[Idx] AS TPlayer).Free;
-    end;
-	Player.Free;
 	PlayerName.Free;
-  //--
-
+	Player.Free;
+	CharaName.Free;
+	Chara.Free;
 	CharaPID.Free;
 {チャットルーム機能追加}
 	ChatRoomList.Free;
@@ -880,10 +847,12 @@ begin
 {取引機能追加ココまで}
 {氏{箱追加}
 	SummonMobList.Free;
+  SummonMobListMVP.Free;
 	SummonIOBList.Free;
 	SummonIOVList.Free;
 	SummonICAList.Free;
 	SummonIGBList.Free;
+  SummonIOWBList.Free;
 {氏{箱追加ココまで}
 {NPCイベント追加}
 	ServerFlag.Free;
@@ -2197,7 +2166,7 @@ var
 	ts1       :TMob;
 	tn        :TNPC;
 begin
-  //CalculateSkillIf(tm, ts, Tick);
+  CalculateSkillIf(tm, ts, Tick);
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -2783,7 +2752,8 @@ begin
     end;
   end;
         //Cancel Monster Casting
-        if ts.Mode = 3 then begin
+
+        if (ts.Mode = 3) and (ts.NoDispel = false) then begin
                 ts.Mode := 0;
                 ts.MPoint.X := 0;
                 ts.MPoint.Y := 0;
@@ -5395,7 +5365,7 @@ begin
                                                         //tn.CData := tc;
                                                         tn.MSkill := MSkill;
                                                         tn.MUseLV := MUseLV;
-                                                        tc.SongTick := Tick + tc.Skill[MSkill].Data.Data1[MUseLV] * 1000;
+                                                        tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
                                                         //i1 := i1 + 2;
                                                         //1 := j1 + 2;
 
@@ -5421,7 +5391,7 @@ begin
                                                         tn := SetSkillUnit(tm, ID, xy, Tick, $49, 0, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
                                                         tn.MSkill := MSkill;
                                                         tn.MUseLV := MUseLV;
-                                                        tc.SongTick := Tick + tc.Skill[MSkill].Data.Data1[MUseLV] * 1000;
+                                                        tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
                                                 end;
 
 
@@ -6334,7 +6304,7 @@ begin
                                                 //tc.ATick := timeGetTime() + Delay;
                                                 MonkDelay(tm, tc, tc.Delay);
 
-                                                tc.ATick := timeGetTime() + Delay;
+                                                tc.ATick := Tick + Cardinal(Delay);
 
                                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                 StatCalc1(tc, ts, Tick);
@@ -6420,7 +6390,7 @@ begin
 
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
-                                                        tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
                                                         tc.spiritSpheres := tc.spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
@@ -6739,7 +6709,7 @@ begin
 					//Mammonite
 					if MSkill = 42 then begin
             // Should check to see if we have the money!
-            if (Zeny >= tl.Data2[MUseLV]) then begin
+            if (Zeny >= Cardinal(tl.Data2[MUseLV])) then begin
   						Dec(Zeny, tl.Data2[MUseLV]);
   						// Update zeny
               SendCStat1(tc, 1, $0014, Zeny);
@@ -9098,7 +9068,7 @@ begin
             end else begin
               // Turn it on
               tc1.Skill[114].EffectLV := 1;
-              tc1.Skill[114].Tick := Tick + (tc1.Skill[114].Data.Data1[tc1.Skill[114].Lv]);
+              tc1.Skill[114].Tick := Tick + Cardinal(tc1.Skill[114].Data.Data1[tc1.Skill[114].Lv]);
   						ProcessType := 1;
             end;
 
@@ -9895,8 +9865,8 @@ begin
                                 269:    {Blade Stop}
                                         begin
                                                 ProcessType := 3;
-                                                tc.MTick := Tick + Skill[269].Data.Data1[MUseLV] * 1000;
-                                                tc1.MTick := Tick + Skill[269].Data.Data1[MUseLV] * 1000;
+                                                tc.MTick := Tick + Cardinal(Skill[269].Data.Data1[MUseLV] * 1000);
+                                                tc1.MTick := Tick + Cardinal(Skill[269].Data.Data1[MUseLV] * 1000);
                                         end;
                                 270:   //Explosion Spirits
                                        if tc.spiritSpheres = 5 then begin
@@ -9937,7 +9907,7 @@ begin
                                                         
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
-                                                        tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
+                                                        tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
                                                         tc.spiritSpheres := tc.spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
@@ -10096,7 +10066,7 @@ begin
 						//メマーのZeny消費
 						if MSkill = 42 then begin
               // Should check to see if we have the money!
-              if (Zeny >= tl.Data2[MUseLV]) then begin
+              if (Zeny >= Cardinal(tl.Data2[MUseLV])) then begin
     						Dec(Zeny, tl.Data2[MUseLV]);
     						// Update Zeny
                 SendCStat1(tc, 1, $0014, Zeny);
@@ -11769,7 +11739,7 @@ begin
                 end;
 
                 if (tc.Option and 4 <> 0) then begin
-                  if (tc.Skill[135].Lv > 0) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
+                  if (tc.Skill[135].Lv > 0) and ((tc.CloakTick + Cardinal(tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000)) < Tick) then begin
                         if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
@@ -11839,7 +11809,7 @@ begin
                 if (tc.Skill[114].Lv > 0) and (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
                         if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
-                          tc.Skill[114].Tick := Tick + tc.Skill[114].Data.Data1[tc.Skill[114].Lv];
+                          tc.Skill[114].Tick := Tick + Cardinal(tc.Skill[114].Data.Data1[tc.Skill[114].Lv]);
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit maximize tick');
                         end else begin
@@ -13046,7 +13016,7 @@ begin
                   ts1.EffectTick[3] := Tick + 1000;
                   //ダメージパケ送信
                   ts1.HP := ts1.HP + i; //dmg[0];
-                  if ts1.HP > ts1.Data.HP then ts1.HP := ts1.Data.HP;
+                  if Cardinal(ts1.HP) > ts1.Data.HP then ts1.HP := Integer(ts1.Data.HP);
 
                   WFIFOW( 0, $011a);
                   WFIFOW( 2, 28); // Use heal
@@ -14132,7 +14102,7 @@ begin
 						end;
 
 						SendCStat1(tc2, 0, 5, tc2.HP);
-						ts.ATick := ts.ATick + abs(ts.Data.ADelay);
+						ts.ATick := ts.ATick + Cardinal(abs(ts.Data.ADelay));
 					end
 
 					else if tc1.Skill[255].Tick <= Tick then begin
@@ -14795,7 +14765,7 @@ begin
 		Tick := timeGetTime();
 
                 // AlexKreuz Online Time
-                ElapsedT := (Tick - OnlineTime);
+                ElapsedT := (Tick - Cardinal(OnlineTime));
 
                 ElapsedD := int (ElapsedT / 86400000);
                 ElapsedT := ElapsedT Mod 86400000;
@@ -14943,7 +14913,7 @@ begin
 								CastingMonster := tm.Block[a][b].Mob.Objects[k] as TMob;
 								Inc(k);
 								//if CastingMonster = nil then Continue;
-
+                                                              if CastingMonster <> nil then begin
                                                                 if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
                                                                         if (tc.HP > 0) and (CastingMonster.Stat2 <> 4) then begin
                                                                                 tl := tc.Skill[CastingMonster.NowSkill].Data;
@@ -14954,7 +14924,7 @@ begin
                                                                                 //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
                                                                                 MobFieldSkills(tm, CastingMonster, Tick);
                                                                                 MobStatSkills(tm, CastingMonster, Tick);
-                                                                                CastingMonster.SkillWaitTick := Tick + CastingMonster.Data.WaitTick;
+                                                                                CastingMonster.SkillWaitTick := Tick + Cardinal(CastingMonster.Data.WaitTick);
 
                                                                                 //end else if Boolean(MMode and $01) then begin
                                                                                 //pcnt := 0;
@@ -14976,6 +14946,7 @@ begin
                                                                                 CastingMonster.Mode := 0;
                                                                         end;
                                                                 end;
+                                                              end;
                                                         end;
                                                 end;
                                         end;
@@ -15583,10 +15554,12 @@ begin
                     MobDB.Clear;
                     MobDBName.Clear;
                     SummonMobList.Clear;
+                    SummonMobListMVP.Clear;
                     SummonIOBList.Clear;
                     SummonIOVList.Clear;
                     SummonICAList.Clear;
                     SummonIGBList.Clear;
+                    SummonIOWBList.Clear;
                     PetDB.Clear;
                     MapInfo.Clear;
                     SkillDB.Clear;
@@ -15850,10 +15823,10 @@ begin
                                                                                                                                                                                 DebugOut.Lines.Add('Total Zeny: ' + inttostr(tc1.Zeny));
 
                                                                                                                                                                                 if (copy(sl.Strings[6],1,1) = '+') or (copy(sl.Strings[6],1,1) = '-') then begin
-                                                                                                                                                                                        if tc1.Zeny + strtoint(sl.Strings[6]) < 0 then begin
+                                                                                                                                                                                        if tc1.Zeny + Cardinal(strtoint(sl.Strings[6])) < 0 then begin
                                                                                                                                                                                                 DebugOut.Lines.Add('Not enough Zeny. Zeny command was un-successful.');
                                                                                                                                                                                         end else begin
-                                                                                                                                                                                                tc1.Zeny := tc1.Zeny + strtoint(sl.Strings[6]);
+                                                                                                                                                                                                tc1.Zeny := tc1.Zeny + Cardinal(strtoint(sl.Strings[6]));
                                                                                                                                                                                                 DebugOut.Lines.Add('Zeny command was successful.');
                                                                                                                                                                                                 DebugOut.Lines.Add('Updated Total: ' + inttostr(tc1.Zeny));
                                                                                                                                                                                         end;

@@ -1088,9 +1088,9 @@ end;
           end else if (Copy(str, 1, 5) = 'zeny ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
 						Val(Copy(str, 6, 256), i, k);
             // Colus, 20040203: Zeny limit was off by a 0.  Bumped the limit up to 1BZ (it can handle it!)
-						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + i <= 999999999) then begin
+						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + cardinal(i) <= 999999999) then begin
                                                         if tc.Zeny > 1000000000 then exit;
-							tc.Zeny := tc.Zeny + i;
+							tc.Zeny := tc.Zeny + cardinal(i);
               SendCStat1(tc, 1, $0014, tc.Zeny);
 						end;
 
@@ -1933,7 +1933,7 @@ end;
                                           try
                                              if WarpDatabase.IndexOf(sl.Strings[0]) <> -1 then begin
                                               twp := WarpDatabase.Objects[WarpDatabase.IndexOf(sl.Strings[0])] as TWarpDatabase;
-                                              if (tc.Zeny >= twp.Cost) and ((k <> 0) and (tc.Item[k].Amount >= 1)) then begin
+                                              if (tc.Zeny >= cardinal(twp.Cost)) and ((k <> 0) and (tc.Item[k].Amount >= 1)) then begin
                                                 if (sl.Strings[0] = 'save') or (sl.Strings[0] = 'return') or (sl.Strings[0] = 'home') then begin
                                                   if (tc.Hidden = false) then SendCLeave(tc, 2);
                                                   tc.Map := tc.SaveMap ;
@@ -1958,7 +1958,7 @@ end;
 						                                  	tc.Point :=Point(twp.X,twp.Y);
                                                 end;
 							                                  //Warp the Player
-                                                tc.Zeny := tc.Zeny - twp.Cost;
+                                                tc.Zeny := tc.Zeny - cardinal(twp.Cost);
 
 							                                  MapMove(Socket, LowerCase(twp.MAP), Point(twp.X,twp.Y));
                                               end else if ((k <> 0) and (tc.Item[k].Amount >= 1)) then SendSkillError(tc, 5)
@@ -2416,7 +2416,7 @@ end;
 {NPCイベント追加ココまで}
 								end;
 {氏{箱追加}
-							10: //古木の枝
+							10, 201: //古木の枝
 								begin
 {アジト機能追加}
 									if not mi.noBranch then begin
@@ -2426,8 +2426,14 @@ end;
 									if (SummonMobList.Count > 0) then begin
 										tm := tc.MData;
 										ts := TMob.Create;
-										l := Random(SummonMobList.Count);
-										tsmn := SummonMobList.Objects[l] as TSummon;
+                    if td.Effect = 10 then begin
+										  l := Random(SummonMobList.Count);
+										  tsmn := SummonMobList.Objects[l] as TSummon;
+                    end else begin
+                      l := Random(SummonMobListMVP.Count);
+										  tsmn := SummonMobListMVP.Objects[l] as TSummon;
+                    end;
+
 										str := tsmn.Name;
 										ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
 										ts.ID := NowMobID;
@@ -2542,7 +2548,16 @@ end;
 												str := tsmn.Name;
 											end;
 										end;
+                  200:  //New --- Old Weapon Box
+                    begin
+                      if (SummonIOWBList.Count > 0) then begin
+                        l := Random(SummonIOWBList.Count);
+                        tsmn := SummonIOWBList.Objects[l] as TSummon;
+                        str := tsmn.Name;
+                      end;
+                    end;
 									end;
+
 
 									if (str <> '') then begin
 										i := 0;
@@ -2735,6 +2750,7 @@ end;
                                                                                 end;
                                                                         end;
                                                                 end;
+
 {キューペットここまで}
 							end;
 						end;
@@ -4767,7 +4783,7 @@ end;
 
 				//重量オーバーの場合はエラーメッセージを送って処理を抜ける
 
-                                if longint(tc.MaxWeight) - longint(tc.Weight) < weight then begin // AlexKreuz: Integer Overflow Protection
+                                if longint(tc.MaxWeight) - longint(tc.Weight) < longint(weight) then begin // AlexKreuz: Integer Overflow Protection
 					WFIFOW(0, $012c);
 					WFIFOB(2, 0);
 					Socket.SendBuf(buf, 3);
