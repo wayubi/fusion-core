@@ -169,6 +169,10 @@ var
     function command_charskillpoint(tc : TChara; str : String) : String;
     function command_changes(tc : TChara; str : String) : String;
 
+    function command_aegis_b(str : String) : String;
+    function command_aegis_bb(tc : TChara; str : String) : String;
+    function command_aegis_nb(str : String) : String;
+
     function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_kami(tc : TChara; str : String) : String;
     function command_athena_alive(tc : TChara) : String;
@@ -437,9 +441,20 @@ Called when we're shutting down the server *only*
     var
         error_msg : String;
         gmstyle : String;
+        aegistype : String;
     begin
-        gmstyle := Copy(str, Pos(' : ', str) + 3, 1);
-        str := Copy(str, Pos(' : ', str) + 4, 256);
+    	if (Copy(str, 0, 1) = '/') then begin
+        	gmstyle := '/';
+            aegistype := Copy(str, 2, 1);
+            str := Copy(str, 3, length(str) - 2);
+        end
+
+        else begin
+        	gmstyle := Copy(str, Pos(' : ', str) + 3, 1);
+            str := Copy(str, Pos(' : ', str) + 4, 256);
+        end;
+
+
         error_msg := '';
 
         if gmstyle = '#' then begin
@@ -527,6 +542,10 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
             else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
             else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_SKPOINT(tc, str)
+        end else if gmstyle = '/' then begin
+        	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
+            else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
+            else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc. ID, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2526,6 +2545,48 @@ Called when we're shutting down the server *only*
         sl.Free;
         changefile.Free;
         Result := 'GM_CHANGES Success.';
+    end;
+
+    function command_aegis_b(str : String) : String;
+    var
+    	tc1 : TChara;
+        k : Integer;
+    begin
+    	WFIFOW(0, $009a);
+	    for k := 0 to CharaName.Count - 1 do begin
+        	tc1 := CharaName.Objects[k] as TChara;
+        	if tc1.Login = 2 then tc1.Socket.SendBuf(buf, length(str) + 5);
+    	end;
+
+        Result := 'GM_AEGIS_B Success.';
+    end;
+
+    function command_aegis_nb(str : String) : String;
+    var
+    	tc1 : TChara;
+        k : Integer;
+    begin
+    	WFIFOW(0, $009a);
+	    for k := 0 to CharaName.Count - 1 do begin
+        	tc1 := CharaName.Objects[k] as TChara;
+        	if tc1.Login = 2 then tc1.Socket.SendBuf(buf, length(str) + 5);
+    	end;
+
+        Result := 'GM_AEGIS_NB Success.';
+    end;
+
+    function command_aegis_bb(tc : TChara; str : String) : String;
+    var
+    	tc1 : TChara;
+        k : Integer;
+    begin
+    	WFIFOW(0, $009a);
+	    for k := 0 to CharaName.Count - 1 do begin
+        	tc1 := CharaName.Objects[k] as TChara;
+        	if (tc1.Login = 2) and (tc1.Map = tc.Map) then tc1.Socket.SendBuf(buf, length(str) + 5);
+    	end;
+
+        Result := 'GM_AEGIS_BB Success.';
     end;
 
     function command_athena_alive(tc : TChara) : String;

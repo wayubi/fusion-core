@@ -874,35 +874,12 @@ Begin(* Proc sv3PacketProcess() *)
 				Socket.SendBuf(buf, 3);
 			end;
 		//--------------------------------------------------------------------------
-		//030316/030317 Cardinal
 		$0099: //GM
 			begin
-      //tp := tc.PData;
-      h := IDTableDB.IndexOf(tc.ID);
-      if (h <> -1) then begin
-      tid := IDTableDB.Objects[h] as TIDTbl;
-      if (tid.BroadCast = 1) then begin
-
-				RFIFOW(2, w);
-				str := RFIFOS(4, w - 4);
-        WFIFOW(0, $009a);
-
-        if (Copy(str, 1, 4) = 'blue') then begin
-        for k := 0 to CharaName.Count - 1 do begin
-					tc1 := CharaName.Objects[k] as TChara;
-        if (tc1.Login = 2) and (tc1.Map = tc.Map) then tc1.Socket.SendBuf(buf, w);
-        end;
-				end else begin
-				for k := 0 to CharaName.Count - 1 do begin
-					tc1 := CharaName.Objects[k] as TChara;
-        if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
-        end;
-        end;
-
-      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'GM:'+str);
-      end;
-      end;
-      end;
+            	RFIFOW(2, w);
+                str := RFIFOS(4, w - 4);
+                parse_commands (tc, '/B'+str);
+            end;
 		//--------------------------------------------------------------------------
 		$009b: //å¸Ç´ïœçX
 			begin
