@@ -1072,6 +1072,7 @@ begin
 					while i <> 0 do begin
 						j := AnsiPos(']', Copy(str, i + 2, 256));
 						if j <= 1 then break;
+                        // grabbing variables
 						if (Copy(str, i + 2, 1) = '$') then begin
 							str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256);
 						end else if (Copy(str, i + 2, 2) = '\$') then begin
@@ -1086,6 +1087,7 @@ begin
 						end;
 						i := AnsiPos('$[', str);
 					end;
+                    //predetermined variable string replacement
 					str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
 					str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
           str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
@@ -1096,22 +1098,27 @@ begin
           str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
 					str := StringReplace(str, '$$', '$', [rfReplaceAll]);
 					str := StringReplace(str, '\\', '\', [rfReplaceAll]);
-					if ((l mod 100) div 10 = 0) then str := tn.Name + ' : ' + str;
-					if (l div 100 = 1) then str := 'blue' + str;
+                    //optional tags (first set is for map only, second set for global)
+                        if ((l = 0) or (l = 200)) then str := tn.Name + ' : ' + str; // Null (0): displays npc name with it
+                        if ((l = 100) or (l = 300)) then str := 'blue' + str;        //  Blue String Broadcast
+                        if ((l = 20) or (l = 220)) then str := tc.Name + ' : ' + str; // displays characters name with it
+                        if ((l = 30) or (l = 230)) then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
+                        if ((l = 40) or (l = 240)) then str := 'blue' + tn.Name + ' : ' +str; //displays npc name and in blue
+
 					w := Length(str) + 4;
 					WFIFOW(0, $009a);
 					WFIFOW(2, w);
 					WFIFOS(4, str, w - 4);
 
-					if (l mod 10 = 0) then begin
-						//カレントMAPのキャラに送信
+					if ((l < 101) or (l > 300)) then begin
+						//MAP broadcasting
 						tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
 						for i := 0 to tm.CList.Count - 1 do begin
 							tc1 := tm.CList.Objects[i] as TChara;
 							if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
 						end;
 					end else begin
-						//全ワールドのキャラに送信
+						//Global Broadcasting
 						for i := 0 to CharaName.Count - 1 do begin
 							tc1 := CharaName.Objects[i] as TChara;
 							if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-15-04: NPC Broadcast's options been redone. Inculdes global broadcast options. [Tsusai]
 - 09-15-04: REED: Guilds, Positions loading restructured. [AlexKreuz]
 - 09-15-04: REED: Parties, Member list loading first member only. [AlexKreuz]
 - 09-15-04: REED: Guilds, Member loading restructured. [AlexKreuz]
