@@ -253,8 +253,10 @@ uses
         end;
 
         if assigned(tc.Socket) then begin
-        	tc.Socket.Close;
-        	tc.Socket := nil;
+            if tc.Login <> 0 then begin
+            	tc.Socket.Close;
+            	tc.Socket := nil;
+            end;
         end;
 
     	leave_party(tc);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-13-04: Defined but inaccessible socket caused crash. [AlexKreuz]
 - 08-13-04: Loading unindexed item in database caused crash. [AlexKreuz]
 - 08-13-04: Scriptlist clearing in database caused crash. [AlexKreuz]
 - 08-13-04: Bad weiss.ini Option_PVP setting caused crash. [AlexKreuz]
