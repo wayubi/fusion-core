@@ -2280,6 +2280,7 @@ object frmMain: TfrmMain
             Height = 25
             Caption = 'Save'
             TabOrder = 2
+            OnClick = Button23Click
           end
           object Button24: TButton
             Left = 296

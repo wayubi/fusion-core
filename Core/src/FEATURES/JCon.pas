@@ -34,6 +34,7 @@ uses
     procedure JCon_Chara_Store_Load();
     procedure JCon_Chara_Skill_Load(HideNull : Boolean);
     procedure JCon_Chara_Skill_Populate();
+    procedure JCon_Chara_Skill_Save();
     procedure JCon_Chara_Flag_Load();
 
 
@@ -861,6 +862,33 @@ uses
             frmMain.ComboBox20.Items.Add(IntToStr(TempIndex));
         frmMain.ComboBox20.ItemIndex := tc.Skill[SkillID].Lv;
     end;
+
+    procedure JCon_Chara_Skill_Save();
+    var
+        tc : TChara;
+        j : integer;
+
+    begin
+        if (frmMain.ListBox7.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+        if assigned(tc) then begin
+            if assigned(tc.Socket) then begin
+                if tc.Login <> 0 then tc.Socket.Close;
+                    tc.Socket := nil;
+                end;
+        end;
+
+        j := StrToInt(frmMain.Label116.Caption);
+
+        tc.Skill[j].Lv := frmMain.ComboBox20.ItemIndex;
+        DataSave(true);
+        if frmMain.CheckBox2.Checked = false then JCon_Chara_Skill_Load(false)
+        else JCon_Chara_Skill_Load(true);
+
+
+    end;
+
 
     procedure JCon_Chara_Flag_Load();
     var

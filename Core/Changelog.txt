@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-21-04: JCon: Character skill modification save finish. [Tsusai]
 - 10-20-04: Free'd a stringlist in script.pas. [Tsusai]
 - 10-20-04: JCon: Character skills & level viewable. [Tsusai]
 - 10-20-04: Another OnTouch improvement. OnTouch basically complete. [Tsusai]

@@ -449,6 +449,7 @@ type
     procedure Button22Click(Sender: TObject);
     procedure CheckBox2Click(Sender: TObject);
     procedure ListBox7Click(Sender: TObject);
+    procedure Button23Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11607,6 +11608,11 @@ end;
 procedure TfrmMain.ListBox7Click(Sender: TObject);
 begin
     JCon_Chara_Skill_Populate();
+end;
+
+procedure TfrmMain.Button23Click(Sender: TObject);
+begin
+    JCon_Chara_Skill_Save();
 end;
 
 end.
