@@ -2,7 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
-
+- 01-10-04: Minor fix to damage calculation- [Oatmeal12345]
 - 01-10-04: Added Algorith to Poison character [Darkhelmet]
 - 01-10-04: Added Monster SKill Sonic Blows - [Darkhelmet + Oatmeal12345]
 - 01-10-04: Added monster skill NPC_Posion, waiting on procedure from Dark-[Oatmeal12345[

@@ -366,7 +366,7 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[192].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
@@ -374,7 +374,7 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[200].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
@@ -382,7 +382,7 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
@@ -390,7 +390,7 @@ begin
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[191].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
