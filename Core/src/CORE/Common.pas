@@ -8472,13 +8472,22 @@ begin
 								SetLength(tn.Script[k].Data3, 1);
 								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
 								Inc(k);}
-							end else if str = 'removeEquipment' then begin //----- 62 Remove Equipment
-                				if sl1.Count <> 0 then begin
+							end else if str = 'removeequipment' then begin //----- 63 Remove Equipment
+                if sl1.Count <> 0 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [Reset Equipment] function error', [ScriptPath, lines]));
 									exit;
 								end;
-                				SetLength(tn.Script, k + 1);
-                				tn.Script[k].ID := 62;
+                SetLength(tn.Script, k + 1);
+                tn.Script[k].ID := 63;
+								Inc(k);
+              end else if str = 'basereset' then begin //----- 64 BaseReset
+                if sl1.Count <> 0 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [Base Reset] function error', [ScriptPath, lines]));
+									exit;
+								end;
+
+                SetLength(tn.Script, k + 1);
+                tn.Script[k].ID := 64;
 								Inc(k);
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin

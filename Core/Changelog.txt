@@ -1,3 +1,5 @@
+- 04-11-04: Fixed 'removeequipment' script command. [Darkhelmet]
+- 04-11-04: Added 'basereset' script command. [Darkhelmet]
 - 04-11-04: Fixed Bug in loading the AI database. [Darkhelmet]
 - 04-11-04: Started Fusion's own AI database. [Darkhelmet]
 - 04-10-04: Added IF_ENEMYCOUNT code. [Darkhelmet]

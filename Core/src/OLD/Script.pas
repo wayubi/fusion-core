@@ -1621,6 +1621,15 @@ begin
               tc.Socket.SendBuf(buf, 7);
             end;
           end;
+          Inc(tc.ScriptStep);
+        end;
+      64: //BaseReset
+        begin
+          for i := 0 to 5 do begin
+            tc.ParamBase[i] := 1;
+            SendCStat(tc);
+          end;
+          Inc(tc.ScriptStep);
         end;
 			44: //checkstr
 				begin
