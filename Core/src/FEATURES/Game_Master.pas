@@ -2506,7 +2506,7 @@ Called when we're shutting down the server *only*
         oldlevel := tc.JobLV;
         Val(Copy(str, 10, 256), i, k);
 
-        if (k = 0) and (i >= -98) and (i <= 98) then begin
+        if (k = 0) and (i >= -70) and (i <= 70) then begin
             if i < 0 then begin
                 if (tc.JobLV + i >= 1) then tc.JobLV := tc.JobLV + i
                 else if (tc.JobLV + i < 1) and (tc.JobLV > 1) then begin
@@ -2516,11 +2516,21 @@ Called when we're shutting down the server *only*
                     Exit;
                 end;
             end else begin
-                if (tc.JobLV + i <= 99) then tc.JobLV := tc.JobLV + i
-                else if (tc.JobLV + i > 99) and (tc.JobLV < 99) then begin
-                    tc.JobLV := 99;
+                if (tc.JID = 0) and (tc.JobLV + i > 10) and (tc.JobLV < 10) then tc.JobLV := 10
+                else if (tc.JID = 0) and (tc.JobLV = 10) then begin
+                    Result := Result + ' Maximum level is 10.';
+                    Exit;
+                end
+                else if (tc.JID > 0) and (tc.JID < 23) and (tc.JobLV + i > 50) and (tc.JobLV < 50) then tc.JobLV := 50
+                else if (tc.JID > 0) and (tc.JID < 23) and (tc.JobLV = 50) then begin
+                    Result := Result + ' Maximum level is 50.';
+                    Exit;
+                end
+                else if (tc.JobLV + i <= 70) then tc.JobLV := tc.JobLV + i
+                else if (tc.JobLV + i > 70) and (tc.JobLV < 70) then begin
+                    tc.JobLV := 70;
                 end else begin
-                    Result := Result + ' Maximum level is 99.';
+                    Result := Result + ' Maximum level is 70.';
                     Exit;
                 end;
             end;
