@@ -2463,6 +2463,10 @@ begin
 		if (tc.guildid > 0) then begin
 			//tg := tguild.create;
 			{ChrstphrR 2004/04/21 Memory Leak!}
+            if GuildList.IndexOf(tc.GuildID) = -1 then begin
+                tc.GuildID := 0;
+                Exit;
+            end;
 			tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
 
 			tg.SLV := 0;

@@ -24,7 +24,8 @@ uses
     REED_SAVE_ACCOUNTS,
     REED_SAVE_CHARACTERS,
     REED_SAVE_PETS,
-    REED_SAVE_PARTIES;
+    REED_SAVE_PARTIES,
+    REED_SAVE_GUILDS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -43,14 +44,11 @@ uses
 
 
     { Guild Data - Basic Data }
-    procedure PD_Save_Guilds(forced : Boolean = False);
     procedure PD_Delete_Guilds(tg : TGuild);
 
     { Guild Data - Member Data }
-    procedure PD_Save_Guilds_Members(forced : Boolean = False);
 
     { Guild Data - Position Data }
-    procedure PD_Save_Guilds_Positions(forced : Boolean = False);
 
     { Guild Data - Skills Data }
     procedure PD_Save_Guilds_Skills(forced : Boolean = False);
@@ -120,10 +118,8 @@ uses
         PD_Save_Characters_Parse(forced);
         PD_Save_Pets_Parse(forced);
         PD_Save_Parties_Parse(forced);
+        PD_Save_Guilds_Parse(forced);
 
-        PD_Save_Guilds(forced);
-        PD_Save_Guilds_Members(forced);
-		PD_Save_Guilds_Positions(forced);
         PD_Save_Guilds_Skills(forced);
         PD_Save_Guilds_BanList(forced);
         PD_Save_Guilds_Diplomacy(forced);
@@ -262,65 +258,9 @@ uses
 
 
 
-
-
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Basic Data ----------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Guilds(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tg : TGuild;
-    	i, j : Integer;
-        saveflag : Boolean;
-    begin
-    	saveflag := False;
-    	datafile := TStringList.Create;
-
-    	for i := 0 to GuildList.Count - 1 do begin
-        	tg := GuildList.Objects[i] as TGuild;
-
-            if (tg = nil) then Continue;
-            if tg.RegUsers = 0 then Continue;
-
-            for j := 0 to tg.RegUsers - 1 do begin
-            	if tg.MemberID[j] = 0 then Break;
-                if not assigned(tg.Member[j]) then Continue;                
-                if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
-                Break;
-            end;
-
-            if not saveflag then Continue;
-
-            datafile.Clear;
-            datafile.Add('NAM : ' + tg.Name);
-            datafile.Add('GID : ' + IntToStr(tg.ID));
-            datafile.Add('GLV : ' + IntToStr(tg.LV));
-            datafile.Add('EXP : ' + IntToStr(tg.EXP));
-            datafile.Add('SKP : ' + IntToStr(tg.GSkillPoint));
-            datafile.Add('NT1 : ' + tg.Notice[0]);
-            datafile.Add('NT2 : ' + tg.Notice[1]);
-            datafile.Add('AGT : ' + tg.Agit);
-            datafile.Add('EMB : ' + IntToStr(tg.Emblem));
-            datafile.Add('PSN : ' + IntToStr(tg.Present));
-            datafile.Add('DFV : ' + IntToStr(tg.DisposFV));
-            datafile.Add('DRW : ' + IntToStr(tg.DisposRW));
-
-            CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
-
-            try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Guild.txt');
-                //debugout.Lines.Add(tg.Name + ' guild data saved.');
-            except
-                DebugOut.Lines.Add('Guild data could not be saved.');
-            end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Delete_Guilds(tg : TGuild);
     var
         deldir : String;
@@ -338,166 +278,6 @@ uses
         RmDir(deldir + IntToStr(tg.ID));
 
         DataSave();
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Guild Data - Member Data ---------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Guilds_Members(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tg : TGuild;
-    	i, j, k : Integer;
-        str : String;
-        len : Integer;
-        saveflag : Boolean;
-        masterflag : Boolean;
-    begin
-    	saveflag := False;
-    	datafile := TStringList.Create;
-
-    	for i := 0 to GuildList.Count - 1 do begin
-        	tg := GuildList.Objects[i] as TGuild;
-
-            if (tg = nil) then Continue;
-            if tg.RegUsers = 0 then Continue;
-
-            for j := 0 to tg.RegUsers - 1 do begin
-            	if tg.MemberID[j] = 0 then Break;
-                if not assigned(tg.Member[j]) then Continue;
-                if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
-                Break;
-            end;
-
-            if not saveflag then Continue;
-
-        	datafile.Clear;
-            datafile.Add(' CID    : PO : EXP        ');
-            datafile.Add('--------------------------');
-
-            masterflag := True;
-            for j := 0 to tg.RegUsers - 1 do begin
-            	if tg.MemberID[j] = 0 then Continue;
-                if not assigned(tg.Member[j]) then Continue;
-                if tg.Member[j].GuildID <> tg.ID then Continue;
-
-                str := ' ';
-                str := str + IntToStr(tg.MemberID[j]);
-                str := str + ' : ';
-
-                if masterflag then begin
-                    tg.MemberPOS[j] := 0;
-                    masterflag := False;
-                end;
-
-                len := length(IntToStr(tg.MemberPOS[j]));
-                for k := 0 to (2 - len) - 1 do begin
-                	str := str + ' ';
-                end;
-                str := str + IntToStr(tg.MemberPOS[j]);
-                str := str + ' : ';
-
-                len := length(IntToStr(tg.MemberEXP[j]));
-                for k := 0 to (10 - len) - 1 do begin
-                	str := str + ' ';
-                end;
-                str := str + IntToStr(tg.MemberEXP[j]);
-
-            	datafile.Add(str);
-			end;
-
-            CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
-
-            try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Members.txt');
-                //debugout.Lines.Add(tg.Name + ' guild member data saved.');
-            except
-                DebugOut.Lines.Add('Guild member data could not be saved.');
-            end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Guild Data - Position Data -------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Guilds_Positions(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tg : TGuild;
-    	i, j, k : Integer;
-        str : String;
-        len : Integer;
-        saveflag : Boolean;
-    begin
-    	saveflag := False;
-    	datafile := TStringList.Create;
-
-    	for i := 0 to GuildList.Count - 1 do begin
-        	tg := GuildList.Objects[i] as TGuild;
-
-            if (tg = nil) then Continue;
-            if tg.RegUsers = 0 then Continue;
-
-            for j := 0 to tg.RegUsers - 1 do begin
-            	if tg.MemberID[j] = 0 then Break;
-                if not assigned(tg.Member[i]) then Break;
-                if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
-                Break;
-            end;
-
-            if not saveflag then Continue;
-
-        	datafile.Clear;
-            datafile.Add(' ID : I : P : XP : NAME');
-            datafile.Add('----------------------------------------------------------');
-
-            for j := 0 to 19 do begin
-                str := ' ';
-
-                len := length(IntToStr(j+1));
-                for k := 0 to (2 - len) - 1 do begin
-                	str := str + ' ';
-                end;
-                str := str + IntToStr(j+1);
-                str := str + ' : ';
-
-                if (tg.PosInvite[j]) then str := str + 'Y' else str := str + 'N';
-                str := str + ' : ';
-
-                if (tg.PosPunish[j]) then str := str + 'Y' else str := str + 'N';
-                str := str + ' : ';
-
-                len := length(IntToStr(tg.PosEXP[j]));
-                for k := 0 to (2 - len) - 1 do begin
-                	str := str + ' ';
-                end;
-                str := str + IntToStr(tg.PosEXP[j]);
-                str := str + ' : ';
-
-                str := str + tg.PosName[j];
-
-                datafile.Add(str);
-            end;
-
-            CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
-
-            try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Positions.txt');
-                //debugout.Lines.Add(tg.Name + ' guild positions data saved.');
-            except
-                DebugOut.Lines.Add('Guild positions data could not be saved.');
-            end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
     end;
 
 

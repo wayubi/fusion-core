@@ -19,6 +19,7 @@ uses
     procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
     procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
     function party_is_online(tpa : TParty) : Boolean;
+    function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
 
 implementation
 
@@ -476,6 +477,25 @@ uses
 
     end;
     { ------------------------------------------------------------------------------------- }
+
+
+    function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
+    var
+        len : Integer;
+        result_string : String;
+        i : Integer;
+    begin
+        result_string := '';
+
+        len := length(result_string);
+        for i := 0 to (count - len) - 2 do begin
+            result_string := result_string + ' ';
+        end;
+        result_string := result_string + str;
+        if last then result_string := result_string + ' : ';
+
+        Result := result_string;
+    end;
         
 end.
 

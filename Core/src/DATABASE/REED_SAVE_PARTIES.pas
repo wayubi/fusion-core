@@ -42,8 +42,7 @@ implementation
             reed_savefile(tpa.ID, datafile, path, pfile);
         end;
 
-        datafile.Clear;
-        datafile.Free;
+        FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }
 

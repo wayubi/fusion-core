@@ -17,7 +17,8 @@ uses
     Classes, Math, SysUtils, StrUtils,
     {Fusion}
     Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData, ISCS,
-    REED_SAVE_PARTIES;
+    REED_SAVE_PARTIES,
+    REED_SAVE_GUILDS;
 
 //==============================================================================
 // 関数定義
@@ -155,14 +156,14 @@ Begin(* Proc sv3PacketProcess() *)
   tcr := nil;
 	while Socket.ReceiveLength >= 2 do
   begin
-		len := Socket.ReceiveLength;
+		//len := Socket.ReceiveLength;
 		Socket.ReceiveBuf(buf[0], 2);
 		RFIFOW(0, cmd);
-		if cmd = $00c8 then
-			debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
+		//if cmd = $00c8 then
+		//	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
 		tc := Socket.Data;
 		if (cmd > MAX_PACKET_NUMBER) then begin
-			debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
 			SetLength(tmpbuf, Socket.ReceiveLength);
 			Socket.ReceiveBuf(tmpbuf[0], Socket.ReceiveLength);
 			Continue;
@@ -172,12 +173,12 @@ Begin(* Proc sv3PacketProcess() *)
 			Socket.ReceiveBuf(buf[2], 2);
 			RFIFOW(2, w);
 			Socket.ReceiveBuf(buf[4], w - 4);
-			debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
 		end else begin
 			Socket.ReceiveBuf(buf[2], PacketLength[cmd] - 2);
-			if cmd <> $0072 then begin
-			debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
-			end;
+			//if cmd <> $0072 then begin
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
+			//end;
 		end;
     //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Command:' + IntToStr(cmd));
 
@@ -4009,7 +4010,7 @@ end;
                     tg.Member[0] := nil;
                     tg.MemberID[0] := 0;
 
-                    PD_Save_Guilds_Members(true);
+                    PD_Save_Guilds_Parse(true);
 					if UseSQL then DeleteGuildInfo(tc.GuildID);
 					GuildList.Delete(GuildList.IndexOf(tc.GuildID));
 
