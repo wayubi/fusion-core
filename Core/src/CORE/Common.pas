@@ -2477,6 +2477,9 @@ begin
 			else
 				i := i - 30;
 		end;
+                if Skill[387].Tick > Tick then begin // Cart boost  // I think this should do it.
+				i := i - 45
+		end;
     { Colus, 20040224: You didn't listen to how I explained the skill. :/
       This is so not right it's not even funny.
         //BS Maximun codes

@@ -1916,7 +1916,9 @@ begin
 			//UŒ‚ƒ~ƒX
 			dmg[0] := 0;
 		end;
-
+                        if tc.Skill[355].Tick > Tick then begin
+                        dmg[0] := dmg[0] + tc.Skill[355].Data.Data2[tc.Skill[355].Lv];
+                        end;
 			//HP leech effect
 			if (dmg[0] > 0) and (random(100) < DrainPer[0]) then begin
 				HP := HP + (dmg[0] * DrainFix[0] div 100);
