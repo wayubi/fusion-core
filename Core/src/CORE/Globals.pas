@@ -457,7 +457,8 @@ uses
             // fileslist.Add(AppPath + 'party.txt');
             // fileslist.Add(AppPath + 'pet.txt');
             // fileslist.Add(AppPath + 'player.txt');
-            fileslist.Add(AppPath + 'status.txt');
+            //fileslist.Add(AppPath + 'status.txt');
+            fileslist.Add(AppPath + 'servervars.txt');
 
             zfile.FileSpecList := fileslist;
             zfile.Add;

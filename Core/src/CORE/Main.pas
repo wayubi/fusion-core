@@ -10678,596 +10678,111 @@ var
 label ExitParse;
 begin
 
-        if (Combo_ISCS.ItemIndex = 1) and (ISCS_ON) then begin
-            iscs_console_send(Edit1.Text);
-        end else
+    if (Combo_ISCS.ItemIndex = 1) and (ISCS_ON) then begin
+        iscs_console_send(Edit1.Text);
+    end else if Copy(Edit1.Text, 1, 1) = '-' then begin
 
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(Edit1.Text, 2, 256);
 
-        if Copy(Edit1.Text, 1, 1) = '-' then begin
-
-                sl := TStringList.Create;
-                sl.DelimitedText := Copy(Edit1.Text, 2, 256);
-
-                if sl.Count = 0 then goto ExitParse;
-
-                if sl.Strings[0] = 'users' then begin
-                // Displays List of Online Users
-                // Syntax: -users [global]
-
-                        str := 'Users Currently Logged in: ';
-
-                        k := 0;
-                        for i := 0 to CharaName.Count - 1 do begin
-        		              tc1 := CharaName.Objects[i] as TChara;
-        			              if (tc1.Login = 2) and (tc1 <> tc2) then begin
-                                        if k = 0 then begin
-                                          tc2 := tc1;
-                                          str := str + tc1.Name;
-                                          k := k + 1
-                                        end else begin
-                                          tc2 := tc1;
-                                          str := str + ', ' + tc1.Name;
-                                          k := k + 1;
-                                        end;
-                                end;
-                        end;
-
-                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + str);
-
-                        if sl.Count = 2 then begin
-                                if sl.Strings[1] = 'global' then begin
-                                        edit1.Text := str;
-                                        button1.Click;
-                                end;
-                        end;
-
-                end
-
-                else if sl.strings[0] = 'save' then begin
-                // Save data
-                    DataSave(true);
-                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
-                end
-
-                else if sl.Strings[0] = 'reload' then begin
+        if sl.Count = 0 then goto ExitParse;
+            if sl.Strings[0] = 'reload' then begin
                 // Reloads Databases. Warning, does not save Data.
-                    MapList.Clear;
-                    ItemDB.Clear;
-                    ItemDBName.Clear;
-                    MaterialDB.Clear;
-                    MobDB.Clear;
-                    MobDBName.Clear;
-                    SummonMobList.Clear;
-                    SummonMobListMVP.Clear; //Safe 2004/05/23
-                    SummonIOBList.Clear;//Safe 2004/04/26
-                    SummonIOVList.Clear;//Safe 2004/04/26
-                    SummonICAList.Clear;//Safe 2004/04/26
-                    SummonIGBList.Clear;//Safe 2004/04/26
-                    SummonIOWBList.Clear;//Safe 2004/04/26
-                    PetDB.Clear;
-                    MapInfo.Clear;
-                    SkillDB.Clear;
-                    SkillDBName.Clear; 
-                    GSkillDB.Clear;
-                    SlaveDBName.Clear;
-                    //PharmacyDB.Clear;
-                    MercenariesList.Clear;
-                    MobAIDB.Clear;
-                    MobAIDBFusion.Clear;
-                    GlobalVars.Clear;
-                    MArrowDB.Clear;
-                    WarpDatabase.Clear;
-                    IDTableDB.Clear;
-                    Playername.Clear;
-                    Player.Clear;
-                    Charaname.Clear;
-                    Chara.Clear;
-                    Castlelist.Clear;
-                    Partynamelist.Clear;
-                    Guildlist.Clear;
-                    PetList.Clear;
-                	DatabaseLoad(Handle);
-	                DataLoad();
-                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
-                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Databases Reload Completed ...');
-                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
-                end
+                MapList.Clear;
+                ItemDB.Clear;
+                ItemDBName.Clear;
+                MaterialDB.Clear;
+                MobDB.Clear;
+                MobDBName.Clear;
+                SummonMobList.Clear;
+                SummonMobListMVP.Clear; //Safe 2004/05/23
+                SummonIOBList.Clear;//Safe 2004/04/26
+                SummonIOVList.Clear;//Safe 2004/04/26
+                SummonICAList.Clear;//Safe 2004/04/26
+                SummonIGBList.Clear;//Safe 2004/04/26
+                SummonIOWBList.Clear;//Safe 2004/04/26
+                PetDB.Clear;
+                MapInfo.Clear;
+                SkillDB.Clear;
+                SkillDBName.Clear;
+                GSkillDB.Clear;
+                SlaveDBName.Clear;
+                //PharmacyDB.Clear;
+                MercenariesList.Clear;
+                MobAIDB.Clear;
+                MobAIDBFusion.Clear;
+                GlobalVars.Clear;
+                MArrowDB.Clear;
+                WarpDatabase.Clear;
+                IDTableDB.Clear;
+                Playername.Clear;
+                Player.Clear;
+                Charaname.Clear;
+                Chara.Clear;
+                Castlelist.Clear;
+                Partynamelist.Clear;
+                Guildlist.Clear;
+                PetList.Clear;
+                DatabaseLoad(Handle);
+                DataLoad();
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Databases Reload Completed ...');
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+            end
 
-                else if sl.Strings[0] = 'uptime' then begin
+            else if sl.Strings[0] = 'uptime' then begin
                 // Displays Uptime Stats in Console
                 // Syntax: -uptime [global]
-
-                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.');
-
-                        if sl.Count = 2 then begin
-                                if sl.Strings[1] = 'global' then begin
-                                        edit1.Text := 'Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.';
-                                        button1.Click;
-                                end;
-                        end;
-                end
-
-                else if sl.Strings[0] = 'kick' then begin
-                // Kicks User
-                // Syntax: -kick username [global]
-
-                        if sl.Count > 1 then begin
-                                for i := 0 to CharaName.Count - 1 do begin
-                                        tc1 := CharaName.Objects[i] as TChara;
-                                        if (tc1.Name = sl.Strings[1]) then begin
-                                                if tc1.Login = 2 then begin
-                                                        WFIFOW(0, $00b3);
-                                                        WFIFOB(2, $0001);
-                                                        tc1.Socket.SendBuf(buf, 3);
-                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + sl.Strings[1] + ' has been kicked.');
-
-                                                        if sl.Count > 2 then begin
-                                                                if sl.Strings[2] = 'global' then begin
-                                                                        edit1.Text := sl.Strings[1] + ' has been kicked.';
-                                                                        button1.Click;
-                                                                end;
-                                                        end;
-                                                end else begin
-                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + sl.Strings[1] + ' is not online.');
-                                                end;
-                                        end;
-                                end;
-                        end;
-                end
-
-                else if str = '-ban' then begin
-                // Bans IP Address [global]
-                // Syntax: -ban ip.address
-
-                end
-
-                else if str = '-unban' then begin
-                // Unbans IP Address [global]
-                // Syntax: -unban ip.addresss
-
-                end
-
-                else if str = '-userstats' then begin
-                // Relocates on or off-line character
-                // Syntax: -move chara_name map_name x_coord y_coord
-
-                end
-
-                else if str = '-take' then begin
-                // Removes an posession from a character
-                // Type: zeny, item, level, jlevel, bexp, jexp, skill
-                // Value: ID Number (item, skill only)
-                // Quantity: Amount to remove
-                // Syntax: -take type value quantity
-
-                end
-
-                else if str = '-give' then begin
-                // Gives a posession to a character
-                // Type: zeny, item, level, jlevel, bexp, jexp, skill
-                // Value: ID Number (item, skill only)
-                // Quantity: Amount to remove
-                // Syntax: -give type value quantity
-
-                end
-
-                else if str = '-help' then begin
-                // Displays list of Console Commands
-                // Syntax: -help
-
-                end
-
-                else if str = '-move' then begin
-                // Relocates on or off-line player
-                // Syntax: -move chara_name map_name x_coord y_coord
-
-                end
-
-                else if sl.Strings[0] = 'sql' then begin
-                // Pseudo SQL Database Administration
-
-			if sl.Count > 1 then begin
-		        	if sl.Strings[1] = 'update' then begin
-					if sl.Count > 2 then begin
-
-                                                // Player Data Begin
-				        	if sl.Strings[2] = 'player' then begin
-							if sl.Count > 3 then begin
-						        	if sl.Strings[3] = 'set' then begin
-									if sl.Count > 4 then begin
-								        	if sl.Strings[4] = 'gender' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = '=' then begin
-													if sl.Count > 6 then begin
-														if sl.Count > 7 then begin
-													        	if sl.Strings[7] = 'where' then begin
-																if sl.Count > 8 then begin
-															        	if sl.Strings[8] = 'username' then begin
-																		if sl.Count > 9 then begin
-																	        	if sl.Strings[9] = '=' then begin
-																			        if sl.Count > 10 then begin
-                                                                                                                                                                        if PlayerName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That username does not exist.');
-                                                                                                                                                                        end
-                                                                                                                                                                        else begin
-                                                                                                                                                                                tp1 := PlayerName.Objects[PlayerName.IndexOf(sl.Strings[10])] as TPlayer;
-
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Gender: '+inttostr(tp1.Gender));
-                                                                                                                                                                                tp1.Gender := strtoint(sl.Strings[6]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Gender: '+sl.Strings[6]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Gender change was successful.');
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-															        	end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end else
-
-                                                                                if sl.Strings[4] = 'password' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = '=' then begin
-													if sl.Count > 6 then begin
-														if sl.Count > 7 then begin
-													        	if sl.Strings[7] = 'where' then begin
-																if sl.Count > 8 then begin
-															        	if sl.Strings[8] = 'username' then begin
-																		if sl.Count > 9 then begin
-																	        	if sl.Strings[9] = '=' then begin
-																			        if sl.Count > 10 then begin
-                                                                                                                                                                        if PlayerName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That username does not exist.');
-                                                                                                                                                                        end
-                                                                                                                                                                        else begin
-                                                                                                                                                                                tp1 := PlayerName.Objects[PlayerName.IndexOf(sl.Strings[10])] as TPlayer;
-
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Password: '+ tp1.Pass);
-                                                                                                                                                                                tp1.Pass := sl.Strings[6];
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Password: '+sl.Strings[6]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password change was successful.');
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-															        	end else
-
-                                                                                                                                        if sl.Strings[8] = 'charaname' then begin
-																		if sl.Count > 9 then begin
-																	        	if sl.Strings[9] = '=' then begin
-																			        if sl.Count > 10 then begin
-                                                                                                                                                                        counter := 11;
-                                                                                                                                                                        while sl.Count > counter do begin
-                                                                                                                                                                                sl.Strings[10] := sl.Strings[10] + ' ' + sl.Strings[counter];
-                                                                                                                                                                                counter := counter + 1;
-                                                                                                                                                                        end;
-
-                                                                                                                                                                        if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
-                                                                                                                                                                        end
-                                                                                                                                                                        else begin
-                                                                                                                                                                                tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
-                                                                                                                                                                                tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
-
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Password: '+ tp1.Pass);
-                                                                                                                                                                                tp1.Pass := sl.Strings[6];
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Password: '+sl.Strings[6]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password change was successful.');
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-                                                                                                                                        end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end;
-								        end;
-						        	end;
-						        end;
-				        	end
-                                                // Player Data End
-
-                                                // Character Data Begin
-				        	else if sl.Strings[2] = 'chara' then begin
-							if sl.Count > 3 then begin
-						        	if sl.Strings[3] = 'set' then begin
-									if sl.Count > 4 then begin
-								        	if sl.Strings[4] = 'zeny' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = '=' then begin
-													if sl.Count > 6 then begin
-														if sl.Count > 7 then begin
-													        	if sl.Strings[7] = 'where' then begin
-																if sl.Count > 8 then begin
-															        	if sl.Strings[8] = 'charaname' then begin
-																		if sl.Count > 9 then begin
-																	        	if sl.Strings[9] = '=' then begin
-																			        if sl.Count > 10 then begin
-                                                                                                                                                                        counter := 11;
-                                                                                                                                                                        while sl.Count > counter do begin
-                                                                                                                                                                                sl.Strings[10] := sl.Strings[10] + ' ' + sl.Strings[counter];
-                                                                                                                                                                                counter := counter + 1;
-                                                                                                                                                                        end;
-
-                                                                                                                                                                        if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
-                                                                                                                                                                        end
-                                                                                                                                                                        else begin
-                                                                                                                                                                                tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[10]);
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Zeny: ' + inttostr(tc1.Zeny));
-
-                                                                                                                                                                                if (copy(sl.Strings[6],1,1) = '+') or (copy(sl.Strings[6],1,1) = '-') then begin
-                                                                                                                                                                                        if tc1.Zeny + Cardinal(strtoint(sl.Strings[6])) < 0 then begin
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Not enough Zeny. Zeny command was un-successful.');
-                                                                                                                                                                                        end else begin
-                                                                                                                                                                                                tc1.Zeny := tc1.Zeny + Cardinal(strtoint(sl.Strings[6]));
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
-                                                                                                                                                                                        end;
-                                                                                                                                                                                end else begin
-                                                                                                                                                                                        tc1.Zeny := strtoint(sl.Strings[6]);
-                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
-                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
-                                                                                                                                                                                end;
-
-                                                                                                                                                                                if tc1.Login = 2 then begin
-                                                                                                                                                                                                      SendCStat1(tc1, 1, $0014, tc1.Zeny);
-                                                                                                                                                                                end;
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-															        	end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end;
-
-								        	if sl.Strings[4] = 'location' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = '=' then begin
-													if sl.Count > 6 then begin
-														if sl.Count > 7 then begin
-                                                                                                                        if sl.Count > 8 then begin
-                                                                                                                                if sl.Count > 9 then begin
-                													        	if sl.Strings[9] = 'where' then begin
-                																if sl.Count > 10 then begin
-		                													        	if sl.Strings[10] = 'charaname' then begin
-				                														if sl.Count > 11 then begin
-						                											        	if sl.Strings[11] = '=' then begin
-								                											        if sl.Count > 12 then begin
-                                                                                                                                                                                        counter := 13;
-                                                                                                                                                                                        while sl.Count > counter do begin
-                                                                                                                                                                                                sl.Strings[12] := sl.Strings[12] + ' ' + sl.Strings[counter];
-                                                                                                                                                                                                counter := counter + 1;
-                                                                                                                                                                                        end;
-
-                                                                                                                                                                                        if CharaName.IndexOf(sl.Strings[12]) = -1 then begin
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
-                                                                                                                                                                                        end else begin
-
-                                                                                                                                                                                                tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[12])] as TChara;
-
-                                                                                                                                                                                                if MapList.IndexOf(sl.Strings[6]) <> -1 then begin
-                                                                                                                                                                                                        ta := MapList.Objects[MapList.IndexOf(sl.Strings[6])] as TMapList;
-                                                                                                                                                                                                        if (strtoint(sl.Strings[7]) >= 0) and (strtoint(sl.Strings[7]) < ta.Size.X) and (strtoint(sl.Strings[8]) >= 0) and (strtoint(sl.Strings[8]) < ta.Size.Y) then begin
-                                                                                                                                                                                                                if tc1.Login = 2 then begin
-                                                                                                                                                                                                                        // User is online
-                                                                                                                                                                                                                        if (tc1.Option and 64 = 0) then SendCLeave(tc1, 2);
-                                                                                                                                                                                                                        MapMove(tc1.Socket, sl.Strings[6], Point(strtoint(sl.Strings[7]),strtoint(sl.Strings[8])));
-                                                                                                                                                                                                                        tc1.Map := sl.Strings[6];
-                                                                                                                                                                                                                        tc1.Point.X := strtoint(sl.Strings[7]);
-                                                                                                                                                                                                                        tc1.Point.Y := strtoint(sl.Strings[8]);
-                                                                                                                                                                                                                end else begin
-                                                                                                                                                                                                                        // User is not online
-                                                                                                                                                                                                                        tc1.Map := sl.Strings[6];
-                                                                                                                                                                                                                        tc1.Point.X := strtoint(sl.Strings[7]);
-                                                                                                                                                                                                                        tc1.Point.Y := strtoint(sl.Strings[8]);
-                                                                                                                                                                                                                end;
-                                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was moved successfully to ' + sl.Strings[6] + ' ' + sl.Strings[7] + ' ' + sl.Strings[8] + '.');
-                                                                                                                                                                                                        end else begin
-                                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was not moved. Bad Map Coordinates.');
-                                                                                                                                                                                                        end;
-                                                                                                                                                                                                end else begin
-                                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was not moved. Bad Map Name.');
-                                                                                                                                                                                                end;
-                                                                                                                                                                                        end;
-                                                                                                                                                                                end;
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-															        	end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end;
-
-								        	{if sl.Strings[4] = 'item' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = '=' then begin
-													if sl.Count > 6 then begin
-														if sl.Count > 7 then begin
-													        	if sl.Strings[7] = 'where' then begin
-																if sl.Count > 8 then begin
-															        	if sl.Strings[8] = 'charaname' then begin
-																		if sl.Count > 9 then begin
-																	        	if sl.Strings[9] = '=' then begin
-																			        if sl.Count > 10 then begin
-                                                                                                                                                                        counter := 11;
-                                                                                                                                                                        while sl.Count > counter do begin
-                                                                                                                                                                                sl.Strings[10] := sl.Strings[10] + ' ' + sl.Strings[counter];
-                                                                                                                                                                                counter := counter + 1;
-                                                                                                                                                                        end;
-
-                                                                                                                                                                        if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
-                                                                                                                                                                        end
-                                                                                                                                                                        else begin
-                                                                                                                                                                                tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
-                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[10]);
-                                                                                                                                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Zeny: ' + inttostr(tc1.Zeny));
-
-                                                                                                                                                                                if (copy(sl.Strings[7],1,1) = '+') or (copy(sl.Strings[7],1,1) = '-') then begin
-                                                                                                                                                                                        if tc1.Item[sl.Strings[6]].Amount + strtoint(sl.Strings[7]) < 0 then begin
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Not enough quantity. Item command was un-successful.');
-                                                                                                                                                                                        end else begin
-                                                                                                                                                                                                tc1.Item[sl.Strings[6]
-                                                                                                                                                                                                tc1.Zeny := tc1.Zeny + strtoint(sl.Strings[6]);
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
-                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
-                                                                                                                                                                                        end;
-                                                                                                                                                                                end else begin
-                                                                                                                                                                                        tc1.Zeny := strtoint(sl.Strings[6]);
-                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
-                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
-                                                                                                                                                                                end;
-
-                                                                                                                                                                                if tc1.Login = 2 then begin
-                                                                                                                                                                                        WFIFOW(0, $00b1);
-	        		                        																WFIFOW(2, $0014);
-                                																			WFIFOL(4, tc1.Zeny);
-			        																	                tc1.Socket.SendBuf(buf, 8);
-                                                                                                                                                                                end;
-                                                                                                                                                                        end;
-                                                                                                                               			        	end;
-                                                                                                                                                        end;
-																	        end;
-															        	end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end;}
-								        end;
-						        	end;
-						        end;
-				        	end;
-                                                // Character Data End
-
-				        end;
-		        	end;
-
-		        	if sl.Strings[1] = 'select' then begin
-					if sl.Count > 2 then begin
-
-                                                // Character Data Begin
-				        	if sl.Strings[2] = 'items' then begin
-							if sl.Count > 3 then begin
-						        	if sl.Strings[3] = 'from' then begin
-									if sl.Count > 4 then begin
-								        	if sl.Strings[4] = 'chara' then begin
-											if sl.Count > 5 then begin
-										        	if sl.Strings[5] = 'where' then begin
-													if sl.Count > 6 then begin
-                                                                                                                if sl.Strings[6] = 'charaname' then begin
-														        if sl.Count > 7 then begin
-													        	        if sl.Strings[7] = '=' then begin
-																        if sl.Count > 8 then begin
-                                                                                                                                                counter := 9;
-                                                                                                                                                while sl.Count > counter do begin
-                                                                                                                                                        sl.Strings[8] := sl.Strings[8] + ' ' + sl.Strings[counter];
-                                                                                                                                                        counter := counter + 1;
-                                                                                                                                                end;
-
-                                                                                                                                                if CharaName.IndexOf(sl.Strings[8]) = -1 then begin
-                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
-                                                                                                                                                end
-                                                                                                                                                else begin
-                                                                                                                                                        tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[8])] as TChara;
-                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[8]);
-                                                                                                                                                        i := 0;
-                                                                                                                                			for j := 1 to 100 do begin
-                                                                                                                                				if tc1.Item[j].ID <> 0 then begin
-                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Call Number: '+inttostr(j)+', ID: '+inttostr(tc1.Item[j].ID)+', Quantity: '+inttostr(tc1.Item[j].Amount));
-                                                                                                                                					{sl.Add(IntToStr(tc.Item[j].ID));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Amount));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Equip));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Identify));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Refine));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Attr));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Card[0]));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Card[1]));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Card[2]));
-                                                                                                                                					sl.Add(IntToStr(tc.Item[j].Card[3]));}
-                                                                                                                                					Inc(i);
-                                                                                                                                				end;
-                                                                                                                                			end;
-                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Items: ' + inttostr(i));
-																	        end;
-															        	end;
-															        end;
-													        	end;
-													        end;
-												        end;
-										        	end;
-										        end;
-								        	end;
-								        end;
-						        	end;
-						        end;
-				        	end;
-                                                // Character Data End
-
-				        end;
-		        	end;
-		        end;
-                end
-
-                else if str = '-' then begin
-                // Relocates on or off-line player
-                // Syntax: -move chara_name map_name x_coord y_coord
-
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.');
+                if sl.Count = 2 then begin
+                    if sl.Strings[1] = 'global' then begin
+                        edit1.Text := 'Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.';
+                        button1.Click;
+                    end;
                 end;
+            end
 
-ExitParse:
+            else if sl.Strings[0] = 'ban' then begin
+            // Bans IP Address [global]
+            // Syntax: -ban ip.address
+            end
 
-                sl.free();
-        end
+            else if sl.Strings[0] = 'unban' then begin
+            // Unbans IP Address [global]
+            // Syntax: -unban ip.addresss
+            end
 
-        else begin
-        // Sends GM Messages via Server Console
+            else if sl.Strings[0] = 'help' then begin
+            // Displays list of Console Commands
+            // Syntax: -help
+            end
 
-                str := edit1.text;
+            else if sl.Strings[0] = 'move' then begin
+            // Relocates on or off-line player
+            // Syntax: -move chara_name map_name x_coord y_coord
+            end;
 
-                //RFIFOW(2, w);
-        	//str := RFIFOS(4, w - 4);
+        ExitParse:
 
-                w := 200;
-        	WFIFOW(0, $009a);
-	        WFIFOW(2, w);
-	        WFIFOS(4, str, w);
-        	//Socket.SendBuf(buf, w);
+        sl.free();
+    end
 
-                for k := 0 to CharaName.Count - 1 do begin
-                        tc1 := CharaName.Objects[k] as TChara;
-		        if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
-                end;
-
-                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server: ' + str);
+    else begin
+    // Sends GM Messages via Server Console
+        str := 'Server: ' + edit1.text;
+        w := 200;
+        WFIFOW(0, $009a);
+        WFIFOW(2, w);
+        WFIFOS(4, str, w);
+        for k := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[k] as TChara;
+            if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
         end;
 
-        edit1.Clear;
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + str);
+    end;
+
+    edit1.Clear;
 
 end;
 
