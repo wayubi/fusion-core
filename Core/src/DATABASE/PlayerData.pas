@@ -22,7 +22,8 @@ uses
     REED_LOAD_GUILDS,
     REED_LOAD_CASTLES,
     REED_SAVE_ACCOUNTS,
-    REED_SAVE_CHARACTERS;
+    REED_SAVE_CHARACTERS,
+    REED_SAVE_PETS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -38,10 +39,6 @@ uses
 
     { Character Data - Basic Data }
     procedure PD_Delete_Characters(tc : TChara);
-
-
-    { Character Data - Pets Data }
-    procedure PD_Save_Characters_Pets(forced : Boolean = False);
 
 
     { Party Data - Member Data }
@@ -124,8 +121,8 @@ uses
 
         PD_Save_Accounts_Parse(forced);
         PD_Save_Characters_Parse(forced);
+        PD_Save_Pets_Parse(forced);
 
-        PD_Save_Characters_Pets(forced);
 
         PD_Save_Parties_Members(forced);
 
@@ -266,120 +263,6 @@ uses
         RmDir(deldir + IntToStr(tc.CID));
 
         DataSave();
-    end;
-
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Pets Data -------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Pets(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tpe : TPet;
-        tc : TChara;
-    	i, j, k, l : Integer;
-    begin
-
-    	datafile := TStringList.Create;
-
-        for i := 0 to PetList.Count - 1 do begin
-            tpe := PetList.Objects[i] as TPet;
-            tpe.Saved := 0;
-        end;
-
-        for i := 0 to PlayerName.Count - 1 do begin
-            tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 1 to 100 do begin
-                if (tp.Kafra.Item[j].ID <> 0) and (tp.Kafra.Item[j].Amount > 0) and (tp.Kafra.Item[j].Card[0] = $FF00) then begin
-                    for k := 0 to PetList.Count - 1 do begin
-                        tpe := PetList.IndexOfObject(k) as TPet;
-
-                        if tp.Kafra.Item[j].Card[1] <> tpe.PetID then Continue;
-                        if tpe.PlayerID <> tp.ID then Continue;
-                        if tpe.Saved <> 0 then Continue;
-
-                        tpe.Incubated := 0;
-                        tpe.CharaID := 0;
-                        tpe.Index := 0;
-
-                        datafile.Clear;
-                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
-                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
-                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
-                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
-                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
-                        datafile.Add('JID : ' + IntToStr(tpe.JID));
-                        datafile.Add('NAM : ' + tpe.Name);
-                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
-                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
-                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
-                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
-                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
-
-                        CreateDir(AppPath + 'gamedata\Accounts');
-                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
-                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID));
-
-                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '\Pet.txt');
-
-                        tpe.Saved := 1;
-                    end;
-                end;
-            end;
-
-            for l := 0 to 8 do begin
-                tc := tp.CData[l];
-
-                if (tc = nil) then Continue;
-
-	            for j := 1 to 100 do begin
-	                if (tc.Item[j].ID <> 0) and (tc.Item[j].Amount > 0) and (tc.Item[j].Card[0] = $FF00) then begin
-	                    for k := 0 to PetList.Count - 1 do begin
-	                        tpe := PetList.IndexOfObject(k) as TPet;
-	
-	                        if tc.Item[j].Card[1] <> tpe.PetID then Continue;
-	                        if tpe.CharaID <> tc.CID then Continue;
-	                        if tpe.Saved <> 0 then Continue;
-
-	                        datafile.Clear;
-	                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
-	                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
-	                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-	                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
-	                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
-	                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
-	                        datafile.Add('JID : ' + IntToStr(tpe.JID));
-	                        datafile.Add('NAM : ' + tpe.Name);
-	                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
-	                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
-	                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
-	                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
-	                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
-
-	                        CreateDir(AppPath + 'gamedata\Accounts');
-	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
-	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID));
-
-	                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '\Pet.txt');
-
-	                        tpe.Saved := 1;
-	                    end;
-	                end;
-	            end;
-            end;
-
-        end;
-
-        datafile.Clear;
-        datafile.Free;
     end;
 
 

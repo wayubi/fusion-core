@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
-- 10-13-04: Added @save, @load, @kick, @kickall, @raise, @raisemap and fixed
-	- a problem with Tiko's @doom. (GM_ATHENA_ITEM instead of GM_ATHENA_DOOM) [Trihan]
+- 10-13-04: REED: Restructured Pet saving. [AlexKreuz]
+- 10-13-04: Added @save, @load, @kick, @kickall, @raise, @raisemap. [Trihan]
+- 10-13-04: Fixed a problem with Tiko's @doom. (GM_ATHENA_ITEM instead of GM_ATHENA_DOOM). [Trihan]
 - 10-12-04: Added a DNS Updater timer. Default is off. [Tsusai]
 - 10-12-04: JCon: Inventory work, can view cart and storage (all read-only). [Tsusai]
 - 10-10-04: REED: Fixed minor problem with REED conversion. [AlexKreuz]
