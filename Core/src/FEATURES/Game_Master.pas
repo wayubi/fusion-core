@@ -95,6 +95,7 @@ var
     GM_ATHENA_CHARWARP : Byte;
     GM_ATHENA_HELP : Byte;
     GM_ATHENA_ZENY : Byte;
+    GM_ATHENA_BASELVLUP : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -162,6 +163,7 @@ var
     //Athena Calls
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
+    function command_athena_baselvlup(tc : TChara; str : String) : String;
     function command_athena_die(tc : TChara) : String;
 implementation
 
@@ -259,6 +261,7 @@ implementation
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
         GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_HELP'], 1);
         GM_ATHENA_ZENY := StrToIntDef(sl.Values['ATHENA_ZENY'], 1);
+        GM_ATHENA_BASELVLUP := StrToIntDef(sl.Values['ATHENA_BASELVLUP'], 1);
 
         sl.Free;
         ini.Free;
@@ -365,6 +368,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
         ini.WriteString('Athena GM Commands', 'ATHENA_HELP', IntToStr(GM_ATHENA_HELP));
         ini.WriteString('Athena GM Commands', 'ATHENA_ZENY', IntToStr(GM_ATHENA_ZENY));
+        ini.WriteString('Athena GM Commands', 'ATHENA_BASELVLUP', IntToStr(GM_ATHENA_BASELVLUP));
 
         ini.Free;
 
@@ -444,6 +448,7 @@ Called when we're shutting down the server *only*
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
+			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
             else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
         end;
 
@@ -2351,6 +2356,67 @@ Called when we're shutting down the server *only*
             end;
         end else begin
             Result := Result + ' Zeny amount out of range [-2147483647-2147483647].';
+        end;
+    end;
+
+    function command_athena_baselvlup(tc : TChara; str : String) : String;
+    var
+        i, k, w3 : Integer;
+        oldlevel : Integer;
+    begin
+        Result := 'GM_ATHENA_BASELVLUP Failure.';
+
+        oldlevel := tc.BaseLV;
+        Val(Copy(str, 11, 256), i, k);
+
+        if (k = 0) and (i >= -198) and (i <= 198) then begin
+            if i < 0 then begin
+                if (tc.BaseLV + i >= 1) then tc.BaseLV := tc.BaseLV + i
+                else if (tc.BaseLV + i < 1) and (tc.BaseLV > 1) then begin
+                    tc.BaseLV := 1;
+                end else begin
+                    Result := Result + ' Minimum level is 1.';
+                    Exit;
+                end;
+
+                for i := 0 to 5 do begin
+                    tc.ParamBase[i] := 1;
+                end;
+
+                tc.StatusPoint := 48;
+
+                for i := 1 to tc.BaseLV - 1 do begin
+                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                end;
+            end
+
+            else begin
+                w3 := tc.BaseLV;
+                if (tc.BaseLV + i <= 199) then tc.BaseLV := tc.BaseLV + i
+                else if (tc.BaseLV + i > 199) and (tc.BaseLV < 199) then begin
+                    tc.BaseLV := 199;
+                end else begin
+                    Result := Result + ' Maximum level is 199.';
+                    Exit;
+                end;
+
+                for i := w3 to tc.BaseLV - 1 do begin
+                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                end;
+            end;
+
+            tc.BaseEXP := tc.BaseNextEXP - 1;
+            tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+
+            CalcStat(tc);
+            SendCStat(tc);
+            SendCStat1(tc, 0, $000b, tc.BaseLV);
+            SendCStat1(tc, 0, $0009, tc.StatusPoint);
+            SendCStat1(tc, 1, $0001, tc.BaseEXP);
+
+            Result := 'GM_BASELVLUP Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.BaseLV) + '.';
+        end else begin
+            Result := Result + ' Incomplete information or level out of range.';
         end;
     end;
 end.
