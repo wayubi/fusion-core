@@ -3,7 +3,7 @@ unit Player_Skills;
 interface
 
 uses
-	IniFiles, Classes, SysUtils, Common, List32, MMSystem;
+	IniFiles, Classes, SysUtils, Common, List32, MMSystem, Math, Path;
 
 var
 	SKILL_TYPE : Byte;
@@ -202,6 +202,8 @@ uses
         tm : TMap;
         tl : TSkillDB;
         rand : Integer;
+        k, r : Integer;
+        rx, ry : Integer;
     begin
     	SKILL_TYPE := 1;
     	Result := -1;
@@ -229,14 +231,43 @@ uses
     	    end else begin
         		{ PvP: Provoke Successful }
 	    		tc1 := tc.AData;
+
+                k := 0;
+                r := 0;
+                while ( (k = 0) and (r < 100) ) do begin
+                	Randomize;
+                    rx := randomrange(-tc1.Range,tc1.Range) + tc.Point.X;
+                    Randomize;
+                    ry := randomrange(-tc1.Range,tc1.Range) + tc.Point.Y;
+                    k := Path_Finding(tc1.path, tm, tc1.Point.X, tc1.Point.Y, rx, ry, 1);
+                    inc(r);
+                end;
+
+                if ( (rx = tc.Point.X) and (ry = tc.Point.y) ) then k := 0;
+
+                if ( (k <> 0) ) then begin
+                	tc1.NextFlag := true;
+                    tc1.nextpoint.X := rx;
+                    tc1.nextpoint.Y := ry;
+                    tc1.tgtPoint := tc1.NextPoint;
+                end;
+
+                WFIFOW( 0, $0139);
+                WFIFOL( 2, tc.ID);
+                WFIFOW( 6, tc.Point.X);
+                WFIFOW( 8, tc.Point.Y);
+                WFIFOW(10, tc1.Point.X);
+                WFIFOW(12, tc1.Point.Y);
+                WFIFOW(14, tc1.Range);
+                tc1.Socket.SendBuf(buf, 16);
+
+                tc1.MTargetType := 1;
+                tc1.AMode := 2;
     	        tc1.ATarget := tc.ID;
         	    tc1.AData := tc;
-                tc1.AMode := 2;
 
-                tc1.NextPoint := tc.Point;
-                tc1.NextFlag := True;
-
-                { Alex: Now I just need to get tc1 to attack tc }
+                if tc1.ATick + tc1.ADelay - 200 < timeGetTime() then
+                tc1.ATick := timeGetTime() - tc1.ADelay + 200;
 
     			tc1.DamageFixS[1] := word(tl.Data1[tc.MUseLV]);
     			tc1.DEF1 := word(tl.Data2[tc.MUseLV]) * tc1.DEF1 div 100;

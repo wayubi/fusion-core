@@ -1,3 +1,5 @@
+- 06-07-04: Minor PVP pathfinding fixes. [AlexKreuz]
+- 06-07-04: Skill SM_PROVOKE now provokes PVP targets into attacking player. [AlexKreuz]
 - 06-07-04: Switched skill [SM_TWOHAND] to PSS system. [AlexKreuz]
 - 06-07-04: Switched skill [SM_SWORD] to PSS system. [AlexKreuz]
 - 06-07-04: Removed memory leaks from Player_Skills.pas. [AlexKreuz]

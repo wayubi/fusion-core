@@ -9234,6 +9234,8 @@ var
 
 	zfile :TZip;
 
+    x, y : Integer;
+
 label ExitWarpSearch;
 begin
 
@@ -9320,8 +9322,18 @@ begin
 					// Purpose: Created to fix bug where you stop attacking when you and mob
 					// share same spot.
 					if (AMode = 1) or (AMode = 2) then begin
+
+                    	if tc.MTargetType = 0 then begin
 						ts := AData;
-						if ( (ts.Point.x = tc.Point.x) and (ts.Point.y = tc.Point.Y) ) then begin
+                            x := ts.Point.x;
+                            y := ts.Point.y;
+                        end else begin
+                        	tc1 := AData;
+                            x := tc1.Point.x;
+                            y := tc1.Point.y;
+                        end;
+
+						if ( (x = tc.Point.x) and (y = tc.Point.Y) ) then begin
 							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'stuck');
 							k := 0;
 							r := 0;
