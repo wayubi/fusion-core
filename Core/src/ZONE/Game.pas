@@ -2337,10 +2337,10 @@ end;
 		//--------------------------------------------------------------------------
 {精錬NPC機能追加}
 				//装備ロックチェック
-				//if tc.EqLock = true then continue;
 {精錬NPC機能追加ココまで}
 		$00a9: //アイテム装備
 			begin
+				if tc.EqLock = true then continue;
 				RFIFOW(2, w1);
 				RFIFOW(4, w2);
 				//DebugOut.Lines.Add(Format('Index:%d EquipType:%d', [w1, w2]));

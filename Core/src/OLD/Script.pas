@@ -938,15 +938,11 @@ begin
 				end;
 			31: //lockitem
 				begin
-{NPCイベント追加}
-					i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0], true);
-{NPCイベント追加ココまで}
+				    i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0], true);
 					if i = 0 then tc.EqLock := false
-						else if i = 1 then tc.EqLock := true;
+					else if i = 1 then tc.EqLock := true;
 					Inc(tc.ScriptStep);
 				end;
-{精錬NPC機能追加ココまで}
-{髪色変更追加}
 			32: //hcolor
 				begin
 {NPCイベント追加}
