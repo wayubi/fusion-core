@@ -64,16 +64,16 @@ const
 
 
 type TLiving = class
-  public
-    ID      :cardinal;
-		JID     :word;
-    Name    :string;
-    Map     :string;
-    Point   :TPoint;
-	  ppos    :integer;
-  	pcnt    :integer;
-  	path    :array[0..999] of byte;
-    Dir     :byte;
+	public
+		ID    : Cardinal;
+		JID   : Word;
+		Name  : string;
+		Map   : string;
+		Point : TPoint;
+		ppos  : Integer;
+		pcnt  : Integer;
+		path  : array[0..999] of byte;
+		Dir   : Byte;
 end;
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -97,13 +97,16 @@ end;
 //------------------------------------------------------------------------------
 // 経路探索用マップデータ
 type rSearchMap = record
-	cost    :word;
-	path    :array[0..255] of byte;
-	pcnt    :byte;
-	addr    :byte;
+	cost : Word;
+	path : array[0..255] of Byte;
+	pcnt : Byte;
+	addr : Byte;
 end;
 //------------------------------------------------------------------------------
-// アイテムデータベース
+{ Item Database
+These objects are linked to either the ItemDB or ItemDBName lists, and referred
+to by the Data reference in the actual instances of items in the game.
+}
 type TItemDB = class
 	ID        :word;
 	Name      :string;
@@ -177,10 +180,7 @@ type TItemDB = class
         PerfectDamage   :boolean;
 
   public
-
     Procedure Assign(Source : TItemDB);
-
-{変更ココまで}
 End;(* TItenDB *)
 
 
@@ -206,11 +206,11 @@ end;//TItem
 //------------------------------------------------------------------------------
 {追加}
 type TItemList = class
-	Zeny      :Cardinal;
-	Item      :Array[1..100] of TItem;
-	Weight    :Cardinal;
-	MaxWeight :Cardinal;
-	Count     :Word;
+	Zeny      : Cardinal;
+	Item      : array[1..100] of TItem;
+	Weight    : Cardinal;
+	MaxWeight : Cardinal;
+	Count     : Word;
 
 	Constructor Create;
 	Destructor  Destroy; OverRide;
@@ -231,20 +231,11 @@ end;
 
 // モンスタードロップアイテム構造体
 type rDropItem = record
-	ID    :word;
-	Per   :cardinal;
-	Data  :TItemDB;
-  Stolen:cardinal;
+	ID     : Word;
+	Per    : Cardinal;
+	Data   : TItemDB;
+	Stolen : Cardinal;
 end;
-//------------------------------------------------------------------------------
-type TPharmacyDB = class
-//ID,BookNeededID,Material1ID,Material2ID,Material3ID,Material4ID,Material5ID,Material1Amount,Material2Amount,Material3Amount,Material4Amount,Material5Amount
-        ID              :cardinal;
-        BookNeededID    :integer;
-        MaterialID      :array [1..5] of integer;
-        MaterialAmount  :array [1..5] of byte;
-end;
-
 //------------------------------------------------------------------------------
 // MapName, TerritoryName
 type TTerritoryDB = class
@@ -392,22 +383,16 @@ end;
 //------------------------------------------------------------------------------
 // モンスターデータ
 type TMob = class(TLiving)
-	//ID          :cardinal;
-	//Name        :string;
-	//JID         :word;
-	//Map         :string;
-	//Point       :TPoint;
 	tgtPoint    :TPoint;
-  NextPoint   :TPoint;
-	//Dir         :byte;
+	NextPoint   :TPoint;
 	Point1      :TPoint;
 	Point2      :TPoint;
 	Speed       :word;
 	Stat1       :Byte; // 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep, 5 = ankle snar
 	Stat2       :Byte; // 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
-  nStat       :Cardinal;
+	nStat       :Cardinal;
 	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
-  BodyCount   :byte; // Colus, 20040505: Counts hits for stat1 effects (current use, SG hitcount)
+	BodyCount   :byte; // Colus, 20040505: Counts hits for stat1 effects (current use, SG hitcount)
 	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
 	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire, 2=ME, 3=Sanct currently)
 	isLooting   :boolean;
@@ -418,15 +403,12 @@ type TMob = class(TLiving)
 	SpawnTick   :cardinal;
 	SpawnType   :cardinal;
 	ATick       :cardinal;
-  NextFlag      :boolean;
+	NextFlag      :boolean;
 	MoveTick    :cardinal;
 	MoveWait    :cardinal;
-        DeadWait    :cardinal;                  // mf
+	DeadWait    :cardinal;// mf
 	DmgTick     :cardinal; //ノックバック
-	//ppos        :integer;
-	//pcnt        :integer;
-	//path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
-  AMode       :byte;
+	AMode       :byte;
 	ATarget     :cardinal;
 	AData       :Pointer;
 	ARangeFlag  :boolean;
@@ -443,47 +425,48 @@ type TMob = class(TLiving)
 	DEF2        :Byte;
 	MDEF1       :Byte;
 	MDEF2       :Byte;
-  SlaveCount  :Byte;
+	SlaveCount  :Byte;
 	isSummon    :Boolean;
-  isLeader    :boolean;
-  isEmperium  :boolean;
-  isGuardian  :Cardinal;
-  isSlave     :boolean;
+	isLeader    :boolean;
+	isEmperium  :boolean;
+	isGuardian  :Cardinal;
+	isSlave     :boolean;
 	isActive    :boolean; //Mode &  4 : アクティブ
 	LeaderID    :Cardinal;
-  EmperiumID  :Cardinal;
-  GID         :Cardinal;
-  NPCID       :Cardinal; //取り巻き用
+	EmperiumID  :Cardinal;
+	GID         :Cardinal;
+	NPCID       :Cardinal; //取り巻き用
 {NPCイベント追加}
 	Event       :cardinal;
-  isCasting   :boolean;
-  Stolen      :cardinal;
+	isCasting   :boolean;
+	Stolen      :cardinal;
 
-  Status  :string;  //Lists the monsters Current status
-  MSkill  :integer;
-  MLevel  :integer;
+	Status  :string;  //Lists the monsters Current status
+	MSkill  :integer;
+	MLevel  :integer;
 
-        Hidden     :boolean;
+	Hidden     :boolean;
 
-        AnkleSnareTick :cardinal;  //Tracks how long ankle snare lasts
+	AnkleSnareTick : Cardinal;  //Tracks how long ankle snare lasts
 
-        MPoint        :rPoint;
-	MTick         :cardinal;
-  CastTime  :integer;
-  SkillWaitTick :cardinal;
+	MPoint         : rPoint;
+	MTick          : Cardinal;
+	CastTime       : Integer;
+	SkillWaitTick  : Cardinal;
 
-        NowSkill        :integer;
-        NowSkillLv      :integer;
-        SkillSlot       :integer;
-        AI              :Pointer;
-        NoDispel        :boolean;
-        Mode           :integer;
-        Burned          :boolean;
-  SkillType :integer; // 1 = No target needed
-                      // 2 = Area Effect
-                      // 3 = Target Skill
-                      // 4 = Support skill
-  CanFindTarget :boolean;
+	NowSkill        : Integer;
+	NowSkillLv      : Integer;
+	SkillSlot       : Integer;
+	AI              : Pointer;
+	NoDispel        : Boolean;
+	Mode            : Integer;
+	Burned          : Boolean;
+	SkillType       : Integer;
+		// 1 = No target needed
+		// 2 = Area Effect
+		// 3 = Target Skill
+		// 4 = Support skill
+	CanFindTarget :boolean;
 
 {NPCイベント追加ココまで}
 	constructor Create;
@@ -492,48 +475,47 @@ type TMob = class(TLiving)
 end;
 //------------------------------------------------------------------------------
 {キューペット}
-// ペットデータベース
+// Pet Database
 TPetDB = class
-	MobID           :word; // ペットモンスターのID
-	ItemID          :word; // 捕獲アイテムのID
-	EggID           :word; // 卵のアイテムID
-	AcceID          :word; // アクセサリのアイテムID
-	FoodID          :word; // エサのアイテムID
-	Fullness        :word; // 餌やりによる満腹度上昇
-	HungryDelay     :word; // 満腹度減少時間(msec/-1)
-	Hungry          :word; // 空腹時餌やりによる親密度上昇
-	Full            :word; // 満腹時餌やりによる親密度減少
-	Reserved        :word; // ??? 時の親密度上昇
-	Die             :word; // 死亡時親密度減少
-	Capture         :word; // 基本捕獲率(0.1%単位)
-  SkillTime       :cardinal;  //Tracks how long a skill lasts
+	MobID       : Word; // ID number
+	ItemID      : Word; // Capture Item ID
+	EggID       : Word; // Egg Item ID
+	AcceID      : Word; // アクセサリのアイテムID
+	FoodID      : Word; // エサのアイテムID
+	Fullness    : Word; // 餌やりによる満腹度上昇
+	HungryDelay : Word; // 満腹度減少時間(msec/-1)
+	Hungry      : Word; // 空腹時餌やりによる親密度上昇
+	Full        : Word; // 満腹時餌やりによる親密度減少
+	Reserved    : Word; // ??? 時の親密度上昇
+	Die         : Word; // degree reduction of intimacy when owner dies
+	Capture     : Word; // Basic Capture Ratio (0.1% units)
+	SkillTime   : Cardinal;  //Tracks how long a skill lasts
 end;
 
 // ペットデータ
 TPet = class
-        PlayerID        :cardinal;
-        CharaID         :cardinal;
-        Cart            :byte;
-        Index           :word;
-        Incubated       :byte;
-        PetID           :cardinal;
-        JID             :word;
-        Name            :string;
-        Renamed         :byte;
-        LV              :word;
-	Relation        :integer;
-        Fullness        :integer;
-        Accessory       :word;
-        Data            :TPetDB;
-	isLooting       :boolean;  //Tracks if the pet is looting
-        ATarget         :cardinal;  //Pets attacking target as well as looting
-        Item            :array[1..25] of TItem;  //Items a pet is holding
-//	MobData         :Pointer;
-	MobData         :TMobDB; //Reference to the Pet's Monster attributes.
-        SkillTick       :cardinal;  //Tracks when to use a skill
-        SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
-        LastTick        :cardinal;  //Used for tracking a minute
-        Saved           :byte;
+	PlayerID      : Cardinal;
+	CharaID       : Cardinal;
+	Cart          : Byte;
+	Index         : Word;
+	Incubated     : byte;
+	PetID         : Cardinal;
+	JID           : Word;
+	Name          : string;
+	Renamed       : Byte;
+	LV            : Word;
+	Relation      : Integer;
+	Fullness      : Integer;
+	Accessory     : Word;
+	Data          : TPetDB;
+	isLooting     : Boolean;  //Tracks if the pet is looting
+	ATarget       : Cardinal;  //Pets attacking target as well as looting
+	Item          : array[1..25] of TItem;  //Items a pet is holding
+	MobData       : TMobDB; //Reference to the Pet's Monster attributes.
+	SkillTick     : Cardinal;  //Tracks when to use a skill
+	SkillActivate : Boolean;  //Tracks if the skill is ready to be activated
+	LastTick      : Cardinal;  //Used for tracking a minute
+	Saved         : Byte;
 
 public
 	Constructor Create;
@@ -714,15 +696,13 @@ public
 end;//TeNPC
 //------------------------------------------------------------------------------
 // Character Data
-	TPlayer = class; //forward declaration - PData field in TChara
-	TNPC = class;    //forward declaration - PetNPC " " "
-	TMap = class;    //forward declaration - MData " " "
+TPlayer = class; //forward declaration - PData field in TChara
+TNPC = class;    //forward declaration - PetNPC " " "
+TMap = class;    //forward declaration - MData " " "
 
-	TChara = class(TLiving)
+TChara = class(TLiving)
 	// Control Variables
-	//ID	          :cardinal;
 	Socket        :TCustomWinSocket;
-//	PData         :Pointer;
 	PData         :TPlayer; // Reference back to owning TPlayer
 	IP            :string;
 	Login         :byte; // 0 = offline; 1 = loading; 2 = online
@@ -730,47 +710,45 @@ end;//TeNPC
 	// Data saved and loaded to/from chara.txt
 	// Line 1:
 	CID	          :cardinal;
-	//Name          :string;
 	Gender        :byte;
 
-	//JID           :Word;
 	BaseLV        :word;
 	BaseEXP       :cardinal;
 	StatusPoint   :word;
 	JobLV         :word;
 	JobEXP        :cardinal;
 	SkillPoint    :word;
-  PLv           :word;
-  Plag          :word;
+	PLv           :word;
+	Plag          :word;
 	Zeny          :cardinal;
 	Stat1         :cardinal; // Status 1
 	Stat2         :cardinal; // Status 2
-  // Colus, 20040204:
-  // Option is a word-length bitmask.  The bits are for the following
-  // character status conditions:
-  //
-  // 01: Sight        02: Hide          04: Cloak         08: Cart 1
-  // 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
-  // 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
-  // 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
+	// Colus, 20040204:
+	// Option is a word-length bitmask.  The bits are for the following
+	// character status conditions:
+	//
+	// 01: Sight        02: Hide          04: Cloak         08: Cart 1
+	// 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
+	// 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
+	// 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
 
-  //  0000 | 0000 | 0000 | 0000
-  //    R    OCCC   CPPF   CCHS
-  //    w    r543   2Hel   1lig
-  //    c    c       dcc    kdt
-  //    h            eon     e
-  //
-  // OptionKeep is not necessary.  All options should be set up
-  // using ands and ors to change the bitmask.
-  //
-  // Example: Cart check: if (Option and $0788);
-  // Example: Hide check: if (Option and 2);
-  // Example: Set peco on: tc.Option := tc.Option or 32;
+	//  0000 | 0000 | 0000 | 0000
+	//    R    OCCC   CPPF   CCHS
+	//    w    r543   2Hel   1lig
+	//    c    c       dcc    kdt
+	//    h            eon     e
+	//
+	// OptionKeep is not necessary.  All options should be set up
+	// using ands and ors to change the bitmask.
+	//
+	// Example: Cart check: if (Option and $0788);
+	// Example: Hide check: if (Option and 2);
+	// Example: Set peco on: tc.Option := tc.Option or 32;
 	//Option        :cardinal;
-  //Optionkeep    :cardinal;
-  Option        :word;
-  Hidden        :boolean;
-  Paradise      :boolean;
+	//Optionkeep    :cardinal;
+	Option        :word;
+	Hidden        :boolean;
+	Paradise      :boolean;
 	Karma         :cardinal;
 	Manner        :cardinal;
 
@@ -825,20 +803,20 @@ end;//TeNPC
 
 	//
 	DefaultSpeed  :word;
-	EquipJob			:Int64;
+	EquipJob      :Int64;
 	BaseNextEXP   :cardinal;
 	JobNextEXP    :cardinal;
 	Weight        :cardinal;
 	MaxWeight     :cardinal;
-  // Changed bonus to smallint (signed words) to prevent negative stat crashes
+	// Changed bonus to smallint (signed words) to prevent negative stat crashes
 	Bonus         :array[0..5] of SmallInt;
 	Param         :array[0..5] of word;
 	ParamUp       :array[0..5] of word;
 	WeaponType    :array[0..1] of word; // Right(0), left(1) hand weapon types
-  WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
+	WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
 {追加 - Weapon Levels}
 	WeaponLv      :array[0..1] of word; // Weapon levels for right/left
-{追加ココまで - Attaclpower and Weapon Fixes}
+{追加ココまで - Attackpower and Weapon Fixes}
 	ArmsFix       :array[0..1] of word; // Right/left training (mastery?)
 	ATK           :array[0..1] of array[0..5] of word; // Displayed ATK power
 	ATKFix        :array[0..1] of array[0..2] of integer; // Weapon correction based on enemy size
@@ -887,35 +865,35 @@ end;//TeNPC
 	DrainPer      :array[0..1] of Integer; //吸収確率 0:HP 1:SP
 	SplashAttack  :boolean;                //Causes an Area Attack
 	SpecialAttack :integer;
-    {
-      1 = Knockback
-      2 = Fatal Blow, .1% chance of instantly killing monster
-    }
-  KnockBackSuccess  :boolean;
-        WeaponSkill   :integer;
-        WeaponSkillLv :integer;
+	{
+	1 = Knockback
+	2 = Fatal Blow, .1% chance of instantly killing monster
+	}
+	KnockBackSuccess  : boolean;
+	WeaponSkill       : integer;
+	WeaponSkillLv :integer;
 	WeaponID      :integer;
 	NoJamstone    :boolean;
-        NoTrap        :boolean;
-        LessSP        :boolean;
-        FastWalk      :boolean;
-        NoTarget      :boolean;
-        FullRecover   :boolean;
-        OrcReflect    :boolean;
-        AnolianReflect :boolean;
-        UnlimitedEndure :boolean;
-        DoppelgagnerASPD :boolean;
-        GhostArmor    :boolean;
-        NoCastInterrupt :boolean;
-        MagicReflect  :boolean;
-        SkillWeapon   :boolean;
-        GungnirEquipped :boolean;
-        LVL4WeaponASPD :boolean;
-        PerfectDamage   :boolean;
-        PerfectHide   :boolean;
+	NoTrap        :boolean;
+	LessSP        :boolean;
+	FastWalk      :boolean;
+	NoTarget          : Boolean;
+	FullRecover       : Boolean;
+	OrcReflect        : Boolean;
+	AnolianReflect    : Boolean;
+	UnlimitedEndure   : Boolean;
+	DoppelgagnerASPD  : Boolean;
+	GhostArmor        : Boolean;
+	NoCastInterrupt   : Boolean;
+	MagicReflect      : Boolean;
+	SkillWeapon       : Boolean;
+	GungnirEquipped   : Boolean;
+	LVL4WeaponASPD    : Boolean;
+	PerfectDamage     : Boolean;
+	PerfectHide       : Boolean;
 
-        {Sage Effects}
-        SageElementEffect   :boolean;
+	{Sage Effects}
+	SageElementEffect : Boolean;
 
 	//# ステ変用
 	SFixPer1       :array[0..1] of array[0..4] of Integer; //変化確率%
@@ -964,7 +942,6 @@ end;//TeNPC
 	GuildPos      :byte; //ギルド職位インデックス
 {ギルド機能追加ココまで}
 
-	//Dir           :byte;
 	HeadDir       :word;
 	Sit           :byte; // 0: moving 1: dead 2: sitting 3: standing
 	AMode         :byte;
@@ -1088,20 +1065,57 @@ TPlayer = class
 	destructor  Destroy; override;
 end;//TPlayer
 //------------------------------------------------------------------------------
-// Party Data
+
+
+(*=============================================================================*
+TParty
+
+--
+Overview:
+--
+Defines the basic data and function of a Party of Characters in the game.
+
+No Constructor/Destructor Pair needed, because the fields/properties are
+simple types.
+
+--
+Revisions:
+--
+2004/05/23 [ChrstphrR] - initial commenting of the class's purpose
+2004/05/23 [ChrstphrR] - changing fields into properties, in preparation for
+	SQL awareness in this object.
+
+*=============================================================================*)
 TParty = class
-	Name        : string; //Party Name - must be unique
-	MinLV       : Word;//Lowest level in party
-	MaxLV       : Word;//Highest level in party
+private
+	fName        : String[24]; //24 characters max.
+protected
+	function  GetName : string;
+	procedure SetName(Value : string);
+
+public
+
 	EXPShare    : Word;//Experience sharing (0 = Not shared, 1 = Shared)
 	ITEMShare   : Word;//Item sharing       (0 = Not Shared, 1 = Shared)
 	MemberID    : array[0..MAX_PARTY_SIZE-1] of Cardinal;//Character IDs
 	Member      : array[0..MAX_PARTY_SIZE-1] of TChara;  //References
+
+	{State Info that's only persistant while the server is running.}
+	MinLV       : Word;//Lowest level in party (of whom are online)
+	MaxLV       : Word;//Highest level in party (of whom are online)
+
 	EXP         : Cardinal; //Used for EXP distribution to members
 	JEXP        : Cardinal; //" " " " " "
 	PartyBard   : array[0..2] of TChara; {Tracks Who the Party's Bard is}
 	PartyDancer : array[0..2] of TChara; {Tracks Who the Party's Dancer is}
-end;//TParty
+
+	property Name : string //Party Name - must be unique
+		read  GetName
+		write SetName;
+
+End;(* <TClassName> ==========================================================*)
+
+
 //------------------------------------------------------------------------------
 TCastle = class
 	Name        :string;
@@ -1520,7 +1534,7 @@ var
 	DealingList :TIntList32;
 	DealMaxID  :cardinal;
 {取引機能追加ココまで}
-{氏{箱追加}
+
 	{ChrstphrR 2004/04/19 - Changing SummonMobList for size/algorithm
 	improvements}
 	SummonMobList : TSummonMobList;
@@ -1530,8 +1544,8 @@ var
 	SummonIOVList : TStringList; //Changed " " " "/"
 	SummonICAList : TStringList; //Changed " " " "/"
 	SummonIGBList : TStringList; //Changed " " " "/"
-	SummonIOWBList: TStringList; //Changed " " " "/"
-{氏{箱追加ココまで}
+	SummonIOWBList : TStringList; //Changed " " " "/"
+
 {NPCイベント追加}
 	ServerFlag :TStringList;
 	MapInfo    :TStringList;
@@ -3348,8 +3362,11 @@ begin
   tn.Map := tc.Map;
   tn.Point.X := tc.Point.X - 1 + Random(3);
   tn.Point.Y := tc.Point.Y - 1 + Random(3);
-  tn.CType := 3;
+	tn.CType := NPC_TYPE_ITEM;
   tn.Enable := true;
+
+	//Create Item structure in NPC, and copy data from Character's item,
+	//Using the amount passed.
   tn.Item := TItem.Create;
   tn.Item.ID := tc.Item[j].ID;
   tn.Item.Amount := amount;
@@ -3361,6 +3378,7 @@ begin
   tn.Item.Card[2] := tc.Item[j].Card[2];
   tn.Item.Card[3] := tc.Item[j].Card[3];
   tn.Item.Data := tc.Item[j].Data;
+
   tn.SubX := Random(8);
   tn.SubY := Random(8);
   tn.Tick := timeGetTime() + 60000;
@@ -3399,58 +3417,55 @@ end;
 
 procedure CreateGroundItem(tm:TMap; itemID:cardinal; XPoint:cardinal; YPoint:cardinal);
 var
-  tn  :TNPC;
-  td  :TItemDB;
+	tn  : TNPC;
+	td  : TItemDB;
 begin
-  // We're creating this item from scratch so we have to get it based on it's ID
-  // We check if it exist's first to prevent a list index error
-  // Maybe we should have a message on a fail though.
- if ItemDB.IndexOf(itemID) <> -1 then begin
-  // Define td after we make sure it won't cause an error
-  // We need this value for the item's data
-  td := ItemDB.IndexOfObject(itemID) as TItemDB;
+	// We're creating this item from scratch so we have to get it based on it's ID
+	// We check if it exist's first to prevent a list index error
+	// Maybe we should have a message on a fail though.
+	if ItemDB.IndexOf(itemID) <> -1 then begin
+	// Define td after we make sure it won't cause an error
+	// We need this value for the item's data
+		td := ItemDB.IndexOfObject(itemID) as TItemDB;
 
-  // Create the item with blank properties since it's new
-  tn := TNPC.Create;
-  tn.ID := NowItemID;
-  Inc(NowItemID);
-  tn.Name := 'item';
-  tn.JID := itemID;
-  tn.Map := tm.Name;
-  tn.Point.X := XPoint;
-  tn.Point.Y := YPoint;
-  tn.CType := 3;
-  tn.Enable := true;
-  tn.Item := TItem.Create;
-  tn.Item.ID := itemID;
-  tn.Item.Amount := 1;
-  tn.Item.Identify := 1;
-  tn.Item.Refine := 0;
-  tn.Item.Attr := 0;
-  tn.Item.Card[0] := 0;
-  tn.Item.Card[1] := 0;
-  tn.Item.Card[2] := 0;
-  tn.Item.Card[3] := 0;
-  tn.Item.Data := td;
-  tn.SubX := Random(8);
-  tn.SubY := Random(8);
-  tn.Tick := timeGetTime() + 60000;
-  // Add the item to the core map
-  tm.NPC.AddObject(tn.ID, tn);
-  tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+		// Create the item with blank properties since it's new
+	tn := TNPC.Create;
+	tn.ID := NowItemID;
+	Inc(NowItemID);
+	tn.Name := 'item';
+	tn.JID := itemID;
+	tn.Map := tm.Name;
+	tn.Point.X := XPoint;
+	tn.Point.Y := YPoint;
+		tn.CType := NPC_TYPE_ITEM;
+		tn.Enable := true;
 
-  //Item Drop on ground Packet
-  WFIFOW( 0, $009e);
-  WFIFOL( 2, tn.ID);
-  WFIFOW( 6, tn.JID);
-  WFIFOB( 8, tn.Item.Identify);
-  WFIFOW( 9, tn.Point.X);
-  WFIFOW(11, tn.Point.Y);
-  WFIFOB(13, tn.SubX);
-  WFIFOB(14, tn.SubY);
-  WFIFOW(15, tn.Item.Amount);
-  SendBCmd(tm, tn.Point, 17);
- end;
+		tn.Item := TItem.Create;
+		//Create Zeros out all fields/properties, so change only what's needed
+		tn.Item.ID := itemID;
+		tn.Item.Amount := 1;
+		tn.Item.Identify := 1;
+		tn.Item.Data := td;
+
+		tn.SubX := Random(8);
+		tn.SubY := Random(8);
+		tn.Tick := timeGetTime() + 60000;
+		// Add the item to the core map
+		tm.NPC.AddObject(tn.ID, tn);
+		tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+
+		//Item Drop on ground Packet
+		WFIFOW( 0, $009e);
+		WFIFOL( 2, tn.ID);
+		WFIFOW( 6, tn.JID);
+		WFIFOB( 8, tn.Item.Identify);
+		WFIFOW( 9, tn.Point.X);
+		WFIFOW(11, tn.Point.Y);
+		WFIFOB(13, tn.SubX);
+		WFIFOB(14, tn.SubY);
+		WFIFOW(15, tn.Item.Amount);
+		SendBCmd(tm, tn.Point, 17);
+	end;
 
 end;
 
@@ -3752,12 +3767,12 @@ end;
 //------------------------------------------------------------------------------
 procedure  PetSkills(tc: TChara; Tick:cardinal);
 var
-  tn:TNPC;
+//	tn:TNPC;
   tpe:TPet;
   tm:TMap;
 begin
   tm := tc.MData;
-  tn := tc.PetNPC;
+//	tn := tc.PetNPC;
   tpe := tc.PetData;
   case tpe.JID of
     1011: {Chon Chon}
@@ -3804,15 +3819,8 @@ begin
         tc.Bonus[1] := tc.Bonus[1] + 6;
         tc.Bonus[4] := tc.Bonus[4] + 6;
       end;
-
-
-
   end;
-
-  
-
   SendCStat(tc);
-
 end;
 //------------------------------------------------------------------------------
 procedure SendCStat(tc:TChara; View:boolean = false);
@@ -6029,20 +6037,25 @@ begin
 end;
 {追加ココまで}
 //------------------------------------------------------------------------------
-{パーティー機能追加}
-procedure SendPartyList(tc:TChara);//tcを引数として与えるとパーティー情報を更新し、PTMに通知する
-var
-	i,j,k :integer;
-	tpa   :TParty;
-begin
-	i := PartyNameList.IndexOf(tc.PartyName);
-	if (i <> -1) then begin
-		tpa := PartyNameList.Objects[i] as TParty;
 
-		tpa.MinLV := 99;
-		tpa.MaxLV := 1;
+{
+When given a character, SendPartyList updates party information, notifies PTM
+}
+procedure SendPartyList(tc:TChara);
+var
+	i    : Integer;
+	j    : Integer; //Member record index inside packet
+	k    : Integer;
+	PIdx : Integer;
+	tpa  : TParty;
+begin
+	PIdx := PartyNameList.IndexOf(tc.PartyName);
+	if (PIdx <> -1) then begin
+		tpa := PartyNameList.Objects[PIdx] as TParty;
+
+		{Rearrange the party members -- any offline characters are
+		removed, and the other entries are bubbled up to the front.}
 		i := 0;
-		//パーティーメンバーの整理(パーティーに入ったまま削除されたキャラクターはパーティーからも削除する)
 		while (i >= 0) and (i <= 11) do begin
 			if (tpa.MemberID[i] <> 0) and (Chara.IndexOf(tpa.MemberID[i]) = -1) then begin
 				for j := i to 10 do begin
@@ -6055,6 +6068,9 @@ begin
 			end;
 			Inc(i);
 		end;
+
+		tpa.MinLV := 99;
+		tpa.MaxLV := 1;
 
 		//パーティー情報の送信(00FBパケット)
 		j := 28;
@@ -8131,6 +8147,7 @@ Begin
 						Readln(txt, str);
 						Inc(lines);
 						if str = '}' then break; //注：スクリプト終了文字「}」は１行にそれのみ書くこと
+
 
 						//Convert Multiple tabs to one tab, then convert remaining tabs to spaces
 						while Pos(#9#9, str) <> 0 do str := StringReplace(str, #9#9, #9, [rfReplaceAll]);
@@ -10537,6 +10554,49 @@ Begin
 	inherited;
 End;(* TPet.Destroy
 *-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+TParty.GetName
+
+Pre:
+	Text storage - reads internal storage for name.
+	SQL storage - queries DB for name. (Database link assumed connected)
+Post:
+	Returns a valid name
+*-----------------------------------------------------------------------------*)
+Function  TParty.GetName : string;
+Begin
+	{if UseSQL then begin
+		//Query database for this party's name.
+	end else begin}
+		Result := fName;
+	{end;//if-else UseSQL}
+End;(* Func TParty.GetName
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+TParty.SetName()
+
+Pre:
+	Assumed that Value is a unique name in PartyNameList
+	(not checked for by this routine!)
+Post:
+	Writes name to object
+*-----------------------------------------------------------------------------*)
+Procedure TParty.SetName(
+		Value : string
+	);
+Begin
+	{if UseSQL then begin
+		//Update Database
+	end else begin}
+		fName := Value;
+	{end;//if-else UseSQL}
+End;(* Proc TParty.SetName()
+*-----------------------------------------------------------------------------*)
+
 
 end.
 
