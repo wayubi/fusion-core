@@ -793,6 +793,7 @@ begin
 	MobDB.Free;
         MArrowDB.Free;
         MobAIDB.Free;
+        MobAIDBAegis.Free;
         PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
@@ -15303,6 +15304,7 @@ begin
                     SlaveDBName.Clear;
                     PharmacyDB.Clear;
                     MobAIDB.Clear;
+                    MobAIDBAegis.Clear;
                     MArrowDB.Clear;
                     IDTableDB.Clear;
                     Playername.Clear;

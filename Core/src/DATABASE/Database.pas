@@ -765,12 +765,12 @@ DebugOut.Lines.Add('Monster AI database loading...');
       tsAI2.IfCond := sl.Strings[9];
       j := j + 1;
       //DebugOut.Lines.Add(Format('%d', [j]));
-      MobAIDB.AddObject(tsAI2.Number, tsAI2);
+      MobAIDBAegis.AddObject(tsAI2.Number, tsAI2);
       end;
     end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDB.Count]));
+	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDBAegis.Count]));
 	Application.ProcessMessages;
 
 {Summon Monster List}
