@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-25-04: Fixed #783 - Crazy Uproar supposed to give +4 STR, not +5. [AlexKreuz]
 - 06-25-04: Fixed crash on die due to fix #994. [AlexKreuz]
 - 06-25-04: Fixed #992 - Chara may not warp/exit for 10 seconds after damage. [AlexKreuz]
 - 06-25-04: Added to Globals.pas -> message_blue. [AlexKreuz]

@@ -2321,7 +2321,7 @@ begin
                 end;
 		//大声歌唱(STR+)
 		if Skill[155].Tick > Tick then begin
-			Bonus[0] := Bonus[0] + 5;
+			Bonus[0] := Bonus[0] + 4;
 		end;
 		//アスペルシオ
 		if Skill[68].Tick > Tick then begin
