@@ -2598,64 +2598,66 @@ Called when we're shutting down the server *only*
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
-        if (sl.count >= 2) then begin
-            if (sl.Strings[1] = 'wanip') then begin
-                if (sl.Count >= 3) then begin
-                    WAN_IP := sl.Strings[2];
-                    Result := 'GM_RCON Success. WAN IP is now ' + sl.Strings[2];
-                end else begin
-                    Result := Result + ' WAN IP Change Failure.';
-                end;
-            end;
-            if (sl.Strings[1] = 'lanip') then begin
-                if (sl.Count >= 3) then begin
-                    LAN_IP := sl.Strings[2];
-                    Result := 'GM_RCON Success. LAN IP is now ' + sl.Strings[2];
-                end else begin
-                    Result := Result + '  LAN IP Change Failure.';
-                end;
-            end;
-            if (sl.Strings[1] = 'basemultiplier') then begin
-                if (sl.Count >= 3) then begin
-                    if (strtoint(sl.Strings[2]) >= 1) then begin
-                        BaseExpMultiplier := (StrToInt(sl.Strings[2]));
-                        Result := 'GM_RCON Success: Base EXP Multiplier is now ' + sl.Strings[2];
-                    end else begin
-                        Result := Result + ' Error with Base Multiplier.';
-                    end;
-                end else begin
-                    Result := Result + ' No Base Multiplier Specified.';
-                end;
-            end;
-            if (sl.Strings[1] = 'jobmultiplier') then begin
-                if (sl.Count >= 3) then begin
-                    if (strtoint(sl.Strings[2]) >= 1) then begin
-                        BaseExpMultiplier := (StrToInt(sl.Strings[2]));
-                        Result := 'GM_RCON Success: Job EXP Multiplier is now ' + sl.Strings[2];
-                    end else begin
-                        Result := Result + ' Error with Job Multiplier.';
-                    end;
-                end else begin
-                    Result := Result + ' No Job Multiplier Specified.';
-                end;
-            end;
-            if (sl.Strings[1] = 'itemmultiplier') then begin
-                if (sl.Count = 3) then begin
-                    if (strtoint(sl.Strings[2]) >= 1) then begin
-                        ItemExpMultiplier := (StrToInt(sl.Strings[2]));
-                        Result := 'GM_RCON Success: Item Drop EXP Multiplier is now ' + sl.Strings[2];
-                    end else begin
-                        Result := Result + ' Error with Item Drop Multiplier.';
-                    end;
-                end else begin
-                    Result := Result + ' No Item Drop Multiplier Specified.';
-                end;
-            end;
-        end else Result := Result + ' Bad Command or No Command Specified.';
+        if (sl.Count >= 3) then begin
+            if ((sl.Strings[1] = 'set') or (sl.Strings[1] = 'check')) then begin
+
+                if (sl.Strings[2] = 'wanip') then begin
+                    if (sl.Strings[1] = 'set') then begin
+                        if (sl.Count >= 4) then begin
+                            WAN_IP := sl.Strings[3];
+                            Result := 'GM_RCON Set Success. WAN IP is now ' + sl.Strings[3];
+                        end else Result := Result + ' WAN IP Change Failure.';
+                    end else if (sl.Strings[1] = 'check') then Result := 'GM_RCON Check Success. Current WAN IP is ' + WAN_IP;
+
+                end else if (sl.Strings[2] = 'lanip') then begin
+                    if (sl.Strings[1] = 'set') then begin
+                        if (sl.Count >= 4) then begin
+                            LAN_IP := sl.Strings[3];
+                            Result := 'GM_RCON Set Success. LAN IP is now ' + sl.Strings[3];
+                        end else Result := Result + ' LAN IP Change Failure.';
+                    end else if (sl.Strings[1] = 'check') then Result := 'GM_RCON Check Success. Current LAN IP is ' + LAN_IP;
+
+                end else if (sl.Strings[2] = 'basemultiplier') then begin
+                    if (sl.Strings[1] = 'set') then begin
+                        if (sl.Count >= 4) then begin
+                            if (strtoint(sl.Strings[3]) >= 1) then begin
+                                BaseExpMultiplier := (StrToInt(sl.Strings[3]));
+                                Result := 'GM_RCON Set Success: Base EXP Multiplier is now ' + sl.Strings[3];
+                            end else Result := Result + ' Error with Base Multiplier.';
+                        end else Result := Result + ' No Base Multiplier Specified.';
+                    end else if (sl.Strings[1] = 'check') then Result := 'GM_RCON Check Success. Current Base EXP Multiplier is ' + IntToStr(BaseEXPMultiplier);
+
+                end else if (sl.Strings[2] = 'jobmultiplier') then begin
+                    if (sl.Strings[1] = 'set') then begin
+                        if (sl.Count >= 4) then begin
+                            if (strtoint(sl.Strings[3]) >= 1) then begin
+                                JobExpMultiplier := (StrToInt(sl.Strings[3]));
+                                Result := 'GM_RCON Set Success: Job EXP Multiplier is now ' + sl.Strings[3];
+                            end else Result := Result + ' Error with Job Multiplier.';
+                        end else Result := Result + ' No Job Multiplier Specified.';
+                    end else if (sl.Strings[1] = 'check') then Result := 'GM_RCON Check Success. Current Job EXP Multiplier is ' + IntToStr(JobEXPMultiplier);
+
+                end else if (sl.Strings[2] = 'itemmultiplier') then begin
+                    if (sl.Strings[1] = 'set') then begin
+                        if (sl.Count >= 4) then begin
+                            if (strtoint(sl.Strings[3]) >= 1) then begin
+                                ItemDropMultiplier := (StrToInt(sl.Strings[3]));
+                                Result := 'GM_RCON Set Success: Item Drop Multiplier is now ' + sl.Strings[3];
+                            end else Result := Result + ' Error with Item Drop Multiplier.';
+                        end else Result := Result + ' No Item Drop Multiplier Specified.';
+                    end else if (sl.Strings[1] = 'check') then Result := 'GM_RCON Check Success. Current Job EXP Multiplier is ' + IntToStr(ItemDropMultiplier);
+
+                end else Result := Result + ' Please Specify CHECK or SET with a valid command.';
+
+            end else Result := Result + ' Please Specify CHECK or SET with a valid command.';
+
+        end else Result := Result + ' Please Specify CHECK or SET with a command.';
+
 
         sl.Free;
         weiss_ini_save();
     end;
+
 
     function command_aegis_b(str : String) : String;
     var
