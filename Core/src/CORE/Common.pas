@@ -3913,13 +3913,26 @@ begin
 end;
 //------------------------------------------------------------------------------
 function DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
+var
+        SPAmount        :integer;
+
 begin
 	Result := false;
         if SkillID = 0 then
          exit;
 	if tc.SP < tc.Skill[SkillID].Data.SP[LV] then exit;
+        SPAmount := tc.Skill[SkillID].Data.SP[LV];
 
-        if tc.LessSP then begin
+        //Changes in SP usage
+        if tc.LessSP then SPAmount := SPAmount * 70 div 100;
+
+        if tc.NoJamstone then SPAmount := SPAmount * 125 div 100;
+
+        if tc.SpRedAmount > 0 then SPAmount := SPAmount - (tc.Skill[SkillID].Data.SP[LV] * tc.SPRedAmount div 100);
+
+        //Golden Thief Bug Card
+        if tc.NoTarget then SPAmount := SPAmount * 2;
+        {if tc.LessSP then begin
                 tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] * 70 div 100);
         end else if tc.NoJamstone then begin
                 tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] * 125 div 100);
@@ -3927,7 +3940,9 @@ begin
                 tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] - (tc.Skill[SkillID].Data.SP[LV] * tc.SPRedAmount div 100));
         end else begin
 	        tc.SP := tc.SP - tc.Skill[SkillID].Data.SP[LV];
-        end;
+        end;}
+        tc.SP := tc.SP - SPAmount;
+
 	WFIFOW( 0, $00b0);
 	WFIFOW( 2, $0007);
 	WFIFOL( 4, tc.SP);

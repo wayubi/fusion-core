@@ -9142,21 +9142,23 @@ begin
 							end;
 						end;
           end;
-				52: //インベ
+				52:     {Envenom}
 					begin
 						DamageCalc3(tm, tc, tc1, Tick, 0, 100, tl.Element);
 						dmg[0] := dmg[0] + 15 * MUseLV;
 						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
-            // Colus, 20040130: Add effect of garment cards
-            dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
+                                                // Colus, 20040130: Add effect of garment cards
+                                                dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
 						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 						k1 := (BaseLV * 2 + MUseLV * 3 + 10) - (tc1.BaseLV * 2 + tc1.Param[2]);
 						k1 := k1 * 10;
 						if Random(1000) < k1 then begin
-							if not Boolean(tc1.Stat2 and 1) then
-								tc1.HealthTick[0] := Tick + tc.aMotion
-							else tc1.HealthTick[0] := tc1.HealthTick[0] + 30000;
+                                                        tc1.isPoisoned := true;
+                                                        tc1.PoisonTick := Tick + 20000;
+							//if not Boolean(tc1.Stat2 and 1) then
+								//tc1.HealthTick[0] := Tick + tc.aMotion
+							//else tc1.HealthTick[0] := tc1.HealthTick[0] + 30000;
 						end;
 						DamageProcess2(tm, tc, tc1, dmg[0], Tick);
 					end;
@@ -10738,7 +10740,7 @@ begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
-                                        if (tc2.NoTarget = false) then begin
+                                        if (tc2.NoTarget = false) and (tc2.HP > 0) then begin
                                           case tn.JID of
                                                 {//$46: //Sanctuary
                                                      begin
@@ -10890,7 +10892,12 @@ begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
-                                    if (tc2 <> tn.CData) and (tc2.NoTarget = false) then begin
+                                    if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
+
+                                        if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
+                                                if (tc2.PartyName = tn.CData.Partyname) then break;
+                                        end;
+                                        
                                         case tn.JID of
                                                 $74://ブラストマイン発動
 							begin
