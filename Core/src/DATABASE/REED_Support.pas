@@ -85,7 +85,7 @@ implementation
     var
         datafile : TStringList;
         columns : TStringList;
-        i, j : Integer;
+        i : Integer;
     begin
         datafile := TStringList.Create;
         columns := TStringList.Create;
