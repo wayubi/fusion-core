@@ -77,6 +77,7 @@ var
     GM_JAIL : Byte;
     GM_UNJAIL : Byte;
     GM_CALL_MERCENARY : Byte;
+    GM_EMAIL : Byte;
 
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
@@ -214,6 +215,7 @@ var
     function command_jail(tc : TChara; str : String) : String;
     function command_unjail(tc: TChara; str : String) : String;
     function command_call_mercenary(tc : TChara; str : String) : String;
+    function command_email(tc : TChara; str : String) : String;
 
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
@@ -352,6 +354,8 @@ implementation
         GM_RCON := StrToIntDef(sl.Values['RCON'], 1);
         GM_JAIL := StrToIntDef(sl.Values['JAIL'], 1);
         GM_UNJAIL := StrToIntDef(sl.Values['UNJAIL'], 1);
+        GM_CALL_MERCENARY := StrToIntDef(sl.Values['CALL_MERCENARY'], 1);
+        GM_EMAIL := StrToIntDef(sl.Values['EMAIL'], 0);
 
         ini.ReadSectionValues('Aegis GM Commands', sl);
 
@@ -420,7 +424,6 @@ implementation
         GM_ATHENA_RAISE := StrToIntDef(sl.Values['ATHENA_RAISE'], 1);
         GM_ATHENA_RAISEMAP := StrToIntDef(sl.Values['ATHENA_RAISEMAP'], 1);
 
-        GM_CALL_MERCENARY := StrToIntDef(sl.Values['CALL_MERCENARY'], 1);
         sl.Free;
         ini.Free;
 
@@ -505,6 +508,7 @@ Called when we're shutting down the server *only*
             ini.WriteString('Fusion GM Commands', 'JAIL', IntToStr(GM_JAIL));
             ini.WriteString('Fusion GM Commands', 'UNJAIL', IntToStr(GM_UNJAIL));
             // Placeholder for CALL_MERCENARY command.
+            ini.WriteString('Fusion GM Commands', 'EMAIL', IntToStr(GM_EMAIL));
 
             ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
             ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -663,6 +667,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('jail')) = 'jail') and (check_level(tc, GM_JAIL)) ) then error_msg := command_jail(tc, str)
             else if ( (copy(str, 1, length('unjail')) = 'unjail') and (check_level(tc, GM_UNJAIL)) ) then error_msg := command_unjail(tc, str)
             // Extremely Buggy GM Command. I don't want this enabled unless it works. else if ( (copy(str, 1, length('call_mercenary')) = 'call_mercenary') and (check_level(tc, GM_CALL_MERCENARY)) ) then error_msg := command_call_mercenary(tc, str)
+            else if ( (copy(str, 1, length('email')) = 'email') and (check_level(tc, GM_EMAIL)) ) then error_msg := command_email(tc, str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
@@ -3217,6 +3222,36 @@ Called when we're shutting down the server *only*
 
         sl.Free;
    	end;
+
+    function command_email(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tp1 : TPlayer;
+    begin
+        Result := 'GM_EMAIL Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 7, 256);
+        if sl.Count = 2 then begin;
+
+            if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
+                Result := Result + ' You have to enter your old password and your new email address.';
+            end else begin
+                tp1 := Player.IndexOfObject(tc.ID) as TPlayer;
+
+                if sl.Strings[0] <> tp1.Pass then begin
+                    Result := Result + ' Your password didnt match the one you entered.';
+                end else begin
+                    tp1.Mail := sl.Strings[1];
+                    Result := 'GM_EMAIL Success. Email changed. New Email: ' + tp1.Mail + '.';
+                end;
+            end;
+        end else begin
+            Result := Result + ' Incomplete information. Syntax: #email [password] [new_email].';
+        end;
+
+        sl.Free;
+    end;
 
 
     function command_aegis_b(str : String) : String;
