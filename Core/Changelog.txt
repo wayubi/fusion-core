@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
- Fusion 1.213 - January 28th, 2004
+ Fusion 1.213 - January 28th, 2005
 --------------------------------------------------------------------------------
 - 01-25-05: Final preparation for 1.213 release. [AlexKreuz]
 - 01-25-05: Gm Sprite Kill command errors if you don't have GM_KICK Power. [Tsusai]
