@@ -205,8 +205,8 @@ end;(* proc CalcAI()
 {Spawn Monster}
 procedure MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
 var
-	i, j, k, l, h, m, ii   :integer;
-	tc                     :TChara;
+	i, j, k, h, m        :integer;
+	tc                   :TChara;
   ts1                    :TMob;
   tss                    :TSlaveDB;
 
@@ -366,11 +366,12 @@ end; }
 //procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
 procedure MobSkills(tm:TMap; ts:TMob; Tick:cardinal);
 var
+        tl      :TSkillDB;
         b       :integer;
         tc      :TChara;
         bb      :array of byte;
         xy      :TPoint;
-        j       :integer;
+        //j       :integer;
 begin
 
         //for i := 0 to 3 do begin
@@ -381,13 +382,19 @@ something in it}
 
         if (assigned(ts.AData)) then begin
 
-        if ts.AData <> nil then tc:= ts.AData;
+        dmg[0] := 0;
 
+        tl := SkillDB.IndexOfObject(ts.MSkill) as TSkillDB;
+
+        if ts.AData <> nil then tc := ts.AData
+        else Exit;
+
+        {Darkhelmet, Now why would you do this here... I mean come on, honestly?}
         if tc <> nil then begin
-    		  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
+    	 {	  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
           else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
           else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
-    		  else j := 1;
+    		  else j := 1;  }
 
 
         case ts.MSkill of
@@ -396,7 +403,7 @@ something in it}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[ts.MLevel] div 100;
+                        dmg[0] := dmg[0] * tl.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
@@ -414,11 +421,11 @@ something in it}
                                 {Unsure about magic calculations so just using the attack calc algorithm [Darkhelmet]}
                                 MobSkillDamageCalc(tm, tc, ts, Tick);
                                 if dmg[0] < 1 then dmg[0] := 1;
-                                dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSkill].Data.Element][j] div 100;
-                                dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data2[ts.MLevel];
+                                //dmg[0] := dmg[0] * ElementTable[tl.Element][j] div 100;
+                                dmg[0] := dmg[0] * tl.Data2[ts.MLevel];
 
                                 if dmg[0] < 0 then dmg[0] := 0;
-                                SendMSkillAttack(tm, tc, ts, Tick, tc.Skill[ts.MSKill].Data.Data2[ts.MLevel]);
+                                SendMSkillAttack(tm, tc, ts, Tick, tl.Data2[ts.MLevel]);
                         end;
                 15:     {Frost Driver}
                 begin
@@ -428,7 +435,7 @@ something in it}
                         //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
                         //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
                         if dmg[0] < 1 then dmg[0] := 1;
-                        dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSKill].Data.Element][j] div 100;
+                        //dmg[0] := dmg[0] * ElementTable[tl.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                         //Send Packets
@@ -509,6 +516,15 @@ something in it}
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 8;
                         SendMSkillAttack(tm, tc, ts, Tick, 8);
+                end;
+
+                137:    {Grimtooth}
+                begin
+                    if (ts.Cloaked) then begin
+                        MobSkillDamageCalc(tm, tc, ts, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, Tick, 1);
+                    end;
                 end;
 
                 148:    {Charge Arrow}
@@ -654,7 +670,7 @@ something in it}
                 begin
                         //ts.Element := 1;  // Water
                         MobSkillDamageCalc(tm, tc, ts, Tick);
-                        dmg[0] := dmg[0] * ElementTable[tc.Skill[ts.MSKill].Data.Element][j] div 100;
+                        //dmg[0] := dmg[0] * ElementTable[tl.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                         //ts.Element := ts.Data.Element;
@@ -710,12 +726,12 @@ something in it}
                         dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
-                else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+                else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters');
             end;
         end;
 
         end;
-
+        //Debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Deals ' + IntToStr(dmg[0]) + ' Damage');
 	{ChrstphrR - 2004/04/26 ensure that the dyn array is unset}
 	bb := NIL;
 end;//proc MobSkills()
@@ -737,8 +753,9 @@ begin
 
         //for i := 0 to 3 do begin
                 if ts.AData <> nil then
-                  AttackData := ts.AData;
-                //else
+                    AttackData := ts.AData
+                else
+                    Exit;
                   //AttackData := ts;
 
                 case ts.MSKill of
@@ -824,7 +841,7 @@ begin
                           debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Venom Dust')
                         end; }
 
-                        else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+                        else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters')
                 end;  //end case
         //end;
 end;
@@ -832,11 +849,12 @@ end;
 procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
 
 var
-ProcessType     :Byte;
-i,j :integer;
-mi  :MapTbl;
-xy  :TPoint;
+    ProcessType     :Byte;
+    j,i1,j1 :integer;
+    //mi  :MapTbl;
+    xy  :TPoint;
 begin
+
 with ts do begin
         ProcessType := 0;
         case ts.MSKill of
@@ -929,6 +947,29 @@ with ts do begin
                 begin
                         ProcessType := 1;
                 end;
+          135:  {Cloaking}
+            begin
+                //When ProcessType = 1, cloaking will be handled
+                xy.X := ts.Point.X;
+                xy.Y := ts.Point.Y;
+
+                if (ts.Cloaked) then begin
+                    // Cloaked, so uncloak
+                    ProcessType := 1;
+
+                end else begin
+                    for j1 := - 1 to 1 do begin
+                        for i1 := -1 to 1 do begin
+                            if ((j1 = 0) and (i1 = 0)) then continue;
+                            j := tm.gat[xy.X + i1, xy.Y + j1];
+                            if (j = 1) or (j = 5) then begin
+                                ProcessType := 1;
+                            end;
+                        end
+                    end;
+                end;
+                //if ProcessType = 0 then DebugOut.Lines.Add('Monster is too far from a wall');
+            end;
           196:  {Summon Slave}
             begin
               // (ts.isLeader) and ( (MonsterMob) or ((ts.isSummon) and (SummonMonsterMob)) )then begin
@@ -958,7 +999,7 @@ with ts do begin
                     WFIFOB(6, j);
                     SendBCmd(tm, ts.Point, 7);
                   end;
-          else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+          else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters')
         end;
 
         case ProcessType of
@@ -983,28 +1024,31 @@ with ts do begin
                                 WFIFOB(14, 1);
                                 SendBCmd(tm, ts.Point, 15);
 
-                                if (ts.MSKill = 51) then begin
+                                if (ts.MSKill = 51) or (ts.MSkill = 135) then begin
+                                    if (ts.Hidden) or (ts.Cloaked) then begin
+                                        ts.Hidden := false;
+                                        ts.Cloaked := false;
+                                        WFIFOW(0, $0119);
+                                        WFIFOL(2, ts.ID);
+                                        WFIFOW(6, 0);
+                                        WFIFOW(8, 0);
+    					                WFIFOW(10, 0);
+    					                WFIFOB(12, 0);
+    					                SendBCmd(tm, ts.Point, 13);
+                                        //DebugOut.Lines.Add('Monster ' + ts.Name + ' uncloaks via Skill Cloaking!');
 
-                                        if ts.Hidden = true then begin
-                                                ts.Hidden := false;
-                                                WFIFOW(0, $0119);
-    					        WFIFOL(2, ts.ID);
-    					        WFIFOW(6, 0);
-    					        WFIFOW(8, 0);
-    					        WFIFOW(10, 0);
-    					        WFIFOB(12, 0);
-    					        SendBCmd(tm, ts.Point, 13);
-
-                                        end else begin
-                                                ts.Hidden := true;
-                                                WFIFOW(0, $0119);
-    					        WFIFOL(2, ts.ID);
-    					        WFIFOW(6, 0);
-    					        WFIFOW(8, 0);
-    					        WFIFOW(10, 6);
-    					        WFIFOB(12, 0);
-    					        SendBCmd(tm, ts.Point, 13);
-                                        end;
+                                    end else begin
+                                        if ts.MSkill = 135 then ts.Cloaked := true
+                                        else ts.Hidden := true;
+                                        WFIFOW(0, $0119);
+    					                WFIFOL(2, ts.ID);
+    					                WFIFOW(6, 0);
+    					                WFIFOW(8, 0);
+    					                WFIFOW(10, 6);
+    					                WFIFOB(12, 0);
+    					                SendBCmd(tm, ts.Point, 13);
+                                        //DebugOut.Lines.Add('Monster ' + ts.Name + ' cloaks!');
+                                    end;
 
                                 end;
                                 {
@@ -1022,7 +1066,7 @@ with ts do begin
                                 end;}
 
                                 if (ts.MSKill = 114) then begin
-                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Casts Power Maximize');
+                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Casts Power Maximize');
                                         {if tc1.Option = 32 then begin
 						//tc1.Option := tc1.Optionkeep;
                                                 SkillTick := tc1.Skill[MSkill].Tick;
@@ -1051,7 +1095,7 @@ procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal);
 	xy        :TPoint;
 	ts1       :TMob;
 	tn        :TNPC;
-        tl        :TSkillDB;
+   //     tl        :TSkillDB;
 begin
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
@@ -1220,13 +1264,21 @@ begin
     // Added elemental property reduction cards...
     //dmg[0] := dmg[0] * (100-tc.DamageFixE[1][ts.Element] )div 100;
 
+    // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
+    //        20040129: Couldn't do it this way.  Must change the card data instead...
+		dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][ts.Data.Race]) div 100;
+		dmg[0] := dmg[0] * (100 - tc.DamageFixE[1][0]) div 100;    
+
+
     // Moving element determination to the separate skills...
-{    // Determine element based on status/armor type...
+
+    //MOVING IT BACK!
+    // Determine element based on status/armor type...
 		if tc.Stat1 = 2 then i := 21 // Frozen?  Water 1
-    else if tc.Stat1 = 1 then i := 22 // Stone?  Earth 1
-    else if tc.ArmorElement <> 0 then i := tc.ArmorElement // PC's armor type
+        else if tc.Stat1 = 1 then i := 22 // Stone?  Earth 1
+        else if tc.ArmorElement <> 0 then i := tc.ArmorElement // PC's armor type
 		else i := 1;
-		dmg[0] := dmg[0] * ElementTable[ts.Element][i] div 100; // Damage modifier based on elements}
+		dmg[0] := dmg[0] * ElementTable[ts.Element mod 20][i] div 100; // Damage modifier based on elements}
 
 
 		if (tc.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
@@ -1379,7 +1431,7 @@ begin
         //with Skill[ts.MSKill] do begin
 
         j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
-        if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
+        if j < tl.CastTime3  then j := tl.CastTime3;
 
         ts.MTick := Tick + cardinal(j);
         //j := j * tc.MCastTimeFix div 100;
@@ -1408,7 +1460,7 @@ end;
 procedure LoadMonsterAIData(tm:TMap; ts:TMob; Tick:cardinal);
 var
   tsAI2 :TMobAIDBFusion;
-  j,k,m     :integer;
+  m     :integer;
   sl    :TStringList;
 
 begin
@@ -1539,11 +1591,10 @@ procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
 var
   tc2 :TChara;
   sl, sl2:TStringList;
-  k,m,c,c1: Integer;
-  p1,p2:integer;
-	i,j:Integer;
-	i1,j1,k1:integer;
-	i2,j2,k2:integer;
+  m,c1: Integer;
+  p1:integer;
+  i,j:Integer;
+  i1:integer;
   HPCount:integer;
   tsAI2 :TMobAIDBFusion;
   EnemyCount:word;
@@ -1655,10 +1706,12 @@ procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
 var
         tc      :TChara;
         j      :integer;
+        tl      :TSkillDB;
 
 begin
 
         tc := ts.AData;
+        tl := SkillDB.IndexOfObject(ts.MSkill) as TSkillDB; 
 	if ((tc <> nil) and (ts <> nil)) or (ts.SkillType = 4) then begin
         //j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
         //if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
@@ -1674,7 +1727,7 @@ begin
                 WFIFOW(10, 0);
                 WFIFOW(12, 0);
                 WFIFOW(14, ts.MSKill); //SkillID
-                WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
+                WFIFOL(16, tl.Element); //Element
                 WFIFOL(20, j);
                 SendBCmd(tm, ts.Point, 24);
                 ts.ATick := Tick + cardinal(j);
@@ -1698,7 +1751,7 @@ begin
             WFIFOW(10, 0);
             WFIFOW(12, 0);
             WFIFOW(14, ts.MSKill); //SkillID
-            WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
+            WFIFOL(16, tl.Element); //Element
             WFIFOL(20, j);
             SendBCmd(tm, ts.Point, 24);
             ts.MMode := 4;
@@ -1730,7 +1783,7 @@ var
 	sl:TStringList;
   Tick:cardinal;
   xy:TPoint;
-  Damage:integer;
+  //Damage:integer;
   ts1:TMob;
 
 begin
@@ -1891,9 +1944,8 @@ end;//proc PetAttackSkill()
 //------------------------------------------------------------------------------
 function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
-        {Random Variables}
-	i :integer;
-        w :Cardinal;
+    {Random Variables}
+    w :Cardinal;
 begin
 	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
 
@@ -1984,9 +2036,8 @@ end;
 //------------------------------------------------------------------------------
 function DamageProcess3(tm:TMap; ts:TMob; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
-        {Random Variables}
-	i :integer;
-        w :Cardinal;
+    {Random Variables}
+	w :Cardinal;
 begin
 
   // Colus, 20040129: Reset Lex Aeterna
@@ -2085,15 +2136,15 @@ end;
 
 procedure PetDamageProcess(tm:TMap; ts:TMob; tc:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True);
 var
-  tn:TNPC;
-  tpe:TPet;
+  //tn:TNPC;
+  //tpe:TPet;
   i,j :integer;
   w :Cardinal;
   xy:TPoint;
   tg    :TGuild;
 begin
-  tn := tc.PetNPC;
-  tpe := tc.PetData;
+  //tn := tc.PetNPC;
+  //tpe := tc.PetData;
 
   // AlexKreuz: Needed to stop damage to Emperium
   // From Splash Attacks.

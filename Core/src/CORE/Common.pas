@@ -465,6 +465,7 @@ TMob = class(TLiving)
 	MLevel  :integer;
 
 	Hidden     :boolean;
+    Cloaked    :boolean;
 
 	AnkleSnareTick : Cardinal;  //Tracks how long ankle snare lasts
 
@@ -4311,6 +4312,7 @@ begin
     WFIFOB(26, dmg5);
     WFIFOW(27, 0);
     SendBCmd(tm, tc.Point, 29);
+    if dmg0 > 0 then Debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster''''s Attack Deals ' + IntToStr(dmg0) + ' Damage');
   end;
 end;
 //------------------------------------------------------------------------------

@@ -2572,7 +2572,8 @@ var
 	ts1       :TMob;
 	tn        :TNPC;
 begin
-  CalculateSkillIf(tm, ts, Tick);
+    CalculateSkillIf(tm, ts, Tick);
+    if ts.Hidden then Exit;
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -2601,7 +2602,6 @@ begin
 
 	with ts.Data do begin
                 if ts.Stat2 <> 4 then CalcAI(tm, ts, Tick);
-                if ts.Hidden = true then exit;
 		i := HIT + HITFix - (tc.FLEE1 * tc.TargetedFix div 10) + 80;
 		i := i - tc.FLEE2;
 		if i < 5 then i := 5
@@ -2749,12 +2749,12 @@ begin
     //Below line is commented because the only elemental hits come on skills.
 		//dmg[0] := dmg[0] * tc.DEFFixE[ts.Data.Element mod 20] div 100;
 
-		if tc.Stat1 = 2 then i := 21 // Frozen?  Water 1
+	{	if tc.Stat1 = 2 then i := 21 // Frozen?  Water 1
 		else if tc.Stat1 = 1 then i := 22 // Stone?  Earth 1
     else if tc.ArmorElement <> 0 then i := tc.ArmorElement
     else i := 1;
 
-    dmg[0] := dmg[0] * ElementTable[0][i] div 100;
+    dmg[0] := dmg[0] * ElementTable[ts.Element mod 20][i] div 100; }
 
     if (tc.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 
@@ -5947,6 +5947,7 @@ var
 //	k1 : Integer;
 	k  : Integer;
 	tm : TMap;
+    ts : TMob;
 begin
 	with tc do begin
 		//if Weight * 2 <> MaxWeight then begin
@@ -6058,7 +6059,6 @@ begin
                                 IntimidateWarp(tm, tc);
                         end;
                 end;
-
 
                 if tc.isCloaked then begin  {Cloaking}
                         tm := tc.MData;
