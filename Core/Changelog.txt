@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-29-04: (Hopefully) fixed limit on packets allowed by Fusion. [Colus]
 - 06-28-04: Fixed Card effects such as 'Baphomet Splash'. Broke with #977. [AlexKreuz]
 - 06-28-04: Added ALBGM command #changes. Displays recent Fusion updates. [AlexKreuz]
 - 06-28-04: Added #1015 - Backup button. Forced backups. [AlexKreuz]
