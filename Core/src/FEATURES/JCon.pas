@@ -167,6 +167,12 @@ uses
                 if (assigned(tp)) then begin
 		            for i := 0 to 8 do begin
         		    	if assigned(tp.CData[i]) then begin
+
+                        	if assigned(tp.CData[i].Socket) then begin
+                        		tp.CData[i].Socket.Close;
+			                    tp.CData[i].Socket := nil;
+    			            end;
+
                 		    leave_party(tp.CData[i]);
 		                    leave_guild(tp.CData[i]);
 
@@ -236,6 +242,11 @@ uses
 
                 Break;
             end;
+        end;
+
+        if assigned(tc.Socket) then begin
+        	tc.Socket.Close;
+        	tc.Socket := nil;
         end;
 
     	leave_party(tc);
