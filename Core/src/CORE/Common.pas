@@ -67,7 +67,12 @@ const
 	MAP_LOADING   = 1;
 	MAP_LOADED    = 2;
 
-type TLiving = class
+
+type
+
+TLivingType = ( imaCHARA, imaMOB, imaNPC );
+
+TLiving = class
 	public
 		ID    : Cardinal;
 		JID   : Word;
@@ -78,6 +83,10 @@ type TLiving = class
 		pcnt  : Integer;
 		path  : array[0..999] of byte;
 		Dir   : Byte;
+
+		LType : TLivingType;
+		//ChrstphrR 2004/06/01 -- Added to get rid of Pointer Types
+		// The LType will determine what type of object AData etc
 end;
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -185,7 +194,7 @@ type TItemDB = class
 
 	public
 		Procedure Assign(Source : TItemDB);
-End;(* TItenDB *)
+End;(* TItemDB *)
 
 
 //------------------------------------------------------------------------------
@@ -365,13 +374,13 @@ type TIDTbl = class
 end;
 //------------------------------------------------------------------------------
 // ID,Create ID,Number Created
-type TMArrowDB = class
-	ID        :integer;
-	CID       :array[0..2] of integer;
-	CNum      :array[0..2] of integer;
+TMArrowDB = class
+	ID   : Integer;
+	CID  : array[0..2] of integer;
+	CNum : array[0..2] of integer;
 end;
 //------------------------------------------------------------------------------
-type TWarpDatabase = class
+TWarpDatabase = class
 	NAME:String;  //Name that player will type
 	MAP :String;  //Name of the Actual Map
 	X   :integer; //X Coordinate to warp to
@@ -380,13 +389,17 @@ type TWarpDatabase = class
 end;
 //------------------------------------------------------------------------------
 // 経験値配分用カウンタ
-type rEXPDist = record
-	CData       :Pointer;
+
+TChara = class; //Forward declaration.
+rEXPDist = record
+//	CData       :Pointer;
+	CData       : TChara;
 	Dmg         :integer;
 end;
+
 //------------------------------------------------------------------------------
 // モンスターデータ
-type TMob = class(TLiving)
+TMob = class(TLiving)
 	tgtPoint    :TPoint;
 	NextPoint   :TPoint;
 	Point1      :TPoint;
@@ -461,7 +474,7 @@ type TMob = class(TLiving)
 	NowSkill        : Integer;
 	NowSkillLv      : Integer;
 	SkillSlot       : Integer;
-	AI              : Pointer;
+//	AI              : Pointer;
 	NoDispel        : Boolean;
 	Mode            : Integer;
 	Burned          : Boolean;
@@ -546,7 +559,7 @@ Revisions:
 2004/05/26 v0.2 [ChrstphrR] - Initial 'import' of this class.
 "/"/26 [ChrstphrR] - Fullness now a property - range protected 0..100
 *=============================================================================*)
-Type TPet = class
+TPet = class
 private
 	fFullness : Byte; // Range 0..100 (It's a percentage, in other words)
 protected
@@ -632,136 +645,7 @@ TSkill = class
 	Effect1     :integer;  //時間制限有りのスキルの効果データ1
 	Data        :TSkillDB;
 end;//TSkill
-//------------------------------------------------------------------------------
-TeNPC = class
-	ID            :Cardinal;  //ID - Identification Number for Character or Mob
-	JID           :Word;      //(Chara)ジョブ (Mob)スプライト - Character Job ID or Mob
-	CID           :Cardinal;
-	Name          :string;    //名前
-	Sit           :Byte;
-	Data          :Pointer;
-	Data2         :Pointer;
 
-	ASpeed        :Word;
-	ADelay        :Word;
-	aMotion       :Word;
-	dMotion       :Word;
-	Speed         :Word;      //移動速度[msec/1マス] - Movement Speed millisecond per tile?
-
-	Item          :TItemList;
-
-	Stat1         :Word;      //状態変化1
-	Stat2         :Word;      //状態変化2
-	Option        :Word;      //オプション(カート、ぺこ、鷹など)
-	BodyTick      :Cardinal;                //状態変化1Tick
-	HealthTick    :Array[0..4] of Cardinal;  //状態変化2Tick
-	Effect        :Array[0..11] of Cardinal; //状態変化3Tick
-	HPDelay       :Array[0..3] of Cardinal;
-	SPDelay       :Array[0..3] of Cardinal;
-	HPTick        :Cardinal;
-	SPTick        :Cardinal;
-	HPRTick       :Cardinal;
-	SPRTick       :Cardinal;
-
-	Hair          :Word;      //(Chara)髪型 - Hair Style
-	Weapon        :Word;      //(Chara)武器の見た目 - Weapon Style
-	Shield        :Word;      //(Chara)盾の見た目 - Shield Style
-	Head1         :Word;      //(Chara)頭装備-上段の見た目 - Upper Head Style
-	Head2         :Word;      //(Chara)頭装備-中段の見た目 - Middle Head Style
-	Head3         :Word;      //(Chara)頭装備-下段の見た目 - Lower Head Style
-	HairColor     :Word;      //(Chara)髪の色 - Hair Color
-	ClothesColor  :Word;      //(Chara)服の色 - Dye Color
-	HeadDir       :Word;      //(Chara)頭の向き - Head Direction
-	GuildID       :Word;      //(Chara)所属ギルドのID - Character's Guild ID
-	__0           :Word;      //不明1
-	__1           :Word;      //不明2
-	Manner        :Word;      //(Chara)マナーポイント
-	Karma         :Word;      //(Chara)カルマポイント
-	__2           :Byte;      //不明3
-	Gender        :Byte;      //(Chara)性別 - Character's Gender
-
-	Map           :string;    //今居るマップ
-	Point         :TPoint;    //今居る座標(左下が(0,0))
-	Dir           :Byte;      //向き
-	MData         :Pointer;
-	tmpMap        :string;
-	NextFlag      :boolean;
-	NextPoint     :TPoint;
-
-	tgtPoint      :TPoint;    //移動目標座標
-	ppos          :Integer;   //pathをどれだけ進んだか
-	pcnt          :Integer;   //pathの経路長
-	path          :Array[0..255] of byte; //キャラの経路(向きで記録されてます)
-	MoveTick      :Cardinal;  //最後に1マス進んだときのTick
-
-	BaseLV        :Word;
-	JobLV         :Word;
-	BaseEXP       :Cardinal;
-	JobEXP        :Cardinal;
-	HP            :Integer;   //HP
-	MAXHP         :Word;      //最大HP
-	SP            :Integer;   //SP
-	MAXSP         :Word;      //最大SP
-	Param         :Array[0..5] of Byte;
-	WeaponType    :Array[0..1] of Word; //右手左手それぞれの武器のタイプ
-	WeaponLv      :Array[0..1] of Word; //それぞれの武器レベル
-	ArmsFix       :Array[0..1] of Word; //右手左手修練
-	BaseATK       :Word;
-	ATK           :Array[0..1] of Word;
-	RefineATK     :Array[0..1] of Word;
-	SkillATK      :Word;
-
-	Scale         :Byte;
-	Race          :Byte;
-	Element       :Byte;
-
-	ATarget       :Cardinal;  //攻撃対象のID
-	AData         :Pointer;   //(Chara)攻撃対象のTMob (Mob)攻撃対象のTChara
-	ATick         :Cardinal;  //最後に攻撃したときのTick
-	AMode         :Byte;
-	DmgTick       :Cardinal;  //ノックバックが解除されるときのTick
-
-	MMode         :Byte;
-	MSkill        :Word;
-	MUseLV        :Word;
-	MTarget       :Cardinal;
-	MTargetType   :Byte; //ADataの種類。0=to Mob, 1=to Player
-	MPoint        :rPoint;
-	MTick         :Cardinal;
-	ESkill        :Array[0..100] of Word;
-	ESkillLv      :Array[0..100] of Word;
-
-	DmgFixR       :Array[0..1] of Array[0..9] of Integer; //種族補正% 0:攻撃 1:防御
-	DmgFixE       :Array[0..1] of Array[0..9] of Integer; //属性補正% 0:攻撃 1:防御
-	DmgFixS       :Array[0..1] of Array[0..2] of Integer; //サイズ補正%
-	StatePerS1    :Array[0..1] of Array[0..4] of Integer; //変化確率%
-	StatePerS2    :Array[0..1] of Array[0..4] of Integer;
-	DrainFix      :array[0..1] of Integer; //吸収量	 0:HP 1:SP
-	DrainPer      :array[0..1] of Integer; //吸収確率 0:HP 1:SP
-	DAPer         :Integer; //DA発動確率
-	DAFix         :Integer; //DA発動時の2発合計攻撃力%
-	Arrow         :Word; //装備中の矢のID
-
-	MATK          :Integer;
-	DEF1          :integer; //防御力%
-	DEF3          :Integer; //ディヴァインプロテクション
-	MDEF2         :Integer;
-	HIT           :Integer;
-	FLEE          :Integer;
-	Critical      :Word;
-	Lucky         :Word;
-
-	Range         :Word;
-	ViewRange     :Word;
-	WElement      :Array[0..1] of byte; //武器属性
-
-	ATKSplash	    :Boolean; //9マス攻撃
-
-public
-	Constructor Create;
-	Destructor  Destroy; OverRide;
-
-end;//TeNPC
 //------------------------------------------------------------------------------
 // Character Data
 TPlayer = class; //forward declaration - PData field in TChara
@@ -1816,9 +1700,6 @@ Option_Font_Style : string;
     procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
     procedure ItemDrop(tm:TMap; tc:TChara; j:integer; amount:integer);
     procedure CreateGroundItem(tm:TMap; itemID:cardinal; XPoint:cardinal; YPoint:cardinal);
-                //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
-                //procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
-                //procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure UpdateOption(tm:TMap; tc:TChara);
                 procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
@@ -1837,7 +1718,7 @@ Option_Font_Style : string;
 
                 procedure  Monkdelay(tm:TMap; tc:TChara; Delay:integer);
 
-                function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
+		Procedure UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer);
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
                 function  UseItem(tc:TChara; j:integer): boolean;
                 function  UseUsableItem(tc:TChara; w:integer) :boolean;
@@ -1854,7 +1735,6 @@ Option_Font_Style : string;
 		procedure SendMData(Socket:TCustomWinSocket; ts:TMob; Use0079:boolean = false);
 		procedure SendMMove(Socket: TCustomWinSocket; ts:TMob; before, after:TPoint; ver2:Word);
     procedure SendNData(Socket:TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
-		procedure SendPMove(Socket: TCustomWinSocket; te:TeNPC; before, after:TPoint; ver2:Word);
 {キューペット}
                 procedure SendPetMove(Socket: TCustomWinSocket; tc:TChara; target:TPoint);
 {キューペットここまで}
@@ -2498,7 +2378,7 @@ var{ChrstphrR 2004/04/28  Eliminating unused variables.}
 	i       : Integer;
 	j       : Integer;
 	k       : Integer;
-	tl      : TSkillDB;
+	tSk    : TSkillDB;
 //g         :double;//unused - code using it commented out.
 	JIDFix  : Word; // JID correction for upper classes.
 	tg      : TGuild;
@@ -2664,15 +2544,15 @@ begin
 		end;
 
 		if (Skill[248].Lv <> 0) then begin
-			tl := Skill[248].Data;
-			if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
+			tSk := Skill[248].Data;
+			if (MAXHP + tSk.Data1[Skill[248].Lv] > 65535) then begin
 				MAXHP := 65535;
 			end else begin
-				MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
+				MAXHP := MAXHP + tSk.Data1[Skill[248].Lv];
 			end;
 		end;
 		if Skill[360].Tick > Tick then begin
-			 tl := Skill[360].Data;
+			tSk := Skill[360].Data;
 			if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
 				MAXHP := 65535;
 			end else begin
@@ -3668,10 +3548,7 @@ begin
                         end;
                         MapMove(tc.Socket, tc.Map, tc.Point);
                 end;
-
-
         end;
-
 end;
 //------------------------------------------------------------------------------
 procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);  //Kills a monster or updates its status
@@ -3857,9 +3734,9 @@ procedure  PetSkills(tc: TChara; Tick:cardinal);
 var
 //	tn:TNPC;
   tpe:TPet;
-  tm:TMap;
+//	tm:TMap;
 begin
-  tm := tc.MData;
+//	tm := tc.MData;
 //	tn := tc.PetNPC;
   tpe := tc.PetData;
   case tpe.JID of
@@ -5006,14 +4883,19 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-function UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
-begin
-        WFIFOW( 0, $01d0);
-        WFIFOL( 2, tc.ID);
-        WFIFOW( 6, spiritspheres);
-        // Colus, 20031222: This packet only has 8 bytes, not 16!
-        SendBCmd(tm, tc.Point, 8);
-end;
+{ChrstphrR 2004/06/01 - this was a Boolean function, but no return value.}
+Procedure UpdateSpiritSpheres(
+		tm : TMap;
+		tc : TChara;
+		spiritSpheres : Integer
+	);
+Begin
+	WFIFOW( 0, $01d0);
+	WFIFOL( 2, tc.ID);
+	WFIFOW( 6, spiritspheres);
+	// Colus, 20031222: This packet only has 8 bytes, not 16!
+	SendBCmd(tm, tc.Point, 8);
+End;
 //------------------------------------------------------------------------------
 procedure Monkdelay(tm:TMap; tc:TChara; Delay:integer);
 begin
@@ -5291,38 +5173,7 @@ begin
 	//Socket.SendBuf(buf, 6);
 end;
 //------------------------------------------------------------------------------
-procedure SendPMove(Socket: TCustomWinSocket; te:TeNPC; before, after:TPoint; ver2:Word);
-begin
-	ZeroMemory(@buf[0], 60);
-	WFIFOW( 0, $007b);
-	WFIFOL( 2, te.ID);
-	WFIFOW( 6, te.Speed);
-	WFIFOW( 8, te.Stat1);
-	WFIFOW(10, te.Stat2);
-	WFIFOW(12, te.Option);
-	WFIFOW(14, te.JID);
-	WFIFOW(16, te.Hair);
-	WFIFOW(18, te.Weapon);
-	WFIFOW(20, te.Head3);
-	WFIFOL(22, timeGetTime());
-	WFIFOW(26, te.Shield);
-	WFIFOW(28, te.Head1);
-	WFIFOW(30, te.Head2);
-	WFIFOW(32, te.HairColor);
-	WFIFOW(34, te.ClothesColor);
-	WFIFOW(36, te.HeadDir);
-	WFIFOW(38, te.GuildID);
-	WFIFOW(44, te.Manner);
-	WFIFOW(46, te.Karma);
-	WFIFOB(49, te.Gender);
-	WFIFOM2(50, after, before);
-	WFIFOB(56, 5);
-	WFIFOB(57, 5);
-{修正}
-	if ver2 = 9 then Socket.SendBuf(buf, 60)  //Kr?
-	else             Socket.SendBuf(buf, 58); //Jp
-end;
-//------------------------------------------------------------------------------
+procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
 {アジト機能追加}
 var
 	i  :integer;
@@ -5332,7 +5183,6 @@ var
 	tg :TGuild;
   tgc:TCastle;
 {アジト機能追加ココまで}
-procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
 begin
 {NPCイベント追加}
 	//if (tn.JID = -1) then exit;//CR 2004/04/26 - JID is Cardinal.
@@ -6953,17 +6803,18 @@ begin
 	Idx := CastleList.IndexOf(tn.Reg);
 
 	if (Idx > -1) then
-		(CastleList.Objects[i] as TCastle).GKafra := mode;
+		(CastleList.Objects[Idx] as TCastle).GKafra := mode;
 end;
 //------------------------------------------------------------------------------
 procedure SpawnNPCMob(tn:TNPC;MobName:string;X:integer;Y:integer;SpawnDelay1:cardinal;SpawnDelay2:cardinal);
 var
-	k   :integer;
-	m   :integer;
-	ts  :TMob;
-	tm  :TMap;
-	te  :TEmp;
-	tgc :TCastle;
+	j   : Integer;
+	k   : Integer;
+	m   : Integer;
+	ts  : TMob;
+	tm  : TMap;
+	te  : TEmp;
+	tgc : TCastle;
 begin
           //debugout.lines.add('[' + TimeToStr(Now) + '] ' + MobName);
           tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
@@ -7451,7 +7302,6 @@ Function  GetGuildDDegree(
 		tn : TNPC
 	) : Cardinal;
 Var
-  tgc:TCastle;
 	Idx : Integer;
 Begin
 	//Check Preconditions
@@ -8008,10 +7858,14 @@ Var
 	k          : Integer;
 	m          : Integer;
 	mcnt       : Integer;
+	i          : Integer;
+	J          : Integer;
 
 	X : Integer;
 	Y : Integer;
 	{Used in callmob code...}
+
+	tgc   : TCastle;
 
 	tn    : TNPC;
 	tm    : TMap; //ref only
@@ -9906,11 +9760,11 @@ begin
 
     modfix := ((tc.Skill[50].Data.Data1[tc.Skill[50].Lv] * StealMultiplier div 100) + tc.Param[4]);
 
-    if assigned(ts) then begin
-        modfix := modfix - ts.Data.Param[4];
-    end else if assigned (tc1) then begin
-        modfix := modfix - tc1.Param[4];
-    end;
+	if Assigned(ts) then begin
+		modfix := modfix - ts.Data.Param[4];
+	end else if Assigned (tc1) then begin
+		modfix := modfix - tc1.Param[4];
+	end;
 
     // This isn't the right check!  It checks for leaders.  We have
     // isLeader and isSlave now for that...
@@ -10386,13 +10240,15 @@ End;(* Proc TItem.ZeroItem
 {追加}
 constructor TMob.Create;
 var
-	i :integer;
+	Idx :integer;
 begin
 	inherited;
-	for i := 1 to 10 do
-		Item[i] := TItem.Create;
-  isSummon := False;
-  isLooting := False;
+
+	for Idx := 1 to 10 do
+		Item[Idx] := TItem.Create;
+	isSummon := False;
+	isLooting := False;
+	LType := imaMob;
 end;
 
 destructor TMob.Destroy;
@@ -10424,20 +10280,29 @@ begin
 end;
 
 
-{追加ここまで}
-constructor TChara.Create;
-var
-	i :integer;
-begin
-	inherited;
+(*-----------------------------------------------------------------------------*
 
-	for i := 0 to MAX_SKILL_NUMBER do
-		Skill[i] := TSkill.Create;
-	for i := 1 to 100 do
-		Item[i] := TItem.Create;
+Revisions:
+2004/06/01 ChrstphrR - renamed internal variable, added LType
+
+*-----------------------------------------------------------------------------*)
+Constructor TChara.Create;
+Var
+	Idx : Integer;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+	for Idx := 0 to MAX_SKILL_NUMBER do
+		Skill[Idx] := TSkill.Create;
+	for Idx := 1 to 100 do
+		Item[Idx] := TItem.Create;
 	Cart := TItemList.Create;
 	Flag := TStringList.Create;
-end;
+
+	LType := imaChara;
+End;(* TChara.Create
+*-----------------------------------------------------------------------------*)
 
 
 destructor TChara.Destroy;
@@ -10471,39 +10336,6 @@ begin
 	inherited;
 end;
 {チャットルーム機能追加ココまで}
-
-
-(*-----------------------------------------------------------------------------*
-ChrstphrR 2004/04/23
-
-- Placeholder constructor -- will fill with creation of owned objects like
-Item : TItemList AFTER I trace down what code manipulates this object already.
-
-*-----------------------------------------------------------------------------*)
-Constructor TeNPC.Create;
-Begin
-	inherited;
-	// Always call ancestor's routines first in Create
-
-	{ChrstphrR 2004/04/23 - would create TItemList here...}
-End;(* TeNPC.Create
-*-----------------------------------------------------------------------------*)
-
-(*-----------------------------------------------------------------------------*
-ChrstphrR 2004/04/23
-
-Freeing up Item(list)
-
-*-----------------------------------------------------------------------------*)
-Destructor TeNPC.Destroy;
-Begin
-	// Always call ancestor's routines after you clean up
-	// objects you created as part of this class
-	Item.Free;
-
-	inherited;
-End;(* TeNPC.Destroy
-*-----------------------------------------------------------------------------*)
 
 
 constructor TPlayer.Create;
@@ -10649,12 +10481,15 @@ ChrstphrR 2004/04/24
 
 Will fold in owned object creation into the constructor, is a placeholder right
 now.
+
+2004/06/01 ChrstphrR - added LType.
 *-----------------------------------------------------------------------------*)
 Constructor TNPC.Create;
 Begin
 	inherited;
 	// Always call ancestor's routines first in Create
 
+	LType := imaNPC;
 End;(* TNPC.Create
 *-----------------------------------------------------------------------------*)
 
