@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-08-04: Changed JCon's Skill hiding function.  Hides skills not learned yet. [Tsusai]
 - 11-08-04: Allowed donpcevent to go ahead and trigger specified script. [Tsusai]
 - 11-07-04: REED: Reduced startup lag on large REED databases. [AlexKreuz]
 - 11-07-04: REED: Ban & Diplomacy lists caused crash on reload. [AlexKreuz]

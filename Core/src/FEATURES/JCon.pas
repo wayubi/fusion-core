@@ -797,6 +797,7 @@ uses
     var
 		j : Integer;
     	tc : TChara;
+        JIDFix : integer;
 
 	begin
         frmMain.ListBox7.Clear;
@@ -804,6 +805,9 @@ uses
 
         if (frmMain.listbox2.ItemIndex = -1) then Exit;
         tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+        JIDFix := StrToInt(frmMain.Edit10.Text);
+
         for j := 1 to MAX_SKILL_NUMBER do begin
 
             if HideNull = true then begin
@@ -813,8 +817,10 @@ uses
                     frmMain.ListBox7.Items.Add((IntToStr(tc.Skill[j].Data.ID)) + ' : ' + tc.Skill[j].Data.Name);
             end else begin
                 frmMain.CheckBox2.Checked := false;
-                if tc.Skill[j].Lv >= 0 then
-                    frmMain.ListBox7.Items.Add((IntToStr(tc.Skill[j].Data.ID)) + ' : ' + tc.Skill[j].Data.Name);
+                if ((tc.Skill[j].Data.Job1[JIDFix]) or (tc.Skill[j].Data.Job2[JIDFix])) then begin
+                    if tc.Skill[j].Lv >= 0 then
+                        frmMain.ListBox7.Items.Add((IntToStr(tc.Skill[j].Data.ID)) + ' : ' + tc.Skill[j].Data.Name);
+                end;
             end;
         end;
     end;
