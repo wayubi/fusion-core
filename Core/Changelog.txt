@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+- 01-13-04: Updated DirMove algorithm. [Colus]
+- 01-13-04: Restored/corrected previous IW behavior until pathing is updated [Colus]
+- 01-13-04: Readded Savian's sprite fix (nonfunctional b/c of other code) [Colus]
+- 01-13-04: Fixed display problem when levelling up stats [Colus]
+- 01-13-04: Updated Icewall terrain change [Colus]
 - 01-13-04: Fixed Land Mine Crash. [AlexKreuz]
 - 01-13-04: Fixed Calculations. [AlexKreuz]
 - 01-13-04: Implemented Grace Time.  [Darkhelmet]	
