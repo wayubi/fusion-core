@@ -133,15 +133,19 @@ End;(* TItenDB *)
 //------------------------------------------------------------------------------
 // アイテムデータ
 type TItem = class
-	ID        :word;
-	Amount    :word;
-	Equip     :word;
-	Identify  :byte;
-	Refine    :byte;
-	Attr      :byte;
-	Card      :array[0..3] of word;
-	Data      :TItemDB;
-        Stolen    :cardinal;
+	ID        : Word;
+	Amount    : Word;
+	Equip     : Word;
+	Identify  : Byte;
+	Refine    : Byte;
+	Attr      : Byte;
+	Card      : Array[0..3] of Word;
+	Data      : TItemDB;
+  Stolen    : Cardinal;
+
+public
+  Constructor Create;
+  Destructor  Destroy; OverRide;
 end;
 //------------------------------------------------------------------------------
 {追加}
@@ -9100,6 +9104,58 @@ end;(*- TItemDB.Assign ---------------*)
 {== End of TItemDB Code ==}
 {=========================}
 
+
+{=========================}
+{== Start of TItem Code ==}
+{=========================}
+
+
+(*----- TItem.Create ------------------*
+start: CRW 2004/04/01
+last: CRW 2004/04/03
+
+Initialzes data (Zero/Nil) held in TItem
+
+*-------------------------------------*)
+Constructor TItem.Create;
+Begin
+  inherited;
+  //init fields
+	ID        := 0;
+  Equip     := 0;
+  Identify  := 0;
+  Refine    := 0;
+ 	Attr      := 0;
+ 	Card[0]   := 0;
+ 	Card[1]   := 0;
+ 	Card[2]   := 0;
+ 	Card[3]   := 0;
+ 	Data      := NIL;
+  Stolen    := 0;
+
+  //init properties
+  Amount    := 0;
+End;(*- TItem.Create ----------------*)
+
+
+(*----- TItem.Destroy -----------------*
+start: CRW 2004/04/04
+last: CRW 2004/04/04
+
+Cleans up TItem
+
+*-------------------------------------*)
+Destructor TItem.Destroy;
+Begin
+  inherited;
+
+ 	Data.Free;
+End;(*- TItem.Destroy ---------------*)
+
+
+{=======================}
+{== End of TItem Code ==}
+{=======================}
 
 
 //==============================================================================
