@@ -691,7 +691,7 @@ Called when we're shutting down the server *only*
             str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
             logfile.Add(str);
 
-            CreateDir('logs');
+            CreateDir(AppPath + 'logs');
             logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
         except
             on E : Exception do DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + '*** GM Logfile Error : ' + E.Message);
