@@ -383,11 +383,13 @@ begin
 				Socket.SendBuf(buf, 4+37*j);
 				}
 
+                                WFIFOW( 2, 4+37*j); 
+                                Socket.SendBuf(buf, 4+37*j);
 				//ƒpƒ‰ƒ[ƒ^
 				CalcStat(tc);
 				SendCStat(tc);
 
-				//ƒAƒCƒeƒ€ƒf[ƒ^
+				//ƒAƒCƒeƒ€ƒf[ƒ
 				WFIFOW(0, $00a3);
 				j := 0;
 				for i := 1 to 100 do begin

@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
---------------------------------------------------------------------------------
+--------------------------------------------------------------------------------- 
+- 01-12-04: Fixed Weapon Bug on startup? [Savian?]
+- 01-12-04: Added display of no Gemstone when using a skill without one. [Darkhelmet]
+- 01-12-04: Added Procedure for monster to disappear. [Darkhelmet]
 - 01-12-04: Fixed AF2 Support. Can now use AF2 Maps. [AlexKreuz]
 - 01-12-04: Fixed Extremity Fist Crash in PvP Mode. [AlexKreuz]
 - 01-12-04: Fixed Extremity Fist Calculations. [AlexKreuz]

@@ -1136,10 +1136,11 @@ var
         str2:string;
 
 begin
-	WFIFOW( 0, $0080);
+        UpdateMonsterDead(tm, ts, k);
+	{WFIFOW( 0, $0080);
 	WFIFOL( 2, ts.ID);
 	WFIFOB( 6, 1);
-	SendBCmd(tm, ts.Point, 7);
+	SendBCmd(tm, ts.Point, 7);}
 
         delcnt := 0;                      // mf
                                           // mf
@@ -2917,10 +2918,11 @@ begin
 					((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
 						//消滅通知
 						//DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
-						WFIFOW(0, $0080);
+                                                UpdateMonsterDead(tm, ts, 0);
+						{WFIFOW(0, $0080);
 						WFIFOL(2, ts.ID);
 						WFIFOB(6, 0);
-						Socket.SendBuf(buf, 7);
+						Socket.SendBuf(buf, 7);}
 					end;
 					if ((dx <> 0) and (abs(Point.Y - ts.Point.Y) < 16) and (Point.X = ts.Point.X - dx * 15)) or
 					((dy <> 0) and (abs(Point.X - ts.Point.X) < 16) and (Point.Y = ts.Point.Y - dy * 15)) then begin
@@ -3644,6 +3646,7 @@ begin
 							tn.MSkill := MSkill;
 
 						end else begin
+                                                        SendItemError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3757,6 +3760,7 @@ begin
 						        end;
 
 						end else begin
+                                                        SendItemError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3783,6 +3787,7 @@ begin
 						        end;
 
 						end else begin  //Doesn't have Gemstone
+                                                        SendItemError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3801,6 +3806,7 @@ begin
                                                         tn.MSkill := MSkill;
                                                         tn.MUseLV := MUseLV;
 						end else begin
+                                                        SendItemError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -4015,6 +4021,7 @@ begin
 	      		tn.MSkill := MSkill;
       			tn.MUseLV := MUseLV;
 						end else begin
+                                                        SendItemError(tc, 7); //No Red Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -5937,6 +5944,7 @@ begin
 				        		end;
 					        end;
                                         end else begin
+                                                SendItemError(tc, 7); //No Red Gemstone
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
@@ -6196,6 +6204,7 @@ begin
 							        DamageProcess1(tm, tc, ts, dmg[0], Tick);
 							        tc.MTick := Tick + 3000;
 						        end else begin
+                                                                SendItemError(tc, 8); //No Blue Gemstone
 							        tc.MMode := 4;
 							        tc.MPoint.X := 0;
 							        tc.MPoint.Y := 0;
@@ -7307,20 +7316,21 @@ begin
 							end;
 						end;
 					end;
-				28: //ヒール
+				28:     {Heal}
 					begin
-            if (tc1.Sit <> 1) then begin
-						dmg[0] := ((BaseLV + Param[3]) div 8) * tl.Data1[MUseLV];
-						tc1.HP := tc1.HP + dmg[0];
-						if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
-						SendCStat1(tc1, 0, 5, tc1.HP);
-						ProcessType := 0;
-						tc.MTick := Tick + 1000;
-            end else begin
-            MMode :=4;
-            Exit;
-            end;
+                                                if (tc1.Sit <> 1) then begin
+						        dmg[0] := ((BaseLV + Param[3]) div 8) * tl.Data1[MUseLV];
+						        tc1.HP := tc1.HP + dmg[0];
+					        	if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
+						        SendCStat1(tc1, 0, 5, tc1.HP);
+						        ProcessType := 0;
+						        tc.MTick := Tick + 1000;
+                                                end else begin
+                                                        MMode :=4;
+                                                        Exit;
+                                                end;
 					end;
+                                
 				29: //Agility Up
 					begin
 						ProcessType := 3;
@@ -7469,7 +7479,7 @@ begin
           tc1 := tc;
           ProcessType := 0;
           end;
-        54: //リザレクション
+                                54:     {Ressurection}
 					begin
                                                 j := SearchCInventory(tc, 717, false);
 						if ((((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True)) or (tc.ItemSkill = true)) and ((tc1.Sit = 1) and (tc1.HP = 0)) then begin
@@ -7486,10 +7496,11 @@ begin
 							WFIFOL( 2, tc1.ID);
 							WFIFOW( 6, 100);
 							SendBCmd(tm, tc1.Point, 8);
-						  ProcessType := 0;
+						        ProcessType := 0;
 						end else begin
-              dmg[0] := 0;
-              tc.MMode := 4;
+                                                        SendItemError(tc, 8); //No Blue Gemstone
+                                                        dmg[0] := 0;
+                                                        tc.MMode := 4;
 							Exit;
 
 							//tc.MPoint.X := 0;
@@ -8615,6 +8626,7 @@ begin
 							end;
 						end;
 						end else begin
+                                                        SendItemError(tc, 7); //No Red Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;

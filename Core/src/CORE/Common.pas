@@ -1405,6 +1405,7 @@ Option_WelcomeMsg :boolean;
 
 		procedure SendItemSkill(tc:TChara; s:Cardinal; L:Cardinal = 1);
 		procedure SendSkillError(tc:TChara; Code:Cardinal);
+                procedure SendItemError(tc:TChara; Code:Cardinal);
 		function  UseFieldSkill(tc:TChara; Tick:Cardinal) : Integer;
 		function  UseTargetSkill(tc:TChara; Tick:Cardinal) : Integer;
 
@@ -1419,6 +1420,7 @@ Option_WelcomeMsg :boolean;
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
+                procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);   //Kills a monster
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
@@ -2722,7 +2724,15 @@ begin
         end;
 
 end;
+//------------------------------------------------------------------------------
+procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);  //Kills a monster or updates its status
 
+begin
+        WFIFOW( 0, $0080);
+	WFIFOL( 2, ts.ID);
+	WFIFOB( 6, k);
+	SendBCmd(tm, ts.Point, 7);
+end;
 //------------------------------------------------------------------------------
 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
 
@@ -3432,6 +3442,32 @@ begin
 			else //‰½‚à–³‚µ
 		end;
 	end;
+end;
+//------------------------------------------------------------------------------
+procedure SendItemError(tc:TChara; Code:Cardinal);
+{
+        type 00: basic type skill
+	type 01: Not enough SP
+	type 02: Not enough HP
+	type 03: No memo
+	type 04: In cast delay
+	type 05: Not enough money (Mammonite)
+	type 06: Weapon is not usable with the skill
+	type 07: No red gemstone
+	type 08: No blue gemstone
+	type 09: Unknown.  (GUESS: 'No yellow gemstone', maybe?)
+}
+begin
+        with tc do begin
+                WFIFOW( 0, $0110);
+                WFIFOW( 2, MUseLV);
+                WFIFOW( 4, 0);
+                WFIFOW( 6, 0);
+                WFIFOB( 8, 0);
+                WFIFOB( 9, Code);
+                Socket.SendBuf(buf, 10);
+        end;
+                
 end;
 //------------------------------------------------------------------------------
 function UseFieldSkill(tc:TChara; Tick:Cardinal) : Integer;
