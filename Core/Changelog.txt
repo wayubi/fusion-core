@@ -2,6 +2,9 @@
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
 - 01-26-04: Fixed Rogue's Discount Skill No Effect Bug. [AlexKreuz]
+- 01-26-04: Fixed Lex Aeterna cast delay/freezing monsters [Colus]
+- 01-26-04: Updated Endure under Lucky Flee conditions [Colus]
+- 01-25-04: Updated Pushcart speed mod for Alchemist (needs another tweak later) [Colus]
 - 01-25-04: Corrected Cart Revolution damage/usability [Colus]
 - 01-25-04: Area Effects no longer attack caster in PvP. [Darkhelmet]
 - 01-24-04: Fixed Ruwatch / Sight unhide Hidden Enemies. [AlexKreuz]
