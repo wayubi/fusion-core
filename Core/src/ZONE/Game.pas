@@ -1666,9 +1666,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been enabled!';
               w := Length(str) + 4;
@@ -1688,9 +1688,9 @@ end;
 							tc1.Socket.SendBuf(buf, 4);   }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been disabled!';
               w := Length(str) + 4;
@@ -1718,9 +1718,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'Guild PVP has been enabled!';
               w := Length(str) + 4;

@@ -2418,6 +2418,7 @@ begin
 		end;
 		CloseFile(txt);
 	end;
+  //DebugOut.Lines.add('Player Saved');
 
 	if CharaName.Count <> 0 then begin
 		AssignFile(txt, AppPath + 'chara.txt');
@@ -2563,6 +2564,7 @@ begin
 		end;
 		CloseFile(txt);
 	end;
+  //DebugOut.Lines.add('Chara Saved');
 
 {NPCイベント追加}
 	//サーバ共有フラグ保存
@@ -2585,6 +2587,7 @@ begin
 	sl.Strings[0] := IntToStr(cnt);
 	writeln(txt, sl.DelimitedText);
 	CloseFile(txt);
+  //DebugOut.Lines.add('Status Saved');
 {NPCイベント追加ココまで}
 
 {パーティー機能追加}
@@ -2611,7 +2614,7 @@ begin
 		writeln(txt, sl.DelimitedText);
 	end;
 	CloseFile(txt);
-
+  //DebugOut.Lines.add('Castle Saved');
 
 	AssignFile(txt, AppPath + 'party.txt');
 	Rewrite(txt);
@@ -2628,6 +2631,7 @@ begin
 		writeln(txt, sl.DelimitedText);
 	end;
 	CloseFile(txt);
+  //DebugOut.Lines.add('Guild Saved');
 {パーティー機能追加ココまで}
 
 {ギルド機能追加}
@@ -2707,6 +2711,7 @@ begin
 		end;
 	end;
 	CloseFile(txt);
+  //DebugOut.Lines.add('Guild Saved');
 {ギルド機能追加ココまで}
 
 {キューペット}
@@ -2798,6 +2803,8 @@ begin
                 end;
         end;
 	CloseFile(txt);
+
+  //DebugOut.Lines.add('Pet Saved');
 {キューペットここまで}
 
   { Ugh I'll fix this ... hmm
