@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-22-04: Updated Pet Skills. [Darkhelmet]
 - 02-22-04: Updated pet movement speed. [Colus]
 - 02-21-04: Fixed bug #528, players trying to log on with case sensitive ID. [Darkhelmet]
 - 02-21-04: Updated Pet Login, pet now shows after server restart. [Darkhelmet]

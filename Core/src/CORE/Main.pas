@@ -51,7 +51,7 @@ type
                 procedure CharaAttack2(tc:TChara;Tick:cardinal);
 		procedure CharaPassive(tc:TChara;Tick:cardinal);
                 procedure SkillPassive(tc:TChara;Tick:Cardinal);
-		procedure PetPassive(tc:TChara; Tick:cardinal);
+		procedure PetPassive(tc:TChara; _Tick:Cardinal);
 
 		function  NPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
 
@@ -11154,7 +11154,7 @@ begin
                         tc.HP := 1;
                 end;}
 //------------------------------------------------------------------------------
-procedure TfrmMain.PetPassive(tc:TChara; Tick:cardinal);
+procedure TfrmMain.PetPassive(tc:TChara; _Tick:cardinal);
 var
   j,k,m,n :Integer;
   spd:cardinal;
@@ -11168,29 +11168,84 @@ var
   i1,j1,k1:integer;
 	MobData:TMobDB;
 	sl:TStringList;
+  Tick:cardinal;
 begin
   sl := TStringList.Create;
   tm := tc.MData;
   tn1 := tc.PetNPC;
   tpe := tc.PetData;
   MobData := tpe.MobData;
+
   with tn1 do begin
-    //if tpe.MobData
+
+    if tpe.Data.SkillTime > 0 then begin
+      //Tick System needs to be redone
+      {if tpe.SkillTick < _Tick - 60000 + (tpe.Data.SkillTime * 1000) then begin
+        tpe.SkillTick := _Tick + (tpe.Data.SkillTime * 1000);
+        CalcStat(tc);
+        CalcSkill(tc, _Tick);
+        SendCStat(tc);
+      end else if tpe.SkillTick > _Tick then begin
+        tpe.SkillActivate := true;
+        tpe.SkillTick := _Tick;
+      end;  }
+      if tpe.SkillTick < _Tick then begin
+        tpe.SkillTick := _Tick + 60000;
+        CalcStat(tc);
+        CalcSkill(tc, _Tick);
+        SendCStat(tc);
+      end;
+
+      if (tpe.SkillTick >= _Tick + (60000 - (tpe.Data.SkillTime * 1000))) and (tpe.SkillActivate = false) then begin
+        tpe.SkillActivate := true;
+        PetSkills(tc, _Tick);
+      end else if (tpe.SkillTick <= _Tick + (60000 - (tpe.Data.SkillTime * 1000))) and (tpe.SkillActivate = true) then begin
+        tpe.SkillActivate := false;
+        CalcStat(tc);
+        CalcSkill(tc, _Tick);
+        SendCStat(tc);
+      end;
+
+    end;
+
+    //Sohee's Heal: When HP is lower than 1/3rd, she heals 400HP/Min until HP is higher than 1/3rd
+    if (tpe.JID = 1170) and (tc.HP < (tc.MAXHP / 3)) then begin
+      if tpe.SkillTick < _Tick then begin
+        tpe.SkillTick := _Tick + 60000;
+        tc.HP := tc.HP + 400;
+
+        //Show Heal
+        WFIFOW( 0, $011a);
+        WFIFOW( 2, 28);  // We cheat and use the heal skill for the gfx
+        WFIFOW( 4, 400);
+        WFIFOL( 6, tc.ID);
+        WFIFOL(10, tn1.ID);
+        WFIFOB(14, 1);
+        SendBCmd(tm, tc.Point, 15);
+
+        //Send Players HP
+        WFIFOW( 0, $00b0);
+        WFIFOW( 2, $0005);
+        WFIFOL( 4, tc.HP);
+        tc.Socket.SendBuf(buf, 8);
+      end;
+    end;
+
+
     if MobData.isLoot = true then begin
-    //if tpe.Data.MobID = 1002 then begin
-    //if (not isLooting) and Data.isLoot then begin
+
       if (not tpe.isLooting) then begin
-				//ルートモンス
+				//Clear the Stringlist
 				sl.Clear;
 
-				//アイテム探し
+				//Find items in Range
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
 							if (abs(tn.Point.X - Point.X) <= 9) and (abs(tn.Point.Y - Point.Y) <= 9) then begin
-								//候補に追加
+								//Add to the string list
 								sl.AddObject(IntToStr(tn.ID), tn);
 							end;
 						end;
@@ -11208,7 +11263,7 @@ begin
 
 						pcnt := k;
 						ppos := 0;
-						MoveTick := Tick;
+						MoveTick := _Tick;
 
 						NextPoint := tn.Point;
             PetMoving(tc, Tick);

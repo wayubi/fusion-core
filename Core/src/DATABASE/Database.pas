@@ -797,6 +797,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
                         Reserved := StrToInt( sl.Strings[9] );
                         Die := StrToInt( sl.Strings[10] );
                         Capture := StrToInt( sl.Strings[11] );
+                        tp.SkillTime := StrToInt( sl.Strings[13] );
                 end;
                 PetDB.AddObject( tp.MobID, tp );
         end;

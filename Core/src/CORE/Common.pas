@@ -372,6 +372,7 @@ type TPetDB = class
 	Reserved        :word; // ??? 時の親密度上昇
 	Die             :word; // 死亡時親密度減少
 	Capture         :word; // 基本捕獲率(0.1%単位)
+  SkillTime       :cardinal;  //Tracks how long a skill lasts
 end;
 
 // ペットデータ
@@ -394,6 +395,9 @@ type TPet = class
         ATarget         :cardinal;  //Pets attacking target as well as looting
         Item            :array[1..25] of TItem;  //Items a pet is holding
         MobData         :Pointer;
+        SkillTick       :cardinal;  //Tracks when to use a skill
+        SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
+        LastTick        :cardinal;  //Used for tracking a minute
 end;
 {キューペットここまで}
 //------------------------------------------------------------------------------
@@ -1514,6 +1518,8 @@ Option_GraceTime_PvPG :cardinal;
 				procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
+
+                procedure  PetSkills(tc: TChara; Tick:cardinal);  //Calculate the Pets Skills
 
                 procedure  Monkdelay(tm:TMap; tc:TChara; Delay:integer);
                 procedure  Tripleblow(tm:TMap; tc:TChara; Delay:word);
@@ -2964,7 +2970,70 @@ begin
         SendBCmd(tm, tc.Point, 10);
 end;
 
+//------------------------------------------------------------------------------
+procedure  PetSkills(tc: TChara; Tick:cardinal);
+var
+  tn:TNPC;
+  tpe:TPet;
+  tm:TMap;
+begin
+  tm := tc.MData;
+  tn := tc.PetNPC;
+  tpe := tc.PetData;
+  case tpe.JID of
+    1011: {Chon Chon}
+      begin
+        //AGI + 4
+        tc.Bonus[1] := tc.Bonus[1] + 4;
+      end;
+    1042: {Steel ChonChon}
+      begin
+        //AGI and VIT + 4
+        tc.Bonus[1] := tc.Bonus[1] + 4;
+        tc.Bonus[2] := tc.Bonus[2] + 4;
+      end;
+    1049: {Picky}
+      begin
+        //STR + 3
+        tc.Bonus[0] := tc.Bonus[0] + 3;
+      end;
+    1052: {Rocker}
+      begin
+        //All Stats + 1
+        tc.Bonus[0] := tc.Bonus[5] + 1;
+        tc.Bonus[1] := tc.Bonus[5] + 1;
+        tc.Bonus[2] := tc.Bonus[5] + 1;
+        tc.Bonus[3] := tc.Bonus[5] + 1;
+        tc.Bonus[4] := tc.Bonus[5] + 1;
+        tc.Bonus[5] := tc.Bonus[5] + 1;
+      end;
+    1063: {Lunatic}
+      begin
+        //Luck + 3
+        tc.Bonus[5] := tc.Bonus[5] + 3;
+      end;
+    1067: {Savage Bebe}
+       begin
+        //Vitality + 4
+        tc.Bonus[2] := tc.Bonus[2] + 4;
+      end;
+    1109: {Deviruchi}
+      begin
+        //STR, AGI, DEX +6
+        tc.Bonus[0] := tc.Bonus[0] + 6;
+        tc.Bonus[1] := tc.Bonus[1] + 6;
+        tc.Bonus[4] := tc.Bonus[4] + 6;
+      end;
 
+
+
+  end;
+
+  
+
+  SendCStat(tc);
+
+end;
 //------------------------------------------------------------------------------
 procedure SendCStat(tc:TChara; View:boolean = false);
 var
@@ -5515,8 +5584,8 @@ begin
 				w := 4;
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
-                    if Member[i] <> nil then begin
-				  if UseSQL then GetCharaData(Member[i].ID);
+                    if tg.Member[i] <> nil then begin
+				  if UseSQL then GetCharaData(tg.Member[i].ID);
                     end;
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin
