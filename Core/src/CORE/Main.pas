@@ -5486,34 +5486,31 @@ begin
       368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
         begin
         if tc.Weapon = 2 then begin
-           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-           if dmg[0] < 0 then dmg[0] := 0;
-           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-           if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-           DamageProcess1(tm, tc, ts, dmg[0], Tick);
-           tc.MTick := Tick + 500;
-           end else begin
-           SendSkillError(tc, 6);
-           MMode := 4;
-           Exit;
+
+          DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+          if dmg[0] < 0 then dmg[0] := 0;
+          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+          if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+          StatCalc1(tc, ts, Tick);
+          end else begin
+            SendSkillError(tc, 6);
+            MMode := 4;
+            Exit;
            end;
            end;
 
            379:
         begin
         if tc.Weapon = 16 then begin
-           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-           if dmg[0] < 0 then dmg[0] := 0;
-           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-           if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-           DamageProcess1(tm, tc, ts, dmg[0], Tick);
-           tc.MTick := Tick + 500;
-           end else begin
-           SendSkillError(tc, 6);
-           MMode := 4;
-           Exit;
+        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+          if dmg[0] < 0 then dmg[0] := 0;
+          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+          if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+          StatCalc1(tc, ts, Tick);
+            end else begin
+            SendSkillError(tc, 6);
+            MMode := 4;
+            Exit;
            end;
            end;
 
@@ -5539,21 +5536,21 @@ begin
                   Item[Arrow].ID := 0;
                   Arrow := 0;
                   end;
-
-                  DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-                  if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
-
-                  //Send Attack Packet
-                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-                  if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-                  DamageProcess1(tm, tc, ts, dmg[0], Tick);
-                  tc.MTick := Tick + 500;
+                  begin
+                  if tc.Weapon = 11 then begin
+                   DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                   if dmg[0] < 0 then dmg[0] := 0;
+                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+          if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+          StatCalc1(tc, ts, Tick);
+            end else begin
+            SendSkillError(tc, 6);
+            MMode := 4;
+            Exit;
 
                   end;
-
-
-        
+                  end;
+                 end;
           394:     {Arrow Shower}
                   begin
                   if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
@@ -5576,36 +5573,40 @@ begin
                   Arrow := 0;
                   end;
 
-                  DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-                  if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
-
-                  //Send Attack Packet
-                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-                  if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-                  DamageProcess1(tm, tc, ts, dmg[0], Tick);
+           if tc.Weapon = 11 then begin
+           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+           if dmg[0] < 0 then dmg[0] := 0;
+           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+          if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+          StatCalc1(tc, ts, Tick);
+            end else begin
+            SendSkillError(tc, 6);
+            MMode := 4;
+            Exit;
                   tc.MTick := Tick + 500;
                   end;
+                  end;
+
 
         381:    //Falcon assault
         //Damace calc needs to be redone not much info about this skill.
         if tc.Option and 16 <> 0 then begin
-        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
-        //Send Skill Packets
-        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-        DamageProcess1(tm, tc, ts, dmg[0], Tick);
-        tc.MTick := Tick + 500;
-        end else begin
-        SendSkillError(tc, 0);
-        MMode := 4;
+         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+          if dmg[0] < 0 then dmg[0] := 0;
+          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+          if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+          StatCalc1(tc, ts, Tick);
+            end else begin
+            SendSkillError(tc, 0);
+            MMode := 4;
             Exit;
+
             end;
 
-            /// We can cheat and use Spear stab 
+
+
+            /// We can cheat and use Spear stab
            370:     //Palm Strike
                                                  if tc.Skill[270].Tick > Tick then begin
 
