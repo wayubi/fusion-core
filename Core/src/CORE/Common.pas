@@ -2981,7 +2981,13 @@ begin
 {修正}
 	if Use0079 then begin
 {追加}
-		WFIFOW(51, tc.BaseLV);
+    {Colus, 20040115: Aura fix for >99 levels}
+    if (tc.BaseLV > 99) then begin
+ 	  	WFIFOW(51, 99);
+    end else begin
+      WFIFOW(51, tc.BaseLV);
+    end;
+
 {追加ココまで}
 		if tc.Socket <> nil then begin
                         if tc1.Login > 0 then begin
@@ -2992,7 +2998,13 @@ begin
 	end else begin
 		WFIFOB(51, tc.Sit);
 {追加}
-		WFIFOW(52, tc.BaseLV);
+    {Colus, 20040115: Aura fix for >99 levels}
+    if (tc.BaseLV > 99) then begin
+	  	WFIFOW(52, 99);
+    end else begin
+      WFIFOW(52, tc.BaseLV);
+    end;
+
 {追加ココまで}
 		if tc.Socket <> nil then begin
                         if tc1.Login > 0 then begin
@@ -3070,7 +3082,13 @@ begin
 	WFIFOB(56, 5);
 	WFIFOB(57, 5);
 {追加}
-	WFIFOW(59, tc.BaseLV);
+  {Colus, 20040115: Aura fix for >99 levels}
+  if (tc.BaseLV > 99) then begin
+ 		WFIFOW(58, 99);
+  end else begin
+    WFIFOW(58, tc.BaseLV);
+  end;
+
 {追加ココまで}
 {修正}
 	if tc.ver2 = 9 then Socket.SendBuf(buf, 60)  //Kr?
