@@ -10,6 +10,7 @@ uses
         function Load_Accounts(userid: String; AID: cardinal = 0) : Boolean;
         function Call_Characters(AID: cardinal) : Boolean;
         function Load_Characters(GID: cardinal) : Boolean;
+        function Load_Parties(GID: cardinal) : Boolean;
 
 implementation
 
@@ -235,9 +236,7 @@ begin
                                 end;
                         end;
                         tc.JID := StrToInt(SQLDataSet.FieldValues['JID']);
-                        // Colus, 20040305: JID becomes the 'proper' value.
                         if (tc.JID > LOWER_JOB_END) then tc.JID := tc.JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
-
                         tc.BaseLV := StrToInt(SQLDataSet.FieldValues['BaseLV']);
                         tc.BaseEXP := StrToInt(SQLDataSet.FieldValues['BaseEXP']);
                         tc.StatusPoint := StrToInt(SQLDataSet.FieldValues['StatusPoint']);
@@ -413,6 +412,56 @@ begin
                 end;
         end;
         sl.Free;
+end;
+
+function Load_Parties(GID: cardinal) : Boolean;
+var
+        i, k : integer;
+        query : string;
+        tpa : TParty;
+        tc : TChara;
+begin
+        Result := False;
+
+        query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''';
+        //OR MemberID1 OR MemberID2 OR MemberID3 OR MemberID4 OR MemberID5 OR MemberID6 OR MemberID7 OR MemberID8 OR MemberID9 OR MemberID10 OR MemberID11);
+        if (MySQL_Query (query)) then begin
+                if SQLDataSet.FieldByName('Name').IsNull then begin
+                end else begin
+                        tpa := TParty.Create;
+                        with tpa do begin
+                                Name := (SQLDataSet.FieldValues['Name']);
+                                EXPShare := StrToInt(SQLDataSet.FieldValues['EXPShare']);
+                                ITEMShare := StrToInt(SQLDataSet.FieldValues['ITEMShare']);
+                                MemberID[0] := StrToInt(SQLDataSet.FieldValues['MemberID0']);
+                                MemberID[1] := StrToInt(SQLDataSet.FieldValues['MemberID1']);
+                                MemberID[2] := StrToInt(SQLDataSet.FieldValues['MemberID2']);
+                                MemberID[3] := StrToInt(SQLDataSet.FieldValues['MemberID3']);
+                                MemberID[4] := StrToInt(SQLDataSet.FieldValues['MemberID4']);
+                                MemberID[5] := StrToInt(SQLDataSet.FieldValues['MemberID5']);
+                                MemberID[6] := StrToInt(SQLDataSet.FieldValues['MemberID6']);
+                                MemberID[7] := StrToInt(SQLDataSet.FieldValues['MemberID7']);
+                                MemberID[8] := StrToInt(SQLDataSet.FieldValues['MemberID8']);
+                                MemberID[9] := StrToInt(SQLDataSet.FieldValues['MemberID9']);
+                                MemberID[10] := StrToInt(SQLDataSet.FieldValues['MemberID10']);
+                                MemberID[11] := StrToInt(SQLDataSet.FieldValues['MemberID11']);
+                        end;
+                        PartyNameList.AddObject(tpa.Name, tpa);
+                        DebugOut.Lines.Add(Format('Add Party Name : %s.', [tpa.Name]));
+
+                        tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
+                        for i := 0 to 11 do begin
+                                if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] = tc.CID) then begin
+                                        tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
+                                        tc.PartyName := tpa.Name;
+                                        tpa.Member[i] := tc;
+                                        break;
+                                end;
+                        end;
+                end;
+        end;
+
+        Result := True;
 end;
 
 end.
