@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;

@@ -1,10 +1,11 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-03-04: FusionSQL -> Created Load_Accounts Function. [AlexKreuz]
 - 03-01-04: Added Sage Skill Dispel. [Darkhelmet]
 - 02-29-04: Removed Perfect Hide, Monsters aggressive again, Code Error on my part. [Darkhelmet]
 - 02-28-04: Experimental New Way of saving the DB, feedback please. [Darkhelmet]
-- 02-27-04: Optimizing SQL Format; Part 1/2 - Startup & Connection Bugs. [AlexKreuz]
+- 02-27-04: Optimizing SQL Format; Startup & Connection Bugs. [AlexKreuz]
 - 02-27-04: Fixed pets getting stuck in walls on warps. [Darkhelmet]
 - 02-27-04: Fixed duplicating of pet.txt, please verify. [Darkhelmet]
 - 02-27-04: Fixed being able to run away from your pet. [Darkhelmet]

@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows,Classes, SysUtils, ScktComp, Common, Database, SQLData;
+	Windows,Classes, SysUtils, ScktComp, Common, Database, SQLData, FusionSQL;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -263,7 +263,8 @@ begin
 			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then begin
-			  if GetPlayerData(userid) then begin
+			  //WILLDELETEif GetPlayerData(userid) then begin
+                          if Load_Accounts(userid) then begin
           sv1PacketProcessSub(Socket,w,userid,userpass);
 			  end else begin
           ZeroMemory(@buf[0],23);
