@@ -12398,7 +12398,7 @@ begin
 			if ts.Stat1 <> 0 then begin
 				//‰ğœ
 				case ts.Stat1 of
-					2:
+					1,2:
 						begin
 							ts.Element := ts.Data.Element;
 						end;
@@ -12407,6 +12407,10 @@ begin
 			//ˆÙí”­¶1
 			ts.Stat1 := ts.nStat;
 			case ts.nStat of
+ 				1:
+					begin
+						ts.Element := 22;
+					end;
 				2:
 					begin
 						ts.Element := 21;
@@ -12419,7 +12423,7 @@ begin
 	end else begin
 		if ts.BodyTick < Tick then begin
 			case ts.Stat1 of
-				2:
+				1,2:
 					begin
 						ts.Element := ts.Data.Element;
 					end;
