@@ -6449,7 +6449,10 @@ end;
 					CalcStat(tc);
 
 				if (w = 1) and (tid.ChangeStatSkill = 1) then begin // ResetSkill
+
+                                        j := 0;
 					for i := 2 to MAX_SKILL_NUMBER do begin
+                                                j := j + tc.Skill[i].Lv;
             if not tc.Skill[i].Card then
 							tc.Skill[i].Lv := 0;
 					end;
@@ -6460,8 +6463,10 @@ end;
           tc.PLv := 0;
           end;
 					if tc.JID = 0 then begin
-					end else if tc.JID < 7 then tc.SkillPoint := tc.JobLV -1
-					else tc.SkillPoint := tc.JobLV -1 + 49;
+                                        end else begin
+                                                tc.skillpoint := j;
+                                        end;
+
 					SendCSkillList(tc);
           CalcStat(tc);
           SendCStat(tc);
