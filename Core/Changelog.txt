@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
-- 12-30-04: Read-only gm_commands.ini file caused crash. Added dialog. [AlexKreuz]
+- 12-31-04: Memory leak in Thief/Assassin stealing skill. [AlexKreuz]
+- 12-31-04: Read-only gm_commands.ini file caused crash. Added dialog. [AlexKreuz]
 - 12-30-04: Fixed GM athena commands "h" and "help". [Tsusai]
 - 12-30-04: JCon Character Zeny control now ranged [0-2147483647]. [AlexKreuz]
 - 12-30-04: Uncapped #ccolor. [Tsusai]

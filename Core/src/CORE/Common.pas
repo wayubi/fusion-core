@@ -10271,19 +10271,25 @@ var
     tc1    :TChara;
     str      :string;
 begin
-    tc1 := tchara.Create;
-    ts := tmob.create;
+    //tc1 := tchara.Create;
+    //ts := tmob.create;
 
-    tc1 := nil;
-    ts := nil;
+    //tc1 := nil;
+    //ts := nil;
     
     tm := tc.MData;
 
-    if (tm.CList.IndexOf(tc.MTarget) <> -1) then begin
+    if tc.MTargetType = 0 then begin
+        ts := tc.adata;
+    end else begin
+        tc1 := tc.adata;
+    end;
+
+    {if (tm.CList.IndexOf(tc.MTarget) <> -1) then begin
         tc1 := tc.adata;
     end else begin
         ts := tc.adata;
-    end;
+    end;}
 
     // Modifier calc:
     // adjusted drop ratio = (10 + 3*skill + cdex - mdex)% * drop
@@ -10299,24 +10305,33 @@ begin
 
     modfix := ((tc.Skill[50].Data.Data1[tc.Skill[50].Lv] * StealMultiplier div 100) + tc.Param[4]);
 
-	if Assigned(ts) then begin
+    if tc.MTargetType = 0 then begin
+        modfix := modfix - ts.Data.Param[4];
+    end else begin
+        modfix := modfix - tc1.Param[4];
+    end;
+
+	{if Assigned(ts) then begin
 		modfix := modfix - ts.Data.Param[4];
 	end else if Assigned (tc1) then begin
 		modfix := modfix - tc1.Param[4];
-	end;
+	end;}
 
     // This isn't the right check!  It checks for leaders.  We have
     // isLeader and isSlave now for that...
     //k := SlaveDBName.IndexOf(ts.Data.Name);
     //if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
-    if assigned(ts) then begin
+
+    if tc.MTargetType = 0 then begin
+    //if assigned(ts) then begin
         if ((ts.isSlave) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
             Result := false;
             exit;
         end;
     end;
 
-    if assigned(tc1) then begin
+    if not (tc.MTargetType = 0) then begin
+    //if assigned(tc1) then begin
         for i := 1 to 100 do begin
             if tc1.Item[i].ID <> 0 then begin
                 if tc1.Item[i].Equip <> 0 then begin
@@ -10376,7 +10391,8 @@ begin
         end;
     end else
 
-    if assigned(ts) then begin
+    begin
+    //if assigned(ts) then begin
         for i := 0 to 7 do begin
             mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
             rand := Random(20000) mod 10000;
