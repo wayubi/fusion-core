@@ -9134,7 +9134,7 @@ begin
 {:119}
 				77: //ターンアンデット
 					begin
-						if (1 = 1) then begin
+						if (ts.Data.Race = 1) or (ts.Element mod 20 = 9) then begin
 							m := MUseLV * 20 + Param[3] + Param[5] + BaseLV + (200 - 200 * Cardinal(tc1.HP) div tc1.HP) div 200;
 							if (Random(1000) < m) then begin
 								dmg[0] := tc1.HP;
@@ -10851,6 +10851,13 @@ begin
 								SendBCmd(tm, tn.Point, 33);
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
+            $99: {Talkie Box}
+              begin
+                WFIFOW(0, $0191);
+                WFIFOL(2, tc2.ID);
+                WFIFOS(6, tn.Name, 80);
+                SendBCmd(tm, tn.Point, 86);
+              end;
 {:119}
 						{//$95: //SM
 							begin
@@ -11421,6 +11428,14 @@ begin
 								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
 							end;
+
+            $99: {Talkie Box}
+              begin
+                WFIFOW(0, $0191);
+                WFIFOL(2, ts1.ID);
+                WFIFOS(6, tn.Name, 80);
+                SendBCmd(tm, tn.Point, 86);
+              end;
                                                 $6E:   {Hammer Fall}
                                                         if Random(100) < tn.CData.Skill[110].Data.Data1[tn.MUseLV] then begin
                                                                 if (ts1.Stat1 <> 3) then begin

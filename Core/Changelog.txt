@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-20-04: Updated Talkie Box/Graffiti [Colus]
+- 01-20-04: Updated SetSkillUnit [Colus]
 - 01-19-04: Upgraded to new view packets [Colus]
 - 01-18-04: Updated Pharmacy [Colus]
 - 01-18-04: Fixed unhide consuming SP [Colus]

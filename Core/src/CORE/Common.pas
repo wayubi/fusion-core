@@ -1455,7 +1455,7 @@ Option_GraceTime_PvPG :cardinal;
 {キューペットここまで}
 //------------------------------------------------------------------------------
     //地点スキル
-		function  SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil):TNPC;
+		function  SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil; SText:string = ''):TNPC;
 		procedure DelSkillUnit(tm:TMap; tn:TNPC);
 //------------------------------------------------------------------------------
     //所持アイテム
@@ -4271,7 +4271,7 @@ begin
 end;
 {キューペットここまで}
 //------------------------------------------------------------------------------
-function SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil):TNPC;
+function SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil; SText:String = ''):TNPC;
 var
 	tn :TNPC;
 begin
@@ -4286,7 +4286,7 @@ begin
 	tn.Tick := Tick + STime;
 	tn.Count := SCount;
 	tn.CData := tc;
-        tn.MData := ts;
+  tn.MData := ts;
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
@@ -4300,7 +4300,24 @@ begin
  	        SendBCmd(tm, tn.Point, 24);
         end;
 
-        if tn.JID = $46 then begin
+        // Graffiti/Talkie Box
+        if (((tn.JID = $B0) or (tn.JID = $99)) and (SText <> '')) then begin
+          tn.Name := SText;
+          WFIFOW(0, $01c9);
+          WFIFOL(2, tn.ID);
+          WFIFOL(6, ID);
+	        WFIFOW(10, tn.Point.X);
+	        WFIFOW(12, tn.Point.Y);
+          WFIFOB(14, tn.JID);
+          WFIFOB(15, 1);
+          if tn.JID = $B0 then
+            WFIFOB(16, 1)
+          else
+            WFIFOB(16, 0);
+
+          WFIFOS(17, SText, 80);
+ 	        SendBCmd(tm, tn.Point, 97);
+        end else if tn.JID = $46 then begin
           WFIFOW( 0, $011f);
 	        WFIFOL( 2, tn.ID);
 	        WFIFOL( 6, ID);

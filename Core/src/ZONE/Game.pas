@@ -6013,6 +6013,15 @@ end;
 
         s := RFIFOS(10, 80);  // 78 + 2 bytes for length.
 
+        xy.X := w2;
+        xy.Y := w3;
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        if w1 = $DC then
+          SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $B0, 0, 30000, tc, nil, s)
+        else
+          SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
+ {
         WFIFOW(0, $01c9);
         WFIFOL(2, 0); // Should be NPC ID of the skillunit...
         WFIFOL(6, tc.ID);
@@ -6032,7 +6041,7 @@ end;
         WFIFOS(17, s, 80); // Write back the message.
 
         Socket.SendBuf(buf, 97);
-
+ }
       end;
 {アイテム製造追加ココまで}
 		//--------------------------------------------------------------------------
