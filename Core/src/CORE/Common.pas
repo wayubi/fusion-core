@@ -1724,6 +1724,7 @@ Option_Font_Style : string;
 		function  GetGuildConUsers(tg:TGuild) : word;
     procedure GuildDInvest(tn:TNPC);
     procedure SpawnNPCMob(tn:TNPC;MobName:string;X:integer;Y:integer;SpawnDelay1:cardinal;SpawnDelay2:cardinal);
+    procedure SpawnEventMob(tn:TNPC;MobID:cardinal;MobName:string;X:integer;Y:integer;DropItem:cardinal);
     procedure CallGuildGuard(tn:TNPC;guard:integer);
     procedure SetGuildKafra(tn:TNPC;mode:integer);
     procedure EnableGuildKafra(MapName:string;KafraName:string;Mode:integer);
@@ -6650,6 +6651,125 @@ begin
 					//SendBCmd(tm,ts.Point,41,tc,False);
 end;
 //------------------------------------------------------------------------------
+
+procedure SpawnEventMob(tn:TNPC;MobID:cardinal;MobName:string;X:integer;Y:integer;DropItem:cardinal);
+var
+  i,j,k :integer;
+  m     :integer;
+  ts    :TMob;
+  tm    :TMap;
+  te    :TEmp;
+  tgc   :TCastle;
+begin
+          //DebugOut.Lines.Add(MobName);
+          tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+          ts := TMob.Create;
+					ts.Data := MobDB.Objects[MobDB.IndexOf(MobID)] as TMobDB;
+					ts.ID := NowMobID;
+					Inc(NowMobID);
+					ts.Name := MobName;
+					ts.JID := ts.Data.ID;
+					ts.Map := tn.Map;
+          ts.Data.isLink :=false;
+          //ts.NPCID := tn.ID;
+
+          //if (X = 0) and (Y = 0) then begin
+          //repeat
+					//ts.Point.X := Random(tm.Size.X - 2);
+					//ts.Point.Y := Random(tm.Size.y - 2);
+          //until ( (tm.gat[ts.Point.X][ts.Point.Y] <> 1) and (tm.gat[ts.Point.X][ts.Point.Y] <> 5) );
+          //end else begin
+					ts.Point.X := X;
+					ts.Point.Y := Y;
+          //end;
+
+					ts.Dir := Random(8);
+					ts.HP := ts.Data.HP;
+					ts.Speed := ts.Data.Speed;
+
+					//ts.SpawnDelay1 := SpawnDelay1;
+					//ts.SpawnDelay2 := SpawnDelay2;
+
+					ts.SpawnType := 0;
+					ts.SpawnTick := 0;
+
+					ts.ATarget := 0;
+					ts.ATKPer := 100;
+					ts.DEFPer := 100;
+					ts.DmgTick := 0;
+
+          ts.Element := ts.Data.Element;
+
+          //ts.Name := ts.Data.JName;
+
+					ts.Data.MEXP := 0;
+					ts.Data.EXP := 0;
+					ts.Data.JEXP := 0;
+
+          ts.isLooting := False;
+  						for j:= 1 to 10 do begin
+								ts.Item[j].ID := 0;
+								ts.Item[j].Amount := 0;
+								ts.Item[j].Equip := 0;
+								ts.Item[j].Identify := 0;
+								ts.Item[j].Refine := 0;
+								ts.Item[j].Attr := 0;
+								ts.Item[j].Card[0] := 0;
+								ts.Item[j].Card[1] := 0;
+								ts.Item[j].Card[2] := 0;
+								ts.Item[j].Card[3] := 0;
+						  end;
+              if DropItem <> 0 then begin
+                ts.Item[1].ID := DropItem;
+                ts.Item[1].Amount := 1;
+                ts.Item[1].Data := ItemDB.Objects[ItemDB.IndexOf(DropItem)] as TItemDB;
+              end;
+
+              if ts.Data.isDontMove then
+              ts.MoveWait := 4294967295
+              else
+              ts.MoveWait := TimeGetTime() + 5000 + Cardinal(Random(10000));
+
+              if (ts.JID = 1288) then begin
+              ts.isEmperium := true;
+              m := CastleList.IndexOf(ts.Map);
+              if (m <> - 1) then begin
+              tgc := CastleList.Objects[m] as TCastle;
+              ts.GID := tgc.GID;
+              end;
+              k := EmpList.IndexOf(ts.Map);
+              if (k = -1) then begin
+              te := TEmp.Create;
+		          with te do begin
+              Map := ts.Map;
+              EID := ts.ID;
+              end;
+		          EmpList.AddObject(te.Map, te);
+              end;
+              end;
+
+          ts.isActive := ts.Data.isActive;
+
+					for j := 0 to 31 do begin
+						ts.EXPDist[j].CData := nil;
+						ts.EXPDist[j].Dmg := 0;
+					end;
+					if ts.Data.MEXP <> 0 then begin
+						for j := 0 to 31 do begin
+							ts.MVPDist[j].CData := nil;
+							ts.MVPDist[j].Dmg := 0;
+						end;
+						ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FA‚É30%‰ÁŽZ
+					end;
+          ts.isSummon := True;
+
+					tm.Mob.AddObject(ts.ID, ts);
+					tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+
+					//SendMData(tc.Socket, ts);
+					//SendBCmd(tm,ts.Point,41,tc,False);
+end;
+//------------------------------------------------------------------------------
 function CheckGuildID(tn:TNPC; tc:TChara) : word;
 var
   tgc:TCastle;
@@ -8665,6 +8785,20 @@ begin
 								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[4]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
+              end else if str = 'eventmob' then begin //------ 67 Event Monster
+                if sl1.Count <> 5 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [Event Mob] function error', [ScriptPath, lines]));
+									exit;
+								end;
+                SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 67;
+                SetLength(tn.Script[k].Data1, 5);
+								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+                tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+                tn.Script[k].Data1[2] := LowerCase(sl1.Strings[2]);
+                tn.Script[k].Data1[3] := LowerCase(sl1.Strings[3]);
+                tn.Script[k].Data1[4] := LowerCase(sl1.Strings[4]);
+                Inc(k);
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [script] function error', [ScriptPath, lines]));

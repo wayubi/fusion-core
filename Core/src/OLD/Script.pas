@@ -1729,6 +1729,18 @@ begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
 					end;
 				end;
+      67: {Event MOB}
+      //Syntax
+      // eventmob [JID],[Name],[X Position],[YPosition],[Perfect Drop ID(0 = None)]
+        begin
+          j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
+          str := UpperCase(tn.Script[tc.ScriptStep].Data1[1]);
+          k := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[2]);
+          l := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[3]);
+          m := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[4]);
+          SpawnEventMob(tn,j,str,k,l,m);
+          Inc(tc.ScriptStep);
+        end;
 			44: //checkstr
 				begin
 					j := tn.Script[tc.ScriptStep].Data3[2];

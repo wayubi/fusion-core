@@ -1,4 +1,5 @@
-- 04-15-04: Consumable Items now check for level. [Darkhelmet]
+- 04-15-04: Added eventmob NPC Command. 
+		-Syntax: eventmob [JID],[Name],[X Position],[YPosition],[Perfect Drop ID(0 = None)].  [Darkhelmet]
 - 04-15-04: Added some error checking to fix some list index errors. [Darkhelmet]
 - 04-15-04: Pathfinding broke some more skills (Vending). Fixed this. [AlexKreuz]
 - 04-13-04: Added SendLivingDisappear function (in testing phase). [Colus]
