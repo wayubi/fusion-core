@@ -399,11 +399,11 @@ begin
 
                         WFIFOW( 0, $011a);
                         WFIFOW( 2, tsAI.Skill[i]);
-                        WFIFOW( 4, dmg[0]);
-                        WFIFOL( 6, ts.ID);
-                        WFIFOL(10, ts.ID);
-                        WFIFOB(14, 1);
-                        SendBCmd(tm, ts.Point, 15);
+                        WFIFOL( 4, dmg[0]);
+                        WFIFOL( 8, ts.ID);
+                        WFIFOL(12, ts.ID);
+                        WFIFOB(16, 1);
+                        SendBCmd(tm, ts.Point, 17);
                 end;
 
                 46:     {Double Strafe}
@@ -759,11 +759,11 @@ with ts do begin
                                 //Packet Process
                                 WFIFOW( 0, $011a);
                                 WFIFOW( 2, tsAI.Skill[i]);
-                                WFIFOW( 4, dmg[0]);
-                                WFIFOL( 6, ts.ID);
-                                WFIFOL(10, ID);
-                                WFIFOB(14, 1);
-                                SendBCmd(tm, ts.Point, 15);
+                                WFIFOL( 4, dmg[0]);
+                                WFIFOL( 8, ts.ID);
+                                WFIFOL(12, ID);
+                                WFIFOB(16, 1);
+                                SendBCmd(tm, ts.Point, 17);
                         end;
                 1:  //Skills Like Power Maximize
                         begin
@@ -902,11 +902,11 @@ begin
                                 WFIFOL(10, timeGetTime());
                                 WFIFOL(14, tc.aMotion);
                                 WFIFOL(18, ts.Data.dMotion);
-                                WFIFOW(22, dmg[0]); //ダメージ
-                                WFIFOW(24, 1); //分割数
-                                WFIFOB(26, 0); //0=単攻撃 8=複数 10=クリティカル
-                                WFIFOW(27, 0); //逆手
-                                SendBCmd(tm, ts.Point, 29);
+                                WFIFOL(22, dmg[0]); //ダメージ
+                                WFIFOW(26, 1); //分割数
+                                WFIFOB(28, 0); //0=単攻撃 8=複数 10=クリティカル
+                                WFIFOW(29, 0); //逆手
+                                SendBCmd(tm, ts.Point, 31);
                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                 StatCalc1(tc, ts, Tick);
@@ -940,11 +940,11 @@ begin
                                 WFIFOL(10, timeGetTime());
                                 WFIFOL(14, tc.aMotion);
                                 WFIFOL(18, ts.Data.dMotion);
-                                WFIFOW(22, dmg[0]); //ダメージ
-                                WFIFOW(24, 1); //分割数
-                                WFIFOB(26, 0); //0=単攻撃 8=複数 10=クリティカル
-                                WFIFOW(27, 0); //逆手
-                                SendBCmd(tm, ts.Point, 29);
+                                WFIFOL(22, dmg[0]); //ダメージ
+                                WFIFOW(26, 1); //分割数
+                                WFIFOB(28, 0); //0=単攻撃 8=複数 10=クリティカル
+                                WFIFOW(29, 0); //逆手
+                                SendBCmd(tm, ts.Point, 31);
                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                 StatCalc1(tc, ts, Tick);
@@ -1049,11 +1049,11 @@ begin
                         WFIFOL(10, timeGetTime());
                         WFIFOL(14, tc.aMotion);
                         WFIFOL(18, ts.Data.dMotion);
-                        WFIFOW(22, dmg[0]); //ダメージ
-                        WFIFOW(24, 1); //分割数
-                        WFIFOB(26, 0); //0=単攻撃 8=複数 10=クリティカル
-                        WFIFOW(27, 0); //逆手
-                        SendBCmd(tm, ts.Point, 29);
+                        WFIFOL(22, dmg[0]); //ダメージ
+                        WFIFOW(26, 1); //分割数
+                        WFIFOB(28, 0); //0=単攻撃 8=複数 10=クリティカル
+                        WFIFOW(29, 0); //逆手
+                        SendBCmd(tm, ts.Point, 31);
                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                         StatCalc1(tc, ts, Tick);
                         tc.Skill[61].Tick := Tick;
