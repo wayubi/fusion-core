@@ -254,12 +254,16 @@ implementation
         GM_CHARSKILLPOINT := StrToIntDef(sl.Values['CHARSKILLPOINT'], 1);
         GM_CHANGES := StrToIntDef(sl.Values['CHANGES'], 0);
 
+        ini.ReadSectionValues('Aegis GM Commands', sl);
+
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
         GM_AEGIS_BB := StrToIntDef(sl.Values['AEGIS_BB'], 1);
         GM_AEGIS_HIDE := StrToIntDef(sl.Values['AEGIS_HIDE'], 1);
         GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_RESETSKILL := StrToIntDef(sl.Values['AEGIS_RESETSKILL'], 1);
+
+        ini.ReadSectionValues('Athena GM Commands', sl);
 
         GM_ATHENA_HEAL := StrToIntDef(sl.Values['ATHENA_HEAL'], 1);
         GM_ATHENA_KAMI := StrToIntDef(sl.Values['ATHENA_KAMI'], 1);
