@@ -272,12 +272,12 @@ type TMob = class
 	Point1      :TPoint;
 	Point2      :TPoint;
 	Speed       :word;
-	Stat1       :Byte; //状態１
-	Stat2       :Byte; //状態２
+	Stat1       :Byte; // 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep
+	Stat2       :Byte; // 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
   nStat       :Cardinal;
-	BodyTick    :Cardinal;   //変化Tick1
-	HealthTick  :Array[0..4] of Cardinal;  //変化Tick2
-	EffectTick  :Array[0..11] of Cardinal; //被スキルTick
+	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
+	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
+	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, currently)
 	isLooting   :boolean;
 	Item        :array[1..10] of TItem;
 	HP          :integer;
@@ -2287,31 +2287,30 @@ begin
 
                 if FastWalk then i := i - 30;
 
-    if (((Option and $0008) <> 0) or ((Option and $0080) <> 0)
-		or ((Option and $0100) <> 0) or ((Option and $0200) <> 0)
-		or ((Option and $0400) <> 0) )and((JID = 10)or(JID = 5)) then begin //カート
-    if Skill[39].Lv = 0 then begin
-    i := i + Skill[39].Data.Data1[1];
-    end else begin
-    i := i + Skill[39].Data.Data1[Skill[39].Lv];
-    end;
+    // Colus, 20040126: Added alchemist to pushcart calc, cleaned it up
+    if (((Option and $0788) <> 0) and ((JID = 10) or (JID = 5) or (JID = 19))) then begin // Pushcart
+      if Skill[39].Lv = 0 then begin
+        i := i + Skill[39].Data.Data1[1];
+      end else begin
+        i := i + Skill[39].Data.Data1[Skill[39].Lv];
+      end;
 		end;
 
-		if Skill[29].Tick > Tick then begin //速度増加
+		if Skill[29].Tick > Tick then begin // AGI Up
 			if Skill[29].EffectLV > 5 then
 				i := i - 45
 			else
 				i := i - 30;
 		end;
 
-		if Skill[30].Tick > Tick then begin //速度減少
+		if Skill[30].Tick > Tick then begin // AGI down
 			if Skill[30].EffectLV > 5 then
 				i := i + 45
 			else
 				i := i + 30;
 		end;
 
-    if Skill[257].Tick > Tick then begin
+    if Skill[257].Tick > Tick then begin // Defender
       i := i + 30;
     end;
 
@@ -2334,7 +2333,7 @@ begin
     //end;
 		//030323
 		aMotion := ADelay div 2;
-		if (Skill[8].Tick > Tick) or (UnlimitedEndure = true) then begin //インデュア
+		if (Skill[8].Tick > Tick) or (UnlimitedEndure = true) then begin // Endure
 			dMotion := 0;
 		end else if Param[1] > 100 then begin
 			dMotion := 400;
@@ -3763,6 +3762,7 @@ begin
       w := tc.Option and $0788;  // Got a cart?
       w2 := tc.Option and 6; // Not hidden or cloaked?
       if ((w = 0) or (w2 <> 0)) then exit;
+
     end;
                  
 		if tc.MSkill =	26 then begin //テレポート
@@ -3832,8 +3832,8 @@ begin
     end;
   end;
   
-  // Moved Lex Aeterna calc up here.  It is display only!
-	if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+  // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
+	if (ts.EffectTick[0] > Tick) then dmg := dmg * 2; //レックス_エーテルナ
 
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
@@ -3855,8 +3855,8 @@ end;
 procedure SendCSkillAtk2(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
 begin
 
-  // Moved Lex Aeterna calc up here.  It is display only!
-	if tc1.Stat1 = 5 then dmg := dmg * 2;
+  // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
+	if (tc1.Skill[78].Tick > Tick) then dmg := dmg * 2;
 
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);

@@ -2120,7 +2120,7 @@ begin
 		j := ((tc.Param[2] div 2) + (tc.Param[2] * 3 div 10));
 		k := ((tc.Param[2] div 2) + (tc.Param[2] * tc.Param[2] div 150 - 1));
 		if j > k then k := j;
-		if tc.Skill[33].Tick > Tick then begin //エンジェラス
+		if tc.Skill[33].Tick > Tick then begin // Angelus
 			k := k * tc.Skill[33].Effect1 div 100;
 		end;
 
@@ -2192,7 +2192,7 @@ begin
                         dmg[5] := 11;
                 end else if avoid then begin
                         dmg[0] := 0;
-			dmg[5] := 11;
+			                  dmg[5] := 11;
 		end else if not miss then begin
 			//攻撃命中
 			if dmg[0] <> 0 then begin
@@ -2231,15 +2231,19 @@ begin
 				tc.MTarget := 0;
 				tc.MPoint.X := 0;
 				tc.MPoint.Y := 0;
+        // Colus, 20040126: Who removed the packet?
+        WFIFOW(0, $01b9);
+        WFIFOL(2, tc.ID);
+        SendBCmd(tm, tc.Point, 6);
                         end;
 {Colus, 20031216: end cast-timer cancel change}
 
       end;
 		end else begin
-			//攻撃ミス
+			// Japanese comment: "Attack missed" (no damage)
 			dmg[0] := 0;
 		end;
-		//ここで星のかけら効果を入れる(未実装)
+		// Japanese comment: "Here effects of Star Crumbs would be considered (unimplemented)"
 
 		dmg[4] := 1;
 	end;
@@ -2491,7 +2495,10 @@ begin
   end;
 
   // Lex Aeterna:
-	if ts.Stat1 = 5 then Dmg := Dmg * 2;
+	if (ts.EffectTick[0] > Tick) then begin
+    Dmg := Dmg * 2;
+    ts.EffectTick[0] := 0;
+  end;
 
 	if ts.HP < Dmg then Dmg := ts.HP;
 
@@ -2570,8 +2577,11 @@ var
 begin
 
   // Lex Aeterna:
-	if tc1.Stat1 = 5 then Dmg := Dmg * 2;
-  
+	if (tc1.Skill[78].Tick > Tick) then begin
+    Dmg := Dmg * 2;
+    tc.Skill[78].Tick := 0;
+  end;
+
 	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
 
   if Dmg = 0 then begin  //Miss, no damage
@@ -6604,11 +6614,20 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, ts.Point, 15);
-						if (ts.Stat1 = 0) or (ts.Stat1 = 3) or (ts.Stat1 = 4) then begin
+
+            // Colus, 20040126: Can't use Stat1 for Lex.  Those effects stop the
+            // monster.  Instead we set an effect tick, which (currently) isn't
+            // being used for anything!  Convenient!
+
+            if ((ts.Stat1 < 1) or (ts.Stat1 > 2)) then
+              ts.EffectTick[0] := $FFFFFFFF;
+
+            tc.MTick := Tick + 3000;
+						{if (ts.Stat1 = 0) or (ts.Stat1 = 3) or (ts.Stat1 = 4) then begin
 							ts.nStat := 5;
 							ts.BodyTick := Tick + tc.aMotion;
-						end else if (ts.Stat1 = 5) then ts.BodyTick := ts.BodyTick + 30000;
-						end;
+						end else if (ts.Stat1 = 5) then ts.BodyTick := ts.BodyTick + 30000;}
+          end;
                                               141:  //venom splasher 
                                                 begin
                                                 WFIFOW( 0, $011a);
@@ -7099,8 +7118,6 @@ begin
 								DamageCalc1(tm, tc, ts1, Tick, 0, 150 + (tc.Cart.Weight div 800), tl.Element, 0);
 								//dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
                 if dmg[0] < 0 then dmg[0] := 0;
-
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
 
               if (dmg[0] > 0) then begin
 							SetLength(bb, 2);
@@ -9293,7 +9310,7 @@ begin
 							Exit;
 						end;
 					end;
-				78: //レックス_エーテルナ
+				78: // Lex Aeterna
 					begin
 						//パケ送信
 						WFIFOW( 0, $011a);
@@ -9303,11 +9320,19 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
-						if (tc1.Stat1 = 0) or (tc1.Stat1 = 3) or (tc1.Stat1 = 4) then begin
+
+            // Colus, 20040126: Can't use Lex Aeterna on Stat1.
+            // Set the tick on the skill instead, for 10 minutes (should be enough?)
+
+            if ((tc1.Stat1 < 1) or (tc1.Stat1 > 2)) then
+              tc1.Skill[78].Tick := $FFFFFFFF;
+              
+            tc.MTick := Tick + 3000;
+						{if (tc1.Stat1 = 0) or (tc1.Stat1 = 3) or (tc1.Stat1 = 4) then begin
 							//tc1.Stat1 := 5;
 							tc1.BodyTick := Tick + tc.aMotion;
-						end else if (tc1.Stat1 = 5) then tc1.BodyTick := tc1.BodyTick + 30000;
-						end;
+						end else if (tc1.Stat1 = 5) then tc1.BodyTick := tc1.BodyTick + 30000;}
+					end;
 				84: //JT
 					begin
 
@@ -12180,7 +12205,7 @@ begin
 				WFIFOL(18, tc2.dMotion);
 				WFIFOW(22, dmg[0]); //ダメージ
 				WFIFOW(24, dmg[4]); //分割数
-				if tc2.dMotion = 0 then dmg[5] := 4;
+				if ((tc2.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;  // 4->9 for Endure damage, allow lucky hit gfx
 				WFIFOB(26, dmg[5]); //0=単攻撃 8=複数
 				WFIFOW(27, 0); //逆手
 				SendBCmd(tm, tc2.Point, 29);
@@ -12248,7 +12273,7 @@ begin
 				WFIFOL(18, tc1.dMotion);
 				WFIFOW(22, dmg[0]); //ダメージ
 				WFIFOW(24, dmg[4]); //分割数
-				if tc1.dMotion = 0 then dmg[5] := 4;
+				if ((tc1.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;  // 4->9 for Endure damage, allow lucky hit gfx
 				WFIFOB(26, dmg[5]); //0=単攻撃 8=複数
 				WFIFOW(27, 0); //逆手
 				SendBCmd(tm, tc1.Point, 29);
