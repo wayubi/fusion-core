@@ -154,10 +154,46 @@ var
 	txt       : TextFile;
 	option_mf : string;
 	Idx       : Integer;
+    tp        : TPlayer;
 	//index used for freeing player/playername lists
 begin
 	Result := False;
+
+
+
+
+		if (Option_Username_MF = True) then begin
+			option_mf := copy(userid, length(userid) - 1, 2);
+			userid := copy(userid, 0, length(userid) - 2);
+
+            if (option_mf = '_M') then begin
+            	tp := TPlayer.Create;
+        	    tp.ID := PlayerName.Count + 100101;
+    	        tp.Name := userid;
+	            tp.Pass := userpass;
+            	tp.Gender := 1;
+        	    tp.Mail := '-@-';
+    	        PlayerName.AddObject(tp.Name, tp);
+	            Player.AddObject(tp.ID, tp);
+            end else if (option_mf = '_F') then begin
+            	tp := TPlayer.Create;
+        	    tp.ID := PlayerName.Count + 100101;
+    	        tp.Name := userid;
+	            tp.Pass := userpass;
+            	tp.Gender := 0;
+        	    tp.Mail := '-@-';
+    	        PlayerName.AddObject(tp.Name, tp);
+	            Player.AddObject(tp.ID, tp);
+            end;
+
+            if UseSQL then
+            	SQLDataSave
+            else
 	DataSave;
+        end;
+
+
+	//DataSave;
 
 	sv1PacketProcessTo(Socket,w,userid,userpass);
 	AssignFile(addtxt, AppPath + 'addplayer.txt');
@@ -168,44 +204,18 @@ begin
 	end else begin
 		Append(txt);
 	end;
+
+
 	if FileExists(AppPath + 'addplayer.txt') then begin
 		Reset(addtxt);
 		count := 1;
 
-		if (Option_Username_MF = True) then begin
-			option_mf := copy(userid, length(userid) - 1, 2);
-			userid := copy(userid, 0, length(userid) - 2);
-
-            if (UseSQL) then begin
-                if (option_mf = '_M') then begin
-                    Create_Account (userid, userpass, 1);
-                    option_mf := 'S';
-                end else if (option_mf = '_F') then begin
-                    Create_Account (userid, userpass, 0);
-                    option_mf := 'S';
-                end;
-            end
-
-            else begin
-			if (option_mf = '_M') then begin
-				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',1,-@-,0,,,,,,,,,');
-			end else if (option_mf = '_F') then begin
-				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',0,-@-,0,,,,,,,,,');
-			end;
-                Writeln(txt, '0');
-            end;
-
-			inc(count);
-		end
-
-		else begin
 			while not SeekEof(addtxt) do begin
 				Readln(addtxt,userdata);
 				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
 				Writeln(txt, '0');
 				inc(count);
 			end;
-		end;
 
 		Flush(txt);  { Verifies that text REALLY was written to the file }
 		CloseFile(txt);
@@ -270,6 +280,8 @@ var{ChrstphrR - 2004/04/25 - removed unused variables}
 	l         :longword;
 	len       :integer;
 	userid    :string;
+    userid2   :string;
+    option_mf :string;
 	userpass  :string;
 begin
 	{ChrstphrR - 2004/04/28 - brought back the Len variable, out of concern
@@ -300,13 +312,22 @@ begin
 			debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'User: ' + userid + ' - Pass: ' + userpass);
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then Load_Accounts(userid);
+
+		userid2 := userid;
+		if (Option_Username_MF = True) then begin
+			option_mf := copy(userid, length(userid) - 1, 2);
+            if (option_mf = '_M') or (option_mf = '_F') then
+				userid := copy(userid, 0, length(userid) - 2);
+        end;
+
+
 				if PlayerName.IndexOf(userid) > -1 then begin
 					//DebugOut.Lines.Add ('User Exists');
 					//DebugOut.Lines.Add ('ID: '+inttostr(id));
 					sv1PacketProcessSub(Socket,w,userid,userpass);
 				end else begin
 					//DebugOut.Lines.Add ('New User');
-					if not sv1PacketProcessAdd(Socket,w,userid,userpass) then begin
+					if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
 						ZeroMemory(@buf[0],23);
 						WFIFOW( 0, $006a);
 						WFIFOB( 2, 0);//Unregistered ID
