@@ -93,6 +93,7 @@ var
     GM_ATHENA_SEND : Byte;
     GM_ATHENA_WARPP : Byte;
     GM_ATHENA_CHARWARP : Byte;
+    GM_ATHENA_HELP : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -157,6 +158,8 @@ var
     function command_charjlevel(tc : TChara; str : String) : String;
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
+
+    function command_athena_help(tc : TChara) : String;
 
 implementation
 
@@ -252,6 +255,7 @@ implementation
         GM_ATHENA_SEND := StrToIntDef(sl.Values['ATHENA_SEND'], 1);
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
+        GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_HELP'], 1);
 
         sl.Free;
         ini.Free;
@@ -356,6 +360,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
         ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
         ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_HELP', IntToStr(GM_ATHENA_HELP));
 
         ini.Free;
 
@@ -433,6 +438,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
         end else if gmstyle = '@' then begin
+            if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2260,4 +2266,40 @@ Called when we're shutting down the server *only*
     sl.Free;
     end;
 
+    function command_athena_help(tc : TChara) : String;
+    var
+	    Help : TStringList;
+	    Idx  : Integer;
+	    J    : Integer;
+	    Len  : Integer;
+    begin
+	    Help := TStringList.Create;
+	    try
+		    try
+			    Help.LoadFromFile( AppPath + 'help.txt' );
+		    except
+			    on EFOpenError do begin
+				    Result := 'No help file found.';
+			    end;
+		    end;//try-except
+
+		    if Help.Count > 0 then begin
+			    Idx := Help.Count;
+			    J := 0;
+			    WFIFOS(4, '', 400);//pre-wipe the buffer used for 200 bytes.
+                // Broadcast style MOTD - 4 lines max, 195 char each
+				repeat
+					Len := Length(Help[J]);
+					if Len > 195 then
+						Help[J] := Copy(Help[J],1,195);
+					WFIFOW(0, $009a);
+					WFIFOS(4, Help[J], Len+1);//Len+1 -> adds null termination
+					Inc(J);
+					tc.Socket.SendBuf(buf, 200);
+				until (J >= Idx);
+		    end;//if
+	    finally
+		    Help.Free;
+	    end;
+    end;
 end.
