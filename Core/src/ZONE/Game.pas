@@ -14,119 +14,139 @@ uses
 //==============================================================================
 
 
-
-
-
-
-
-
-
-
 implementation
 //==============================================================================
+
+
+(*-----------------------------------------------------------------------------*
 // ゲームサーバーパケット処理
-procedure sv3PacketProcess(Socket: TCustomWinSocket);
-var
-	i    :integer;
-  h    :integer;
-	j    :integer;
-	k    :integer;
-	ii   :integer;
-	cmd  :word;
-	w    :word;
-	w1   :word;
-	w2   :word;
-  w3   :word;
+
+???
+Appears to have a large portion of the game logic intermixed with a
+case statement that processes incoming messages from the server.
+
+CRW - 2004/04/07
+- Applied consistant formatting to PART of this 7300 line long routine so it's
+  now sane to look at.
+- Separated variables, one per line, no exceptions.
+- Started Translation of the SJIS code from the original coder(s) in the form:
+  <original> ' Lit. "'<Edited_Babelfish_Translation_Here>'"'
+
+  I hope this helps a wee bit. :P
+
+*-----------------------------------------------------------------------------*)
+Procedure sv3PacketProcess(Socket: TCustomWinSocket);
+Var
+	i     : Integer;
+  h     : Integer;
+	j     : Integer;
+	k     : Integer;
+	ii    : Integer;
+	cmd   : Word;
+	w     : Word;
+	w1    : Word;
+	w2    : Word;
+  w3    : Word;
 {追加}
-	wjob:Int64;
+	wjob  : Int64;
 {追加ココまで}
 {アイテム製造追加}
-	m1     :word;//主に製造されるアイテムのIDとして利用
-	m      :array[0..2] of word;//主に製造アイテムに不可される属性石、星のかけらのIDとして利用
-	e,e2   :word;//主に製造時消費アイテムのInventory内検索時に利用
-	anvil  :word;//金敷によって上がる成功率
+	m1      : Word;//主に製造されるアイテムのIDとして利用
+	m       : Array[0..2] of Word;//主に製造アイテムに不可される属性石、星のかけらのIDとして利用
+	e,e2    : Word;//主に製造時消費アイテムのInventory内検索時に利用
+	anvil   : Word;//金敷によって上がる成功率
 {アイテム製造追加ココまで}
-	id1,id2:cardinal;
-	l         :cardinal;
-	l2        :cardinal;
-	weight    :cardinal;
-  c         :cardinal;
-	b         :byte;
-  b1        :byte;
-	len       :integer;
-	str       :string;
-  str2      :string;
-	accountid :string;
-	charaid   :string;
-	npcid     :string;
-	tp  :TPlayer;
-	tc  :TChara;
-	tc1 :TChara;
-	tm  :TMap;
-	tn  :TNPC;
-	ts  :TMob;
-  ts1 :TMob;
-  tss :TSlaveDB;
-  ma  :TMArrowDB;
-  tid :TIDTbl;
-	ti  :TItem;
-	tk  :TSkill;
-	tl  :TSkillDB;
-	td  :TItemDB;
+	id1       : Cardinal;
+  id2       : Cardinal;
+
+	L         : Cardinal; //was lowercase "l"
+	L2        : Cardinal; //was lowercase "l2" (close to 1 or I in the wrong font)
+	weight    : Cardinal;
+  c         : Cardinal;
+	b         : Byte;
+  b1        : Byte;
+	Len       : Integer;
+
+	Str       : String;
+  Str2      : String;
+	AccountID : String;
+	CharaID   : String;
+	NpcID     : String;
+
+	tp  : TPlayer;
+	tc  : TChara;
+	tc1 : TChara;
+	tm  : TMap;
+	tn  : TNPC;
+	ts  : TMob;
+  ts1 : TMob;
+  tss : TSlaveDB;
+  ma  : TMArrowDB;
+  tid : TIDTbl;
+	ti  : TItem;
+	tk  : TSkill;
+	tl  : TSkillDB;
+	td  : TItemDB;
+
 {アイテム製造追加}
-	tma :TMaterialDB;
+	tma : TMaterialDB;
 {アイテム製造追加ココまで}
 {パーティー機能追加}
-	tpa :TParty;
+	tpa : TParty;
 {パーティー機能追加ココまで}
 {チャットルーム機能追加}
-	tcr :TChatRoom;
+	tcr : TChatRoom;
 {チャットルーム機能追加ココまで}
 {露店スキル追加}
-	tv  :TVender;
-{露店スキル追加ココまで}  
+	tv  : TVender;
+{露店スキル追加ココまで}
 {取引機能追加}
-	tdl :TDealings;
-  twp :TWarpDatabase;
+	tdl : TDealings;
+  twp : TWarpDatabase;
 {取引機能追加ココまで}
 {キューペット}
-        tpd             :TPetDB;
-        tmd             :TMobDB;
+  tpd : TPetDB;
+  tmd : TMobDB;
 {氏{箱追加}
-	tsmn	:TSummon;
+	tsmn  : TSummon;
 {氏{箱追加ココまで}
-        tpe             :TPet;
-        i1, j1, k1      :integer;
+  tpe             :TPet;
+
+  i1  : Integer;
+  j1  : Integer;
+  k1  : Integer;
 {キューペットここまで}
 {NPCイベント追加}
-	mi  :MapTbl;
+	mi  : MapTbl;
 {NPCイベント追加ココまで}
 {ギルド機能追加}
-	tg    :TGuild;
-	tg1   :TGuild;
-	tgb   :TGBan;
-	tgl   :TGRel;
-	tp1   :TPlayer;
+	tg    : TGuild;
+	tg1   : TGuild;
+	tgb   : TGBan;
+	tgl   : TGRel;
+	tp1   : TPlayer;
 {ギルド機能追加ココまで}
-	ta  :TMapList;
-	xy  :TPoint;
-  s   :string;
-	sl  :TStringList;
-	ww  :array of array of word;
-	tmpbuf:array of byte;
+	ta  : TMapList;
+	xy  : TPoint;
+  s   : String;
+	SL  : TStringList;
+	ww      : array of array of Word; //CRW This is dynamic 2-dim array??
+	tmpbuf  : array of Byte;
 
-        afm_compressed :TZip;
-        afm :textfile;
-        letter :char;
-        MapName :string;
-        dat     :TMemoryStream;
-        h2  :array[0..3] of single;
-        maptype :integer;
+  afm_compressed  : TZip;
+  afm             : Textfile;
+  letter          : Char;
+  MapName         : String;
+  dat             : TMemoryStream;
+  h2              :array[0..3] of Single; //CRW What is this for??
+  maptype         : Integer;
 
-begin
+Begin(* Proc sv3PacketProcess() *)
+
   j := 0;
   tcr := nil;
-	while Socket.ReceiveLength >= 2 do begin
+	while Socket.ReceiveLength >= 2 do
+  begin
 		//len := Socket.ReceiveLength;
 		Socket.ReceiveBuf(buf[0], 2);
 		RFIFOW(0, cmd);
@@ -137,9 +157,9 @@ begin
 			//DebugOut.Lines.Add('不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
 			SetLength(tmpbuf, Socket.ReceiveLength);
 			Socket.ReceiveBuf(tmpbuf[0], Socket.ReceiveLength);
-			continue;
+			Continue;
 		end;
-		Assert((cmd > 0) and (cmd <= $200), 'Packet Type: index error ' + IntToStr(cmd));
+		Assert((cmd > 0) AND (cmd <= $200), 'Packet Type: index error ' + IntToStr(cmd));
 		if PacketLength[cmd] = -1 then begin
 			Socket.ReceiveBuf(buf[2], 2);
 			RFIFOW(2, w);
@@ -155,11 +175,10 @@ begin
 
 		case cmd of
 		//--------------------------------------------------------------------------
-
-		$0072: //ゲーム鯖接続要求
+		$0072: //ゲーム鯖接続要求    Lit. "Game socket connection requested"
 			begin
-				RFIFOL( 2, l);
-				accountid := IntToStr(l);
+				RFIFOL( 2, L);
+				accountid := IntToStr(L);
 				//DebugOut.Lines.Add(Format('3:%.8d CMD %.4x', [l, cmd]));
 				//DebugOut.Lines.Add('		AccountID = ' + IntToHex(l, 4));
 				RFIFOL( 6, l2);
@@ -168,9 +187,9 @@ begin
 				RFIFOL(10, id1);
 				//DebugOut.Lines.Add('		LoginID1 = ' + IntToHex(id1, 4));
 				//RFIFOL(14, id2);
-				if (Player.IndexOf(l) <> -1) and (Chara.IndexOf(l2) <> -1) then begin
-					tp := Player.IndexOfObject(l) as TPlayer;
-					tc := Chara.IndexOfObject(l2) as TChara;
+				if (Player.IndexOf(L) <> -1) and (Chara.IndexOf(L2) <> -1) then begin
+					tp := Player.IndexOfObject(L) as TPlayer;
+					tc := Chara.IndexOfObject(L2) as TChara;
 
 					//if tc.IP = Socket.RemoteAddress then begin
 					if (tp.LoginID1 = id1) and (tp.LoginID1 <> 0) then begin
@@ -216,20 +235,22 @@ begin
 							SendGLoginInfo(tg, tc);
 						end;
 
-                        if (Option_WelcomeMsg) then begin
-                            str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
-                            w := 200;
-                            WFIFOW(0, $009a);
-                            WFIFOW(2, w);
-                            WFIFOS(4, str2, w-4);
-                            for i := 0 to CharaName.Count - 1 do begin
-		    		            tc1 := CharaName.Objects[i] as TChara;
-			    	            if tc1.Login = 2 then begin
-                                    tc1.Socket.SendBuf(buf, w);
-                                end;
-                            end;
-                            tc.Socket.SendBuf(buf, w);
-                        end;
+            //CRW -- Broadcasts Welcome Message to all Users.
+            if (Option_WelcomeMsg) then begin
+              str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
+              //CRW -- why is "w" 200 -- should it not be SizeOf(str2) ??
+              w := 200;
+              WFIFOW(0, $009a);
+              WFIFOW(2, w);
+              WFIFOS(4, str2, w-4);
+              for i := 0 to CharaName.Count - 1 do begin
+				        tc1 := CharaName.Objects[i] as TChara;
+				        if tc1.Login = 2 then begin
+                  tc1.Socket.SendBuf(buf, w);
+                end;
+              end;
+              tc.Socket.SendBuf(buf, w);
+            end;//if (Option.WelcomeMsg)
 
 {ギルド機能追加ココまで}
 					end else begin
@@ -238,9 +259,9 @@ begin
 						Socket.SendBuf(buf, 3);
 					end;
 				end;
-			end;
+			end;//$0072
 		//--------------------------------------------------------------------------
-		$007d: //MAPロード完了
+		$007d: //MAPロード完了..Lit. "Completion of MAP load"
 			begin
 				if tc.tmpMap <> '' then begin
 					tc.Map := tc.tmpMap;
@@ -254,48 +275,47 @@ begin
 				tc.MData := tm;
 				if CharaPID.IndexOf(tc.ID) = -1 then CharaPID.AddObject(tc.ID, tc);
 
-                                mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 				//マップに自分が居ることを記録
 				tm.CList.AddObject(tc.ID, tc);
 				tm.Block[tc.Point.X div 8][tc.Point.Y div 8].CList.AddObject(tc.ID, tc);
 
-                                //Grace Time
-                                if mi.PvPG = true then begin
-                                        tc.GraceTick := timeGetTime() + 15000;
-                                end else begin
-                                        tc.GraceTick := timeGetTime() + 5000;
-                                end;
+        //Grace Time
+        if mi.PvPG = true then begin
+          tc.GraceTick := timeGetTime() + 15000;
+        end else begin
+          tc.GraceTick := timeGetTime() + 5000;
+        end;
 
-
-				//生き返り処理
+				//生き返り処理  Lit. "Reanimating processing"
 				if tc.Sit = 1 then tc.Sit := 3;
 				if tc.HP = 0 then begin
-                                        if tc.JID = 0 then begin
-                                                tc.HP := tc.MAXHP div 2;
-                                                if tc.FullRecover then begin
-                                                        tc.HP := tc.MAXHP;
-                                                        tc.SP := tc.MAXSP;
-                                                end;
-                                        end else begin
-                                                if tc.FullRecover then begin
-                                                        tc.HP := tc.MAXHP;
-                                                        tc.SP := tc.MAXSP;
-                                                end else begin
-                                                        tc.HP := 1;
-                                                end;
-                                        end;
-                                end;
+          if tc.JID = 0 then begin
+            tc.HP := tc.MAXHP div 2;
+            if tc.FullRecover then begin
+              tc.HP := tc.MAXHP;
+              tc.SP := tc.MAXSP;
+            end;
+          end else begin
+            if tc.FullRecover then begin
+              tc.HP := tc.MAXHP;
+              tc.SP := tc.MAXSP;
+            end else begin
+              tc.HP := 1;
+            end;
+          end;
+        end;
 
-{露店スキル追加}
+{露店スキル追加} {Lit. "Street stall skill addition"}
 				tc.VenderID := 0;
-{露店スキル追加ココまで}
-{チャットルーム機能追加}
+{露店スキル追加ココまで} {Lit. "To street stall skill additional coconut"}
+{チャットルーム機能追加} {Lit. "Chat room functional addition"}
 				tc.ChatRoomID := 0;
-{チャットルーム機能追加ココまで}
-{取引機能追加}
+{チャットルーム機能追加ココまで} {Lit. "To Chat room functional additional coconut"}
+{取引機能追加} {Lit. "Transaction functional addition"}
 				tc.DealingID := 0;
 				tc.PreDealID := 0;
-{取引機能追加ココまで}
+{取引機能追加ココまで}{Lit. "Transaction functional additional cocout"}
 
 				//ブロック処理
 				for j := tc.Point.Y div 8 - 2 to tc.Point.Y div 8 + 2 do begin
@@ -304,7 +324,7 @@ begin
 						for k := 0 to tm.Block[i][j].NPC.Count - 1 do begin
 							tn := tm.Block[i][j].NPC.Objects[k] as TNPC;
 							if (abs(tc.Point.X - tn.Point.X) < 16) and (abs(tc.Point.Y - tn.Point.Y) < 16) then begin
-{NPCイベント追加}
+{NPCイベント追加} {Lit. "NPC Event Addition"}
                 //SendNData(Socket, tn, tc.ver2);
 								if (tn.Enable = true) then begin
 									SendNData(Socket, tn,tc.ver2);
@@ -483,24 +503,21 @@ begin
 				SendPartyList(tc);
 {パーティー機能ココまで}
 {キューペット}
-                                j := 0;
-                                for i := 1 to 100 do begin
-                                        if ( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
-                                        ( tc.Item[i].Card[0] = $FF00 ) and ( tc.Item[i].Attr <> 0 ) then begin
-                                                j := i;
-                                                break;
-                                        end;
-                                end;
+        j := 0;
+        for i := 1 to 100 do begin
+          if ( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
+          ( tc.Item[i].Card[0] = $FF00 ) and ( tc.Item[i].Attr <> 0 ) then begin
+            j := i;
+            break;
+          end;
+        end;
 
-                                if j > 0 then begin
-
-                                        i := PetList.IndexOf( tc.Item[j].Card[2] + tc.Item[j].Card[3] * $10000 );
-
-                                        if i <> -1 then begin
-                                            SendPetRelocation(tm, tc, i);
-
-                                        end;
-                                end;
+        if j > 0 then begin
+          i := PetList.IndexOf( tc.Item[j].Card[2] + tc.Item[j].Card[3] * $10000 );
+          if i <> -1 then begin
+            SendPetRelocation(tm, tc, i);
+          end;
+        end;
 {キューペットここまで}
 
 {ギルド機能追加}
@@ -514,47 +531,46 @@ begin
 					Socket.SendBuf(buf, 182);
 				end;
 
-          if (mi.Pvp = true) then begin
-              for j := 0 to tm.CList.Count - 1 do begin
-              tc1 := tm.CList.Objects[j] as TChara;
-              WFIFOW( 0, $0199);
-							WFIFOW( 2, 1);
-							tc1.Socket.SendBuf(buf, 4);
-              k := j + 1;
-              i := tm.CList.Count;
-              WFIFOW( 0, $019a);
-              WFIFOL( 2, tc1.ID);
-              WFIFOL( 6, k);
-              WFIFOL( 10, i);
-              tc1.Socket.SendBuf(buf, 14);
-              end;
-
+        if (mi.Pvp = true) then begin
+          for j := 0 to tm.CList.Count - 1 do begin
+            tc1 := tm.CList.Objects[j] as TChara;
+            WFIFOW( 0, $0199);
+            WFIFOW( 2, 1);
+            tc1.Socket.SendBuf(buf, 4);
+            k := j + 1;
+            i := tm.CList.Count;
+            WFIFOW( 0, $019a);
+            WFIFOL( 2, tc1.ID);
+            WFIFOL( 6, k);
+            WFIFOL( 10, i);
+            tc1.Socket.SendBuf(buf, 14);
           end;
+        end;
 
-          if (mi.PvPG = true) then begin
-              for j := 0 to tm.CList.Count - 1 do begin
-                tc1 := tm.CList.Objects[j] as TChara;
-                WFIFOW( 0, $0199);
-                WFIFOW( 2, 3);
-                tc1.Socket.SendBuf(buf, 4);
-              end;
+        if (mi.PvPG = true) then begin
+          for j := 0 to tm.CList.Count - 1 do begin
+            tc1 := tm.CList.Objects[j] as TChara;
+            WFIFOW( 0, $0199);
+            WFIFOW( 2, 3);
+            tc1.Socket.SendBuf(buf, 4);
           end;
+        end;
 
-          // Colus, 20040118: Update Spirit Spheres for monks
-          if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-          
-          {if (mi.noDay = true) {or (tc.noDay = true) then begin
-                WFIFOW(0, $0119);
-                WFIFOL(2, tc1.ID);
-                WFIFOW(6, 00);
-                WFIFOW(8, 16);
-                WFIFOW(10, 00);
-                WFIFOB(12, 0); // attack animation
-                Socket.SendBuf(buf, 13)
-          end;}
+        // Colus, 20040118: Update Spirit Spheres for monks
+        if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
-{ギルド機能追加ココまで}
-			end;
+        {if (mi.noDay = true) {or (tc.noDay = true) then begin
+          WFIFOW(0, $0119);
+          WFIFOL(2, tc1.ID);
+          WFIFOW(6, 00);
+          WFIFOW(8, 16);
+          WFIFOW(10, 00);
+          WFIFOB(12, 0); // attack animation
+          Socket.SendBuf(buf, 13)
+        end;}
+
+{ギルド機能追加ココまで} {Lit. "To guild functional additional coconut"}
+			end;//$007d
 		//--------------------------------------------------------------------------
 		$007e: //tick
 			begin
@@ -565,19 +581,19 @@ begin
 		//--------------------------------------------------------------------------
 		$0085: //移動要求 (座ってるときやチャットなどでは移動できないようにすること)
 			begin
-{チャットルーム機能追加}
+{チャットルーム機能追加} {Lit. "Chat room functional addition"}
         if tc.Sit = 1 then continue;
 
 				if tc.ChatRoomID <> 0 then continue; //チャット中の移動禁止
-{チャットルーム機能追加ココまで}
-{露店スキル追加}
-				if tc.VenderID <> 0 then continue; //露店中の移動禁止
-{露店スキル追加ココまで}
+{チャットルーム機能追加ココまで} {Lit. "To Chat room functional additional coconut}
+{露店スキル追加} {Lit. "Street stall skill addition"}
+				if tc.VenderID <> 0 then continue; //露店中の移動禁止  Lit. "Movement prohibition in street stall"
+{露店スキル追加ココまで} {Lit. "To street stall skill additional coconut"}
 				RFIFOM1(2, xy);
 				tc.NextFlag := true;
 				tc.NextPoint := xy;
-{パーティー機能追加}
-				//同一マップ内PTMに所在を知らせる
+{パーティー機能追加} {Lit. "Party functional addition"}
+				//同一マップ内PTMに所在を知らせる  Lit. "It informs about location inside PTM the identical map"
 				if tc.PartyName <> '' then begin
 					WFIFOW( 0, $0107);
 					WFIFOL( 2, tc.ID);
@@ -585,7 +601,7 @@ begin
 					WFIFOW( 8, tc.NextPoint.Y);
 					SendPCmd(tc,10,true,true);
 				end;
-{パーティー機能追加ココまで}
+{パーティー機能追加ココまで} {Lit. "To party functional additional coconut"}
 			end;
 		//--------------------------------------------------------------------------
 		$0089: //攻撃、座り
@@ -603,50 +619,51 @@ begin
 					RFIFOL(2, l);
 					tm := tc.MData;
           //DebugOut.Lines.Add(IntToStr(l));
-////////////////////////////////////
-																				//モンスター型NPC（攻撃しようとすると開始）
-if tm.NPC.IndexOf(l) <> -1 then begin
-tn := tm.NPC.IndexOfObject(l) as TNPC;
-									//距離チェック
-if (tc.Map <> tn.Map) or (abs(tc.Point.X - tn.Point.X) > 15) or (abs(tc.Point.Y - tn.Point.Y) > 15) then begin
-continue;
-end;
-					        case tn.CType of
-					        1:	//shop
-				        		begin
-				        			WFIFOW(0, $00c4);
-				        			WFIFOL(2, l);
-											Socket.SendBuf(buf, 6);
-				        		end;
-				        	2:	//script
-				        		begin
-				        			tc.TalkNPCID := tn.ID;
-					        		tc.ScriptStep := 0;
-						        	tc.AMode := 3;
-							// Option Reset
-              // Colus, 20040204: WHY?  You will lose your peco/falcon when
-              // talking/shopping...you want to unhide, perhaps, but not
-              // completely reset your options.
-							if (tc.Option and 6 <> 0) then begin
-								tc.Option := tc.Option and $FFF9;
-								//見た目変更
-                UpdateOption(tm, tc);
-							end;
-							        tc.AData := tn;
-					        		NPCScript(tc);
-					        	end;
-                 { 4: // Skillunit
-                    begin
-                      if (tn.JID = $8d) then begin
-						if tc.pcnt <> 0 then xy := tc.tgtPoint else xy := tc.Point;
-						if (abs(xy.X - tn.Point.X) > tc.Range) or (abs(xy.Y - tn.Point.Y) > tc.Range) then begin
-							//距離が遠すぎる
-							WFIFOW( 0, $0139);
-							WFIFOL( 2, tn.ID);
-							WFIFOW( 6, tn.Point.X);
-							WFIFOW( 8, tn.Point.Y);
-							WFIFOW(10, tc.Point.X);
-							WFIFOW(12, tc.Point.Y);
+          ////////////////////////////////////
+					//モンスター型NPC（攻撃しようとすると開始）
+          if tm.NPC.IndexOf(l) <> -1 then begin
+            tn := tm.NPC.IndexOfObject(l) as TNPC;
+						//距離チェック
+            if (tc.Map <> tn.Map) OR (abs(tc.Point.X - tn.Point.X) > 15) OR
+               (abs(tc.Point.Y - tn.Point.Y) > 15) then begin
+              Continue;
+            end;
+					  case tn.CType of
+					    1:	//shop
+				    		begin
+				    			WFIFOW(0, $00c4);
+				    			WFIFOL(2, l);
+									Socket.SendBuf(buf, 6);
+				    		end;
+				    	2:	//script
+				    		begin
+				    			tc.TalkNPCID := tn.ID;
+					    		tc.ScriptStep := 0;
+						    	tc.AMode := 3;
+								// Option Reset
+                // Colus, 20040204: WHY?  You will lose your peco/falcon when
+                // talking/shopping...you want to unhide, perhaps, but not
+                // completely reset your options.
+									if (tc.Option and 6 <> 0) then begin
+										tc.Option := tc.Option and $FFF9;
+										//見た目変更  Lit. "The eye modification which you saw"
+                  UpdateOption(tm, tc);
+									end;
+							    tc.AData := tn;
+					    		NPCScript(tc);
+					    	end;
+                { 4: // Skillunit
+                  begin
+                  if (tn.JID = $8d) then begin
+										if tc.pcnt <> 0 then xy := tc.tgtPoint else xy := tc.Point;
+										if (abs(xy.X - tn.Point.X) > tc.Range) or (abs(xy.Y - tn.Point.Y) > tc.Range) then begin
+											//距離が遠すぎる
+											WFIFOW( 0, $0139);
+											WFIFOL( 2, tn.ID);
+											WFIFOW( 6, tn.Point.X);
+											WFIFOW( 8, tn.Point.Y);
+											WFIFOW(10, tc.Point.X);
+											WFIFOW(12, tc.Point.Y);
 							WFIFOW(14, tc.Range); //射程
 							Socket.SendBuf(buf, 16);
 						end else begin
@@ -1326,10 +1343,11 @@ else if (Copy(str, 1, 5) = 'kick ') then begin
 end;
 
 					end else if (Copy(str, 1, 4) = 'job ') and ((DebugCMD and $0010) <> 0) and (tid.ChangeJob = 1) then begin
-{修正}                                          if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ノービスからは出来ない
-                                                begin
-						        //職業変更
-										Val(Copy(str, 5, 256), i, k);
+{修正}
+            if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ノービスからは出来ない
+            begin
+						//職業変更
+							Val(Copy(str, 5, 256), i, k);
               if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
                 // Colus, 20040203: Added unequip of items when you #job
             		for  j := 1 to 100 do begin
@@ -7339,6 +7357,8 @@ end;
 {露店スキル追加ココまで}
 		end;
   end;
-end;
+End;(* Proc sv3PacketProcess()
+*-----------------------------------------------------------------------------*)
+
 //==============================================================================
 end.
