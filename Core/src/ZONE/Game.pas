@@ -506,6 +506,7 @@ begin
                                                 tn.Name := tpe.Name;
                                                 tn.JID := tpe.JID;
                                                 tn.Map := tc.Map;
+                                                tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
 
                                                 repeat
                                                         tn.Point.X := tc.Point.X + Random(5) - 2;
@@ -6992,7 +6993,7 @@ end;
                                                         tpe.Relation := 250;
                                                         tpe.Fullness := 25;
                                                         tpe.Accessory := 0;
-                                                        tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
+
 
                                                         PetList.AddObject( tpe.PetID, tpe );
 
@@ -7004,6 +7005,7 @@ end;
 																												else Inc( NowPetID );
                                                 end;
 
+                                                tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
                                                 tn.Name := tpe.Name;
                                                 tn.JID := tpe.JID;
                                                 tn.Map := tc.Map;

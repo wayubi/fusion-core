@@ -2917,7 +2917,7 @@ begin
 						break;
 					end;
 				end;}
-				if j <> 0 then begin
+				{if j <> 0 then begin
 					//アイテム追加
 					tpe.Item[j].ID := tn.Item.ID;
 					tpe.Item[j].Amount := tpe.Item[j].Amount + tn.Item.Amount;
@@ -2929,7 +2929,36 @@ begin
 					tpe.Item[j].Card[1] := tn.Item.Card[1];
 					tpe.Item[j].Card[2] := tn.Item.Card[2];
 					tpe.Item[j].Card[3] := tn.Item.Card[3];
-					tpe.Item[j].Data := tn.Item.Data;
+					tpe.Item[j].Data := tn.Item.Data;}
+        //Add to players inventory
+        if tc.MaxWeight >= tc.Weight + tn.Item.Data.Weight * tn.Item.Amount then begin
+				  j := SearchCInventory(tc, tn.Item.ID, tn.Item.Data.IEquip);
+				  if j <> 0 then begin
+					  //アイテム撤去
+					  WFIFOW(0, $00a1);
+					  WFIFOL(2, tn.ID);
+					  SendBCmd(tm, tn.Point, 6);
+					  //アイテム追加
+					  tc.Item[j].ID := tn.Item.ID;
+					  tc.Item[j].Amount := tc.Item[j].Amount + tn.Item.Amount;
+					  tc.Item[j].Equip := 0;
+					  tc.Item[j].Identify := tn.Item.Identify;
+					  tc.Item[j].Refine := tn.Item.Refine;
+					  tc.Item[j].Attr := tn.Item.Attr;
+					  tc.Item[j].Card[0] := tn.Item.Card[0];
+					  tc.Item[j].Card[1] := tn.Item.Card[1];
+					  tc.Item[j].Card[2] := tn.Item.Card[2];
+					  tc.Item[j].Card[3] := tn.Item.Card[3];
+					  tc.Item[j].Data := tn.Item.Data;
+					  //重量追加
+					  tc.Weight := tc.Weight + tn.Item.Data.Weight * tn.Item.Amount;
+					  WFIFOW( 0, $00b0);
+					  WFIFOW( 2, $0018);
+					  WFIFOL( 4, tc.Weight);
+					  tc.Socket.SendBuf(buf, 8);
+					  //アイテムゲット通知
+					  SendCGetItem(tc, j, tn.Item.Amount);
+          end;
 				end;
 				//Remove the item from screen
 				WFIFOW(0, $00a1);
