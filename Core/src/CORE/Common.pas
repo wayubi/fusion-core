@@ -4037,21 +4037,15 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure SendCData(tc1:TChara; tc:TChara; Use0079:boolean = false);
-{ギルド機能追加}
 var
 	j   :integer;
 	w   :word;
 	tg  :TGuild;
-{ギルド機能追加ココまで}
 begin
 	ZeroMemory(@buf[0], 54);
 
-
-
-
     // Alex: switched 01d9/01d8 to 0079/0078 to reenabled lower dyes. Wonder why
     // it was changed.
-
 	if Use0079 then begin
         WFIFOW(0, $0079);
 		//WFIFOW(0, $01d9); //0079->01d9
@@ -4059,12 +4053,11 @@ begin
     	WFIFOW(0, $0078);
 		//WFIFOW(0, $01d8); //0078->01d8
 	end;
+
 	WFIFOL( 2, tc.ID);
 	WFIFOW( 6, tc.Speed);
-{追加}
 	WFIFOW( 8, tc.Stat1);
 	WFIFOW(10, tc.Stat2);
-{追加ココまで}
 	WFIFOW(12, tc.Option);
 	WFIFOW(14, tc.JID);
 	WFIFOW(16, tc.Hair);
@@ -4081,77 +4074,71 @@ begin
 	WFIFOW(28, tc.HairColor);
 	WFIFOW(30, tc.ClothesColor);
 	WFIFOW(32, tc.HeadDir);
-{ギルド機能追加}
 	WFIFOL(34, tc.GuildID); //GuildID.L
+
 	w := 0;
 	if (tc.GuildID <> 0) then begin
-		j := GuildList.IndexOf(tc.GuildID);
-		if (j <> -1) then begin
+        j := GuildList.IndexOf(tc.GuildID);
+        if (j <> -1) then begin
 			tg := GuildList.Objects[j] as TGuild;
 			w := tg.Emblem;
 		end;
 	end;
+
 	WFIFOL(38, w); //EmblemID.L
 	WFIFOW(42, tc.Manner); //.W?
 	WFIFOB(44, tc.Karma); //.B?
-{ギルド機能追加ココまで}
 	WFIFOB(45, tc.Gender);
 	WFIFOM1(46, tc.Point, tc.Dir);
 	WFIFOB(49, 5);
 	WFIFOB(50, 5);
-{修正}
 	if Use0079 then begin
-{追加}
-    {Colus, 20040115: Aura fix for >99 levels}
-    if (tc.BaseLV > 99) then begin
- 	  	WFIFOW(51, 99);
+
+        {Colus, 20040115: Aura fix for >99 levels}
+        if (tc.BaseLV > 99) then begin
+ 	  	    WFIFOW(51, 99);
+        end else begin
+            WFIFOW(51, tc.BaseLV);
+        end;
+
+		if tc.Socket <> nil then begin
+            if not (tc1.Login = 0) and not (tc1.Socket = nil) then begin
+                if tc.ver2 = 9 then tc1.Socket.SendBuf(buf, 53)	//Kr?
+                else tc1.Socket.SendBuf(buf, 51); //Jp
+            end;
+        end;
     end else begin
-      WFIFOW(51, tc.BaseLV);
+
+        WFIFOB(51, tc.Sit);
+        {Colus, 20040115: Aura fix for >99 levels}
+        if (tc.BaseLV > 99) then begin
+	  	    WFIFOW(52, 99);
+        end else begin
+            WFIFOW(52, tc.BaseLV);
+        end;
+
+        if tc.Socket <> nil then begin
+            if not (tc1.Login = 0) and not (tc1.Socket = nil) then begin
+                if tc.ver2 = 9 then tc1.Socket.SendBuf(buf, 54)	//Kr?
+                else tc1.Socket.SendBuf(buf, 52); //Jp
+            end;
+        end;
     end;
 
-{追加ココまで}
-		if tc.Socket <> nil then begin
-                        if tc1.Login > 0 then begin
-        			if tc.ver2 = 9 then tc1.Socket.SendBuf(buf, 53)	//Kr?
-	        		else                tc1.Socket.SendBuf(buf, 51); //Jp
-                        end;
-		end;
-	end else begin
-		WFIFOB(51, tc.Sit);
-{追加}
-    {Colus, 20040115: Aura fix for >99 levels}
-    if (tc.BaseLV > 99) then begin
-	  	WFIFOW(52, 99);
-    end else begin
-      WFIFOW(52, tc.BaseLV);
-    end;
-
-{追加ココまで}
-		if tc.Socket <> nil then begin
-                        if tc1.Login > 0 then begin
-        			if tc.ver2 = 9 then tc1.Socket.SendBuf(buf, 54)	//Kr?
-	        		else                tc1.Socket.SendBuf(buf, 52); //Jp
-                        end;
-		end;
-	end;
-{ココまで}
-{パーティー機能追加}
 	if tc.PartyName <> '' then begin
-	//パーティーメンバーにHPバーを表示させる
-	WFIFOW( 0, $0106);
-	WFIFOL( 2, tc.ID);
-	WFIFOW( 6, tc.HP);
-	WFIFOW( 8, tc.MAXHP);
-	SendPCmd(tc, 10, true, true);
+    	WFIFOW( 0, $0106);
+	    WFIFOL( 2, tc.ID);
+    	WFIFOW( 6, tc.HP);
+	    WFIFOW( 8, tc.MAXHP);
+    	SendPCmd(tc, 10, true, true);
 
-	//パーティーメンバーの位置表示
-	WFIFOW( 0, $0107);
-	WFIFOL( 2, tc.ID);
-	WFIFOW( 6, tc.Point.X);
-	WFIFOW( 8, tc.Point.Y);
-	SendPCmd(tc, 10, true, true);
-  end;
-{パーティー機能追加ココまで}
+    	WFIFOW( 0, $0107);
+	    WFIFOL( 2, tc.ID);
+    	WFIFOW( 6, tc.Point.X);
+	    WFIFOW( 8, tc.Point.Y);
+    	SendPCmd(tc, 10, true, true);
+    end;
+
 end;
 //------------------------------------------------------------------------------
 procedure SendCMove(Socket: TCustomWinSocket; tc:TChara; before, after:TPoint);
