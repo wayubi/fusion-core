@@ -10,7 +10,7 @@ uses
     {Kylix/Delphi CLX}
         {need eqive of MMSystem.  MMSystem is needed for timeGetTime}
     {Shared}
-    Classes, SysUtils,
+    Classes, SysUtils, Dialogs,
     {Fusion}
     Common, SQLData, Zip, List32, PlayerData, REED_SAVE_ACCOUNTS;
 
@@ -813,9 +813,13 @@ uses
         ports : Variant;
     begin
         if not (LAN_IP = '127.0.0.1') then begin
-            nat := CreateOleObject('HNetCfg.NATUPnP');
-            ports := nat.StaticPortMappingCollection;
-            ports.Add(port, 'TCP', port, LAN_IP, true, name);
+            try
+                nat := CreateOleObject('HNetCfg.NATUPnP');
+                ports := nat.StaticPortMappingCollection;
+                ports.Add(port, 'TCP', port, LAN_IP, true, name);
+            except
+                ShowMessage('An Error occured with adding UPnP Ports. The ' + name + ' port was not added to the router.  Please check to see if your router supports UPnP and has it enabled or disable UPnP.');
+            end;
         end;
     end;
 
