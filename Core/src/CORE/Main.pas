@@ -395,6 +395,11 @@ begin
 	end else begin
 		StealMultiplier := 100;
 	end;
+	if sl.IndexOfName('EnablePetSkills') <> -1 then begin
+		EnablePetSkills := StrToBool(sl.Values['EnablePetSkills']);
+	end else begin
+		EnablePetSkills := true;
+	end;
 	if sl.IndexOfName('DisableFleeDown') <> -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
@@ -724,6 +729,7 @@ begin
  	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
  	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
 	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
+	ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));  
 	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
         ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
         ini.WriteString('Server', 'DefaultMap', DefaultMap);
@@ -14778,7 +14784,7 @@ if (cmdStart.Caption = 'Start') then begin
 
 				CharaPassive(tc,Tick);
                                 SkillPassive(tc,Tick);
-				if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetPassive(tc, Tick);
+				if (EnablePetSkills) and ( tc.PetData <> nil ) and ( tc.PetNPC <> nil )then PetPassive(tc, Tick);
 
 				//時間制限スキルが切れたかどうかチェック
 				if SkillTick <= Tick then begin

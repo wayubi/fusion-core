@@ -1318,6 +1318,7 @@ var
   ItemDropMultiplier     :integer;
 	ItemDropPer            :integer;
   StealMultiplier        :integer;
+  EnablePetSkills        :boolean;  
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
         Timer                  :boolean;

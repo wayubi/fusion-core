@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
+- 03-13-04: Added EnablePetSkills boolean option. [Colus]
 - 03-13-04: Updated ME and Sanctuary (damage, duration). [Colus]
 - 03-13-04: FusionSQL -> Fixed Guild Overwriting Bug. [AlexKreuz]
 - 03-13-04: Added StealMultiplier (works as percentage, default 100). [Colus]
