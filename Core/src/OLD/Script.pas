@@ -853,21 +853,19 @@ begin
                 l := tn.Script[tc.ScriptStep].Data3[0];
                 str := tn.Script[tc.ScriptStep].Data1[0] + chr(0);
                 if ((l < 101) or (l > 300)) then begin
+                    //Global Broadcasting
+                    for i := 0 to CharaName.Count - 1 do begin
+                        tc1 := CharaName.Objects[i] as TChara;
+                        broadcast_handle(tc,tc1,str,true,l,tn);
+                    end;
+                end else begin
                     //MAP broadcasting
                     tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
                     for i := 0 to tm.CList.Count - 1 do begin
                         tc1 := tm.CList.Objects[i] as TChara;
-                        if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
-                    end;
-                end else begin
-                    //Global Broadcasting
-                    for i := 0 to CharaName.Count - 1 do begin
-                        tc1 := CharaName.Objects[i] as TChara;
-                        if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
+                        broadcast_handle(tc,tc1,str,true,l,tn);
                     end;
                 end;
-
-                broadcast_handle(tc,tc1,str,true,l,tn);
                 Inc(tc.ScriptStep);
             end;
         35: //npctimer
@@ -1726,10 +1724,9 @@ begin
                         (tc1.Point.X <= tn.Script[tc.ScriptStep].Data3[2]) and
                         (tc1.Point.Y >= tn.Script[tc.ScriptStep].Data3[1]) and
                         (tc1.Point.Y <= tn.Script[tc.ScriptStep].Data3[3]) then begin
-                            if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
+                            broadcast_handle(tc,tc1,str,true,l,tn);
                     end;
                 end;
-                broadcast_handle(tc,tc1,str,true,l,tn);
                 Inc(tc.ScriptStep);
             end;
         83: //waitingroomcount

@@ -927,12 +927,13 @@ uses
             if BroadcastType = 4 then str := 'blue' + NPC.Name + ' : ' +str; //displays npc name and in blue
             if BroadcastType = 0 then str := NPC.Name + ' : ' + str; // Null (0): displays npc name with it
         end;
-
-        w := Length(str) + 4;
-        WFIFOW(0, $009a);
-        WFIFOW(2, w);
-        WFIFOS(4, str, w - 4);
-        tc1.Socket.SendBuf(buf, w);
+        if tc1.Login = 2 then begin
+            w := Length(str) + 4;
+            WFIFOW(0, $009a);
+            WFIFOW(2, w);
+            WFIFOS(4, str, w - 4);
+            tc1.Socket.SendBuf(buf, w);
+        end;
     end;
 
     function JIDFixer(ID:integer) : integer;
