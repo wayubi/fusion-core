@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-25-04: JCon: Can view and delete Character variables. [Tsusai]
 - 10-25-04: JCon: Restarts WAC if WAC is on to make port change work. [Tsusai]
 - 10-25-04: WAC: Fixed account submission %40 instead of @ problem for non-IE browsers. [Tsusai]
 - 10-21-04: JCon: Character skill modification save finish. [Tsusai]

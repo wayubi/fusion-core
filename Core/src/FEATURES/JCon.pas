@@ -36,6 +36,7 @@ uses
     procedure JCon_Chara_Skill_Populate();
     procedure JCon_Chara_Skill_Save();
     procedure JCon_Chara_Flag_Load();
+    procedure JCon_Chara_Flag_Delete();
 
 
     procedure JCon_INI_Server_Load();
@@ -896,15 +897,30 @@ uses
 
     procedure JCon_Chara_Flag_Load();
     var
-		j : Integer;
     	tc : TChara;
 
 	begin
-        //frmMain.ListBox7.Clear;
+        frmMain.ListBox8.Clear;
 
-        //if (frmMain.listbox2.ItemIndex = -1) then Exit;
-        //tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+        frmMain.ListBox8.Items.AddStrings(tc.Flag);
+
     end;
 
+    procedure JCon_Chara_Flag_Delete();
+    var
+        tc : TChara;
+    begin
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        if (frmMain.listbox8.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        tc.Flag.Delete(frmMain.ListBox8.ItemIndex);
+
+        DataSave(true);
+        JCon_Chara_Flag_Load();
+
+    end;
 
 end.

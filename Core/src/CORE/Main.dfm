@@ -2307,6 +2307,15 @@ object frmMain: TfrmMain
             TabOrder = 5
             OnClick = CheckBox2Click
           end
+          object Button25: TButton
+            Left = 296
+            Top = 328
+            Width = 75
+            Height = 25
+            Caption = 'Delete'
+            TabOrder = 6
+            OnClick = Button25Click
+          end
         end
       end
     end

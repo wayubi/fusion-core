@@ -339,6 +339,7 @@ type
     CheckBox2: TCheckBox;
     Label116: TLabel;
     Label131: TLabel;
+    Button25: TButton;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -450,6 +451,7 @@ type
     procedure CheckBox2Click(Sender: TObject);
     procedure ListBox7Click(Sender: TObject);
     procedure Button23Click(Sender: TObject);
+    procedure Button25Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11613,6 +11615,11 @@ end;
 procedure TfrmMain.Button23Click(Sender: TObject);
 begin
     JCon_Chara_Skill_Save();
+end;
+
+procedure TfrmMain.Button25Click(Sender: TObject);
+begin
+    JCon_Chara_Flag_Delete();
 end;
 
 end.
