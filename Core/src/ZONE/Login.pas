@@ -199,43 +199,7 @@ begin
 
             if (option_mf = '_M') or (option_mf = '_F') then begin
 				userid := copy(userid, 0, length(userid) - 2);
-
-                Idx := 100101;
-                i := 0;
-                
-                for i := 0 to Player.Count - 1 do begin
-                	tp2 := Player.Objects[i] as TPlayer;
-                	if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
-                    	Idx := i + 100101;
-                        Break;
-                    end;
-                end;
-
-                if (i = player.count) then Idx := 100101 + Player.Count;
-
-	            if (option_mf = '_M') then begin
-    	        	tp := TPlayer.Create;
-        		    tp.ID := Idx;
-    	    	    tp.Name := userid;
-	            	tp.Pass := userpass;
-	            	tp.Gender := 1;
-    	    	    tp.Mail := '-@-';
-                    tp.Login := 0;
-                    PlayerName.AddObject(tp.Name, tp);
-	        	    Player.AddObject(tp.ID, tp);
-	            end else if (option_mf = '_F') then begin
-    	        	tp := TPlayer.Create;
-        		    tp.ID := Idx;
-    	    	    tp.Name := userid;
-	            	tp.Pass := userpass;
-	            	tp.Gender := 0;
-    	    	    tp.Mail := '-@-';
-                    tp.Login := 0;
-                    PlayerName.AddObject(tp.Name, tp);
-	        	    Player.AddObject(tp.ID, tp);
-                end;
-
-                PD_Save_Accounts(True);
+                create_account(userid, userpass, '-@-', option_mf);
             end;
 
         end;
@@ -256,28 +220,7 @@ begin
         	Readln(addtxt,userdata);
             sl.DelimitedText := userdata;
 
-            i := 0;
-            Idx := 100101;
-
-            for i := 0 to Player.Count - 1 do begin
-            	tp2 := Player.Objects[i] as TPlayer;
-                if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
-                	Idx := i + 100101;
-                    Break;
-                end;
-            end;
-
-            if (i = player.count) then Idx := 100101 + Player.Count;
-
-            tp := TPlayer.Create;
-            tp.ID := Idx;
-            tp.Name := sl.Strings[0];
-            tp.Pass := sl.Strings[1];
-            tp.Gender := StrToInt(sl.Strings[2]);
-            tp.Mail := sl.Strings[3];
-            PlayerName.AddObject(tp.Name, tp);
-            Player.AddObject(tp.ID, tp);
-            PD_Save_Accounts(True);
+            create_account(sl.Strings[0], sl.Strings[1], sl.Strings[3], sl.Strings[2]);
 
             inc(count);
             sl.Clear;

@@ -5,14 +5,13 @@ interface
 uses
     StrUtils, SysUtils,
     Common, PlayerData,
-    BRSHttpSrv;
+    BRSHttpSrv, Globals;
 
 var
     BRSHttpSrv1 : TBRSHttpSrv;
 
     function parse_wac(URI : String) : String;
     function account_exists(username : String) : Boolean;
-    procedure create_account(username : String; password : String; email : String; sex : String);
 
     procedure create_wac();
     procedure destroy_wac(forced : Boolean = False);
@@ -81,41 +80,6 @@ uses
     begin
         if PlayerName.IndexOf(username) = -1 then Result := False
         else Result := True;
-    end;
-
-    procedure create_account(username : String; password : String; email : String; sex : String);
-    var
-        Idx : Integer;
-        i : Integer;
-        tp : TPlayer;
-    begin
-        Idx := 100101;
-        i := 0;
-
-        for i := 0 to Player.Count - 1 do begin
-            tp := Player.Objects[i] as TPlayer;
-            if (tp.ID <> i + 100101) and (tp.ID > 100100) then begin
-                Idx := i + 100101;
-                Break;
-            end;
-        end;
-
-        if (i = Player.Count) then Idx := 100101 + Player.Count;
-
-        tp := TPlayer.Create;
-        tp.ID := Idx;
-        tp.Name := username;
-        tp.Pass := password;
-
-        if (sex = 'M') then tp.Gender := 1
-        else if (sex = 'F') then tp.Gender := 0;
-
-        tp.Mail := email;
-        tp.Login := 0;
-        PlayerName.AddObject(tp.Name, tp);
-        Player.AddObject(tp.ID, tp);
-
-        PD_Save_Accounts(True);
     end;
 
     procedure create_wac();

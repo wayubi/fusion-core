@@ -45,6 +45,8 @@ uses
 
     procedure fnl_lists(stringlist : TStringList; intlist : TIntList32);
 
+    procedure create_account(username : String; password : String; email : String; sex : String);
+
 implementation
 
 uses
@@ -741,6 +743,49 @@ uses
             FreeAndNil(intlist);
         end;
 
+    end;
+
+    procedure create_account(username : String; password : String; email : String; sex : String);
+    var
+        last : Integer;
+        i : Integer;
+        tp, tp2 : TPlayer;
+    begin
+
+        last := 100099;
+
+        for i := 0 to Player.Count do begin
+
+            if (i = Player.Count) then begin
+                Inc(last, 2);
+                Break;
+            end;
+
+            tp2 := Player.Objects[i] as TPlayer;
+
+            if (tp2.ID < 100101) then Continue;
+            Inc(last);
+            if ( (tp2.ID - last) <= 1 ) then Continue;
+            Inc(last);
+            Break;
+
+        end;
+
+        tp := TPlayer.Create;
+        tp.ID := last;
+        tp.Name := username;
+        tp.Pass := password;
+
+        if (sex = 'M') or (sex = '_M') then tp.Gender := 1
+        else if (sex = 'F') or (sex = '_F') then tp.Gender := 0
+        else tp.Gender := StrToInt(sex);
+
+        tp.Mail := email;
+        tp.Login := 0;
+        PlayerName.AddObject(tp.Name, tp);
+        Player.AddObject(tp.ID, tp);
+
+        PD_Save_Accounts(True);
     end;
 
 end.

@@ -111,9 +111,9 @@ uses
 
     procedure JCon_Accounts_Save();
 	var
-	    AccountItem, tp2 : TPlayer;
+	    AccountItem : TPlayer;
     	tc : TChara;
-	    i, Idx : Integer;
+	    i : Integer;
 	begin
     	if (frmMain.Edit3.Text = '') then begin
         	Exit;
@@ -138,30 +138,7 @@ uses
 	        AccountItem.Banned := frmMain.ComboBox18.ItemIndex;
 		    DataSave(True);
         end else begin
-
-            Idx := 100101;
-            i := 0;
-
-        	for i := 0 to Player.Count - 1 do begin
-            	tp2 := Player.Objects[i] as TPlayer;
-                if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
-                	Idx := i + 100101;
-                    Break;
-                end;
-            end;
-
-            if (i = Player.Count) then Idx := 100101 + Player.Count;
-
-    		AccountItem := TPlayer.Create;
-	    	AccountItem.ID := Idx;
-	        AccountItem.Name := frmMain.Edit3.Text;
-    	    AccountItem.Pass := frmMain.Edit4.Text;
-        	AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
-	        AccountItem.Mail := frmMain.Edit6.Text;
-    		PlayerName.AddObject(AccountItem.Name, AccountItem);
-    		Player.AddObject(AccountItem.ID, AccountItem);
-            PD_Save_Accounts(True);
-
+            create_account(frmMain.Edit3.Text, frmMain.Edit4.Text, frmMain.Edit6.Text, IntToStr(frmMain.ComboBox15.ItemIndex));
     	    frmMain.Button3.Click;
         end;
 
