@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
+
+- 03-14-04: Commented out debugout of Steal, too much server window flooding [Eliot]
 - 03-13-04: Fixed bug regarding pets changing to other pets. [Colus]
 - 03-13-04: Added EnablePetSkills option to attack skills. [Colus]
 - 03-13-04: Added EnablePetSkills boolean option. [Colus]

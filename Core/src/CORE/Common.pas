@@ -8448,7 +8448,7 @@ begin
   for i := 0 to 7 do begin
     mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
     rand := Random(20000) mod 10000;
-    DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
+   // DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
     if rand <= mdrop[i] then begin
                                      // Graphic send
                                      WFIFOW( 0, $011a);
