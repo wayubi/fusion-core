@@ -4891,19 +4891,12 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure CalcGuildLvUP(tg:TGuild; tc:TChara; GEXP:cardinal);
-//ギルドのレベルアップ用
 begin
-	//経験値加算
 	tg.EXP := tg.EXP + GEXP;
 	tg.MemberEXP[tc.GuildPos] := tg.MemberEXP[tc.GuildPos] + GEXP;
 
-        tg.NextEXP := GExpTable[tg.LV];
-        // AlexKreuz: Fix 50% Tax Bug
-
-	if (tg.EXP >= tg.NextEXP) then begin
-		//レベルアップ
-
-		while (tg.EXP >= tg.NextEXP) do begin
+        if (tg.EXP >= GExpTable[tg.LV]) then begin
+                while (tg.EXP >= GExpTable[tg.LV]) do begin
 			tg.EXP := tg.EXP - GExpTable[tg.LV];
 			if (tg.LV < 50) then begin
 				tg.LV := tg.LV + 1;

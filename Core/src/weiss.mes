@@ -1,6 +1,6 @@
 [GeneralSettings]
 AppendMapFileToBinary=1
-HandleExceptions=1
+HandleExceptions=0
 CheckForFrozenMainThread=1
 FreezeTimeout=60000
 ShowExceptionBox=1

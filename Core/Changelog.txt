@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-22-03: Crash on Guild Level Up with too high Experience & Tax Rate. [AlexKreuz]
 - 12-21-03: Fixed Monk Dodge Skill [Darkhelmet]
 - 12-21-03: Added Option_PVP setting to weiss.ini (0=Off|1=MapInfo_DB). [AlexKreuz]
 - 12-21-03: Fixed Minor Bug With Finger Offensive [Darkhelmet]
