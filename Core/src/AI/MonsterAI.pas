@@ -1615,7 +1615,7 @@ begin
   sl.Clear;
   sl.Delimiter := ',';
   sl.DelimitedText := ts.Data.SkillLocations;
-  i :=  ts.Data.SkillCount;
+  i := sl.Count;
   if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
   while (i > 0) and (EnableMonsterSkills) do begin
     i := i - 1;
