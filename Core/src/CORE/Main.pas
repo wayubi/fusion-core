@@ -1153,18 +1153,18 @@ begin
 	ts.SpawnTick := Tick;
 
 	n := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
-  if n = -1 then exit;
+        if n = -1 then exit;
 
-  if ts.isSlave then begin
-  ts1 := tm.Mob.IndexOfObject(ts.LeaderID) as TMob;
-  if (ts1 <> nil) then begin
-  if (ts1.SlaveCount - 1 <= 0) then begin
-  ts1.SlaveCount := 0;
-  end else begin
-  ts1.SlaveCount := ts1.SlaveCount - 1;
-  end;
-  end;
-  end;
+        if ts.isSlave then begin
+                ts1 := tm.Mob.IndexOfObject(ts.LeaderID) as TMob;
+                if (ts1 <> nil) then begin
+                        if (ts1.SlaveCount - 1 <= 0) then begin
+                                ts1.SlaveCount := 0;
+                        end else begin
+                                ts1.SlaveCount := ts1.SlaveCount - 1;
+                        end;
+                end;
+        end;
 
 if (ts.isEmperium) then begin
 
@@ -1678,7 +1678,7 @@ begin
 		end;
 
 		if not miss then begin
-			//攻撃命中
+			//Monster is hit
 			if Arms = 0 then if crit then dmg[5] := 10 else dmg[5] := 0; //クリティカルチェック
 			if WeaponType[Arms] = 0 then begin
 				//素手
@@ -5367,9 +5367,12 @@ begin
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
+                                                        
+                                                tc.intimidateActive := true;
+                                                tc.intimidateTick := Tick + 1000;
 
 
-									i := MapInfo.IndexOf(tc.Map);
+									{i := MapInfo.IndexOf(tc.Map);
 									j := -1;
 									if (i <> -1) then begin
 										mi := MapInfo.Objects[i] as MapTbl;
@@ -5391,11 +5394,11 @@ begin
 										tc.Point := xy;
 										MapMove(Socket, tc.Map, tc.Point);
 									end;
-                                                                        
+
                                                                         ts.Point.X := tc.Point.X;
                                                                         ts.Point.Y := tc.Point.Y;
                                                                         if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
-                                                        	end;
+                                                        	end;  }
 
 
 
@@ -9800,7 +9803,7 @@ var
   tm:TMap;
 begin
 	with tc do begin
-         if Weight * 2 <> MaxWeight then begin
+         //if Weight * 2 <> MaxWeight then begin
 
             {Sanctuary}
                 // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
@@ -9842,6 +9845,14 @@ begin
                         HPRTick := Tick;
                         tc.InField := false;
                 end;
+
+                if tc.intimidateActive then begin
+                        if tc.intimidateTick < Tick then begin
+                                tc.intimidateActive := false;
+                                IntimidateWarp(tm, tc);
+                        end;
+                end;
+
 
                 if tc.isCloaked then begin  {Cloaking}
                         tm := tc.MData;
@@ -9934,6 +9945,11 @@ begin
 						SPTick := Tick;
 				end;
 			end;
+
+                        {if tc.PosionTick > Tick then begin
+                                (tc.PosionTick > Tick) and (tc.PoisionTick + tc.Skill[LastSong].Data.Element * 1000 < Tick) then begin
+                        end; }
+
 			if (Sit >= 2) then begin
 
         if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) then begin
@@ -9954,7 +9970,7 @@ begin
 				end;
                                 end;
                                 end;
-                                end;
+                                //end;
                                 end;
                 {if (tc.Skill[70].Tick mod 5000 = 0) then begin
                         tc.HP := 1;

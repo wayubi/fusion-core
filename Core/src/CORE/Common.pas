@@ -795,6 +795,9 @@ type TChara = class
         isCloaked     :Boolean;   {Says if Cloaking is Active}
         CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
 
+        intimidateActive:Boolean; {Sets intimidate Active}
+        intimidateTick:cardinal;  {Used so you can delay before you intimidate}
+
         noHPRecovery  :Boolean;   {Player Cannot Recover HP}
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 
@@ -1399,6 +1402,8 @@ Option_AutoSave   :word;
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
+                //procedure PosionCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
+                procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
@@ -2360,12 +2365,12 @@ end;
 //------------------------------------------------------------------------------
 procedure CalcSongStat(tc:TChara; Tick:cardinal = 0);
 var
-	i,j,k,o,p :integer;
-	Side      :byte;
-	td        :TItemDB;
+	i,j,      :integer;
+	//Side      :byte;
+	//td        :TItemDB;
         tl        :TSkillDB;
-        mi        :MapTbl;
-        g         :double;
+        //mi        :MapTbl;
+        //g         :double;
 
 begin
 	if Tick = 0 then Tick := timeGetTime();
@@ -2600,6 +2605,69 @@ begin
   end;
 end;}
 //------------------------------------------------------------------------------
+{procedure PosionCharacter(tm:TMap; tc:TChara; Tick:cardinal);
+begin
+        if tc.PosionTick > Tick then begin
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, $01);
+                WFIFOW(10, 0);
+                WFIFOB(12, 0);
+                SendBCmd(tm, tc.Point, 13);
+        end else begin
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, 0);
+                WFIFOW(10, 0);
+                WFIFOB(12, 0);
+                SendBCmd(tm, tc.Point, 13);
+        end;
+end;}
+//------------------------------------------------------------------------------
+procedure IntimidateWarp(tm:TMap; tc:TChara);
+var
+        i       :integer;
+        j       :integer;
+        xy      :TPoint;
+        mi      :MapTbl;
+        ts      :TMob;
+
+begin
+        ts := tc.AData;
+        i := MapInfo.IndexOf(tc.Map);
+        j := -1;
+        if (i <> -1) then begin
+                mi := MapInfo.Objects[i] as MapTbl;
+                if (mi.noTele = true) then j := 0;
+        end;
+
+        if (j <> 0) then begin
+
+                tm := tc.MData;
+                j := 0;
+                repeat
+                        xy.X := Random(tm.Size.X - 2) + 1;
+                        xy.Y := Random(tm.Size.Y - 2) + 1;
+                        Inc(j);
+                until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+
+                if j <> 100 then begin
+
+                        SendCLeave(tc, 3);
+                        tc.Point := xy;
+                        ts.Point.X := tc.Point.X;
+                        ts.Point.Y := tc.Point.Y;
+                        if ts.HP > 0 then SendMmove(tc.Socket, ts, ts.Point, tc.Point, tc.ver2);
+                        MapMove(tc.Socket, tc.Map, tc.Point);
+                end;
+
+
+        end;
+
+end;
+
 procedure SendCStat(tc:TChara; View:boolean = false);
 var
 	i :integer;
