@@ -169,6 +169,7 @@ var
     function command_charskillpoint(tc : TChara; str : String) : String;
     function command_changes(tc : TChara; str : String) : String;
 
+    function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_die(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
@@ -473,7 +474,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc.ID, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
         end else if gmstyle = '@' then begin
-			if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
+            if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc.ID, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
+			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2290,7 +2292,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         tm : TMap;
         oldvalue : Integer;
-        i, k, w3 : Integer;
+        i, k : Integer;
     begin
         Result := 'GM_CHARSKILLPOINT Failure.';
 
@@ -2324,6 +2326,53 @@ Called when we're shutting down the server *only*
             Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
         end;
     sl.Free;
+    end;
+
+    function command_athena_heal(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tm : TMap;
+        i, j, ii : Integer;
+    begin
+        Result := 'GM_ATHENA_HEAL failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if (sl.Count < 2) or (sl.Count > 3) then Exit;
+
+        i := 0;
+        j := 0;
+
+        if (sl.Count = 2) then begin
+            val(sl.Strings[0], i, ii);
+            if ii <> 0 then Exit;
+            val(sl.Strings[1], j, ii);
+            if ii <> 0 then Exit;
+        end;
+
+        if (i <= 0) then i := tc.MAXHP;
+        if (j <= 0) then j := tc.MAXSP;
+
+        if (tc.HP + i > tc.MAXHP) then i := tc.MAXHP - tc.HP;
+        if (tc.SP + j > tc.MAXSP) then j := tc.MAXSP - tc.SP;
+
+        i := i + tc.HP;
+        j := j + tc.SP;
+
+        tc.HP := i;
+        tc.SP := j;
+        tc.Sit := 3;
+        SendCStat1(tc, 0, 5, tc.HP);
+        SendCStat1(tc, 0, 7, tc.SP);
+        WFIFOW( 0, $0148);
+        WFIFOL( 2, tc.ID);
+        WFIFOW( 6, 100);
+        SendBCmd(tm, tc.Point, 8);
+
+        Result := 'GM_ATHENA_HEAL success. HP/SP healed!';
     end;
 
     function command_changes(tc : TChara; str : String) : String;
@@ -2531,7 +2580,7 @@ Called when we're shutting down the server *only*
         Result := 'GM_ATHENA_LVUP Failure.';
 
         oldlevel := tc.BaseLV;
-        Val(Copy(str, 11, 256), i, k);
+        Val(Copy(str, 6, 256), i, k);
 
         if (k = 0) and (i >= -198) and (i <= 198) then begin
             if i < 0 then begin
@@ -2663,7 +2712,7 @@ Called when we're shutting down the server *only*
         Result := 'GM_ATHENA_JOBLVUP Failure.';
 
         oldlevel := tc.JobLV;
-        Val(Copy(str, 10, 256), i, k);
+        Val(Copy(str, 9, 256), i, k);
 
         if (k = 0) and (i >= -70) and (i <= 70) then begin
             if i < 0 then begin
