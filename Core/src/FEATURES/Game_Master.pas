@@ -114,7 +114,8 @@ var
     GM_ATHENA_LUK : Byte;
     GM_ATHENA_SPIRITBALL : Byte;
     GM_ATHENA_QUESTSKILL : Byte;
-
+    GM_ATHENA_LOSTSKILL : Byte;
+    GM_ATHENA_MODEL : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -229,6 +230,8 @@ var
     function command_athena_luk(tc : TChara; str : String) : String;
     function command_athena_spiritball(tc : TChara; str : String) : String;
     function command_athena_questskill(tc : TChara; str : String) : String;
+    function command_athena_lostskill(tc : TChara; str : String) : String;
+    function command_athena_model(tc : TChara; str : String) : String;
 
 implementation
 
@@ -349,6 +352,8 @@ implementation
         GM_ATHENA_LUK := StrToIntDef(sl.Values['ATHENA_LUK'], 1);
         GM_ATHENA_SPIRITBALL := StrToIntDef(sl.Values['ATHENA_SPIRITBALL'], 1);
         GM_ATHENA_QUESTSKILL := StrToIntDef(sl.Values['ATHENA_QUESTSKILL'], 1);
+        GM_ATHENA_LOSTSKILL := StrToIntDef(sl.Values['ATHENA_LOSTSKILL'], 1);
+        GM_ATHENA_MODEL := StrToIntDef(sl.Values['ATHENA_MODEL'], 1);
 
         sl.Free;
         ini.Free;
@@ -474,6 +479,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_LUK', IntToStr(GM_ATHENA_LUK));
         ini.WriteString('Athena GM Commands', 'ATHENA_SPIRITBALL', IntToStr(GM_ATHENA_SPIRITBALL));
         ini.WriteString('Athena GM Commands', 'ATHENA_QUESTSKILL', IntToStr(GM_ATHENA_QUESTSKILL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_LOSTSKILL', IntToStr(GM_ATHENA_LOSTSKILL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_MODEL', IntToStr(GM_ATHENA_MODEL));
 
         ini.Free;
 
@@ -603,6 +610,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('luk')) = 'luk') and (check_level(tc.ID, GM_ATHENA_LUK)) ) then error_msg := command_athena_luk(tc, str)
             else if ( (copy(str, 1, length('spiritball')) = 'spiritball') and (check_level(tc.ID, GM_ATHENA_SPIRITBALL)) ) then error_msg := command_athena_spiritball(tc, str)
             else if ( (copy(str, 1, length('questskill')) = 'questskill') and (check_level(tc.ID, GM_ATHENA_QUESTSKILL)) ) then error_msg := command_athena_questskill(tc, str)
+            else if ( (copy(str, 1, length('lostskill')) = 'lostskill') and (check_level(tc.ID, GM_ATHENA_LOSTSKILL)) ) then error_msg := command_athena_lostskill(tc, str)
+            else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc.ID, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -4356,6 +4365,54 @@ Called when we're shutting down the server *only*
             tc.Skill[i].Lv := 1;
             SendCSkillList(tc);
             Result := 'GM_ATHENA_QUESTSKILL Success.';
+        end;
+    end;
+
+    function command_athena_lostskill(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+    begin
+        Result := 'GM_ATHENA_LOSTSKILL Failure.';
+
+        Val(Copy(str, 11, 256), i, k);
+
+        if (k = 0) and (i >= 144) and (i <= 157) then begin
+            tc.Skill[i].Lv := 0;
+            SendCSkillList(tc);
+            Result := 'GM_ATHENA_LOSTSKILL Success.';
+        end;
+    end;
+
+    function command_athena_model(tc : TChara; str : String) : String;
+    var
+        i, j, k, ii : Integer;
+        tm : TMap;
+        sl : TStringList;
+    begin
+        Result := 'GM_ATHENA_MODEL Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := str;
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        if sl.count <> 4 then Exit;
+
+        val(sl.Strings[1], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[2], j, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[3], k, ii);
+        if ii <> 0 then Exit;
+
+        if (i >= 0) and (i <= 20) and (j >= 0) and (j <= 8) and (k >= 0) and (k <= 4) then begin
+            tc.Hair := i;
+            tc.HairColor := j;
+            tc.ClothesColor := k;
+            UpdateLook(tm, tc, 1, i, 0, true);
+            UpdateLook(tm, tc, 6, i, 0, true);
+            UpdateLook(tm, tc, 7, i, 0, true);
+            Result := 'GM_ATHENA_MODEL Success.';
         end;
     end;
 end.
