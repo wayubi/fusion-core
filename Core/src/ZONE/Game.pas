@@ -5577,7 +5577,9 @@ end;
 				As crummy as bots are, server crashes are the greater evil.}
 
 				//Occupation and Skill Check - Merchant/BlackSmith/Alchemist
-				if (tc.JID <> 5) AND (tc.JID <> 10) AND (tc.JID <> 18) then Continue;
+				if (tc.JID <> 5) AND (tc.JID <> 10) AND (tc.JID <> 18)
+                //High Merchant/Whitesmith/Creator (thanks to cebuPH)
+                AND (tc.JID <> 4006) AND (tc.JID <> 4011) AND (tc.JID <> 4019)then Continue;
 				if (tc.Skill[41].Lv = 0) then Continue;
 
 				//Cancellation Decision
