@@ -1,4 +1,9 @@
-
+- 03-29-04: Added Assassin Cross's Meteor Assault (NOT fx only). [Colus]
+- 03-29-04: Added HW's Napalm Vulcan (fx only). [Colus]
+- 03-29-04: Added Champion's Gather Souls (NOT fx only :)). [Colus]
+- 03-29-04: Added Professor's Fog Wall/Spider Web/Memorize/Mind Breaker (fx only). [Colus]
+- 03-29-04: Added Lord Knight's Spiral Pierce/Head Crush/Joint Beat (fx only). [Colus]
+- 03-29-04: Added support for new upper class skills. [Colus]
 - 03-28-04: Added Loading of the Aegis Monster SKills Database [Darkhelmet]
 - 03-25-04: Removed LOV/Storm Gust double divide error and damage error [Eliot]
 - 03-25-04: Fixed Sonic Blow PVP stacking bug [Eliot]
