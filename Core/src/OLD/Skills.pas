@@ -2414,8 +2414,8 @@ Begin
 				{CODE-ERROR: You have got to be joking...}
 				{Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
 					abort for the skills which require certain weapon types.}
-				5,42,316,324:
-				{ 5   : Bash
+				42,316,324:
+				{
 					42  : Mammonite
 					316 : Musical Strike
 					324 : Throw Arrow}
@@ -2423,11 +2423,7 @@ Begin
 				//ダメージ算出
 					j := 1; // Moved # of hits up here to initialize.
 
-					if (MSkill = 5) then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					end else begin
 						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					end;
 
 					if (MSkill = 316) or (MSkill = 324) then begin
 						if (Weapon = 13) or (Weapon = 14) then begin

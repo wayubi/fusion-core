@@ -5,9 +5,19 @@ interface
 uses
 	IniFiles, Classes, SysUtils, Common, List32, MMSystem;
 
-    procedure parse_skills(tc : TChara; Tick : Cardinal);
-    procedure process_effect(tc : TChara; success : Integer);
+var
+	SKILL_TYPE : Byte;
+    {
+    	1: Process Effect
+        2: Process Skill Attack
+    }
 
+    procedure parse_skills(tc : TChara; Tick : Cardinal);
+
+    procedure process_effect(tc : TChara; success : Integer);
+    procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
+
+    function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
 	function skill_provoke(tc : TChara) : Integer;
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
 
@@ -21,6 +31,7 @@ uses
     	success : Integer;
     begin
     	case tc.MSkill of
+        	5: success := skill_bash(tc, Tick);
         	6: success := skill_provoke(tc);
             46: success := skill_double_strafe(tc, Tick);
         end;
@@ -40,7 +51,12 @@ uses
 	        9 : No yellow gemstone
         }
 
-        process_effect(tc, success);
+        case SKILL_TYPE of
+        	1: process_effect(tc, success);
+            2: process_skill_attack(tc, success, Tick);
+        end;
+
+        SKILL_TYPE := 0;
 	end;
 
 	procedure process_effect(tc : TChara; success : Integer);
@@ -78,6 +94,71 @@ uses
         end;
     end;
 
+    procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
+    var
+    	ts : TMob;
+        tc1 : TChara;
+        tm : TMap;
+        tl : TSkillDB;
+    begin
+    	if dmg[0] < 0 then dmg[0] := 0;
+		if tc.MTargetType = 0 then begin
+			ts := TMob.Create;
+			ts := tc.AData;
+			SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+			if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then frmMain.StatCalc1(tc, ts, Tick);
+		end else begin
+			tc1 := TChara.Create;
+			tc1 := tc.AData;
+			SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
+			if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then frmMain.StatCalc2(tc, tc1, Tick);
+		end;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Swordsman --------------------------------- }
+    { - Job ID: 1 -------------------------------------- }
+    { - Skill Name: Bash ------------------------------- }
+    { - Skill ID Name: SM_BASH ------------------------- }
+    { - Skill ID: 5 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
+    var
+    	ts : TMob;
+        tc1 : TChara;
+        tm : TMap;
+        tl : TSkillDB;
+    begin
+    	SKILL_TYPE := 2;
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        tl := tc.Skill[tc.MSkill].Data;
+
+		if tc.MTargetType = 0 then begin
+			ts := TMob.Create;
+			ts := tc.AData;
+			frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data2[tc.MUseLV]);
+		end else begin
+			tc1 := TChara.Create;
+			tc1 := tc.AData;
+			frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data2[tc.MUseLV]);
+		end;
+
+        if (tc.Skill[145].Lv <> 0) and (tc.MSkill = 5) and (tc.MUseLV > 5) then begin
+    		if Random(1000) < tc.Skill[145].Data.Data1[tc.MUseLV] * 10 then begin
+            	if (ts.Stat1 <> 3) then begin
+                	ts.nStat := 3;
+                    ts.BodyTick := Tick + tc.aMotion;
+                end else begin
+                	ts.BodyTick := ts.BodyTick + 30000;
+                end;
+            end;
+        end;
+
+        Result := 1;
+    end;
+
 
     { -------------------------------------------------- }
     { - Job: Swordsman --------------------------------- }
@@ -94,6 +175,7 @@ uses
         tl : TSkillDB;
         rand : Integer;
     begin
+    	SKILL_TYPE := 1;
     	Result := -1;
         
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
@@ -135,7 +217,7 @@ uses
             end;
         end else begin
         	{ Provoke failed. % chance too low. }
-            Result := 1;
+            Result := 0;
         end;
     end;
 
@@ -153,9 +235,8 @@ uses
         tc1 : TChara;
         tm : TMap;
         tl : TSkillDB;
-        j : Integer;
     begin
-    	Result := -1;
+    	SKILL_TYPE := 2;
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tl := tc.Skill[tc.MSkill].Data;
@@ -172,17 +253,9 @@ uses
             end;
 
             dmg[0] := dmg[0] * 2;
-            j := 2;
-
-            if dmg[0] < 0 then dmg[0] := 0;
-            if tc.MTargetType = 0 then begin
-            	SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-            	if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then frmMain.StatCalc1(tc, ts, Tick);
-            end else begin
-            	SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
-                if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then frmMain.StatCalc2(tc, tc1, Tick);
-            end;
+            Result := 2;
         end else begin
+        	SKILL_TYPE := 1;
         	Result := 6;
         end;
     end;
