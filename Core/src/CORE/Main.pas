@@ -2996,7 +2996,7 @@ begin
 			AMode := 0;
 			Exit;
 		end;
-		if (pcnt <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
+		{if (pcnt <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//ˆÚ“®’†‚ÌŽž‚ÍˆÚ“®’âŽ~
 			Sit := 3;
 			HPTick := timeGetTime();
@@ -3009,8 +3009,9 @@ begin
 			WFIFOW(8, Point.Y);
 			SendBCmd(tm, Point, 10);
 			if ATick + ADelay - 200 < Tick then ATick := Tick - ADelay + 200;
-		end;
-		if (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
+		end;}
+
+		if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//UŒ‚
 			if ts = nil then begin
 				AMode := 0;
