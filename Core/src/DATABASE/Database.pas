@@ -1814,8 +1814,8 @@ begin
             for i := 1 to j do ServerFlag.Add('\' + statusfile.Strings[i]);
             CloseFile(txt);
 
-            for i := 1 to (statusfile.Count -1) do
-            debugout.Lines.Add('status.txt flag: ' + statusfile.Strings[i]);
+            //for i := 1 to (statusfile.Count -1) do
+            //debugout.Lines.Add('status.txt flag: ' + statusfile.Strings[i]);
 
             statusfile.Free;
             DeleteFile(AppPath + 'status.txt');
@@ -1830,14 +1830,14 @@ begin
             for i := 0 to (svarfile.Count -1) do
                 ServerFlag.Add('\' + svarfile.Strings[i]);
 
-            for i := 0 to (svarfile.Count -1) do
-                debugout.Lines.Add('Server file flag: ' + svarfile.Strings[i]);
+            //for i := 0 to (svarfile.Count -1) do
+            //debugout.Lines.Add('Server file flag: ' + svarfile.Strings[i]);
 
             svarfile.Free;
         end;
 
-        for i := 0 to (ServerFlag.Count -1) do
-            debugout.Lines.Add('Server flag: ' + ServerFlag.Strings[i]);
+        //for i := 0 to (ServerFlag.Count -1) do
+        //debugout.Lines.Add('Server flag: ' + ServerFlag.Strings[i]);
 
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Variables loaded.', [ServerFlag.Count]));
         Application.ProcessMessages;
