@@ -9,8 +9,9 @@ uses
         procedure MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
         procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
         procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-        procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-        procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+        procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+        procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+        procedure MobStatSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
 
@@ -297,29 +298,36 @@ end;
 
 procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
 
-//var
+var
         //tc:TChara;
-
+        i   :integer;
+        j   :integer;
 
 begin
-        if tsAI.Skill[0] <> 0 then begin
-                if tsAI.PercentChance[0] > Random(100) then begin
-                        DebugOut.Lines.Add('Success');
-                        MobSkills(tm, ts, tsAI, Tick);
-                        MobFieldSkills(tm, ts, tsAI, Tick);
-                end else DebugOut.Lines.Add('Fail');
+        for j := 0 to 3 do begin
+                i := Random(3);
+                if tsAI.Skill[i] <> 0 then begin
+                        if tsAI.PercentChance[i] > Random(200) then begin
+                                //DebugOut.Lines.Add('Success');
+                                MobSkills(tm, ts, tsAI, Tick, i);
+                                MobFieldSkills(tm, ts, tsAI, Tick, i);
+                                MobStatSkills(tm, ts, tsAI, Tick, i);
+                                //Break;
+                        end;
+                        //end else DebugOut.Lines.Add('Fail');
+                end;
         end;
 end;
 
 //------------------------------------------------------------------------------
 
-procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
 var
         tc  :TChara;
-        i   :integer;
+        //i   :integer;
 begin
 
-        for i := 0 to 3 do begin
+        //for i := 0 to 3 do begin
         tc := ts.AData;
         case tsAI.Skill[i] of
                 28:     {Heal}
@@ -329,7 +337,7 @@ begin
                         if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
 
                         WFIFOW( 0, $011a);
-                        WFIFOW( 2, tsAI.Skill[0]);
+                        WFIFOW( 2, tsAI.Skill[i]);
                         WFIFOW( 4, dmg[0]);
                         WFIFOL( 6, ts.ID);
                         WFIFOL(10, ts.ID);
@@ -354,18 +362,17 @@ begin
                 end;
         end;
 
-        end;
+        //end;
 
 end;
 
 //------------------------------------------------------------------------------
 
-procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
 var
         tl  :TSkillDB;
         sl  :TStringList;
         tc  :TChara;
-        i   :integer;
         j   :integer;
         AttackData :TChara;
         xy  :TPoint;
@@ -374,7 +381,7 @@ var
 
 begin
 
-        for i := 0 to 3 do begin
+        //for i := 0 to 3 do begin
                 tc := ts.AData;
                 case tsAI.Skill[i] of
                         83:     {Meteor}
@@ -403,8 +410,123 @@ begin
 
                         end;
                 end;
+        //end;
+end;
+//------------------------------------------------------------------------------
+procedure MobStatSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
+
+var
+ProcessType     :Byte;
+
+begin
+with ts do begin
+        ProcessType := 0;
+        case tsAI.Skill[i] of
+                114:    {Power Maximize}
+                begin
+                        ProcessType := 1;
+                end;
+        end;
+
+        case ProcessType of
+                0:  //Skill Used on Oneself Like Hiding
+                        begin
+                                //Packet Process
+                                WFIFOW( 0, $011a);
+                                WFIFOW( 2, tsAI.Skill[i]);
+                                WFIFOW( 4, dmg[0]);
+                                WFIFOL( 6, ts.ID);
+                                WFIFOL(10, ID);
+                                WFIFOB(14, 1);
+                                SendBCmd(tm, ts.Point, 15);
+                        end;
+                1:  //Skills Like Power Maximize
+                        begin
+                                WFIFOW( 0, $011a);
+                                WFIFOW( 2, tsAI.Skill[i]);
+                                WFIFOW( 4, tsAI.SkillLv[i]);
+                                WFIFOL( 6, ts.ID);
+                                WFIFOL(10, ts.ID);
+                                WFIFOB(14, 1);
+                                SendBCmd(tm, ts.Point, 15);
+
+                                {if (tc1.MSkill = 51) then begin
+
+                                        if tc1.Option = 6 then begin
+                                                tc1.Skill[MSkill].Tick := Tick;
+	    					tc1.Option := tc1.Optionkeep;
+                                                SkillTick := tc1.Skill[MSkill].Tick;
+                                                SkillTickID := MSkill;
+                                                tc1.SP := tc1.SP + 10;
+                                                tc1.Hidden := false;
+                                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+
+                                        end else begin
+                                                // Required to place Hide on a timer.
+                                                tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
+
+    						if SkillTick > tc1.Skill[MSkill].Tick then begin
+							    SkillTick := tc1.Skill[MSkill].Tick;
+							    SkillTickID := MSkill;
+    						end;
+
+                                                tc1.Optionkeep := tc1.Option;
+                                                tc1.Option := 6;
+                                                tc1.Hidden := true;
+
+                                        end;
+
+                                        CalcStat(tc1, Tick);
+
+                                        WFIFOW(0, $0119);
+    					WFIFOL(2, tc1.ID);
+    					WFIFOW(6, tc1.Stat1);
+    					WFIFOW(8, tc1.Stat2);
+    					WFIFOW(10, tc1.Option);
+    					WFIFOB(12, 0);
+    					SendBCmd(tm, tc1.Point, 13);
+
+                                        // Colus, 20031228: Tunnel Drive speed update
+                                        if (tc1.Skill[213].Lv <> 0) then begin
+    						WFIFOW(0, $00b0);
+    						WFIFOW(2, $0000);
+    						WFIFOL(4, tc1.Speed);
+    						tc1.Socket.SendBuf(buf, 8);
+                                        end;
+
+                                end;
+
+                                if (tc1.MSkill = 143) then begin
+                                        if tc1.Sit = 1 then begin
+						tc1.Sit := 3;
+                                                SkillTick := tc1.Skill[MSkill].Tick;
+                                                SkillTickID := MSkill;
+                                                tc1.SP := tc1.SP + 5;
+                                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                                CalcStat(tc1, Tick);
+                                        end else begin
+                                                tc1.Sit := 1;
+                                        end;
+                                end;}
+
+                                if (tsAI.Skill[i] = 114) then begin
+                                        DebugOut.Lines.Add('Monster Casts Power Maximize');
+                                        {if tc1.Option = 32 then begin
+						//tc1.Option := tc1.Optionkeep;
+                                                SkillTick := tc1.Skill[MSkill].Tick;
+                                                SkillTickID := MSkill;
+                                                //CalcMonsterStat(ts, Tick);
+                                        end else begin
+                                                tc1.Optionkeep := tc1.Option;
+                                                tc1.Option := 32;
+                                        end; }
+                                end;
+
+                        end;
+                end;
         end;
 end;
+
 //------------------------------------------------------------------------------
 
 procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
