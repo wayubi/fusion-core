@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
- Fusion 1.213 - November 12th, 2004
+ Fusion 1.213 - January 28th, 2004
 --------------------------------------------------------------------------------
+- 01-25-05: Final preparation for 1.213 release. [AlexKreuz]
 - 01-25-05: Gm Sprite Kill command errors if you don't have GM_KICK Power. [Tsusai]
 - 01-24-05: Added GM Sprite's ability to kill things (Mob/NPC/Players). [Tsusai]
 - 01-16-05: Fixed my mistake, only mobs (no npc/warp) loaded. [Tsusai]
