@@ -1,3 +1,4 @@
+- 06-05-04: Player_Skills - Added Skill Double Strafing. [Darkhelmet]
 - 06-05-04: Added Skill Failure error checking to PSS. [AlexKreuz]
 - 06-05-04: Testing of PSS using SM_PROVOKE. [AlexKreuz]
 - 06-05-04: Creation of PSS, Partitioned Skill Structure. [AlexKreuz]

@@ -9,6 +9,7 @@ uses
     procedure process_effect(tc : TChara; success : Integer);
 
 	function skill_provoke(tc : TChara) : Integer;
+  function skill_doubleStrafe(tc : TChara) : Integer;
 
 implementation
 
@@ -18,6 +19,7 @@ implementation
     begin
     	case tc.MSkill of
         	6: success := skill_provoke(tc);
+          46: success := skill_doubleStrafe(tc);
         end;
 
         {
@@ -125,6 +127,48 @@ implementation
         	{ Provoke failed. % chance too low. }
             Result := 1;
         end;
+    end;
+
+    function skill_doubleStrafe(tc : TChara) : Integer;
+
+    begin
+      Result := -1;
+
+      tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+      tl := tc.Skill[tc.MSkill].Data;
+
+      if (Weapon = 11) then begin
+
+        if tc.MTargetType = 0 then begin
+          ts := TMob.Create;
+          ts := tc.AData;
+          frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+        end else begin
+          tc1 := TChara.Create;
+          tc1 := tc.AData;
+          frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+        end;
+
+        dmg[0] := dmg[0] * 2;
+        j := 2;
+
+        if dmg[0] < 0 then dmg[0] := 0;
+
+        if tc.MTargetType = 0 then begin
+          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j); //Send Attack with two hits
+          if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+        end else begin
+          SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
+          if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
+							frmMain.StatCalc2(tc, tc1, Tick);
+        end;
+
+      end else begin
+        Result := 6;
+        Exit;
+      end;
+
     end;
 
 end.
