@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-06-05: Readded support for set baselevel (hopefully improved). [Tsusai]
 - 01-06-05: Bug tracing in retrieve_inventories. Missing data in "identify" column. [AlexKreuz]
 - 01-06-05: Bug tracing in PD_Load_Accounts function. Loading ActiveChars fails (?). [AlexKreuz]
 - 01-06-05: Bug tracing in DatabaseLoad function. Item can not be inserted into Item List. [AlexKreuz]

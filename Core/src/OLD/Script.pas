@@ -1904,13 +1904,13 @@ begin
         end;
     str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
     str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+    str := StringReplace(str, '$joblevel', IntToStr(tc.JobLV), [rfReplaceAll]);
     str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
     str := StringReplace(str, '$guildmaster', GetGuildMName(tn), [rfReplaceAll]);
     str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(tn)), [rfReplaceAll]);
     str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
     str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
     str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
-    str := StringReplace(str, '$joblevel', IntToStr(tc.JobLV), [rfReplaceAll]);
     str := StringReplace(str, '$$', '$', [rfReplaceAll]);
     Result := str;
 end;
@@ -1926,6 +1926,8 @@ begin
     len := 0;
     if left = 'zeny'             then begin p := @tc.Zeny;       len := 4; end
     else if left = 'statuspoint' then begin p := @tc.StatusPoint;len := 2; end
+    else if left = 'baselevel'   then begin p := @tc.BaseLV;     len := 2; end
+
     else if left = 'skillpoint'  then begin p := @tc.SkillPoint; len := 2; end
     else if left = 'option'      then begin p := @tc.Option;     len := 4; end
     else if left = 'speed'       then begin p := @tc.Speed;      len := 2; end
@@ -1977,7 +1979,13 @@ begin
         (left = 'int') or (left = 'luk') then begin
         CalcStat(tc);
         SendCStat(tc);
-    end else if (left = 'option') then UpdateOption(tm, tc);
+    end else if (left = 'option') then UpdateOption(tm, tc)
+    else if (left = 'baselevel') then begin
+        CalcStat(tc);
+        SendCStat(tc);
+        SendCStat1(tc, 0, $000b, tc.BaseLV);
+    end;
+
 end;
 
 end.
