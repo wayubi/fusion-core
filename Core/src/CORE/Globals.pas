@@ -723,22 +723,28 @@ uses
         if assigned(stringlist) and assigned(intlist) then dual := True;
 
         if assigned(stringlist) then begin
-            if stringlist.Count > 0 then begin
-                for idx := 0 to stringlist.Count - 1 do begin
-                    if assigned(stringlist.Objects[idx]) then
-                        stringlist.Objects[idx].Free;
-                        stringlist.Objects[idx] := nil;
+            try
+                if stringlist.Count > 0 then begin
+                    for idx := 0 to stringlist.Count - 1 do begin
+                        if assigned(stringlist.Objects[idx]) then
+                            stringlist.Objects[idx].Free;
+                            stringlist.Objects[idx] := nil;
+                    end;
                 end;
+            except
             end;
             FreeAndNil(stringlist);
         end;
 
         if assigned(intlist) then begin
-            if (intlist.Count > 0) and not (dual) then begin
-                for idx := 0 to intlist.Count - 1 do begin
-                    if assigned(intlist.Objects[idx]) then
-                        intlist.Objects[idx].Free;
+            try
+                if (intlist.Count > 0) and not (dual) then begin
+                    for idx := 0 to intlist.Count - 1 do begin
+                        if assigned(intlist.Objects[idx]) then
+                            intlist.Objects[idx].Free;
+                    end;
                 end;
+            except
             end;
             FreeAndNil(intlist);
         end;

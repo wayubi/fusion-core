@@ -4,6 +4,7 @@ program Weiss;
 
 uses
   {$IFDEF MSWINDOWS}
+  madScreenShot,
   madExcept,
   Forms,
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-05-04: Undefined stringlists clearing on close caused crashes. [AlexKreuz]
 - 10-05-04: JCon: Cleaned my mess & Inventory work. [Tsusai]
 - 10-05-04: REED: Restructured Account Saving procedures. [AlexKreuz]
 - 10-03-04: REED: Restructured Castle Loading. Last of the REED_LOADS. [AlexKreuz]
