@@ -1948,6 +1948,65 @@ Begin(* Proc sv3PacketProcess() *)
 				WFIFOB(2, 0);
 				Socket.SendBuf(buf, 3);
 			end;
+        //--------------------------------------------------------------------------
+        $00cc: //GM Sprite Right-Click -> KILL!
+            begin
+                RFIFOL(2, L); //ID that is sent to the server
+                //Does the person have the power (prevent other people abusing the sprite menu)
+                if (tc.PData.AccessLevel > GM_KICK) or (tc.PData.AccessLevel = GM_KICK) then begin
+                    if tc.MData.NPC.IndexOf(L) <> -1 then begin //NPC Disabling
+                        tn := tc.MData.NPC.Objects[tc.MData.NPC.IndexOf(L)] as TNPC;
+                        if tn.Enable then begin
+                            for j := tn.Point.Y div 8 - 2 to tn.Point.Y div 8 + 2 do begin
+                                for i := tn.Point.X div 8 - 2 to tn.Point.X div 8 + 2 do begin
+                                    for k := 0 to tc.MData.Block[i][j].CList.Count - 1 do begin
+                                        tc1 := tc.MData.Block[i][j].Clist.Objects[k] as TChara;
+                                        if (abs(tc1.Point.X - tn.Point.X) < 16) and
+                                        (abs(tc1.Point.Y - tn.Point.Y) < 16) then begin
+                                            WFIFOW(0, $0080);
+                                            WFIFOL(2, tn.ID);
+                                            WFIFOB(6, 0);
+                                            tc1.Socket.SendBuf(buf, 7);
+                                        end;
+                                    end;
+                                end;
+                            end;
+                        end;
+                        WFIFOW( 0, $00cd);
+                        WFIFOL( 2, L); //Success
+                        tc.Socket.SendBuf(buf, 6);
+                    end else if tc.MData.Mob.IndexOf(L) <> -1 then begin //Monster Killing
+                        ts := tc.MData.Mob.Objects[tc.MData.Mob.IndexOf(L)] as TMob;
+                        if (tc.MData.CList.Count > 0) then begin
+                            WFIFOW( 0, $0080);
+                            WFIFOL( 2, ts.ID);
+                            WFIFOB( 6, 1);
+                            SendBCmd(tc.MData, ts.Point, 7);
+                        end;
+                        if tc.MData.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID) <> -1 then
+                            tc.MData.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(j);
+                        if tc.MData.Mob.IndexOf(ts.ID) <> -1 then tc.MData.Mob.Delete(j);
+                        WFIFOW( 0, $00cd);
+                        WFIFOL( 2, L); //Success
+                        tc.Socket.SendBuf(buf, 6);
+                    end else if CharaPID.IndexOf(L) <> -1 then begin //Disconnect a character
+                        tc1 := CharaPID.IndexOfObject(L) as TChara;
+                        if (tc1.Login <> 0) then begin
+                            tc1.Socket.Close;
+                            tc1.Socket := nil;
+                        end;
+                        if Option_GM_Logs then save_gm_log(tc, 'GM KICK Success. Character ' + tc1.Name + ' has been kicked.');
+                        WFIFOW( 0, $00cd);
+                        WFIFOL( 2, L); //Success
+                        tc.Socket.SendBuf(buf, 6);
+                    end else begin
+                        WFIFOW( 0, $00cd);
+                        WFIFOL( 2, 0); //failed
+                        tc.Socket.SendBuf(buf, 6);
+                    end;
+                end;
+            end;
+
 		//--------------------------------------------------------------------------
 		$00d5: //Requesting chat room creation.
 			begin
