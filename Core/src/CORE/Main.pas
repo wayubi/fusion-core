@@ -1248,8 +1248,10 @@ if (ts.isEmperium) then begin
                 end;
         end;
 
-		    {Colus, 20040110: Set territory for the guild}
-        tg.Agit := tm.Name;
+		    {Colus, 20040113: Set territory for the guild (not done in real RO!  BAH!}
+        {I will replace this with something that parses the guild bases in
+         ClaimGuildCastle.}
+        //tg.Agit := tm.Name;
         
         ClaimGuildCastle(tc.GuildID,ts.Map);
         EnableGuildKafra(ts.Map,'Kafra Service',0);
@@ -10074,18 +10076,7 @@ begin
           begin
 						DelSkillUnit(tm, tn);
 						Dec(k);
-
-       			tm.gat[tn.Point.X][tn.Point.Y] := 0;
-
-            {Colus, 20030111: Reverse the 0192 change of terrain}
-            WFIFOW(0, $0192);
-            WFIFOW(2, tn.Point.X);
-            WFIFOW(4, tn.Point.Y);
-            WFIFOW(6, 0);
-            WFIFOS(8, tm.Name, 16);
-   	        SendBCmd(tm, tn.Point, 24);
-
-                    			end;
+     			end;
 				$81://ポータル発動前->発動後
 					begin
 						tn.JID := $80;
@@ -10285,12 +10276,12 @@ begin
                                                      end;}
                                                 $8d: {Ice Wall}
 							begin
-                {Colus, 20030111: No, we're not going to do this silly bouncing around.}
-								{SetLength(bb, 1);
-								bb[0] := 1;
+                {Colus, 20030113: Put the bounce back in until pathing works right again.}
+								SetLength(bb, 1);
+								bb[0] := 4;     // 1->4
 								//bb[1] := 0;
                                                                 xy := tc2.Point;
-                                                                tc2.Dir := 8 - tc2.Dir;
+                                                                //tc2.Dir := 8 - tc2.Dir;
 								DirMove(tm, tc2.Point, tc2.Dir, bb);
 								//ブロック移動
 								if (xy.X div 8 <> tc2.Point.X div 8) or (xy.Y div 8 <> tc2.Point.Y div 8) then begin
@@ -10302,7 +10293,7 @@ begin
 								end;
 								tc2.pcnt := 0;
 			      					//Update Players Location
-								UpdatePlayerLocation(tm, tc2);     }
+								UpdatePlayerLocation(tm, tc2);
 							end;
                                                 $46:    {Sanctuary}
                                                         begin
@@ -11073,9 +11064,9 @@ begin
 
 						$8d:    {Ice Wall}
 							begin
-                {Colus, 20030111: No, we're not going to do this silly bouncing around.}
-								{SetLength(bb, 1);
-								bb[0] := 2;
+                {Colus, 20030113: Put bounce back in until pathing is updated.}
+								SetLength(bb, 1);
+								bb[0] := 4;   // 2->4
                                                                 xy := ts1.Point;
 								DirMove(tm, ts1.Point, ts1.Dir, bb);
 
@@ -11089,7 +11080,7 @@ begin
 								ts1.pcnt := 0;
 
                                                                 UpdateMonsterLocation(tm, ts1);
-                  }
+                   
 							end;
 
                                                 $90: //アイスウォール
