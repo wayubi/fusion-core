@@ -1804,8 +1804,8 @@ begin
 			dmg[4] := 2;
 			dmg[5] := 8;
                 end else if tatk then begin
-                        //dmg[0] := dmg[0] * DAFix div 100;
-			//dmg[4] := 3;
+                        dmg[0] := dmg[0] * (tc.Skill[263].Data.Data2[Skill[263].Lv] div 100);
+			dmg[4] := 3;
 			dmg[5] := 8;
                         tc.MTarget := tc.ATarget;
                         ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
@@ -2387,7 +2387,7 @@ begin
 			dmg[4] := 2;
 			dmg[5] := 8;
                 end else if tatk then begin
-                        dmg[0] := dmg[0] * DAFix div 100;
+                        dmg[0] := dmg[0] * (tc.Skill[263].Data.Data2[Skill[263].Lv] div 100);
 			dmg[4] := 3;
 			dmg[5] := 8;
                         tc.Skill[MSkill].Tick := Tick + cardinal(2) * 1000;
