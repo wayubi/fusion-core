@@ -1,3 +1,26 @@
+1-26-04: TODO for 1.2.0.9 [Colus]
+
+OK, let's make a list.  I assume we're planning a release around 2-1-2004.
+Here are some things that I *know* we want to iron out before releasing.
+
+Core: 
+
+- Pet crashes/lag/data duplications (bug #314)
+
+- Monster skill crashes/bugs (if they exist!) (350, others)
+  * Fix order of casting (skill *after* cast timer)
+  * Get all skills in if possible
+  * Fix hide leading to unhittable, crittastic monsters (bug 339)
+
+- Check out status effects and correct them if needed
+  (This is needed for things like lex A)
+
+- As many skill fixes as is reasonable
+
+- Limits on multipliers for XP, party distribution, drops...
+
+- Correct HP/SP regen rates to kRO standard
+
 12-23-03: Just a thought [Darkhelmet]
 
 
