@@ -14,7 +14,7 @@ uses
     {Shared}
     Classes, SysUtils, IniFiles,
     {Fusion}
-    Common;
+    Common, REED_Support, REED_Load;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -25,16 +25,13 @@ uses
     procedure PD_Create_Structure();
 
     { Account Data - Basic Data }
-    procedure PD_Load_Accounts(UID : String = '*');
     procedure PD_Save_Accounts(forced : Boolean = False);
     procedure PD_Delete_Accounts(tp : TPlayer);
 
     { Account Data - Active Characters }
-    procedure PD_Load_Accounts_ActiveCharacters(UID : String = '*');
     procedure PD_Save_Accounts_ActiveCharacters(forced : Boolean = False);
 
     { Account Data - Storage }
-    procedure PD_Load_Accounts_Storage(UID : String = '*');
     procedure PD_Save_Accounts_Storage(forced : Boolean = False);
 
 
@@ -217,58 +214,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Account Data - Basic Data --------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Accounts(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        tp : TPlayer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-        	try
-                if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Account.txt') then begin
-                    datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Account.txt');
-
-                    if (UID = '*') then tp := TPlayer.Create
-                    else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                    tp.ID := StrToInt( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-                    tp.Name := Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3);
-                    tp.Pass := Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3);
-
-                    if ( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) ) = 'MALE' then
-                    	tp.Gender := 1
-                    else if ( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) ) = 'FEMALE' then
-                    	tp.Gender := 0;
-
-                    tp.Mail := Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3);
-
-                    if ( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) ) = 'YES' then
-                    	tp.Banned := 1
-                    else if ( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) ) = 'NO' then
-                    	tp.Banned := 0;
-
-                    tp.AccessLevel := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-
-                    if (UID = '*') then begin
-	                    PlayerName.AddObject(tp.Name, tp);
-    	                Player.AddObject(tp.ID, tp);
-                    end;
-
-                    //debugout.Lines.Add(tp.Name + ' account data loaded.');
-                end;
-        	except
-                DebugOut.Lines.Add('Account data could not be loaded.');
-        	end;
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Accounts(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -387,52 +332,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Account Data - Active Characters -------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Accounts_ActiveCharacters(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        tp : TPlayer;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-        	try
-                if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\ActiveChars.txt') then begin
-                    datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\ActiveChars.txt');
-
-                    for i := 0 to PlayerName.Count - 1 do begin
-                        tp := PlayerName.Objects[i] as TPlayer;
-                        if tp.ID = StrToInt(searchResult.Name) then Break
-                        else tp := nil;
-                    end;
-
-                    {if (UID = '*') then tp := PlayerName.Objects[PlayerName.IndexOf(searchResult.Name)] as TPlayer
-                    else tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;}
-
-                    tp.CName[0] := Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3);
-                    tp.CName[1] := Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3);
-                    tp.CName[2] := Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3);
-                    tp.CName[3] := Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3);
-                    tp.CName[4] := Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3);
-                    tp.CName[5] := Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3);
-                    tp.CName[6] := Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3);
-                    tp.CName[7] := Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3);
-                    tp.CName[8] := Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3);
-
-                    //debugout.Lines.Add(tp.Name + ' account active character data loaded.');
-                end;
-        	except
-                DebugOut.Lines.Add('Account active character data could not be loaded.');
-        	end;
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Accounts_ActiveCharacters(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -476,61 +375,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Account Data - Storage ------------------------------------------------------ }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Accounts_Storage(UID : String = '*');
-	var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-        	try
-                if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Storage.txt') then begin
-                    datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Storage.txt');
-
-                    if (UID = '*') then tp := Player.Objects[Player.IndexOf(StrToInt(searchResult.Name))] as TPlayer
-                    else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                    for i := 1 to 100 do begin
-                        tp.Kafra.Item[i].ID := 0;
-                    end;
-
-                    for i := 2 to datafile.Count - 1 do begin
-                    	sl.delimiter := ':';
-                        sl.delimitedtext := datafile[i];
-
-                        tp.Kafra.Item[i-1].ID := StrToInt(sl.Strings[0]);
-                        tp.Kafra.Item[i-1].Amount := StrToInt(sl.Strings[1]);
-                        tp.Kafra.Item[i-1].Equip := StrToInt(sl.Strings[2]);
-                        tp.Kafra.Item[i-1].Identify := StrToInt(sl.Strings[3]);
-                        tp.Kafra.Item[i-1].Refine := StrToInt(sl.Strings[4]);
-                        tp.Kafra.Item[i-1].Attr := StrToInt(sl.Strings[5]);;
-                        tp.Kafra.Item[i-1].Card[0] := StrToInt(sl.Strings[6]);
-                        tp.Kafra.Item[i-1].Card[1] := StrToInt(sl.Strings[7]);
-                        tp.Kafra.Item[i-1].Card[2] := StrToInt(sl.Strings[8]);
-                        tp.Kafra.Item[i-1].Card[3] := StrToInt(sl.Strings[9]);
-                        tp.Kafra.Item[i-1].Data := ItemDB.Objects[ItemDB.IndexOf(tp.Kafra.Item[i-1].ID)] as TItemDB;
-                    end;
-
-                    //debugout.Lines.Add(tp.Name + ' account storage data loaded.');
-                end;
-        	except
-                DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
-                DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Storage.txt');
-        	end;
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Accounts_Storage(forced : Boolean = False);
     var
     	datafile : TStringList;

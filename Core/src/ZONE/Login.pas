@@ -83,6 +83,7 @@ begin
             {This way we check that a character of the player is also logged in}
             for i := 0 to 8 do begin
             //CharaName.IndexOfName()
+                if CharaName.IndexOf(APlayer.CName[i]) = -1 then Continue;
                 tc := CharaName.Objects[CharaName.IndexOf(APlayer.CName[i])] as TChara;
                 if tc.Login = 2 then loggedIn := true;
             end;
