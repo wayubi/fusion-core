@@ -11,6 +11,7 @@ uses
 
     procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
 
     function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
@@ -76,6 +77,9 @@ implementation
             pfile := 'Members.txt';
             PD_Load_Guilds_Members(tg, path + pfile);
 
+            pfile := 'Positions.txt';
+            PD_Load_Guilds_Positions(tg, path + pfile);
+
 
             NowGuildID := (tg.ID + 1);
 
@@ -113,7 +117,7 @@ implementation
 
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Guilds Settings ---------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Members ----------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
     var
@@ -164,37 +168,31 @@ implementation
 
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Parties Members ---------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Members ----------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Members(tpa : TParty; path : String);
+    procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
     var
-        i, j : Integer;
-        tc : TChara;
+        i : Integer;
     begin
 
-        for i := 0 to 11 do begin
-            tpa.MemberID[i] := 0;
-        end;
+        for i := 0 to 19 do begin
+            tg.PosName[i] := retrieve_value(path, i, 4);
 
-        for i := 0 to retrieve_length(path) do begin
-            j := retrieve_value(path, 0, 0);
+            if (retrieve_value(path, i, 1) = 'Y') then tg.PosInvite[i] := True
+            else tg.PosInvite[i] := False;
 
-            if Chara.IndexOf(j) = -1 then Continue;
-            tc := Chara.Objects[Chara.IndexOf(j)] as TChara;
+            if (retrieve_value(path, i, 2) = 'Y') then tg.PosPunish[i] := True
+            else tg.PosPunish[i] := False;
 
-            tpa.MemberID[i] := j;
-            tpa.Member[i] := tc;
-            tc.PartyName := tpa.Name;
-            tc.PartyID := tpa.ID;
+            tg.PosEXP[i] := retrieve_value(path, i, 3);
         end;
 
     end;
     { ------------------------------------------------------------------------------------- }
-
     
 
     { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - Party Supplemental Functions                                                }
+    { R.E.E.D - Guild Supplemental Functions                                                }
     { ------------------------------------------------------------------------------------- }
 
     

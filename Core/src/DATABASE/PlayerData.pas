@@ -75,7 +75,6 @@ uses
     procedure PD_Save_Guilds_Members(forced : Boolean = False);
 
     { Guild Data - Position Data }
-    procedure PD_Load_Guilds_Positions(UID : String = '*');
     procedure PD_Save_Guilds_Positions(forced : Boolean = False);
 
     { Guild Data - Skills Data }
@@ -134,8 +133,6 @@ uses
         if UID = '*' then debugout.Lines.add('­ Guilds ­');
         PD_Load_Guilds_Pre_Parse(UID);
 
-
-        PD_Load_Guilds_Positions(UID);
         PD_Load_Guilds_Skills(UID);
         PD_Load_Guilds_BanList(UID);
         PD_Load_Guilds_Diplomacy(UID);
