@@ -3505,7 +3505,7 @@ begin
 			end;
 
       //Pet Attacks
-      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetAttackSkill(tm, ts, tc);
+      if (EnablePetSkills) and ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetAttackSkill(tm, ts, tc);
 
 
 			// + 激 し く 自 動 鷹 +
@@ -15012,7 +15012,7 @@ if (cmdStart.Caption = 'Start') then begin
 				end;
 {キューペット}
                                         if ( PetData <> nil ) and ( PetNPC <> nil ) and (PetMoveTick < Tick) then begin
-                                                tpe := PetData;
+                                          tpe := PetData;
                                           tn := PetNPC;
                                           if tpe.isLooting = false then begin
                                             // 移動
@@ -15054,7 +15054,8 @@ if (cmdStart.Caption = 'Start') then begin
                                                 end;
 
                                               end;
-                                            end else if (k >= 15) or (k = 0) then begin
+                                            // k = 0 case makes pets dupe next to you...
+                                            end else if (k >= 15) then begin //or (k = 0) then begin
 
                                               WFIFOW( 0, $0080 );
                                               WFIFOL( 2, tn.ID );
@@ -15078,7 +15079,7 @@ if (cmdStart.Caption = 'Start') then begin
                                               for m := 1 to 100 do begin
                                                 if ( tc.Item[m].ID <> 0 ) and ( tc.Item[m].Amount > 0 ) and
                                                   ( tc.Item[m].Card[0] = $FF00 ) and ( tc.Item[m].Attr <> 0 ) then begin
-                                                    n := 1;
+                                                    n := m;
                                                     break;
                                                 end;
                                               end;
