@@ -1877,6 +1877,38 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
+        80: //resetmyareamob
+            begin
+                i := tn.Script[tc.ScriptStep].Data3[0]; //x1
+                j := tn.Script[tc.ScriptStep].Data3[1]; //y1
+                k := tn.Script[tc.ScriptStep].Data3[2]; //x2
+                l := tn.Script[tc.ScriptStep].Data3[3]; //y2
+
+                if Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0]) <> -1 then begin
+                    tm1 := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
+                    for cnt := tm1.Mob.Count -1 downto 0 do begin
+                        ts := tm1.Mob.Objects[cnt] as TMob;
+                        if (ts.isSummon = true) then begin
+                            if (ts.Point.X >= i) and
+                                (ts.Point.X <= k) and
+                                (ts.Point.Y >= j) and
+                                (ts.Point.Y <= l) then begin
+                                if (tm1.CList.Count > 0) then begin
+                                    WFIFOW( 0, $0080);
+                                    WFIFOL( 2, ts.ID);
+                                    WFIFOB( 6, 1);
+                                    SendBCmd(tm1, ts.Point, 7);
+                                end;
+                                m := tm1.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
+                                if (m <> -1) then tm1.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(m);
+                                m := tm1.Mob.IndexOf(ts.ID);
+                                if (m <> -1) then tm1.Mob.Delete(m);
+                            end;
+                        end;
+                    end;
+                end;
+                Inc(tc.ScriptStep);
+            end;
         //add commands before this
 
 
