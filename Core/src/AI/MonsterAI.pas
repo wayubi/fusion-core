@@ -346,6 +346,60 @@ begin
                         dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
+                171: //Npc-combo hit
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 3;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 3, i);
+                end;
+                199: //Npc-Blood drain hit
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 2;
+                        ts.HP := ts.HP + dmg[0];
+                        if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+                 192: //Npc-Blood drain hit
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+                    200: //Npc-Blood drain hit
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+                       202: 
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+                     191:
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+                176:
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        //posiontick := tick + 15000;
+                end;
+
+
 
                 11,13,14,19,20:
                                 { 11  : Napalm Beat
