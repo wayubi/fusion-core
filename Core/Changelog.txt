@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.208 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-24-03: Commented out PassiveIcon function. Bandwidth Drain. [AlexKreuz]
 - 12-24-03: Added Dancer SKill Service For You. [Darkhelmet]
 	      *Note, testing was not cooperating so it may be buggy.
 - 12-24-03: Added Auto-Generating addplayer.txt file to prevent errors. [AlexKreuz]
