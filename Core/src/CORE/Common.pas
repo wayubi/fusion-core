@@ -357,6 +357,7 @@ type TMob = class
         SkillSlot       :integer;
         AI              :Pointer;
         Mode           :integer;
+        Burned          :boolean;
 
 {NPCイベント追加ココまで}
 	constructor Create;

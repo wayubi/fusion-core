@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-06-04: Added Professor Skill HP Conversion (Values on skills arent 100% accurate). [Darkhelmet]
+- 03-06-04: Added Professor Skill Soul Change. [Darkhelmet]
+- 03-06-04: Added Professor Skill Soul Burn. [Darkhelmet]
 - 03-06-04: FusionSQL -> Optimized Guild Loading Algorithm. [AlexKreuz]
 - 03-06-04: FusionSQL -> Created Preload_GuildMembers. [AlexKreuz]
 - 03-05-04: FusionSQL -> Created Load_Guilds. [AlexKreuz]

@@ -6348,6 +6348,19 @@ begin
                                         Skilleffect(tc, Tick);
                                 end;
 
+                                374:  {Soul Change PvM}
+                                begin
+                                  if ts.Burned = false then begin
+                                    tc.SP := tc.SP + (tc.MAXSP * 3 div 100);
+                                    ts.Burned := true;
+                                    tc.MTick := Tick + 5000;
+                                    SendCStat(tc);
+                                  end else begin
+                                    SendSkillError(tc, 0);
+                                    MMode := 4;
+                                    Exit;
+                                  end;
+                                end;
         {CODE-ERROR: You have got to be joking...}
         {Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
           abort for the skills which require certain weapon types.}
@@ -8049,6 +8062,29 @@ begin
                                                 tc1 := tc;
                                                 ProcessType := 3;
                                         end;}
+                                //New Professor Skills
+                                373:  //Hp Conversion
+                                begin
+                                  i := Skill[373].Data.Data1[MUseLv];
+                                  if tc.HP - i > 0 then begin
+                                    i := Skill[373].Data.Data1[MUseLv];
+	                                  tc.HP := tc.HP - i;
+	                                  tc.SP := tc.SP + i;
+                                    dmg[0] := Skill[373].Data.Data1[MUseLv];
+	                                  if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+                                    WFIFOW( 0, $013d);
+                                    WFIFOW( 2, $0007);
+    						                    WFIFOW( 4, dmg[0]);
+    						                    tc.Socket.SendBuf(buf, 6);
+                                    SendCStat(tc);
+                                    //SendCStat1(tc, 0, 5, tc.HP);
+
+                                  end else begin
+                                    SendSkillError(tc, 0);
+                                    MMode := 4;
+                                    Exit;
+                                  end;
+                                end;
 
       	                        8: //ƒCƒ“ƒfƒ…ƒA
 					begin
@@ -10684,6 +10720,66 @@ begin
                                     end;
 
                                   end;
+                                374:  {Soul Change PvP}
+                                begin
+                                {
+                                  Requirement: Magic Rod LV 3, Spell Breaker LV 2
+                                  * Exchange SP of the target with your SP. You can use this for
+                                  party members in normal maps, and for anyone in PvP. If any leftover
+                                  SP remains, they will be ignored (for example, a Knight with 200 SP
+                                  will not have any more than max SP of 200 even if the Professor
+                                  had 1000 SP). If a magic caster gets SP switched,
+                                  and his or her SP doesn't fulfill the requirement for magic he
+                                  or she was casting, the magic will do absolutely nothing.
+                                  It takes 3 seconds to cast, and takes 5 SP.
+                                  There's also nasty 5 second after-skill delay.
+                                  If you use this on a monster, you regain 3% of your SP.
+                                  You can't use this skill on a monster again that already had
+                                  Soul Change.
+                                }
+                                  i := tc.SP;
+                                  k := tc1.SP;
+                                  tc.SP := k;
+                                  tc1.SP := i;
+                                  if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                  if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+                                  tc.MTick := Tick + 5000;
+
+                                  SendCStat(tc);
+                                  SendCStat(tc1);
+                                  {Socket.SendBuf(buf, 8);
+                                  WFIFOW( 0, $00b0);
+                                  WFIFOW( 2, $0005);
+                                  WFIFOL( 4, SP);
+                                  Socket.SendBuf(buf, 8);
+
+                                  tc1.Socket.SendBuf(buf, 8);
+                                  WFIFOW( 0, $00b0);
+                                  WFIFOW( 2, $0005);
+                                  WFIFOL( 4, tc1.SP);
+                                  tc1.Socket.SendBuf(buf, 8); }
+
+
+
+                                end;
+
+                                375: //Soul Burn pVp
+                                begin
+	                                i := tc1.SP;
+	                                dmg[0] := i * 2;
+	                                if Random(100) < Skill[375].Data.Data1[MUseLV] then begin
+                                    tc.SP := 0;
+                                    //dmg[0] := dmg[0] - (tc.MDEF1 + tc.MDEF2);
+                                    //if dmg[0] < 0 then dmg[0] := 0;
+		                                DamageProcess2(tm, tc, tc, dmg[0], Tick);
+                                    SendCStat(tc);
+	                                end else begin
+                                    tc1.SP := 0;
+                                    //dmg[0] := dmg[0] - (tc1.MDEF1 + tc1.MDEF2);
+		                                DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                                    SendCStat(tc1);
+                                  end;
+                                end;
 
            end;
            if tc1.MagicReflect then begin
