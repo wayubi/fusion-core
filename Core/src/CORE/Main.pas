@@ -2239,7 +2239,7 @@ var
 	ts1       :TMob;
 	tn        :TNPC;
 begin
-  CalculateSkillIf(tm, ts, Tick);
+  //CalculateSkillIf(tm, ts, Tick);
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -13954,7 +13954,7 @@ begin
 					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
             Status := 'MOVEITEM_ST';
-            CalculateSkillIf(tm, ts, Tick);
+            //CalculateSkillIf(tm, ts, Tick);
 						ATarget := tn.ID;
 						ATick := Tick;
 
