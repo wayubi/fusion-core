@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.214 - Sometime before we die
 --------------------------------------------------------------------------------
+- 02-25-05: packet_db loading complete. [Tsusai]
 - 02-05-05: Error proofed Default_Map and added framework for packet_db reading. [Tsusai]
 - 02-04-05: fixed broadcast_handle and it's callers useage. [Tsusai]
 

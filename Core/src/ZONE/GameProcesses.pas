@@ -7,14 +7,14 @@ uses
     {Fusion}
     Common, Globals, List32, Script;
 
-    procedure MapConnect(PID: word; Socket: TCustomWinSocket);
+    procedure MapConnect(Loc1,Loc2,Loc3 : integer; Socket: TCustomWinSocket);
     procedure DisplayMap(tc: TChara; Socket : TCustomWinSocket);
     procedure Tick(Socket : TCustomWinSocket);
-    procedure CharacterWalk(tc : TChara; Socket : TCustomWinSocket);
+    procedure CharacterWalk(Loc1 : integer; tc : TChara; Socket : TCustomWinSocket);
 
 implementation
 
-procedure MapConnect(PID: word; Socket: TCustomWinSocket);
+procedure MapConnect(Loc1,Loc2,Loc3 : integer; Socket: TCustomWinSocket);
     var
         rAID, rCID, id1 : Cardinal;
         tp : TPlayer;
@@ -24,13 +24,9 @@ procedure MapConnect(PID: word; Socket: TCustomWinSocket);
         idx : integer;
 
     begin
-        if PID = $0072 then begin
-            RFIFOL(2, rAID);
-            RFIFOL(6, rCID);
-            RFIFOL(10, id1);
-        end else if PID = $00F5 then begin
-            //new version
-        end;
+        RFIFOL(Loc1, rAID);
+        RFIFOL(Loc2, rCID);
+        RFIFOL(Loc3, id1);
 
         if (Player.IndexOf(rAID) <> -1) and (Chara.IndexOf(rCID) <> -1) then begin
             tp := Player.IndexOfObject(rAID) as TPlayer;
@@ -373,11 +369,11 @@ procedure Tick(Socket : TCustomWinSocket);
         Socket.SendBuf(buf, 6);
     end;
 
-procedure CharacterWalk(tc : TChara; Socket : TCustomWinSocket);
+procedure CharacterWalk(Loc1 : integer; tc : TChara; Socket : TCustomWinSocket);
     var xy : TPoint;
     begin
         if (tc.Sit = 1) or (tc.ChatRoomID <> 0) or (tc.VenderID <> 0) then exit;
-        RFIFOM1(2, xy);
+        RFIFOM1(Loc1, xy);
         tc.NextFlag := true;
         tc.NextPoint := xy;
         if tc.PartyName <> '' then begin

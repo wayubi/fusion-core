@@ -221,6 +221,9 @@ begin
 
                 WFIFOW(26, sv3port);
                 Socket.SendBuf(buf, 28);
+
+                tc.clientver := -1; //reset client version identifier
+
             end;
 		$0067: { -- Create New Character -- }
 			begin

@@ -1032,6 +1032,7 @@ TChara = class(TLiving)
 
         guild_storage : Boolean;
         OnTouchIDs      :TIntList32; //to make sure you don't keep setting off the same npc ontouch script.
+        clientver : Integer; //what version of packets
 
     {Mercenary System}
     mercenaryID       :cardinal;  {The ID of a character's Mercenary}
