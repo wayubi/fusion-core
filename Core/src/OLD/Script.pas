@@ -1731,14 +1731,14 @@ begin
 						Inc(tc.ScriptStep);
 					end;
 				}end;
-        76: //areawarp <areawarp x1,y1,x2,y2,dest_map,dest_x,dest_y;>
+        76: //areawarp <areawarp map,x1,y1,x2,y2,dest_map,dest_x,dest_y;>
             //checks for characters on map of npc, between x/y range and warps.
             begin
                 i := tn.Script[tc.ScriptStep].Data3[0]; //x1
                 j := tn.Script[tc.ScriptStep].Data3[1]; //y1
                 k := tn.Script[tc.ScriptStep].Data3[2]; //x2
                 l := tn.Script[tc.ScriptStep].Data3[3]; //y2
-                tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+                tm := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
                 for cnt := 0 to tm.CList.Count - 1 do begin
                     tc1 := tm.CList.Objects[cnt] as TChara;
                     if tc1.Login = 2 then begin
@@ -1747,7 +1747,7 @@ begin
                         (tc1.Point.Y >= j) and
                         (tc1.Point.Y <= l) then begin
                             SendCLeave(tc1, 2);
-                            tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
+                            tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[1];
                             tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[4],tn.Script[tc.ScriptStep].Data3[5]);
                             MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
                         end;
@@ -1949,7 +1949,7 @@ begin
         82: //areabroadcast
             begin
                 l := tn.Script[tc.ScriptStep].Data3[4];
-                str := tn.Script[tc.ScriptStep].Data1[0] + chr(0);
+                str := tn.Script[tc.ScriptStep].Data1[1] + chr(0);
                 i := AnsiPos('$[', str);
                 while i <> 0 do begin
                     j := AnsiPos(']', Copy(str, i + 2, 256));
@@ -1988,7 +1988,7 @@ begin
                 WFIFOW(2, w);
                 WFIFOS(4, str, w - 4);
                 //Broadcast on map
-                tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+                tm := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
                 for i := 0 to tm.CList.Count - 1 do begin
                     tc1 := tm.CList.Objects[i] as TChara;
                     if (tc1.Point.X >= tn.Script[tc.ScriptStep].Data3[0]) and
@@ -2000,6 +2000,20 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
+        83: //waitingroomcount
+            begin
+                if (tn.ChatRoomID <> 0) then begin
+                    i := ChatRoomList.IndexOf(tn.ChatRoomID);
+                    tcr := ChatRoomList.Objects[i] as TChatRoom;
+                    if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then
+                        tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := IntToStr(tcr.Users)
+                    else ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := IntToStr(tcr.Users);
+                end;
+                Inc(tc.ScriptStep);
+            end;
+
+
+
         //add commands before this
 
 

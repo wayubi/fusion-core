@@ -9807,21 +9807,22 @@ Begin
 							tn.Script[k].Data1[0] := SL1[0];
 							Inc(k);
                         end else if str = 'areawarp' then begin //------- 76 areawarp
-                            if sl1.Count <> 7 then begin
+                            if sl1.Count <> 8 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
 								Exit;
 							end;
                             SetLength(tn.Script, k + 1);
 							tn.Script[k].ID := 76;
-                            SetLength(tn.Script[k].Data1, 1);
+                            SetLength(tn.Script[k].Data1, 2);
 							SetLength(tn.Script[k].Data3, 6);
-							tn.Script[k].Data1[0] := SL1[4];
-							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
-							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
-                            tn.Script[k].Data3[2] := StrToInt(SL1[2]);
-                            tn.Script[k].Data3[3] := StrToInt(SL1[3]);
-                            tn.Script[k].Data3[4] := StrToInt(SL1[5]);
-                            tn.Script[k].Data3[5] := StrToInt(SL1[6]);
+							tn.Script[k].Data1[0] := SL1[0];
+                            tn.Script[k].Data1[1] := Sl1[5];
+							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+                            tn.Script[k].Data3[2] := StrToInt(SL1[3]);
+                            tn.Script[k].Data3[3] := StrToInt(SL1[4]);
+                            tn.Script[k].Data3[4] := StrToInt(SL1[6]);
+                            tn.Script[k].Data3[5] := StrToInt(SL1[7]);
                             Inc(k);
                         end else if str = 'gstore' then begin //------- 78 gstore
                             if SL1.Count <> 0 then begin
@@ -9880,22 +9881,33 @@ Begin
 							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 							Inc(k);
                         end else if str = 'areabroadcast' then begin //------- 82 areabroadcast
-                            if (sl1.Count = 5) then sl1.Add('0');
-                            if (sl1.Count <> 6) then begin
+                            if (sl1.Count = 6) then sl1.Add('0');
+                            if (sl1.Count <> 7) then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
 								Exit;
 							end;
                             SetLength(tn.Script, k + 1);
 							tn.Script[k].ID := 82;
-                            SetLength(tn.Script[k].Data1, 1);
+                            SetLength(tn.Script[k].Data1, 2);
 							SetLength(tn.Script[k].Data3, 5);
 							tn.Script[k].Data1[0] := SL1[0];
+                            tn.Script[k].Data1[1] := SL1[5];
 							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
                             tn.Script[k].Data3[2] := StrToInt(SL1[3]);
                             tn.Script[k].Data3[3] := StrToInt(SL1[4]);
-                            tn.Script[k].Data3[4] := StrToInt(SL1[5]);
+                            tn.Script[k].Data3[4] := StrToInt(SL1[6]);
                             Inc(k);
+                        end else if str = 'waitingroomcount' then begin //------- 83 waitingroomcount
+							if (sl1.Count <> 1) then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 83;
+							SetLength(tn.Script[k].Data1, 1);
+							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
@@ -9982,9 +9994,9 @@ Begin
 					end;//for i
 
 					if tn.ScriptLabel <> '' then tm.NPCLabel.AddObject(tn.ScriptLabel, tn);
-					tm.NPC.AddObject(tn.ID, tn);
-					tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
-                    tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8)
+    					tm.NPC.AddObject(tn.ID, tn);
+    					tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+                        tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8)
 
 {d$0100fix5よりココまで}
 	// モンスター ----------------------------------------------------------------
