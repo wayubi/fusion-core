@@ -603,6 +603,11 @@ begin
                 end else begin
                         Option_Font_Style := 'B';
                 end;
+	if sl.IndexOfName('Option_Pet_Capture_Rate') > -1 then begin
+                        Option_Pet_Capture_Rate := StrToInt(sl.Values['Option_Pet_Capture_Rate']);
+                end else begin
+                        Option_Pet_Capture_Rate := 100;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -909,6 +914,7 @@ begin
 	ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
 	ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
 	ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
+    ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
 	// Fusion INI Lines
 
 	// MySQL Server Lines

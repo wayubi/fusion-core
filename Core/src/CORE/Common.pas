@@ -1643,6 +1643,7 @@ Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_AutoBackup   :word;
 Option_WelcomeMsg :boolean;
+Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
 Option_Username_MF : boolean;

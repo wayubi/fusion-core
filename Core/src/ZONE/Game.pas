@@ -7167,8 +7167,12 @@ end;
 
                                                         // ïﬂäló¶ÅBLUK Ç∆Ç©Ç‡óçÇﬂÇÈÇ∆äyÇµÇ¢Ç©Ç‡ÅB
                                                         k := tpd.Capture;
+
+                                                        // Pet Capture Multiplier
+                                                        k := ((k * Option_Pet_Capture_Rate) div 100);
+
                                                         //k := 1000;
-                                                        if Random( 1000 ) < k then begin
+                                                        if Random(1000) < k then begin
 
                                                                 b := 1;
 

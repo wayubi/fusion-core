@@ -1,3 +1,4 @@
+- 05-26-04: Added #137 - Feature Request: Pet Capture Multiplier. 2000 = Perfect. 100 = Normal. [AlexKreuz]
 - 05-26-04: Fixed #873 - Assassin Cross can now equip two daggers. [AlexKreuz]
 - 05-26-04: Added named constants for Damage correction arrays for Race and Element. [ChrspthrR]
 - 05-25-04: Fixed #882 - Blacksmith Weapon Research increases Hit Rate. [AlexKreuz]
