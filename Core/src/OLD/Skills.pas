@@ -3392,6 +3392,7 @@ Begin
 							//Socket.SendBuf(buf[0], 8);
 							ProcessType := 3;
 						end else begin
+                            SendSkillError(tc,6);
 							MMode := 4;
 							Exit;
 						end;
