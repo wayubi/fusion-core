@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-30-04: Capped Fire Wall so only 3 can be active at a time. [Trihan]
 - 06-30-04: Added Athena @charwarp command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @warp command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @rura command to ALBGM. [Trihan]

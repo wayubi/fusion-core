@@ -200,7 +200,7 @@ type
 		procedure SkillPassive(tc:TChara;Tick:Cardinal);
 		procedure PetPassive(tc:TChara; _Tick:Cardinal);
 
-		function  NPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
+		function  NPCAction(tm:TMap;tn:TNPC;Tick:cardinal;tc:TChara) : Integer;
 
 		procedure MobAI(tm:TMap;ts:TMob;Tick:cardinal);
 		procedure MobMoveL(tm:TMap;Tick:cardinal);
@@ -2708,7 +2708,7 @@ begin
 						miss := true;
 						if not avoid then Dec(tn.Count);
 						if tn.Count = 0 then begin
-							DelSkillUnit(tm, tn);
+							DelSkillUnit(tm, tn, tc);
 							Dec(i1);
 						end;
 						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Safety Wall OK >>' + IntToStr(tn.Count));
@@ -4622,6 +4622,7 @@ begin
 			end;
 		18:     {Fire Wall}
 			begin
+                if FireWallCount < 3 then begin
 				xy.X := MPoint.X - Point.X;
 				xy.Y := MPoint.Y - Point.Y;
 				if abs(xy.X) > abs(xy.Y) * 3 then begin
@@ -4681,6 +4682,12 @@ begin
 					tn.MUseLV := MUseLV;
 				end;
 				Colus, 20031219: FW update end}
+                inc (FireWallCount);
+                end
+                else begin
+                SendSkillError(tc,0);
+                Exit;
+                end;
 			end;
 		25:     {Pneuma}
 			begin
@@ -6543,7 +6550,7 @@ end;
 
 
 //------------------------------------------------------------------------------
-function TfrmMain.NPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
+function TfrmMain.NPCAction(tm:TMap;tn:TNPC;Tick:cardinal;tc:TChara) : Integer;
 var
 	k,m,c,c1: Integer;
 	i,j:Integer;
@@ -6588,7 +6595,7 @@ begin
 			case tn.JID of
         $8D: // Icewall ends
           begin
-						DelSkillUnit(tm, tn);
+						DelSkillUnit(tm, tn, tc);
 						Dec(k);
      			end;
 				$81:// Warp Portal Opens
@@ -6621,7 +6628,7 @@ begin
 				else
 					begin
 						//スキル効能地撤去
-						DelSkillUnit(tm, tn);
+						DelSkillUnit(tm, tn, tc);
 						Dec(k);
 					end;
 			end;
@@ -6645,7 +6652,7 @@ begin
 								MapMove(tc1.Socket, tn.WarpMap, tn.WarpPoint);
 								Dec(tn.Count);
 								if tn.Count = 0 then begin //ここの処理がうまくいくかどうか謎
-									DelSkillUnit(tm, tn);
+									DelSkillUnit(tm, tn, tc);
 									Dec(k);
 									c := -1;
 									continue;
@@ -7511,7 +7518,7 @@ begin
 								DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								Dec(tn.Count);
 								if tn.Count = 0 then begin //ここの処理がうまくいくかどうか謎
-									DelSkillUnit(tm, tn);
+									DelSkillUnit(tm, tn, tc);
 									Dec(k);
 									Break;
 								end;
@@ -7948,7 +7955,7 @@ begin
 								DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								Dec(tn.Count);
 								if tn.Count = 0 then begin //ここの処理がうまくいくかどうか謎
-									DelSkillUnit(tm, tn);
+									DelSkillUnit(tm, tn, tc);
 									Dec(k);
 									Break;
 								end;
@@ -9909,7 +9916,7 @@ begin
 									tn := tm.Block[a][b].NPC.Objects[k] as TNPC;
 									Inc(k);
 									if tn = nil then Continue;
-									k := k + NPCAction(tm,tn,Tick);
+									k := k + NPCAction(tm,tn,Tick,tc);
 								end;
 								//フラグON
 								//tm.Block[a][b].MobProcess := true;

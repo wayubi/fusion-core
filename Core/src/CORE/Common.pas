@@ -987,6 +987,7 @@ TChara = class(TLiving)
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
         StatRecalc    :boolean; {Used for the Sage skill free cast}
         //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
+        FireWallCount : Integer;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1740,7 +1741,7 @@ Option_Font_Style : string;
 //------------------------------------------------------------------------------
     //地点スキル
 		function  SetSkillUnit(tm:TMap; ID:cardinal; xy:TPoint; Tick:cardinal; SType:word; SCount:word; STime:cardinal; tc:TChara = nil; ts:TMob = nil; SText:string = ''):TNPC;
-		procedure DelSkillUnit(tm:TMap; tn:TNPC);
+		procedure DelSkillUnit(tm:TMap; tn:TNPC; tc:TChara);
 //------------------------------------------------------------------------------
     //所持アイテム
 		Function  MoveItem(
@@ -5554,7 +5555,7 @@ begin
 	Result := tn;
 end;
 //------------------------------------------------------------------------------
-procedure DelSkillUnit(tm:TMap; tn:TNPC);
+procedure DelSkillUnit(tm:TMap; tn:TNPC ; tc:TChara);
 begin
 	//スキル効能地撤去
 	WFIFOW(0, $0120);
@@ -5573,6 +5574,11 @@ begin
     WFIFOW(6, 0);
     WFIFOS(8, tm.Name, 16);
     SendBCmd(tm, tn.Point, 24);
+  end;
+
+  if (tn.JID = $7f) and (tn.CData <> nil) then begin
+    tc := tn.CData;
+    dec (tc.FireWallCount);
   end;
   
 	tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));

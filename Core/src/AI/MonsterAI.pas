@@ -1220,7 +1220,7 @@ begin
 						miss := true;
 						if not avoid then Dec(tn.Count);
 						if tn.Count = 0 then begin
-							DelSkillUnit(tm, tn);
+							DelSkillUnit(tm, tn, tc);
 							Dec(i1);
 						end;
 						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Safety Wall OK >>' + IntToStr(tn.Count));
