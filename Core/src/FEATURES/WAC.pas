@@ -123,7 +123,12 @@ uses
         if (Option_Enable_WAC) then begin
             BRSHttpSrv1 := TBRSHttpSrv.Create(frmMain);
             BRSHttpSrv1.Port := wacport;
-            BRSHttpSrv1.Start;
+            try
+                BRSHttpSrv1.Start;
+            except
+                debugout.Lines.add('WAC was unable to use that port.');
+                destroy_wac(true);
+            end;
         end;
     end;
 

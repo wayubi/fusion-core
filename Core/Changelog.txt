@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-18-04: W.A.C port conflict caused crash. [AlexKreuz]
 - 08-18-04: Unknown summon slaves caused crash. [AlexKreuz]
 - 08-18-04: Mob pcnt initialized on spawn. Maybe responsible for crash. [AlexKreuz]
 - 08-18-04: ItemDB access violation on shutdown caused crash. [AlexKreuz]
