@@ -8336,6 +8336,7 @@ begin
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
                                                         end;
+                                                        SendCStat(tc);
                                                 end;
                                 266:  //Investigate
                                                 if spiritSpheres <> 0 then begin
