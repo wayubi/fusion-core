@@ -7004,7 +7004,7 @@ begin
 
 			case tc.MSkill of
                                 //Assassain Skills
-                                139: //Posion React
+                                139: //Poison React
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 3;
@@ -9912,14 +9912,33 @@ begin
                         CloakTick := Tick;
                 end;
 
+                if (tc.isPoisoned = true) then begin
+                        if tc.PoisonTick < Tick then begin
+                                tc.isPoisoned := False;
+                                PoisonCharacter(tm, tc, Tick);
+                        end;
+                end;
+
+
+
       {Colus, 20031223: Added check for Ashura recovery period.}
 			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
-				if HP <> MAXHP then begin
+				if (HP <> MAXHP)  and (tc.isPoisoned = False) then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
 						Inc(HP);
 						HPTick := HPTick + HPDelay[3 - Sit];
 					end;
 					if HP > MAXHP then HP := MAXHP;
+					WFIFOW( 0, $00b0);
+					WFIFOW( 2, $0005);
+					WFIFOL( 4, HP);
+					Socket.SendBuf(buf, 8);
+                                end else if (tc.isPoisoned = True) then begin
+                                        for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
+						Dec(HP);
+						HPTick := HPTick + HPDelay[3 - Sit];
+					end;
+					if HP < 1 then HP := 1;
 					WFIFOW( 0, $00b0);
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, HP);
@@ -9945,10 +9964,6 @@ begin
 						SPTick := Tick;
 				end;
 			end;
-
-                        {if tc.PosionTick > Tick then begin
-                                (tc.PosionTick > Tick) and (tc.PoisionTick + tc.Skill[LastSong].Data.Element * 1000 < Tick) then begin
-                        end; }
 
 			if (Sit >= 2) then begin
 

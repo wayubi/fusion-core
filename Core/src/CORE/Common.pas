@@ -795,6 +795,9 @@ type TChara = class
         isCloaked     :Boolean;   {Says if Cloaking is Active}
         CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
 
+        PoisonTick    :Cardinal;  {Tracks how long a player is Poisoned}
+        isPoisoned    :Boolean;  {Says if player is Poisoned}
+
         intimidateActive:Boolean; {Sets intimidate Active}
         intimidateTick:cardinal;  {Used so you can delay before you intimidate}
 
@@ -1402,7 +1405,7 @@ Option_AutoSave   :word;
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
-                //procedure PosionCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
+                procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
@@ -2365,7 +2368,7 @@ end;
 //------------------------------------------------------------------------------
 procedure CalcSongStat(tc:TChara; Tick:cardinal = 0);
 var
-	i,j,      :integer;
+	i,j      :integer;
 	//Side      :byte;
 	//td        :TItemDB;
         tl        :TSkillDB;
@@ -2605,9 +2608,9 @@ begin
   end;
 end;}
 //------------------------------------------------------------------------------
-{procedure PosionCharacter(tm:TMap; tc:TChara; Tick:cardinal);
+procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);
 begin
-        if tc.PosionTick > Tick then begin
+        if tc.PoisonTick > Tick then begin
                 WFIFOW(0, $0119);
                 WFIFOL(2, tc.ID);
                 WFIFOW(6, 0);
@@ -2624,7 +2627,7 @@ begin
                 WFIFOB(12, 0);
                 SendBCmd(tm, tc.Point, 13);
         end;
-end;}
+end;
 //------------------------------------------------------------------------------
 procedure IntimidateWarp(tm:TMap; tc:TChara);
 var

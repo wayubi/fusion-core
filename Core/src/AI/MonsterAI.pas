@@ -346,7 +346,7 @@ begin
                         dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
-                171: //Npc-combo hit
+                171:    {Npc-combo hit}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
@@ -369,36 +369,30 @@ begin
                         dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
-                    200: 
+
+                200:
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-                       202: 
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-                     191:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-                176:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                        //posiontick := tick + 15000;
                 end;
 
+                202:
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+                191:
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
 
 
                 11,13,14,19,20:
@@ -562,6 +556,17 @@ begin
                                 WFIFOW(8, tc.Point.Y);
                                 SendBCmd(tm, tc.Point, 10);;
                         end;
+                end;
+
+                176:    {Posion Attack}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        tc.isPoisoned := True;
+                        tc.PoisonTick := tick + 15000;
+                        PoisonCharacter(tm, tc, Tick);
                 end;
         end;
 
