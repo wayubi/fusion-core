@@ -451,6 +451,15 @@ begin
 	end;
 {U0x008a_fix_end}
 	sl.Clear;
+
+        ini.ReadSectionValues('Fusion', sl);
+                if sl.IndexOfName('Option_PVP') <> -1 then begin
+                        Option_PVP := StrToBool(sl.Values['Option_PVP']);
+                end else begin
+                        Option_PVP := false;
+                end;
+        sl.Clear;
+
 	ini.ReadSectionValues('Option', sl);
 
 	if sl.IndexOfName('Left') <> -1 then begin
@@ -598,6 +607,11 @@ begin
 	ini.WriteString('Option', 'Height', IntToStr(FormHeight));
 	ini.WriteString('Option', 'Priority', IntToStr(Priority));
         ini.WriteString('Option', 'Priority', IntToStr(Priority));
+
+        // Fusion INI Lines
+        ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
+        // Fusion INI Lines
+        
 	ini.Free;
 
 	DataSave();

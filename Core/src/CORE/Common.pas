@@ -1295,6 +1295,12 @@ SummonMonsterMob  :boolean;
 GlobalGMsg        :string;
 MapGMsg           :string;
 {オプション関連ここまで}
+
+// Fusion INI Declarations
+Option_PVP        :boolean;
+// Fusion INI Declarations
+
+
 //------------------------------------------------------------------------------
 // 関数定義
 		procedure MapLoad(MapName:string);

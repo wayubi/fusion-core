@@ -788,6 +788,11 @@ begin
                                 else if (sl[i] = 'pvpg') then mi.PvPG := true
                                 else if (sl[i] = 'noday') then mi.noday := true;
 
+                                if (Option_PVP = false) then begin
+                                        mi.PvP := false;
+                                        mi.PvPG := false;
+                                end;
+
                                 {アジト機能追加ココまで}
 			end;
 			if (j = 1) then begin
