@@ -12543,6 +12543,47 @@ begin
 
                 end
 
+                else if sl.strings[0] = 'save' then begin
+                // Save data
+                    DataSave();
+                    Debugout.lines.add('Player data has been saved.');
+                end
+
+                else if sl.Strings[0] = 'reload' then begin
+                // Reloads Databases. Warning, does not save Data.
+                    MapList.Clear;
+                    ItemDB.Clear;
+                    ItemDBName.Clear;
+                    MaterialDB.Clear;
+                    MobDB.Clear;
+                    MobDBName.Clear;
+                    SummonMobList.Clear;
+                    SummonIOBList.Clear;
+                    SummonIOVList.Clear;
+                    SummonICAList.Clear;
+                    SummonIGBList.Clear;
+                    PetDB.Clear;
+                    MapInfo.Clear;
+                    SkillDB.Clear;
+                    GSkillDB.Clear;
+                    SlaveDBName.Clear;
+                    MArrowDB.Clear;
+                    IDTableDB.Clear;
+                    Playername.Clear;
+                    Player.Clear;
+                    Charaname.Clear;
+                    Chara.Clear;
+                    Castlelist.Clear;
+                    Partynamelist.Clear;
+                    Guildlist.Clear;
+                    PetList.Clear;
+                	DatabaseLoad(Handle);
+	                DataLoad();
+                    debugout.lines.add('');
+                    debugout.lines.add('Databases Reload Completed ...');
+                    debugout.lines.add('');
+                end
+
                 else if sl.Strings[0] = 'uptime' then begin
                 // Displays Uptime Stats in Console
                 // Syntax: -uptime [global]
