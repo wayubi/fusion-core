@@ -1,10 +1,10 @@
 object frmMain: TfrmMain
-  Left = 238
-  Top = 171
+  Left = 311
+  Top = 334
   Width = 680
   Height = 344
   Caption = 'c'
-  Color = clBtnFace
+  Color = clCream
   Font.Charset = SHIFTJIS_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -16,11 +16,11 @@ object frmMain: TfrmMain
   OnResize = FormResize
   DesignSize = (
     672
-    317)
+    310)
   PixelsPerInch = 96
   TextHeight = 15
   object lbl00: TLabel
-    Left = 129
+    Left = 177
     Top = 8
     Width = 28
     Height = 15
@@ -61,9 +61,9 @@ object frmMain: TfrmMain
     OnClick = cmdStopClick
   end
   object Edit1: TEdit
-    Left = 165
+    Left = 144
     Top = 5
-    Width = 362
+    Width = 425
     Height = 24
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
@@ -77,7 +77,7 @@ object frmMain: TfrmMain
     OnKeyPress = Edit1KeyPress
   end
   object Button1: TButton
-    Left = 533
+    Left = 573
     Top = 5
     Width = 93
     Height = 22
@@ -94,9 +94,10 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 298
+    Top = 291
     Width = 672
     Height = 19
+    Color = clCream
     Panels = <
       item
         Width = 100
@@ -108,18 +109,17 @@ object frmMain: TfrmMain
         Alignment = taRightJustify
         Width = 50
       end>
-    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0
-    Top = 48
+    Top = 32
     Width = 672
-    Height = 250
+    Height = 259
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = cl3DDkShadow
+    Color = clMoneyGreen
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clRed
+    Font.Color = clNavy
     Font.Height = -12
     Font.Name = 'Century Gothic'
     Font.Style = []
@@ -136,8 +136,8 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv1ClientDisconnect
     OnClientRead = sv1ClientRead
     OnClientError = sv1ClientError
-    Left = 20
-    Top = 112
+    Left = 12
+    Top = 248
   end
   object sv2: TServerSocket
     Active = False
@@ -147,8 +147,8 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv2ClientDisconnect
     OnClientRead = sv2ClientRead
     OnClientError = sv2ClientError
-    Left = 108
-    Top = 112
+    Left = 44
+    Top = 248
   end
   object sv3: TServerSocket
     Active = False
@@ -158,14 +158,14 @@ object frmMain: TfrmMain
     OnClientDisconnect = sv3ClientDisconnect
     OnClientRead = sv3ClientRead
     OnClientError = sv3ClientError
-    Left = 60
-    Top = 120
+    Left = 76
+    Top = 248
   end
   object DBsaveTimer: TTimer
     Enabled = False
     Interval = 300000
     OnTimer = DBsaveTimerTimer
-    Left = 64
-    Top = 160
+    Left = 112
+    Top = 248
   end
 end

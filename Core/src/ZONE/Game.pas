@@ -2698,7 +2698,7 @@ end;
 				end;
 			end;
 		//--------------------------------------------------------------------------
-		$00c8: //NPCのお店から買う
+		$00c8: // Send Request to Buy Item from NPC Shop
 			begin
 				tm := tc.MData;
 				tn := tm.NPC.IndexOfObject(tc.TalkNPCID) as TNPC;
@@ -2759,43 +2759,54 @@ end;
 						end;
 
 						if td = nil then continue;
-						j := SearchCInventory(tc, ww[k][1], td.IEquip);
-						if j <> 0 then begin
-							//アイテム追加
-							tc.Item[j].ID := ww[k][1];
-							tc.Item[j].Amount := tc.Item[j].Amount + ww[k][0];
-							tc.Item[j].Equip := 0;
-							tc.Item[j].Identify := 1;
-							tc.Item[j].Refine := 0;
-							tc.Item[j].Attr := 0;
-							tc.Item[j].Card[0] := 0;
-							tc.Item[j].Card[1] := 0;
-							tc.Item[j].Card[2] := 0;
-							tc.Item[j].Card[3] := 0;
-							tc.Item[j].Data := td;
 
-							tc.Weight := tc.Weight + td.Weight * ww[k][0];
-							tc.Zeny := tc.Zeny - l;
-							SendCGetItem(tc, j, ww[k][0]);
-						end else begin
-							//これ以上もてない(時の処理：未)
-						end;
+            // AlexKreuz - 12/19/2003.
+            // Added to prevent overweight NPC purchases.
+            if (cardinal(td.Weight * ww[k][0]) > tc.MaxWeight - tc.Weight) then begin
+					    WFIFOW(0, $00ca); // "You are over the weight limit"
+					    WFIFOB(2, 2);
+					    Socket.SendBuf(buf, 3);
+            end
+
+            else begin
+  						j := SearchCInventory(tc, ww[k][1], td.IEquip);
+  						if j <> 0 then begin
+  							//アイテム追加
+	  						tc.Item[j].ID := ww[k][1];
+		  					tc.Item[j].Amount := tc.Item[j].Amount + ww[k][0];
+			  				tc.Item[j].Equip := 0;
+				  			tc.Item[j].Identify := 1;
+					  		tc.Item[j].Refine := 0;
+  							tc.Item[j].Attr := 0;
+	  						tc.Item[j].Card[0] := 0;
+		  					tc.Item[j].Card[1] := 0;
+			  				tc.Item[j].Card[2] := 0;
+				  			tc.Item[j].Card[3] := 0;
+					  		tc.Item[j].Data := td;
+
+  							tc.Weight := tc.Weight + td.Weight * ww[k][0];
+	  						tc.Zeny := tc.Zeny - l;
+		  					SendCGetItem(tc, j, ww[k][0]);
+
+      					//重量更新
+      			 		WFIFOW(0, $00b0);
+      					WFIFOW(2, $0018);
+      					WFIFOL(4, tc.Weight);
+      					Socket.SendBuf(buf, 8);
+      					//所持金更新
+      					WFIFOW(0, $00b1);
+      					WFIFOW(2, $0014);
+      					WFIFOL(4, tc.Zeny);
+      					Socket.SendBuf(buf, 8);
+      					//取引ができました
+      					WFIFOW(0, $00ca);
+      					WFIFOB(2, 0);
+      					Socket.SendBuf(buf, 3);
+  						end else begin
+  							//これ以上もてない(時の処理：未)
+	  					end;
+            end;
 					end;
-
-					//重量更新
-					WFIFOW(0, $00b0);
-					WFIFOW(2, $0018);
-					WFIFOL(4, tc.Weight);
-					Socket.SendBuf(buf, 8);
-					//所持金更新
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc.Zeny);
-					Socket.SendBuf(buf, 8);
-					//取引ができました
-					WFIFOW(0, $00ca);
-					WFIFOB(2, 0);
-					Socket.SendBuf(buf, 3);
 				end else begin
 					//不正な処理（店にないものを買おうとした）
 					WFIFOW(0, $00ca);

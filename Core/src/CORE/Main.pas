@@ -531,10 +531,8 @@ begin
 	DebugOut.Lines.Add('Startup Success.');
         DebugOut.Lines.SaveToFile('StartupLog.txt');
 
-        DebugOut.Lines.LoadFromFile('Fusion.notice');
+        //DebugOut.Lines.LoadFromFile('Fusion.notice');
 
-        DebugOut.Lines.Add('');
-        DebugOut.Lines.Add('');
         DebugOut.Lines.Add('');
         DebugOut.Lines.Add('--- Fusion Command Output Begin ---');
         DebugOut.Lines.Add('');
