@@ -589,6 +589,10 @@ begin
               end;
           end;
 
+          // Colus, 20040118: Update Spirit Spheres for monks
+          // TODO: Get spiritSpheres into tc and not a main variable
+          //if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, spiritSpheres);
+          
           {if (mi.noDay = true) {or (tc.noDay = true) then begin
                 WFIFOW(0, $0119);
                 WFIFOL(2, tc1.ID);

@@ -9939,19 +9939,19 @@ begin
                         tc.HP := tc.HP + j;
                         if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
 
-{                        // Colus, 20040117: Nobody else sees the heal, use 011a:
+                        // Colus, 20040117: Nobody else sees the heal, use 011a:
   							        WFIFOW( 0, $011a);
   							        WFIFOW( 2, 28);  // Cheat with heal
   							        WFIFOW( 4, j);
   							        WFIFOL( 6, ID);
   							        WFIFOL(10, 0); // Not sure what to do about this (NPC's ID?)
   							        WFIFOB(14, 1);
-  							        SendBCmd(tc.MData, tc.Point, 15);}
-                        WFIFOW( 0, $013d);
+  							        SendBCmd(tc.MData, tc.Point, 15);
+{                        WFIFOW( 0, $013d);
                         WFIFOW( 2, $0005);
                         WFIFOW( 4, j);
                         //Socket.SendBuf(buf, 6);
-                        SendBCmd(tc.MData, tc.Point, 6);
+                        SendBCmd(tc.MData, tc.Point, 6);}
 
                         WFIFOW( 0, $00b0);
                         WFIFOW( 2, $0005);
@@ -9969,20 +9969,20 @@ begin
                         tc.HP := tc.HP + j;
                         if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
 
-                        {// Colus, 20040117: Nobody else sees the heal, use 011a:
+                        // Colus, 20040117: Nobody else sees the heal, use 011a:
   							        WFIFOW( 0, $011a);
   							        WFIFOW( 2, 28);  // Cheat with heal
   							        WFIFOW( 4, j);
   							        WFIFOL( 6, ID);
-  							        WFIFOL(10, ID); // Not sure what to do about this (NPC's ID?)
+  							        WFIFOL(10, 0); // Not sure what to do about this (NPC's ID?)
   							        WFIFOB(14, 1);
-  							        SendBCmd(tc.MData, tc.Point, 15);}
-                        WFIFOW( 0, $013d);
+  							        SendBCmd(tc.MData, tc.Point, 15);
+                        {WFIFOW( 0, $013d);
                         WFIFOW( 2, $0005);
                         WFIFOW( 4, j);
                         //Socket.SendBuf(buf, 6);
-                        SendBCmd(tc.MData, tc.Point, 6);
-                        
+                        SendBCmd(tc.MData, tc.Point, 6);}
+
                         WFIFOW( 0, $00b0);
                         WFIFOW( 2, $0005);
                         WFIFOL( 4, HP);
@@ -10966,7 +10966,7 @@ begin
                   if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
                   dmg[0] := dmg[0] div 2; // Half-heal damage for undead/demon
 
-                  tn.Tick := Tick;
+                  tn.Tick := Tick; // TODO: Don't expire on one hit?
                   WFIFOW( 0, $01de);
                   WFIFOW( 2, $46);
                   WFIFOL( 4, tn.ID);
@@ -11068,7 +11068,7 @@ begin
 									dmg[0] := dmg[0] * tn.Count;
 									dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[79].Data.Element][ts1.Element] div 100;
 									if dmg[0] < 0 then dmg[0] := 0;
-									tn.Tick := Tick;
+									tn.Tick := Tick;       // TODO: Stop expiring ME tiles on 1 hit
 									//ダメージパケ送信
 									WFIFOW( 0, $01de);
 									WFIFOW( 2, 79);
