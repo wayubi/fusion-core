@@ -10,6 +10,7 @@ uses
 	{Fusion Units}
 	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
 	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
+    PacketProcesses,
 	{3rd Party Units}
 	List32, Zip, Menus;
 
@@ -3714,7 +3715,8 @@ begin
                                                 ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
                                                         //出現通知
                                                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Add', [tc1.Name]));
-                                                        SendNData( tc1.Socket, tn, tc1.ver2 );
+                                                        //Darkhelmet, I found you you stupid bastard!  YOU ARE CAUSING OUR BARD PROBLEMS
+                                                        SendNData( tc1.Socket, tn, tc1.ver2, tc );
                                                         //移動通知
                                                         if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
                                                                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
@@ -3852,7 +3854,7 @@ with tc do begin
                         //end;
 
                         if (tn.Enable = true) then begin
-                            SendNData(Socket, tn, tc.ver2);
+                            SendNData(Socket, tn, tc.ver2, tc);
                             if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
                                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn.ID]));
     
@@ -5058,6 +5060,7 @@ begin
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
+
 				{Colus, 20031219: Removed stair-step pattern for diagonal IWs
 				if (b mod 2) <> 0 then begin
 					//斜め向き
@@ -5737,6 +5740,7 @@ begin
 
 						tn := SetSkillUnit(tm, ID, xy, Tick, $9a, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
+                        tn.CharacterReceivedList.Add(tc.ID);
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 					end;
@@ -5786,6 +5790,7 @@ begin
 
 						tn := SetSkillUnit(tm, ID, xy, Tick, $9b, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
+                        tn.CharacterReceivedList.Add(tc.ID);
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 					end;
@@ -5803,6 +5808,7 @@ begin
 
 						tn := SetSkillUnit(tm, ID, xy, Tick, $9c, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
+                        tn.CharacterReceivedList.Add(tc.ID);
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 					end;
@@ -5820,6 +5826,7 @@ begin
 
 						tn := SetSkillUnit(tm, ID, xy, Tick, $9d, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
+                        tn.CharacterReceivedList.Add(tc.ID);
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 					end;
@@ -5887,6 +5894,7 @@ begin
 							//tn.CData := tc;
 							tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
+                            tn.CharacterReceivedList.Add(tc.ID);
 							tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
 							//i1 := i1 + 2;
 							//1 := j1 + 2;
@@ -6645,73 +6653,84 @@ begin
 
 end;
 
+{Darkhelmet - July 28, 2004.
+   Sigh, in all of fusions time not one developer has tackled this function.  I made some crappy
+   additions to it, but it contains some vital bandwidth problems of over updating so
+   I am hoping to conqure them now.
+}
 function TfrmMain.NPCAction(tm:TMap;tn:TNPC;Tick:cardinal;tc:TChara) : Integer;
 var
 	k,m,c,c1: Integer;
 	i,j:Integer;
 	i1,j1,k1:integer;
 	i2,j2,k2:integer;
-        p1,p2:integer;
+    p1,p2:integer;
 	tc1:TChara;
-        tMonster:TMob;
+    tMonster:TMob;
 	ts1:TMob;
-        tc2:TChara;
+    tc2:TChara;
 	tl	:TSkillDB;
 	xy:TPoint;
-  b:integer;
+    b:integer;
 	bb:array of byte;
 	sl:TStringList;
-        sl2:TStringList;
+    sl2:TStringList;
 	flag:Boolean;
-        mi :MapTbl;
+    mi :MapTbl;
 begin
-        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+    // Get the Maps Info
+    mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+
 	k := 0;
+
+    // If the NPC is an item
 	if (tn.CType = 3) and (tn.Tick <= Tick) then begin
-                if tn.JID  = $F1 then begin
-                        WFIFOW(0, $00a1);
-		        WFIFOL(2, 1118);
-		        SendBCmd(tm, tn.Point, 6);
-                        with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
-			        Delete(IndexOf(1118));
-                        tn.Free;
-                end;
-		//アイテム撤去
+        if tn.JID  = $F1 then begin  //If its biocannabliaze begin
+            WFIFOW(0, $00a1);
+            WFIFOL(2, 1118);
+            SendBCmd(tm, tn.Point, 6);
+            {Delte the plant}
+            with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
+                Delete(IndexOf(1118));
+
+            tn.Free;  //Free the NPC
+        end;
+		//This is a normal NPC
 		WFIFOW(0, $00a1);
 		WFIFOL(2, tn.ID);
 		SendBCmd(tm, tn.Point, 6);
-		//アイテム削除
+		//Remove from NPC index
 		tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
 		with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
 			Delete(IndexOf(tn.ID));
 			tn.Free;
-	end else if (tn.CType = 4) then begin //スキル効能地
-		if tn.Tick <= Tick then begin
+	end else if (tn.CType = 4) then begin //If its a skill
+		if tn.Tick <= Tick then begin  //It's tick has expired
 			case tn.JID of
-        $8D: // Icewall ends
-          begin
-						DelSkillUnit(tm, tn, tc);
-						Dec(k);
-     			end;
+                $8D: // Icewall ends
+                    begin
+                        DelSkillUnit(tm, tn, tc);
+                        Dec(k);
+     			    end;
 				$81:// Warp Portal Opens
-					begin
+                    begin
 						tn.JID := $80;
-            UpdateLook(tm, tn, 0, tn.JID, 0, true);
+                        UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 20000;
 					end;
 				$8F:// Blast Mine activated
 					begin
 						tn.JID := $74;
-            UpdateLook(tm, tn, 0, tn.JID, 0, true);
+                        UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 2000;
 					end;
-        $99: // Talkie Box Activated
-          begin
+                $99: // Talkie Box Activated
+                    begin
 						tn.JID := $8c;
-            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie changed');
-            UpdateLook(tm, tn, 0, tn.JID, 0, true);
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie changed');
+                        UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 60000;
-          end;
+                    end;
         { $8c: // Talkie Box fires
           begin
             WFIFOW(0, $0191);
@@ -6720,15 +6739,15 @@ begin
             SendBCmd(tm, tn.Point, 86);
           end;}
 
-				else
-					begin
-						//スキル効能地撤去
-						DelSkillUnit(tm, tn, tc);
-						Dec(k);
-					end;
+            else  //Not a special case, so we are going to delete it as normal
+                begin
+                    //Remove the graphic
+                    DelSkillUnit(tm, tn, tc);
+                    Dec(k);
+                end;
 			end;
 		end else begin
-			//スキル効能地効果 Chara踏み型
+			//It is still active, so let's do it's effects
 			c := 0;
 			while (c >= 0) and (c < tm.Block[tn.Point.X div 8][tn.Point.Y div 8].CList.Count) do begin
 				tc1 := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].CList.Objects[c] as TChara;
@@ -6736,7 +6755,7 @@ begin
 				if tc1 = nil then continue;
 				if (tc1.pcnt = 0) and (tc1.Point.X = tn.Point.X) and (tc1.Point.Y = tn.Point.Y) then begin
 					case tn.JID of
-						$80: //ポータル発動後
+						$80: //Chat room
 							begin
                                                                 {チャットルーム機能追加}
 								if (tc1.ChatRoomID <> 0) then continue;
@@ -6755,29 +6774,29 @@ begin
 									Dec(c);
 								end;
 							end;
-            $99: // Talkie Box fires
-            begin
-             //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie fire self');
-              WFIFOW(0, $0191);
-              WFIFOL(2, tc1.ID);
-              WFIFOS(6, tn.Name, 80);
-              //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
-              SendBCmd(tm, tn.Point, 86);
-            end;
-            $8c: // Talkie Box fires
-            begin
-              WFIFOW(0, $0191);
-              //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
-              WFIFOL(2, tn.ID);
-              WFIFOS(6, tn.Name, 80);
-              SendBCmd(tm, tn.Point, 86);
-            end;
+                        $99: // Talkie Box fires
+                            begin
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie fire self');
+                                WFIFOW(0, $0191);
+                                WFIFOL(2, tc1.ID);
+                                WFIFOS(6, tn.Name, 80);
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
+                                SendBCmd(tm, tn.Point, 86);
+                            end;
+                        $8c: // Talkie Box fires
+                            begin
+                                WFIFOW(0, $0191);
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
+                                WFIFOL(2, tn.ID);
+                                WFIFOS(6, tn.Name, 80);
+                                SendBCmd(tm, tn.Point, 86);
+                            end;
 					end;
 				end;
 			end;
 
 			tc1 := tn.CData;
-                        tMonster := tn.MData;
+            tMonster := tn.MData;
 
 			tl := SkillDB.IndexOfObject(tn.MSkill) as TSkillDB;
 			if tl <> nil then begin
@@ -6785,36 +6804,40 @@ begin
 			end else begin
 				m := 0;
 			end;
-			//場所指定スキル 範囲型
-		  flag := False;
-                        sl2 := TStringList.Create;
-                        for p1 := (tn.Point.Y - m) div 8 to (tn.Point.Y + m) div 8 do begin
+			//Start Searching
+		    flag := False;
+            sl2 := TStringList.Create;
+
+            {Find Characters in area}
+            for p1 := (tn.Point.Y - m) div 8 to (tn.Point.Y + m) div 8 do begin
 				for i1 := (tn.Point.X - m) div 8 to (tn.Point.X + m) div 8 do begin
 					for c1 := 0 to tm.Block[i1][p1].Clist.Count -1 do begin
-                                                if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
-						tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
-						if tc2 = nil then Continue;
-						if (abs(tc2.Point.X - tn.Point.X) <= m) and (abs(tc2.Point.Y - tn.Point.Y) <= m) then
-							sl2.AddObject(IntToStr(tc2.ID),tc2);
-						if (tc2.Point.X = tn.Point.X) and (tc2.Point.Y = tn.Point.Y) then
-							flag := True;
-					end;
-				end;
+                        if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
+						    tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
+						    if tc2 = nil then Continue;
+						    if (abs(tc2.Point.X - tn.Point.X) <= m) and (abs(tc2.Point.Y - tn.Point.Y) <= m) then
+							    sl2.AddObject(IntToStr(tc2.ID),tc2);
+						    if (tc2.Point.X = tn.Point.X) and (tc2.Point.Y = tn.Point.Y) then
+							    flag := True;
+					    end;
+				    end;
+			    end;
 			end;
-			end;
-                        if tMonster <> nil then begin
-                            if tMonster.isCasting then begin
-                                if sl2.Count <> 0 then begin
-                                        for c1 := 0 to sl2.Count - 1 do begin
-                                                tc2 := sl2.Objects[c1] as TChara;
-                                                case tn.JID of
-                                                        $88: //Meteor
-							begin
-								//if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+
+            //Monster casting sysem I randomly placed... needs to be moved to monsterAI under a call
+            if tMonster <> nil then begin
+                if tMonster.isCasting then begin
+                    if sl2.Count <> 0 then begin
+                        for c1 := 0 to sl2.Count - 1 do begin
+                            tc2 := sl2.Objects[c1] as TChara;
+                            case tn.JID of
+                                $88: //Meteor
+							    begin
+								    //if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
 									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
 									//dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									//dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
-                  MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
+                                    MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
 
 									if dmg[0] < 1 then dmg[0] := 1;
 
@@ -6842,15 +6865,15 @@ begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
 										if tn.Count = 3 then tn.Tick := Tick
 									end;
-								//end;
-                                                        end;
 
-                                                        $86:    {Lord of Vermillion Damage}
-							begin
+                                end;
+
+                                $86:    {Lord of Vermillion Damage}
+							    begin
 								//if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
-                                                                        dmg[0] := dmg[0] * tMonster.Data.Param[3];
-                                                                        if dmg[0] > 15000 then dmg[0] := 15000;
+                                    MobSkillDamageCalc(tm, tc2, tn.MData, Tick);
+                                    dmg[0] := dmg[0] * tMonster.Data.Param[3];
+                                    if dmg[0] > 15000 then dmg[0] := 15000;
 									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
 									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									dmg[0] := dmg[0] - tc2.Param[3]; //Magic Defence
@@ -6870,7 +6893,7 @@ begin
 									WFIFOW(28, tn.MUseLV);
 									WFIFOW(30, tl.Data2[tn.MUseLV]);
 									WFIFOB(32, 8);
-                                                                        SendBCmd(tm, tn.Point, 33);
+                                    SendBCmd(tm, tn.Point, 33);
 
 									DamageProcess3(tm, tn.MData, tc2, dmg[0], Tick);
 
@@ -6878,51 +6901,29 @@ begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
 										if tn.Count = 3 then tn.Tick := Tick
 									end;
-								//end;
-							end;
-                                                end;  //End Case
+							    end;
+                            end;  //End Case
                                         //tMonster.IsCasting := false;
                                         //Exit;
-                                        end;
-                                end;
-                            end;
                         end;
+                    end;
+                end;
+            end;  //End of monster Casting
 
-                        if sl2.Count <> 0 then begin
-                                for c1 := 0 to sl2.Count - 1 do begin
-                                        tc2 := sl2.Objects[c1] as TChara;
-                                        if (tc2.NoTarget = false) and (tc2.HP > 0) then begin
-                                          case tn.JID of
-                                                {//$46: //Sanctuary
-                                                     begin
-                                                                if tc2.MTick < Tick then begin
-									dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
-
-									tn.Tick := Tick;
-                                                     
-                                                                        tc2.HP := tc2.HP + dmg[0];
-						                        if tc2.HP > tc2.MAXHP then tc2.HP := tc2.MAXHP;
-                                                                        WFIFOW( 0, $011a);
-                                                                        WFIFOW( 2, tn.MSkill);
-                                                                        WFIFOW( 4, dmg[0]);
-                                                                        WFIFOL( 6, tc2.ID);
-                                                                        WFIFOL(10, tn.ID);
-                                                                        WFIFOB(14, 1);
-							                SendBCmd(tm, tc2.Point, 15);
-						                        SendCStat1(tc2, 0, 5, tc2.HP);
-									SendBCmd(tm, tn.Point, 31);
-
-                                                                        tc2.MTick := Tick + 1000;
-                                                                end;
-                                                     end;}
-                                                $8d: {Ice Wall}
+            //Pvp Area effects begin
+            if sl2.Count <> 0 then begin
+                for c1 := 0 to sl2.Count - 1 do begin
+                    tc2 := sl2.Objects[c1] as TChara;
+                    if (tc2.NoTarget = false) and (tc2.HP > 0) then begin
+                        case tn.JID of
+                            $8d: {Ice Wall}
 							begin
-                {Colus, 20030113: Put the bounce back in until pathing works right again.}
+                                {Colus, 20030113: Put the bounce back in until pathing works right again.}
 								SetLength(bb, 1);
 								bb[0] := 4;     // 1->4
 								//bb[1] := 0;
-                                                                xy := tc2.Point;
-                                                                //tc2.Dir := 8 - tc2.Dir;
+                                xy := tc2.Point;
+                                //tc2.Dir := 8 - tc2.Dir;
 								DirMove(tm, tc2.Point, tc2.Dir, bb);
 								//ブロック移動
 								if (xy.X div 8 <> tc2.Point.X div 8) or (xy.Y div 8 <> tc2.Point.Y div 8) then begin
@@ -6933,159 +6934,135 @@ begin
 									tm.Block[tc2.Point.X div 8][tc2.Point.Y div 8].Clist.AddObject(tc2.ID, tc2);
 								end;
 								tc2.pcnt := 0;
-			      					//Update Players Location
+                                //Update Players Location
 								UpdatePlayerLocation(tm, tc2);
 							end;
-                                                $46:    {Sanctuary}
-                                                        begin
-                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
 
-                                                                //if tc2.Skill[tn.MSkill].Tick < Tick then begin;
-                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
-                                                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
-                                                                        tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
-                                                                        tc2.SkillTickID := tn.MSkill;
+                            $46:    {Sanctuary}
+                            begin
+                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
 
-                                                                end;
-                                                                tc2.InField := true;
-                                                        end;
-                                                           $b3:    // Gospel
-                                                        begin
-                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+                                //if tc2.Skill[tn.MSkill].Tick < Tick then begin;
+                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
+                                    tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
+                                    tc2.SkillTickID := tn.MSkill;
 
-                                                                //if tc2.Skill[tn.MSkill].Tick < Tick then begin;
-                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
-                                                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
-                                                                        tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
-                                                                        tc2.SkillTickID := tn.MSkill;
-
-                                                                end;
-                                                                tc2.InField := true;
-                                                        end;
-                                                $49:    {Ragnarok}
-                                                        begin
-                                                                j := Random(10);
-                                                        end;
-                                                $9a:    {Volcano Effect}
-                                                        begin
-                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
-
-                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
-
-                                                                CalcStat(tc2, Tick);
-                                                                CalcSageSkill(tc2, Tick);
-
-                                                                //SendCStat(tc2);
-                                                                tc2.InField := true;
-
-                                                        end;
-                                                $9b,$9c: {Deluge, Violent Gale}
-                                                        begin
-                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
-
-                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
-
-                                                                CalcStat(tc2, Tick);
-                                                                CalcSageSkill(tc2, Tick);
-
-                                                                SendCStat(tc2);
-                                                                tc2.InField := true;
-                                                        end;
-
-
-                                                $9e,$9f,$a0,$a1,$a2,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af:
-                                                {Mr Rich Man A Kim}
-                                                        begin
-                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
-
-                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
-                                                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
-                                                                        tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
-                                                                        tc2.SkillTickID := tn.MSkill;
-                                                                end;
-
-                                                                CalcSongStat(tc2, Tick);
-
-                                                                CalcSongSkill(tc2, Tick);
-
-                                                                SendCStat(tc2);
-                                                                tc2.InField := true;
-
-                                                        end;
-                                                {//$a7:    Whistle Effect
-                                                        begin
-                                                                //if tc2.MTick < Tick then begin
-                                                                //if not flag then Break;
-                                                                if tc2.Skill[319].Tick > Tick then break;
-                                                                        {tc2.FLEE1 := tc2.FLEE1 - (tc2.FLEE1 * tc2.Skill[319].Effect1 div 100);
-                                                                        tc2.Bonus[5] := tc2.Bonus[5] - (tc2.Param[5] * tc2.Skill[319].Effect1 div 100);
-                                                                end;
-                                                                tc2.Skill[319].Tick := tn.Tick;
-                                                                        {tc2.FLEE1 := tc2.FLEE1 + (tc2.FLEE1 * tn.CData.Skill[319].Data.Data2[tn.MUseLV] div 100);
-                                                                        tc2.Bonus[5] := tc2.Param[5] * tn.CData.Skill[319].Data.Data2[tn.MUseLV] div 100;
-                                                                        {CalcStat(tc2, Tick);
-                                                                        SendCStat1(tc2, 0, 5, tc2.FLEE1);
-                                                                        SendCStat1(tc2, 0, 5, tc2.Bonus[5]);
-                                                                        SendBCmd(tm, tn.Point, 31);
-                                                                tc2.Skill[319].EffectLV := tn.MUseLV;
-                                                                tc2.Skill[319].Effect1 := tc2.Skill[319].Data.Data2[tn.MUseLV];
-						                if tc2.SkillTick > tc2.Skill[319].Tick then begin
-							                tc2.SkillTick := tc2.Skill[319].Tick;
-							                tc2.SkillTickID := 319;
-						                end;
-                                                                CalcSkill(tc2, Tick);
-                                                                SendCStat(tc2);
-                                                                tn.Tick := Tick;
-                                                                //flag := false;
-
-                                                        end;}
-                                                {//$a8:    {Assassain Cross At Sunset
-                                                        begin
-                                                                tc2.Skill[320].Tick := Tick + tn.CData.Skill[320].Data.Data1[tn.MUseLV];
-
-                                                        end;}
-                                                end;
                                 end;
-                        end;
-                        end;
-                        if (mi.PvP = true) then begin
-                        if sl2.Count <> 0 then begin
-                                for c1 := 0 to sl2.Count - 1 do begin
-                                        tc2 := sl2.Objects[c1] as TChara;
-                                    if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
+                                tc2.InField := true;
+                            end;
 
-                                        // Colus, 20040317: Alex commented this out, beita undid it, I recommented.
-                                        // Caused crashes with parties in PvP maps
-                                        {if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
-                                                if (tc2.PartyName = tn.CData.Partyname) then break;
-                                        end;}
-                                        
-                                        case tn.JID of
-                                                $74://ブラストマイン発動
-							begin
-								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
-								dmg[0] := dmg[0] * tn.Count;
-								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-								tn.Tick := Tick;
-								WFIFOW( 0, $01de);
-								WFIFOW( 2, $74);
-								WFIFOL( 4, tn.ID);
-								WFIFOL( 8, tc2.ID);
-								WFIFOL(12, Tick);
-								WFIFOL(16, tc1.aMotion);
-								WFIFOL(20, tc2.dMotion);
-								WFIFOL(24, dmg[0]);
-								WFIFOW(28, tn.Count);
-								WFIFOW(30, 1);
-								WFIFOB(32, 5);
-								SendBCmd(tm, tn.Point, 33);
-								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
-							end;
+                            $b3:    // Gospel
+                            begin
+                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+
+                                //if tc2.Skill[tn.MSkill].Tick < Tick then begin;
+                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
+                                    tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
+                                    tc2.SkillTickID := tn.MSkill;
+
+                                end;
+                                tc2.InField := true;
+                            end;
+
+                            $49:    {Ragnarok}  //UNCODED
+                            begin
+                                j := Random(10);
+                            end;
+
+                            $9a:    {Volcano Effect}
+                            begin
+                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+
+                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+
+                                CalcStat(tc2, Tick);
+                                CalcSageSkill(tc2, Tick);
+
+                                //SendCStat(tc2);
+                                tc2.InField := true;
+
+                            end;
+
+                            $9b,$9c: {Deluge, Violent Gale}
+                            begin
+                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+
+                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+
+                                CalcStat(tc2, Tick);
+                                CalcSageSkill(tc2, Tick);
+
+                                SendCStat(tc2);
+                                tc2.InField := true;
+                            end;
+
+
+                            $9e,$9f,$a0,$a1,$a2,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af:
+                            {Mr Rich Man A Kim.. and like every bard skill starts here}
+                            begin
+                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+
+                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
+                                    tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
+                                    tc2.SkillTickID := tn.MSkill;
+                                end;
+
+                                CalcSongStat(tc2, Tick);
+
+                                CalcSongSkill(tc2, Tick);
+
+                                SendCStat(tc2);
+                                tc2.InField := true;
+
+                            end;
+
+                        end;
+                    end;
+                end;
+            end;  //End of friendly Pvp Skills
+
+            //Damage PvP begins
+            if (mi.PvP = true) then begin
+                if sl2.Count <> 0 then begin
+                    for c1 := 0 to sl2.Count - 1 do begin
+                        tc2 := sl2.Objects[c1] as TChara;
+                        if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
+
+                            // Colus, 20040317: Alex commented this out, beita undid it, I recommented.
+                            // Caused crashes with parties in PvP maps
+                            {if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
+                                if (tc2.PartyName = tn.CData.Partyname) then break;
+                            end;}
+
+                            case tn.JID of
+                                $74://Unsure... what  this is exactly... I Don't see anywhere that calls it
+                                begin
+								    dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
+								    dmg[0] := dmg[0] * tn.Count;
+							    	if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+								    tn.Tick := Tick;
+								    WFIFOW( 0, $01de);
+								    WFIFOW( 2, $74);
+								    WFIFOL( 4, tn.ID);
+								    WFIFOL( 8, tc2.ID);
+								    WFIFOL(12, Tick);
+								    WFIFOL(16, tc1.aMotion);
+								    WFIFOL(20, tc2.dMotion);
+								    WFIFOL(24, dmg[0]);
+								    WFIFOW(28, tn.Count);
+								    WFIFOW(30, 1);
+								    WFIFOB(32, 5);
+								    SendBCmd(tm, tn.Point, 33);
+								    DamageProcess2(tm, tc1, tc2, dmg[0], tick);
+							    end;
 
 						{//$7f: //ファイアーウォール
 							begin
@@ -7170,89 +7147,93 @@ begin
                   end;
 							end;  }
 {追加:119ココまで}
-						$86: //LoV
-							begin
-								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 * (80 + 20 * tl.Data1[tn.MUseLV]) div 400;
-									dmg[0] := dmg[0] * (100 - (tc2.MDEF1 + tc2.MDEF2)) div 100; //MDEF%
-									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
-									if dmg[0] < 1 then dmg[0] := 1;
-									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
-									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $01de);
-									WFIFOW( 2, 85);
-									WFIFOL( 4, tn.ID);
-									WFIFOL( 8, tc2.ID);
-									WFIFOL(12, Tick);
-									WFIFOL(16, tc1.aMotion);
-									WFIFOL(20, tc2.dMotion);
-									WFIFOL(24, dmg[0]);
-									WFIFOW(28, tn.MUseLV);
-									WFIFOW(30, tl.Data2[tn.MUseLV]);
-									WFIFOB(32, 8);
-									SendBCmd(tm, tn.Point, 33);
-									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
-									if c1 = (sl2.Count -1) then begin
-										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 1 then tn.Tick := Tick
-									end;
-								end;
-							end;
-						$87: //FP
-							begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit') ;
-								{if not flag then Break;} //踏んでない
-								tn.Tick := Tick;
-								dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tc1.MATKFix div 500 + 50;
-								if dmg[0] < 51 then dmg[0] := 51;
-								dmg[0] := dmg[0] * tl.Data2[tn.Count];
-								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-								//無理やりエフェクトを出してみる
-								{SetSkillUnit(tm,tc1.ID,tn.Point,Tick,$88,0,4000);}
+						    $86: //LoV
+							    begin
+								    if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+									    dmg[0] := tc1.MATK1 * (80 + 20 * tl.Data1[tn.MUseLV]) div 400;
+									    dmg[0] := dmg[0] * (100 - (tc2.MDEF1 + tc2.MDEF2)) div 100; //MDEF%
+									    dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
+									    if dmg[0] < 1 then dmg[0] := 1;
+								    	//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+								    	if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+									    WFIFOW( 0, $01de);
+									    WFIFOW( 2, 85);
+									    WFIFOL( 4, tn.ID);
+									    WFIFOL( 8, tc2.ID);
+									    WFIFOL(12, Tick);
+									    WFIFOL(16, tc1.aMotion);
+									    WFIFOL(20, tc2.dMotion);
+									    WFIFOL(24, dmg[0]);
+									    WFIFOW(28, tn.MUseLV);
+									    WFIFOW(30, tl.Data2[tn.MUseLV]);
+									    WFIFOB(32, 8);
+									    SendBCmd(tm, tn.Point, 33);
+									    DamageProcess2(tm,tc1,tc2,dmg[0],tick);
+									    if c1 = (sl2.Count -1) then begin
+										    Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										    if tn.Count = 1 then tn.Tick := Tick
+									    end;
+								    end;
+							    end;
+						    $87: //FP
+							    begin
+								    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit') ;
+								    {if not flag then Break;} //踏んでない
+								    tn.Tick := Tick;
+								    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tc1.MATKFix div 500 + 50;
+								    if dmg[0] < 51 then dmg[0] := 51;
+								    dmg[0] := dmg[0] * tl.Data2[tn.Count];
+								    if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+								    //無理やりエフェクトを出してみる
+								    {SetSkillUnit(tm,tc1.ID,tn.Point,Tick,$88,0,4000);}
 
-								WFIFOW( 0, $01de);
-								WFIFOW( 2, tn.JID);
-								WFIFOL( 4, tn.ID);
-								WFIFOL( 8, tc2.ID);
-								WFIFOL(12, Tick);
-								WFIFOL(16, tc1.aMotion);
-								WFIFOL(20, tc2.dMotion);
-								WFIFOL(24, dmg[0]);
-								WFIFOW(28, tn.Count);
-								WFIFOW(30, tl.Data2[tn.Count]);
-								WFIFOB(32, 8);
-								SendBCmd(tm, tn.Point, 33);
-								DamageProcess2(tm,tc1,tc2,dmg[0],Tick);
-							end;
+								    WFIFOW( 0, $01de);
+								    WFIFOW( 2, tn.JID);
+								    WFIFOL( 4, tn.ID);
+								    WFIFOL( 8, tc2.ID);
+								    WFIFOL(12, Tick);
+								    WFIFOL(16, tc1.aMotion);
+								    WFIFOL(20, tc2.dMotion);
+								    WFIFOL(24, dmg[0]);
+								    WFIFOW(28, tn.Count);
+								    WFIFOW(30, tl.Data2[tn.Count]);
+								    WFIFOB(32, 8);
+								    SendBCmd(tm, tn.Point, 33);
+								    DamageProcess2(tm,tc1,tc2,dmg[0],Tick);
+							    end;
 
-                                                $88: //Meteor
-							begin
-								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
-									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
-									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
-									if dmg[0] < 1 then dmg[0] := 1;
-									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
-									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $01de);
-									WFIFOW( 2, 83);
-									WFIFOL( 4, tn.ID);
-									WFIFOL( 8, tc2.ID);
-									WFIFOL(12, Tick);
-									WFIFOL(16, tc1.aMotion);
-									WFIFOL(20, tc2.dMotion);
-									WFIFOL(24, dmg[0]);
-									WFIFOW(28, tn.MUseLV);
-									WFIFOW(30, tl.Data2[tn.MUseLV]);
-									WFIFOB(32, 8);
-                                                                        SendBCmd(tm, tn.Point, 33);
-									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
-									if c1 = (sl2.Count -1) then begin
-										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 3 then tn.Tick := Tick
-									end;
-								end;
-                                                        end;
+                            $88: //Meteor
+							    begin
+								    if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+									    dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									    dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									    dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
+									    if dmg[0] < 1 then dmg[0] := 1;
+									    dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									    if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+                                        //if tn.LastPacketSendTick + tn.PacketSendDelay < Tick then begin
+                                            //UpdateGroundEffect(tm, 83, tn.ID, tc2.ID, Tick, tc1.aMotion, tc2.dMotion, dmg[0], tn.MUseLV, tl.Data2[tn.MUseLV], 8, tn.Point);
+                                            //tn.LastPacketSendTick := Tick;
+                                        //end;
+									    WFIFOW( 0, $01de);
+									    WFIFOW( 2, 83);
+									    WFIFOL( 4, tn.ID);
+									    WFIFOL( 8, tc2.ID);
+									    WFIFOL(12, Tick);
+									    WFIFOL(16, tc1.aMotion);
+									    WFIFOL(20, tc2.dMotion);
+									    WFIFOL(24, dmg[0]);
+									    WFIFOW(28, tn.MUseLV);
+									    WFIFOW(30, tl.Data2[tn.MUseLV]);
+									    WFIFOB(32, 8);
+                                        SendBCmd(tm, tn.Point, 33);
+									    DamageProcess2(tm,tc1,tc2,dmg[0],tick);
+									    if c1 = (sl2.Count -1) then begin
+										    Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										    if tn.Count = 3 then tn.Tick := Tick
+									    end;
+								    end;
+                                end;
                                                 {//$89: //Quagmire
                                                         begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
@@ -10155,6 +10136,7 @@ begin
 			end;
 
             {Check to unload maps}
+        if tm.UnloadTime > 0 then begin
             for k := 0 to Map.Count - 1 do begin
                 tm := Map.Objects[k] as TMap;
                 if NOT MapPassive(tm, Tick) then tm.LastAction := Tick;
@@ -10169,6 +10151,7 @@ begin
                     Break;
                 end;
             end;
+        end;
 
 	{NPCイベント追加}
 			for k := 0 to Map.Count - 1 do begin

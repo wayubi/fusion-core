@@ -1296,7 +1296,7 @@ begin
 									for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
 										tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
 										if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
-											SendNData(tc1.Socket, tn1, tc1.ver2);
+											SendNData(tc1.Socket, tn1, tc1.ver2, tc1);
 										end;
 									end;
 								end;

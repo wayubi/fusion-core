@@ -335,7 +335,7 @@ Begin(* Proc sv3PacketProcess() *)
 
                 //SendNData(Socket, tn, tc.ver2);
 								if (tn.Enable = true) then begin
-									SendNData(Socket, tn,tc.ver2);
+									SendNData(Socket, tn,tc.ver2, tc);
 									if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
 										//OnInit processing
 										//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn.ID]));
@@ -5394,7 +5394,7 @@ end;
                                                 tm.NPC.AddObject(tn.ID, tn);
                                                 tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-                                                SendNData(tc.Socket, tn, tc.ver2 );
+                                                SendNData(tc.Socket, tn, tc.ver2, tc );
                                                 SendBCmd(tm, tn.Point, 41, tc, False);
 
                                                 tc.PetData := tpe;

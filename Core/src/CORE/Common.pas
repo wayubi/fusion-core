@@ -1195,6 +1195,11 @@ public
 	NextPoint   :TPoint;
 	MoveTick    :cardinal;
 
+    //Memory Helper
+    //LastPacketSendTick :Cardinal;
+    //PacketSendDelay : Cardinal;
+    CharacterReceivedList : TIntList32;
+
 	Constructor Create;
 	Destructor  Destroy; OverRide;
 
@@ -1756,7 +1761,7 @@ Option_Font_Style : string;
 		//モンス・NPC
 		procedure SendMData(Socket:TCustomWinSocket; ts:TMob; Use0079:boolean = false);
 		procedure SendMMove(Socket: TCustomWinSocket; ts:TMob; before, after:TPoint; ver2:Word);
-    procedure SendNData(Socket:TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
+        procedure SendNData(Socket:TCustomWinSocket; tn:TNPC; ver2:Word; tc:TChara; Use0079:boolean = false);
 {キューペット}
                 procedure SendPetMove(Socket: TCustomWinSocket; tc:TChara; target:TPoint);
 {キューペットここまで}
@@ -1867,7 +1872,7 @@ Option_Font_Style : string;
 
 implementation
 
-uses SQLData, FusionSQL, Player_Skills, Globals;
+uses SQLData, FusionSQL, Player_Skills, Globals, PacketProcesses;
 
 procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0);
 begin
@@ -3688,7 +3693,7 @@ begin
 		tm.NPC.AddObject(tn.ID, tn);
 		tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-		SendNData(tc.Socket, tn, tc.ver2 );
+		SendNData(tc.Socket, tn, tc.ver2, tc );
 		SendBCmd(tm, tn.Point, 41, tc, False);
 
 		tc.PetData := tpe;
@@ -5345,7 +5350,7 @@ begin
 	//Socket.SendBuf(buf, 6);
 end;
 //------------------------------------------------------------------------------
-procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
+procedure SendNData(Socket:TCustomWinSocket; tn:TNPC; ver2:Word; tc:TChara; Use0079:boolean = false);
 {アジト機能追加}
 var
 	i  :integer;
@@ -5353,9 +5358,11 @@ var
 	w1 :word;
 	w2 :word;
 	tg :TGuild;
-  tgc:TCastle;
+    tgc:TCastle;
+    Tick:Cardinal;
 {アジト機能追加ココまで}
 begin
+    Tick := TimeGetTime();
 {NPCイベント追加}
 	//if (tn.JID = -1) then exit;//CR 2004/04/26 - JID is Cardinal.
 	// Colus, 20040503: Checking against the constant value now.
@@ -5373,33 +5380,37 @@ begin
 		WFIFOB(16, tn.SubY);
 		Socket.SendBuf(buf, 17);
 	end else if tn.CType = 4 then begin
-     if ((tn.JID = $B0) or (tn.JID = $99)) then begin
+        if ((tn.JID = $B0) or (tn.JID = $99)) then begin
 
-          WFIFOW(0, $01c9);
-          WFIFOL(2, tn.ID);
-          WFIFOL(6, tn.CData.ID);
+            WFIFOW(0, $01c9);
+            WFIFOL(2, tn.ID);
+            WFIFOL(6, tn.CData.ID);
 	        WFIFOW(10, tn.Point.X);
 	        WFIFOW(12, tn.Point.Y);
-          WFIFOB(14, tn.JID);
-          WFIFOB(15, 1);
-          if tn.JID = $B0 then
-            WFIFOB(16, 1)
-          else
+            WFIFOB(14, tn.JID);
+            WFIFOB(15, 1);
+            if tn.JID = $B0 then
+                WFIFOB(16, 1)
+            else
             WFIFOB(16, 0);
-          WFIFOS(17, tn.Name, 80);
-          //WFIFOW(95, Length(tn.Name));
+            WFIFOS(17, tn.Name, 80);
+            //WFIFOW(95, Length(tn.Name));
 
  	        Socket.SendBuf(buf, 97);
-    end else begin
-  		WFIFOW( 0, $011f);
-  		WFIFOL( 2, tn.ID);
-  		WFIFOL( 6, 0);
-  		WFIFOW(10, tn.Point.X);
-	  	WFIFOW(12, tn.Point.Y);
-  		WFIFOB(14, tn.JID);
-  		WFIFOB(15, 1);
-  		Socket.SendBuf(buf, 16);
-    end;
+        end else begin
+            if tn.CharacterReceivedList.IndexOf(tc.ID) = - 1 then begin
+                UpdateGroundEffect(nil, tn.ID, 0, tn.Point, tn.JID, 1, Socket);
+                tn.CharacterReceivedList.Add(tc.ID)
+  		    {WFIFOW( 0, $011f);
+  		    WFIFOL( 2, tn.ID);
+  		    WFIFOL( 6, 0);
+  		    WFIFOW(10, tn.Point.X);
+	  	    WFIFOW(12, tn.Point.Y);
+  		    WFIFOB(14, tn.JID);
+  		    WFIFOB(15, 1);
+  		    Socket.SendBuf(buf, 16);}
+            end;
+        end;
 	end else if tn.JID < 45 then begin
 		ZeroMemory(@buf[0], 53);
 		WFIFOW(0, $0079);
@@ -5532,8 +5543,9 @@ begin
 	tn.Tick := Tick + STime;
 	tn.Count := SCount;
 	tn.CData := tc;
-  tn.MData := ts;
-  tn.Enable := true;  // Enable a skillunit so that it will reappear when you reenter screen
+    tn.MData := ts;
+    tn.Enable := true;  // Enable a skillunit so that it will reappear when you reenter screen
+
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
@@ -5579,14 +5591,15 @@ begin
 
         end else begin
 	//周りに通知
-	        WFIFOW( 0, $011f);
+            UpdateGroundEffect(tm, tn.ID, ID, tn.Point, tn.JID, 1);
+	        {WFIFOW( 0, $011f);
 	        WFIFOL( 2, tn.ID);
 	        WFIFOL( 6, ID);
 	        WFIFOW(10, tn.Point.X);
 	        WFIFOW(12, tn.Point.Y);
 	        WFIFOB(14, tn.JID);
 	        WFIFOB(15, 1);
-	        SendBCmd(tm, tn.Point, 16);
+	        SendBCmd(tm, tn.Point, 16);}
         end;
 
 	Result := tn;
@@ -6976,7 +6989,7 @@ begin
 					for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
 						tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
 						if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
-							SendNData(tc1.Socket, tn1, tc1.ver2);
+							SendNData(tc1.Socket, tn1, tc1.ver2, tc1);
 						end;
 					end;
 				end;
@@ -10770,7 +10783,7 @@ Constructor TNPC.Create;
 Begin
 	inherited;
 	// Always call ancestor's routines first in Create
-
+    CharacterReceivedList := TIntList32.Create;
 	LType := imaNPC;
 End;(* TNPC.Create
 *-----------------------------------------------------------------------------*)
@@ -10812,6 +10825,8 @@ Begin
 			Item.Free;
 		end;
 	end;//case
+
+    CharacterReceivedList.Free;
 
 	inherited;
 End;(* TNPC.Destroy
