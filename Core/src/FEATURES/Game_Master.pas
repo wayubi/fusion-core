@@ -654,7 +654,7 @@ Called when we're shutting down the server *only*
         td : TItemDB;
         i, j, k : Integer;
     begin
-        Result := 'GM_ITEM Success.';
+        Result := 'GM_ITEM Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 6, 256);
@@ -695,6 +695,7 @@ Called when we're shutting down the server *only*
                     SendCStat1(tc, 0, $0018, tc.Weight);
 
                     SendCGetItem(tc, k, j);
+                    Result := 'GM_ITEM Success.';
                 end;
             end
 

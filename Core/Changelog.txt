@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-09-04: Fixed #1091 - #item Result message wasn't showing correctly. [Trihan]
 - 07-07-04: Updated the default starting map location (new_1-1). [Tsusai]
 - 07-07-04: Made PvPN act like PvP. [Tsusai]
 - 07-06-04: Fixed Skill Sight. [Darkhelmet]
