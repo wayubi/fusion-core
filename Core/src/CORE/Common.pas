@@ -4682,7 +4682,7 @@ begin
 		for i := 0 to 11 do begin
 			if tpa.MemberID[i] = 0 then Continue;
 			tc1 := tpa.Member[i];
-			if tc1.Login = 2 then begin
+			if (tc1.Login = 2) and (tc1.HP > 0) then begin
 				if tc1.Map = Map then Inc(m);
 			end;
 		end;
@@ -4696,7 +4696,7 @@ begin
 		for i := 0 to 11 do begin
 			if tpa.MemberID[i] = 0 then Continue;
 			tc1 := tpa.Member[i];
-			if tc1.Login = 2 then begin
+			if (tc1.Login = 2) and (tc1.HP > 0) then begin
 				if tc1.Map = Map then CalcLvUP(tc1,l,w);
 			end;
 		end;
