@@ -736,7 +736,12 @@ begin
 
 	ini.ReadSectionValues('Fusion', sl);
 	if sl.IndexOfName('Option_PVP') > -1 then begin
+                    try
                         Option_PVP := StrToBool(sl.Values['Option_PVP']);
+                    except
+                        on EConvertError do
+                            Option_PVP := False;
+                    end;
                 end else begin
                         Option_PVP := false;
                 end;
