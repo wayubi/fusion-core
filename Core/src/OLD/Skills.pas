@@ -1862,6 +1862,7 @@ Begin
 						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
 							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
 								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                                    k := tm.Block[i1][j1].Mob.Count + 1;
 									if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then
 										Continue;
 									ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
@@ -1884,7 +1885,7 @@ Begin
 								ts1 := sl.Objects[k1] as TMob;
 								frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 								//dmg[0] := dmg[0];
-								dmg[0] := (MATK2 - MATK1 + 20) * 35 + ATTPOWER + dmg[0];
+								dmg[0] := ((MATK2 - MATK1 + 20) * 35 + ATTPOWER + dmg[0]) div (k - 1);
 								j := 3;
 								if DamageProcessed = false then begin
 									DamageProcessed := true;
