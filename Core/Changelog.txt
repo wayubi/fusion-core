@@ -1,3 +1,8 @@
+- 05-28-04: Added ALBGM command usage succes/error message. [AlexKreuz]
+- 05-28-04: Switched GM Command, #auto to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #die to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #return to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #save to ALBGM system. [AlexKreuz]
 - 05-28-04: Fixed ALBGM ID non-existant caused crash. [AlexKreuz]
 - 05-28-04: Switched GM Command, #item to ALBGM system. [AlexKreuz]
 - 05-28-04: Switched GM Command, #alive to ALBGM system. [AlexKreuz]

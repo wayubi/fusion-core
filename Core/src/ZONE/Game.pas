@@ -1102,7 +1102,6 @@ Begin(* Proc sv3PacketProcess() *)
                                                 
                                                 sl.Free;
                                         end
-
                                         else if (copy(str, 1, 3) = 'die') then begin
                                                 tc.Sit := 1;
                                                 tc.HP := 0;
@@ -1112,7 +1111,6 @@ Begin(* Proc sv3PacketProcess() *)
                                                 WFIFOB( 6, 1);
                                                 SendBCmd(tm, tc.Point, 7);
                                         end
-
                                         else if (copy(str, 1, 4) = 'kill') then begin
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
@@ -1263,28 +1261,8 @@ Begin(* Proc sv3PacketProcess() *)
 								tc.Stat2 := j;
 							end;
 						end;
-					end
 					// NEW GM COMMANDS
 
-					else if (Copy(str, 1, 4) = 'save') and ((DebugCMD and $0001) <> 0) and (tid.SaveReturn = 1) then begin
-						//現在地をセーブする
-						tc.SaveMap := tc.Map;
-						tc.SavePoint.X := tc.Point.X;
-						tc.SavePoint.Y := tc.Point.Y;
-
-						//Mitch 01-29-2004: Tell the user its saved
-            str2 := 'Saved at ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
-            w := Length(str2) + 4;
-            WFIFOW(0, $009a);
-            WFIFOW(2, w);
-            WFIFOS(4, str2, w - 4);
-            Socket.SendBuf(buf, w);
-					end else if (Copy(str, 1, 6) = 'return') and ((DebugCMD and $0002) <> 0) and (tid.SaveReturn = 1) then begin
-						//セーブポイントまで戻る
-						SendCLeave(Socket.Data, 2);
-						tc.Map := tc.SaveMap;
-						tc.Point := tc.SavePoint;
-						MapMove(Socket, tc.Map, tc.Point);
 					end else if (Copy(str, 1, 7) = 'blevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
 						Val(Copy(str, 8, 256), i, k);
 						if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc.BaseLV) then begin
@@ -1993,23 +1971,6 @@ Begin(* Proc sv3PacketProcess() *)
         end;
       end //GM cmd #hstyle
 
-      else if (Copy(str, 1, 3) = 'die') AND ((DebugCMD AND $0080) <> 0) AND
-      				(tid.KillDieAlive = 1) then
-			begin
-        //自殺
-        tc.HP := 0;
-        tc.Sit := 1;
-        SendCStat1(tc, 0, 5, tc.HP);
-        WFIFOW(0, $0080);
-        WFIFOL(2, tc.ID);
-        WFIFOB(6, 1);
-        Socket.SendBuf(buf, 7);
-        WFIFOW( 0, $0080);
-        WFIFOL( 2, tc.ID);
-        WFIFOB( 6, 1);
-        SendBCmd(tm, tc.Point, 7);
-      end //GM cmd #die
-
       else if (Copy(str, 1, 7) = 'option ') AND ((DebugCMD AND $0400) <> 0) AND
       				(tid.ChangeOption = 1) then
 			begin
@@ -2175,22 +2136,7 @@ Begin(* Proc sv3PacketProcess() *)
 						SendCSkillList(tc);
 {追加}      CalcStat(tc);
             SendCStat(tc);
- 					end else if (Copy(str, 1, 4) = 'auto') and ((DebugCMD and $8000) <> 0) and (tid.AutoRawUnit = 1) then begin
-						//自動行動テスト
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 5, 256);
-						try
-						if sl.Count = 0 then Continue;
-						Val(sl.Strings[0], j, k);
-						if (k <> 0) or (j < 0) then continue;
-						tc.Auto := j;
-						if sl.Count = 3 then begin
-							Val(sl.Strings[1], tc.A_Skill, k);
-							Val(sl.Strings[2], tc.A_Lv, k);
-						end;
-						finally
-							sl.Free();
-						end;
+
           { MITCH 01-31-04: Added PVP and GPVP GM commands! }
           end else if (Copy(str, 1, 5) = 'pvpon') and (tid.PVPControl = 1) then begin
             if MapInfo.IndexOf(tc.Map) = -1 then continue;
