@@ -438,7 +438,7 @@ Called when we're shutting down the server *only*
     Procedure save_commands();
     Var
         ini : TIniFile;
-        Idx : Integer;
+
     Begin
         ini := TIniFile.Create(AppPath + 'gm_commands.ini');
 
@@ -1004,33 +1004,28 @@ Called when we're shutting down the server *only*
     function command_ccolor(tc : TChara; str : String) : String;
     var
         s : String;
-        colour, k : Integer;
+        k : Integer;
+        color : integer;
     begin
         Result := 'GM_CCOLOR Failure.';
 
         s := Copy(str, 8, 256);
 
         if s <> '' then begin
-            Val(Copy(str, 8, 256), colour, k);
+            Val(Copy(str, 8, 256), color, k);
             if k = 0 then begin
-                if (colour >= 0) and (colour <= 4) then begin
-                    Result := 'GM_CCOLOR Success.';
-                    tc.ClothesColor := colour;
-                    UpdateLook(tc.MData, tc, 7, colour, 0, true);
-                end
-
-                else begin
-                    Result := Result + ' Colour must be in range [0-4].';
-                end;
+                Result := 'GM_CCOLOR Success.';
+                tc.ClothesColor := color;
+                UpdateLook(tc.MData, tc, 7, color, 0, true);
             end
 
             else begin
-                Result := Result + ' Colour must be a valid integer.';
+                Result := Result + ' Color must be a valid integer.';
             end;
         end
 
         else begin
-            Result := Result + ' Insufficient input. Format is <clothes colour> (In range 0-4).';
+            Result := Result + ' Insufficient input. Format is <clothes color>.';
         end;
     end;
 
