@@ -10671,7 +10671,7 @@ begin
 								end;
 							end;
 
-						$93: {Land Mine]
+						$93: {Land Mine}
 							begin
 								if not flag then Break; //“¥‚ñ‚Å‚È‚¢
                                                                 //Land Mine : [ (Dex/2 +75) * (1 + Int/100) x S.Lv ]
@@ -11145,7 +11145,7 @@ begin
 							        else ts1.HealthTick[0] := ts1.HealthTick[0] + 30000;
                                                         end;
 
-						$93: //LM
+						$93: {Land Mine}
 							begin
 								if not flag then Break; //“¥‚ñ‚Å‚È‚¢
                                                                 //Land Mine : [ (Dex/2 +75) * (1 + Int/100) x S.Lv ]
