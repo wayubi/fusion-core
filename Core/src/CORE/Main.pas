@@ -4974,73 +4974,19 @@ begin
 				end;
 			end;
 		92:     {Quagmire}
-			begin
-				xy.X := MPoint.X;
-				xy.Y := MPoint.Y;
-				for i := 0 to 8 do begin;
-					MPoint.Y := - 4 + MPoint.Y + i;
-					MPoint.X := - 4 + MPoint.X + i;
-					tn := SetSkillUnit(tm, ID, xy, Tick, $89, 0, MUseLv*5000,tc);
-				end;
-
-				tn.MSkill := MSkill;
-				tn.MUseLV := MUseLV;
-
-				for i := 0 to 4 do begin;
-					WFIFOW( 0, $0117);
-					WFIFOW( 2, MSkill);
-					WFIFOL( 4, ID);
-					WFIFOW( 8, MUseLV);
-					WFIFOW(10, (-2 + MPoint.X + i));
-					WFIFOW(12, (MPoint.Y));
-					WFIFOL(14, 1);
-					SendBCmd(tm, xy, 18);
-				end;
-
-				for i := 0 to 4 do begin;
-					WFIFOW( 0, $0117);
-					WFIFOW( 2, MSkill);
-					WFIFOL( 4, ID);
-					WFIFOW( 8, MUseLV);
-					WFIFOW(10, (-2 + MPoint.X + i));
-					WFIFOW(12, (MPoint.Y - 2));
-					WFIFOL(14, 1);
-					SendBCmd(tm, xy, 18);
-				end;
-
-				for i := 0 to 4 do begin;
-					WFIFOW( 0, $0117);
-					WFIFOW( 2, MSkill);
-					WFIFOL( 4, ID);
-					WFIFOW( 8, MUseLV);
-					WFIFOW(10, (-2 + MPoint.X + i));
-					WFIFOW(12, (MPoint.Y - 1));
-					WFIFOL(14, 1);
-					SendBCmd(tm, xy, 18);
-				end;
-
-				for i := 0 to 4 do begin;
-					WFIFOW( 0, $0117);
-					WFIFOW( 2, MSkill);
-					WFIFOL( 4, ID);
-					WFIFOW( 8, MUseLV);
-					WFIFOW(10, (-2 + MPoint.X + i));
-					WFIFOW(12, (MPoint.Y + 1));
-					WFIFOL(14, 1);
-					SendBCmd(tm, xy, 18);
-				end;
-
-				for i := 0 to 4 do begin;
-					WFIFOW( 0, $0117);
-					WFIFOW( 2, MSkill);
-					WFIFOL( 4, ID);
-					WFIFOW( 8, MUseLV);
-					WFIFOW(10, (-2 + MPoint.X + i));
-					WFIFOW(12, (MPoint.Y + 2));
-					WFIFOL(14, 1);
-					SendBCmd(tm, xy, 18);
-				end;
-			end;{Quagmire}
+ 			begin
+ 			  xy.X := MPoint.X; // not even needed
+ 			  xy.Y := MPoint.Y; // not even needed
+ 				for i := 0 to 4 do begin
+          for j := 0 to 4 do begin
+					  xy.Y := - 2 + tc.MPoint.Y + j;
+ 					  xy.X := - 2 + tc.MPoint.X + i;
+					  tn := SetSkillUnit(tm, ID, xy, Tick, $8E, 0, tc.Skill[92].Data.Data1[MUseLv]*1000,tc); // You could/should? use tc.Skill[92].Data.Data1[MUseLv] * 1000 for the time instead of tc.MUseLv*5000, that would make it rely totally on DB
+   				  tn.MSkill := tc.MSkill;
+  				  tn.MUseLV := tc.MUseLV;
+          end;
+        end;
+      end;{Quagmire}
 
 		110:    {Hammer Fall}
 			if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
@@ -7608,13 +7554,14 @@ begin
                                                                         end;
 								end;
 							end;
-                $89: //Quagmire
+                $8E: //Quagmire
                      //ts.EffectTick[1] set to be the tick value of monster under
                      //Quagmire effect. effect will resume after EffectTick[1]
                      //is less than Tick, done in procedure StatEffect
             begin
               if (ts1.EffectTick[1] < Tick ) then begin
                  ts1.Speed := ts1.Speed * 2;
+                 ts1.Data.Param[2] := ts1.Data.Param[2] div 2;
                  ts1.Data.Param[4] := ts1.Data.Param[4] div 2;
               end;
                  ts1.EffectTick [1]:= Tick + 5000*tc1.Skill[92].Lv;
