@@ -3694,7 +3694,7 @@ begin
 
   Now there are some other types of messages that we are going to parse.
   Messages such as overweight, arrows need equipping, etc. are done with
-  013b.  We'll signify those by adding 10 to the parameter passed in.
+  013b.  We'll signify those by adding 20 to the parameter passed in.
 
   I think these are the 013b following codes and values:
 
@@ -3705,7 +3705,7 @@ begin
 
   }
 	with tc do begin
-    if (EType < 10) then begin
+    if (EType < 20) then begin
       WFIFOW( 0, $0110);
   		WFIFOW( 2, MSkill);
   		WFIFOW( 4, BType);
@@ -3715,7 +3715,7 @@ begin
       Socket.SendBuf(buf, 10);
     end else begin
       WFIFOW(0, $013b);
-      WFIFOW(2, EType - 10);
+      WFIFOW(2, EType - 20);
       Socket.SendBuf(buf, 4);
     end;
     {
@@ -3805,7 +3805,7 @@ begin
 				Exit;
 			end;
 			if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
-				Result := 12;
+				Result := 22;
 				Exit;
 			end;
 			if tm.Mob.IndexOf(tc.MTarget) <> -1 then begin
@@ -3883,7 +3883,7 @@ begin
 
 		if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
 			//重量オーバー
-			Result := 12;
+			Result := 22;
 			Exit;
 		end;
 

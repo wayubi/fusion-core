@@ -2008,7 +2008,7 @@ begin
 			EXPShare := 0;
 		end;
 		PartyNameList.AddObject(tpa.Name, tpa);
-		DebugOut.Lines.Add(Format('Name : %s.', [tpa.Name]));
+		// DebugOut.Lines.Add(Format('Name : %s.', [tpa.Name]));
 	end;
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));

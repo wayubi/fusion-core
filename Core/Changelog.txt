@@ -2,6 +2,9 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-18-04: Fixed most/all conditions for basic skills [Colus]
+- 02-18-04: Added error messages for basic skills [Colus]
+- 02-18-04: Updated SendSkillError [Colus]
 - 02-16-04: Looted items now go to players inventory. [Darkhelmet]
 - 02-16-04: Added Pet looting system, items cannot be recovered though. [Darkhelmet]
 - 02-16-04: Added Chance to Blind for Holy cross to undead [Oatmeal]

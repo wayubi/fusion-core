@@ -758,6 +758,11 @@ end;
 					WFIFOB(26, b);
 
 					SendBCmd(tm, tc.Point, 29);
+        end else begin
+          w := tc.MSkill;
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 2);
+          tc.MSkill := w;
         end;
 				end;
 			end;
@@ -3099,18 +3104,24 @@ end;
 
 			end;
 		//--------------------------------------------------------------------------
-		$00bf: //エモーション
+		$00bf: // Display an emotion.
 			begin
 				tm := tc.MData;
 
 				RFIFOB(2, b);
+				if (tc.Skill[1].Lv < 2) and (not DisableSkillLimit) then begin
+          w := tc.MSkill;
+          // This is for a basic skill.
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 1);
+          tc.MSkill := w;
+        end else begin
+  				WFIFOW(0, $00c0);
+  				WFIFOL(2, tc.ID);
+  				WFIFOB(6, b);
+          SendBCmd(tm, tc.Point, 7);
+        end;
 
-				WFIFOW(0, $00c0);
-				WFIFOL(2, tc.ID);
-				WFIFOB(6, b);
-
-				//ブロック処理
-				SendBCmd(tm, tc.Point, 7);
 			end;
 		//--------------------------------------------------------------------------
 		$00c1: //login人数問い合わせ
@@ -3349,6 +3360,11 @@ end;
 			begin
 				if (tc.Skill[1].Lv < 4) and (not DisableSkillLimit) then begin
 					i := 1;
+          w := tc.MSkill;
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 3);
+          tc.MSkill := w;
+          continue;
 				end else if (tc.VenderID <> 0) then begin
 					i := 1;
 				end else begin
@@ -3607,16 +3623,28 @@ end;
 		//--------------------------------------------------------------------------
 		$00e4: //取引要請
 			begin
+        // Can you even do it?
+				if (tc.Skill[1].Lv = 0) and (not DisableSkillLimit) then begin
+          w := tc.MSkill;
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 0);
+          tc.MSkill := w;
+          continue;
+        end;
+
 				RFIFOL(2, l);
 				tc1 := CharaPID.IndexOfObject(l) as TChara;
 				b := 0;
+
 				if (tc1 = nil) then begin
-					b := 1;//相手キャラ不存在
+					b := 1; // Invalid player.
 				end else if (tc1.Map <> tc.Map) or (abs(tc1.Point.X - tc.Point.X) > 5)
 					or (abs(tc1.Point.Y - tc.Point.Y) > 5) then begin
-					b := 0;//遠すぎ
+					b := 0; // Too far away.
 				end else if (tc1.DealingID <> 0) or (tc1.PreDealID <> 0) then begin
-					b := 2;//取引中or取引要請保留中
+					b := 2; // Already in another trade.
+        end else if (tc1.Skill[1].Lv = 0) and (not DisableSkillLimit) then begin
+          b := 4; // Failed (due to no basic skills!)
 				end else begin
 					tc.PreDealID := tc1.ID;
 					tc1.PreDealID := tc.ID;
@@ -4031,18 +4059,24 @@ end;
 				Socket.SendBuf(buf, 2);
 			end;
 		//--------------------------------------------------------------------------
-{パーティー機能追加}
-		$00f9: //パーティー作成
+		$00f9: // Request to organize a party - NOTE, 01e8 is updated version
 			begin
 				str := RFIFOS(2, 24);
 				if (tc.Skill[1].Lv < 7) and (not DisableSkillLimit) then begin
           { Mitch: Fix (Bug #394) }
-          str := 'You must be at least Basic Skill Level 7 to create a party!';
+          // Colus, 20040218: Are you kidding me?  Why would you use a GLOBAL
+          // BROADCAST to give the party fail message?
+          {str := 'You must be at least Basic Skill Level 7 to create a party!';
           w := Length(str) + 4;
           WFIFOW (0, $009a);
           WFIFOW (2, w);
           WFIFOS (4, str, w - 4);
-          tc.socket.sendbuf(buf, w);
+          tc.socket.sendbuf(buf, w); }
+          w := tc.MSkill;
+          // This is for a basic skill.
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 4);
+          tc.MSkill := w;
 				end else begin
 					if tc.PartyName <> '' then begin
 						i := 2;
@@ -4078,6 +4112,7 @@ end;
 				//DebugOut.Lines.Add(Format('PartyNameList.Count = %d', [PartyNameList.Count]));
 
 			end;
+
 		//--------------------------------------------------------------------------
 		$00fc: //パーティー勧誘
 			begin
@@ -4093,7 +4128,10 @@ end;
 				end else begin
 					WFIFOW( 0, $00fd);
 					WFIFOS( 2, tc1.Name, 24);
-					WFIFOB( 26, 0);
+          if (tc1.Skill[1].Lv < 5) and (not DisableSkillLimit) then
+  					WFIFOB(26, 1)
+          else
+            WFIFOB(26, 0);
 					tc.Socket.SendBuf(buf, 27);
 				end;
 			end;
@@ -7260,6 +7298,55 @@ end;
 
         tc.Skill[279].Effect1 := l;
       end;
+//--------------------------------------------------------------------------
+		$01e8: // Request to organize a party - 00f9's updated version
+			begin
+				str := RFIFOS(2, 24);
+
+        // TODO: These two bytes control item share and loot share.
+        RFIFOB(26, b);
+        RFIFOB(27, b1);
+				if (tc.Skill[1].Lv < 7) and (not DisableSkillLimit) then begin
+          w := tc.MSkill;
+          // This is for a basic skill.
+          tc.MSkill := 1;
+          SendSkillError(tc, 0, 4);
+          tc.MSkill := w;
+				end else begin
+					if tc.PartyName <> '' then begin
+						i := 2;
+					end else if (str = '') or (PartyNameList.IndexOf(str) <> -1) then begin
+						i := 1;
+					end else begin
+						//パーティー名が重複してはいけない
+						tpa := TParty.Create;
+						tpa.Name := str;
+						tpa.EXPShare := 0;
+						tpa.ITEMShare := 1;
+						tpa.MemberID[0] := tc.CID; //リーダ:0
+						tpa.Member[0] := tc;
+                                                if tc.JID = 19 then begin
+                                                        tpa.PartyBard[0] := tc;
+                                                        DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                end else if tc.JID = 20 then begin
+                                                        tpa.PartyDancer[0] := tc;
+                                                        DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                end;
+						tc.PartyName := tpa.Name;
+						PartyNameList.AddObject(tpa.Name, tpa);
+						//DebugOut.Lines.Add(Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+						SendPartyList(tc);
+						i := 0;
+					end;
+
+					//パーティー作成正否応答
+					WFIFOW( 0, $00fa);
+					WFIFOB( 2, i);         // 1:同名～ 2:既に～
+					Socket.SendBuf(buf, 3);
+				end;
+				//DebugOut.Lines.Add(Format('PartyNameList.Count = %d', [PartyNameList.Count]));
+
+			end;
 {露店スキル追加ココまで}
 		end;
   end;
