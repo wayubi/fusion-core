@@ -7892,6 +7892,15 @@ begin
 						end;
                   214: //Raid
                   begin
+                  if (tc.Option = 6) then begin
+                  tc.Hidden := false;
+                  WFIFOW(0, $0119);
+                  WFIFOL(2, tc.ID);
+                  WFIFOW(6, 0);
+                  WFIFOW(8, 0);
+                  WFIFOW(10, 0);
+                  WFIFOB(12, 0);
+                  SendBCmd(tm, tc.Point, 13);
                   xy := tc.Point;
                   sl.Clear;
                   j := tl.Range2;
@@ -7915,7 +7924,13 @@ begin
                   DamageProcess1(tm, tc, ts1, dmg[0], Tick);
                   end;
                   end;
-                  end;
+            end else begin
+            SendSkillError(tc, 0);
+            tc.MMode := 4;
+            tc.MPoint.X := 0;
+            tc.MPoint.Y := 0;
+            Exit;
+            end;
 
 				111: //アドレナリン_ラッシ
 					begin
@@ -13210,7 +13225,7 @@ begin
 								MPoint.X := 0;
 								MPoint.Y := 0;
 						 end;
-            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) then begin
+            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
               if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
