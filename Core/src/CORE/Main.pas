@@ -2300,6 +2300,11 @@ begin
 
     if (tc.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 
+         if (tc.Skill[361].Tick > Tick) then begin
+        dmg[0] :=dmg[0] div 2;
+        end else begin
+         tc.Skill[361].Tick := Tick;
+         end;
                 //Auto Gaurd
                 if ((miss = False) and (tc.Skill[249].Tick > Tick)) then begin
                         miss := boolean(Random(100) <= tc.Skill[249].Effect1);
@@ -8500,11 +8505,7 @@ begin
           tc1 := tc;
           ProcessType := 0;
           end;
-          378:
-          begin
-          tc1 := tc;
-          ProcessType := 0;
-          end;
+
           54:     {Resurrection}
 					begin
             j := SearchCInventory(tc, 717, false);
@@ -8560,27 +8561,53 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                        	355: //AC
+                                        	355: //Aurablade
 					begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                             	356: //AC
+                                             	356: //Parrying
 					begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                         	357: //AC
+                                         	357: //Concentration
 					begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                         	358: //AC
+                                         	358: //  Tension Relax
 					begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                            	359: //AC
+                                      	360: // Fury
+					begin
+                                        if (tc.Weapon = 3) then begin
+						tc1 := tc;
+
+						ProcessType := 3;
+                                                end else begin
+                                                MMode := 4;
+                                                Exit;
+                                                end;
+                                                end;
+                                        	359: // Berserk
+					begin
+                                        if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+						tc1 := tc;
+						ProcessType := 3;
+                                                end else begin
+                                                MMode := 4;
+                                                Exit;
+                                                end;
+                                                end;
+                                        361: //  Assumptio
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+                                        378: // Advance Enchat Poison
 					begin
 						tc1 := tc;
 						ProcessType := 3;

@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 03-06-04: Added Lord Knight Berserk ASPD. [Oatmeal]
+- 03-06-04: Added Lord Knight Fury Aspd. [Oatmeal]
+- 03-06-04: Added High priest Assumptio.[Oatmeal]
 - 03-06-04: FusionSQL -> Fixed Character data not saving bug. [AlexKreuz]
 - 03-06-04: Added Palm Strike [Oatmeal]
 - 03-06-04: Added Tiger Claw [Oatmeal]

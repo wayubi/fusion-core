@@ -2366,6 +2366,8 @@ begin
 
     
 			if (Skill[60].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
+                        if (Skill[360].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 60 div 100;
+                        if (Skill[359].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 60 div 100;
 			if (Skill[111].Tick > Tick) and ((tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8))then ADelay := ADelay * 70 div 100; //Adrenaline Rush
 {Editted By AppleGirl}  if (Skill[258].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
                         if Skill[268].Tick > Tick then ADelay := ADelay * 2;    {Steel Body}
@@ -2381,6 +2383,18 @@ begin
                     Skill[60].Tick := Tick;
                     SkillTick := Tick;
                 end;
+
+                
+                if (Skill[360].Tick > Tick) and (tc.Weapon <> 3) then begin
+                    Skill[360].Tick := Tick;
+                    SkillTick := Tick;
+                end;
+
+                if (Skill[359].Tick > Tick) and (tc.Weapon <> (4 or 5)) then begin
+                    Skill[359].Tick := Tick;
+                    SkillTick := Tick;
+                end;
+
 
                 if (Skill[111].Tick > Tick) and (tc.Weapon <> (6 or 7)) then begin
                     Skill[111].Tick := Tick;
