@@ -302,14 +302,16 @@ var
         //tc:TChara;
         i   :integer;
         j   :integer;
+        tc  :TChara;
 
 begin
-        for j := 0 to 3 do begin
-                i := Random(3);
+        for j := 0 to 7 do begin
+                i := Random(7);
                 if tsAI.Skill[i] <> 0 then begin
                         if tsAI.PercentChance[i] > Random(200) then begin
                                 //DebugOut.Lines.Add('Success');
                                 MobSkills(tm, ts, tsAI, Tick, i);
+                                //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
                                 MobFieldSkills(tm, ts, tsAI, Tick, i);
                                 MobStatSkills(tm, ts, tsAI, Tick, i);
                                 //Break;
@@ -323,16 +325,44 @@ end;
 
 procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; i:integer);
 var
-        tc  :TChara;
+        b       :integer;
+        tc      :TChara;
+        bb      :array of byte;
+        xy      :TPoint;
         //i   :integer;
 begin
 
         //for i := 0 to 3 do begin
         tc := ts.AData;
         case tsAI.Skill[i] of
+                //dmg[0] := dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data1[tsAI.SkillLV[i]];
+                5:      {Bash}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+                13:     {Soul Strike}
+                        begin
+                                //dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+                                //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+                                //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+                                {Unsure about magic calculations so just using the attack calc algorithm [Darkhelmet]}
+                                MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+
+                                if dmg[0] < 1 then dmg[0] := 1;
+                                dmg[0] := dmg[0] * ElementTable[tc.Skill[13].Data.Element][0] div 100;
+                                dmg[0] := dmg[0] * tc.Skill[13].Data.Data2[tsAI.SkillLV[i]];
+
+                                if dmg[0] < 0 then dmg[0] := 0;
+                                SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        end;
+
                 28:     {Heal}
                 begin
-                        dmg[0] := (ts.Data.LV + 10);
+                        dmg[0] := (ts.Data.LV * 2 + 10);
                         ts.HP := ts.HP + dmg[0];
                         if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
 
@@ -344,21 +374,94 @@ begin
                         WFIFOB(14, 1);
                         SendBCmd(tm, ts.Point, 15);
                 end;
+
                 46:     {Double Strafe}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 2;
-                        tc.HP := tc.HP - dmg[0];
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
                 end;
+
                 57:     {Brandish Spear}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        tc.HP := tc.HP - dmg[0];
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        if (dmg[0] > 0) then begin
+                                SetLength(bb, 6);
+                                bb[0] := 6;
+                                xy := tc.Point;
+                                DirMove(tm, tc.Point, tc.Dir, bb);
+                                //Move the Player
+                                if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                        with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                Delete(IndexOf(tc.ID));
+                                        end;
+                                        tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                end;
+                                tc.pcnt := 0;
+
+                                //Send Packets to Update
+                                WFIFOW(0, $0088);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Point.X);
+                                WFIFOW(8, tc.Point.Y);
+                                SendBCmd(tm, tc.Point, 10);;
+                        end;
+                end;
+
+                148:    {Charge Arrow}
+                begin
+
+                        xy.X := tc.Point.X - tc.Point.X;
+                        xy.Y := tc.Point.Y - tc.Point.Y;
+                        if abs(xy.X) > abs(xy.Y) * 3 then begin
+                                //Get KnockBack Distance
+                                if xy.X > 0 then b := 6 else b := 2;
+                        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+								//cŒü‚«
+                                if xy.Y > 0 then b := 0 else b := 4;
+                        end else begin
+                                if xy.X > 0 then begin
+                                        if xy.Y > 0 then b := 7 else b := 5;
+                                end else begin
+                                        if xy.Y > 0 then b := 1 else b := 3;
+                                end;
+                        end;
+
+                        //Damage Calculations
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                        //Send Attack
+                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+
+                        //Successful Damage
+                        if (dmg[0] > 0) then begin
+                                SetLength(bb, 6);
+                                bb[0] := 6;
+                                xy := tc.Point;
+                                DirMove(tm, tc.Point, tc.Dir, bb);
+                                //Move the Player
+                                if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                        with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                Delete(IndexOf(tc.ID));
+                                        end;
+                                        tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                end;
+                                tc.pcnt := 0;
+
+                                //Send Packets to Update
+                                WFIFOW(0, $0088);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Point.X);
+                                WFIFOW(8, tc.Point.Y);
+                                SendBCmd(tm, tc.Point, 10);;
+                        end;
                 end;
         end;
 
@@ -539,6 +642,7 @@ procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:ca
 	xy        :TPoint;
 	ts1       :TMob;
 	tn        :TNPC;
+        tl        :TSkillDB;
 begin
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
@@ -798,7 +902,7 @@ begin
 			dmg[0] := 0;
 		end;}
 		//‚±‚±‚Å¯‚Ì‚©‚¯‚çŒø‰Ê‚ð“ü‚ê‚é(–¢ŽÀ‘•)
-
+                if dmg[0] > 16000 then dmg[0] := 16000;
 		dmg[4] := 1;
 	end;
 	//DebugOut.Lines.Add(Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
@@ -808,6 +912,7 @@ end;
 procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
 
 begin
+        tc.HP := tc.HP - dmg[0];  //Subtract Damage
         WFIFOW( 0, $01de);
 	WFIFOW( 2, tsAI.Skill[i]);
 	WFIFOL( 4, ts.ID);

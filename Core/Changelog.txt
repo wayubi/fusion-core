@@ -2,6 +2,10 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-01-04: Extended so monsters can use up to 8 Skills [Darkhelmet + Oatmeal12345]
+- 01-01-04: Added Monster Skill Soul Strike [Darkhelmet]
+- 01-01-04: Added Monster Skill Charged Arrow [Darkhelmet]
+- 01-01-04: Added Monster Skill Bash [Darkhelmet]
 - 01-01-04: Graphical Support for Two Hand Quicken and others (monster skills) [Darkhelmet]
 - 01-01-04: Updated Chance System for Monster Skills [Darkhelmet]
 - 12-31-03: Added Graphics For Monster Skill Meteor (No Damage) [Darkhelmet]

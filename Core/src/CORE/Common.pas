@@ -155,9 +155,9 @@ end;
 type TMobAIDB = class
 // ID,SKILL1,LEVEL1,PERCENT1,TYPE1,SKILL2,LEVEL2,PERCENT2,TYPE2,SKILL3,LEVEL3,PERCENT3,TYPE3,SKILL4,LEVEL4,PERCENT4,TYPE4
         ID              :cardinal;
-        Skill           :array[0..3] of integer;
-        SkillLv         :array[0..3] of integer;
-        PercentChance   :array[0..3] of integer;
+        Skill           :array[0..7] of integer;
+        SkillLv         :array[0..7] of integer;
+        PercentChance   :array[0..7] of integer;
         //SkillType       :array[0..3] of integer;
 end;
 //------------------------------------------------------------------------------

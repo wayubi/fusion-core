@@ -660,10 +660,10 @@ DebugOut.Lines.Add('Monster AI database loading...');
 
 		with tsAI do begin
                         ID := StrToInt(sl.Strings[0]);
-                        for j := 0 to 3 do begin
+                        for j := 0 to 7 do begin
 			        Skill[j] := StrToInt(sl.Strings[1 + j]);
-                                SkillLV[j] := StrToInt(sl.Strings[5 + j]);
-                                PercentChance[j] := StrToInt(sl.Strings[9 + j]);
+                                SkillLV[j] := StrToInt(sl.Strings[9 + j]);
+                                PercentChance[j] := StrToInt(sl.Strings[17 + j]);
                                 //SkillType[j] := StrToInt(sl.Strings[13 + j]);
                         end;
 		end;
