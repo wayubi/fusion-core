@@ -3464,11 +3464,14 @@ begin
 				AMode := 0;
 				Exit;
 			end;
+
+      //Pet Attacks
+      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
       // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
       // Hammer Fall on enemy when Master is attacking
-      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
         tn := tc.PetNPC;
         tpe := tc.PetData;
+        if tpe.Accessory <> 1 then break;
         if (tpe.JID = 1110) and (tc.AData <> nil) then begin
           if Random(100) < (tpe.Relation / 100.0) then begin
             xy.X := ts.Point.X;
@@ -3489,7 +3492,25 @@ begin
 			      WFIFOW(12, ts.Point.Y);
 			      WFIFOL(14, 1);
 			      SendBCmd(tm, xy, 18);
-
+          end;
+        end;
+        if (tpe.JID = 1107) and (Random(100) > 90) then begin
+          ts.ATarget := tc.ID;
+          ts.ARangeFlag := false;
+          ts.AData := tc;
+          //Send Graphic
+          WFIFOW( 0, $011a);
+          WFIFOW( 2, 6);
+          WFIFOW( 4, 1);
+          WFIFOL( 6, tn.ID);
+          WFIFOL(10, tn.ID);
+          if ts.Data.Race <> 1 then begin
+            WFIFOB(14, 1);
+            ts.ATKPer := word(tc.Skill[6].Data.Data1[1]);
+            ts.DEFPer := word(tc.Skill[6].Data.Data2[1]);
+          end else begin
+            WFIFOB(14, 0);
+            SendBCmd(tm, tn.Point, 15);
           end;
         end;
       end;
@@ -11211,7 +11232,7 @@ begin
   tpe := tc.PetData;
   MobData := tpe.MobData;
 
-  with tn1 do begin
+  if tpe.Accessory <> 0 then with tn1 do begin
 
     if tpe.Data.SkillTime > 0 then begin
       //Tick System needs to be redone
