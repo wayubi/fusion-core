@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-28-04: Updated the default starting map location (new_1-1) again... [Tsusai]
 - 07-27-04: Added more to duplicate check logging in.  [Darkhelmet]
 - 07-27-04: Added check for duplicate account logging in.  [Darkhelmet]
 - 07-26-04: R.E.E.D: Better error checking. Couldn't break guilds. [AlexKreuz]

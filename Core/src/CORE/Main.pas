@@ -635,7 +635,7 @@ begin
 	if sl.IndexOfName('DefaultMap') > -1 then begin
 		DefaultMap := sl.Values['DefaultMap'];
 	end else begin
-		DefaultMap := 'new_zone01';
+		DefaultMap := 'new_1-1';
 	end;
 	if sl.IndexOfName('DefaultPoint_X') > -1 then begin
 		DefaultPoint_X := StrToInt(sl.Values['DefaultPoint_X']);
