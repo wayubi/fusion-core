@@ -2804,7 +2804,8 @@ begin
 	CloseFile(txt);
 {キューペットここまで}
 
-  { Mitch 01-31-2004 : mapinfo_db.txt save! }
+  { Ugh I'll fix this ... hmm
+  Mitch 01-31-2004 : mapinfo_db.txt save! 
   AssignFile(txt, AppPath + '\database\mapinfo_db.txt');
   Rewrite(txt);
   WriteLn(txt, 'MapName,Memo,Save,Teleport,PVP,GuildPVP');
@@ -2829,7 +2830,7 @@ begin
     end;
     writeln(txt, sl.DelimitedText);
   end;
-  CloseFile(txt);
+  CloseFile(txt);}
 
 	sl.Free;
 end;
