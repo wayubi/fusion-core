@@ -10,7 +10,11 @@ uses
     {$IFDEF MSWINDOWS}
 	Windows, ScktComp,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, Types
+    {$ENDIF}
+    {Shared}
     Classes, SysUtils,
     {Fusion}
     Common, Database, SQLData, FusionSQL, PlayerData;

@@ -7,7 +7,11 @@ uses
     {$IFDEF MSWINDOWS}
     Windows, MMSystem,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, Types,
+    {$ENDIF}
+    {Shared}
     IniFiles, Classes, SysUtils, Math,
     {Fusion}
     Common, List32, Path;

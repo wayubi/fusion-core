@@ -8,10 +8,13 @@ uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-	Windows, StdCtrls,{replace with QStdCtrls soon and place in common}
-    MMSystem, ScktComp,
+	Windows, StdCtrls, MMSystem, ScktComp,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, QStdCtrls, Types,
+    {$ENDIF}
+    {Shared}
     Classes, SysUtils,
     {Fusion}
 	GlobalLists, List32;

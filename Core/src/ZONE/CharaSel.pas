@@ -10,8 +10,14 @@ uses
     {$IFDEF MSWINDOWS}
 	Windows, ScktComp,
     {$ENDIF}
-    {Shared Components}
-    SysUtils, Common, SQLData, FusionSQL;
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt,
+    {$ENDIF}
+    {Shared}
+    SysUtils,
+    {Fusion}
+    Common, SQLData, FusionSQL;
 
 //==============================================================================
 // ä÷êîíËã`

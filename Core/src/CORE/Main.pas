@@ -8,15 +8,12 @@ uses
         Windows, Messages, MMSystem, Forms, ShellApi, Graphics, Controls, Dialogs,
         Menus, ScktComp, StdCtrls, ExtCtrls, WinSock, ComCtrls,
         {$ENDIF}
-    {Delphi / Kylix Delphi Compatable units}
-        SysUtils, Variants, Classes, IniFiles, Types,
-    {Possible replacement for some VCL units; crossplatform conpatable but things still need fixing}
-    {QExtCtrls, QComCtrls, QGraphics, QControls, QDialogs, QMenus,}
+    {Delphi/Kylix CLX units (Linux)}
         {$IFDEF LINUX}
-        QStdCtrls, Types,
-        //TMemo and TPoint are in these, StdCtrls needs to be replaced by this
-        //These components are cross platform compatable
+        QExtCtrls, QComCtrls, QGraphics, QControls, QDialogs, QMenus, Qt, QStdCtrls,
         {$ENDIF}
+    {Shared}
+        SysUtils, Variants, Classes, IniFiles, Types,
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,

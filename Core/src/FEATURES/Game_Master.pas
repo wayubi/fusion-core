@@ -7,7 +7,9 @@ uses
     {$IFDEF MSWINDOWS}
     MMSystem,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+        {Need to finx CLX equiv of MMSystem (timeGetTime)}
+    {Shared}
     IniFiles, Classes, SysUtils,
     {Fusion}
     Common, List32, Globals, PlayerData;

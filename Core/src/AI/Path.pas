@@ -9,7 +9,11 @@ uses
     {$IFDEF MSWINDOWS}
 	Windows,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Types,
+    {$ENDIF}
+    {Shared}
     SysUtils,
     {Fusion}
     Common;

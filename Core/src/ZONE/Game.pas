@@ -9,7 +9,11 @@ uses
     {$IFDEF MSWINDOWS}
 	Windows, MMSystem, ScktComp, Forms, {Replace with QForms soon, and place in common}
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, Types, QForms,
+    {$ENDIF}
+    {Shared}
     Classes, Math, SysUtils,
     {Fusion}
     Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData;

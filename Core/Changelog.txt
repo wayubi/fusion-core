@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-06-04: Cleaned up cross platform USES. [Tsusai]
 - 08-05-04: Another class type usage cross platform fix. [Tsusai]
 - 08-05-04: Forgot to update how directories work in Linux. [Tsusai]
 - 08-05-04: Finished organizing USES for future linux development. [Tsusai]

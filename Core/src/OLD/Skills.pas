@@ -40,7 +40,11 @@ uses
     {$IFDEF MSWINDOWS}
 	Windows,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Types, Qt,
+    {$ENDIF}
+    {Shared}
     Classes,
 	{Fusion Units}
 	Common, Skill_Constants, Player_Skills, Globals,

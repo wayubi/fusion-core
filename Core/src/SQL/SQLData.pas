@@ -8,10 +8,14 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-	Windows, MMSystem, StrUtils, Forms, {Replace with QForms and place in common}
+	Windows, MMSystem, StrUtils, Forms,
     {$ENDIF}
-    {Common}
-    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr,
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, QForms,
+    {$ENDIF}
+    {Shared}
+    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr, Types,
     {Fusion}
     Common, FusionSQL;
 

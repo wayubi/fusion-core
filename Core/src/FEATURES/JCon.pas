@@ -6,7 +6,7 @@ uses
     {$IFDEF MSWINDOWS}
 	WinSock,
     {$ENDIF}
-    {Common}
+    {Shared}
     SysUtils,
     {Fusion}
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData;

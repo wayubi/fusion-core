@@ -5,10 +5,14 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-	Windows, MMSystem, Forms,
+	Windows, MMSystem, Forms,  //Tsusai: are Windows, MMSystem, and Forms even used?
     {$ENDIF}
-    {Common}
-    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr,
+    {Klyix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, QForms,
+    {$ENDIF}
+    {Shared}
+    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr, //Types,
     {Fusion}
     Common;
 

@@ -5,9 +5,13 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-    Windows, MMSystem, Forms, {replace with QForms and move to common}
+    Windows, MMSystem, Forms,
     {$ENDIF}
-    {Common}
+    {Kylix/Delphi CLX}
+    {$IFDEF LINUX}
+    Qt, QForms, Types,
+    {$ENDIF}
+    {Shared}
     Classes, SysUtils, IniFiles;
 
     { Parsers }
