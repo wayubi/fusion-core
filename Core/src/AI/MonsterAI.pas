@@ -16,7 +16,7 @@ uses
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; k:integer);
         procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
 
-        procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
+        procedure LoadMonsterAIData(tm:TMap; ts:TMob; Tick:cardinal);
         procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
         procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBFusion; Tick:Cardinal);
         procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
@@ -366,7 +366,6 @@ begin
 
         if tc.AData <> nil then tc:= ts.AData;
 
-        tc := ts.AData;
         if tc <> nil then begin
     		  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
           else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
@@ -1255,7 +1254,7 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
+procedure LoadMonsterAIData(tm:TMap; ts:TMob; Tick:cardinal);
 var
   tsAI2 :TMobAIDBFusion;
   j,k,m     :integer;
@@ -1402,7 +1401,7 @@ begin
   sl.DelimitedText := ts.Data.SkillLocations;
   i :=  ts.Data.SkillCount;
   if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
-  while i > 0 do begin
+  while (i > 0) and (EnableMonsterSkills) do begin
     i := i - 1;
     j := StrToInt(sl.Strings[i]);
     tsAI2 := MobAIDBFusion.Objects[MobAIDBFusion.IndexOf(j)] as TMobAIDBFusion;
@@ -1456,12 +1455,14 @@ procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBFusion; Tick:Cardinal);
 var
   TempSkill:TSkillDB;
 begin
-  //if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) then begin
-  if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
+  if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) and (ts.SkillWaitTick < Tick) then begin
+  //if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
 	if tsAI2.SkillID = 'RUN' then begin
       ts.Status := 'RUN';
     end else begin
+      ts.SkillType := 0;
       TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
+      ts.SkillType := TempSkill.SType;
       ts.MSkill := TempSkill.ID;
       ts.MLevel := tsAI2.SkillLV;
       ts.CastTime := tsAI2.Cast_Time;
@@ -1482,12 +1483,12 @@ var
 begin
 
         tc := ts.AData;
-	if (tc <> nil) and (ts <> nil) then begin
+	if ((tc <> nil) and (ts <> nil)) or (ts.SkillType = 4) then begin
         //j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
         //if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
         j := ts.CastTime;
         ts.MTick := Tick + cardinal(j);
-        
+
         if (j > 0) then begin
                 //Send Packets
                 WFIFOW( 0, $013e);
@@ -1499,10 +1500,12 @@ begin
                 WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
                 WFIFOL(20, j);
                 SendBCmd(tm, ts.Point, 24);
+                ts.Mode := 3;
                 ts.MMode := 1;
                 ts.ATick := Tick + cardinal(j);
         end else begin
                 //ârè•Ç»Çµ
+                ts.Mode := 3;
                 ts.MMode := 1;
                 ts.ATick := Tick;
         end;

@@ -1419,6 +1419,7 @@ var
 	ItemDropPer            :integer;
   StealMultiplier        :integer;
   EnablePetSkills        :boolean;
+  EnableMonsterSkills    :boolean;
   EnableLowerClassDyes   :boolean;
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
