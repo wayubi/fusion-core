@@ -212,7 +212,7 @@ type TMobAIDB = class
 end;
 //------------------------------------------------------------------------------
 type TMobAIDBAegis = class
-// Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
+// ID, Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
   ID  :cardinal;
         Number  :integer;
         Name    :string;
@@ -228,6 +228,11 @@ type TMobAIDBAegis = class
         IfCond :string
 end;
 //------------------------------------------------------------------------------
+type TGlobalVars = class
+// Variable, Value
+  Variable:String;
+  Value:integer;
+end;
 
 // モンスターデータベース
 //ID,Name,JName,LV,HP,EXP,JEXP,Range,ATK1,ATK2,DEF1,DEF2,MDEF1,MDEF2,HIT,FLEE,
@@ -1454,7 +1459,8 @@ var
         MobAIDB    :TIntList32;
         //MobAIDBAegis:TStringList;
         MobAIDBAegis:TIntList32;
-        PharmacyDB :TIntList32;
+        GlobalVars:TStringList;
+        //PharmacyDB :TIntList32;
   SlaveDBName:TStringList;
   MArrowDB   :TIntList32;
   WarpDatabase:TStringList;
@@ -8489,6 +8495,103 @@ begin
                 SetLength(tn.Script, k + 1);
                 tn.Script[k].ID := 64;
 								Inc(k);
+              end else if str = 'global' then begin //----- 65 Global Variable
+                //We convert literal math into easier things to work with
+                sl.Strings[0] := StringReplace(sl.Strings[0], '+=', '+', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '-=', '-', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '*=', '*', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '/=', '/', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '+', ',1,', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '-', ',2,',	[]);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '=', ',0,', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '*', ',3,', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '/', ',4,', []);
+								while Pos('- ', sl.Strings[0]) <> 0 do
+									sl.Strings[0] := StringReplace(sl.Strings[0], '- ', '-',	[]);
+								sl1.DelimitedText := sl.Strings[0];
+								if sl1.Count = 3 then sl1.Add('0');
+								if sl1.Count <> 4 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [global] function error', [ScriptPath, lines]));
+									exit;
+								end;
+								val(sl1.Strings[1], i, j);
+								if (j <> 0) or (i < 0) or (i > 4) then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [global] range error (2)', [ScriptPath, lines]));
+									exit;
+								end;
+								val(sl1.Strings[2], i, j);
+								if j = 0 then begin
+									if (i < -999999999) or (i > 999999999) then begin
+										DebugOut.Lines.Add(Format('%s %.4d: [global] range error (3)', [ScriptPath, lines]));
+										exit;
+									end else if (StrToInt(sl1.Strings[1]) = 3) and (i = 0) then begin
+										DebugOut.Lines.Add(Format('%s %.4d: [global] div 0 error (3)', [ScriptPath, lines]));
+										exit;
+									end;
+								end;
+								val(sl1.Strings[3], i, j);
+								if (j <> 0) or (i < -999999999) or (i > 999999999) then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [set] range error (4)', [ScriptPath, lines]));
+									exit;
+								end;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 65;
+								SetLength(tn.Script[k].Data1, 2);
+								SetLength(tn.Script[k].Data3, 2);
+								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
+								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[3]);
+								Inc(k);
+              end else if str = 'gcheck' then begin //------- 66 Global Check
+                sl.Strings[0] := StringReplace(sl.Strings[0], '=>', '>=', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '=<', '<=', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '==', '=',	[]);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '><', '<>', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '!=', '<>', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '>',	',>,',	[]);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '<',	',<,',	[]);
+								sl.Strings[0] := StringReplace(sl.Strings[0], '=',	',=,',	[]);
+								sl.Strings[0] := StringReplace(sl.Strings[0], ',>,,=,', ',>=,', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,=,', ',<=,', []);
+								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,>,', ',<>,', []);
+								sl1.DelimitedText := sl.Strings[0];
+								if sl1.Count <> 5 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [gcheck] function error', [ScriptPath, lines]));
+									exit;
+								end;
+								val(sl1.Strings[2], i, j);
+								if j = 0 then begin
+									if (i < 0) or (i > 999999999) then begin
+										DebugOut.Lines.Add(Format('%s %.4d: [gcheck] range error (1)', [ScriptPath, lines]));
+										exit;
+									end;
+								end;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 66;
+								SetLength(tn.Script[k].Data1, 3);
+								SetLength(tn.Script[k].Data2, 2);
+								SetLength(tn.Script[k].Data3, 3);
+								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
+								tn.Script[k].Data1[2] := sl1.Strings[1];
+								str := sl1.Strings[1];
+								j := -1;
+										 if str = '>=' then j := 0
+								else if str = '<=' then j := 1
+								else if str = '='	then j := 2
+								else if str = '<>' then j := 3
+								else if str = '>'	then j := 4
+								else if str = '<'	then j := 5;
+								if j = -1 then begin
+									DebugOut.Lines.Add(Format('%s %.4d: [gcheck] syntax error (2)', [ScriptPath, lines]));
+									exit;
+								end;
+								tn.Script[k].Data3[2] := j;
+								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[3]);
+								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[4]);
+								tn.Script[k].DataCnt := 2;
+								Inc(k);
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [script] function error', [ScriptPath, lines]));
@@ -8539,7 +8642,7 @@ begin
 						tn.ScriptCnt := k;
 						for i := 0 to k - 1 do begin
 							case tn.Script[i].ID of
-							4,14,15,16,44:
+							4,14,15,16,44,66:
 								begin
 									for j := 0 to tn.Script[i].DataCnt - 1 do begin
 										if tn.Script[i].Data2[j] = '-' then begin //nopラベル

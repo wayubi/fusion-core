@@ -211,6 +211,8 @@ begin
         MobAIDBAegis:= TIntList32.Create;
         MobAIDBAegis.Sorted := true;
 
+        GlobalVars := TStringList.Create;
+
        // PharmacyDB := TIntList32.Create;
        // PharmacyDB.Sorted := true;
 
@@ -889,6 +891,7 @@ begin
         WarpDatabase.Free;
         MobAIDB.Free;
         MobAIDBAegis.Free;
+        GlobalVars.Free;
   //      PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
@@ -15875,6 +15878,7 @@ begin
                     //PharmacyDB.Clear;
                     MobAIDB.Clear;
                     MobAIDBAegis.Clear;
+                    GlobalVars.Clear;
                     MArrowDB.Clear;
                     WarpDatabase.Clear;
                     IDTableDB.Clear;

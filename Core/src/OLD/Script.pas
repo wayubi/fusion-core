@@ -5,7 +5,7 @@ unit Script;
 interface
 
 uses
-	Windows, Types, SysUtils, Common, MMSystem;
+	Windows, Types, SysUtils, Common, MMSystem, Classes;
 
 //==============================================================================
 // 関数定義
@@ -29,6 +29,8 @@ var
   m       :integer;
 	cnt     :integer;
 	str     :string;
+  txt2    :TextFile;
+  sl      :TStringList;
 	p       :pointer;
 	len     :cardinal;
 	flag    :boolean;
@@ -48,6 +50,7 @@ var
 	tr      :NTimer;
 	tcr     :TChatRoom;
 	mi      :MapTbl;
+  tGlobal :TGlobalVars;
 {NPCイベント追加ココまで}
 begin
 	flag := false;
@@ -1631,6 +1634,98 @@ begin
           end;
           Inc(tc.ScriptStep);
         end;
+      65: //Global Variable
+        {Syntax:
+          global [variable name] = [value];
+        }
+        begin
+          tGlobal := TGlobalVars.Create;
+          sl := TStringList.Create;
+					str := tn.Script[tc.ScriptStep].Data1[0];
+					p := nil;
+					len := 0;
+
+					//Get the Data from the script
+          j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
+          if (tn.Script[tc.ScriptStep].Data3[0] = 0) then begin
+            i := 0;
+          end else begin
+            i := ConvFlagValue(tc, str);
+          end;
+
+          //Different Math cases
+          case tn.Script[tc.ScriptStep].Data3[0] of
+						0,1:  i := i + j;
+						2:    i := i - j;
+						3:    i := i * j;
+						4:    i := i div j;
+          end;
+
+          //Prevent i from being negative
+          if i < 0 then i := 0;
+          if (tn.Script[tc.ScriptStep].Data3[1] <> 0) and
+            (i > tn.Script[tc.ScriptStep].Data3[1]) then i := tn.Script[tc.ScriptStep].Data3[1];
+          {Write the Vaules}
+						{if (Copy(str, 1, 1) <> '\') then begin
+							tc.Flag.Values[str] := IntToStr(i);
+						end else begin
+							ServerFlag.Values[str] := IntToStr(i);
+						end;}
+          tGlobal.Variable := str;
+          tGlobal.Value := i;
+
+          if GlobalVars.IndexOf(str) = - 1 then
+            GlobalVars.AddObject(tGlobal.Variable, tGlobal)
+          else begin
+            tGlobal := GlobalVars.Objects[GlobalVars.IndexOf(str)] as TGlobalVars;
+            tGlobal.Variable := str;
+            tGlobal.Value := i;
+          end;
+
+          AssignFile(txt2, 'Global_Vars.txt');
+          Rewrite(txt2);
+          Writeln(txt2, '// Variable, Value');
+          for i := 0 to GlobalVars.Count - 1 do begin
+            tGlobal := GlobalVars.Objects[i] as TGlobalVars;
+            sl.Clear;
+            sl.Add( tGlobal.Variable );
+            sl.Add( IntToStr( tGlobal.Value ) );
+            Writeln(txt2, sl.DelimitedText);
+          end;
+
+					Inc(tc.ScriptStep);
+          CloseFile(txt2);
+				end;
+      66: // gcheck - Global Variable Check
+        begin
+          flag := false;
+					str := tn.Script[tc.ScriptStep].Data1[0];
+          tGlobal := GlobalVars.Objects[GlobalVars.Indexof(str)] as TGlobalVars;
+          i := tGlobal.Value;
+
+					j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
+{NPCイベント追加ココまで}
+					case tn.Script[tc.ScriptStep].Data3[2] of
+					0: flag := boolean(i >= j);
+					1: flag := boolean(i <= j);
+					2: flag := boolean(i  = j);
+					3: flag := boolean(i <> j);
+					4: flag := boolean(i >  j);
+					5: flag := boolean(i <  j);
+					else
+						begin
+							//DebugOut.Lines.Add(Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
+							tc.ScriptStep := $FFFF;
+							break;
+						end;
+					end;
+					//DebugOut.Lines.Add(Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
+					if flag then begin
+						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
+					end else begin
+						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
+					end;
+				end;
 			44: //checkstr
 				begin
 					j := tn.Script[tc.ScriptStep].Data3[2];

@@ -65,6 +65,7 @@ var
 	tsAI :TMobAIDB;
   tsAI2 :TMobAIDBAegis;
   twp :TWarpDatabase;
+  tGlobal:TGlobalVars;
 
       //  tPharm  :TPharmacyDB;  {Pharmacy's Database}
   tt  :TTerritoryDB;
@@ -818,6 +819,40 @@ DebugOut.Lines.Add('Monster AI database loading...');
   CloseFile(txt2);
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDBAegis.Count]));
+	Application.ProcessMessages;
+
+  {Global Variables Load}
+  if not FileExists(AppPath + 'Global_Vars.txt') then begin
+		AssignFile(txt, AppPath + 'Global_Vars.txt');
+		Rewrite(txt);
+		Writeln(txt, '// Variable, Value');
+		CloseFile(txt);
+	end;
+  DebugOut.Lines.Add('Global Variables loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'Global_Vars.txt');
+	Reset(txt);
+	Readln(txt, str);
+
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+    sl.Delimiter := ',';
+		sl.DelimitedText := str;
+
+    tGlobal := TGlobalVars.Create;
+    if (sl.Strings[0] <> '//') and (sl.Strings[0] <> '') then begin
+		  with tGlobal do begin
+
+      tGlobal.Variable   := sl.Strings[0];
+      tGlobal.Value   := StrToInt(sl.Strings[1]);
+
+      GlobalVars.AddObject(tGlobal.Variable, tGlobal);
+      end;
+    end;
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [MobAIDBAegis.Count]));
 	Application.ProcessMessages;
 
 {Summon Monster List}
