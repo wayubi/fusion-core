@@ -246,7 +246,8 @@ Begin(* Proc sv3PacketProcess() *)
 					if (Option_WelcomeMsg) then begin
 						str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
 						//CRW -- why is "w" 200 -- should it not be SizeOf(str2) ??
-						w := 200;
+                        w := length(str2) + 4;
+						//w := 200;
 						WFIFOW(0, $009a);
 						WFIFOW(2, w);
 						WFIFOS(4, str2, w-4);

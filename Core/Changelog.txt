@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-10-04: Updated length of welcome message, was 2x more than needed. [Darkhelmet]
 - 09-10-04: File->Exit now disconnects ISCS before closing. [Tsusai]
 - 09-10-04: Gui Tweak. [Tsusai]
 - 09-10-04: Character Tab work hopefully to Alex's specifications. [Tsusai]
