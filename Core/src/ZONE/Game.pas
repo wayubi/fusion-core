@@ -288,7 +288,11 @@ Begin(* Proc sv3PacketProcess() *)
         // Colus, 20040409: Gave the option to enable lower class dyes.
         // This should be removed when Gravity reenables them.
         { Alex: moved up here to prevent the flicker of changing colors }
-        UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);                
+        UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+
+        {Tsusai: Reapply Status options like blind and silence.
+        These things have to carry over upon map change.  Thanks Trihan!}
+        UpdateOption(tm,tc);
 
         //Grace Time
         if mi.PvPG = true then begin

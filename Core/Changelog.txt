@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-10-04: Status problems now carry over upon map change. [Tsusai/Trihan]
 - 07-10-04: Added @item2 to ALBGM. [Trihan]
 - 07-10-04: Added @item to ALBGM. [Trihan]
 - 07-10-04: Added @model to ALBGM. [Trihan]
