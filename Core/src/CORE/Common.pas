@@ -1317,6 +1317,7 @@ var
 	ItemDropDenominator    :integer;
   ItemDropMultiplier     :integer;
 	ItemDropPer            :integer;
+  StealMultiplier        :integer;
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
         Timer                  :boolean;
@@ -2525,8 +2526,11 @@ begin
 			else
 				i := i - 30;
 		end;
-                if Skill[387].Tick > Tick then begin // Cart boost  // I think this should do it.
-				i := i - 45
+    if Skill[387].Tick > Tick then begin // Cart boost  // I think this should do it.
+				i := i - 45;
+		end;
+    if Skill[383].Tick > Tick then begin // Wind Walk AGI effect
+				i := i - 45;
 		end;
     { Colus, 20040224: You didn't listen to how I explained the skill. :/
       This is so not right it's not even funny.
@@ -3319,13 +3323,16 @@ if View then begin
       //tc.Socket.SendBuf(buf, 8); // patket change for view weapon
       WFIFOB(6, 3);
       WFIFOB(7, tc.Head3);
-      tc.Socket.SendBuf(buf, 8);
+      SendBCmd(tc.MData, tc.Point, 8);
+      //tc.Socket.SendBuf(buf, 8);
       WFIFOB(6, 4);
       WFIFOB(7, tc.Head1);
-      tc.Socket.SendBuf(buf, 8);
+      SendBCmd(tc.MData, tc.Point, 8);
+      //tc.Socket.SendBuf(buf, 8);
       WFIFOB(6, 5);
       WFIFOB(7, tc.Head2);
-      tc.Socket.SendBuf(buf, 8);
+      SendBCmd(tc.MData, tc.Point, 8);
+      //tc.Socket.SendBuf(buf, 8);
       //WFIFOB(6, 8);
       //WFIFOB(7, tc.Shield);
       //tc.Socket.SendBuf(buf, 8); // patket change for view Shield
@@ -3340,7 +3347,8 @@ if View then begin
       end else begin
         WFIFOW(9, tc.WeaponSprite[1]);
       end;
-      tc.Socket.SendBuf(buf, 11);
+      SendBCmd(tc.MData, tc.Point, 11);
+      //tc.Socket.SendBuf(buf, 11);
 end;
 // Tumy
 
@@ -8428,6 +8436,7 @@ var
 begin
   tm := tc.MData;
   modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
+  modfix := modfix * StealMultiplier div 100;
 
   k := SlaveDBName.IndexOf(ts.Data.Name);
   if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
@@ -8438,7 +8447,7 @@ begin
   for i := 0 to 7 do begin
     mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
     rand := Random(20000) mod 10000;
-    //DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
+    DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
     if rand <= mdrop[i] then begin
                                      // Graphic send
                                      WFIFOW( 0, $011a);

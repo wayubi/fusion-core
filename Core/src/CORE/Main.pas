@@ -385,6 +385,16 @@ begin
 	end else begin
 		ItemDropMultiplier := 1;
 	end;
+ 	if sl.IndexOfName('StealMultiplier') <> -1 then begin
+		StealMultiplier := StrToInt(sl.Values['StealMultiplier']);
+    if StealMultiplier <= 0 then begin
+      StealMultiplier := 0;
+    end else if StealMultiplier > 10000 then begin
+      StealMultiplier := 10000;
+    end;
+	end else begin
+		StealMultiplier := 100;
+	end;
 	if sl.IndexOfName('DisableFleeDown') <> -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
@@ -712,6 +722,7 @@ begin
 	ini.WriteString('Server', 'ItemDropDenominator', IntToStr(ItemDropDenominator));
 	ini.WriteString('Server', 'ItemDropPer', IntToStr(ItemDropPer));
  	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
+ 	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
 	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
 	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
         ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
@@ -5526,6 +5537,11 @@ begin
 
                   //Send Attack Packet
                   SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+                  if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                  DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                  tc.MTick := Tick + 500;
+
                   end;
 
 
@@ -5557,6 +5573,10 @@ begin
 
                   //Send Attack Packet
                   SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+                  if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                  DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                  tc.MTick := Tick + 500;
                   end;
 
         381:    //Falcon assault
@@ -5567,7 +5587,10 @@ begin
 
         //Send Skill Packets
         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
+        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+        tc.MTick := Tick + 500;
         end else begin
         SendSkillError(tc, 0);
         MMode := 4;
@@ -8489,6 +8512,8 @@ begin
                                                 ProcessType := 3;
                                                 MTick := Tick + 100;
                                                 end else begin
+                                                SendSkillError(tc, 6);
+                                                MMode := 4;
                                                 Exit;
                                                 end;
                                         end;
@@ -8496,8 +8521,14 @@ begin
 
                                          	357: //Concentration
 					begin
-						tc1 := tc;
-						ProcessType := 3;
+            if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+  						tc1 := tc;
+  						ProcessType := 3;
+            end else begin
+              SendSkillError(tc, 6);
+              MMode := 4;
+              Exit;
+            end;
 					end;
                                          	358: //  Tension Relax
 					begin
@@ -8506,25 +8537,27 @@ begin
 					end;
                                       	360: // Fury
 					begin
-                                        if (tc.Weapon = 3) then begin
-						tc1 := tc;
+            if (tc.Weapon = 3) then begin
+  						tc1 := tc;
+  						ProcessType := 3;
+            end else begin
+              SendSkillError(tc, 6);
+              MMode := 4;
+              Exit;
+            end;
+          end;
 
-						ProcessType := 3;
-                                                end else begin
-                                                MMode := 4;
-                                                Exit;
-                                                end;
-                                                end;
-                                        	359: // Berserk
+          359: // Berserk
 					begin
-                                        if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
-						tc1 := tc;
-						ProcessType := 3;
-                                                end else begin
-                                                MMode := 4;
-                                                Exit;
-                                                end;
-                                                end;
+            if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+  						tc1 := tc;
+  						ProcessType := 3;
+            end else begin
+              SendSkillError(tc, 6);
+              MMode := 4;
+              Exit;
+            end;
+          end;
                                         361: //  Assumptio
 					begin
 						tc1 := tc;
@@ -8544,7 +8577,7 @@ begin
                                        383: //         Windwalk
 					begin
 						tc1 := tc;
-						ProcessType := 3;
+						ProcessType := 5;
 					end;
                                           380: // Sight
 					begin
@@ -10947,13 +10980,15 @@ begin
           end;
         1:
 					begin
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, MSkill);
-						WFIFOW( 4, MUseLV);
-						WFIFOL( 6, tc1.ID);
-						WFIFOL(10, ID);
-						WFIFOB(14, 1);
-						SendBCmd(tm, tc1.Point, 15);
+            if (tc1.MSkill <> 135) then begin
+  						WFIFOW( 0, $011a);
+  						WFIFOW( 2, MSkill);
+  						WFIFOW( 4, MUseLV);
+  						WFIFOL( 6, tc1.ID);
+  						WFIFOL(10, ID);
+  						WFIFOB(14, 1);
+  						SendBCmd(tm, tc1.Point, 15);
+            end;
 
             // Hiding
             if (tc1.MSkill = 51) then begin {Hiding}
@@ -11042,7 +11077,7 @@ begin
 						CalcStat(tc1, Tick);
 						if ProcessType = 3 then SendCStat(tc1);
 						//アイコン表示
-			if tl.Icon <> 0 then begin
+			if (tl.Icon <> 0) and (tl.Icon <> 107) then begin
 							//DebugOut.Lines.Add('(ﾟ∀ﾟ)!');
 							WFIFOW(0, $0196);
 							WFIFOW(2, tl.Icon);
@@ -11080,9 +11115,9 @@ begin
 								WFIFOL(10, tc1.ID);
 								WFIFOB(14, 1);
 								SendBCmd(tm, tc1.Point, 15);
-                                                                if tc.MSkill = 255 then begin
-                                                                if tc.JID = 14 then tc1.Crusader := tc;
-                                                                end;
+                if tc.MSkill = 255 then begin
+                  if tc.JID = 14 then tc1.Crusader := tc;
+                end;
 								//DebugOut.Lines.Add(Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
 								tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
 								tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;

@@ -1363,13 +1363,13 @@ end;
                       WFIFOW(9, 0);
 											SendBCmd(tm, tc.Point, 11);
 										end;
-																								end;
+                end;
 					end else if (Copy(str, 1, 5) = 'icon ') and ((DebugCMD and $0040) <> 0) then begin
             // Set the specified icon
 						Val(Copy(str, 6, 256), i, k);
 
 						if (k = 0) then begin
-            for j := i to i+10 do begin
+            for j := i to i do begin
             WFIFOW(0, $0196);
             WFIFOW(2, j);
             WFIFOL(4, tc.ID);
@@ -1382,7 +1382,7 @@ end;
 						Val(Copy(str, 8, 256), i, k);
 
 						if (k = 0) then begin
-            for j := i to i+10 do begin
+            for j := i to i do begin
             WFIFOW(0, $0196);
             WFIFOW(2, j);
             WFIFOL(4, tc.ID);
