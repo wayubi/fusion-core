@@ -1477,7 +1477,7 @@ end;
 //------------------------------------------------------------------------------
 procedure TFrmMain.MonsterDie(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal);
 var
-        //Variable Declarations
+	//Variable Declarations
 	k,i,j,m,n:integer;
 	total:cardinal;
 	mvpid:integer;
@@ -1485,13 +1485,13 @@ var
 	mvpcheck:integer;
 	i1,j1,k1:integer;
 	l,w:cardinal;
-        TgtFlag:boolean;
+	TgtFlag:boolean;
 	DropFlag:boolean;
-        delcnt:integer;
+	delcnt:integer;
 
-        //Class Usage
+	//Class Usage
 	tc1:TChara;     {Player}
-        ts1:TMob;       {Monster}
+	ts1:TMob;       {Monster}
 	tn:TNPC;        {NPC}
 	td:TItemDB;     {Reads the Item Database}
 	tpaDB:TStringList;
@@ -1507,22 +1507,20 @@ var
 	str2 : string;
 
 begin
-        UpdateMonsterDead(tm, ts, 1);
+	UpdateMonsterDead(tm, ts, 1);
 	{WFIFOW( 0, $0080);
 	WFIFOL( 2, ts.ID);
 	WFIFOB( 6, 1);
 	SendBCmd(tm, ts.Point, 7);}
 
-        delcnt := 0;                      // mf
-                                          // mf
-        repeat                            // mf
-                delcnt := delcnt + 1;     // mf
-        until (DelPointX[delcnt] = 0) or (delcnt >= 999);      // mf
-                                          // mf
-        DelPointX[delcnt] := ts.Point.X;  // mf
-        DelPointY[delcnt] := ts.Point.Y;  // mf
-        DelID[delcnt] := ts.ID;           // mf
-        DelWait[delcnt] := ts.DeadWait;   // mf
+	delcnt := 0;                      // mf
+	repeat                            // mf
+		delcnt := delcnt + 1;           // mf
+	until (DelPointX[delcnt] = 0) or (delcnt >= 999);      // mf
+	DelPointX[delcnt] := ts.Point.X;  // mf
+	DelPointY[delcnt] := ts.Point.Y;  // mf
+	DelID[delcnt] := ts.ID;           // mf
+	DelWait[delcnt] := ts.DeadWait;   // mf
 
 	ts.HP := 0;
 	ts.pcnt := 0;
@@ -1530,12 +1528,12 @@ begin
 	ts.Stat1 :=0;
 	ts.Stat2 :=0;
 	ts.nStat := 0;
-        ts.Element := ts.Data.Element;
+	ts.Element := ts.Data.Element;
 	ts.BodyTick := 0;
 	for i := 0 to 4 do
-        ts.HealthTick[i] := 0;
+		ts.HealthTick[i] := 0;
 	ts.isLooting := False;
-  ts.Status := 'DEAD_ST';
+	ts.Status := 'DEAD_ST';
 
 
 	ts.SpawnTick := Tick;
@@ -1543,112 +1541,113 @@ begin
 	n := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
 	if n = -1 then Exit;//safe 2004/04/26
 
-        if ts.isSlave then begin
-                ts1 := tm.Mob.IndexOfObject(ts.LeaderID) as TMob;
-                if (ts1 <> nil) then begin
-                        if (ts1.SlaveCount - 1 <= 0) then begin
-                                ts1.SlaveCount := 0;
-                        end else begin
-                                ts1.SlaveCount := ts1.SlaveCount - 1;
-                        end;
-                end;
-        end;
+	if ts.isSlave then begin
+		ts1 := tm.Mob.IndexOfObject(ts.LeaderID) as TMob;
+		if (ts1 <> nil) then begin
+			if (ts1.SlaveCount - 1 <= 0) then begin
+				ts1.SlaveCount := 0;
+			end else begin
+				ts1.SlaveCount := ts1.SlaveCount - 1;
+			end;
+		end;
+	end;
 
-if (ts.isEmperium) then begin
+	if (ts.isEmperium) then begin
 
-        j := GuildList.IndexOf(tc.GuildID);
-        m := TerritoryList.IndexOf(ts.Map);
-        if (j <> -1) and (m <> -1) then begin
-                tg := GuildList.Objects[j] as TGuild;
-                tt := TerritoryList.Objects[m] as TTerritoryDB;
-                str := GlobalGMsg;
+		j := GuildList.IndexOf(tc.GuildID);
+		m := TerritoryList.IndexOf(ts.Map);
+		if (j <> -1) and (m <> -1) then begin
+			tg := GuildList.Objects[j] as TGuild;
+			tt := TerritoryList.Objects[m] as TTerritoryDB;
+			str := GlobalGMsg;
 
-                str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
-                str := StringReplace(str, '$mapname', ts.Map, [rfReplaceAll]);
-                str := StringReplace(str, '$castlename', tt.TerritoryName, [rfReplaceAll]);
-                str := StringReplace(str, '$guildname', tg.Name, [rfReplaceAll]);
-                str := StringReplace(str, '$guildmaster', tg.MasterName, [rfReplaceAll]);
-        end else begin
-                str := MapGMsg;
-        end;
+			str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+			str := StringReplace(str, '$mapname', ts.Map, [rfReplaceAll]);
+			str := StringReplace(str, '$castlename', tt.TerritoryName, [rfReplaceAll]);
+			str := StringReplace(str, '$guildname', tg.Name, [rfReplaceAll]);
+			str := StringReplace(str, '$guildmaster', tg.MasterName, [rfReplaceAll]);
+		end else begin
+			str := MapGMsg;
+		end;
 
-        str2 :='blue' + MapGMsg;
-        //str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
-        //str := StringReplace(str, '$mapname', ts.Map, [rfReplaceAll]);
-        //str := StringReplace(str, '$guildname', tg.Name, [rfReplaceAll]);
-        //str := StringReplace(str, '$guildmaster', tg.MasterName, [rfReplaceAll]);
+		str2 :='blue' + MapGMsg;
+		//str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+		//str := StringReplace(str, '$mapname', ts.Map, [rfReplaceAll]);
+		//str := StringReplace(str, '$guildname', tg.Name, [rfReplaceAll]);
+		//str := StringReplace(str, '$guildmaster', tg.MasterName, [rfReplaceAll]);
 
-        w := Length(str) + 4;
-        WFIFOW(0, $009a);
-        WFIFOW(2, w);
-        WFIFOS(4, str, w - 4);
+		w := Length(str) + 4;
+		WFIFOW(0, $009a);
+		WFIFOW(2, w);
+		WFIFOS(4, str, w - 4);
 
-        for l := 0 to CharaName.Count - 1 do begin
-                tc1 := CharaName.Objects[l] as TChara;
-                if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
-        end;
+		for l := 0 to CharaName.Count - 1 do begin
+			tc1 := CharaName.Objects[l] as TChara;
+			if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
+		end;
 
-        w := Length(str) + 4;
-        WFIFOW(0, $009a);
-        WFIFOW(2, w);
-        WFIFOS(4, str2, w - 4);
+		w := Length(str) + 4;
+		WFIFOW(0, $009a);
+		WFIFOW(2, w);
+		WFIFOS(4, str2, w - 4);
 
-        for l := 0 to tm.CList.Count - 1 do begin
-                tc1 := tm.CList.Objects[l] as TChara;
-                if (tc1.Login = 2) then tc1.Socket.SendBuf(buf, w);
-        end;
+		for l := 0 to tm.CList.Count - 1 do begin
+			tc1 := tm.CList.Objects[l] as TChara;
+			if (tc1.Login = 2) then tc1.Socket.SendBuf(buf, w);
+		end;
 
-        if (EmpList.Count > 0) then begin
-                k := EmpList.IndexOf(ts.Map);
-                if (k <> - 1) then begin
-                        EmpList.Delete(k);
-                end;
-        end;
+		if (EmpList.Count > 0) then begin
+			k := EmpList.IndexOf(ts.Map);
+			if (k > - 1) then begin
+				EmpList.Objects[k].Free;
+				EmpList.Delete(k);
+			end;
+		end;
 
-        if (CastleList.Count > 0) then begin
-                m := CastleList.IndexOf(ts.Map);
-                //debugout.lines.add(inttostr(m));
-                if (m <> - 1) then begin
-                        CastleList.Delete(m);
-                end;
-        end;
+		if (CastleList.Count > 0) then begin
+			m := CastleList.IndexOf(ts.Map);
+			if (m > - 1) then begin
+				CastleList.Objects[m].Free;
+				CastleList.Delete(m);
+			end;
+		end;
 
-		    {Colus, 20040113: Set territory for the guild (not done in real RO!  BAH!}
-        {I will replace this with something that parses the guild bases in
-         ClaimGuildCastle.}
-        //tg.Agit := tm.Name;
-        
-        ClaimGuildCastle(tc.GuildID,ts.Map);
-        EnableGuildKafra(ts.Map,'Kafra Service',0);
+		{Colus, 20040113: Set territory for the guild (not done in real RO!  BAH!}
+		{I will replace this with something that parses the guild bases in
+		ClaimGuildCastle.}
+		//tg.Agit := tm.Name;
 
-        for l := 0 to CharaName.Count - 1 do begin
-                tc1 := CharaName.Objects[l] as TChara;
-                if (tc1.Map = tm.Name) and (tc1.Login = 2) and ((tc1.GuildID = 0) or (tc1.GuildID <> tc.GuildID))then begin
-                        SendCLeave(tc1, 2);
-                        tc1.tmpMap := tc1.SaveMap;
-                        tc1.Map := tc1.SaveMap;
-                        tc1.Point := tc1.SavePoint;
-                        MapMove(tc1.Socket, tc1.Map, tc1.Point);
-                end;
-        end;
-end;
+		ClaimGuildCastle(tc.GuildID,ts.Map);
+		EnableGuildKafra(ts.Map,'Kafra Service',0);
+
+		for l := 0 to CharaName.Count - 1 do begin
+			tc1 := CharaName.Objects[l] as TChara;
+			if (tc1.Map = tm.Name) AND (tc1.Login = 2) AND
+			   ((tc1.GuildID = 0) OR (tc1.GuildID <> tc.GuildID))then begin
+				SendCLeave(tc1, 2);
+				tc1.tmpMap := tc1.SaveMap;
+				tc1.Map := tc1.SaveMap;
+				tc1.Point := tc1.SavePoint;
+				MapMove(tc1.Socket, tc1.Map, tc1.Point);
+			end;
+		end;
+	end;
 
 
+	if (ts.NPCID > 0) then begin
+		tn := tm.NPC.IndexOfObject(ts.NPCID) as TNPC;
+		tc1 := TChara.Create;
+		tc1.TalkNPCID := 0;
+		tc1.ScriptStep := tn.ScriptInitMS;
+		tc1.AMode := 3;
+		tc1.AData := tn;
+		tc1.Login := 0;
+		NPCScript(tc1,0,1);
+		tc1.Free;
+		ts.NPCID := 0;
+	end;
 
-                if (ts.NPCID <> 0) then begin
-                        tn := tm.NPC.IndexOfObject(ts.NPCID) as TNPC;
-                        tc1 := TChara.Create;
-                        tc1.TalkNPCID := 0;
-                        tc1.ScriptStep := tn.ScriptInitMS;
-                        tc1.AMode := 3;
-                        tc1.AData := tn;
-                        tc1.Login := 0;
-                        NPCScript(tc1,0,1);
-                        tc1.Free;
-                        ts.NPCID := 0;
-                end;
-
-                ts.LeaderID := 0;
+	ts.LeaderID := 0;
 
 	tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(n);
 
@@ -1661,13 +1660,13 @@ end;
 					tc1.AMode := 0;
 					tc1.ATarget := 0;
 				end;
-				if (tc1.MMode <> 0) and (tc1.MTarget = ts.ID) then begin
-						tc1.MMode := 0;
-						tc1.MTarget := 0;
+				if (tc1.MMode > 0) and (tc1.MTarget = ts.ID) then begin
+					tc1.MMode := 0;
+					tc1.MTarget := 0;
 				end;
-			end;
-		end;
-	end;
+			end;//for k1
+		end;//for i1
+	end;//for j1
 
 	//経験値分配処理
 	n := 32;
@@ -1687,7 +1686,7 @@ end;
 
 	mvpid := -1;
 
-	if ts.Data.MEXP <> 0 then begin
+	if ts.Data.MEXP > 0 then begin
 		mvpcheck := 0;
 		for i := 0 to 31 do begin
 			if ts.MVPDist[i].CData = nil then break;
@@ -1709,7 +1708,7 @@ end;
 			SendBCmd(tm, tc1.Point, 6);
 			//MVPチェック
 			mvpitem := false;
-                        GetMVPItem(tc1, ts, mvpitem);
+			GetMVPItem(tc1, ts, mvpitem);
 			{if ts.Data.MEXPPer <= Random(10000) then begin
 				for i := 0 to 2 do begin
 					if ts.Data.MVPItem[i].Per > cardinal(Random(10000)) then begin
@@ -1774,15 +1773,15 @@ end;
 		if n <> 1 then Inc(l);
 		if i = mvpid then l := l + ts.Data.MEXP; //MVP
 		l := l * BaseExpMultiplier;
-                if tc.Skill[307].Tick > Tick then l := l * cardinal(tc.Skill[307].Effect1 div 100);
+		if tc.Skill[307].Tick > Tick then l := l * cardinal(tc.Skill[307].Effect1 div 100);
 		//ジョブ経験値
-               
-                w := ts.Data.JEXP * (cardinal(ts.EXPDist[i].Dmg) div total);
+
+		w := ts.Data.JEXP * (cardinal(ts.EXPDist[i].Dmg) div total);
 
 		if n <> 1 then Inc(w);
 		if i = mvpid then w := w + ts.Data.MEXP; //MVP
-                w := w * JobExpMultiplier;
-                if tc.Skill[307].Tick > Tick then w := w * cardinal(tc.Skill[307].Effect1 div 100);
+		w := w * JobExpMultiplier;
+		if tc.Skill[307].Tick > Tick then w := w * cardinal(tc.Skill[307].Effect1 div 100);
 
 		j := GuildList.IndexOf(tc.GuildID);
 		if (j <> -1) then begin
@@ -1808,7 +1807,7 @@ end;
 					tpaDB.AddObject(tpa.Name,tpa);
 				 end;
 			end else begin
-			 	CalcLvUP(tc1,l,w);
+				CalcLvUP(tc1,l,w);
 			end;
 		end else begin
 				CalcLvUP(tc1,l,w);
@@ -1819,64 +1818,64 @@ end;
 		tpa := tpaDB.Objects[i] as TParty;
 		PartyDistribution(ts.Map,tpa);
 	end;
-	tpaDB.Free;
+	tpaDB.Free;//safe 2004/04/27
 
 	//アイテムドロップ
 
-  if (ts.isSlave = false) then begin
-	for k := 0 to 7 do begin
-		DropFlag := false;
+	if (ts.isSlave = false) then begin
+		for k := 0 to 7 do begin
+			DropFlag := false;
 
-{Colus, 20031222: Added ItemDropMultiplier to the calc.  It modifies IDD.}
-    j := ItemDropDenominator div ItemDropMultiplier;
-		i := (j - (j - ts.Data.Drop[k].Per) * 10000 div ItemDropPer);
-		if ItemDropType then begin
-			if Random(j) <= i then DropFlag := true; //重力仕様。リンゴを落とす。
-		end else begin
-			if Random(j) < i then DropFlag := true; //本来の(?)仕様。リンゴは落とさない。
-		end;
-		if DropFlag then begin
-			tn := TNPC.Create;
-			tn.ID := NowItemID;
-			Inc(NowItemID);
-			tn.Name := 'item';
-			tn.JID := ts.Data.Drop[k].ID;
-			tn.Map := ts.Map;
-			tn.Point.X := ts.Point.X - 1 + Random(3);
-			tn.Point.Y := ts.Point.Y - 1 + Random(3);
-			tn.CType := 3;
-                        tn.Enable := true;
-			tn.Item := TItem.Create;
-			tn.Item.ID := ts.Data.Drop[k].ID;
-			tn.Item.Amount := 1;
-			tn.Item.Identify := 1 - byte(ts.Data.Drop[k].Data.IEquip);
-			tn.Item.Refine := 0;
-			tn.Item.Attr := 0;
-			tn.Item.Card[0] := 0;
-			tn.Item.Card[1] := 0;
-			tn.Item.Card[2] := 0;
-			tn.Item.Card[3] := 0;
-			tn.Item.Data := ts.Data.Drop[k].Data;
-			tn.SubX := Random(8);
-			tn.SubY := Random(8);
-			tn.Tick := Tick + 60000;
-			tm.NPC.AddObject(tn.ID, tn);
-			tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+			{Colus, 20031222: Added ItemDropMultiplier to the calc.  It modifies IDD.}
+			j := ItemDropDenominator div ItemDropMultiplier;
+			i := (j - (j - ts.Data.Drop[k].Per) * 10000 div ItemDropPer);
+			if ItemDropType then begin
+				if Random(j) <= i then DropFlag := true; //重力仕様。リンゴを落とす。
+			end else begin
+				if Random(j) < i then DropFlag := true; //本来の(?)仕様。リンゴは落とさない。
+			end;
+			if DropFlag then begin
+				tn := TNPC.Create;
+				tn.ID := NowItemID;
+				Inc(NowItemID);
+				tn.Name := 'item';
+				tn.JID := ts.Data.Drop[k].ID;
+				tn.Map := ts.Map;
+				tn.Point.X := ts.Point.X - 1 + Random(3);
+				tn.Point.Y := ts.Point.Y - 1 + Random(3);
+				tn.CType := 3;
+				tn.Enable := true;
+				tn.Item := TItem.Create;
+				tn.Item.ID := ts.Data.Drop[k].ID;
+				tn.Item.Amount := 1;
+				tn.Item.Identify := 1 - byte(ts.Data.Drop[k].Data.IEquip);
+				tn.Item.Refine := 0;
+				tn.Item.Attr := 0;
+				tn.Item.Card[0] := 0;
+				tn.Item.Card[1] := 0;
+				tn.Item.Card[2] := 0;
+				tn.Item.Card[3] := 0;
+				tn.Item.Data := ts.Data.Drop[k].Data;
+				tn.SubX := Random(8);
+				tn.SubY := Random(8);
+				tn.Tick := Tick + 60000;
+				tm.NPC.AddObject(tn.ID, tn);
+				tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-			//周りに通知
-			WFIFOW( 0, $009e);
-			WFIFOL( 2, tn.ID);
-			WFIFOW( 6, tn.JID);
-			WFIFOB( 8, tn.Item.Identify);
-			WFIFOW( 9, tn.Point.X);
-			WFIFOW(11, tn.Point.Y);
-			WFIFOB(13, tn.SubX);
-			WFIFOB(14, tn.SubY);
-			WFIFOW(15, tn.Item.Amount);
-			SendBCmd(tm, tn.Point, 17);
+				//周りに通知
+				WFIFOW( 0, $009e);
+				WFIFOL( 2, tn.ID);
+				WFIFOW( 6, tn.JID);
+				WFIFOB( 8, tn.Item.Identify);
+				WFIFOW( 9, tn.Point.X);
+				WFIFOW(11, tn.Point.Y);
+				WFIFOB(13, tn.SubX);
+				WFIFOB(14, tn.SubY);
+				WFIFOW(15, tn.Item.Amount);
+				SendBCmd(tm, tn.Point, 17);
+			end;
 		end;
 	end;
-  end;
 	//溜め込んだアイテム
 	for k := 1 to 10 do begin
 		if ts.Item[k].Amount = 0 then Break;
@@ -1917,7 +1916,7 @@ end;
 		ts.Item[k].Card[1] := 0;
 		ts.Item[k].Card[2] := 0;
 		ts.Item[k].Card[3] := 0;
-                ts.Item[k].Data := nil;
+		ts.Item[k].Data := nil;
 
 		//周りに通知
 		WFIFOW( 0, $009e);
@@ -1938,7 +1937,7 @@ end;
 		if i = -1 then Exit;
 		tm.Mob.Delete(i);
 
-		if (ts.Event <> 0) then begin
+		if (ts.Event > 0) then begin
 			tn := tm.NPC.IndexOfObject(ts.Event) as TNPC;
 			tc1 := TChara.Create;
 			tc1.TalkNPCID := tn.ID;
@@ -1949,11 +1948,10 @@ end;
 			NPCScript(tc1,0,1);
 			tc1.Free;
 		end;
-
 		ts.Free;
 	end;
 
-end;
+end;//proc TFrmMain.MonsterDie()
 //------------------------------------------------------------------------------
 
 // 対モンスター状態変化計算
@@ -2067,8 +2065,8 @@ begin
 		miss := boolean((Random(100) >= i) and (not crit));
 		//DAチェック
 		if (miss = false) and (Arms = 0) and (SkillPer = 0) and (Random(100) < DAPer) then begin
-			if Skill[263].Lv <> 0 then tatk := true;
-			if Skill[48].Lv <> 0 then datk := true;
+			if Skill[263].Lv > 0 then tatk := true;
+			if Skill[48].Lv > 0 then datk := true;
 			crit := false;
 												if tatk = true then datk := false;
 												 //if tatk = true then tc.ATick := timeGetTime() + Delay;
@@ -2102,7 +2100,7 @@ begin
 						3: dmg[1] := Param[4] * 140 div 100;
 						4: dmg[1] := Param[4] * 160 div 100;
 						else dmg[1] := Param[4];
-					end;
+					end;//case
           // Colus, 20040226: I *think* we apply Maximize Power here.
           // Of course this is bow code and probably will never be called normally.
           // Leaving this as a TODO.
@@ -2128,7 +2126,7 @@ begin
 						3: dmg[1] := Param[4] * 140 div 100;
 						4: dmg[1] := Param[4] * 160 div 100;
 						else dmg[1] := Param[4];
-					end;
+					end;//case
 
 					dmg[2] := ATK[Arms][1];
           // Colus, 20040226: I *think* we apply Maximize Power here.
@@ -2271,7 +2269,6 @@ begin
                       ts.ATarget := ID;
 				              ts.AData := tc;
 				              ts.isLooting := False;
-                    
 				              ts.ATick := Tick + aMotion;
                     end;
 
@@ -2295,7 +2292,7 @@ begin
                         begin
                           m := 1;
                         end;
-                    end;
+				end;//case
 
                     if (j > m) then j := m;
                     tc.MSkill := i;
@@ -2973,11 +2970,9 @@ var
 	{Random Variables}
 	i  : Integer;
 	j  : Integer;
-	b  : Integer;
 	w  : Cardinal;
 	xy : TPoint;
 	tg : TGuild;
-	bb : array of byte;
 begin
 	Result := False; //Assume false
 
@@ -4152,7 +4147,7 @@ begin
 				end;
 			end;
 		end;
-		if sl.Count <> 0 then begin
+		if sl.Count > 0 then begin
 			for k1 := 0 to sl.Count -1 do begin
 				ts1 := sl.Objects[k1] as TMob;
 				DamageCalc1(tm, tc, ts1, Tick);
@@ -4188,8 +4183,10 @@ begin
 				StatCalc1(tc, ts1, Tick);
 			end;
 		end;
+		{ChrstphrR 2004/04/26 - TSL not freed after creation}
+		sl.Free;
 	end;
-end;
+end;//proc TfrmMain.CharaSplash()
 //------------------------------------------------------------------------------
 procedure TfrmMain.CharaSplash2(tc:TChara;Tick:cardinal);
 var
