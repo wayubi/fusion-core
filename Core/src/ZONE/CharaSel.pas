@@ -17,7 +17,7 @@ uses
     {Shared}
     SysUtils,
     {Fusion}
-    Common, SQLData, FusionSQL;
+    Common, SQLData, FusionSQL, Database;
 
 //==============================================================================
 // 関数定義
@@ -401,73 +401,81 @@ begin
 				end;
 				Socket.SendBuf(buf, 108);
 			end;
-		$0068: //キャラ削除要求
-			begin
-				if Socket.Data = nil then exit;
-				tp := Socket.Data;
+		$0068: { Request to Delete Character }
+            begin
+                if Socket.Data = nil then exit;
+                tp := Socket.Data;
 
-				RFIFOL(2, l);
-				str1 := RFIFOS(6, 40);
-				if str1 = tp.Mail then begin
-					i := Chara.IndexOf(l);
-					if (i <> -1) then begin
-						//削除。
-						tc := Chara.Objects[i] as TChara;
-						for k := 0 to 4 do begin
-							if tp.CData[k] = tc then begin
-								tp.CName[k] := '';
-								tp.CData[k] := nil;
-								break;
-							end;
-						end;
-            { Mitch 02-06-2004: Fix character delete/blank char in guild bug }
-            if (tc.GuildID <> 0) then begin
-              j := GuildList.IndexOf(tc.GuildID);
-              if (j <> -1) then begin
-                tg := GuildList.Objects[j] as TGuild;
-                if (tg.MasterName <> tc.Name) then begin
-                  for k := tc.GuildPos to 35 do begin
-						        tg.MemberID[k] := tg.MemberID[k + 1];
-						        tg.Member[k] := tg.Member[k + 1];
-						        tg.MemberPos[k] := tg.MemberPos[k + 1];
-						        tg.MemberEXP[k] := tg.MemberEXP[k + 1];
-                  end;
-                end else begin
-                  //Lets delete all the members.
-                  for k := 0 to 35 do begin
-                    if tg.MemberID[k] <> 0 then begin
-                      m := Chara.IndexOf(tg.MemberID[k]);
-                      if m <> -1 then begin
-                        tc1 := Chara.Objects[m] as TChara;
-                        tc1.GuildID := 0;
-                        tc1.GuildPos := 0;
-                        tc1.GuildName := '';
-                        tc1.Classname := '';
-                      end;
+                RFIFOL(2, l);
+                str1 := RFIFOS(6, 40);
+                if str1 = tp.Mail then begin
+                    i := Chara.IndexOf(l);
+                    if (i <> -1) then begin
+                        tc := Chara.Objects[i] as TChara;
+
+                        { Alex: this 4 needs to be changed to 8 when 9 Character
+                          Slots become available. }
+                        for k := 0 to 4 do begin
+                            if tp.CData[k] = tc then begin
+                                tp.CName[k] := '';
+                                tp.CData[k] := nil;
+                                break;
+                            end;
+                        end;
+
+                        { Mitch 02-06-2004: Fix character delete/blank char in guild bug }
+                        if (tc.GuildID <> 0) then begin
+                            j := GuildList.IndexOf(tc.GuildID);
+                            if (j <> -1) then begin
+                                tg := GuildList.Objects[j] as TGuild;
+                                if (tg.MasterName <> tc.Name) then begin
+                                    for k := tc.GuildPos to 35 do begin
+                                        tg.MemberID[k] := tg.MemberID[k + 1];
+                                        tg.Member[k] := tg.Member[k + 1];
+                                        tg.MemberPos[k] := tg.MemberPos[k + 1];
+                                        tg.MemberEXP[k] := tg.MemberEXP[k + 1];
+                                    end;
+                                end else begin
+                                    //Lets delete all the members.
+                                    for k := 0 to 35 do begin
+                                        if tg.MemberID[k] <> 0 then begin
+                                            m := Chara.IndexOf(tg.MemberID[k]);
+                                            if m <> -1 then begin
+                                                tc1 := Chara.Objects[m] as TChara;
+                                                tc1.GuildID := 0;
+                                                tc1.GuildPos := 0;
+                                                tc1.GuildName := '';
+                                                tc1.Classname := '';
+                                            end;
+                                        end;
+                                    end;
+                                    GuildList.Delete(j);
+                                end;
+                            end;
+                        end;
+
+                        if UseSQL then DeleteChar(tc.CID);
+
+                        CharaName.Delete(CharaName.IndexOf(tc.Name));
+                        Chara.Delete(i);
+
+                        DataSave(false);
+
+                        tc.Free;
+                        WFIFOW(0, $006f);
+                        Socket.SendBuf(buf, 2);
+                    end else begin
+                        { Deletion was rejected. Character not found. }
+                        WFIFOW(0, $0070);
+                        WFIFOB(2, 1);
+                        Socket.SendBuf(buf, 3);
                     end;
-                  end;
-                  GuildList.Delete(j);
-                end;
-              end;
-            end;
-						if UseSQL then
-						  DeleteChar(tc.CID);
-						CharaName.Delete(i);
-						Chara.Delete(i);
-						tc.Free;
-						WFIFOW(0, $006f);
-						Socket.SendBuf(buf, 2);
-					end else begin
-						//削除するキャラが見つからない(削除拒否を返す)
-						WFIFOW(0, $0070);
-						WFIFOB(2, 1);
-						Socket.SendBuf(buf, 3);
-					end;
-				end else begin
-					//メールアドレスが違う
-					WFIFOW(0, $0070);
-					WFIFOB(2, 0);
-					Socket.SendBuf(buf, 3);
+
+                end else begin
+					{ Deletion was rejected. Incorrect Email address. }
+                    WFIFOW(0, $0070);
+                    WFIFOB(2, 0);
+                    Socket.SendBuf(buf, 3);
 				end;
 			end;
 		end;
