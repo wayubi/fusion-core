@@ -1355,11 +1355,13 @@ end;
 											CalcStat(tc);
                       SendCStat(tc, true); // Add the true to recalc sprites
 											SendCSkillList(tc);
-											WFIFOW(0, $00c3);
+                      // Colus, 20040303: Using newer packet to allow upper job changes
+											WFIFOW(0, $01d7);
 											WFIFOL(2, tc.ID);
 						        	WFIFOB(6, 0);
-											WFIFOB(7, i);
-											SendBCmd(tm, tc.Point, 8);
+											WFIFOW(7, i);
+                      WFIFOW(9, 0);
+											SendBCmd(tm, tc.Point, 11);
 										end;
 																								end;
 {èCê≥ÉRÉRÇ‹Ç≈}

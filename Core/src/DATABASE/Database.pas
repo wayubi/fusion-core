@@ -292,14 +292,16 @@ begin
             Job := Job or Int64(jf[14]) * $004000;  //Crusader 
             Job := Job or Int64(jf[15]) * $008000;  //Monk 
             Job := Job or Int64(jf[16]) * $010000;  //Sage 
-            Job := Job or Int64(jf[17]) * $020000;  //Rouge
+            Job := Job or Int64(jf[17]) * $020000;  //Rogue
             Job := Job or Int64(jf[18]) * $040000;  //Alchemist
             Job := Job or Int64(jf[19]) * $080000;  //Bard 
             Job := Job or Int64(jf[20]) * $100000;  //Dancer 
 
+            // $200000: Groom, $400000: Bride...
             //Crusader Same as a swordsman and knight
-
             if Boolean(Job and $0002) or Boolean(Job and $0080) then Job := Job or $4000;
+
+            // Super Novices get all Novice equipments.
             if Boolean(Job and $0001) then Job := Job or $800000;
 
             //Monk 
