@@ -73,9 +73,10 @@ type TItemDB = class
 	//Rare      :boolean;
 	//Box       :byte;
 {ïœçX}
-	DamageFixR :array[0..9] of Word; // Race mod
-	DamageFixE :array[0..9] of Word; // Element mod
-	DamageFixS :array[0..2] of Word; // Size mod
+  // Colus, 20040130: Changing these to smallints for resistance purposes
+	DamageFixR :array[0..9] of SmallInt; // Race mod
+	DamageFixE :array[0..9] of SmallInt; // Element mod
+	DamageFixS :array[0..2] of SmallInt; // Size mod
 	SFixPer1   :array[0..5] of Word; // Option 1 mod
 	SFixPer2   :array[0..4] of Word; // Option 2 mod
 	DrainFix   :array[0..1] of Word; // Drain amount

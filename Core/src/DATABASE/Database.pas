@@ -343,6 +343,7 @@ begin
 				DamageFixR[i] := 0;
 				DamageFixE[i] := 0;
 			end;
+      //if ID > 4000 then DebugOut.Lines.Add(Format('ID = %d', [ID]));
 			DamageFixR[StrToInt(sl.Strings[36])] := StrToInt(sl.Strings[37]);
 			DamageFixE[StrToInt(sl.Strings[38])] := StrToInt(sl.Strings[39]);
 			i := StrToInt(sl.Strings[40]);

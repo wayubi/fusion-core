@@ -2167,6 +2167,7 @@ begin
     // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
     //        20040129: Couldn't do it this way.  Must change the card data instead...
 		dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][ts.Data.Race]) div 100;
+		dmg[0] := dmg[0] * (100 - tc.DamageFixE[1][0]) div 100;    
 
     // Determine element based on status/armor type...
 
@@ -8923,7 +8924,9 @@ begin
 						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
 						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
 						if dmg[0] < 1 then dmg[0] := 1;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
+            // Colus, 20040130: Add effect of garment cards
+            dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
 						dmg[0] := dmg[0] * tl.Data2[MUseLV];
 						if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
 
@@ -8946,7 +8949,9 @@ begin
 						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
 						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
 						if dmg[0] < 1 then dmg[0] := 1;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
+            // Colus, 20040130: Add effect of garment cards
+            dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
 						if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
 						//ƒpƒP‘—M
             if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;            
@@ -9015,7 +9020,9 @@ begin
 								dmg[0] := dmg[0] * (100 - tc2.MDEF1) div 100; //MDEF%
 								dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 								if dmg[0] < 1 then dmg[0] := 1;
-								dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+								dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
+                // Colus, 20040130: Add effect of garment cards
+                dmg[0] := dmg[0] * (100 - tc2.DamageFixE[1][tl.Element]) div 100;
 								dmg[0] := dmg[0] * tl.Data2[MUseLV];
 								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                 if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
@@ -9130,7 +9137,9 @@ begin
 					begin
 						DamageCalc3(tm, tc, tc1, Tick, 0, 100, tl.Element);
 						dmg[0] := dmg[0] + 15 * MUseLV;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
+            // Colus, 20040130: Add effect of garment cards
+            dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
 						if dmg[0] < 0 then dmg[0] := 0; //‘®«UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 						k1 := (BaseLV * 2 + MUseLV * 3 + 10) - (tc1.BaseLV * 2 + tc1.Param[2]);
@@ -9428,6 +9437,8 @@ begin
 						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
 						if dmg[0] < 1 then dmg[0] := 1;
 						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
+            // Colus, 20040130: Add effect of garment cards
+            dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
 						dmg[0] := dmg[0] * tl.Data2[MUseLV];
 						if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
             if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
@@ -9479,10 +9490,12 @@ begin
 								dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 								if dmg[0] < 1 then dmg[0] := 1;
 								dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
+                // Colus, 20040130: Add effect of garment cards
+                dmg[0] := dmg[0] * (100 - tc2.DamageFixE[1][tl.Element]) div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                 if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], 1 , 5);
-                // Colus: What the hell is this?  1 <>1?
+                // Colus: What the hell is this?  1 <> 1?
                 if (1 <> 1) and (dmg[0] <> 0)then begin
                   if Random(1000) < tl.Data1[MUseLV] * 10 then begin
 								    //tc2.Stat1 := 2;
