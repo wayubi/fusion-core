@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 314
-  Top = 155
+  Left = 203
+  Top = 115
   Width = 408
   Height = 535
   Caption = 's'
@@ -1368,7 +1368,7 @@ object frmMain: TfrmMain
             Top = 200
             Width = 369
             Height = 26
-            TabOrder = 4
+            TabOrder = 5
             OnKeyPress = Edit8KeyPress
           end
           object Button19: TButton
@@ -1377,7 +1377,7 @@ object frmMain: TfrmMain
             Width = 105
             Height = 17
             Caption = 'Send'
-            TabOrder = 5
+            TabOrder = 6
             Visible = False
             OnClick = Button19Click
           end
@@ -1396,7 +1396,7 @@ object frmMain: TfrmMain
             Width = 97
             Height = 25
             Caption = 'Rescue'
-            TabOrder = 6
+            TabOrder = 4
             OnClick = Button21Click
           end
         end
@@ -1886,7 +1886,7 @@ object frmMain: TfrmMain
             Width = 73
             Height = 25
             Caption = 'Save'
-            TabOrder = 30
+            TabOrder = 39
             OnClick = Button16Click
           end
           object Edit67: TEdit
@@ -1894,42 +1894,42 @@ object frmMain: TfrmMain
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 24
+            TabOrder = 27
           end
           object Edit66: TEdit
             Left = 256
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 25
+            TabOrder = 28
           end
           object Edit65: TEdit
             Left = 312
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 26
+            TabOrder = 29
           end
           object Edit64: TEdit
             Left = 256
             Top = 294
             Width = 49
             Height = 26
-            TabOrder = 28
+            TabOrder = 34
           end
           object Edit63: TEdit
             Left = 200
             Top = 296
             Width = 49
             Height = 26
-            TabOrder = 27
+            TabOrder = 33
           end
           object Edit61: TEdit
             Left = 312
             Top = 294
             Width = 49
             Height = 26
-            TabOrder = 29
+            TabOrder = 35
           end
           object Edit59: TEdit
             Left = 144
@@ -1971,63 +1971,63 @@ object frmMain: TfrmMain
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 31
+            TabOrder = 26
           end
           object Edit62: TEdit
             Left = 88
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 32
+            TabOrder = 25
           end
           object Edit68: TEdit
             Left = 16
             Top = 256
             Width = 65
             Height = 26
-            TabOrder = 33
+            TabOrder = 24
           end
           object Edit69: TEdit
             Left = 16
             Top = 296
             Width = 65
             Height = 26
-            TabOrder = 34
+            TabOrder = 30
           end
           object Edit70: TEdit
             Left = 88
             Top = 296
             Width = 49
             Height = 26
-            TabOrder = 35
+            TabOrder = 31
           end
           object Edit71: TEdit
             Left = 144
             Top = 296
             Width = 49
             Height = 26
-            TabOrder = 36
+            TabOrder = 32
           end
           object Edit72: TEdit
             Left = 144
             Top = 336
             Width = 49
             Height = 26
-            TabOrder = 37
+            TabOrder = 38
           end
           object Edit73: TEdit
             Left = 88
             Top = 336
             Width = 49
             Height = 26
-            TabOrder = 38
+            TabOrder = 37
           end
           object Edit74: TEdit
             Left = 16
             Top = 336
             Width = 65
             Height = 26
-            TabOrder = 39
+            TabOrder = 36
           end
         end
         object TabSheet14: TTabSheet

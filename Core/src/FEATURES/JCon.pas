@@ -485,6 +485,15 @@ uses
         frmMain.Label98.Caption := IntToStr(CharacterItem.HP);
         frmMain.Label99.Caption := IntToStr(CharacterItem.SP);
         frmMain.Label102.Caption := CharacterItem.PData.Name;
+        frmMain.Edit68.Text := CharacterItem.MemoMap[0];
+        frmMain.Edit62.Text := IntToStr(CharacterItem.MemoPoint[0].X);
+        frmMain.Edit60.Text := IntToStr(CharacterItem.MemoPoint[0].Y);
+        frmMain.Edit69.Text := CharacterItem.MemoMap[1];
+        frmMain.Edit70.Text := IntToStr(CharacterItem.MemoPoint[1].X);
+        frmMain.Edit71.Text := IntToStr(CharacterItem.MemoPoint[1].Y);
+        frmMain.Edit74.Text := CharacterItem.MemoMap[2];
+        frmMain.Edit73.Text := IntToStr(CharacterItem.MemoPoint[2].X);
+        frmMain.Edit72.Text := IntToStr(CharacterItem.MemoPoint[2].Y);
         if CharacterItem.GuildID <> 0 then frmMain.Label105.Caption := CharacterItem.GuildName;
         if CharacterItem.PartyID <> 0 then frmMain.Label103.Caption := CharacterItem.PartyName;
 
@@ -536,6 +545,15 @@ uses
         CharacterItem.SaveMap := frmMain.Edit49.Text;
         CharacterItem.SavePoint.X := StrToInt(frmMain.Edit50.Text);
         CharacterItem.SavePoint.X := StrToInt(frmMain.Edit51.Text);
+        CharacterItem.MemoMap[0] :=  frmMain.Edit68.Text;
+        CharacterItem.MemoPoint[0].X := StrToInt(frmMain.Edit62.Text);
+        CharacterItem.MemoPoint[0].Y := StrToInt(frmMain.Edit63.Text);
+        CharacterItem.MemoMap[1] := frmMain.Edit69.Text;
+        CharacterItem.MemoPoint[1].X := StrToInt(frmMain.Edit70.Text);
+        CharacterItem.MemoPoint[1].Y := StrToInt(frmMain.Edit71.Text);
+        CharacterItem.MemoMap[2] := frmMain.Edit74.Text;
+        CharacterItem.MemoPoint[2].X := StrToInt(frmMain.Edit73.Text);
+        CharacterItem.MemoPoint[2].Y := StrToInt(frmMain.Edit72.Text);
 
         DataSave(true);
         JCon_Characters_Load();
