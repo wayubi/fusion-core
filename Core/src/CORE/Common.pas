@@ -2527,6 +2527,11 @@ begin
            //     if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
 
     end;
+
+    if (Skill[107].Lv <> 0) then begin
+        tc.HIT := tc.HIT + (skill[107].Lv * 2);
+    end;
+
     if (Skill[248].Lv <> 0) then begin
     tl := Skill[248].Data;
     if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
