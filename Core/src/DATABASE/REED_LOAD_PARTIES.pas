@@ -115,7 +115,7 @@ implementation
         end;
 
         for i := 0 to retrieve_length(path) do begin
-            j := retrieve_value(path, 0, 0);
+            j := retrieve_value(path, i, 0);
 
             if Chara.IndexOf(j) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(j)] as TChara;

@@ -72,7 +72,6 @@ uses
     procedure PD_Delete_Guilds(tg : TGuild);
 
     { Guild Data - Member Data }
-    procedure PD_Load_Guilds_Members(UID : String = '*');
     procedure PD_Save_Guilds_Members(forced : Boolean = False);
 
     { Guild Data - Position Data }
@@ -136,7 +135,6 @@ uses
         PD_Load_Guilds_Pre_Parse(UID);
 
 
-        PD_Load_Guilds_Members(UID);
         PD_Load_Guilds_Positions(UID);
         PD_Load_Guilds_Skills(UID);
         PD_Load_Guilds_BanList(UID);
@@ -1290,150 +1288,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Member Data ---------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_Members(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        tp : TPlayer;
-        tg : TGuild;
-        i, j : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds\');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Members.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Members.txt');
-                    sl.delimiter := ':';
-
-                    // Delete empty guilds.
-                    if (datafile.Count < 3) then begin
-                    	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\BanList.txt');
-                        DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Diplomacy.txt');
-                        DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Guild.txt');
-                        DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Members.txt');
-                        DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Positions.txt');
-                        DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Skills.txt');
-                    	RmDir(AppPath + 'gamedata\Guilds\' + searchResult.Name);
-                        Continue;
-                    end;
-                    // Delete empty guilds.
-
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-                            if tp.CData[i] = nil then Continue;
-
-                            for j := 0 to datafile.Count - 3 do begin
-                            	sl.DelimitedText := datafile[j+2];
-                                if StrToInt(sl.Strings[0]) = tp.CData[i].CID then begin
-                                	if GuildList.IndexOf(tp.CData[i].GuildID) = -1 then Continue;
-                                    tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-                                    Break;
-                                end;
-                            end;
-
-                            if assigned(tg) then Break;
-                        end;
-
-                        if tg = nil then Continue;
-
-                    end else begin
-                        for i := 0 to GuildList.Count - 1 do begin
-                            tg := GuildList.Objects[i] as TGuild;
-                            if tg.ID = StrToInt(searchResult.Name) then Break;
-                        end;
-                    end;
-
-                    if not assigned(tg) then Continue;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                        if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
-                    	if tg.MemberID[i] <> 0 then begin
-                        	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 0 to tg.RegUsers - 1 do begin
-                    	j := Chara.IndexOf(tg.MemberID[i]);
-                        if j <> -1 then begin
-	                    	tc := Chara.Objects[j] as TChara;
-    	                    tc.GuildName := '';
-        	                tc.GuildID := 0;
-            	            tc.ClassName := '';
-                	        tc.GuildPos := 0;
-                    	    tg.Member[i] := nil;
-                        	if (i = 0) then tg.MasterName := '';
-	                        tg.SLV := 0;
-                        end;
-                    end;
-
-                    tg.RegUsers := 0;
-                    for i := 0 to datafile.Count - 3 do begin
-                    	sl.delimiter := ':';
-                        sl.delimitedtext := datafile[i+2];
-
-                        tg.MemberID[i] := StrToInt(sl.Strings[0]);
-                        tg.MemberPos[i] := StrToInt(sl.Strings[1]);
-                        tg.MemberEXP[i] := StrToInt(sl.Strings[2]);
-                        if (tg.MemberID[i] <> 0) then Inc(tg.RegUsers, 1);
-                    end;
-
-                    //for i := 0 to (tg.RegUsers + 2) - datafile.Count do begin
-                    for i := 0 to tg.RegUsers - 1 do begin
-                    	j := Chara.IndexOf(tg.MemberID[i]);
-                        if j <> -1 then begin
-                        	tc := Chara.Objects[j] as TChara;
-    	                    tc.GuildName := tg.Name;
-        	                tc.GuildID := tg.ID;
-            	            tc.ClassName := tg.PosName[tg.MemberPos[i]];
-                	        tc.GuildPos := i;
-                    	    tg.Member[i] := tc;
-                        	if (i = 0) then tg.MasterName := tc.Name;
-                        	tg.SLV := tg.SLV + tc.BaseLV;
-                        end;
-                    end;
-
-                    //debugout.Lines.Add(tg.Name + ' guild member data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild member data could not be loaded.');
-                end;
-            end else if (searchResult.Name <> '.') and (searchResult.Name <> '..') then begin
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\BanList.txt');
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Diplomacy.txt');
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Guild.txt');
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Members.txt');
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Positions.txt');
-            	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Skills.txt');
-                	RmDir(AppPath + 'gamedata\Guilds\' + searchResult.Name);
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Guilds_Members(forced : Boolean = False);
     var
     	datafile : TStringList;

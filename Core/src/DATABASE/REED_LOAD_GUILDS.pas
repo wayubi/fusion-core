@@ -10,6 +10,7 @@ uses
     procedure PD_Load_Guilds_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
 
     procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
 
     function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
@@ -72,6 +73,9 @@ implementation
             pfile := 'Guild.txt';
             PD_Load_Guilds_Settings(tg, path + pfile);
 
+            pfile := 'Members.txt';
+            PD_Load_Guilds_Members(tg, path + pfile);
+
 
             NowGuildID := (tg.ID + 1);
 
@@ -104,6 +108,57 @@ implementation
         tg.Present := retrieve_data(9, path, 1);
         tg.DisposFV := retrieve_data(10, path, 1);
         tg.DisposRW := retrieve_data(11, path, 1);
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Settings ---------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
+    var
+        i : Integer;
+        tc : TChara;
+    begin
+
+        { -- Clear Member List -- }
+        for i := 0 to tg.RegUsers - 1 do begin
+            if Chara.IndexOf(tg.MemberID[i]) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
+
+            tc.GuildName := '';
+            tc.GuildID := 0;
+            tc.ClassName := '';
+            tc.GuildPos := 0;
+
+            if (i = 0) then tg.MasterName := '';
+            tg.Member[i] := nil;
+            tg.SLV := 0;
+        end;
+        tg.RegUsers := 0;
+        { -- Clear Member List -- }
+
+        { -- Assign Members -- }
+        for i := 0 to retrieve_length(path) do begin
+            tg.MemberID[i] := retrieve_value(path, i, 0);
+            tg.MemberPos[i] := retrieve_value(path, i, 1);
+            tg.MemberEXP[i] := retrieve_value(path, i, 2);
+            if ((tg.MemberID[i]) <> 0) then Inc(tg.RegUsers, 1);
+
+            if Chara.IndexOf(tg.MemberID[i]) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
+
+            tc.GuildName := tg.Name;
+            tc.GuildID := tg.ID;
+            tc.ClassName := tg.PosName[tg.MemberPos[i]];
+            tc.GuildPos := i;
+
+            if (i = 0) then tg.MasterName := tc.Name;
+            tg.Member[i] := tc;
+            tg.SLV := tg.SLV + tc.BaseLV;
+        end;
+        { -- Assign Members -- }
+
     end;
     { ------------------------------------------------------------------------------------- }
 
