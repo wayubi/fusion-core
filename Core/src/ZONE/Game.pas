@@ -1174,6 +1174,16 @@ end;
 						    WFIFOW( 6, 100);
 						    SendBCmd(tm, tc1.Point, 8);
               end;
+
+              str := tc.Name + ' revived ' + tc1.Name + '!';
+              w := Length(str) + 4;
+              WFIFOW (0, $009a);
+              WFIFOW (2, w);
+              WFIFOS (4, str, w - 4);
+              tc.socket.sendbuf(buf, w);
+              if tc1.Login = 2 then begin
+                tc1.Socket.SendBuf(buf, w);
+              end;
             finally
 
             end;
