@@ -541,9 +541,9 @@ var
 	cost:word;
 begin
 	x := rh.mx + dx;
-	if (x < 0) then exit; //or (x > 30) then exit;
+	if (x < 0) or (x > 60) then exit;
 	y := rh.my + dy;
-	if (y < 0) then exit; //or (y > 30) then exit;
+	if (y < 0) or (y > 60) then exit;
 	cost := rh.cost2 + dist + (abs(x2 - (rh.x + dx)) + abs(y2 - (rh.y + dy))) * 10;
 	if mm[x][y].cost <> 0 then begin
 		//¡‚Ü‚Å‚É“¯‚¶“_‚ª‚ ‚Á‚½‚È‚çcost‚ğ”äŠr‚µ¬‚³‚¢‚È‚çV‚µ‚¢path‚Å‚»‚Ì“_‚ğÄ“o˜^
