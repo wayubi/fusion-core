@@ -11098,9 +11098,10 @@ begin
                                         tc2 := sl2.Objects[c1] as TChara;
                                     if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
 
-                                        if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
+                                        {Alex: I have no clue why this is here, but it caused serious problems}
+                                        {if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
                                                 if (tc2.PartyName = tn.CData.Partyname) then break;
-                                        end;
+                                        end;}
                                         
                                         case tn.JID of
                                                 $74://ブラストマイン発動

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-08-04: Fixed Pneuma/Warp/Other Crashes when target is in a Party. [AlexKreuz]
 - 02-07-04: Potion Effects can now be seen by other players. [AlexKreuz]
 - 02-06-04: BlackSmith skill Maximun fully functional now. [beita]
 - 02-06-04: Fixed bug #347: Certain moves in Blacksmiths increase ASPD. [beita]
