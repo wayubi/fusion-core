@@ -183,7 +183,7 @@ begin
 
 	DebugOut := txtDebug;
 
-	Caption := ' Fusion 1.2.1.0 CVS Release'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
+	Caption := ' Fusion 1.210'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
 
 	ScriptList := TStringList.Create;
 

@@ -1,15 +1,15 @@
 [GeneralSettings]
 AppendMapFileToBinary=1
-HandleExceptions=0
+HandleExceptions=1
 CheckForFrozenMainThread=1
 FreezeTimeout=60000
-ShowExceptionBox=1
+ShowExceptionBox=0
 SuspendAllRunningThreads=0
 AutomaticallySaveBugReport=0
 AutomaticallyMailBugReport=0
-CopyBugReportToClipboard=1
-AutomaticallyContinueApplication=0
-AutomaticallyRestartApplication=0
+CopyBugReportToClipboard=0
+AutomaticallyContinueApplication=1
+AutomaticallyRestartApplication=1800
 AutomaticallyCloseApplication=0
 MailAddress=waheed@cobax.net
 MailSubject=Fusion Bug Report

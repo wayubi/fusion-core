@@ -16,7 +16,7 @@ object frmMain: TfrmMain
   OnResize = FormResize
   DesignSize = (
     757
-    401)
+    408)
   PixelsPerInch = 96
   TextHeight = 15
   object lbl00: TLabel
@@ -94,7 +94,7 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 382
+    Top = 389
     Width = 757
     Height = 19
     Color = clCream
@@ -109,10 +109,11 @@ object frmMain: TfrmMain
         Alignment = taRightJustify
         Width = 50
       end>
+    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0
-    Top = 56
+    Top = 63
     Width = 757
     Height = 326
     Align = alBottom
