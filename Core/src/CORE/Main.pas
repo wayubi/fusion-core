@@ -553,6 +553,11 @@ begin
                 end else begin
                         Option_GraceTime_PvPG := 15000;
                 end;
+                if sl.IndexOfName('Option_Username_MF') <> -1 then begin
+                        Option_Username_MF := StrToBool(sl.Values['Option_Username_MF']);
+                end else begin
+                        Option_Username_MF := False;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -787,6 +792,7 @@ begin
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
         ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
         ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
+        ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
         // Fusion INI Lines
         
         // MySQL Server Lines

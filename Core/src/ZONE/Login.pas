@@ -156,6 +156,7 @@ var
 	count        :integer;
         addtxt :TextFile;
         txt :TextFile;
+        option_mf : string;
 begin
   Result := False;
            DataSave();
@@ -174,14 +175,30 @@ begin
           begin
             Reset(addtxt);
             count := 1;
-						while not SeekEof(addtxt) do
-            begin
-              Readln(addtxt,userdata);
-              Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
-              //DebugOut.Lines.Add('Account Creation');
-              Writeln(txt, '0');
-              inc(count);
+
+            if (Option_Username_MF = True) then begin
+                option_mf := copy(userid, length(userid) - 1, 2);
+                userid := copy(userid, 0, length(userid) - 2);
+
+                if (option_mf = '_M') then begin
+                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',1,-@-,0,,,,,,,,,');
+                end else if (option_mf = '_F') then begin
+                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',0,-@-,0,,,,,,,,,');
+                end;
+                
+                Writeln(txt, '0');
+                inc(count);
+            end
+
+            else begin
+                while not SeekEof(addtxt) do begin
+                        Readln(addtxt,userdata);
+                        Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
+                        Writeln(txt, '0');
+                        inc(count);
+                end;
             end;
+
             Flush(txt);  { テキストが実際にファイルに書き込まれたことを確かめる }
             CloseFile(txt);
 

@@ -1528,6 +1528,7 @@ Option_AutoBackup   :word;
 Option_WelcomeMsg :boolean;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
+Option_Username_MF : boolean;
 // Fusion INI Declarations
 
 

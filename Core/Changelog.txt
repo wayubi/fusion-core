@@ -1,3 +1,4 @@
+- 04-07-04: Added Athena-Style Username_MF Registration Method Option. [AlexKreuz]
 - 04-07-04: Updated Ashura, now works in combo mode.  Test this more in PvP (PvM seems OK). [Colus]
 - 04-06-04: Added Support for item database effects 200, 201. [Darkhelmet]
 - 04-06-04: Updated Monster AI again. [Darkhelmet]
