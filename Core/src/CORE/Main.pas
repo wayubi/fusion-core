@@ -5239,6 +5239,27 @@ begin
                                                                 dmg[0] := 0;
                                                                 //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
                                                         end;
+                                                        
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        WFIFOW(0, $0088);
+                                                        WFIFOL(2, tc.ID);
+                                                        WFIFOW(6, tc.Point.X);
+                                                        WFIFOW(8, tc.Point.Y);
+                                                        SendBCmd(tm, tc.Point, 10);
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                         tc.MTick := Tick + 1000;
@@ -7774,9 +7795,29 @@ begin
                                                         spbonus := tc.SP;
                                                         tc.SP := 0;
                                                         dmg[0] := dmg[0] + spbonus;
-                                                         if dmg[0] < 0 then begin
+                                                        if dmg[0] < 0 then begin
                                                                 dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                                                        end;
+                                                        SetLength(bb, 6);
+                                                        bb[0] := 6;
+
+                                                        xy := tc.Point;
+                                                        DirMove(tm, tc.Point, tc.Dir, bb);
+
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
                                                                 end;
+                                                                tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+
+                                                        WFIFOW(0, $0088);
+                                                        WFIFOL(2, tc.ID);
+                                                        WFIFOW(6, tc.Point.X);
+                                                        WFIFOW(8, tc.Point.Y);
+                                                        SendBCmd(tm, tc.Point, 10);
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                         tc.MTick := Tick + 1000;
