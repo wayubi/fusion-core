@@ -83,8 +83,8 @@ begin
 
 			if isActive then begin
 				//sl.Clear; //First use of SL, it's already empty :)
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
 							if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin  //edited by The Harbinger -- darkWeiss Version
@@ -112,8 +112,8 @@ begin
 			if (NOT isLooting) AND Data.isLoot then begin
 
 				sl.Clear;
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
@@ -146,8 +146,8 @@ begin
 		//if ATarget=0 ...
 		end else begin //ATarget > 0
 			if isLeader AND NOT isLooting then begin
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							if (tm.Block[i1][j1].Mob.Objects[k1] is TMob) then begin
 								ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
@@ -170,8 +170,8 @@ begin
 			end;
 
 			if Data.isLink AND NOT isLooting then begin
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							ts2 := tm.Block[i1][j1].Mob.Objects[k1] AS TMob;
 							if (ts2 <> nil) or (ts2 <> ts) then begin

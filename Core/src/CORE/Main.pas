@@ -6410,8 +6410,8 @@ begin
 					sl.Clear;
 
 					//Find items in Range
-					for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-						for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+					for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+						for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 							for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 								tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 								if tn.CType <> 3 then Continue;
@@ -7969,8 +7969,8 @@ begin
 			if (isActive) and (ts.Status <> 'RUN') then begin
 
 				sl.Clear;
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
 							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and 64 = 0) and ((tc1.Option and 6 = 0) or ((tc1.Option and 6 <> 0) and (ts.Data.Race = 6) or (ts.Data.Race = 4) or (ts.Data.MEXP <> 0))) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
@@ -8001,8 +8001,8 @@ begin
 				sl.Clear;
 
 				//アイテム探し
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
@@ -8040,8 +8040,8 @@ begin
 
 		else begin
 			if (isLeader) and (isLooting = false) then begin
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							if (tm.Block[i1][j1].Mob.Objects[k1] is TMob) then begin
 								ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
@@ -8064,8 +8064,8 @@ begin
 			end;
 
 			if Data.isLink and (not isLooting) then begin
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
 							if (ts2 <> nil) or (ts2 <> ts) then begin
@@ -8826,8 +8826,8 @@ begin
 			end;
 			if (MMode = 0) and (MPoint.X = 0) and (MPoint.Y = 0) then begin
 				sl := TStringList.Create;
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							ts := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
 							if ts.HP = 0 then Continue;
@@ -8907,8 +8907,8 @@ begin
 			if (AMode = 0) and (ATarget = 0) then begin
 				//タゲ探し
 				sl := TStringList.Create;
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+				for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+					for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 							ts := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
 							if ts.HP = 0 then Continue;
@@ -8978,8 +8978,8 @@ begin
 		if ((Auto and $04) = $04) and (ATarget = 0) and (MMode = 0) then begin //ルート
 			//アイテム探し
 			sl := TStringList.Create;
-			for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-				for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+			for j1 := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+				for i1 := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 					for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 						tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 						if tn.CType <> 3 then Continue;
@@ -9443,8 +9443,8 @@ begin
 					// so it does not always work.  But, this is the
 					// correct way of doing the cast time.
 
-					for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-						for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+					for b := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+						for a := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 							if tm.Block[a][b] = nil then continue;
 							//if not tm.Block[a][b].MobProcess then begin
 							if tm.Block[a][b].MobProcTick < Tick then begin
@@ -9650,8 +9650,8 @@ begin
 
 					//Mob&Item Process
 					tm := tc.MData;
-					for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-						for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+					for b := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+						for a := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 							if tm.Block[a][b] = nil then continue;
 							//if not tm.Block[a][b].MobProcess then begin
 							if tm.Block[a][b].MobProcTick < Tick then begin
