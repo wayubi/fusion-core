@@ -1383,7 +1383,7 @@ end;
 		if n <> 1 then Inc(l);
 		if i = mvpid then l := l + ts.Data.MEXP; //MVP
 		l := l * BaseExpMultiplier;
-                if tc.Skill[307].Tick > Tick then l := l * tc.Skill[307].Effect1 div 100;
+                if tc.Skill[307].Tick > Tick then l := l * cardinal(tc.Skill[307].Effect1 div 100);
 		//ÉWÉáÉuåoå±íl
                
                 w := ts.Data.JEXP * (cardinal(ts.EXPDist[i].Dmg) div total);
@@ -1391,7 +1391,7 @@ end;
 		if n <> 1 then Inc(w);
 		if i = mvpid then w := w + ts.Data.MEXP; //MVP
                 w := w * JobExpMultiplier;
-                if tc.Skill[307].Tick > Tick then w := w * tc.Skill[307].Effect1 div 100;
+                if tc.Skill[307].Tick > Tick then w := w * cardinal(tc.Skill[307].Effect1 div 100);
 
 		j := GuildList.IndexOf(tc.GuildID);
 		if (j <> -1) then begin
@@ -1438,7 +1438,7 @@ end;
 
 {Colus, 20031222: Added ItemDropMultiplier to the calc.  It modifies IDD.}
     j := ItemDropDenominator div ItemDropMultiplier;
-		i := (j - ((j - ts.Data.Drop[k].Per) * 10000 div ItemDropPer));
+		i := (j - (j - ts.Data.Drop[k].Per) * 10000 div ItemDropPer);
 		if ItemDropType then begin
 			if Random(j) <= i then DropFlag := true; //èdóÕédólÅBÉäÉìÉSÇóéÇ∆Ç∑ÅB
 		end else begin
@@ -2445,11 +2445,7 @@ begin
 		ts.BodyTick := Tick + tc.aMotion;
 	end;
 
-	WFIFOW(0, $0088);
-	WFIFOL(2, ts.ID);
-	WFIFOW(6, ts.Point.X);
-	WFIFOW(8, ts.Point.Y);
-	SendBCmd(tm, ts.Point, 10);
+        UpdateMonsterLocation(tm, ts);
 
 	ts.HP := ts.HP - Dmg;
 	for i := 0 to 31 do begin
@@ -2641,20 +2637,14 @@ begin
 				tn.Free;
 
 			end else begin
-				//ÉAÉCÉeÉÄÇÕà⁄ìÆÇµÇ»Ç¢ÇÃÇ≈ÇªÇÃÇ‹Ç‹
-				WFIFOW(0, $0088);
-				WFIFOL(2, ts.ID);
-				WFIFOW(6, ts.Point.X);
-				WFIFOW(8, ts.Point.Y);
-				SendBCmd(tm, ts.Point, 10);
+				//Update Monster Location
+                                UpdateMonsterLocation(tm, ts);
 				Exit;
 			end;
 		end;
-		WFIFOW(0, $0088);
-		WFIFOL(2, ts.ID);
-		WFIFOW(6, ts.Point.X);
-		WFIFOW(8, ts.Point.Y);
-		SendBCmd(tm, ts.Point, 10);
+
+                UpdateMonsterLocation(tm, ts);
+		
 		ts.pcnt := 0;
 		ts.MoveWait := Tick + ts.Data.aMotion;
 		ts.ATarget := 0;
@@ -3003,7 +2993,7 @@ begin
 				//DebugOut.Lines.Add(Format('		Move OK', [ID]));
 				break;
 			end;
-			MoveTick := (MoveTick + spd);
+			MoveTick := MoveTick + cardinal(spd);
 		end;
 	end;
 {í«â¡}
@@ -5062,12 +5052,9 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+							//Update Monster Location
+                                                        UpdateMonsterLocation(tm, ts);
+							
 						end;
                                                 if Random(100) < Skill[250].Data.Data2[MUseLV] then begin
                                                         if (ts.Stat1 <> 3) then begin
@@ -5666,12 +5653,9 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+							//Update Monster Location
+                                                        UpdateMonsterLocation(tm, ts);
+							
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                         spiritSpheres := spiritSpheres - 1;
@@ -6042,126 +6026,129 @@ begin
 						tc.MTick := Tick + 1000;
 					end;
 
-                                         264:   {Body Relocation}  //New Version Oatmeal style U_U
-                                         
-                                                if spiritSpheres <> 0 then begin
-						        //Send Graphics Packet
-						        WFIFOW( 0, $011a);
-						        WFIFOW( 2, MSkill);
-						        WFIFOW( 4, MUseLV);
-						        WFIFOL( 6, ts.ID);
-						        WFIFOL(10, ID);
-						        WFIFOB(14, 1);
-                                                        spiritSpheres := spiritSpheres - 1;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
-						        SendBCmd(tm, ts.Point, 15);
+                                264:   {Body Relocation}  //New Version Oatmeal style U_U
 
-						        if tc.Skill[264].EffectLV > 1 then begin
-						                ts.speed := ts.speed - 45;
-                                                        end else begin
-						                ts.speed := ts.speed - 30;
-						        end;
+                                        if spiritSpheres <> 0 then begin
+                                                //Send Graphics Packet
+                                                WFIFOW( 0, $011a);
+                                                WFIFOW( 2, MSkill);
+                                                WFIFOW( 4, MUseLV);
+                                                WFIFOL( 6, ts.ID);
+                                                WFIFOL(10, ID);
+                                                WFIFOB(14, 1);
+                                                spiritSpheres := spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                SendBCmd(tm, ts.Point, 15);
 
-						        tc.MTick := Tick + 1000;
-					        end;
-                                        47:     {Arrow Shower}
-                                                begin
-                                                        if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
-					                        WFIFOW(0, $013b);
-					                        WFIFOW(2, 0);
-					                        Socket.SendBuf(buf, 4);
-					                        ATick := ATick + ADelay;
-                                                                Exit;
-				                        end;
-                                                        Dec(Item[Arrow].Amount,9);
+                                                if tc.Skill[264].EffectLV > 1 then begin
+                                                        ts.speed := ts.speed - 45;
+                                                end else begin
+                                                        ts.speed := ts.speed - 30;
+                                                end;
 
-                                                        WFIFOW( 0, $00af);
-                                                        WFIFOW( 2, Arrow);
-                                                        WFIFOW( 4, 9);
-                                                        Socket.SendBuf(buf, 6);
+                                                tc.MTick := Tick + 1000;
+                                        end;
 
-				                        if Item[Arrow].Amount = 0 then begin
-					                        Item[Arrow].ID := 0;
-                                                                Arrow := 0;
-				                        end;
+                                47:     {Arrow Shower}
+                                        begin
+                                                if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
+                                                        WFIFOW(0, $013b);
+                                                        WFIFOW(2, 0);
+                                                        Socket.SendBuf(buf, 4);
+                                                        ATick := ATick + ADelay;
+                                                        Exit;
+                                                end;
 
-                                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						        if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
+                                                Dec(Item[Arrow].Amount,9);
 
-						        //Send Attack Packet
-					                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                WFIFOW( 0, $00af);
+                                                WFIFOW( 2, Arrow);
+                                                WFIFOW( 4, 9);
+                                                Socket.SendBuf(buf, 6);
 
-							StatCalc1(tc, ts, Tick);
-						        xy := ts.Point;
+                                                if Item[Arrow].Amount = 0 then begin
+                                                        Item[Arrow].ID := 0;
+                                                        Arrow := 0;
+                                                end;
 
-						        //Begin Area Effect
-						        sl.Clear;
-						        for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							        for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								        for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-									        if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-                                                                                if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
-									        if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-										        sl.AddObject(IntToStr(ts1.ID),ts1);
-								        end;
-							        end;
-						        end;
+                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                                                if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
 
-						        if sl.Count <> 0 then begin
-							        for k1 := 0 to sl.Count - 1 do begin
-								        ts1 := sl.Objects[k1] as TMob;
+                                                //Send Attack Packet
+                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+                                                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 
-                                                                        j := 0;
-                                                                        case tc.Dir of
-						                                0:
-                                                                                        begin
-                                                                                                if ts1.Point.Y < tc.Point.Y then j := 1;
-                                                                                        end;
-                                                                                1:
-                                                                                        begin
-                                                                                                if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-                                                                                        end;
-                                                                                2:
-                                                                                        begin
-                                                                                                if ts1.Point.X > tc.Point.X then j := 1;
-                                                                                        end;
-                                                                                3:
-                                                                                        begin
-                                                                                                if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y < tc.Point.Y) then j := 1;
-                                                                                        end;
-                                                                                4:
-                                                                                        begin
-                                                                                                if ts1.Point.Y > tc.Point.Y then j := 1;
-                                                                                        end;
-                                                                                5:
-                                                                                        begin
-                                                                                                if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-                                                                                        end;
-                                                                                6:
-                                                                                        begin
-                                                                                                if ts1.Point.X < tc.Point.X then j := 1;
-                                                                                        end;
-                                                                                7:
-                                                                                        begin
-                                                                                                if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-                                                                                        end;
-                                                                        end;
+                                                StatCalc1(tc, ts, Tick);
+                                                xy := ts.Point;
 
-                                                                        if j <> 1 then begin
-								                DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								                if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
-
-								                //Send Graphics Packet
-								                SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-								                //É_ÉÅÅ[ÉWèàóù
-								                if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-						                                StatCalc1(tc, ts1, Tick);
-                                                                        end;
-
+                                                //Begin Area Effect
+                                                sl.Clear;
+                                                for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+                                                        for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+                                                                for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                                                                        if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+                                                                        if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
+                                                                        if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+                                                                                sl.AddObject(IntToStr(ts1.ID),ts1);
                                                                 end;
                                                         end;
                                                 end;
+
+                                                if sl.Count <> 0 then begin
+                                                        for k1 := 0 to sl.Count - 1 do begin
+                                                                ts1 := sl.Objects[k1] as TMob;
+
+                                                                j := 0;
+                                                                case tc.Dir of
+                                                                        0:
+                                                                                begin
+                                                                                        if ts1.Point.Y < tc.Point.Y then j := 1;
+                                                                                end;
+                                                                        1:
+                                                                                begin
+                                                                                        if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+                                                                                end;
+                                                                        2:
+                                                                                begin
+                                                                                        if ts1.Point.X > tc.Point.X then j := 1;
+                                                                                end;
+                                                                        3:
+                                                                                begin
+                                                                                        if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y < tc.Point.Y) then j := 1;
+                                                                                end;
+                                                                        4:
+                                                                                begin
+                                                                                        if ts1.Point.Y > tc.Point.Y then j := 1;
+                                                                                end;
+                                                                        5:
+                                                                                begin
+                                                                                        if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+                                                                                end;
+                                                                        6:
+                                                                                begin
+                                                                                        if ts1.Point.X < tc.Point.X then j := 1;
+                                                                                end;
+                                                                        7:
+                                                                                begin
+                                                                                        if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+                                                                                end;
+                                                                end;
+
+                                                                if j <> 1 then begin
+                                                                        DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+                                                                        if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+
+                                                                        //Send Graphics Packet
+                                                                        SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
+
+                                                                        //Damage Process for Monster
+                                                                        if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
+						                                StatCalc1(tc, ts1, Tick);
+                                                                end;
+
+                                                        end;
+                                                end;
+                                        end;
 
                                         52:     {Poison}
 					        begin
@@ -6181,187 +6168,188 @@ begin
 						        DamageProcess1(tm, tc, ts, dmg[0], Tick);
 				        	end;
 
-				54: //ÉäÉUÉåÉNÉVÉáÉì
-					begin
-                                                j := SearchCInventory(tc, 717, false);
-						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) and ((ts.Data.Race = 1) or (ts.Element mod 20 = 9)) then begin
+				        54:     {Resurrection}
+					        begin
+                                                        j := SearchCInventory(tc, 717, false);
+						        if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) and ((ts.Data.Race = 1) or (ts.Element mod 20 = 9)) then begin
 							
-                                                        if NoJamstone = False then begin
+                                                                if NoJamstone = False then begin
 
-							UseItem(tc, j);
+							                UseItem(tc, j);
 
-                                                        end;
-								//ëŒÉAÉìÉfÉbÉh
-							if (Random(1000) < MUseLV * 20 + Param[3] + Param[5] + BaseLV + Trunc((1 - HP / MAXHP) * 200)) and (ts.Data.MEXP = 0) then begin
-								dmg[0] := ts.HP;
-							end else begin
-								dmg[0] := (BaseLV + Param[3] + (MUseLV * 10)) * ElementTable[6][ts.Element] div 100;
-								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-							end;
-							if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //ï€åØ
-							SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-							DamageProcess1(tm, tc, ts, dmg[0], Tick);
-							tc.MTick := Tick + 3000;
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-
-        56:
-          begin
-            if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
-            DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-            j := ts.Data.Scale + 1;
-            dmg[0] := dmg[0] * j;
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-            StatCalc1(tc, ts, Tick);
-            end else begin
-            MMode := 4;
-            Exit;
-            end;
-          end;
-
-
-        58:
-          begin
-          if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
-						xy.X := ts.Point.X - Point.X;
-						xy.Y := ts.Point.Y - Point.Y;
-						if abs(xy.X) > abs(xy.Y) * 3 then begin
-							//â°å¸Ç´
-							if xy.X > 0 then b := 6 else b := 2;
-							end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-								//ècå¸Ç´
-								if xy.Y > 0 then b := 0 else b := 4;
-								end else begin
-									if xy.X > 0 then begin
-									if xy.Y > 0 then b := 7 else b := 5;
-								end else begin
-									if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-						//íeÇ´îÚÇŒÇ∑ëŒè€Ç…ëŒÇ∑ÇÈÉ_ÉÅÅ[ÉWÇÃåvéZ
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						if dmg[0] < 0 then dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-						//ÉpÉPëóêM
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
-						//ÉmÉbÉNÉoÉbÉNèàóù
-						if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
-							xy := ts.Point;
-							DirMove(tm, ts.Point, b, bb);
-							//ÉuÉçÉbÉNà⁄ìÆ
-							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
-								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-									assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
-									Delete(IndexOf(ts.ID));
-								end;
-								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-							end;
-							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
-						end;
-						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							StatCalc1(tc, ts, Tick);
-            
-          end else begin
-            MMode := 4;
-            Exit;
-          end;
-          end;
-        57:
-          begin
-                if ts.HP <= 0 then exit;
-                if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
-                        xy.X := ts.Point.X - Point.X;
-			xy.Y := ts.Point.Y - Point.Y;
-                        if abs(xy.X) > abs(xy.Y) * 3 then begin
-                                if xy.X > 0 then b := 6 else b := 2;
-                        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-                                if xy.Y > 0 then b := 0 else b := 4;
-                        end else begin
-                                if xy.X > 0 then begin
-                                        if xy.Y > 0 then b := 7 else b := 5;
-                                end else begin
-                                        if xy.Y > 0 then b := 1 else b := 3;
-                                end;
-                        end;
-                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-                        if dmg[0] < 0 then dmg[0] := 0;
-
-                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
-
-                        if (dmg[0] > 0) then begin
-                                xy := ts.Point;
-					sl.Clear;
-					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-								if ts = ts1 then
-                                                                        Continue;
-								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-									sl.AddObject(IntToStr(ts1.ID),ts1);
-							end;
-						end;
-					end;
-					if sl.Count <> 0 then begin
-						for k1 := 0 to sl.Count - 1 do begin
-							ts1 := sl.Objects[k1] as TMob;
-							DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-							if dmg[0] < 0 then
-                                                                dmg[0] := 0;
-							SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-
-							if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-        			                        	StatCalc1(tc, ts1, Tick);
-
-                                                        SetLength(bb, 6);
-                                                        bb[0] := 6;
-                                                        xy := ts1.Point;
-                                                        if ts1.HP <= 0 then break;
-                                                        DirMove(tm, ts1.Point, b, bb);
-
-                                                        if (xy.X div 8 <> ts1.Point.X div 8) or (xy.Y div 8 <> ts1.Point.Y div 8) then begin
-                                                                with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-                                                                        assert(IndexOf(ts1.ID) <> -1, 'MobBlockDelete Error');
-                                                                        Delete(IndexOf(ts1.ID));
                                                                 end;
-                                                        tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
-                                                        ts1.pcnt := 0;
 
-                                                        WFIFOW(0, $0088);
-                                                        WFIFOL(2, ts1.ID);
-                                                        WFIFOW(6, ts1.Point.X);
-                                                        WFIFOW(8, ts1.Point.Y);
-                                                        SendBCmd(tm, ts1.Point, 10);
+                                                                //Damage Calculation
+							        if (Random(1000) < MUseLV * 20 + Param[3] + Param[5] + BaseLV + Trunc((1 - HP / MAXHP) * 200)) and (ts.Data.MEXP = 0) then begin
+								        dmg[0] := ts.HP;
+							        end else begin
+								        dmg[0] := (BaseLV + Param[3] + (MUseLV * 10)) * ElementTable[6][ts.Element] div 100;
+								        if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+							        end;
+
+							        if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //ï€åØ
+
+							        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+							        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+							        tc.MTick := Tick + 3000;
+						        end else begin
+							        tc.MMode := 4;
+							        tc.MPoint.X := 0;
+							        tc.MPoint.Y := 0;
+							        Exit;
+						        end;
+					        end;
+
+                                        56:     {Pierce}
+                                                begin
+                                                        //Check if player has a Spear
+                                                        if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+                                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                                                j := ts.Data.Scale + 1;
+                                                                dmg[0] := dmg[0] * j;
+						                if dmg[0] < 0 then dmg[0] := 0;
+						                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+						                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                                        StatCalc1(tc, ts, Tick);
+                                                        end else begin
+                                                                MMode := 4;
+                                                                Exit;
+                                                        end;
                                                 end;
 
-                                	end;
-					end;
-                        end;
+
+                                        58:     {Spear Stab}
+                                                begin
+                                                        if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+						                xy.X := ts.Point.X - Point.X;
+						                xy.Y := ts.Point.Y - Point.Y;
+						                if abs(xy.X) > abs(xy.Y) * 3 then begin
+							                //Knockback Distance?
+							                if xy.X > 0 then b := 6 else b := 2;
+							        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+								        //ècå¸Ç´
+								        if xy.Y > 0 then b := 0 else b := 4;
+								end else begin
+									if xy.X > 0 then begin
+									        if xy.Y > 0 then b := 7 else b := 5;
+								        end else begin
+									        if xy.Y > 0 then b := 1 else b := 3;
+							                end;
+						                end;
+
+						                //Calculate Damage
+						                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						                if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+
+						                //Send Attacking Packet
+						                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+
+						                //Begin Knockback
+						                if (dmg[0] > 0) then begin
+							                SetLength(bb, 6);
+							                bb[0] := 6;
+							                xy := ts.Point;
+							                DirMove(tm, ts.Point, b, bb);
+
+							                //Knockback Monster
+							                if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
+								                with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+									                assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
+									                Delete(IndexOf(ts.ID));
+								                end;
+								                tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+							                end;
+							                ts.pcnt := 0;
+
+							                //Update Coordinates of Monster
+							                UpdateMonsterLocation(tm, ts);
+						                end;
+
+						                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							                StatCalc1(tc, ts, Tick);
+
+                                                        end else begin
+                                                                MMode := 4;
+                                                                Exit;
+                                                        end;
+                                                end;
+                                        57:     {Brandish Spear}
+                                                begin
+                                                        //if ts.HP <= 0 then exit;
+                                                        if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+                                                                xy.X := ts.Point.X - Point.X;
+			                                        xy.Y := ts.Point.Y - Point.Y;
+                                                                if abs(xy.X) > abs(xy.Y) * 3 then begin
+                                                                        if xy.X > 0 then b := 6 else b := 2;
+                                                                end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+                                                                        if xy.Y > 0 then b := 0 else b := 4;
+                                                                end else begin
+                                                                        if xy.X > 0 then begin
+                                                                                if xy.Y > 0 then b := 7 else b := 5;
+                                                                        end else begin
+                                                                                if xy.Y > 0 then b := 1 else b := 3;
+                                                                        end;
+                                                                end;
+                                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                                                if dmg[0] < 0 then dmg[0] := 0;
+
+                                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 
 
-                                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
-            
-          end else begin
-            MMode := 4;
-            Exit;
-          end;
-          end;
+                                                                if (dmg[0] > 0) then begin
+                                                                        xy := ts.Point;
+					                                sl.Clear;
+					                                for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+						                                for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+							                                for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+								                                ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								                                if ts = ts1 then
+                                                                                                        Continue;
+								                                if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+									                                sl.AddObject(IntToStr(ts1.ID),ts1);
+                                                                                        end;
+					                                	end;
+					                                end;
+
+				                                	if sl.Count <> 0 then begin
+						                                for k1 := 0 to sl.Count - 1 do begin
+							                                ts1 := sl.Objects[k1] as TMob;
+							                                DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+							                                if dmg[0] < 0 then
+                                                                                                dmg[0] := 0;
+							                                SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
+
+							                                if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
+        			                        	                                StatCalc1(tc, ts1, Tick);
+
+                                                                                        SetLength(bb, 6);
+                                                                                        bb[0] := 6;
+                                                                                        xy := ts1.Point;
+                                                                                        if ts1.HP <= 0 then break;
+                                                                                        DirMove(tm, ts1.Point, b, bb);
+
+                                                                                        if (xy.X div 8 <> ts1.Point.X div 8) or (xy.Y div 8 <> ts1.Point.Y div 8) then begin
+                                                                                                with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+                                                                                                        assert(IndexOf(ts1.ID) <> -1, 'MobBlockDelete Error');
+                                                                                                        Delete(IndexOf(ts1.ID));
+                                                                                                end;
+                                                                                        tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
+                                                                                        ts1.pcnt := 0;
+
+                                                                                        UpdateMonsterLocation(tm, ts1);
+                                                                                end;
+
+                                	                                end;
+					                        end;
+                                                        end;
+
+                                                        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+
+                                                        end else begin
+                                                                MMode := 4;
+                                                                Exit;
+                                                        end;
+                                                end;
         59:
           begin
           if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
@@ -6417,12 +6405,10 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+
+							//Update Location of Monster
+                                                        UpdateMonsterLocation(tm, ts);
+							
 							xy := ts.Point;
 							//ä™Ç´Ç±Ç›îÕàÕçUåÇ
 							sl.Clear;
@@ -6572,12 +6558,8 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-						//ÉpÉPëóêM
-						WFIFOW(0, $0088);
-						WFIFOL(2, ts.ID);
-						WFIFOW(6, ts.Point.X);
-						WFIFOW(8, ts.Point.Y);
-						SendBCmd(tm, ts.Point, 10);
+						//Update Monster Location
+						UpdateMonsterLocation(tm, ts);
 						end;
 						DamageProcess1(tm, tc, ts, dmg[0], Tick);
 					end;
@@ -6878,12 +6860,8 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+							//Update Monster Location
+                                                        UpdateMonsterLocation(tm, ts);
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
@@ -6960,12 +6938,8 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+							//Update Monster Location
+							UpdateMonsterLocation(tm, ts);
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
             StatCalc1(tc, ts, Tick);
@@ -7021,12 +6995,9 @@ begin
 								tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
 							end;
 							ts1.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts1.ID);
-							WFIFOW(6, ts1.Point.X);
-							WFIFOW(8, ts1.Point.Y);
-							SendBCmd(tm, ts1.Point, 10);
+							//Update Monster Location
+                                                        UpdateMonsterLocation(tm, ts1);
+							
 						end;
 								if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
     						StatCalc1(tc, ts1, Tick);
@@ -8483,12 +8454,9 @@ begin
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end;
 							ts.pcnt := 0;
-							//ÉpÉPëóêM
-							WFIFOW(0, $0088);
-							WFIFOL(2, ts.ID);
-							WFIFOW(6, ts.Point.X);
-							WFIFOW(8, ts.Point.Y);
-							SendBCmd(tm, ts.Point, 10);
+							//Update Monster Location
+                                                        UpdateMonsterLocation(tm, ts);
+							
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
@@ -10969,12 +10937,9 @@ begin
 										tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
 									end;
 									ts1.pcnt := 0;
-									//ÉpÉPëóêM
-									WFIFOW(0, $0088);
-									WFIFOL(2, ts1.ID);
-									WFIFOW(6, ts1.Point.X);
-									WFIFOW(8, ts1.Point.Y);
-									SendBCmd(tm, ts1.Point, 10);
+									//Update Monster Location
+                                                                        UpdateMonsterLocation(tm, ts1);
+									
 								end;
 								DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								Dec(tn.Count);
@@ -11134,11 +11099,8 @@ begin
 								end;
 								ts1.pcnt := 0;
 
-								WFIFOW(0, $0088);
-								WFIFOL(2, ts1.ID);
-								WFIFOW(6, ts1.Point.X);
-								WFIFOW(8, ts1.Point.Y);
-								SendBCmd(tm, ts1.Point, 10);
+                                                                UpdateMonsterLocation(tm, ts1);
+                                                        
 							end;
 
                                                 $90: //ÉAÉCÉXÉEÉHÅ[Éã
@@ -11159,12 +11121,9 @@ begin
 									tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
 								end;
 								ts1.pcnt := 0;
-								//ÉpÉPëóêM
-								WFIFOW(0, $0088);
-								WFIFOL(2, ts1.ID);
-								WFIFOW(6, ts1.Point.X);
-								WFIFOW(8, ts1.Point.Y);
-								SendBCmd(tm, ts1.Point, 10);
+								//Update Monster Location
+                                                                UpdateMonsterLocation(tm, ts1);
+								
 							end;
 
 							$91: //AS  - Fixed by Bellium (Crimson)
@@ -11183,11 +11142,8 @@ begin
 									ts1.Point.X := tn.Point.X;
 									ts1.Point.Y := tn.Point.Y;
 									ts1.pcnt := 0;
-									WFIFOW(0, $0088);
-									WFIFOL(2, ts1.ID);
-									WFIFOW(6, ts1.Point.X);
-									WFIFOW(8, ts1.Point.Y);
-									SendBCmd(tm, ts1.Point, 10);
+                                                                        UpdateMonsterLocation(tm, ts1);
+									
 									if c = (sl.Count -1) then tn.Count := 0;
 								end;
 							end;
@@ -11360,12 +11316,9 @@ begin
 										tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
 									end;
 									ts1.pcnt := 0;
-									//ÉpÉPëóêM
-									WFIFOW(0, $0088);
-									WFIFOL(2, ts1.ID);
-									WFIFOW(6, ts1.Point.X);
-									WFIFOW(8, ts1.Point.Y);
-									SendBCmd(tm, ts1.Point, 10);
+									//Update Monster Location
+                                                                        UpdateMonsterLocation(tm, ts1);
+									
 								end;
 								DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								Dec(tn.Count);
@@ -11794,11 +11747,8 @@ begin
 				if isLooting then begin
 					tn := tm.NPC.IndexOfObject(ts.ATarget) as TNPC;
 					if tn = nil then begin
-						WFIFOW( 0, $0088);
-						WFIFOL( 2, ts.ID);
-						WFIFOW( 6, ts.Point.X);
-						WFIFOW( 8, ts.Point.Y);
-						SendBCmd(tm, ts.Point, 10);
+                                                UpdateMonsterLocation(tm, ts);
+						
 						isLooting := False;
 						ATarget := 0;
 						ppos := pcnt;
@@ -11812,11 +11762,8 @@ begin
 					tc1 := AData;
 					if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) and (ts.isSlave = false) then begin
 						//éãäEÇÃÇªÇ∆Ç‹Ç≈ì¶Ç∞ÇÁÇÍÇΩ
-						WFIFOW( 0, $0088);
-						WFIFOL( 2, ts.ID);
-						WFIFOW( 6, ts.Point.X);
-						WFIFOW( 8, ts.Point.Y);
-						SendBCmd(tm, ts.Point, 10);
+                                                UpdateMonsterLocation(tm, ts);
+						
 						ATarget := 0;
 						ARangeFlag := false;
 						MoveWait := Tick + 5000;
@@ -11838,12 +11785,9 @@ begin
 					MoveWait := Tick;
 				end;
 				ATick := Tick - Data.ADelay;
-				//ÉpÉPëóêM(ã|çUåÇÇ≈ÇÃà íuÇ∏ÇÍëŒçÙ)
-				WFIFOW(0, $0088);
-				WFIFOL(2, ts.ID);
-				WFIFOW(6, ts.Point.X);
-				WFIFOW(8, ts.Point.Y);
-				SendBCmd(tm, ts.Point, 10);
+				//ÉpÉPëóêM(ã|çUåÇÇ≈ÇÃà íuÇ∏ÇÍëŒç
+                                UpdateMonsterLocation(tm, ts);
+			
 				break;
 			end;
 			MoveTick := MoveTick + spd;
@@ -11883,11 +11827,8 @@ begin
 			end;
 			if ATick + Data.ADelay <= Tick then begin
 			//à íuÇ∏ÇÍèCê≥
-			WFIFOW(0, $0088);
-			WFIFOL(2, ts.ID);
-			WFIFOW(6, ts.Point.X);
-			WFIFOW(8, ts.Point.Y);
-			SendBCmd(tm, ts.Point, 10);
+                        UpdateMonsterLocation(tm, ts);
+			
 			for j := 1 to (Tick - ATick) div Data.ADelay do begin
 				//îΩåÇ
                                 if tc1.Skill[255].Tick > Tick then begin
@@ -12049,11 +11990,8 @@ begin
 			ARangeFlag := true;
 		end else if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) then begin
 			//éãäEÇÃÇªÇ∆Ç‹Ç≈ì¶Ç∞ÇÁÇÍÇΩ
-			WFIFOW( 0, $0088);
-			WFIFOL( 2, ts.ID);
-			WFIFOW( 6, ts.Point.X);
-			WFIFOW( 8, ts.Point.Y);
-			SendBCmd(tm, ts.Point, 10);
+                        UpdateMonsterLocation(tm, ts);
+			
 			ATarget := 0;
 			if Data.isDontMove then
 				MoveWait := $FFFFFFFF
@@ -12201,11 +12139,7 @@ begin
 		WFIFOW(10, 0);
 		WFIFOB(12, 0);
 		SendBCmd(tm, ts.Point, 13);
-		WFIFOW(0, $0088);
-		WFIFOL(2, ts.ID);
-		WFIFOW(6, ts.Point.X);
-		WFIFOW(8, ts.Point.Y);
-		SendBCmd(tm, ts.Point, 10);
+                UpdateMonsterLocation(tm, ts);
 	end;
 end;
 //------------------------------------------------------------------------------
@@ -12990,11 +12924,7 @@ begin
 													MoveTick := Tick;
 													tgtPoint := xy;
 
-													WFIFOW(0, $0088);
-													WFIFOL(2, ts.ID);
-													WFIFOW(6, ts.Point.X);
-													WFIFOW(8, ts.Point.Y);
-													SendBCmd(tm, ts.Point, 10);
+                                                                                                        UpdateMonsterLocation(tm, ts);
 
 													SendMMove(tc.Socket, ts, Point, tgtPoint, tc.ver2);
 													SendBCmd(tm,ts.Point,58,tc,True);

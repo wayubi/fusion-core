@@ -1419,6 +1419,8 @@ Option_WelcomeMsg :boolean;
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
+                procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
+
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
                 function  UseItem(tc:TChara; j:integer): boolean;
@@ -2091,7 +2093,7 @@ begin
 		Lucky := Lucky + (Param[5] div 10);
 		Critical := Critical + 1 + (Param[5] div 3);
 
-		MaxWeight := MaxWeight + (Param[0]- Bonus[0]) * 300 + WeightTable[JID];
+		MaxWeight := MaxWeight + cardinal((Param[0]- Bonus[0]) * 300 + WeightTable[JID]);
 
 		DEF2 := Param[2];
 		MDEF2 := Param[3];
@@ -2720,6 +2722,17 @@ begin
 
 end;
 
+//------------------------------------------------------------------------------
+procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
+
+begin
+        WFIFOW(0, $0088);
+        WFIFOL(2, ts.ID);
+        WFIFOW(6, ts.Point.X);
+        WFIFOW(8, ts.Point.Y);
+        SendBCmd(tm, ts.Point, 10);
+end;
+//------------------------------------------------------------------------------
 procedure SendCStat(tc:TChara; View:boolean = false);
 var
 	i :integer;
