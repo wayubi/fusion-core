@@ -4975,7 +4975,7 @@ begin
                                                         if DamageProcessed = false then begin
                                                                 DamageProcessed := true;
                                                                 SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j);
-							        if tc.HP > dmg[0] then begin
+							        if tc.HP > (dmg[0] * 100 div 200) then begin
 					                                tc.HP := tc.HP - (dmg[0] * 100 div 200);
 					                                if dmg[0] <> 0 then begin
 						                                tc.DmgTick := Tick + tc.dMotion div 2;
