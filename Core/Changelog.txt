@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
-- 12-19-03: Hide status is reset upon DB Load & Save. [AlexKreuz]
+- 12-19-03: Hide Status is reset on DB Load & Save. Fixed permanent hide. [AlexKreuz]
 - 12-19-03: Thief SKill -> Hide now expires when receiving area damage. (#82) [AlexKreuz]
 - 12-19-03: Thief Skill -> Hide now expires on timer. [AlexKreuz]
 - 12-19-03: Bonus STR will now count towards MaxWeight. (#65) [AlexKreuz]
