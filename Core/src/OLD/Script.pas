@@ -1508,6 +1508,7 @@ begin
                     sl.Add( IntToStr( tGlobal.Value ) );
                     Writeln(txt2, sl.DelimitedText);
                 end;
+                sl.Free;
                 Inc(tc.ScriptStep);
                 CloseFile(txt2);
             end;

@@ -322,12 +322,23 @@ type
     Button22: TButton;
     Edit85: TEdit;
     TabSheet14: TTabSheet;
-    TabSheet11: TTabSheet;
     ListBox5: TListBox;
     ListBox6: TListBox;
     Label128: TLabel;
     Label129: TLabel;
     Label130: TLabel;
+    Label85: TLabel;
+    ListBox7: TListBox;
+    ListBox8: TListBox;
+    Label110: TLabel;
+    Label111: TLabel;
+    Button23: TButton;
+    Button24: TButton;
+    ComboBox20: TComboBox;
+    Label115: TLabel;
+    CheckBox2: TCheckBox;
+    Label116: TLabel;
+    Label131: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -436,6 +447,8 @@ type
     procedure ListBox4Click(Sender: TObject);
     procedure DNSUpdateTimerTimer(Sender: TObject);
     procedure Button22Click(Sender: TObject);
+    procedure CheckBox2Click(Sender: TObject);
+    procedure ListBox7Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -1154,7 +1167,7 @@ begin
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
 
 	cmdStart.Enabled := true;
-  
+
 	//cbxPriorityClick(Sender);
 	if AutoStart then PostMessage(cmdStart.Handle, BM_CLICK, 0, 0);
 {U0x003b}
@@ -4086,7 +4099,7 @@ with tc do begin
                             if tc.Login <> 0 then Socket.SendBuf(buf, 7);
                         end;
                     end;
-                    
+
                     if ((dx <> 0) and (abs(Point.Y - tn.Point.Y) < 16) and (Point.X = tn.Point.X - dx * 15)) or
                     ((dy <> 0) and (abs(Point.X - tn.Point.X) < 16) and (Point.Y = tn.Point.Y - dy * 15)) then begin
                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		NPC %s Add', [tn.Name]));
@@ -4099,7 +4112,7 @@ with tc do begin
                             SendNData(Socket, tn, tc.ver2, tc);
                             if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
                                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn.ID]));
-    
+
                                 tc1 := TChara.Create;
                                 tc1.TalkNPCID := tn.ID;
                                 tc1.ScriptStep := tn.ScriptInitS;
@@ -4158,7 +4171,7 @@ with tc do begin
                         if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
                         ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
                             //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Add', [tc1.Name]));
-    
+
                             SendCData(tc, tc1);
                             SendCData(tc1, tc);
                             
@@ -4244,7 +4257,8 @@ with tc do begin
                             if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
                             (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
                                 tc.TalkNPCID := tn.ID;
-                                tc.ScriptStep := 0;
+                                if tn.OnTouchLabel <> 0 then tc.ScriptStep := tn.OnTouchLabel
+                                else tc.ScriptStep := 0;
                                 tc.AMode := 3;
                                 if (tc.Option and 6 <> 0) then begin
                                     tc.Option := tc.Option and $FFF9;
@@ -11509,16 +11523,15 @@ procedure TfrmMain.PageControl3Change(Sender: TObject);
 begin
 	if (TabSheet6.Showing) then begin
     	JCon_Characters_Online();
-    end else if (TabSheet14.Showing) then begin
-        ShowMessage('Under Development, This section does not work.');
     end else if (TabSheet9.Showing) then begin
     	JCon_Characters_Load();
     end else if (TabSheet10.Showing) then begin
         JCon_Chara_Inv_Load();
         JCon_Chara_Cart_Load();
         JCon_Chara_Store_Load();
-    end else if (TabSheet11.Showing) then begin
-        ShowMessage('Under Development, This section does not work.');
+    end else if (TabSheet14.Showing) then begin
+        JCon_Chara_Flag_Load();
+        frmMain.CheckBox2.Checked := True;  //this controls skill load
     end;
 end;
 
@@ -11582,6 +11595,18 @@ end;
 procedure TfrmMain.Button22Click(Sender: TObject);
 begin
     JCon_Chara_Inv_Save();
+end;
+
+procedure TfrmMain.CheckBox2Click(Sender: TObject);
+begin
+    if frmMain.CheckBox2.Checked = true then
+        JCon_Chara_Skill_Load(true)
+    else JCon_Chara_Skill_Load(false);
+end;
+
+procedure TfrmMain.ListBox7Click(Sender: TObject);
+begin
+    JCon_Chara_Skill_Populate();
 end;
 
 end.

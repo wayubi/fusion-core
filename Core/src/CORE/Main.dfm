@@ -2104,6 +2104,13 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'Character Inventory'
           end
+          object Label85: TLabel
+            Left = 104
+            Top = 352
+            Width = 186
+            Height = 18
+            Caption = 'The ability to save is not available'
+          end
           object ListBox4: TListBox
             Left = 8
             Top = 16
@@ -2211,12 +2218,94 @@ object frmMain: TfrmMain
           end
         end
         object TabSheet14: TTabSheet
-          Caption = 'Skills'
+          Caption = 'Skills / Flags'
           ImageIndex = 5
-        end
-        object TabSheet11: TTabSheet
-          Caption = 'Flags'
-          ImageIndex = 2
+          object Label110: TLabel
+            Left = 8
+            Top = 184
+            Width = 85
+            Height = 18
+            Caption = 'Flags (variables)'
+          end
+          object Label111: TLabel
+            Left = 8
+            Top = 0
+            Width = 26
+            Height = 18
+            Caption = 'Skills'
+          end
+          object Label115: TLabel
+            Left = 192
+            Top = 40
+            Width = 53
+            Height = 18
+            Caption = 'Skill Level'
+          end
+          object Label116: TLabel
+            Left = 240
+            Top = 16
+            Width = 21
+            Height = 18
+            Caption = 'N/A'
+          end
+          object Label131: TLabel
+            Left = 192
+            Top = 16
+            Width = 39
+            Height = 18
+            Caption = 'Skill ID:'
+          end
+          object ListBox7: TListBox
+            Left = 8
+            Top = 16
+            Width = 177
+            Height = 169
+            ItemHeight = 18
+            TabOrder = 0
+            OnClick = ListBox7Click
+          end
+          object ListBox8: TListBox
+            Left = 8
+            Top = 200
+            Width = 177
+            Height = 169
+            ItemHeight = 18
+            TabOrder = 1
+            OnClick = ListBox4Click
+          end
+          object Button23: TButton
+            Left = 288
+            Top = 160
+            Width = 75
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 2
+          end
+          object Button24: TButton
+            Left = 296
+            Top = 352
+            Width = 75
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 3
+          end
+          object ComboBox20: TComboBox
+            Left = 192
+            Top = 56
+            Width = 41
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 4
+          end
+          object CheckBox2: TCheckBox
+            Left = 192
+            Top = 144
+            Width = 137
+            Height = 17
+            Caption = 'Hide Unused Skills'
+            TabOrder = 5
+            OnClick = CheckBox2Click
+          end
         end
       end
     end

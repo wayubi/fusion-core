@@ -700,10 +700,10 @@ TChara = class(TLiving)
 	// Option is a word-length bitmask.  The bits are for the following
 	// character status conditions:
 	//
-	// 01: Sight        02: Hide          04: Cloak         08: Cart 1
-	// 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
-	// 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
-	// 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
+	// 01: Sight         02: Hide          04: Cloak         08: Cart 1
+	// 16: Falcon        32: Peco          64: GM Hide       128: Cart 2
+	// 256: Cart 3       512: Cart 4       1024: Cart 5      2048: Reverse Orcish
+	// 4096: Wedding SPR 8192: Ruwach      16384: Footsteps  32768: Cart 6?
 
 	//  0000 | 0000 | 0000 | 0000
 	//    R    OCCC   CPPF   CCHS
@@ -1189,6 +1189,7 @@ public
 	ScriptInitMS :integer;
 
     OnTouch :Boolean;
+    OnTouchLabel : integer;
 
 	ChatRoomID  :cardinal; //チャットルームID
 	Enable      :Boolean; //有効スイッチ
@@ -8345,6 +8346,7 @@ Begin
                             Exit; // Safe - 2004/10/19
                         end else begin
                             tn.OnTouch := True;
+                            tn.OnTouchLabel := 0;
                             tn.WarpSize.X  := StrToInt(SL1[1]);
                             tn.WarpSize.Y  := StrToInt(SL1[2]);
                         end;
@@ -9718,8 +9720,7 @@ Begin
 							SetLength(tn.Script, k + 1);
 							tn.Script[k].ID := 71;
 							SetLength(tn.Script[k].Data1, 2);
-                            SetLength(tn.Script[k].Data3, 1);
-							//SetLength(tn.Script[k].Data3, 1);
+                            //SetLength(tn.Script[k].Data3, 1);
 							tn.Script[k].Data1[0] := SL1[0];
 							tn.Script[k].Data1[1] := lowercase(SL1[1]);
 							//tn.Script[k].Data3[0] := StrToInt(SL1[2]);
@@ -9859,6 +9860,8 @@ Begin
 								tn.ScriptInitS := k;
 							end else if (LowerCase(Copy(str, 1, 11)) = 'onmymobdead') then begin
 								tn.ScriptInitMS := k;
+                            end else if (LowerCase(Copy(str, 1, 7)) = 'ontouch') then begin
+                                tn.OnTouchLabel := k;
 							end;
 
 							str := Copy(str, 1, Length(str) - 1);
@@ -9910,14 +9913,7 @@ Begin
 					if tn.ScriptLabel <> '' then tm.NPCLabel.AddObject(tn.ScriptLabel, tn);
 					tm.NPC.AddObject(tn.ID, tn);
 					tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
-                    if NOT tn.OnTouch then tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8)
-                    else begin //Assuming this might have something to do with the area
-                        for j := tn.Point.Y - tn.WarpSize.Y to tn.Point.Y + tn.WarpSize.Y do begin
-    						for i := tn.Point.X - tn.WarpSize.X to tn.Point.X + tn.WarpSize.X do begin
-    							tm.gat[i][j] := (tm.gat[i][j] or $8); {this is from WARP.  Shop has $fe instead of $8}
-    						end;
-    					end;
-                    end;
+                    tm.gat[tn.Point.X][tn.Point.Y] := (tm.gat[tn.Point.X][tn.Point.Y] or $8)
 
 {d$0100fix5よりココまで}
 	// モンスター ----------------------------------------------------------------

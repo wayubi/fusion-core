@@ -32,6 +32,9 @@ uses
     procedure JCon_Chara_Inv_Save();
     procedure JCon_Chara_Cart_Load();
     procedure JCon_Chara_Store_Load();
+    procedure JCon_Chara_Skill_Load(HideNull : Boolean);
+    procedure JCon_Chara_Skill_Populate();
+    procedure JCon_Chara_Flag_Load();
 
 
     procedure JCon_INI_Server_Load();
@@ -699,18 +702,19 @@ uses
         if (frmMain.listbox4.ItemIndex = -1) then Exit;
             j := (frmMain.Listbox4.ItemIndex + 1);
             Item := tc.Item[j].Data;
-            frmMain.Label121.Caption := Item.Name;
-            frmMain.Edit85.Text := IntToStr(tc.Item[j].ID);
-            frmMain.CheckBox1.Checked := StrToBool(IntToStr(tc.Item[j].Identify));
+            try frmMain.Label121.Caption := Item.Name; except end;
+            try frmMain.Edit85.Text := IntToStr(tc.Item[j].ID); except end;
+            try frmMain.CheckBox1.Checked := StrToBool(IntToStr(tc.Item[j].Identify)); except end;
 
             if tc.Item[j].Equip <> 0 then frmMain.Label97.Visible := True
             else frmMain.Label97.Visible := false;
 
-            frmMain.Edit58.Text := IntToStr(tc.Item[j].Amount);
-            frmMain.Edit75.Text := IntToStr(tc.Item[j].Card[0]);
-            frmMain.Edit76.Text := IntToStr(tc.Item[j].Card[1]);
-            frmMain.Edit77.Text := IntToStr(tc.Item[j].Card[2]);
-            frmMain.Edit78.Text := IntToStr(tc.Item[j].Card[3]);
+            try frmMain.ComboBox19.ItemIndex := tc.Item[j].Refine; except end;
+            try frmMain.Edit58.Text := IntToStr(tc.Item[j].Amount); except end;
+            try frmMain.Edit75.Text := IntToStr(tc.Item[j].Card[0]); except end;
+            try frmMain.Edit76.Text := IntToStr(tc.Item[j].Card[1]); except end;
+            try frmMain.Edit77.Text := IntToStr(tc.Item[j].Card[2]); except end;
+            try frmMain.Edit78.Text := IntToStr(tc.Item[j].Card[3]); except end;
     end;
 
     procedure JCon_Chara_Inv_Save();
@@ -796,6 +800,78 @@ uses
                 frmMain.ListBox5.Items.Add(Item.Name + ' : ' + IntToStr(tc.PData.Kafra.Item[j].ID));
             end;
         end;
+    end;
+
+    procedure JCon_Chara_Skill_Load(HideNull : Boolean);
+    var
+		j : Integer;
+    	tc : TChara;
+
+	begin
+        frmMain.ListBox7.Clear;
+        frmMain.ComboBox20.Clear;
+
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        for j := 1 to MAX_SKILL_NUMBER do begin
+
+            if HideNull = true then begin
+
+                frmMain.CheckBox2.Checked := true;
+                if tc.Skill[j].Lv <> 0 then
+                    frmMain.ListBox7.Items.Add((IntToStr(tc.Skill[j].Data.ID)) + ' : ' + tc.Skill[j].Data.Name);
+            end else begin
+                frmMain.CheckBox2.Checked := false;
+                if tc.Skill[j].Lv >= 0 then
+                    frmMain.ListBox7.Items.Add((IntToStr(tc.Skill[j].Data.ID)) + ' : ' + tc.Skill[j].Data.Name);
+            end;
+        end;
+    end;
+
+    procedure JCon_Chara_Skill_Populate();
+    var
+        tc : TChara;
+        TempIndex, SkillID : integer;
+
+    begin
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        if (frmMain.ListBox7.ItemIndex = -1) then Exit;
+
+		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+        frmMain.ComboBox20.Clear;
+
+        if frmMain.CheckBox2.Checked = false then begin
+            SkillID := (frmMain.ListBox7.ItemIndex + 1); //Skill ID if you show all skills
+        end else begin
+            TempIndex := 0;
+            SkillID := 0; //the skill ID if you have hidden
+            repeat  //selecting a skill ID that isn't lvl 0,
+                    // and then adding a counter to compare with selected itemindex
+                SkillID := SkillID + 1;
+                if tc.Skill[SkillID].Lv <> 0 then
+                    TempIndex := TempIndex + 1;
+            until (TempIndex = (frmMain.ListBox7.ItemIndex + 1)) OR (SkillID > MAX_SKILL_NUMBER);
+        end;
+        frmMain.Label116.Caption := IntToStr(SkillID);
+
+        //reusing TempIndex to save variables
+        //creating the combobox to hold valid skill levels
+        for TempIndex := 0 to tc.Skill[SkillID].Data.MasterLV do
+            frmMain.ComboBox20.Items.Add(IntToStr(TempIndex));
+        frmMain.ComboBox20.ItemIndex := tc.Skill[SkillID].Lv;
+    end;
+
+    procedure JCon_Chara_Flag_Load();
+    var
+		j : Integer;
+    	tc : TChara;
+
+	begin
+        //frmMain.ListBox7.Clear;
+
+        //if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        //tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
     end;
 
 
