@@ -812,9 +812,11 @@ uses
         nat : Variant;
         ports : Variant;
     begin
-        nat := CreateOleObject('HNetCfg.NATUPnP');
-        ports := nat.StaticPortMappingCollection;
-        ports.Add(port, 'TCP', port, LAN_IP, true, name);
+        if not (LAN_IP = '127.0.0.1') then begin
+            nat := CreateOleObject('HNetCfg.NATUPnP');
+            ports := nat.StaticPortMappingCollection;
+            ports.Add(port, 'TCP', port, LAN_IP, true, name);
+        end;
     end;
 
     procedure destroy_upnp(port : Integer);
@@ -822,9 +824,11 @@ uses
         nat : Variant;
         ports : Variant;
     begin
-        nat := CreateOleObject('HNetCfg.NATUPnP');
-        ports := nat.StaticPortMappingCollection;
-        ports.Remove(port, 'TCP');
+        if not (LAN_IP = '127.0.0.1') then begin
+            nat := CreateOleObject('HNetCfg.NATUPnP');
+            ports := nat.StaticPortMappingCollection;
+            ports.Remove(port, 'TCP');
+        end;
     end;
 
 end.

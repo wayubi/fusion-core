@@ -18,7 +18,8 @@ uses
     {Fusion}
     Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData, ISCS,
     REED_SAVE_PARTIES,
-    REED_SAVE_GUILDS;
+    REED_SAVE_GUILDS,
+    REED_DELETE;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -4010,9 +4011,11 @@ end;
                     tg.Member[0] := nil;
                     tg.MemberID[0] := 0;
 
-                    PD_Save_Guilds_Parse(true);
+                    //PD_Save_Guilds_Parse(true);
 					if UseSQL then DeleteGuildInfo(tc.GuildID);
-					GuildList.Delete(GuildList.IndexOf(tc.GuildID));
+					//GuildList.Delete(GuildList.IndexOf(tc.GuildID));
+
+                    PD_Delete_Guilds(tc.GuildID);
 
 					tc.GuildID := 0;
 					tc.GuildName := '';

@@ -232,7 +232,7 @@ implementation
                 if assigned(tg.GuildBanList.Objects[i]) then
                     tg.GuildBanList.Objects[i].Free;
             end;
-            tg.GuildBanList.Free;
+            tg.GuildBanList.Clear;
         end;
         { -- Clear existing BanList -- }
 
@@ -265,7 +265,7 @@ implementation
                 if assigned(tg.RelAlliance.Objects[i]) then
                     tg.RelAlliance.Objects[i].Free;
             end;
-            tg.RelAlliance.Free;
+            tg.RelAlliance.Clear;
         end;
 
         if (tg.RelHostility.Count > 0) then begin
@@ -273,7 +273,7 @@ implementation
                 if assigned(tg.RelHostility.Objects[i]) then
                     tg.RelHostility.Objects[i].Free;
             end;
-            tg.RelHostility.Free;
+            tg.RelHostility.Clear;
         end;
         { -- Clear existing Diplomacy List -- }
 

@@ -1,7 +1,10 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
-- 11-06-04: UPnP Automatic Port Forwarding Implemented. [AlexKreuz]
+- 11-07-04: REED: Reduced startup lag on large REED databases. [AlexKreuz]
+- 11-07-04: REED: Ban & Diplomacy lists caused crash on reload. [AlexKreuz]
+- 11-07-04: UPnP: Fixed crash when no network detected. [AlexKreuz]
+- 11-06-04: UPnP: Automatic Port Forwarding Implemented. [AlexKreuz]
 - 11-06-04: ISCS send option updated. [AlexKreuz]
 - 11-06-04: Updated Account JCon page. [AlexKreuz]
 - 11-06-04: Preparing Fusion 1.213 layout and format. [AlexKreuz]

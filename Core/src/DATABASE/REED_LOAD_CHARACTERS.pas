@@ -4,7 +4,7 @@ interface
 
 uses
     Common, REED_Support,
-    Classes, SysUtils;
+    Classes, SysUtils, Forms;
 
     procedure PD_Load_Characters_Parse(UID : String = '*');
 
@@ -34,6 +34,8 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
+
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
@@ -76,6 +78,8 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
+            
             path := basepath + resultlist[i] + '\' + pfile;
     
             if (UID = '*') then begin
@@ -179,6 +183,7 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
 
             if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
@@ -210,6 +215,7 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
 
             if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
@@ -257,6 +263,7 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
 
             if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
@@ -282,6 +289,7 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
 
             if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
@@ -307,6 +315,7 @@ implementation
         tc : TChara;
     begin
         for i := 0 to resultlist.Count - 1 do begin
+            Application.ProcessMessages;
 
             if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
