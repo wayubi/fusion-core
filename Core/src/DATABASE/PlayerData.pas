@@ -57,16 +57,14 @@ uses
             UID := IntToStr(tp.ID);
         end;
 
-        if UID = '*' then debugout.Lines.add('­ Accounts ­');
+        if UID = '*' then debugout.Lines.add('­ Account / Character / Pet Linkages ­');
     	PD_Load_Accounts(UID);
-        PD_Load_Accounts_ActiveCharacters(UID);
-        PD_Load_Accounts_Storage(UID);
 
-        if UID = '*' then debugout.Lines.add('­ Characters ­');
-        PD_Load_Characters_Parse(UID);
+        //if UID = '*' then debugout.Lines.add('­ Characters ­');
+        //PD_Load_Characters_Parse(UID);
 
-        if UID = '*' then debugout.Lines.add('­ Pets ­');
-        PD_Load_Pets_Parse(UID);
+        //if UID = '*' then debugout.Lines.add('­ Pets ­');
+        //PD_Load_Pets_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Parties ­');
         PD_Load_Parties_Pre_Parse(UID);

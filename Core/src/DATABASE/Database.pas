@@ -1785,9 +1785,6 @@ begin
 	if FileExists(AppPath + 'guild.txt') then
         DeleteFile(AppPath + 'guild.txt');
 
-    debugout.lines.add('Loading R.E.E.D Database ... Please wait ...');
-    PD_PlayerData_Load();
-
     { -- Server Flags -- }
 	{if not FileExists(AppPath + 'status.txt') then begin
 		AssignFile(txt, AppPath + 'status.txt');
@@ -1858,7 +1855,9 @@ begin
 
 
 
-
+    debugout.lines.add('Loading R.E.E.D Database ... Please wait ...');
+    PD_PlayerData_Load();
+    
 	Application.ProcessMessages;
 end;
 

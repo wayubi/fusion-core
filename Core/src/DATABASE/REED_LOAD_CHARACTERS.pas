@@ -6,6 +6,8 @@ uses
     Common, REED_Support,
     Classes, SysUtils, Forms;
 
+    procedure PD_Load_Characters_Startup(UID : String; path : String);
+
     procedure PD_Load_Characters_Parse(UID : String = '*');
 
     procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
@@ -16,6 +18,47 @@ uses
     procedure PD_Load_Characters_Variables(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
 
 implementation
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Characters Parser -------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Characters_Startup(UID : String; path : String);
+    var
+        tp : TPlayer;
+        pfile : String;
+        dirlist : TStringList;
+    begin
+        dirlist := TStringList.Create;
+        dirlist.Clear;
+
+        tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
+        path := path + 'Characters\';
+
+        pfile := 'Character.txt';
+        dirlist := get_list(path, pfile);
+
+        pfile := 'Character.txt';
+        PD_Load_Characters(UID, tp, dirlist, path, pfile);
+
+        pfile := 'ActiveMemos.txt';
+        PD_Load_Characters_Memos(UID, tp, dirlist, path, pfile);
+
+        pfile := 'Skills.txt';
+        PD_Load_Characters_Skills(UID, tp, dirlist, path, pfile);
+
+        pfile := 'Inventory.txt';
+        PD_Load_Characters_Inventory(UID, tp, dirlist, path, pfile);
+
+        pfile := 'Cart.txt';
+        PD_Load_Characters_Cart(UID, tp, dirlist, path, pfile);
+
+        pfile := 'Variables.txt';
+        PD_Load_Characters_Variables(UID, tp, dirlist, path, pfile);
+
+        dirlist.Free;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
 
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Characters Parser -------------------------------------------------- }
@@ -91,10 +134,9 @@ implementation
             datafile.Clear;
             datafile.LoadFromFile(path);
     
-            if (UID = '*') then begin
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
                 tc := TChara.Create;
             end else begin
-                if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
                 tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
                 if (tc.Name <> tp.CName[0]) and (tc.Name <> tp.CName[1]) and (tc.Name <> tp.CName[2])
@@ -158,7 +200,7 @@ implementation
             tc.PData := tp;
             { -- End - Retrieve and assign values to character. -- }
 
-            if (UID = '*') then begin
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
                 CharaName.AddObject(tc.Name, tc);
                 Chara.AddObject(tc.CID, tc);
             end;
