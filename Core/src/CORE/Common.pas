@@ -3939,6 +3939,7 @@ begin
 	WFIFOW(0, $00b0 + Mode);
 	WFIFOW(2, DType);
 	WFIFOL(4, Value);
+    if (tc.Login <> 2) then Exit;
 	tc.Socket.SendBuf(buf, 8);
 {パーティー機能追加}
 	//ステータスの更新時にHPバーの情報も更新する
