@@ -12,7 +12,7 @@ uses
     {Shared}
     Classes, SysUtils, Dialogs,
     {Fusion}
-    Common, SQLData, Zip, List32, PlayerData, REED_SAVE_ACCOUNTS;
+    Common, SQLData, Zip, List32, PlayerData, REED_SAVE_ACCOUNTS, REED_Support;
 
 
 
@@ -53,6 +53,8 @@ uses
     procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);
     function JIDFixer(ID:integer) : integer;
 
+    function get_nowguildid() : Integer;
+
 implementation
 
 uses
@@ -81,7 +83,7 @@ uses
         NowCharaID := 0;
         NowPartyID := 10000;
         NowPetID := 0;
-        NowGuildID := 1;
+        NowGuildID := get_nowguildid();
 
         DebugOut := frmMain.txtDebug;
 
@@ -941,6 +943,21 @@ uses
         if (ID > UPPER_JOB_BEGIN) then
             Result :=  ID - UPPER_JOB_BEGIN + LOWER_JOB_END // (RN 4001 - 4000 + 23 = 24
         else Result := ID;
+    end;
+
+
+    function get_nowguildid() : Integer;
+    var
+        basepath, pfile : String;
+        resultlist : TStringList;
+    begin
+        resultlist := TStringList.Create;
+        basepath := AppPath + 'gamedata\Guilds\';
+        pfile := 'Members.txt';
+        resultlist := get_list(basepath, pfile);
+        resultlist.Sort;
+        Result := StrToInt(resultlist[resultlist.Count-1])+1;
+        resultlist.Free;
     end;
 
 end.

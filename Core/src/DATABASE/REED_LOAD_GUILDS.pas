@@ -75,8 +75,6 @@ implementation
             pfile := 'Storage.txt';
             PD_Load_Guilds_Storage(tg, path + pfile);
 
-            NowGuildID := (tg.ID + 1);
-
             if GuildList.IndexOf(tg.ID) = -1 then begin
                 GuildList.AddObject(tg.ID, tg);
             end;
