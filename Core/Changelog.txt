@@ -1,3 +1,5 @@
+- 05-28-04: Fixed ALBGM ID non-existant caused crash. [AlexKreuz]
+- 05-28-04: Switched GM Command, #item to ALBGM system. [AlexKreuz]
 - 05-28-04: Switched GM Command, #alive to ALBGM system. [AlexKreuz]
 - 05-28-04: Created access level based GM system (ALBGM) structure. [AlexKreuz]
 - 05-28-04: Fixed Assassin can not equip two daggers. [AlexKreuz]

@@ -18,10 +18,12 @@ var
 
     procedure load_commands();
     procedure save_commands();
+
     procedure parse_commands(tc : TChara; str : String);
     function check_level(id : Integer; cmd : Integer) : Boolean;
+
     procedure command_alive(tc : TChara);
-    procedure command_item();
+    procedure command_item(tc : TChara; str : String);
 
 implementation
 
@@ -60,7 +62,7 @@ implementation
         str := Copy(str, Pos(' : ', str) + 4, 256);
 
         if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then command_alive(tc);
-        if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then command_item();
+        if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then command_item(tc, str);
     end;
 
     function check_level(id : Integer; cmd : Integer) : Boolean;
@@ -70,9 +72,10 @@ implementation
         tGM : TGM_Table;
     begin
         Result := False;
-        tGM := GM_Access_DB.Objects[GM_Access_DB.IndexOf(id)] as TGM_Table;
+        idx := GM_Access_DB.IndexOf(id);
 
-        if (assigned(tGM)) then begin
+        if (idx <> -1) then begin
+            tGM := GM_Access_DB.Objects[idx] as TGM_Table;
             if ( (tGM.ID = id) and (tGM.Level >= cmd) ) then Result := True;
         end;
     end;
@@ -93,8 +96,66 @@ implementation
         SendBCmd(tm, tc.Point, 8);
     end;
 
-    procedure command_item();
+    procedure command_item(tc : TChara; str : String);
+    var
+        sl : TStringList;
+        td : TItemDB;
+        i, j, k : Integer;
     begin
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        try
+            if sl.Count = 2 then begin
+                Val(sl[0], i, k);
+    
+                if k <> 0 then Exit;
+                if ItemDB.IndexOf(i) = -1 then Exit;
+    
+                Val(sl[1], j, k);
+    
+                if k <> 0 then Exit;
+                if (j <= 0) or (j > 30000) then Exit;
+    
+                td := ItemDB.IndexOfObject(i) as TItemDB;
+    
+                if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
+                    k := SearchCInventory(tc, i, td.IEquip);
+    
+                    if k <> 0 then begin
+                        if tc.Item[k].Amount + j > 30000 then Exit;
+                        if td.IEquip then j := 1;
+    
+                        tc.Item[k].ID := i;
+                        tc.Item[k].Amount := tc.Item[k].Amount + j;
+                        tc.Item[k].Equip := 0;
+                        tc.Item[k].Identify := 1;
+                        tc.Item[k].Refine := 0;
+                        tc.Item[k].Attr := 0;
+                        tc.Item[k].Card[0] := 0;
+                        tc.Item[k].Card[1] := 0;
+                        tc.Item[k].Card[2] := 0;
+                        tc.Item[k].Card[3] := 0;
+                        tc.Item[k].Data := td;
+    
+                        tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
+                        SendCStat1(tc, 0, $0018, tc.Weight);
+    
+                        SendCGetItem(tc, k, j);
+                    end;
+                end
+    
+                else begin
+                    WFIFOW( 0, $00a0);
+                    WFIFOB(22, 2);
+                    tc.Socket.SendBuf(buf, 23);
+                end;
+            end;
+
+        finally
+            sl.Free();
+        end;
+
     end;
 
 end.
