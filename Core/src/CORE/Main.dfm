@@ -2,10 +2,10 @@ object frmMain: TfrmMain
   Left = 288
   Top = 430
   Width = 608
-  Height = 369
+  Height = 366
   Caption = 's'
   Color = clCream
-  Constraints.MaxHeight = 369
+  Constraints.MaxHeight = 366
   Constraints.MaxWidth = 608
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -1329,7 +1329,7 @@ object frmMain: TfrmMain
         Top = 0
         Width = 393
         Height = 433
-        ActivePage = TabSheet14
+        ActivePage = TabSheet6
         TabOrder = 0
         OnChange = PageControl3Change
         object TabSheet6: TTabSheet
