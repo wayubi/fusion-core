@@ -1,3 +1,7 @@
+
+- 03-21-04: Added range check for negative stat bonuses (they become 0). [Colus]
+- 03-21-04: Now supporting items/cards with negative stat modifiers. [Colus]
+- 03-21-04: Fixed armor items/cards giving status attack+ instead of resist+. [Colus]
 - 03-20-04: Fixed a few lag issues while players attack near each other.  [Darkhelmet]
 - 03-19-04: Fixed Waterball Crash PvP. Bug #597.  [Darkhelmet]
 - 03-19-04: Cleaned up a few more commonly called code bits and comments. [Colus]

@@ -8931,7 +8931,7 @@ begin
                                                         Inc(j);
                                                 until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );}
                                         end;
-				138: //エンチャント_ポイズン
+				138: // Enchant Poison
 					begin
 						ProcessType := 3;
 					end;

@@ -95,10 +95,10 @@ type TItemDB = class
 	DamageFixR :array[0..9] of SmallInt; // Race mod
 	DamageFixE :array[0..9] of SmallInt; // Element mod
 	DamageFixS :array[0..2] of SmallInt; // Size mod
-	SFixPer1   :array[0..5] of Word; // Option 1 mod
-	SFixPer2   :array[0..4] of Word; // Option 2 mod
-	DrainFix   :array[0..1] of Word; // Drain amount
-	DrainPer   :array[0..1] of Word; // Drain chance
+	SFixPer1   :array[0..5] of SmallInt; // Option 1 mod
+	SFixPer2   :array[0..4] of SmallInt; // Option 2 mod
+	DrainFix   :array[0..1] of SmallInt; // Drain amount
+	DrainPer   :array[0..1] of SmallInt; // Drain chance
 	AddSkill   :array[0..MAX_SKILL_NUMBER] of Word; // Skill addition
 	SplashAttack  :boolean;          // Splash attack
         WeaponSkill   :integer;
@@ -700,7 +700,8 @@ type TChara = class(TLiving)
 	JobNextEXP    :cardinal;
 	Weight        :cardinal;
 	MaxWeight     :cardinal;
-	Bonus         :array[0..5] of word;
+  // Changed bonus to smallint (signed words) to prevent negative stat crashes
+	Bonus         :array[0..5] of SmallInt;
 	Param         :array[0..5] of word;
 	ParamUp       :array[0..5] of word;
 	WeaponType    :array[0..1] of word; // Right(0), left(1) hand weapon types
@@ -1003,7 +1004,7 @@ type TNPC = class(TLiving)
 	//ID          :cardinal;
 	//Name        :string;
 {NPCイベント追加}
-	JID         :word;
+	//JID         :word;
 	//JID         :integer;  // Why make it integer?
 {NPCイベント追加ココまで}
 	//Map         :string;
@@ -1730,6 +1731,7 @@ end;
 procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 var
 	j :Integer;
+  i :byte;
   JIDFix :word; // JID correction
 begin
 	with tc do begin
@@ -1793,9 +1795,13 @@ begin
 		for j:=0 to 2 do begin
 			Inc(DamageFixS[j],td.DamageFixS[j]);
 		end;
+    // Colus, 20040321: Only weapon card/items increase status affliction chances
+    // (I think).  Other items increase resistances.
+    if (td.IType = 4) or ((td.IType = 6) and (td.Loc = 0)) then i := 0 else i := 1;
+
 		for j:=0 to 4 do begin
-			Inc(SFixPer1[0][j],td.SFixPer1[j]);
-			Inc(SFixPer2[0][j],td.SFixPer2[j]);
+			Inc(SFixPer1[i][j],td.SFixPer1[j]);
+			Inc(SFixPer2[i][j],td.SFixPer2[j]);
 		end;
 		Inc(DrainFix[0],td.DrainFix[0]);
 		Inc(DrainPer[0],td.DrainPer[0]);
@@ -2269,6 +2275,8 @@ begin
 		CalcSkill(tc,Tick);
 		for i := 0 to 5 do begin
 			ParamUp[i] := ((ParamBase[i] - 1) div 10) + 2;
+      // Colus, 20040321: Negative bonus for stats might crash server?
+      if (Bonus[i] < 0) then Bonus[i] := 0;
 			Param[i] := ParamBase[i] + Bonus[i];
 		end;
 
@@ -3264,7 +3272,7 @@ begin
   SendCStat1(tc, 0, 7, tc.SP);
   SendCStat1(tc, 0, 8, tc.MAXSP);
 
-	//ステータス
+	// Update status points and points needed to level up.
 	WFIFOW( 0, $00bd);
 	WFIFOW( 2, tc.StatusPoint);
 	for i := 0 to 5 do begin
@@ -3301,7 +3309,7 @@ begin
   SendCStat1(tc, 0, $0018, tc.Weight);
   SendCStat1(tc, 0, $0019, tc.MaxWeight);
 
-	//ボーナス
+  // Send status points.
 	for i := 0 to 5 do begin
 		WFIFOW( 0, $0141);
 		WFIFOL( 2, 13+i);
@@ -3309,7 +3317,7 @@ begin
 		WFIFOL(10, tc.Bonus[i]);
 		tc.Socket.SendBuf(buf, 14);
 	end;
-	//射程距離セット
+	// Send attack range.
 	WFIFOW(0, $013a);
 	WFIFOW(2, tc.Range);
 	tc.Socket.SendBuf(buf, 4);
