@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
-Fusion 1.2.0.8 - December 25th, 2003
+Fusion 1.208 - December 25th, 2003
 --------------------------------------------------------------------------------
 - 12-24-03: Added Auto-Generating addplayer.txt file to prevent errors. [AlexKreuz]
 - 12-24-03: Added Option_MaxUsers to weiss.ini. Maximum allowed online. [AlexKreuz]
@@ -59,37 +59,36 @@ Fusion 1.2.0.8 - December 25th, 2003
 - 12-17-03: Added Phen Card [Colus]
 - 12-16-03: Fixed Monk's Falling Pearl Petals (bug #94) [Colus]
 - 12-16-03: Fixed ItemDropDenominator variable type -> integer (bug #69) [Colus]
---------------------------------------------------------------------------------
--Added: Whistle. [Darkhelemt]
--Added: Apple of Idun-Bard. [Darkhelmet]
--Added: Deluge, Valcano, Viloentgale. [Darkhelmet]
--Added: Icons 50 % and 90 % weight,Peko, Falcon. [Darkhelmet]
--Added: Extremity fist graphics. [Unknown]
--Added: Musical Strike. [Oatmeal12345]
--Added: Throw Arrow Dancer. [Oatmeal12345]
--Added: BladeStop. [Darkhelmet]
--Fixed: Acid Terror Graphics. [Oatmeal12345]
--Added: Wedding Skills to Skill db (note none of them work). [Oatmeal12345]
--Added: Venom Dust. [Oatmeal12345]
--Fixed: Demonstration Graphics. [Oatmeal12345]
--Added: Spirit Spheres graphics. [Darkhelmet, Oatmeal12345, Apple Girl]
--Added: New npc script command resetbonusstat (2x stat points). [Oatmeal12345] 
--Added: Super Novice Class. [Oatmeal12345, Darkhelmet] 
--Fixed: Cpu usage problem. [DarkHelmet]
--Fixed: Angelus it now adds to the right type. [Darkhelmet] 
--Fixed: Hiding. [Darkhelmet] 
--Fixed: Icewall and Firepillar in pvp. [Darkhelmet] 
--Fixed: Gm zeny bug. [Darkhelmet] 
--Fixed: Two hand quicken taking off weapon and effect still stays bug. [Darkhelmet] 
--Fixed: Spear Quicken taking off weapon and effect still stays bug. [Darkhelmet] 
--Fixed: Adrenaline Rush taking off weapon an effect still stays bug. [Darkhelmet] 
--Fixed: Thief Backslide now moves 5 tiles backwards instead of warping. [Darkhelmet] 
--Fixed: Assassin Grimtooh requires Katar now. [Darkhelmet] 
--Fixed: Double Strafe. [Darkhelmet] 
--Fixed: Drake Card adds perfect damage. [Oatmeal12345] 
+- 12-??-03: Added Whistle. [Darkhelemt]
+- 12-??-03: Added Apple of Idun-Bard. [Darkhelmet]
+- 12-??-03: Added Deluge, Valcano, Viloentgale. [Darkhelmet]
+- 12-??-03: Added Icons 50 % and 90 % weight,Peko, Falcon. [Darkhelmet]
+- 12-??-03: Added Extremity fist graphics. [Unknown]
+- 12-??-03: Added Musical Strike. [Oatmeal12345]
+- 12-??-03: Added Throw Arrow Dancer. [Oatmeal12345]
+- 12-??-03: Added BladeStop. [Darkhelmet]
+- 12-??-03: Fixed Acid Terror Graphics. [Oatmeal12345]
+- 12-??-03: Added Wedding Skills to Skill db (note none of them work). [Oatmeal12345]
+- 12-??-03: Added Venom Dust. [Oatmeal12345]
+- 12-??-03: Fixed Demonstration Graphics. [Oatmeal12345]
+- 12-??-03: Added Spirit Spheres graphics. [Darkhelmet, Oatmeal12345, Apple Girl]
+- 12-??-03: Added New npc script command resetbonusstat (2x stat points). [Oatmeal12345] 
+- 12-??-03: Added Super Novice Class. [Oatmeal12345, Darkhelmet] 
+- 12-??-03: Fixed Cpu usage problem. [DarkHelmet]
+- 12-??-03: Fixed Angelus it now adds to the right type. [Darkhelmet] 
+- 12-??-03: Fixed Hiding. [Darkhelmet] 
+- 12-??-03: Fixed Icewall and Firepillar in pvp. [Darkhelmet] 
+- 12-??-03: Fixed Gm zeny bug. [Darkhelmet] 
+- 12-??-03: Fixed Two hand quicken taking off weapon and effect still stays bug. [Darkhelmet] 
+- 12-??-03: Fixed Spear Quicken taking off weapon and effect still stays bug. [Darkhelmet] 
+- 12-??-03: Fixed Adrenaline Rush taking off weapon an effect still stays bug. [Darkhelmet] 
+- 12-??-03: Fixed Thief Backslide now moves 5 tiles backwards instead of warping. [Darkhelmet] 
+- 12-??-03: Fixed Assassin Grimtooh requires Katar now. [Darkhelmet] 
+- 12-??-03: Fixed Double Strafe. [Darkhelmet] 
+- 12-??-03: Fixed Drake Card adds perfect damage. [Oatmeal12345] 
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.7 - November 27th, 2003
+Fusion 1.207 - November 27th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Bug -> Storm Gust > Caused Crash. [DarkHelmet] 
 - Fixed: Bug -> Area Effect Harmed Caster. [DarkHelmet] 
@@ -144,7 +143,7 @@ Fusion 1.2.0.7 - November 27th, 2003
 - Card: Drake-perfect damge  -[Oatmeal12345]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.6 - November 12th, 2003
+Fusion 1.206 - November 12th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Cart -> User Overweight Bug. [AlexKreuz]
 - Fixed: Merchant Shop -> Fatal Crash. [AlexKreuz]
@@ -222,12 +221,12 @@ Fusion 1.2.0.6 - November 12th, 2003
 - Created: New Map (MAP) based on DWM. [AlexKreuz]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.5 - November 1st, 2003
+Fusion 1.205 - November 1st, 2003
 --------------------------------------------------------------------------------
 - Fixed: Healing Items now work again. [AlexKreuz]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.4 - November 1st, 2003
+Fusion 1.204 - November 1st, 2003
 --------------------------------------------------------------------------------
 - Fixed: Console Command: -kick caused crash. [AlexKreuz] 
 - Fixed: 10053: Random Client Reset caused Fatal Crash. [AlexKreuz] 
@@ -262,7 +261,7 @@ Fusion 1.2.0.4 - November 1st, 2003
 - Updated: Monk: Finger Offensive. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.3 - October 22nd, 2003
+Fusion 1.203 - October 22nd, 2003
 --------------------------------------------------------------------------------
 - Added: Console Command: -sql update player set gender [AlexKreuz] 
 - Added: Console Command: -sql update chara set zeny [AlexKreuz] 
@@ -283,7 +282,7 @@ Fusion 1.2.0.3 - October 22nd, 2003
 - Removed: Monk: Extremity Fists. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.2 - October 20th, 2003
+Fusion 1.202 - October 20th, 2003
 --------------------------------------------------------------------------------
 - Fixed: 50% Guild Tax Bug caused Integer Overflow. [AlexKreuz] 
 - Fixed: The url to DarkWeiss home was incorrect. [AlexKreuz] 
@@ -293,13 +292,13 @@ Fusion 1.2.0.2 - October 20th, 2003
 - Fixed: Monk: Investigate. [DarkHelmet]
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.1 - October 19th, 2003
+Fusion 1.201 - October 19th, 2003
 --------------------------------------------------------------------------------
 - Fixed: /monster command fixed. [AlexKreuz] 
 - Fixed: Monk Crash w/ Claws. [DarkHelmet] 
 
 --------------------------------------------------------------------------------
-Fusion 1.2.0.0 - October 19th, 2003
+Fusion 1.200 - October 19th, 2003
 --------------------------------------------------------------------------------
 - Fixed: Guild Bugs removed. [GTO] 
 - Fixed: Login Fix. [GTO] 
@@ -332,13 +331,13 @@ Fusion 1.2.0.0 - October 19th, 2003
 - Added: Status Bar: UpTime. [AlexKreuz] 
 
 --------------------------------------------------------------------------------
-Fusion 1.1.0.0 - October 15th, 2003
+Fusion 1.100 - October 15th, 2003
 --------------------------------------------------------------------------------
 - Added: Server-Side Control Panel. [AlexKreuz] 
 - Added: Server-Side Command @users. [AlexKreuz] 
 
 --------------------------------------------------------------------------------
-Fusion 1.0.0.0 - October 14th, 2003
+Fusion 1.000 - October 14th, 2003
 --------------------------------------------------------------------------------
 - Changed: GM IDs extend from 100000 - 100100. [AlexKreuz] 
 - Fixed: ccolor NPC command. [AlexKreuz] 
