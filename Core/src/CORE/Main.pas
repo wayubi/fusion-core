@@ -266,6 +266,13 @@ type
     Label97: TLabel;
     Label98: TLabel;
     Label99: TLabel;
+    PageControl3: TPageControl;
+    TabSheet9: TTabSheet;
+    TabSheet10: TTabSheet;
+    TabSheet11: TTabSheet;
+    TabSheet12: TTabSheet;
+    TabSheet13: TTabSheet;
+    TabSheet14: TTabSheet;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -11439,7 +11446,7 @@ begin
 		JCon_Accounts_Load();
     end else if (TabSheet4.Showing) then begin
     	JCon_INI_Server_Load();
-    end else if (TabSheet7.Showing) then begin
+    end else if (TabSheet9.Showing) then begin
         JCon_Characters_Load();
         //ShowMessage('Under Development, This section does not work.');
     end;

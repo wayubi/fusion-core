@@ -1982,6 +1982,28 @@ begin
 //						Inc(tc.ScriptStep);
 //					end;
 				end;
+            76: //areawarp
+                //Tsusai: usage: areawarp x1,y1,x2,y2,map,x,y
+                //checks for characters on map of npc, between x/y range and warps.
+                begin
+                    i := tn.Script[tc.ScriptStep].Data3[0]; //x1
+                    j := tn.Script[tc.ScriptStep].Data3[1]; //y1
+                    k := tn.Script[tc.ScriptStep].Data3[2]; //x2
+                    l := tn.Script[tc.ScriptStep].Data3[3]; //y2
+                    tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+                    for cnt := 0 to tm.CList.Count - 1 do begin
+                            tc1 := tm.CList.Objects[0] as TChara;
+                            if tc1.Login = 2 then begin
+                                if (tc1.Point.X >= i) and (tc1.Point.X <= k) and (tc1.Point.Y >= j) and (tc1.Point.Y <= l) then begin
+                                    SendCLeave(tc1, 2);
+                                    tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
+                                    tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[4],tn.Script[tc.ScriptStep].Data3[5]);
+                                    MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                                end;
+                            end;
+                    end;
+                    Inc(tc.ScriptStep);
+                end;
 
 			end;
     Inc(cnt);

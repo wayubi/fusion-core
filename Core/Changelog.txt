@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-25-04: Added NPC Areawarp command. [Tsusai]
+- 09-25-04: Redid character tab design. [Tsusai]
 - 09-24-04: HP/SP checks in Character JCon Work. [Tsusai]
 - 09-23-04: Disabled HP/SP conversion checks in JCon. [Tsusai]
 - 09-23-04: Character Tab finished, GUI updated. [Tsusai]

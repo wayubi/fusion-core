@@ -9710,7 +9710,7 @@ Begin
 							SetLength(tn.Script[k].Data3, 2);
 							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
 							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
-							Inc(k);       
+							Inc(k);
  						end else if str = 'checkpoint' then begin //------- 74 checkpoint
 							if sl1.Count <> 3 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
@@ -9744,6 +9744,23 @@ Begin
 							SetLength(tn.Script[k].Data1, 1);
 							tn.Script[k].Data1[0] := SL1[0];
 							Inc(k);
+                        end else if str = 'areawarp' then begin //------- 76 areawarp
+                            if sl1.Count <> 7 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit;
+							end;
+                            SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 76;
+                            SetLength(tn.Script[k].Data1, 1);
+							SetLength(tn.Script[k].Data3, 6);
+							tn.Script[k].Data1[0] := SL1[4];
+							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
+                            tn.Script[k].Data3[2] := StrToInt(SL1[2]);
+                            tn.Script[k].Data3[3] := StrToInt(SL1[3]);
+                            tn.Script[k].Data3[4] := StrToInt(SL1[5]);
+                            tn.Script[k].Data3[5] := StrToInt(SL1[6]);
+                            Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
