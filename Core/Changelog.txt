@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-03-04: No more 10053/10054. Replaced with user friendly messages. [AlexKreuz]
 - 07-03-04: Modified #changes to support oscripts and cscripts flags. [AlexKreuz]
 - 07-03-04: Fixed Leader/Follow mobs caused pathfinding crash. [AlexKreuz]
 - 07-03-04: Updated LOV calculations. Math laws were not true. [AlexKreuz]

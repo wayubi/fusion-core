@@ -1321,7 +1321,7 @@ procedure TfrmMain.sv1ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Error: ' + inttostr(ErrorCode));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Player has been disconnected from server. Player did not exit via Exit button');
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1366,7 +1366,7 @@ procedure TfrmMain.sv2ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Error: ' + inttostr(ErrorCode));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Player has been disconnected from server. Player did not exit via Exit button');
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1449,10 +1449,15 @@ procedure TfrmMain.sv3ClientError(Sender: TObject;
 //	tc  :TChara;
 //	tp  :TPlayer;
 begin
-	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
 	if UseSQL then SQLDataSave();
-	if ErrorCode = 10053 then Socket.Close;
-	if ErrorCode = 10054 then Socket.Close;
+	if ErrorCode = 10053 then begin
+    	Socket.Close;
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player did not exit via Exit button');
+    end;
+	if ErrorCode = 10054 then begin
+    	Socket.Close;
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player tried to log in twice with the same account');
+    end;
 
 	ErrorCode := 0;
 	NowUsers := sv3.Socket.ActiveConnections;
