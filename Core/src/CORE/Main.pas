@@ -3111,70 +3111,6 @@ begin
 				Exit;
 			end;
 
-      {Colus, 20030106: Changed this to work with modded Steal calc.}
-      {TODO: Figure out proper modification of Snatcher by Steal skill.}
-      if (tc.Skill[210].Lv <> 0) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv])) then begin
-                               { found := false;
-                                k := SlaveDBName.IndexOf(ts.Data.Name);
-                                if (k = -1) then begin
-                                        for i := 0 to 7 do begin
-                                                if (ts.Data.Drop[i].Stolen = tc.ID) then found := true;
-                                        end;  }
-                                //if (found = false) then begin
-        if (ts.Stolen = 0) then begin
-
-          for j := 0 to 7 do begin
-            i := ts.Data.Drop[j].Per;
-            if (Random(10000) <= i) then begin
-
-              WFIFOW( 0, $011a);
-              WFIFOW( 2, 50);
-              WFIFOW( 4, dmg[0]);
-              WFIFOL( 6, tc.ID);
-              WFIFOL(10, tc.ID);
-              WFIFOB(14, 1);
-              SendBCmd(tm,ts.Point,15);
-
-              k := ts.Data.Drop[j].Data.ID;
-              td := ItemDB.IndexOfObject(k) as TItemDB;
-              if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
-                k := SearchCInventory(tc, td.ID, td.IEquip);
-                if (k <> 0) and (tc.Item[k].Amount < 30000) then begin
-                  UpdateWeight(tc, k, td);
-                                                                {tc.Item[k].ID := td.ID;
-                                                                tc.Item[k].Amount := tc.Item[k].Amount + 1;
-                                                                tc.Item[k].Equip := 0;
-                                                                tc.Item[k].Identify := 1;
-                                                                tc.Item[k].Refine := 0;
-                                                                tc.Item[k].Attr := 0;
-                                                                tc.Item[k].Card[0] := 0;
-                                                                tc.Item[k].Card[1] := 0;
-                                                                tc.Item[k].Card[2] := 0;
-                                                                tc.Item[k].Card[3] := 0;
-                                                                tc.Item[k].Data := td;
-                                                                tc.Weight := tc.Weight + cardinal(td.Weight);
-                                                                WFIFOW( 0, $00b0);
-                                                                WFIFOW( 2, $0018);
-                                                                WFIFOL( 4, tc.Weight);}
-                  Socket.SendBuf(buf, 8);
-                  SendCGetItem(tc, k, 1);
-                                                                //ts.Data.Drop[j].Stolen := tc.ID;
-                  ts.Stolen := tc.ID;
-                  Break;
-
-	  						end else begin
-	  							//重量オーバー
-		  						WFIFOW( 0, $00a0);
-  								WFIFOB(22, 2);
-  								Socket.SendBuf(buf, 23);
-		  					end;
-
-              end;
-            end;
-
-          end;
-        end;
-      end;
 
 			// + 激 し く 自 動 鷹 +
 			if (Option and 16 <> 0) and (Skill[129].Lv <> 0) and (Random(1000) < Param[5] * 10 div 3) then begin //確率チェック
@@ -3247,6 +3183,53 @@ begin
 			end else begin
 				dmg[1] := 0;
 			end;
+
+      {Colus, 20040106: Changed this to work with modded Steal calc.
+              20040114: Moved this so that you have to do damage before Snatching,
+                        added the MVP checks/slave checks back.}
+      {TODO: Figure out proper modification of Snatcher by Steal skill.}
+      if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
+
+        k := SlaveDBName.IndexOf(ts.Data.Name);
+
+        if (not ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0))) then begin
+
+          for j := 0 to 7 do begin
+            i := ts.Data.Drop[j].Per;
+            if (Random(10000) <= i) then begin
+
+              WFIFOW( 0, $011a);
+              WFIFOW( 2, 50);
+              WFIFOW( 4, dmg[0]);
+              WFIFOL( 6, tc.ID);
+              WFIFOL(10, tc.ID);
+              WFIFOB(14, 1);
+              SendBCmd(tm,ts.Point,15);
+
+              k := ts.Data.Drop[j].Data.ID;
+              td := ItemDB.IndexOfObject(k) as TItemDB;
+              if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
+                k := SearchCInventory(tc, td.ID, td.IEquip);
+                if (k <> 0) and (tc.Item[k].Amount < 30000) then begin
+                  UpdateWeight(tc, k, td);
+                  Socket.SendBuf(buf, 8);
+                  SendCGetItem(tc, k, 1);
+                  ts.Stolen := tc.ID;
+                  Break;
+	  						end else begin
+	  							//重量オーバー
+		  						WFIFOW( 0, $00a0);
+  								WFIFOB(22, 2);
+  								Socket.SendBuf(buf, 23);
+		  					end;
+
+              end;
+            end;
+
+          end;
+        end;
+      end;
+
 			WFIFOW( 0, $008a);
 			WFIFOL( 2, ID);
 			WFIFOL( 6, ATarget);
