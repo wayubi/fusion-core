@@ -5281,26 +5281,24 @@ begin
                                                 end;
                                         end;
                                 end;}
-                                234:    {Chemical Protection --- Weapon}
-                                begin
-                                        tc1 := tc;
+                           {     234:    {Chemical Protection --- Weapon}
+                            {    begin
+
                                         ProcessType := 3;
                                 end;
                                 235:    {Chemical Protection --- Shield}
-                                begin
-                                        tc1 := tc;
+
+                              {  begin
                                         ProcessType := 3;
                                 end;
                                 236:    {Chemical Protection --- Armor}
-                                begin
-                                        tc1 := tc;
+                               { begin
                                         ProcessType := 3;
                                 end;
                                 237:    {Chemical Protection --- Helmet}
-                                begin
-                                        tc1 := tc;
+                                {begin
                                         ProcessType := 3;
-                                end;
+                                end;}
                                 //New skills ---- Rouge
                                 211:    {Steal Coin}
                                 begin
@@ -7565,6 +7563,26 @@ begin
                                                 ProcessType := 1;
 					end;
         53:
+          begin
+          tc1 := tc;
+          ProcessType := 0;
+          end;
+           234:
+          begin
+          tc1 := tc;
+          ProcessType := 0;
+          end;
+          235:
+          begin
+          tc1 := tc;
+          ProcessType := 0;
+          end;
+          236:
+          begin
+          tc1 := tc;
+          ProcessType := 0;
+          end;
+           237:
           begin
           tc1 := tc;
           ProcessType := 0;
