@@ -2005,11 +2005,11 @@ begin
                                 WFIFOL(10, timeGetTime());
                                 WFIFOL(14, tc.aMotion);
                                 WFIFOL(18, ts.Data.dMotion);
-                                WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-                                WFIFOW(26, 1); //ï™äÑêî
-                                WFIFOB(28, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-                                WFIFOW(29, 0); //ãtéË
-                                SendBCmd(tm, ts.Point, 31);
+                                WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+                                WFIFOW(24, 1); //ï™äÑêî
+                                WFIFOB(26, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+                                WFIFOW(27, 0); //ãtéË
+                                SendBCmd(tm, ts.Point, 29);
                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                 StatCalc1(tc, ts, Tick);
@@ -2043,11 +2043,11 @@ begin
                                 WFIFOL(10, timeGetTime());
                                 WFIFOL(14, tc.aMotion);
                                 WFIFOL(18, ts.Data.dMotion);
-                                WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-                                WFIFOW(26, 1); //ï™äÑêî
-                                WFIFOB(28, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-                                WFIFOW(29, 0); //ãtéË
-                                SendBCmd(tm, ts.Point, 31);
+                                WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+                                WFIFOW(24, 1); //ï™äÑêî
+                                WFIFOB(26, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+                                WFIFOW(27, 0); //ãtéË
+                                SendBCmd(tm, ts.Point, 29);
                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                 StatCalc1(tc, ts, Tick);
@@ -2152,11 +2152,11 @@ begin
                         WFIFOL(10, timeGetTime());
                         WFIFOL(14, tc.aMotion);
                         WFIFOL(18, ts.Data.dMotion);
-                        WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-                        WFIFOW(26, 1); //ï™äÑêî
-                        WFIFOB(28, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-                        WFIFOW(29, 0); //ãtéË
-                        SendBCmd(tm, ts.Point, 31);
+                        WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+                        WFIFOW(24, 1); //ï™äÑêî
+                        WFIFOB(26, 0); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+                        WFIFOW(27, 0); //ãtéË
+                        SendBCmd(tm, ts.Point, 29);
                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                         StatCalc1(tc, ts, Tick);
                         tc.Skill[61].Tick := Tick;
@@ -3096,11 +3096,11 @@ begin
 
               WFIFOW( 0, $011a);
               WFIFOW( 2, 50);
-              WFIFOL( 4, dmg[0]);
-              WFIFOL( 8, tc.ID);
-              WFIFOL(12, tc.ID);
-              WFIFOB(16, 1);
-              SendBCmd(tm,ts.Point,17);
+              WFIFOW( 4, dmg[0]);
+              WFIFOL( 6, tc.ID);
+              WFIFOL(10, tc.ID);
+              WFIFOB(14, 1);
+              SendBCmd(tm,ts.Point,15);
 
               k := ts.Data.Drop[j].Data.ID;
               td := ItemDB.IndexOfObject(k) as TItemDB;
@@ -3220,11 +3220,11 @@ begin
 			WFIFOL(10, timeGetTime());
 			WFIFOL(14, aMotion);
 			WFIFOL(18, ts.Data.dMotion);
-			WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-			WFIFOW(26, dmg[4]); //ï™äÑêî
-			WFIFOB(28, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-			WFIFOW(29, dmg[1]); //ãtéË
-			SendBCmd(tm, ts.Point, 31);
+			WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+			WFIFOW(24, dmg[4]); //ï™äÑêî
+			WFIFOB(26, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+			WFIFOW(27, dmg[1]); //ãtéË
+			SendBCmd(tm, ts.Point, 29);
 			//ÉXÉvÉâÉbÉVÉÖçUåÇêÁóté†âÍç≤âÍ(ﬂÅÕﬂ)
 			if SplashAttack then begin
 {í«â¡}  CharaSplash(tc,Tick);
@@ -3371,11 +3371,11 @@ begin
 			WFIFOL(10, timeGetTime());
 			WFIFOL(14, aMotion);
 			WFIFOL(18, tc1.dMotion);
-			WFIFOL(22, dmg[0]);
-			WFIFOW(26, dmg[4]);
-			WFIFOB(28, dmg[5]);
-			WFIFOW(29, dmg[1]);
-			SendBCmd(tm, tc1.Point, 31);
+			WFIFOW(22, dmg[0]);
+			WFIFOW(24, dmg[4]);
+			WFIFOB(26, dmg[5]);
+			WFIFOW(27, dmg[1]);
+			SendBCmd(tm, tc1.Point, 29);
 
 			if SplashAttack then CharaSplash2(tc,Tick);  //Splash Attack Enabled
 
@@ -3478,11 +3478,11 @@ begin
 				WFIFOL(10, timeGetTime());
 				WFIFOL(14, aMotion);
 				WFIFOL(18, ts1.Data.dMotion);
-				WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-				WFIFOW(26, dmg[4]); //ï™äÑêî
-				WFIFOB(28, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-				WFIFOW(29, dmg[1]); //ãtéË
-				SendBCmd(tm, ts1.Point, 31);
+				WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+				WFIFOW(24, dmg[4]); //ï™äÑêî
+				WFIFOB(26, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+				WFIFOW(27, dmg[1]); //ãtéË
+				SendBCmd(tm, ts1.Point, 29);
 				//É_ÉÅÅ[ÉWèàó
 
 				if not DamageProcess1(tm, tc, ts1, dmg[0] + dmg[1], Tick) then
@@ -3541,11 +3541,11 @@ begin
 				WFIFOL(10, timeGetTime());
 				WFIFOL(14, aMotion);
 				WFIFOL(18, tc2.dMotion);
-				WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-				WFIFOW(26, dmg[4]); //ï™äÑêî
-				WFIFOB(28, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
-				WFIFOW(29, dmg[1]); //ãtéË
-				SendBCmd(tm, tc2.Point, 31);
+				WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+				WFIFOW(24, dmg[4]); //ï™äÑêî
+				WFIFOB(26, dmg[5]); //0=íPçUåÇ 8=ï°êî 10=ÉNÉäÉeÉBÉJÉã
+				WFIFOW(27, dmg[1]); //ãtéË
+				SendBCmd(tm, tc2.Point, 29);
 				//É_ÉÅÅ[ÉWèàóù
 				if not DamageProcess2(tm, tc, tc2, dmg[0] + dmg[1], Tick) then
 				StatCalc2(tc, tc2, Tick);
@@ -4291,11 +4291,11 @@ begin
                                                 if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                         WFIFOW( 0, $011a);
                                                         WFIFOW( 2, tc.MSkill);
-                                                        WFIFOL( 4, dmg[0]);
-                                                        WFIFOL( 8, tc.ID);
-                                                        WFIFOL(12, tc.ID);
-                                                        WFIFOB(16, 1);
-                                                        SendBCmd(tm,tc.Point,17);
+                                                        WFIFOW( 4, dmg[0]);
+                                                        WFIFOL( 6, tc.ID);
+                                                        WFIFOL(10, tc.ID);
+                                                        WFIFOB(14, 1);
+                                                        SendBCmd(tm,tc.Point,15);
 
                                                         SendCLeave(tc, 2);
                                                         tc.tmpMap := tc.Map;
@@ -4890,12 +4890,12 @@ begin
                                     // Send failure of Steal--maybe?
                                     {WFIFOW( 0, $011a);
                                     WFIFOW( 2, tc.MSkill);
-                                    WFIFOL( 4, dmg[0]);
-                                    WFIFOL( 8, tc.ID);
-                                    WFIFOL(12, tc.ID);
-                                    WFIFOB(16, 0);
+                                    WFIFOW( 4, dmg[0]);
+                                    WFIFOL( 6, tc.ID);
+                                    WFIFOL(10, tc.ID);
+                                    WFIFOB(14, 0);
 
-                                    SendBCmd(tm,ts.Point,17);}
+                                    SendBCmd(tm,ts.Point,15);}
 
                                     Exit;
                                   end;
@@ -4915,11 +4915,11 @@ begin
                                      // Graphic send
                                      WFIFOW( 0, $011a);
                                      WFIFOW( 2, tc.MSkill);
-                                     WFIFOL( 4, dmg[0]);
-                                     WFIFOL( 8, tc.ID);
-                                     WFIFOL(12, tc.ID);
-                                     WFIFOB(16, 1);
-                                     SendBCmd(tm,ts.Point,17);
+                                     WFIFOW( 4, dmg[0]);
+                                     WFIFOL( 6, tc.ID);
+                                     WFIFOL(10, tc.ID);
+                                     WFIFOB(14, 1);
+                                     SendBCmd(tm,ts.Point,15);
 
                                      k := ts.Data.Drop[j].Data.ID;
                                      td := ItemDB.IndexOfObject(k) as TItemDB;
@@ -4978,12 +4978,12 @@ begin
                                     {
                                     WFIFOW( 0, $011a);
                                     WFIFOW( 2, tc.MSkill);
-                                    WFIFOL( 4, dmg[0]);
-                                    WFIFOL( 8, tc.ID);
-                                    WFIFOL(12, tc.ID);
-                                    WFIFOB(16, 0);
+                                    WFIFOW( 4, dmg[0]);
+                                    WFIFOL( 6, tc.ID);
+                                    WFIFOL(10, tc.ID);
+                                    WFIFOB(14, 0);
 
-                                    SendBCmd(tm,ts.Point,17);}
+                                    SendBCmd(tm,ts.Point,15);}
 
                                     Exit;
                                   end;
@@ -5250,11 +5250,11 @@ begin
 
                                                         WFIFOW( 0, $011a);
                                                         WFIFOW( 2, MSkill);
-                                                        WFIFOL( 4, dmg[0]);
-                                                        WFIFOL( 8, MTarget);
-                                                        WFIFOL(12, ID);
-                                                        WFIFOB(16, 1);
-                                                        SendBCmd(tm, ts.Point, 17);
+                                                        WFIFOW( 4, dmg[0]);
+                                                        WFIFOL( 6, MTarget);
+                                                        WFIFOL(10, ID);
+                                                        WFIFOB(14, 1);
+                                                        SendBCmd(tm, ts.Point, 15);
                                                         tc.MTick := Tick + 1000;
                                                 end;
                                         end;
@@ -5478,11 +5478,11 @@ begin
                                         if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                 WFIFOW( 0, $011a);
                                                 WFIFOW( 2, tc.MSkill);
-                                                WFIFOL( 4, dmg[0]);
-                                                WFIFOL( 8, tc.ID);
-                                                WFIFOL(12, tc.ID);
-                                                WFIFOB(16, 1);
-                                                SendBCmd(tm,tc.Point,17);
+                                                WFIFOW( 4, dmg[0]);
+                                                WFIFOL( 6, tc.ID);
+                                                WFIFOL(10, tc.ID);
+                                                WFIFOB(14, 1);
+                                                SendBCmd(tm,tc.Point,15);
 
                                                 SendCLeave(tc, 2);
                                                 tc.tmpMap := tc.Map;
@@ -5912,11 +5912,11 @@ begin
 						       //ÉpÉPëóêM
         					WFIFOW( 0, $011a);
 	        				WFIFOW( 2, MSkill);
-		        			WFIFOL( 4, dmg[0]);
-			        		WFIFOL( 8, MTarget);
-				        	WFIFOL(12, ID);
-					        WFIFOB(16, 1);
-                                                SendBCmd(tm, ts.Point, 17);
+		        			WFIFOW( 4, dmg[0]);
+			        		WFIFOL( 6, MTarget);
+				        	WFIFOL(10, ID);
+					        WFIFOB(14, 1);
+                                                SendBCmd(tm, ts.Point, 15);
         					if Random(1000) < tl.Data1[MUseLV] * 10 then begin
 	        					if (ts.Stat1 <> 1) then begin
 		        					ts.nStat := 1;
@@ -5983,11 +5983,11 @@ begin
 							        //Send Skill packet
 							        WFIFOW( 0, $011a);
 							        WFIFOW( 2, MSkill);
-							        WFIFOL( 4, dmg[0]);
-							        WFIFOL( 8, MTarget);
-							        WFIFOL(12, ID);
-							        WFIFOB(16, 1);
-							        SendBCmd(tm, ts.Point, 17);
+							        WFIFOW( 4, dmg[0]);
+							        WFIFOL( 6, MTarget);
+							        WFIFOL(10, ID);
+							        WFIFOB(14, 1);
+							        SendBCmd(tm, ts.Point, 15);
 						        end;
 						        //Set Character Delay Tick
 						        tc.MTick := Tick + 1000;
@@ -6705,11 +6705,11 @@ begin
 						Socket.SendBuf(buf,29);//édólÇ∆ÇµÇƒÇÕÇ±Ç¡ÇøÇÃï˚Ç™ÇﬁÇµÇÎÇ¢Ç¢ÇÃÇ≈ÇÕÅHñ{êlÇÃÇ›Ç…å©ÇπÇÈ
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
-						WFIFOL( 4, dmg[0]);
-						WFIFOL( 8, MTarget);
-						WFIFOL(12, ID);
-						WFIFOB(16, 1);
-						SendBCmd(tm, ts.Point, 17);
+						WFIFOW( 4, dmg[0]);
+						WFIFOL( 6, MTarget);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, ts.Point, 15);
 					end;
 				129://Blitz beat
 					begin
@@ -7049,8 +7049,8 @@ begin
 						        tc.MTick := Tick + 1000;
                                                         WFIFOW( 0, $013d);
 						        WFIFOW( 2, $0005);
-						        WFIFOL( 4, dmg[0]);
-						        Socket.SendBuf(buf, 8);
+						        WFIFOW( 4, dmg[0]);
+						        Socket.SendBuf(buf, 6);
 						        WFIFOW( 0, $00b0);
 						        WFIFOW( 2, $0005);
 						        WFIFOL( 4, HP);
@@ -8049,10 +8049,10 @@ begin
 						        if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
                                                         WFIFOW( 0, $011a);
                                                         WFIFOW( 2, MSkill);
-                                                        WFIFOL( 4, dmg[0]);
-                                                        WFIFOL( 8, MTarget);
-                                                        WFIFOL(12, ID);
-                                                        WFIFOB(16, 1);
+                                                        WFIFOW( 4, dmg[0]);
+                                                        WFIFOL( 6, MTarget);
+                                                        WFIFOL(10, ID);
+                                                        WFIFOB(14, 1);
                                                         SendCStat1(tc1, 0, 5, tc1.HP);
 						        ProcessType := 0;
 						        tc.MTick := Tick + 1000;
@@ -8582,11 +8582,11 @@ begin
 						//ÉpÉPëóêM
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
-						WFIFOL( 4, dmg[0]);
-						WFIFOL( 8, MTarget);
-						WFIFOL(12, ID);
-						WFIFOB(16, 1);
-						SendBCmd(tm, tc1.Point, 17);
+						WFIFOW( 4, dmg[0]);
+						WFIFOL( 6, MTarget);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, tc1.Point, 15);
 						if Random(1000) < tl.Data1[MUseLV] * 10 then begin
 							if (tc1.Stat1 <> 1) then begin
 								//tc1.Stat1 := 1;
@@ -9472,11 +9472,11 @@ begin
 						//ÉpÉPëóêM
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
-						WFIFOL( 4, dmg[0]);
-						WFIFOL( 8, tc1.ID);
-						WFIFOL(12, ID);
-						WFIFOB(16, 1);
-						SendBCmd(tm, tc1.Point, 17);
+						WFIFOW( 4, dmg[0]);
+						WFIFOL( 6, tc1.ID);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, tc1.Point, 15);
                                         end;
                                 1:
 					begin
@@ -10212,11 +10212,11 @@ begin
 						                        if tc2.HP > tc2.MAXHP then tc2.HP := tc2.MAXHP;
                                                                         WFIFOW( 0, $011a);
                                                                         WFIFOW( 2, tn.MSkill);
-                                                                        WFIFOL( 4, dmg[0]);
-                                                                        WFIFOL( 8, tc2.ID);
-                                                                        WFIFOL(12, tn.ID);
-                                                                        WFIFOB(16, 1);
-							                SendBCmd(tm, tc2.Point, 17);
+                                                                        WFIFOW( 4, dmg[0]);
+                                                                        WFIFOL( 6, tc2.ID);
+                                                                        WFIFOL(10, tn.ID);
+                                                                        WFIFOB(14, 1);
+							                SendBCmd(tm, tc2.Point, 15);
 						                        SendCStat1(tc2, 0, 5, tc2.HP);
 									SendBCmd(tm, tn.Point, 31);
 
@@ -10777,11 +10777,11 @@ begin
 
                   WFIFOW( 0, $011a);
                   WFIFOW( 2, tn.MSkill);
-                  WFIFOL( 4, dmg[0]);
-                  WFIFOL( 8, ts1.ID);
-                  WFIFOL(12, tn.ID);
-                  WFIFOB(16, 1);
-                  SendBCmd(tm, ts1.Point, 17);
+                  WFIFOW( 4, dmg[0]);
+                  WFIFOL( 6, ts1.ID);
+                  WFIFOL(10, tn.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, ts1.Point, 15);
 
                 end else begin
                   dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
@@ -11769,12 +11769,12 @@ begin
 				WFIFOL(10, timeGetTime());
 				WFIFOL(14, ts.Data.aMotion);
 				WFIFOL(18, tc2.dMotion);
-				WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-				WFIFOW(26, dmg[4]); //ï™äÑêî
+				WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+				WFIFOW(24, dmg[4]); //ï™äÑêî
 				if tc2.dMotion = 0 then dmg[5] := 4;
-				WFIFOB(28, dmg[5]); //0=íPçUåÇ 8=ï°êî
-				WFIFOW(29, 0); //ãtéË
-				SendBCmd(tm, tc2.Point, 31);
+				WFIFOB(26, dmg[5]); //0=íPçUåÇ 8=ï°êî
+				WFIFOW(27, 0); //ãtéË
+				SendBCmd(tm, tc2.Point, 29);
 				if (dmg[0] <> 0) and (tc2.pcnt <> 0) and (tc2.dMotion <> 0) then begin
 					//É_ÉÅÅ[ÉWÇéÛÇØÇÈÇ∆óßÇøé~Ç‹ÇÈ
 					tc2.Sit := 3;
@@ -11837,12 +11837,12 @@ begin
 				WFIFOL(10, timeGetTime());
 				WFIFOL(14, ts.Data.aMotion);
 				WFIFOL(18, tc1.dMotion);
-				WFIFOL(22, dmg[0]); //É_ÉÅÅ[ÉW
-				WFIFOW(26, dmg[4]); //ï™äÑêî
+				WFIFOW(22, dmg[0]); //É_ÉÅÅ[ÉW
+				WFIFOW(24, dmg[4]); //ï™äÑêî
 				if tc1.dMotion = 0 then dmg[5] := 4;
-				WFIFOB(28, dmg[5]); //0=íPçUåÇ 8=ï°êî
-				WFIFOW(29, 0); //ãtéË
-				SendBCmd(tm, tc1.Point, 31);
+				WFIFOB(26, dmg[5]); //0=íPçUåÇ 8=ï°êî
+				WFIFOW(27, 0); //ãtéË
+				SendBCmd(tm, tc1.Point, 29);
 				if (dmg[0] <> 0) and (tc1.pcnt <> 0) and (tc1.dMotion <> 0) then begin
 					//É_ÉÅÅ[ÉWÇéÛÇØÇÈÇ∆óßÇøé~Ç‹ÇÈ
 					tc1.Sit := 3;
