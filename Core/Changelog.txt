@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Fixed Character deletion in slots 4/5 bug. [AlexKreuz]
 - 01-22-04: Updated spirit sphere usage and display [Colus]
 - 01-22-04: Fixed bug #208 for scripts as well [Colus]
 - 01-22-04: Fixed problem with #warp (bug #208) [Colus]

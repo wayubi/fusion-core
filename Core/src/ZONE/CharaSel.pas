@@ -356,7 +356,7 @@ begin
 					if (i <> -1) then begin
 						//íœB
 						tc := Chara.Objects[i] as TChara;
-						for k := 0 to 2 do begin
+						for k := 0 to 4 do begin
 							if tp.CData[k] = tc then begin
 								tp.CName[k] := '';
 								tp.CData[k] := nil;
