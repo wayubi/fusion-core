@@ -1696,7 +1696,7 @@ Called when we're shutting down the server *only*
     var
         job, i : Integer;
     begin
-        Result := 'GM_SKILLALL Failure.';
+        Result := 'GM_SKILLALL Success.';
 
         job := tc.JID;
         if (job > UPPER_JOB_BEGIN) then job := job - UPPER_JOB_BEGIN + LOWER_JOB_END;
@@ -1721,26 +1721,24 @@ Called when we're shutting down the server *only*
         CalcStat(tc);
 
         SendCStat(tc);
-
-        Result := 'GM_SKILLALL Success.';
     end;
 
     function command_statall(tc : TChara) : String;
     var
         i : Integer;
     begin
-        Result := 'GM_STATALL Failure.';
+        Result := 'GM_STATALL Success.';
 
         for i := 0 to 5 do begin
             tc.ParamBase[i] := 99;
         end;
 
         tc.StatusPoint := 1000;
+
         CalcStat(tc);
+
         SendCStat(tc);
         SendCStat1(tc, 0, $0009, tc.StatusPoint);
-
-        Result := 'GM_STATALL Success.';
     end;
 
     function command_superstats(tc : TChara) : String;
