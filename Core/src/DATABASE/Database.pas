@@ -2995,7 +2995,11 @@ begin
 	  cnt := 0;
   	for j := 0 to ServerFlag.Count - 1 do begin
 	  	if (Copy(ServerFlag[j], 1, 1) = '\') then begin
-			  ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
+
+        	{ Alex: Ok, crack control again. Putting this line here ensures that any temporary
+            variables stop working because the '\' in front is permanently removed. Bad coding. }
+            //ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
+
 		  	if ((Copy(ServerFlag[j], 1, 1) <> '@') and (Copy(ServerFlag[j], 1, 2) <> '$@'))
   			and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
 	  			sl.Add(ServerFlag[j]);
