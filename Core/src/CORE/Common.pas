@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = '1.212 H -- I.S.C.S Alpha 3 Release';
+	RELEASE_VERSION = '1.212 I -- I.S.C.S Alpha 4 Release';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
@@ -6150,6 +6150,9 @@ var
     i : Integer;
 begin
     RankOne := 0;
+    if not assigned(tm) then Exit;
+    if not assigned(tm.CList) then Exit;
+    
     if tm.CList.Count > 0 then begin
         tc1 := tm.CList.Objects[0] as TChara;
         tc1.PvPRank := 1;
