@@ -8684,6 +8684,7 @@ begin
       if (ts.EffectTick[1] <= Tick) and (ts.EffectTick[1]<>0) then begin
         ts.EffectTick[1]:=0;
         ts.Speed := ts.Speed div 2;
+        ts.Data.Param[2] := ts.Data.Param[2] * 2;
         ts.Data.Param[4] := ts.Data.Param[4] * 2;
 			  ZeroMemory(@buf[0], 60);
 			  WFIFOW( 0, $007b);
