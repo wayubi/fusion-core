@@ -7409,51 +7409,61 @@ begin
 						tc1 := tc;
 						ProcessType := 2;
 					end;
-				10,24: //サイト、ルアフ
-					begin
-						Option := Option or 1;
-						WFIFOW(0, $0119);
-						WFIFOL(2, ID);
-						WFIFOW(6, 0);
-						WFIFOW(8, 0);
-						WFIFOW(10, Option);
-						WFIFOB(12, 0);
-						SendBCmd(tm, Point, 13);
-						ProcessType := 2;
+    10,24: {Ruwatch, Sight}
+        begin
+            Option := Option or 1;
+            WFIFOW(0, $0119);
+            WFIFOL(2, ID);
+            WFIFOW(6, 0);
+            WFIFOW(8, 0);
+            WFIFOW(10, Option);
+            WFIFOB(12, 0);
+            SendBCmd(tm, Point, 13);
+            ProcessType := 2;
 
-                                                xy := tc.Point;
-						sl.Clear;
-            
-						for j1 := (xy.Y - tl.Range) div 8 to (xy.Y + tl.Range) div 8 do begin
-							for i1 := (xy.X - tl.Range) div 8 to (xy.X + tl.Range) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
-									if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then continue; tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-									if (abs(tc1.Point.X - xy.X) <= tl.Range) and (abs(tc1.Point.Y - xy.Y) <= tl.Range) then
-                    sl.AddObject(IntToStr(tc1.ID),tc1);
-								end;
-							end;
-						end;
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count - 1 do begin
-								tc1 := sl.Objects[k1] as TChara;
-                if tc1.Option = 6 then begin
-  						    tc1.Option := tc1.Optionkeep;
-                  tc1.Hidden := false;
-                  tc1.SkillTick := tc1.Skill[51].Tick;
-                  tc1.SkillTickID := 51;
-                  CalcStat(tc1, Tick);
+            xy := tc.Point;
+            sl.Clear;
 
-                  // Colus, 20031228: Tunnel Drive speed update
-                  if (tc1.Skill[213].Lv <> 0) then begin
-        						WFIFOW(0, $00b0);
-        						WFIFOW(2, $0000);
-        						WFIFOL(4, tc1.Speed);
-        						tc1.Socket.SendBuf(buf, 8);
-                  end;
+            for j1 := (xy.Y - tl.Range) div 8 to (xy.Y + tl.Range) div 8 do begin
+                for i1 := (xy.X - tl.Range) div 8 to (xy.X + tl.Range) div 8 do begin
+                    for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
+                        if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then continue; tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
+                        if (abs(tc1.Point.X - xy.X) <= tl.Range) and (abs(tc1.Point.Y - xy.Y) <= tl.Range) then
+                            sl.AddObject(IntToStr(tc1.ID),tc1);
+                    end;
                 end;
-							end;
-						end;
-					end;
+            end;
+
+            if sl.Count <> 0 then begin
+                for k1 := 0 to sl.Count - 1 do begin
+                    tc1 := sl.Objects[k1] as TChara;
+                    if tc1.Option = 6 then begin
+                        tc1.Option := tc1.Optionkeep;
+                        tc1.Hidden := false;
+                        tc1.SkillTick := tc1.Skill[51].Tick;
+                        tc1.SkillTickID := 51;
+                        CalcStat(tc1, Tick);
+
+                        WFIFOW(0, $0119);
+                        WFIFOL(2, tc1.ID);
+                        WFIFOW(6, tc1.Stat1);
+                        WFIFOW(8, tc1.Stat2);
+                        WFIFOW(10, tc1.Option);
+                        WFIFOB(12, 0);
+                        SendBCmd(tm, tc1.Point, 13);
+
+                        // Colus, 20031228: Tunnel Drive speed update
+                        if (tc1.Skill[213].Lv <> 0) then begin
+                            WFIFOW(0, $00b0);
+                            WFIFOW(2, $0000);
+                            WFIFOL(4, tc1.Speed);
+                            tc1.Socket.SendBuf(buf, 8);
+                        end;
+                    end;
+                end;
+            end;
+        end;
+
 				28:     {Heal}
 					begin
                                                 if (tc1.Sit <> 1) then begin
