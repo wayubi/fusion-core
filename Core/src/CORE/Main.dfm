@@ -109,7 +109,6 @@ object frmMain: TfrmMain
         Alignment = taRightJustify
         Width = 50
       end>
-    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0

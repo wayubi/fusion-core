@@ -9200,6 +9200,7 @@ begin
 					end;}
                                 250:    //Shield Charge
                                         begin
+                                    if (tc.Shield <> 0) then begin // 20040324,Eliot: It should check if You have a shield.
 						xy.X := tc1.Point.X - Point.X;
 						xy.Y := tc1.Point.Y - Point.Y;
 						{if abs(xy.X) > abs(xy.Y) * 3 then begin
@@ -9243,7 +9244,10 @@ begin
 					     	if Random(100) < Skill[250].Data.Data2[MUseLV] then begin
                                                         //Nothing
 						    	tc1.BodyTick := tc1.BodyTick + 30000;
-					    	end;
+                          end;
+                   if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
+							StatCalc2(tc, tc1, Tick);     // 20040324,Eliot : Wouldn't it be nice if we actually deal any damage ?
+                                        end;
                                         end;
                                         end;
                                 264:   {Body Relocation}
