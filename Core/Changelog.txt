@@ -1,3 +1,5 @@
+- 05-26-04: PlayerDataLoad - Removed Unused Variables from var declaration. [ChrstphrR]
+- 05-26-04: DataSave - Comment Translation, removal of unused commented-out code blocks [ChrstphrR]
 - 05-26-04: Database code - segmented pet_db.txt load into LoadPetData [ChrstphrR]
 - 05-26-04: LoadPetData - improved error checking and message output. [ChrstphrR]
 - 05-26-04: DataBaseLoad - fixed potential memory leak. [ChrstphrR]

@@ -1703,29 +1703,15 @@ end;//proc DatabaseLoad()
 // データ読み込み
 procedure PlayerDataLoad();
 var
-	i,j,k :integer;
-	i1  :integer;
-	ver :integer;
-	str :string;
-	txt :TextFile;
-	sl  :TStringList;
-	ta	:TMapList;
-	tp  :TPlayer;
-	tc  :TChara;
-{パーティー機能追加}
-	tpa	:TParty;
-	tgc :TCastle;
-{パーティー機能追加ココまで}
-{キューペット}
-	tpe     :TPet;
-	tpd     :TPetDB;
-	tmd     :TMobDB;
-{キューペットここまで}
-{ギルド機能追加}
-	tg  :TGuild;
-	tgb :TGBan;
-	tgl :TGRel;
-{ギルド機能追加ココまで}
+	i   : Integer;
+	j   : Integer;
+	k   : Integer;
+	i1  : Integer;
+	ver : Integer;
+	str : string;
+	txt : TextFile;
+	sl  : TStringList;
+	tp  : TPlayer;
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
@@ -2277,7 +2263,8 @@ begin
 {カート機能追加}
 			//カート内のアイテム総数
 			tc.Cart.Count := j;
-{カート機能追加ココまで}			for i := 1 to j do begin
+{カート機能追加ココまで}
+			for i := 1 to j do begin
 				if ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1])) <> -1 then begin
 					tc.Cart.Item[i].ID := StrToInt(sl.Strings[(i-1)*10+1]);
 					tc.Cart.Item[i].Amount := StrToInt(sl.Strings[(i-1)*10+2]);
@@ -2618,19 +2605,19 @@ begin
 			if i <> -1 then begin
 				tpe := TPet.Create;
 				with tpe do begin
-                                                PlayerID    := StrToInt( sl.Strings[ 0] );
-                                                CharaID     := StrToInt( sl.Strings[ 1] );
-                                                Cart        := StrToInt( sl.Strings[ 2] );
-                                                Index       := StrToInt( sl.Strings[ 3] );
-                                                Incubated   := StrToInt( sl.Strings[ 4] );
-                                                PetID       := StrToInt( sl.Strings[ 5] );
-                                                JID         := StrToInt( sl.Strings[ 6] );
-                                                Name        :=           sl.Strings[ 7];
-                                                Renamed     := StrToInt( sl.Strings[ 8] );
-                                                LV          := StrToInt( sl.Strings[ 9] );
-																								Relation    := StrToInt( sl.Strings[10] );
-                                                Fullness    := StrToInt( sl.Strings[11] );
-                                                Accessory   := StrToInt( sl.Strings[12] );
+					PlayerID    := StrToInt( SL[ 0] );
+					CharaID     := StrToInt( SL[ 1] );
+					Cart        := StrToInt( SL[ 2] );
+					Index       := StrToInt( SL[ 3] );
+					Incubated   := StrToInt( SL[ 4] );
+					PetID       := StrToInt( SL[ 5] );
+					JID         := StrToInt( SL[ 6] );
+					Name        :=           SL[ 7];
+					Renamed     := StrToInt( SL[ 8] );
+					LV          := StrToInt( SL[ 9] );
+					Relation    := StrToInt( SL[10] );
+					Fullness    := StrToInt( SL[11] );
+					Accessory   := StrToInt( SL[12] );
 
 					Data        := PetDB.Objects[i] as TPetDB;
 				end;
@@ -2737,24 +2724,27 @@ end;
 // データ保存
 procedure DataSave();
 var
-	i,j,m,z :integer;
-	cnt :integer;
-	txt :TextFile;
-	sl  :TStringList;
-	tp  :TPlayer;
-	tc  :TChara;
+	i   : Integer;
+	j   : Integer;
+	m   : Integer;
+	z   : Integer;
+	cnt : Integer;
+	txt : TextFile;
+	sl  : TStringList;
+	tp  : TPlayer;
+	tc  : TChara;
 {パーティー機能追加}
-	tpa	:TParty;
-  tgc :TCastle;
+	tpa : TParty;
+	tgc : TCastle;
 {パーティー機能追加ココまで}
 {キューペット}
-        tpe :TPet;
-        k:integer;
+	tpe : TPet;
+	k   : Integer;
 {キューペットここまで}
 {ギルド機能追加}
-	tg  :TGuild;
-	tgb :TGBan;
-	tgl :TGRel;
+	tg  : TGuild;
+	tgb : TGBan;
+	tgl : TGRel;
 {ギルド機能追加ココまで}
 begin
 
@@ -2766,7 +2756,7 @@ begin
 		tp := PlayerName.Objects[i] as TPlayer;
 		tp.Saved := 0;
 	end;
-	if PlayerName.Count <> 0 then begin
+	if PlayerName.Count > 0 then begin
 		AssignFile(txt, AppPath + 'player.txt');
 		Rewrite(txt);
 		Writeln(txt, '##Weiss.PlayerData.0x0003');
@@ -2792,7 +2782,7 @@ begin
 					sl.Add(CName[8]);
 					Saved := 1;
 				end;
-				writeln(txt, sl.DelimitedText);
+				WriteLn(txt, sl.DelimitedText);
 				//アイテムデータ保存
 				sl.Clear;
 				sl.Add('0');
@@ -3115,7 +3105,7 @@ begin
 	//DebugOut.Lines.add('Guild Saved');
 {ギルド機能追加ココまで}
 
-{キューペット}
+//Cute Pet Load Start
 	AssignFile(txt, AppPath + 'pet.txt');
 	Rewrite(txt);
 	Writeln( txt, '##Weiss.PetData.0x0002' );
@@ -3125,39 +3115,6 @@ begin
 		tpe := PetList.Objects[i] as TPet;
 		tpe.Saved := 0;
 	end;
-
-        {
-        PlayerID    := StrToInt( sl.Strings[ 0] );
-                                        CharaID     := StrToInt( sl.Strings[ 1] );
-                                        Cart        := StrToInt( sl.Strings[ 2] );
-                                        Index       := StrToInt( sl.Strings[ 3] );
-                                        Incubated   := StrToInt( sl.Strings[ 4] );
-                                        PetID       := StrToInt( sl.Strings[ 5] );
-                                        Name        :=           sl.Strings[ 6];
-                                        Renamed     := StrToInt( sl.Strings[ 7] );
-																				Relation    := StrToInt( sl.Strings[ 8] );
-                                        Fullness    := StrToInt( sl.Strings[ 9] );
-                                        Accessory   := StrToInt( sl.Strings[10] );
-        }
-        {for i := 0 to PetList.Count - 1 do begin
-          tpe := PetList.Objects[i] as TPet;
-          sl.Clear;
-          sl.Add( IntToStr( tpe.PlayerID ) );
-          sl.Add( IntToStr( tpe.CharaID ) );
-          sl.Add( IntToStr( tpe.Cart ) ); // Cart
-          sl.Add( IntToStr( tpe.Index ) ); // Index
-          sl.Add( IntToStr( tpe.Incubated ) );
-          sl.Add( IntToStr( tpe.PetID ) ); // PetID
-          sl.Add( IntToStr( tpe.JID ) );
-          sl.Add( tpe.Name );
-          sl.Add( IntToStr( tpe.Renamed ) );
-          sl.Add( IntToStr( tpe.LV ) );
-          sl.Add( IntToStr( tpe.Relation  ) );
-          sl.Add( IntToStr( tpe.Fullness  ) );
-          sl.Add( IntToStr( tpe.Accessory ) );
-          writeln(txt, sl.DelimitedText);
-          tpe.Saved := 1;
-        end;}
 
 	for i := 0 to Player.Count - 1 do begin
 		tp := Player.Objects[i] as TPlayer;
@@ -3171,19 +3128,6 @@ begin
 							tpe := PetList.IndexOfObject( k ) as TPet;
 							if tpe.Saved = 0 then begin
 								sl.Clear;
-                                                {sl.Add( IntToStr( tpe.PlayerID ) );
-                                                sl.Add( IntToStr( tpe.CharaID ) );
-                                                sl.Add( '0' ); // Cart
-                                                sl.Add( IntToStr( j ) ); // Index
-                                                sl.Add( '0' ); // Incubated
-                                                sl.Add( IntToStr( k ) ); // PetID
-                                                sl.Add( IntToStr( tpe.JID ) );
-                                                sl.Add( tpe.Name );
-                                                sl.Add( IntToStr( tpe.Renamed ) );
-                                                sl.Add( IntToStr( tpe.LV ) );
-                                                sl.Add( IntToStr( tpe.Relation  ) );
-                                                sl.Add( IntToStr( tpe.Fullness  ) );
-                                                sl.Add( IntToStr( tpe.Accessory ) ); }
 								sl.Add( IntToStr( tpe.PlayerID ) );
 								sl.Add( IntToStr( tpe.CharaID ) );
 								sl.Add( IntToStr( tpe.Cart ) ); // Cart
@@ -3221,20 +3165,6 @@ begin
 									tpe := PetList.IndexOfObject( k ) as TPet;
 										if tpe.Saved = 0 then begin
 											sl.Clear;
-                                                {sl.Add( IntToStr( tpe.PlayerID ) );
-                                                sl.Add( IntToStr( 0 ) );
-                                                sl.Add( '0' ); // Cart
-                                                sl.Add( IntToStr( j ) ); // Index
-                                                sl.Add( IntToStr( Attr ) );
-                                                sl.Add( IntToStr( k ) ); // PetID
-                                                sl.Add( IntToStr( tpe.JID ) );
-                                                sl.Add( tpe.Name );
-                                                sl.Add( IntToStr( tpe.Renamed ) );
-                                                sl.Add( IntToStr( tpe.LV ) );
-                                                sl.Add( IntToStr( tpe.Relation  ) );
-                                                sl.Add( IntToStr( tpe.Fullness  ) );
-                                                sl.Add( IntToStr( tpe.Accessory ) );
-		                                            writeln(txt, sl.DelimitedText); }
 											sl.Add( IntToStr( tpe.PlayerID ) );
 											sl.Add( IntToStr( tpe.CharaID ) );
 											sl.Add( IntToStr( tpe.Cart ) ); // Cart
@@ -3267,20 +3197,6 @@ begin
 										if tpe.Saved = 0 then begin
 											tpe := PetList.IndexOfObject( k ) as TPet;
 											sl.Clear;
-                                                {sl.Add( IntToStr( tpe.PlayerID ) );
-                                                sl.Add( IntToStr( tpe.CharaID ) );
-                                                sl.Add( '1' ); // Cart
-                                                sl.Add( IntToStr( j ) ); // Index
-                                                sl.Add( '0' ); // Incubated
-                                                sl.Add( IntToStr( k ) ); // PetID
-                                                sl.Add( IntToStr( tpe.JID ) );
-                                                sl.Add( tpe.Name );
-                                                sl.Add( IntToStr( tpe.Renamed ) );
-                                                sl.Add( IntToStr( tpe.LV ) );
-                                                sl.Add( IntToStr( tpe.Relation  ) );
-                                                sl.Add( IntToStr( tpe.Fullness  ) );
-                                                sl.Add( IntToStr( tpe.Accessory ) );
-                                                }
 											sl.Add( IntToStr( tpe.PlayerID ) );
 											sl.Add( IntToStr( tpe.CharaID ) );
 											sl.Add( IntToStr( tpe.Cart ) ); // Cart
@@ -3309,35 +3225,7 @@ begin
 		CloseFile(txt);
 
 	//DebugOut.Lines.add('Pet Saved');
-{キューペットここまで}
-
-  { Ugh I'll fix this ... hmm
-  Mitch 01-31-2004 : mapinfo_db.txt save! 
-  AssignFile(txt, AppPath + '\database\mapinfo_db.txt');
-	Rewrite(txt);
-  WriteLn(txt, 'MapName,Memo,Save,Teleport,PVP,GuildPVP');
-  for i := 0 to MapInfo.Count - 1 do begin
-    mi := MapInfo.Objects[i] as MapTbl;
-    sl.Clear;
-    sl.Add(MapInfo.Strings[i] + '.gat');
-    with mi do begin
-      if noMemo then sl.Add('nomemo');
-      if noSave then sl.Add('nosave');
-      if noPortal then sl.Add('noportal');
-      if nofly then sl.Add('nofly');
-      if nobfly then sl.Add('nobutterfly');
-      if noTele then sl.Add('noteleport');
-      if noBranch then sl.Add('nobranch');
-      if noSkill then sl.Add('noskill');
-      if noItem then sl.Add('noitem');
-      if Agit then sl.Add('agit');
-      if dbPvP then sl.Add('pvp');
-      if dbPvPG then sl.Add('pvpg');
-      if noday then sl.Add('noday');
-    end;
-    writeln(txt, sl.DelimitedText);
-  end;
-  CloseFile(txt);}
+//Cute Pet Load End
 
 	sl.Free;
 end;
