@@ -1,3 +1,13 @@
+2003-12-18: Set up CVS Server with Initial Script Import. Follow this Logging Format. [AlexKreuz]
+
+
+-----------------------------------------------------------------
+OLD FORMAT
+-----------------------------------------------------------------
+
+RESERVED FOR 1.2.0.7 & 1.2.0.8
+
+-----------------------------------------------------------------
 Fusion 1.2.0.6 - November 12th, 2003
 - Fixed: Cart -> User Overweight Bug. [AlexKreuz]
 - Fixed: Merchant Shop -> Fatal Crash. [AlexKreuz]
