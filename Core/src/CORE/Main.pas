@@ -5160,7 +5160,7 @@ begin
                                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
                                                         tc.SP := 0;
-                                                        dmg[0] := dmg[0] + spbonus;
+                                                        dmg[0] := dmg[0] *(8 + MAXSP div 100) + 250;
                                                         dmg[0] := dmg[0] + j;
                                                         if dmg[0] < 0 then begin
                                                                 dmg[0] := 0;
