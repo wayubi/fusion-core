@@ -657,6 +657,10 @@ TNPC = class;    //forward declaration - PetNPC " " "
 TMap = class;    //forward declaration - MData " " "
 
 TChara = class(TLiving)
+    private
+    fFireWallCount : Byte;
+    procedure SetFirewallCount( Value : Byte );
+    public
 	// Control Variables
 	Socket        :TCustomWinSocket;
 	PData         :TPlayer; // Reference back to owning TPlayer
@@ -987,13 +991,15 @@ TChara = class(TLiving)
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
         StatRecalc    :boolean; {Used for the Sage skill free cast}
         //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
-        FireWallCount : Integer;
 
 	constructor Create;
 	destructor  Destroy; override;
   //procedures to get skilonbool and set skillonbool
   //procedure setSkillOnBool(temp:Boolean);
   //function getSkillOnBool:Boolean;
+    property FireWallCount : Byte
+    read   fFireWallCount
+    write  SetFireWallCount;
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
@@ -5576,10 +5582,10 @@ begin
     SendBCmd(tm, tn.Point, 24);
   end;
 
-  if (tn.JID = $7f) and (tn.CData <> nil) then begin
-    tc := tn.CData;
-    dec (tc.FireWallCount);
-  end;
+//  if (tn.JID = $7f) and (tn.CData <> nil) then begin
+//    tc := tn.CData;
+//    tc.FireWallCount := tc.FireWallCount - 1 ;
+//  end;
   
 	tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
 	with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
@@ -10490,6 +10496,17 @@ begin
 	Flag.Free;
 
 	inherited;
+end;
+
+procedure TChara.SetFireWallCount( Value : Byte );
+begin
+if Value > 128 then
+    fFireWallCount := 0;
+
+    if Value >= 3 then
+        fFireWallCount := 3
+    else
+        fFireWallCount := Value;
 end;
 
 

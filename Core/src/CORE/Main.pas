@@ -4622,7 +4622,7 @@ begin
 			end;
 		18:     {Fire Wall}
 			begin
-                if FireWallCount < 3 then begin
+                //if FireWallCount < 3 then begin
 				xy.X := MPoint.X - Point.X;
 				xy.Y := MPoint.Y - Point.Y;
 				if abs(xy.X) > abs(xy.Y) * 3 then begin
@@ -4682,12 +4682,12 @@ begin
 					tn.MUseLV := MUseLV;
 				end;
 				Colus, 20031219: FW update end}
-                inc (FireWallCount);
-                end
-                else begin
-                SendSkillError(tc,0);
-                Exit;
-                end;
+                //FireWallCount := FireWallCount + 1;
+                //end
+                //else begin
+                //SendSkillError(tc,0);
+                //Exit;
+                //end;
 			end;
 		25:     {Pneuma}
 			begin
