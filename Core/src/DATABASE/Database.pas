@@ -339,7 +339,8 @@ begin
 
             // Colus, 20040304: Kludged method of porting the reqs to upper jobs
             for i := 0 to LOWER_JOB_END do begin
-               if (i < (LOWER_JOB_END - 1)) and (jf[i]) then begin
+               //if (i < (LOWER_JOB_END - 1)) and (jf[i]) then begin
+               if (i < (LOWER_JOB_END - 1)) and (Job and (1 shl i) <> 0) then begin
                   Job := Job or Int64(1) shl (i + LOWER_JOB_END + 1);
                end;
             end;
