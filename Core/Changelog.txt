@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-16-04: Updated JCon, character disconnected before update. [AlexKreuz]
+- 06-16-04: Fixed JCon, Accounts ban wan't being updated. [AlexKreuz]
+- 06-16-04: More aggressive Auto-Protection against crashes. [AlexKreuz]
 - 06-16-04: Base & Job experiences uncapped. [AlexKreuz]
 - 06-16-04: Built in account creator. [AlexKreuz]
 - 06-16-04: Live editing of account data. [AlexKreuz]

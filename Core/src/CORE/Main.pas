@@ -10939,14 +10939,28 @@ end;
 procedure TfrmMain.Button4Click(Sender: TObject);
 var
     AccountItem : TPlayer;
+    tc : TChara;
+    i : Integer;
 begin
 	if PlayerName.IndexOf(Edit3.Text) <> -1 then begin
 		AccountItem := PlayerName.Objects[PlayerName.IndexOf(Edit3.Text)] as TPlayer;
+
+    	for i := 0 to 8 do begin
+        	tc := AccountItem.CData[i];
+            if assigned(tc) then begin
+	            if assigned(tc.Socket) then begin
+    	        	tc.Socket.Close;
+                    tc.Socket := nil;
+                end;
+            end;
+        end;
+
 	    AccountItem.ID := StrToInt(Edit2.Text);
         AccountItem.Name := Edit3.Text;
         AccountItem.Pass := Edit4.Text;
         AccountItem.Gender := StrToInt(Edit5.Text);
         AccountItem.Mail := Edit6.Text;
+        AccountItem.Banned := StrToInt(Edit7.Text);
 	    DataSave();
     end else begin
     	AccountItem := TPlayer.Create;
