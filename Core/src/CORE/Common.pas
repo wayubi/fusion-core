@@ -25,7 +25,7 @@ const
 type TLiving = class
   public
     ID      :cardinal;
-    JID     :word;
+		JID     :word;
     Name    :string;
     Map     :string;
     Point   :TPoint;
@@ -130,7 +130,7 @@ type TItemDB = class
         GhostArmor    :boolean;
         NoCastInterrupt :boolean;
         MagicReflect  :boolean;
-        SkillWeapon   :boolean;
+				SkillWeapon   :boolean;
         GungnirEquipped :boolean;
         LVL4WeaponASPD :boolean;
         PerfectDamage   :boolean;
@@ -157,9 +157,9 @@ type TItem = class
   Stolen    : Cardinal;
 
 public
-  Constructor Create;
-  Destructor  Destroy; OverRide;
-end;
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+end;//TItem
 //------------------------------------------------------------------------------
 {追加}
 type TItemList = class
@@ -169,9 +169,9 @@ type TItemList = class
 	MaxWeight :Cardinal;
 	Count     :Word;
 
-	constructor Create;
-	destructor Destroy; override;
-end;
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+end;//TItemList
 {追加ココまで}
 //------------------------------------------------------------------------------
 {アイテム製造追加}
@@ -489,6 +489,11 @@ TPet = class
         SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
         LastTick        :cardinal;  //Used for tracking a minute
         Saved           :byte;
+
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+
 end;//TPet
 {キューペットここまで}
 //------------------------------------------------------------------------------
@@ -656,6 +661,10 @@ TeNPC = class
 	WElement      :Array[0..1] of byte; //武器属性
 
 	ATKSplash	    :Boolean; //9マス攻撃
+
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
 
 end;//TeNPC
 //------------------------------------------------------------------------------
@@ -883,10 +892,7 @@ end;//TeNPC
 	SkillTickID   :word; //次にどのスキルが切れるか
 
 //	MData         :Pointer;
-	MData         :TMap;//ChrstphrR - typed pointer, req. forward declaration
-	//ppos          :integer;
-	//pcnt          :integer;
-	//path          :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	MData         :TMap;//ref ChrstphrR - typed pointer, req. forward declaration
 	NextFlag      :boolean;
 	NextPoint     :TPoint;
 	MoveTick      :cardinal;
@@ -1025,8 +1031,8 @@ TPlayer = class
 	Banned        :byte;
 	CID           :array[0..8] of cardinal;
 	CName         :array[0..8] of string;
-	CData         :array[0..8] of TChara;
-	Kafra         :TItemList;
+	CData         :array[0..8] of TChara; //Reference pointers
+	Kafra         :TItemList;//Owned
 
 	LoginID1      :cardinal;
 	LoginID2      :cardinal;
@@ -1035,7 +1041,7 @@ TPlayer = class
 
 	constructor Create;
 	destructor  Destroy; override;
-end;
+end;//TPlayer
 //------------------------------------------------------------------------------
 {パーティー機能追加}
 // パーティーデータ
@@ -1076,7 +1082,7 @@ end;
 TShopItem = class
 	ID    :word;
 	Price :cardinal;
-	Data  :TItemDB;
+	Data  :TItemDB;//reference
 end;
 //------------------------------------------------------------------------------
 // NPCスクリプト
@@ -1089,17 +1095,25 @@ rScript = record
 end;
 //------------------------------------------------------------------------------
 // NPCデータ
+
+(*=============================================================================*
+TNPC
+
+--
+Overview:
+--
+Derived from TLiving (this change made by Colus, for the common attributes
+for NPC, Mob, and Chara objects.
+
+ChrstphrR - question for other devs -- What does an NPC represent?
+Just the Kafra babes, and townsfolk?  Can it represent NPC associated monsters,
+like the one in Prontera?  My description here bites, so someone feel free to
+expand on what the class -represents-
+
+*=============================================================================*)
 TNPC = class(TLiving)
-	//ID          :cardinal;
-	//Name        :string;
-{NPCイベント追加}
-	//JID         :word;
-	//JID         :integer;  // Why make it integer?
-{NPCイベント追加ココまで}
-	//Map         :string;
-  Reg         :string;
-	//Point       :TPoint;
-	//Dir         :byte;
+public
+	Reg         :string;
 	CType       :byte; //0=warp 1=shop 2=script 3=item 4=skill
 	//warp
 	WarpSize    :TPoint;
@@ -1111,10 +1125,11 @@ TNPC = class(TLiving)
 	Script      :array of rScript;
 	ScriptCnt   :integer;
 	ScriptLabel :string;
+
 {NPCイベント追加}
 	ScriptInitS  :integer; //OnInitステップ
 	ScriptInitD  :Boolean; //OnInit実行済フラグ
-  ScriptInitMS :integer;
+	ScriptInitMS :integer;
 
 	ChatRoomID  :cardinal; //チャットルームID
 	Enable      :Boolean; //有効スイッチ
@@ -1123,30 +1138,31 @@ TNPC = class(TLiving)
 {アジト機能追加ココまで}
 {NPCイベント追加ココまで}
 	//item
-	Item        :TItem;
+	Item        :TItem; //owned.
 	SubX        :byte;
 	SubY        :byte;
 	Tick        :cardinal;
 	//skill
 	Count       :word;
-	CData       :TChara;
-	MData       :TMob;
+	CData       :TChara; //ref
+	MData       :TMob;   //ref
 {追加}
 	MSkill      :Word;
 {追加ココまで}
 	MUseLV      :word;
 {キューペット}
-        //pet
-        HungryTick  :cardinal;
-        NextPoint   :TPoint;
-        MoveTick    :cardinal;
-        //ppos        :integer;
-	//pcnt        :integer;
-        //path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	//pet
+	HungryTick  :cardinal;
+	NextPoint   :TPoint;
+	MoveTick    :cardinal;
 
-        //AnkleTick   :cardinal;  //How long ankle snare lasts.
-{キューペットここまで}
-end;
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+
+End;(* TNPC
+*=============================================================================*)
+
+
 //------------------------------------------------------------------------------
 {NPCイベント追加}
 // タイマーデータ
@@ -1157,6 +1173,9 @@ NTimer = class
 	Idx       :array of integer;//インデックス
 	Step      :array of integer;//分岐先
 	Done      :array of byte;//実行済みフラグ
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
 end;
 //マップ設定データ
 MapTbl = class
@@ -1180,15 +1199,15 @@ end;
 //------------------------------------------------------------------------------
 // マップブロックデータ
 TBlock = class
-	NPC         :TIntList32;
-	Mob         :TIntList32;
-	CList       :TIntList32;
+	NPC         :TIntList32;//Reference list
+	Mob         :TIntList32;//Reference list
+	CList       :TIntList32;//Reference list
 	//MobProcess  :boolean;
 	MobProcTick :cardinal;
 
-	constructor Create;
-	destructor Destroy; override;
-end;
+	Constructor Create;
+	Destructor Destroy; OverRide;
+end;//TBlock
 //------------------------------------------------------------------------------
 // マップデータ
 TMap = class
@@ -1539,7 +1558,7 @@ var
 	mm              :array[0..30] of array[0..30] of rSearchMap;
 
 	buf             :array[0..32767] of byte;
-  buf2            :array[0..32767] of byte;
+//  buf2            :array[0..32767] of byte;{ChrstphrR 2004/04/24 - not used!}
 	stra            :array[0..32767] of char;
 {Things related to Options}
 	//キャラクター初期データ関連
@@ -3385,9 +3404,9 @@ begin
     tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.Delete(l);
   end;
 
-  l := tm.MOB.IndexOf( ts.ID );
+  l := tm.Mob.IndexOf( ts.ID );
   if l <> -1 then begin
-    tm.MOB.Delete(l);
+    tm.Mob.Delete(l);
   end;
   ts.ATarget := 0;
   ts.AData := nil;
@@ -9797,6 +9816,39 @@ end;
 {チャットルーム機能追加ココまで}
 
 
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/23
+
+- Placeholder constructor -- will fill with creation of owned objects like
+Item : TItemList AFTER I trace down what code manipulates this object already.
+
+*-----------------------------------------------------------------------------*)
+Constructor TeNPC.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+	{ChrstphrR 2004/04/23 - would create TItemList here...}
+End;(* TeNPC.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/23
+
+Freeing up Item(list)
+
+*-----------------------------------------------------------------------------*)
+Destructor TeNPC.Destroy;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	Item.Free;
+
+	inherited;
+End;(* TeNPC.Destroy
+*-----------------------------------------------------------------------------*)
+
+
 destructor TChara.Destroy;
 var
 	i :integer;
@@ -9810,23 +9862,36 @@ begin
 	inherited;
 end;
 
+
 constructor TPlayer.Create;
 begin
 	inherited;
-  Kafra := TItemList.Create;
-  Kafra.MaxWeight := 4000000000;
+	Kafra := TItemList.Create;
+	Kafra.MaxWeight := 4000000000;
 end;
 
-destructor TPlayer.Destroy;
-begin
-  Kafra.Free;
+
+(*-----------------------------------------------------------------------------*
+ChrstphrR - 2004/04/24
+TPlayer.Destroy
+
+Properly clean up all it's owned items.
+*-----------------------------------------------------------------------------*)
+Destructor TPlayer.Destroy;
+Begin
+	//Owned item cleanup...
+	Kafra.Free; //Defer to ItemList to clean itself up...
+
+	{ChrstphrR - Referenced items don't affect memory leaks,
+	code to NIL them out found to be unnecessary.}
 	inherited;
-end;
+End;(* TPlayer.Destroy
+*-----------------------------------------------------------------------------*)
+
 
 constructor TBlock.Create;
 begin
 	inherited;
-
 	NPC := TIntList32.Create;
 	CList := TIntList32.Create;
 	Mob := TIntList32.Create;
@@ -9834,6 +9899,7 @@ end;
 
 destructor TBlock.Destroy;
 begin
+	//ChrstphrR These are all reference lists
 	NPC.Free;
 	CList.Free;
 	Mob.Free;
@@ -9856,15 +9922,36 @@ begin
 end;
 
 destructor TMap.Destroy;
+var
+	Idx : Integer;
+	Idy : Integer;
 begin
+	for Idx := NPC.Count-1 downto 0 do
+		if Assigned(NPC.Objects[Idx]) then
+			(NPC.Objects[Idx] AS TNPC).Free;
 	NPC.Free;
 	NPCLabel.Free;
 	CList.Free;
 	Mob.Free;
 {NPCイベント追加}
+
+	for Idx := TimerAct.Count-1 downto 0 do
+		if Assigned(TimerAct.Objects[Idx]) then
+			(TimerAct.Objects[Idx] AS NTimer).Free;
 	TimerAct.Free;
+	for Idx := TimerDef.Count-1 downto 0 do
+		if Assigned(TimerDef.Objects[Idx]) then
+			(TimerDef.Objects[Idx] AS NTimer).Free;
 	TimerDef.Free;
 {NPCイベント追加ココまで}
+
+	//Block is an array it's extents are an odd range, need to find out
+	// if the "border" around the block needs freeing, or not.
+	for Idx := BlockSize.X-1 downto 0 do
+		for Idy := BlockSize.Y-1 downto 0 do
+			if Assigned(Block[Idx][Idy]) then
+				(Block[Idx][Idy] AS TBlock).Free;
+
 
 	inherited;
 end;
@@ -9897,5 +9984,102 @@ begin
 end;
 {ギルド機能追加ココまで}
 //==============================================================================
+
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/24
+
+Will fold in owned object creation into the constructor, is a placeholder right
+now.
+*-----------------------------------------------------------------------------*)
+Constructor TNPC.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+End;(* TNPC.Create
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor TNPC.Destroy;
+Var
+	Idx : Integer;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+
+	Item.Free;
+	for Idx := Low(ShopItem) to High(ShopItem) do
+		if Assigned(ShopItem[Idx]) then
+			ShopItem[Idx].Free;
+
+
+	inherited;
+End;(* TNPC.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+
+(*-----------------------------------------------------------------------------*
+Placeholder..
+*-----------------------------------------------------------------------------*)
+Constructor NTimer.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+
+End;(* NTimer.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor NTimer.Destroy;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	{
+	SetLength(Idx,0);
+	SetLength(Step,0)
+	SetLength(Done,0)
+	}
+
+	inherited;
+End;(* NTimer.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Constructor TPet.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+	//CR will create items here, later.
+End;(* TPet.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor TPet.Destroy;
+Var
+	Idx : Integer;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	for Idx := Low(Item) to High(Item) do
+		if Assigned(Item[Idx]) then
+			Item[Idx].Free;
+
+	inherited;
+End;(* TPet.Destroy
+*-----------------------------------------------------------------------------*)
+
 end.
- 
+
