@@ -81,7 +81,7 @@ begin
 			    WFIFOW( 0, $006a);
 			    WFIFOB( 2, 3);//It will say rejected from server, but I'm not sure if this is the right message
 			    Socket.SendBuf(buf, 23);
-            end else tp.Login := 0;
+            end else APlayer.Login := 0;
         end
 		else if APlayer.Pass = userpass then begin
 
