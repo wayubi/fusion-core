@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 11-09-04: Corrected npctimer mistake. [Tsusai]
 - 11-08-04: Added waitingroomcount NPC command. [Tsusai]
 - 11-08-04: Updated areawarp and areabroadcast. [Tsusai]
 - 11-08-04: Changed JCon's Skill hiding function.  Hides skills not learned yet. [Tsusai]
