@@ -19,6 +19,7 @@ uses
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
     procedure PD_PlayerData_Save(forced : Boolean = False);
+    procedure PD_PlayerData_Delete(UID : String);
 
     { Create Basic Structure }
     procedure PD_Create_Structure();
@@ -26,6 +27,7 @@ uses
     { Account Data - Basic Data }
     procedure PD_Load_Accounts(UID : String = '*');
     procedure PD_Save_Accounts(forced : Boolean = False);
+    procedure PD_Delete_Accounts(tp : TPlayer);
 
     { Account Data - Active Characters }
     procedure PD_Load_Accounts_ActiveCharacters(UID : String = '*');
@@ -74,6 +76,7 @@ uses
     { Guild Data - Basic Data }
     procedure PD_Load_Guilds(UID : String = '*');
     procedure PD_Save_Guilds(forced : Boolean = False);
+    procedure PD_Delete_Guilds(tg : TGuild);
 
     { Guild Data - Member Data }
     procedure PD_Load_Guilds_Members(UID : String = '*');
@@ -111,8 +114,16 @@ uses
     { -- Parsers --------------------------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
     procedure PD_PlayerData_Load(UID : String = '*');
+    var
+        tp : TPlayer;
     begin
         PD_Create_Structure();
+
+        if UID <> '*' then begin
+            if PlayerName.IndexOf(UID) = -1 then Exit;
+            tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+            UID := IntToStr(tp.ID);
+        end;
 
         if UID = '*' then debugout.Lines.add('­ Accounts ­');
     	PD_Load_Accounts(UID);
@@ -177,6 +188,18 @@ uses
         if (forced) then debugout.lines.add('Comprehensive Save Completed.');
     end;
 
+    procedure PD_PlayerData_Delete(UID : String);
+    var
+        tp : TPlayer;
+        tc : TChara;
+    begin
+        if PlayerName.IndexOf(UID) = -1 then Exit;
+        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+
+        //PD_Delete_Characters(tc : TChara);
+        PD_Delete_Accounts(tp);
+    end;
+
 
     { -------------------------------------------------------------------------------- }
     { -- Create Structure ------------------------------------------------------------ }
@@ -209,7 +232,7 @@ uses
                     datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Account.txt');
 
                     if (UID = '*') then tp := TPlayer.Create
-                    else tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                     tp.ID := StrToInt( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
                     tp.Name := Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3);
@@ -276,10 +299,10 @@ uses
             datafile.Add('ACCESSLEVEL : ' + IntToStr(tp.AccessLevel));
 
             CreateDir(AppPath + 'gamedata\Accounts');
-            CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name);
+            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
 
             try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Account.txt');
+	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Account.txt');
                 //debugout.Lines.Add(tp.Name + ' account data saved.');
             except
                 DebugOut.Lines.Add('Account data could not be saved.');
@@ -288,6 +311,76 @@ uses
 
         datafile.Clear;
         datafile.Free;
+    end;
+
+    procedure PD_Delete_Accounts(tp : TPlayer);
+    var
+        deldir : String;
+        searchResult : Array[0..3] of TSearchRec;
+    begin
+        deldir := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\';
+        SetCurrentDir(deldir);
+
+        { -- Delete Account Files -- }
+        if FindFirst('*', faAnyFile, searchResult[0]) = 0 then repeat
+            try
+                DeleteFile(deldir + searchResult[0].Name);
+            except
+                DebugOut.Lines.Add('Account could not be deleted.');
+            end;
+        until FindNext(searchResult[0]) <> 0;
+        FindClose(searchResult[0]);
+        { -- Delete Account Files -- }
+
+        deldir := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\';
+        SetCurrentDir(deldir);
+        if FindFirst('*', faDirectory, searchResult[0]) = 0 then repeat
+
+            if (searchResult[0].Name = '.') or (searchResult[0].Name = '..') then Continue;
+
+            { -- Delete Character Files -- }
+            SetCurrentDir(deldir + searchResult[0].Name + '\');
+            if FindFirst('*', faAnyFile, searchResult[1]) = 0 then repeat
+                try
+                    DeleteFile(deldir + searchResult[0].Name + '\' + searchResult[1].Name);
+                except
+                    DebugOut.Lines.Add('Character data could not be deleted.');
+                end;
+            until FindNext(searchResult[1]) <> 0;
+            FindClose(searchResult[1]);
+            { -- Delete Character Files -- }
+
+            { -- Delete Character Pet Files -- }
+            SetCurrentDir(deldir + searchResult[0].Name + '\Pets\');
+            if FindFirst('*', faAnyFile, searchResult[1]) = 0 then repeat
+                try
+                    DeleteFile(deldir + searchResult[0].Name + '\Pets\' + searchResult[1].Name);
+                except
+                    DebugOut.Lines.Add('Pet data could not be deleted.');
+                end;
+            until FindNext(searchResult[1]) <> 0;
+            FindClose(searchResult[1]);
+            { -- Delete Character Pet Files -- }
+
+            { -- Delete Character / Pet Directory -- }
+            SetCurrentDir(AppPath);
+            if FileExists(deldir + searchResult[0].Name + '\Pets') then
+                RmDir(deldir + searchResult[0].Name + '\Pets');
+            if FileExists(deldir + searchResult[0].Name) then
+                RmDir(deldir + searchResult[0].Name);
+            { -- Delete Character / Pet Directory -- }
+
+        until FindNext(searchResult[0]) <> 0;
+        FindClose(searchResult[0]);
+
+        { -- Delete Account / Characters Directory -- }
+        if FileExists(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\') then
+            RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\');
+        if FileExists(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID)) then
+            RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
+        { -- Delete Account / Characters Directory -- }
+
+        DataSave();
     end;
 
 
@@ -311,7 +404,7 @@ uses
 
                     for i := 0 to PlayerName.Count - 1 do begin
                         tp := PlayerName.Objects[i] as TPlayer;
-                        if tp.Name = searchResult.Name then Break
+                        if tp.ID = StrToInt(searchResult.Name) then Break
                         else tp := nil;
                     end;
 
@@ -365,10 +458,10 @@ uses
             datafile.Add('SLOT8 : ' + tp.CName[7]);
             datafile.Add('SLOT9 : ' + tp.CName[8]);
 
-            CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name);
+            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
 
             try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\ActiveChars.txt');
+	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\ActiveChars.txt');
                 //debugout.Lines.Add(tp.Name + ' account active character data saved.');
         	except
                 DebugOut.Lines.Add('Account active character data could not be saved.');
@@ -400,8 +493,8 @@ uses
                 if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Storage.txt') then begin
                     datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Storage.txt');
 
-                    if (UID = '*') then tp := PlayerName.Objects[PlayerName.IndexOf(searchResult.Name)] as TPlayer
-                    else tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    if (UID = '*') then tp := Player.Objects[Player.IndexOf(StrToInt(searchResult.Name))] as TPlayer
+                    else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                     for i := 1 to 100 do begin
                         tp.Kafra.Item[i].ID := 0;
@@ -529,10 +622,10 @@ uses
 	            end;
             end;
 
-            CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name);
+            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
 
             try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Storage.txt');
+	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Storage.txt');
                 //debugout.Lines.Add(tp.Name + ' account storage data saved.');
             except
             	DebugOut.Lines.Add('Account storage data could not be saved.');
@@ -564,8 +657,10 @@ uses
 
     	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
 
-        	if PlayerName.IndexOf(searchResult.Name) <> -1 then begin
-        		tp := PlayerName.Objects[PlayerName.IndexOf(searchResult.Name)] as TPlayer;
+            if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
+
+        	if Player.IndexOf(StrToInt(searchResult.Name)) <> -1 then begin
+        		tp := Player.Objects[Player.IndexOf(StrToInt(searchResult.Name))] as TPlayer;
                 for i := 0 to 8 do begin
                 	tp.CData[i] := nil;
                 end;
@@ -577,13 +672,16 @@ uses
                     	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Character.txt');
 
                         if (UID = '*') then begin
-                        	tc := TChara.Create;
-                        end else if (searchResult2.Name = tp.CName[0]) or (searchResult2.Name = tp.CName[1]) or (searchResult2.Name = tp.CName[2])
-                        or (searchResult2.Name = tp.CName[3]) or (searchResult2.Name = tp.CName[4]) or (searchResult2.Name = tp.CName[5])
-                        or (searchResult2.Name = tp.CName[6]) or (searchResult2.Name = tp.CName[7]) or (searchResult2.Name = tp.CName[8]) then begin
-                        	tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                            tc := TChara.Create;
                         end else begin
-                        	Continue;
+                            if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then Continue;
+                            tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
+
+                            if (tc.Name <> tp.CName[0]) and (tc.Name <> tp.CName[1]) and (tc.Name <> tp.CName[2])
+                            and (tc.Name <> tp.CName[3]) and (tc.Name <> tp.CName[4]) and (tc.Name <> tp.CName[5])
+                            and (tc.Name <> tp.CName[6]) and (tc.Name <> tp.CName[7]) and (tc.Name <> tp.CName[8]) then begin
+                            	Continue;
+                            end;
                         end;
 
                         tc.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
@@ -638,7 +736,7 @@ uses
                         tc.PData := tp;
 
                         for i := 0 to 8 do begin
-                        	if (searchResult2.Name = tp.CName[i]) then begin
+                        	if (tc.Name = tp.CName[i]) then begin
             	            	tp.CData[i] := tc;
     	                        tp.CData[i].CharaNumber := i;
         	                    tp.CData[i].ID := tp.ID;
@@ -688,6 +786,9 @@ uses
                 tc := tp.CData[j];
 
                 if (tc = nil) then Continue;
+
+                if tc.CID < 100001 then tc.CID := tc.CID + 100001;
+                if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
 
                 datafile.Add('NAM : ' + tc.Name);
                 datafile.Add('AID : ' + IntToStr(tc.ID));
@@ -749,11 +850,11 @@ uses
                 
                 datafile.Add('GID : ' + IntToStr(tc.GuildID));
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Character.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Character.txt');
                 	//debugout.Lines.Add(tp.Name + ' character data saved.');
             	except
             		DebugOut.Lines.Add('Character data could not be saved.');
@@ -773,7 +874,7 @@ uses
     begin
         tp := tc.PData;
 
-        deldir := AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\';
+        deldir := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\';
         if FileExists(deldir+'ActiveMemos.txt') then DeleteFile(deldir+'ActiveMemos.txt');
         if FileExists(deldir+'Cart.txt') then DeleteFile(deldir+'Cart.txt');
         if FileExists(deldir+'Character.txt') then DeleteFile(deldir+'Character.txt');
@@ -781,11 +882,11 @@ uses
         if FileExists(deldir+'Skills.txt') then DeleteFile(deldir+'Skills.txt');
         if FileExists(deldir+'Variables.txt') then DeleteFile(deldir+'Variables.txt');
 
-        deldir := AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\';
+        deldir := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\';
         SetCurrentDir(deldir);
-        RmDir(deldir + tc.Name);
+        RmDir(deldir + IntToStr(tc.CID));
 
-        Datasave();
+        DataSave();
     end;
 
 
@@ -810,8 +911,8 @@ uses
                 	try
                     	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\ActiveMemos.txt');
 
-                        if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
-                        tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
+                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
 
                         for i := 0 to 2 do begin
                         	tc.MemoMap[i] := ( Copy(datafile[0+(3*i)], Pos(' : ', datafile[0+(3*i)]) + 3, length(datafile[0+(3*i)]) - Pos(' : ', datafile[0+(3*i)]) + 3) );
@@ -860,11 +961,11 @@ uses
                     datafile.Add('M'+IntToStr(k+1)+'Y : ' + IntToStr(tc.MemoPoint[k].Y));
 				end;
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\ActiveMemos.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\ActiveMemos.txt');
                 	//debugout.Lines.Add(tp.Name + ' character memo data saved.');
             	except
             		DebugOut.Lines.Add('Character memo data could not be saved.');
@@ -898,8 +999,10 @@ uses
 
         	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
 
-            	if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
-            	tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                if (searchResult2.Name = '.') or (searchResult2.Name = '..') then Continue; 
+
+            	if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
+            	tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
 
             	for i := 0 to MAX_SKILL_NUMBER do begin
             		if SkillDB.IndexOf(i) <> -1 then begin
@@ -996,11 +1099,11 @@ uses
     	            end;
                 end;
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Skills.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Skills.txt');
                 	//debugout.Lines.Add(tp.Name + ' character skills data saved.');
             	except
             		DebugOut.Lines.Add('Character skills data could not be saved.');
@@ -1037,8 +1140,8 @@ uses
                 	try
                     	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Inventory.txt');
 
-                        if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
-                        tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
+                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
 
                         for i := 1 to 100 do begin
                             tc.Item[i].ID := 0;
@@ -1177,11 +1280,11 @@ uses
                 end;
 
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Inventory.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Inventory.txt');
                 	//debugout.Lines.Add(tp.Name + ' character inventory data saved.');
             	except
             		DebugOut.Lines.Add('Character inventory data could not be saved.');
@@ -1218,8 +1321,8 @@ uses
                 	try
                     	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Cart.txt');
 
-                        if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
-                        tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
+                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
 
                         for i := 1 to 100 do begin
                             tc.Cart.Item[i].ID := 0;
@@ -1358,11 +1461,11 @@ uses
                 end;
 
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Cart.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Cart.txt');
                 	//debugout.Lines.Add(tp.Name + ' character cart data saved.');
             	except
             		DebugOut.Lines.Add('Character cart data could not be saved.');
@@ -1399,8 +1502,8 @@ uses
                 	try
                     	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Variables.txt');
 
-                        if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
-                        tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
+                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
 
                         if (UID <> '*') then begin
                             for i := 0 to datafile.Count - 1 do begin
@@ -1456,11 +1559,11 @@ uses
                     end;
                 end;
 
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
 
                 try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Variables.txt');
+	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Variables.txt');
                 	//debugout.Lines.Add(tp.Name + ' character variables data saved.');
             	except
             		DebugOut.Lines.Add('Character variables data could not be saved.');
@@ -1590,7 +1693,7 @@ uses
                 FindClose(searchPetResult);
 
             until FindNext(searchResult2) <> 0;
-            FindClose(searchPetResult);
+            FindClose(searchResult2);
 
         until FindNext(searchResult) <> 0;
         FindClose(searchResult);
@@ -1715,7 +1818,7 @@ uses
                 end;
 
                 if petdelete then begin
-                    DeleteFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + searchResult.Name);
+                    DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + searchResult.Name);
                     //RmDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets');
                 end;
 
@@ -1755,7 +1858,7 @@ uses
                                     CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets');
 
                                     try
-                                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + tpe.Name + '.txt');
+                                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
                                         //debugout.Lines.Add(tpe.Name + ' player pets data saved.');
                                     except
                                         DebugOut.Lines.Add('Player pets data could not be saved.');
@@ -1791,7 +1894,7 @@ uses
                     end;
 
                     if petdelete then begin
-                        DeleteFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets\' + searchResult.Name);
+                        DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + searchResult.Name);
                         //RmDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets');
                     end;
                     
@@ -1826,14 +1929,14 @@ uses
                                         datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
                                         datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
 
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets');
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
 
                                         try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets\' + tpe.Name + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + tpe.Name + '.txt');
+                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + tpe.Name + '.txt');
+                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
+                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
                                         	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
                                     	except
                                 	    	DebugOut.Lines.Add('Character pets data could not be saved.');
@@ -1871,14 +1974,14 @@ uses
                                         datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
                                         datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
 
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters');
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name);
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets');
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
+                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
 
                                         try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets\' + tpe.Name + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets\' + tpe.Name + '.txt');
+                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + tpe.Name + '.txt');
+                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
+                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
                                         	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
                                     	except
                                 	    	DebugOut.Lines.Add('Character pets data could not be saved.');
@@ -1940,8 +2043,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2123,8 +2226,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2145,7 +2248,6 @@ uses
                     	tg := TGuild.Create;
                     end;
 
-                    tg.Name := searchResult.Name;
                     for i := 0 to tg.RegUsers - 1 do begin
                         if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
                     	if tg.MemberID[i] <> 0 then begin
@@ -2234,10 +2336,10 @@ uses
             datafile.Add('DRW : ' + IntToStr(tg.DisposRW));
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\Guild.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Guild.txt');
                 //debugout.Lines.Add(tg.Name + ' guild data saved.');
             except
                 DebugOut.Lines.Add('Guild data could not be saved.');
@@ -2246,6 +2348,25 @@ uses
 
         datafile.Clear;
         datafile.Free;
+    end;
+
+    procedure PD_Delete_Guilds(tg : TGuild);
+    var
+        deldir : String;
+    begin
+        deldir := AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\';
+        if FileExists(deldir+'BanList.txt') then DeleteFile(deldir+'BanList.txt');
+        if FileExists(deldir+'Diplomacy.txt') then DeleteFile(deldir+'Diplomacy.txt');
+        if FileExists(deldir+'Guild.txt') then DeleteFile(deldir+'Guild.txt');
+        if FileExists(deldir+'Members.txt') then DeleteFile(deldir+'Members.txt');
+        if FileExists(deldir+'Positions.txt') then DeleteFile(deldir+'Positions.txt');
+        if FileExists(deldir+'Skills.txt') then DeleteFile(deldir+'Skills.txt');
+
+        deldir := AppPath + 'gamedata\Guilds\';
+        SetCurrentDir(deldir);
+        RmDir(deldir + IntToStr(tg.ID));
+
+        DataSave();
     end;
 
 
@@ -2292,8 +2413,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2316,7 +2437,7 @@ uses
                     end else begin
                         for i := 0 to GuildList.Count - 1 do begin
                             tg := GuildList.Objects[i] as TGuild;
-                            if tg.Name = searchResult.Name then Break;
+                            if tg.ID = StrToInt(searchResult.Name) then Break;
                         end;
                     end;
 
@@ -2460,10 +2581,10 @@ uses
 			end;
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\Members.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Members.txt');
                 //debugout.Lines.Add(tg.Name + ' guild member data saved.');
             except
                 DebugOut.Lines.Add('Guild member data could not be saved.');
@@ -2504,8 +2625,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2522,7 +2643,7 @@ uses
                     end else begin
                         for i := 0 to GuildList.Count - 1 do begin
                             tg := GuildList.Objects[i] as TGuild;
-                            if tg.Name = searchResult.Name then Break;
+                            if tg.ID = StrToInt(searchResult.Name) then Break;
                         end;
                     end;
 
@@ -2629,10 +2750,10 @@ uses
             end;
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\Positions.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Positions.txt');
                 //debugout.Lines.Add(tg.Name + ' guild positions data saved.');
             except
                 DebugOut.Lines.Add('Guild positions data could not be saved.');
@@ -2672,8 +2793,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2690,7 +2811,7 @@ uses
                     end else begin
                         for i := 0 to GuildList.Count - 1 do begin
                             tg := GuildList.Objects[i] as TGuild;
-                            if tg.Name = searchResult.Name then Break;
+                            if tg.ID = StrToInt(searchResult.Name) then Break;
                         end;
                     end;
 
@@ -2795,10 +2916,10 @@ uses
             end;
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\Skills.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Skills.txt');
                 //debugout.Lines.Add(tg.Name + ' guild skill data saved.');
             except
                 DebugOut.Lines.Add('Guild skill data could not be saved.');
@@ -2839,8 +2960,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -2857,7 +2978,7 @@ uses
                     end else begin
                         for i := 0 to GuildList.Count - 1 do begin
                             tg := GuildList.Objects[i] as TGuild;
-                            if tg.Name = searchResult.Name then Break;
+                            if tg.ID = StrToInt(searchResult.Name) then Break;
                         end;
                     end;
 
@@ -2968,10 +3089,10 @@ uses
             end;
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\BanList.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\BanList.txt');
                 //debugout.Lines.Add(tg.Name + ' guild banlist data saved.');
             except
                 DebugOut.Lines.Add('Guild banlist data could not be saved.');
@@ -3012,8 +3133,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;
@@ -3030,7 +3151,7 @@ uses
                     end else begin
                         for i := 0 to GuildList.Count - 1 do begin
                             tg := GuildList.Objects[i] as TGuild;
-                            if tg.Name = searchResult.Name then Break;
+                            if tg.ID = StrToInt(searchResult.Name) then Break;
                         end;
                     end;
 
@@ -3167,10 +3288,10 @@ uses
             end;
 
             CreateDir(AppPath + 'gamedata\Guilds');
-            CreateDir(AppPath + 'gamedata\Guilds\' + tg.Name);
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + tg.Name + '\Diplomacy.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Diplomacy.txt');
                 //debugout.Lines.Add(tg.Name + ' guild diplomacy data saved.');
             except
                 DebugOut.Lines.Add('Guild diplomacy data could not be saved.');
@@ -3213,8 +3334,8 @@ uses
 
                     if (UID <> '*') then begin
 
-                    	if PlayerName.IndexOf(UID) = -1 then Continue;
-                        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
+                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
 
                         for i := 0 to 8 do begin
     	                    if tp.CName[i] = '' then Continue;

@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 190
-  Top = 71
+  Left = 232
+  Top = 204
   Width = 408
   Height = 518
   Caption = 's'
@@ -45,7 +45,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 400
     Height = 445
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alClient
     Constraints.MinHeight = 445
     Constraints.MinWidth = 400

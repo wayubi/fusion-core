@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-22-04: Major R.E.E.D overhaul to fix internation characters. [AlexKreuz]
+- 08-22-04: JCon account deletion now permanent. [AlexKreuz]
+- 08-22-04: Proper character id assigning on character create. [AlexKreuz]
 - 08-20-04: Added error message for Reflect Shield skill [BieL®]
 - 08-20-04: Added error message for Auto Guard skill [BieL®]
 - 08-20-04: Added error message for Defender skill [BieL®]

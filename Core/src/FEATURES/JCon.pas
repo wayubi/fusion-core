@@ -207,6 +207,7 @@ uses
     		        	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
 	        	    end;
 
+                    PD_PlayerData_Delete(tp.Name);
                     if PlayerName.IndexOf(tp.Name) <> -1 then
     		        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
                     if Player.IndexOf(tp.ID) <> -1 then
@@ -217,7 +218,6 @@ uses
 
         JCon_Accounts_Clear();
         JCon_Accounts_Load();
-        DataSave(True);
 
     end;
 

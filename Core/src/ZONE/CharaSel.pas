@@ -278,8 +278,13 @@ begin
 					Gender := tp.Gender;
 					if UseSQL then CID := GetNowCharaID()
 					else begin
+
 					CID := NowCharaID;
 					Inc(NowCharaID);
+
+                    if tc.CID < 100001 then tc.CID := tc.CID + 100001;
+                    if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
+
 					end;
 					Name := str1;
 					Gender := tp.Gender;

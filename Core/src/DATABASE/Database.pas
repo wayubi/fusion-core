@@ -1968,7 +1968,7 @@ begin
 					ID := StrToInt(sl.Strings[0]);
 					Name := sl.Strings[1];
 
-                    Name := remove_badsavechars(Name);
+                    {Name := remove_badsavechars(Name);}
 
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
@@ -1986,9 +1986,9 @@ begin
 						CName[8] := sl.Strings[14];
 					end;
 
-                    for i := 0 to 8 do begin
+                    {for i := 0 to 8 do begin
                         CName[i] := remove_badsavechars(CName[i]);
-                    end;
+                    end;}
 
 				end;
 {C³ƒRƒR‚Ü‚Å}
@@ -2016,7 +2016,7 @@ begin
 					CalcInventory(tp.Kafra);
 				end;
 
-                redo := True;
+                {redo := True;
                 while (redo) do begin
                     redo := False;
                     for i := 0 to PlayerName.Count - 1 do begin
@@ -2025,7 +2025,7 @@ begin
                             redo := True;
                         end;
                     end;
-                end;
+                end;}
 
 				PlayerName.AddObject(tp.Name, tp);
 				Player.AddObject(tp.ID, tp);
@@ -2036,17 +2036,17 @@ begin
 				with tp do begin
 					ID := StrToInt(sl.Strings[0]);
 					Name := sl.Strings[1];
-                    Name := remove_badsavechars(Name);
+                    {Name := remove_badsavechars(Name);}
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
 					Banned := 0;
-					CName[0] := remove_badsavechars(sl.Strings[5]);
-					CName[1] := remove_badsavechars(sl.Strings[6]);
-					CName[2] := remove_badsavechars(sl.Strings[7]);
+					CName[0] := (sl.Strings[5]);
+					CName[1] := (sl.Strings[6]);
+					CName[2] := (sl.Strings[7]);
 				end;
 
-                redo := True;
+                {redo := True;
                 while (redo) do begin
                     redo := False;
                     for i := 0 to PlayerName.Count - 1 do begin
@@ -2055,7 +2055,7 @@ begin
                             redo := True;
                         end;
                     end;
-                end;
+                end;}
 
 				PlayerName.AddObject(tp.Name, tp);
 				Player.AddObject(tp.ID, tp);
@@ -2094,7 +2094,7 @@ begin
 		tc := TChara.Create;
 		with tc do begin
 			CID           := StrToInt(sl.Strings[ 0]);
-			Name          := remove_badsavechars(sl.Strings[ 1]);
+			Name          := (sl.Strings[ 1]);
 			JID           := StrToInt(sl.Strings[ 2]);
 			// Colus, 20040305: JID becomes the 'proper' value.
 			if (JID > LOWER_JOB_END) then JID := JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
@@ -2304,7 +2304,7 @@ begin
 			for i := 1 to j do tc.Flag.Add(sl.Strings[i]);
 		end;
 
-        redo := True;
+        {redo := True;
         while (redo) do begin
             redo := False;
             for i := 0 to CharaName.Count - 1 do begin
@@ -2314,7 +2314,7 @@ begin
                     redo := True;
                 end;
             end;
-        end;
+        end;}
 
 		CharaName.AddObject(tc.Name, tc);
 		Chara.AddObject(tc.CID, tc);
@@ -2334,10 +2334,10 @@ begin
 		for j := 0 to i1 do begin
 			if tp.CName[j] <> '' then begin
 				k := CharaName.IndexOf(tp.CName[j]);
-                if k = -1 then begin
+                {if k = -1 then begin
                     k := CharaName.IndexOf(tp.CName[j]+'_');
                     tp.CName[j] := tp.CName[j] + '_';
-                end;
+                end;}
 				if k <> -1 then begin
 					tp.CData[j] := CharaName.Objects[k] as TChara;
 					tp.CData[j].CharaNumber := j;
@@ -2373,10 +2373,10 @@ begin
 		if sl.Count <> 17 then continue;
 		tgc := TCastle.Create;
 		with tgc do begin
-			Name := remove_badsavechars(sl.Strings[0]);
+			Name := (sl.Strings[0]);
 			GID  := StrToInt(sl.Strings[1]);
-			GName:= remove_badsavechars(sl.Strings[2]);
-			GMName:=remove_badsavechars(sl.Strings[3]);
+			GName:= (sl.Strings[2]);
+			GMName:=(sl.Strings[3]);
 			GKafra:=StrToInt(sl.Strings[4]);
 			EDegree:=StrToInt(sl.Strings[5]);
 			ETrigger:=StrToInt(sl.Strings[6]);
@@ -2467,7 +2467,7 @@ begin
 			if sl.Count <> 12 then continue;
 			ID := StrToInt(sl.Strings[0]);
 			if (ID > NowGuildID) then NowGuildID := ID;
-			Name := remove_badsavechars(sl.Strings[1]);
+			Name := (sl.Strings[1]);
 			LV := StrToInt(sl.Strings[2]);
 			EXP := StrToInt(sl.Strings[3]);
 			GSkillPoint := StrToInt(sl.Strings[4]);
@@ -2527,9 +2527,9 @@ begin
 			j := StrToInt(sl.Strings[0]);
 			for i := 1 to j do begin
 				tgb := TGBan.Create;
-				tgb.Name := remove_badsavechars(sl.Strings[k]);
+				tgb.Name := (sl.Strings[k]);
 				Inc(k);
-				tgb.AccName := remove_badsavechars(sl.Strings[k]);
+				tgb.AccName := (sl.Strings[k]);
 				Inc(k);
 				tgb.Reason := sl.Strings[k];
 				Inc(k);
@@ -2541,7 +2541,7 @@ begin
 				tgl := TGRel.Create;
 				tgl.ID := StrToInt(sl.Strings[k]);
 				Inc(k);
-				tgl.GuildName := remove_badsavechars(sl.Strings[k]);
+				tgl.GuildName := (sl.Strings[k]);
 				Inc(k);
 				RelAlliance.AddObject(tgl.GuildName, tgl);
 			end;
@@ -2551,7 +2551,7 @@ begin
 				tgl := TGRel.Create;
 				tgl.ID := StrToInt(sl.Strings[k]);
 				Inc(k);
-				tgl.GuildName := remove_badsavechars(sl.Strings[k]);
+				tgl.GuildName := (sl.Strings[k]);
 				Inc(k);
 				RelHostility.AddObject(tgl.GuildName, tgl);
 			end;
@@ -2577,7 +2577,7 @@ begin
 					k := Chara.IndexOf(MemberID[j]);
 					if k <> -1 then begin
 						tc := Chara.Objects[k] as TChara;
-						tc.GuildName := remove_badsavechars(Name);
+						tc.GuildName := (Name);
 						tc.GuildID := ID;
 						tc.ClassName := PosName[MemberPos[j]];
 						tc.GuildPos := j;
@@ -2626,7 +2626,7 @@ begin
 				Index       := StrToInt( sl.Strings[ 3] );
 				Incubated   := StrToInt( sl.Strings[ 4] );
 				PetID       := StrToInt( sl.Strings[ 5] );
-				Name        :=           remove_badsavechars(sl.Strings[ 6]);
+				Name        :=           (sl.Strings[ 6]);
 				Renamed     := StrToInt( sl.Strings[ 7] );
 				Relation    := StrToInt( sl.Strings[ 8] );
 				Fullness    := StrToInt( sl.Strings[ 9] );
@@ -2647,7 +2647,7 @@ begin
 					Incubated   := StrToInt( SL[ 4] );
 					PetID       := StrToInt( SL[ 5] );
 					JID         := StrToInt( SL[ 6] );
-					Name        :=           remove_badsavechars(SL[ 7]);
+					Name        :=           (SL[ 7]);
 					Renamed     := StrToInt( SL[ 8] );
 					LV          := StrToInt( SL[ 9] );
 					Relation    := StrToInt( SL[10] );

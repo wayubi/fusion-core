@@ -196,6 +196,7 @@ uses
                 end;
             end;
         	guildlist.Delete(j);
+            PD_Delete_Guilds(tg);
         end;
     end;
 
