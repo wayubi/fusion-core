@@ -67,8 +67,8 @@ implementation
 
         { -- Characters can not be deleted while Parties / Guilds / Pets Exist -- }
 
-        //leave_party(tc);
-        //leave_guild(tc);
+        leave_party(tc);
+        leave_guild(tc);
 
         for i := 0 to PetList.Count - 1 do begin
             tpe := PetList.Objects[i] as TPet;
