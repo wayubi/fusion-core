@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-22-04: Accidentally put vit instead of agi. [Trihan]
+- 06-22-04: Forgot to update agi when Quagmire expires. [Trihan]
 - 06-22-04: Fixed #651 - Quagmire not lasting long enough, and made it halve agi. [Trihan]
 - 06-18-04: Fixed #962 - Leaf of Yggdrasil without Blue Gemstone caused crash. [AlexKreuz]
 - 06-18-04: Fixed #960 - Dual weapon characters crashed other players. [AlexKreuz]

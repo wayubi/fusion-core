@@ -7561,7 +7561,7 @@ begin
             begin
               if (ts1.EffectTick[1] < Tick ) then begin
                  ts1.Speed := ts1.Speed * 2;
-                 ts1.Data.Param[2] := ts1.Data.Param[2] div 2;
+                 ts1.Data.Param[1] := ts1.Data.Param[1] div 2;
                  ts1.Data.Param[4] := ts1.Data.Param[4] div 2;
               end;
                  ts1.EffectTick [1]:= Tick + 5000*tc1.Skill[92].Lv;
@@ -8684,7 +8684,7 @@ begin
       if (ts.EffectTick[1] <= Tick) and (ts.EffectTick[1]<>0) then begin
         ts.EffectTick[1]:=0;
         ts.Speed := ts.Speed div 2;
-        ts.Data.Param[2] := ts.Data.Param[2] * 2;
+        ts.Data.Param[1] := ts.Data.Param[1] * 2;
         ts.Data.Param[4] := ts.Data.Param[4] * 2;
 			  ZeroMemory(@buf[0], 60);
 			  WFIFOW( 0, $007b);
