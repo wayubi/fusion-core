@@ -1,3 +1,27 @@
+IGNORE THESE NOTES.
+
+MUDVAYNE QUIT.
+
+IVE NEVER HEARD OF SOMETHING SO STUPID, THE FILES RECOMMENDED BY HIM IN MAPINFO ARENT EVEN
+AVAILABLE IN AFM FORMAT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+
+
 //---------------
 // mob_db.txt - Remove all ,, and repleace with ,0, ...
 //---------------
