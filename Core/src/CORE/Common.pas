@@ -10,7 +10,7 @@ uses
 
 const
   // Colus, 20040304: Let's see if this is truly global scope.
-  MAX_SKILL_NUMBER = 336;
+  MAX_SKILL_NUMBER = 400;
   MAX_JOB_NUMBER = 45;
   LOWER_JOB_END = 23;
   UPPER_JOB_BEGIN = 4000;
