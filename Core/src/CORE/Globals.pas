@@ -626,6 +626,14 @@ uses
         j := SearchPInventory(tc, tc.Item[w1].ID, tc.Item[w1].Data.IEquip, storage_items);
         if j < 0 then Exit;
 
+        if (storage_items[j].Amount = 0) then begin
+            Inc(amt);
+            WFIFOW(0, $00f2);
+            WFIFOW(2, amt);
+            WFIFOW(4, 100);
+            tc.Socket.SendBuf(buf, 6);
+        end;
+
         if storage_items[j].Amount + w2 > 30000 then Exit;
 
         storage_items[j].ID := tc.Item[w1].ID;
@@ -653,12 +661,6 @@ uses
         WFIFOW(17, storage_items[j].Card[2]);
         WFIFOW(19, storage_items[j].Card[3]);
         tc.Socket.SendBuf(buf, 21);
-
-        Inc(amt);
-        WFIFOW(0, $00f2);
-        WFIFOW(2, amt);
-        WFIFOW(4, 100);
-        tc.Socket.SendBuf(buf, 6);
 
         Dec(tc.Item[w1].Amount, w2);
         if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
