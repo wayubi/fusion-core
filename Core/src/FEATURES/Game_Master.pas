@@ -2814,6 +2814,7 @@ Called when we're shutting down the server *only*
     var
         i : Integer;
     begin
+        Result := 'GM_AEGIS_RESETSTATE Activated.';
         for i := 0 to 5 do begin
             tc.ParamBase[i] := 1;
         end;
@@ -2829,6 +2830,7 @@ Called when we're shutting down the server *only*
     var
         i, j : Integer;
     begin
+        Result := 'GM_AEGIS_RESETSKILL Activated.';
         j := 0;
         for i := 2 to MAX_SKILL_NUMBER do begin
             j := j + tc.Skill[i].Lv;
@@ -2860,9 +2862,11 @@ Called when we're shutting down the server *only*
         if (tc.Option and 64 = 0) then begin
             tc.Option := tc.Option or 64;
             tc.Hidden := true;
+            Result := 'GM_AEGIS_HIDE Activated.';
         end else begin
             tc.Option := tc.Option and $FFBF;
             tc.Hidden := false;
+            Result := 'GM_AEGIS_HIDE Deactivated.';
         end;
 
 
