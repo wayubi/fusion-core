@@ -5388,6 +5388,7 @@ begin
                                 end;
                                 267:    {Finger Offensive}
                                 begin
+                                    if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) then begin
                                         if spiritSpheres >= tc.MUseLV then begin
 					//É_ÉÅÅ[ÉWéZè
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
@@ -5405,6 +5406,7 @@ begin
                                                 spiritSpheres := spiritSpheres - tc.MUseLV;
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                         end;
+                                end;
                                 end;
                                 //Sage
                                 290:    {Abracadabra}
