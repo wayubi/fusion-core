@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 470
-  Top = 219
+  Left = 313
+  Top = 356
   Width = 765
   Height = 435
   Caption = '#33'
@@ -109,6 +109,7 @@ object frmMain: TfrmMain
         Alignment = taRightJustify
         Width = 50
       end>
+    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0

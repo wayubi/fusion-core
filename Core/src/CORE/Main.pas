@@ -570,7 +570,7 @@ begin
                 if sl.IndexOfName('Option_Font_Color') <> -1 then begin
                         Option_Font_Color := sl.Values['Option_Font_Color'];
                 end else begin
-                        Option_Font_Color := 'FFB933';
+                        Option_Font_Color := '797979';
                 end;
                 if sl.IndexOfName('Option_Font_Size') <> -1 then begin
                         Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
