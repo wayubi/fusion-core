@@ -984,6 +984,7 @@ begin
                 str := StringReplace(str, '\\', '\', [rfReplaceAll]);
                 //optional tags (first set is for map only, second set for global)
                 if ((l = 0) or (l = 200)) then str := tn.Name + ' : ' + str; // Null (0): displays npc name with it
+                //10 isn't here and isn't needed since it'll make str show itself anyways
                 if ((l = 100) or (l = 300)) then str := 'blue' + str;        //  Blue String Broadcast
                 if ((l = 20) or (l = 220)) then str := tc.Name + ' : ' + str; // displays characters name with it
                 if ((l = 30) or (l = 230)) then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
@@ -1946,6 +1947,60 @@ begin
                         tr.Tick := timeGetTime();
                         for k := 0 to tr.Cnt - 1 do tr.Done[k] := 0;
                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn1.ID,tm.TimerAct.Count]));
+                    end;
+                end;
+                Inc(tc.ScriptStep);
+            end;
+        82: //areabroadcast
+            begin
+                l := tn.Script[tc.ScriptStep].Data3[4];
+                str := tn.Script[tc.ScriptStep].Data1[0] + chr(0);
+                i := AnsiPos('$[', str);
+                while i <> 0 do begin
+                    j := AnsiPos(']', Copy(str, i + 2, 256));
+                    if j <= 1 then break;
+                    //grabbing variables
+                    if (Copy(str, i + 2, 1) = '$') then
+                        str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+                    else if (Copy(str, i + 2, 2) = '\$') then
+                        str := Copy(str, 1, i - 1) + ServerFlag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+                    else begin
+                        k := ConvFlagValue(tc, Copy(str, i + 2, j - 1), true);
+                        if k <> -1 then str := Copy(str, 1, i - 1) + IntToStr(k) + Copy(str, i + j + 2, 256)
+                        else str := Copy(str, 1, i - 1) + Copy(str, i + j + 2, 256);
+                    end;
+                    i := AnsiPos('$[', str);
+                end;
+                //predetermined variable string replacement
+                str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
+                str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+                str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
+                str := StringReplace(str, '$guildmaster', GetGuildMName(tn), [rfReplaceAll]);
+                str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(tn)), [rfReplaceAll]);
+                str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
+                str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
+                str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
+                str := StringReplace(str, '$$', '$', [rfReplaceAll]);
+                str := StringReplace(str, '\\', '\', [rfReplaceAll]);
+                //option tags
+                if l = 0 then str := tn.Name + ' : ' + str; // Null (0): displays npc name with it
+                if l = 100 then str := 'blue' + str;        //  Blue String Broadcast
+                if l = 20 then str := tc.Name + ' : ' + str; // displays characters name with it
+                if l = 30 then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
+                if l = 40 then str := 'blue' + tn.Name + ' : ' +str; //displays npc name and in blue
+                w := Length(str) + 4;
+                WFIFOW(0, $009a);
+                WFIFOW(2, w);
+                WFIFOS(4, str, w - 4);
+                //Broadcast on map
+                tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+                for i := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[i] as TChara;
+                    if (tc1.Point.X >= tn.Script[tc.ScriptStep].Data3[0]) and
+                        (tc1.Point.X <= tn.Script[tc.ScriptStep].Data3[1]) and
+                        (tc1.Point.Y >= tn.Script[tc.ScriptStep].Data3[2]) and
+                        (tc1.Point.Y <= tn.Script[tc.ScriptStep].Data3[3]) then begin
+                            if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
                     end;
                 end;
                 Inc(tc.ScriptStep);

@@ -9877,6 +9877,23 @@ Begin
 							tn.Script[k].Data1[0] := SL1[0];
 							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 							Inc(k);
+                        end else if str = 'areabroadcast' then begin //------- 82 areabroadcast
+                            if (sl1.Count = 5) then sl1.Add('0');
+                            if (sl1.Count <> 6) then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit;
+							end;
+                            SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 82;
+                            SetLength(tn.Script[k].Data1, 1);
+							SetLength(tn.Script[k].Data3, 5);
+							tn.Script[k].Data1[0] := SL1[0];
+							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+                            tn.Script[k].Data3[2] := StrToInt(SL1[3]);
+                            tn.Script[k].Data3[3] := StrToInt(SL1[4]);
+                            tn.Script[k].Data3[4] := StrToInt(SL1[5]);
+                            Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
