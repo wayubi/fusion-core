@@ -170,6 +170,7 @@ begin
 				if (Player.IndexOf(l) <> -1) and (Chara.IndexOf(l2) <> -1) then begin
 					tp := Player.IndexOfObject(l) as TPlayer;
 					tc := Chara.IndexOfObject(l2) as TChara;
+
 					//if tc.IP = Socket.RemoteAddress then begin
 					if (tp.LoginID1 = id1) and (tp.LoginID1 <> 0) then begin
 						tc.ver2 := tp.ver2;
@@ -6856,6 +6857,10 @@ end;
                                                                         WFIFOB( 6, 0 );
                                                                         SendBCmd( tm, tn.Point, 7 );
 
+                                                                        if UseSQL then begin
+                                                                          tpe.Incubated := 0;
+                                                                          SavePetData(tpe, i, 1);
+                                                                        end;
                                                                         //ÉyÉbÉgçÌèú
 																																				j := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
                                                                         if j <> -1 then begin
@@ -7056,9 +7061,10 @@ end;
                                                 tn.Dir := Random(8);
                                                 tn.CType := 2;
                                                 tn.HungryTick := timeGettime();
-                                                
-																								tpe.Data := tpd;
 
+																								tpe.Data := tpd;
+                                                tpe.Incubated := 1;
+                                                
                                                 tm.NPC.AddObject(tn.ID, tn);
                                                 tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 

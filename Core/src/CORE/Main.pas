@@ -2935,6 +2935,8 @@ begin
 				  j := SearchCInventory(tc, tn.Item.ID, tn.Item.Data.IEquip);
 				  if j <> 0 then begin
 					  //ƒAƒCƒeƒ€“P‹Ž
+					  tpe.ATarget := 0;
+            		  tn1.NextPoint := tc.Point;
 					  WFIFOW(0, $00a1);
 					  WFIFOL(2, tn.ID);
 					  SendBCmd(tm, tn.Point, 6);

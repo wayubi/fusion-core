@@ -46,8 +46,11 @@ var
     tp: TPlayer;
     count: integer;
     h: integer;
+    a: TObject;
 begin
+  if PlayerName.IndexOf(userid) <> - 1 then begin
     tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
+
     h := IDTableDB.IndexOf(tp.ID);
 
     if (h = -1) then begin
@@ -122,6 +125,12 @@ begin
         WFIFOB( 2, 1);
         Socket.SendBuf(buf, 23);
     end;
+  end else begin
+    ZeroMemory(@buf[0],23);
+    WFIFOW( 0, $006a);
+    WFIFOB( 2, 0);
+    Socket.SendBuf(buf, 23);
+  end;
 end;
 
 

@@ -2,6 +2,8 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-21-04: Fixed bug #528, players trying to log on with case sensitive ID. [Darkhelmet]
+- 02-21-04: Updated Pet Login, pet now shows after server restart. [Darkhelmet]
 - 02-21-04: Updated Pet Looting, pet just moves a little fast. [Darkhelmet]
 - 02-18-04: Added new party packet w/item/loot share (not implemented yet!) [Colus]
 - 02-18-04: Fixed most/all conditions for basic skills [Colus]
