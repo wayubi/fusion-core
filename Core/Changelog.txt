@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 02-11-04: Fixed being able to Pharmacy w/o books. [Colus]
 - 02-10-04: Added SQL CharacterDelete Check. [AlexKreuz]
 - 02-10-04: Edited a few default INI options for ease of use. [AlexKreuz]
 - 02-10-04: Updated & Cleaned up MySQL Code. [AlexKreuz]

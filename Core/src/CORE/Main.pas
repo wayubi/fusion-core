@@ -8398,7 +8398,7 @@ begin
                 if (tma.ItemLV > MSkill) then begin
                   i1 := SearchCInventory(tc, tma.ItemLV, false);
 
-                  if (i1 = 0) then begin
+                  if (i1 = 0) or (tc.Item[i1].Amount < 1) then begin
                     m := 1;
                     continue;
                   end;
