@@ -3518,6 +3518,28 @@ Called when we're shutting down the server *only*
                     if tc1.JID = 21 then job :='Crusader 2' else
                     if tc1.JID = 22 then job :='Wedding' else
                     if tc1.JID = 23 then job :='Super Novice' else
+                    if tc1.JID = 4001 then job :='High Novice' else
+                    if tc1.JID = 4002 then job :='High Swordsman' else
+                    if tc1.JID = 4003 then job :='High Mage' else
+                    if tc1.JID = 4004 then job :='High Archer' else
+                    if tc1.JID = 4005 then job :='High Acolyte' else
+                    if tc1.JID = 4006 then job :='High Merchant' else
+                    if tc1.JID = 4007 then job :='High Thief' else
+                    if tc1.JID = 4008 then job :='Lord Knight' else
+                    if tc1.JID = 4009 then job :='High Priest' else
+                    if tc1.JID = 4010 then job :='High Wizard' else
+                    if tc1.JID = 4011 then job :='Whitesmith' else
+                    if tc1.JID = 4012 then job :='Sniper' else
+                    if tc1.JID = 4013 then job :='Assassin Cross' else
+                    if tc1.JID = 4014 then job :='Lord Knight2' else
+                    if tc1.JID = 4015 then job :='Paladin' else
+                    if tc1.JID = 4016 then job :='Champion' else
+                    if tc1.JID = 4017 then job :='Professor' else
+                    if tc1.JID = 4018 then job :='Stalker' else
+                    if tc1.JID = 4019 then job :='Creator' else
+                    if tc1.JID = 4020 then job :='Clown' else
+                    if tc1.JID = 4021 then job :='Gypsy' else
+                    if tc1.JID = 4022 then job :='Paladin 2' else
                     job := 'Unknown Class';
 
                     if tp.AccessLevel > 0 then begin

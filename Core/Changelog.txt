@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-14-04: Added High jobs to @who2. [Tsusai]
 - 10-14-04: Fixed GM_JOB to display new job number correctly. [Tsusai]
 - 10-14-04: JCon: Fixed High Job display and saving. [Tsusai]
 - 10-14-04: Modified @who, @who2 and @who3 to accept matchtext and show GM levels. [Trihan]
