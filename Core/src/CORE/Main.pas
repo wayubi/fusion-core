@@ -19,7 +19,7 @@ uses
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
         PacketProcesses, ISCS, WAC,
     {3rd Party Units}
-    	List32, Zip, WSocket, jpeg;
+    	List32, Zip, WSocket;
 
 const
     {I know these are windows based, keep away from linux XD}

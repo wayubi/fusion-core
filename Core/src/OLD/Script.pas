@@ -2011,6 +2011,28 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
+        84: //reseteventmob
+            begin
+                if Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0]) <> -1 then begin
+                    tm1 := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
+                    for i := tm1.Mob.Count -1 downto 0 do begin
+                        ts := tm1.Mob.Objects[i] as TMob;
+                        if ((ts.isSummon = true) and (ts.Event = StrToInt(tn.Script[tc.ScriptStep].Data2[0]))) then begin
+                            if (tm1.CList.Count > 0) then begin
+                                WFIFOW( 0, $0080);
+                                WFIFOL( 2, ts.ID);
+                                WFIFOB( 6, 1);
+                                SendBCmd(tm1, ts.Point, 7);
+                            end;
+                            j := tm1.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
+                            if (j <> -1) then tm1.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(j);
+                            j := tm1.Mob.IndexOf(ts.ID);
+                            if (j <> -1) then tm1.Mob.Delete(j);
+                        end;
+                    end;
+                end;
+                Inc(tc.ScriptStep);
+            end;
 
 
 

@@ -6044,7 +6044,7 @@ begin
 	if DisableLevelLimit or (tc1.BaseLV < 99) then
 		tc1.BaseEXP := tc1.BaseEXP + EXP;
 
-	if DisableLevelLimit or ((tc1.JID = 0) and (tc1.JobLV < 10)) or ((tc1.JID <> 0) and (tc1.JobLV < 50)) then
+	if DisableLevelLimit or (((tc1.JID = 0) or (tc1.JID = 4001))  and (tc1.JobLV < 10)) or ((tc1.JID <> 0) and (tc1.JobLV < 50)) then
 		tc1.JobEXP := tc1.JobEXP + JEXP;
 
 	if tc1.BaseEXP >= tc1.BaseNextEXP then begin
@@ -9907,6 +9907,18 @@ Begin
 							tn.Script[k].ID := 83;
 							SetLength(tn.Script[k].Data1, 1);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+							Inc(k);
+                        end else if str = 'reseteventmob' then begin //------- 84 reseteventmob
+							if (sl1.Count <> 2) then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 41;
+							SetLength(tn.Script[k].Data1, 1);
+                            SetLength(tn.Script[k].Data2, 1);
+							tn.Script[k].Data1[0] := SL1[0];
+                            tn.Script[k].Data2[0] := SL1[1];
 							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
