@@ -1745,18 +1745,18 @@ Called when we're shutting down the server *only*
     var
         i : Integer;
     begin
-        Result := 'GM_SUPERSTATS Failure.';
+        Result := 'GM_SUPERSTATS Success.';
 
         for i := 0 to 5 do begin
             tc.ParamBase[i] := 32767;
         end;
 
         tc.StatusPoint := 1000;
+
         CalcStat(tc);
+
         SendCStat(tc);
         SendCStat1(tc, 0, $0009, tc.StatusPoint);
-
-        Result := 'GM_SUPERSTATS Success.';
     end;
 
     function command_zeny(tc : TChara; str : String) : String;
