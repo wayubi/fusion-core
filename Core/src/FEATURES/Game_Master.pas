@@ -174,6 +174,7 @@ var
     function command_athena_alive(tc : TChara) : String;
     function command_athena_kill(tc: TChara; str : String) : String;
     function command_athena_die(tc : TChara) : String;
+    function command_athena_jobchange(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -482,6 +483,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
             else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
 			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
+            else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc.ID, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2556,6 +2558,88 @@ Called when we're shutting down the server *only*
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         CharaDie(tm, tc, 1);
+    end;
+
+    function command_athena_jobchange(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tm : TMap;
+        i, j, ii : Integer;
+    begin
+        Result := 'GM_ATHENA_JOBCHANGE failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 2 then Exit;
+
+        val(sl.Strings[1], i, ii);
+        if ii <> 0 then Exit;
+
+        if (ii = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
+            // Colus, 20040203: Added unequip of items when you #job
+            for  j := 1 to 100 do begin
+                if tc.Item[j].Equip = 32768 then begin
+                    tc.Item[j].Equip := 0;
+                    WFIFOW(0, $013c);
+                    WFIFOW(2, 0);
+                    tc.Socket.SendBuf(buf, 4);
+                end else if tc.Item[j].Equip <> 0 then begin
+                    WFIFOW(0, $00ac);
+                    WFIFOW(2, j);
+                    WFIFOW(4, tc.Item[j].Equip);
+                    tc.Item[j].Equip := 0;
+                    WFIFOB(6, 1);
+                    tc.Socket.SendBuf(buf, 7);
+                end;
+            end;
+
+            // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+            for j := 1 to MAX_SKILL_NUMBER do begin
+                if tc.Skill[j].Data.Icon <> 0 then begin
+                    if tc.Skill[j].Tick >= timeGetTime() then begin
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(Icon Removed');
+                        UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
+                    end;
+                end;
+                tc.Skill[j].Tick := timeGetTime();
+                tc.Skill[j].Effect1 := 0;
+            end;
+
+            if (i > LOWER_JOB_END) then begin
+                i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+            end else begin
+                tc.ClothesColor := 0; // Reset the clothes color to the default value.
+            end;
+
+            tc.JID := i; // Set the JID to the corrected value.
+
+            if (tc.Option <> 0) then begin
+                tc.Option := 0;
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, 0);
+                WFIFOW(10, tc.Option);
+                WFIFOB(12, 0);
+                SendBCmd(tc.MData, tc.Point, 13);
+            end;
+
+            CalcStat(tc);
+            SendCStat(tc, true); // Add the true to recalc sprites
+            SendCSkillList(tc);
+
+            // Colus, 20040303: Using newer packet to allow upper job changes
+            UpdateLook(tm, tc, 0, i);
+
+            Result := 'GM_ATHENA_JOBCHANGE success.';
+
+        end;
+            
+        sl.Free;
     end;
       
     function command_athena_help(tc : TChara) : String;
