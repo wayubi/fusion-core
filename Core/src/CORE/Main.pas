@@ -1867,8 +1867,7 @@ begin
 
                                 tc.MTarget := tc.ATarget;
                                 ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-                                if ts = nil then Exit;
-                                
+
                                 tc.MTargetType := 0;
                                 tc.AData := ts;
 
@@ -5224,40 +5223,52 @@ begin
                                         begin
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							StatCalc1(tc, ts, Tick);
+
+                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+                                                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                        StatCalc1(tc, ts, Tick);
+
+                                                i := MapInfo.IndexOf(tc.Map);
+                                                j := -1;
+
+                                                if (i <> -1) then begin
+                                                        mi := MapInfo.Objects[i] as MapTbl;
+                                                        if (mi.noTele = true) then j := 0;
+                                                end;
+
+                                                if (j <> 0) then begin
+
+                                                        tm := tc.MData;
+                                                        j := 0;
+                                                        repeat
+                                                                xy.X := Random(tm.Size.X - 2) + 1;
+                                                                xy.Y := Random(tm.Size.Y - 2) + 1;
+                                                                Inc(j);
+                                                        until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+
+                                                if j <> 100 then begin
+
+                                                        SendCLeave(tc, 3);
+                                                        tc.Point := xy;
+                                                        ts.Point := xy;
+                                                        ts.tgtPoint := xy;
+                                                        MapMove(Socket, tc.Map, tc.Point);
+                                                        SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
+                                                        SendBCmd(tm, ts.Point, 58, tc,True);
+                                                end;
+                                        
+                                                //ts.Point.X := tc.Point.X;
+                                                //ts.Point.Y := tc.Point.Y;
 
 
-									i := MapInfo.IndexOf(tc.Map);
-									j := -1;
-									if (i <> -1) then begin
-										mi := MapInfo.Objects[i] as MapTbl;
-										if (mi.noTele = true) then j := 0;
-									end;
-									if (j <> 0) then begin
-
-										tm := tc.MData;
-									j := 0;
-									repeat
-										xy.X := Random(tm.Size.X - 2) + 1;
-										xy.Y := Random(tm.Size.Y - 2) + 1;
-										Inc(j);
-									until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
-
-									if j <> 100 then begin
-
-										SendCLeave(tc, 3);
-										tc.Point := xy;
-										MapMove(Socket, tc.Map, tc.Point);
-									end;
-                                                                        
-                                                                        ts.Point.X := tc.Point.X;
-                                                                        ts.Point.Y := tc.Point.Y;
-                                                                        if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
-                                                        	end;
+                                                {if ts.HP - dmg[0] > 0 then begin
+                                                        SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
+                                                        SendBCmd(tm, ts.Point, 58, tc,True);
+                                                end;}
+                                                //MobMoveL(tm, Tick);
 
 
+                                                end;
 
                                         end;
                                 //New skills ---- Monk
@@ -10834,7 +10845,7 @@ begin
 								SendBCmd(tm, ts1.Point, 10);
 							end;
 
-							$91: //AS  - Fixed by Bellium (Crimson)
+							$91:    {Ankle Snare Effect}
 							begin
 								if tn.Count <> 0 then begin
                 if not flag then Break; //ì•ÇÒÇ≈Ç»Ç¢
@@ -11282,13 +11293,16 @@ begin
 			if tm.Block[i][j].MobProcTick < Tick then begin
 				//for a := 0 to Block[i][j].Mob.Count - 1 do begin
 				a := 0;
+                                //if tm.Block[i][j].Mob.Objects[a] as TMob = nil then exit;
 				while (a >= 0) and (a < tm.Block[i][j].Mob.Count) do begin
                                         try
 					        ts := tm.Block[i][j].Mob.Objects[a] as TMob;
+                                                if ts = nil then exit;
                                         except
                                                 exit;
                                         end;
 					with ts do begin
+                                                if ts = nil then exit;
 			if (Data.isDontMove) or (HP = 0) or (ts.Stat1 <> 0) then begin
 							Inc(a);
 							continue;
@@ -12779,6 +12793,7 @@ begin
 			tm := Map.Objects[k] as TMap;
 			with tm do begin
 				if (Mode = 2) and (CList.Count > 0) then begin
+                                        if ts = nil then exit;
 					MobMoveL(tm,Tick);
 					//Spwanèàóù
 					for i := 0 to Mob.Count - 1 do begin
