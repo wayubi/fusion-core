@@ -80,6 +80,7 @@ uses
         NowCharaID := 0;
         NowPartyID := 10000;
         NowPetID := 0;
+        NowGuildID := 1;
 
         DebugOut := frmMain.txtDebug;
 
