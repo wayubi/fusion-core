@@ -482,10 +482,8 @@ uses
         frmMain.Edit63.Text := IntToStr(CharacterItem.Parambase[3]);
         frmMain.Edit64.Text := IntToStr(CharacterItem.Parambase[4]);
         frmMain.Edit61.Text := IntToStr(CharacterItem.Parambase[5]);
-        frmMain.Edit58.Text := IntToStr(CharacterItem.HP);
-        frmMain.Edit53.Text := IntToStr(CharacterItem.SP);
-        frmMain.Label98.Caption := IntToStr(CharacterItem.MAXHP);
-        frmMain.Label99.Caption := IntToStr(CharacterItem.MAXSP);
+        frmMain.Label98.Caption := IntToStr(CharacterItem.HP);
+        frmMain.Label99.Caption := IntToStr(CharacterItem.SP);
         frmMain.Label102.Caption := CharacterItem.PData.Name;
         if CharacterItem.GuildID <> 0 then frmMain.Label105.Caption := CharacterItem.GuildName;
         if CharacterItem.PartyID <> 0 then frmMain.Label103.Caption := CharacterItem.PartyName;
@@ -530,9 +528,6 @@ uses
         if StrToInt(frmMain.Edit53.Text) > CharacterItem.MAXSP then
             frmMain.Edit53.Text := IntToStr(CharacterItem.MAXSP);
         if StrToInt(frmMain.Edit53.Text) < 1 then frmMain.Edit53.Text := '1';
-
-        CharacterItem.HP := StrToInt(frmMain.Edit58.Text);
-        CharacterItem.SP := StrToInt(frmMain.Edit53.Text);
 
         CharacterItem.Speed := StrToInt(frmMain.Edit41.Text);
         CharacterItem.Hair := StrToInt(frmMain.Edit46.Text);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-29-04: Removed HP/SP character tab modification.  Just displays. [Tsusai]
 - 09-29-04: Stat Tab Account was showing ID instead of name. [Tsusai]
 - 09-29-04: Online Tab "Rescue" button added, used to get chars out of bad spots. [Tsusai]
 - 09-29-04: Character Stat tab redesigned, shows addditional info and memo map/points. [Tsusai]

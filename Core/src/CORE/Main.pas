@@ -233,12 +233,10 @@ type
     Edit50: TEdit;
     Edit51: TEdit;
     Edit52: TEdit;
-    Edit53: TEdit;
     Edit54: TEdit;
     Edit55: TEdit;
     Edit56: TEdit;
     Edit57: TEdit;
-    Edit58: TEdit;
     Edit59: TEdit;
     Edit61: TEdit;
     Edit63: TEdit;
@@ -262,8 +260,6 @@ type
     Label93: TLabel;
     Label94: TLabel;
     Button16: TButton;
-    Label65: TLabel;
-    Label97: TLabel;
     Label98: TLabel;
     Label99: TLabel;
     PageControl3: TPageControl;

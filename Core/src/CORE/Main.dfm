@@ -1626,30 +1626,16 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'C-Map X'
           end
-          object Label65: TLabel
-            Left = 200
-            Top = 360
-            Width = 45
-            Height = 18
-            Caption = 'Max HP:'
-          end
-          object Label97: TLabel
-            Left = 200
-            Top = 376
-            Width = 43
-            Height = 18
-            Caption = 'Max SP:'
-          end
           object Label98: TLabel
-            Left = 248
-            Top = 360
+            Left = 200
+            Top = 336
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label99: TLabel
-            Left = 248
-            Top = 376
+            Left = 256
+            Top = 336
             Width = 21
             Height = 18
             Caption = 'N/A'
@@ -1895,12 +1881,12 @@ object frmMain: TfrmMain
             TabOrder = 14
           end
           object Button16: TButton
-            Left = 304
-            Top = 368
+            Left = 240
+            Top = 360
             Width = 73
             Height = 25
             Caption = 'Save'
-            TabOrder = 32
+            TabOrder = 30
             OnClick = Button16Click
           end
           object Edit67: TEdit
@@ -1952,13 +1938,6 @@ object frmMain: TfrmMain
             Height = 26
             TabOrder = 20
           end
-          object Edit58: TEdit
-            Left = 200
-            Top = 336
-            Width = 49
-            Height = 26
-            TabOrder = 30
-          end
           object Edit57: TEdit
             Left = 88
             Top = 216
@@ -1987,75 +1966,68 @@ object frmMain: TfrmMain
             Height = 26
             TabOrder = 23
           end
-          object Edit53: TEdit
-            Left = 256
-            Top = 336
-            Width = 49
-            Height = 26
-            TabOrder = 31
-          end
           object Edit60: TEdit
             Left = 144
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 33
+            TabOrder = 31
           end
           object Edit62: TEdit
             Left = 88
             Top = 256
             Width = 49
             Height = 26
-            TabOrder = 34
+            TabOrder = 32
           end
           object Edit68: TEdit
             Left = 16
             Top = 256
             Width = 65
             Height = 26
-            TabOrder = 35
+            TabOrder = 33
           end
           object Edit69: TEdit
             Left = 16
             Top = 296
             Width = 65
             Height = 26
-            TabOrder = 36
+            TabOrder = 34
           end
           object Edit70: TEdit
             Left = 88
             Top = 296
             Width = 49
             Height = 26
-            TabOrder = 37
+            TabOrder = 35
           end
           object Edit71: TEdit
             Left = 144
             Top = 296
             Width = 49
             Height = 26
-            TabOrder = 38
+            TabOrder = 36
           end
           object Edit72: TEdit
             Left = 144
             Top = 336
             Width = 49
             Height = 26
-            TabOrder = 39
+            TabOrder = 37
           end
           object Edit73: TEdit
             Left = 88
             Top = 336
             Width = 49
             Height = 26
-            TabOrder = 40
+            TabOrder = 38
           end
           object Edit74: TEdit
             Left = 16
             Top = 336
             Width = 65
             Height = 26
-            TabOrder = 41
+            TabOrder = 39
           end
         end
         object TabSheet14: TTabSheet
