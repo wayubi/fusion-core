@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-24-04: Fixed Pneuma stops Shield Boomerang. [AlexKreuz]
+- 01-24-04: Fixed Pneuma stops Spear Boomerang. [AlexKreuz]
+- 01-24-04: Fixed Pneuma stops Players' Arrows. [AlexKreuz]
 - 01-24-04: Updated Resurrection [Colus]
 - 01-24-04: Updated Lex Aeterna damage effects [Colus]
 - 01-24-04: Fixed PVP cast timer did not cancel on hit. [AlexKreuz]

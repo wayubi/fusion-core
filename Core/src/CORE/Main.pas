@@ -2250,12 +2250,13 @@ end;
 {Player Attacking Player}
 procedure TFrmMain.DamageCalc3(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; Arms:byte = 0; SkillPer:integer = 0; AElement:byte = 0; HITFix:integer = 0);
 var
-	i,j,m :integer;
+	i,j,m,i1 :integer;
 	k     :Cardinal;
 	miss  :boolean;
 	crit  :boolean;
 	datk  :boolean;
         tatk  :boolean;
+        tn    :TNPC;
 begin
 	with tc do begin
                 //Grace Time Handling
@@ -2288,6 +2289,28 @@ begin
                         tatk := false;
 		end;
                
+        i1 := 0;
+        while (i1 >= 0) and (i1 < tm.Block[tc.Point.X div 8][tc.Point.Y div 8].NPC.Count) do begin
+            tn := tm.Block[tc.Point.X div 8][tc.Point.Y div 8].NPC.Objects[i1] as TNPC;
+            if tn = nil then begin
+                Inc(i1);
+                continue;
+            end;
+            if (tc1.Point.X = tn.Point.X) and (tc1.Point.Y = tn.Point.Y) then begin
+                case tn.JID of
+                    $85: {Pneuma}
+                    begin
+                        if (miss = false) and (tc.Weapon = 11) then begin
+                            miss := true;
+                            //DebugOut.Lines.Add('Pneuma OK');
+                            dmg[6] := 0;
+                        end;
+                    end;
+                end;
+            end;
+            Inc(i1);
+        end;
+
 		if not miss then begin
                         if tc1.OrcReflect then begin
                                 i := dmg[0];
@@ -4794,6 +4817,7 @@ var
   tma             :TMaterialDB;
   ProcessType     :Byte;
   DamageProcessed :boolean;
+  tn :TNPC;
 
 begin
 	sl := TStringList.Create;
@@ -9104,20 +9128,46 @@ begin
             Exit;
           end;
           end;
+
         59:
-          begin
-          if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
-          DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0; //‘®«UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
-						//ƒpƒP‘—M
-						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
-						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
-							StatCalc2(tc, tc1, Tick);
-          end else begin
-            MMode := 4;
-            Exit;
-          end;
-          end;
+            begin
+                if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
+
+                    i1 := 0;
+                    k  := 1;
+                    while (i1 >= 0) and (i1 < tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].NPC.Count) do begin
+                        tn := tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].NPC.Objects[i1] as TNPC;
+                        if tn = nil then begin
+                            Inc(i1);
+                            continue;
+                        end;
+                        if (tc1.Point.X = tn.Point.X) and (tc1.Point.Y = tn.Point.Y) then begin
+                            case tn.JID of
+                                $85: {Pneuma}
+                                begin
+                                    dmg[0] := 0;
+                                    //DebugOut.Lines.Add('Pneuma OK');
+                                    dmg[6] := 0;
+                                    k := 0;
+                                end;
+                            end;
+                        end;
+                        Inc(i1);
+                    end;
+
+                    if (k = 1) then begin
+                        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                    end;
+
+                    if dmg[0] < 0 then dmg[0] := 0;
+                    SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
+                    if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then StatCalc2(tc, tc1, Tick);
+                end else begin
+                    MMode := 4;
+                    Exit;
+                end;
+            end;
+
 				62: //BB
 					begin
 						//‚Æ‚Î‚·•ûŒüŒˆ’èˆ—
@@ -9660,16 +9710,43 @@ begin
 						end;
 
           end;
+
         251:
-          begin
-            if (tc.Shield <> 0) then begin
-            DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
-						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
-							StatCalc2(tc, tc1, Tick);
+            begin
+                if (tc.Shield <> 0) then begin
+
+                    i1 := 0;
+                    k  := 1;
+                    while (i1 >= 0) and (i1 < tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].NPC.Count) do begin
+                        tn := tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].NPC.Objects[i1] as TNPC;
+                        if tn = nil then begin
+                            Inc(i1);
+                            continue;
+                        end;
+                        if (tc1.Point.X = tn.Point.X) and (tc1.Point.Y = tn.Point.Y) then begin
+                            case tn.JID of
+                                $85: {Pneuma}
+                                begin
+                                    dmg[0] := 0;
+                                    //DebugOut.Lines.Add('Pneuma OK');
+                                    dmg[6] := 0;
+                                    k := 0;
+                                end;
+                            end;
+                        end;
+                        Inc(i1);
+                    end;
+
+                    if (k = 1) then begin
+                        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                    end;
+
+                    if dmg[0] < 0 then dmg[0] := 0;
+                    SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
+                    if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then StatCalc2(tc, tc1, Tick);
+                end;
             end;
-          end;
+
         254:
           begin
                 NoCastInterrupt := true;
