@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 03-07-04: Added High Wizard Magic Crush. [Oatmeal]
+- 03-07-04: Added Sniper Sniper Shot. [Oatmeal]
 - 03-07-04: Fixed all aspects of Steal.  No, really.  Try it out. [Colus]
 - 03-07-04: Added StealItem function. [Colus]
 - 03-07-04: Added #icon and #unicon commands for testing. [Colus]

@@ -3491,7 +3491,7 @@ begin
 				end;
 				dmg[1] := dmg[1] + (Param[4] div 10 + Param[3] div 2) * 2 + 80;
 				dmg[1] := dmg[1] * dmg[4];
-				MMode := 4;
+				MMode := 0;
 				MSkill := 129;
 				MUseLV := $F000;
 
@@ -5431,12 +5431,9 @@ begin
            end;
            end;
 
-
-
-          379:   // ASC_Soulbreaker
-          // Damage Calc needs to redone
+           379:
         begin
-     if tc.Weapon = 16 then begin
+        if tc.Weapon = 16 then begin
            DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
            if dmg[0] < 0 then dmg[0] := 0;
            SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
@@ -5450,6 +5447,36 @@ begin
            Exit;
            end;
            end;
+
+
+    382:     //Sniper Shot
+                  begin
+                  if (Arrow = 0) or (Item[Arrow].Amount < 1) then begin
+                  WFIFOW(0, $013b);
+                  WFIFOW(2, 0);
+                  Socket.SendBuf(buf, 4);
+                  ATick := ATick + ADelay;
+                  Exit;
+                  end;
+
+                  Dec(Item[Arrow].Amount,1);
+
+                  WFIFOW( 0, $00af);
+                  WFIFOW( 2, Arrow);
+                  WFIFOW( 4, 9);
+                  Socket.SendBuf(buf, 6);
+
+                  if Item[Arrow].Amount = 0 then begin
+                  Item[Arrow].ID := 0;
+                  Arrow := 0;
+                  end;
+
+                  DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                  if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
+
+                  //Send Attack Packet
+                  SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+                  end;
 
 
         
@@ -5553,6 +5580,25 @@ begin
                                                                 MMode := 4;
                                                                 Exit;
                                                         end;
+           365:   //Magic Crusher
+                                begin
+
+					//Magic Attack Calculation
+					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+					dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
+					dmg[0] := dmg[0] - ts.Data.Param[2]; 
+					if dmg[0] < 1 then
+                                                dmg[0] := 1;
+					dmg[0] := dmg[0] * 1;
+                                        dmg[0] := dmg[0] * tl.Data2[MUseLV];
+                                        if dmg[0] < 0 then
+                                                dmg[0] := 0;
+
+          if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                                     end;
 
         367: //Pressure
 
