@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Added hidden warp support [Colus]
+- 01-22-04: Corrected Snatching with bow weapons [Colus]
 - 01-22-04: Fixed dead char gains party share exp bug. [AlexKreuz]
 - 01-22-04: Fixed Monk Spirit Recovery timing for SP. [AlexKreuz]
 - 01-22-04: Fixed "Please equip arrow first" bug. [AlexKreuz]

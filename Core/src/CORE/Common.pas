@@ -6294,13 +6294,18 @@ begin
 				sl1.DelimitedText := sl.Strings[0];
 				if ChangeFileExt(sl1.Strings[0], '') = MapName then begin
 	// ワープポイント ------------------------------------------------------------
-					if sl.Strings[1] = 'warp' then begin
+          // Colus, 20040122: Added parsing for hidden warps.
+					if (sl.Strings[1] = 'warp') or (sl.Strings[1] = 'hiddenwarp') then begin
 						tn := TNPC.Create;
 						tn.ID := NowNPCID;
 						Inc(NowNPCID);
 						tn.Name := sl.Strings[2];
 						//DebugOut.Lines.Add('-> adding warp point ' + tn.Name);
-						if WarpDebugFlag then tn.JID := 1002 else tn.JID := 45; //hiddenwarp=139
+						if WarpDebugFlag then begin
+              tn.JID := 1002;
+            end else begin
+              if sl.Strings[1] = 'warp' then tn.JID := 45 else tn.JID := 139;
+            end;
 						tn.Map := MapName;
 						tn.Point.X := StrToInt(sl1.Strings[1]);
 						tn.Point.Y := StrToInt(sl1.Strings[2]);

@@ -3186,9 +3186,10 @@ begin
 
       {Colus, 20040106: Changed this to work with modded Steal calc.
               20040114: Moved this so that you have to do damage before Snatching,
-                        added the MVP checks/slave checks back.}
+                        added the MVP checks/slave checks back.
+              20040122: No more Snatching with ranged weapons.}
       {TODO: Figure out proper modification of Snatcher by Steal skill.}
-      if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
+      if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (tc.Weapon <> 11) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
 
         k := SlaveDBName.IndexOf(ts.Data.Name);
 
