@@ -6,7 +6,7 @@ interface
 
 uses
 	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database;
+	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData;
 
 //==============================================================================
 // 関数定義
@@ -2927,6 +2927,7 @@ end;
 		$0100: //パーティー脱退
 			begin
             	leave_party(tc);
+                PD_Save_Parties_Members(True);
 			end;
 		//--------------------------------------------------------------------------
 		$0102: //パーティー設定変更
@@ -3003,6 +3004,7 @@ end;
 						end;
 					end;
 				end;
+                PD_Save_Parties_Members(True);
 			end;
 		//--------------------------------------------------------------------------
 		$0108: //パーティーチャット
