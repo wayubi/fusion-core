@@ -3,6 +3,8 @@ Fusion_SQL 1.0.0.0 - December 25th, 2003
 --------------------------------------------------------------------------------
 - Modify: SavePet. [Michen]
 - Modify: Get NowLoginID,NowCharaID,NowPetID from DB. [Michen]
+- Fixed: Muti party save bug. [Michen]
+- Fixed: When user disconnect, can't login again. [Michen]
 
 --------------------------------------------------------------------------------
 Fusion_SQL 1.0.0.0 - December 24th, 2003
