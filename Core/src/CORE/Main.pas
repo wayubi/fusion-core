@@ -2880,7 +2880,7 @@ var
 	tn        :TNPC;
 begin
     CalculateSkillIf(tm, ts, Tick);
-    if ts.Hidden then Exit;
+    if ts.Hidden then exit;
 	if tc.TargetedTick <> Tick then begin
 		if DisableFleeDown then begin
 			tc.TargetedFix := 10;
@@ -4292,7 +4292,7 @@ begin
 	with tc do begin
 		ts := AData;
 		tm := MData;
-		if ts.Hidden = True then exit;  //Monster is hidden so you can't hit it.
+		if ts.Hidden = True then ts.AMode := 0;  //Monster is hidden so you can't hit it.
 
 		if ts.HP <= 0 then begin
 			//Monster is Dead
