@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-17-04: Commented out old school weiss files from backup (except status.txt). [Tsusai]
 - 08-17-04: Added W.A.C. Port modification option in JCon. [Tsusai]
 - 08-17-04: Added R.E.E.D. gamedata to the backup function. [Tsusai]
 - 08-14-04: Added Napalm Beat to PSS. [Trihan]

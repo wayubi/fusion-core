@@ -302,12 +302,12 @@ uses
     	zfile.Filename := AppPath + 'backup\' + filename + '.zip';
 
 	    fileslist := tstringlist.Create;
-    	fileslist.Add(AppPath + 'chara.txt');
-	    fileslist.Add(AppPath + 'gcastle.txt');
-    	fileslist.Add(AppPath + 'guild.txt');
-	    fileslist.Add(AppPath + 'party.txt');
-    	fileslist.Add(AppPath + 'pet.txt');
-	    fileslist.Add(AppPath + 'player.txt');
+//    	fileslist.Add(AppPath + 'chara.txt');
+//	    fileslist.Add(AppPath + 'gcastle.txt');
+//    	fileslist.Add(AppPath + 'guild.txt');
+//	    fileslist.Add(AppPath + 'party.txt');
+//    	fileslist.Add(AppPath + 'pet.txt');
+//	    fileslist.Add(AppPath + 'player.txt');
         fileslist.Add(AppPath + 'status.txt');
 
 	    zfile.FileSpecList := fileslist;
