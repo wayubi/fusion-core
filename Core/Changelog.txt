@@ -1,3 +1,4 @@
+- 01-08-04: Fixed Pathfinding changes broke self-targeting skills. [AlexKreuz]
 - 01-08-04: Fixed Player spells can not be cast over walls anymore. [AlexKreuz]
 - 01-08-04: Fixed Archer-Type monsters can attack over cliffs now. [AlexKreuz]
 - 01-08-04: Fixed Archer-Type monsters can not attack over walls anymore. [AlexKreuz]
