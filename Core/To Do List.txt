@@ -6,8 +6,14 @@ December 23, 2003
 [Suggestions by Darkhelmet]
 
 - Monster Skills
-- Tweak New Map Format
+- Tweak New Map Format <-- (what do you mean, tweak?) (Alex)
 - Wedding System (Low Priority)
 - GM commands #ban , #kick (very helpful) [Eliot]
+- Mercenary Monsters .. Talk to Paradox (Alex)
+
+
+<-- we have "-kick username" or "-kick username global" but not for ingame only console (Alex)
+<-- for ban I just do -sql update chara set password = xxx where username = yyy .. but -ban is good (Alex)
+
 
 -----------------------------------------------
