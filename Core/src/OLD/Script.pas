@@ -804,8 +804,8 @@ begin
 						tn.Script[tc.ScriptStep].Data2[3] := '[Right Hand - Not Equipped]';
 						tn.Script[tc.ScriptStep].Data2[4] := '[Robe - Not Equipped]';
 						tn.Script[tc.ScriptStep].Data2[5] := '[Foot - Not Equipped]';
-						tn.Script[tc.ScriptStep].Data2[6] := '[Accesory1 - Not Equipped]';
-						tn.Script[tc.ScriptStep].Data2[7] := '[Accesory2 - Not Equipped]';
+						tn.Script[tc.ScriptStep].Data2[6] := '[Accessory1 - Not Equipped]';
+						tn.Script[tc.ScriptStep].Data2[7] := '[Accessory2 - Not Equipped]';
 						tn.Script[tc.ScriptStep].Data2[8] := '[Head2 - Not Equipped]';
 						tn.Script[tc.ScriptStep].Data2[9] := '[Head3 - Not Equipped]';
             for i := 1 to 100 do begin
@@ -1591,11 +1591,26 @@ begin
           Inc(tc.ScriptStep);
         end;
 
-        {60: //Movenpc
+
+    	{Colus, 20040110: Added (empty so far) guild territory commands}
+      58: //getagit
+        begin
+
+        end;
+      59: //getguild
+        begin
+        end;
+      60: //agitregist
+        begin
+          //DebugOut.Lines.Add(Format('Agit now %s', [tn.Script[tc.ScriptStep].Data1[0]]));
+          tn.Agit := tn.Script[tc.ScriptStep].Data1[0];
+					Inc(tc.ScriptStep);        
+        end;
+
+        {61: //Movenpc
                 begin
 
                 end;}
-
 			44: //checkstr
 				begin
 					j := tn.Script[tc.ScriptStep].Data3[2];
