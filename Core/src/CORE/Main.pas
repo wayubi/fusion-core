@@ -4899,9 +4899,17 @@ begin
                                                         tc.SongTick := Tick + tc.Skill[MSkill].Data.Data1[MUseLV] * 1000;
                                                         //i1 := i1 + 2;
                                                         //1 := j1 + 2;
+
                                                      end;
                                                   end;
-						end;
+						                                  end;
+                                              WFIFOW( 0, $011a);
+						                                  WFIFOW( 2, MSkill);
+						                                  WFIFOW( 4, dmg[0]);
+						                                  WFIFOL( 6, tc.ID);
+						                                  WFIFOL(10, ID);
+						                                  WFIFOB(14, 1);
+						                                  SendBCmd(tm, tc.Point, 15);
 
                                         end;
 
