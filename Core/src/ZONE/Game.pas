@@ -6454,7 +6454,7 @@ end;
              WFIFOW(12, xy.Y);
              WFIFOL(14, timeGetTime());
              SendBCmd(tm, xy, 18);
-						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
+						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 3000, tc, nil, s);
 	      		 tn.MSkill := tc.MSkill;
       		   tn.MUseLV := tc.MUseLV;
 

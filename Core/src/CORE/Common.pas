@@ -1522,6 +1522,8 @@ Option_GraceTime_PvPG :cardinal;
                 //procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
                 //procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
+                procedure UpdateOption(tm:TMap; tc:TChara);
+                procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
@@ -1961,8 +1963,6 @@ begin
 		end else begin
 			DEF3 := 0;
 		end;
-
-
 		//デーモンベイン ATK[0][5]
 		if Skill[23].Lv <> 0 then ATK[0][5] := Skill[23].Data.Data1[Skill[23].Lv];
 		//速度増加(AGI+)
@@ -2969,6 +2969,29 @@ begin
         WFIFOW(10, tc.Option);
         WFIFOB(12, 0); // attack animation
         SendBCmd(tm, tc.Point, 13);
+end;
+//------------------------------------------------------------------------------
+procedure UpdateOption(tm:TMap; tc:TChara);
+begin
+        tm := tc.MData;
+
+  {Here we simply want to change a player option that has been previously set.}
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, tc.Stat1);
+        WFIFOW(8, tc.Stat2);
+        WFIFOW(10, tc.Option);
+        WFIFOB(12, 0); // attack animation
+        SendBCmd(tm, tc.Point, 13);
+end;
+//------------------------------------------------------------------------------
+procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
+begin
+  WFIFOW(0, $0196);
+  WFIFOW(2, icon);
+  WFIFOL(4, tc.ID);
+  WFIFOB(8, active);
+  SendBCmd(tm, tc.Point, 9);
 end;
 //------------------------------------------------------------------------------
 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);

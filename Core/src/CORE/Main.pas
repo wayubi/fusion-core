@@ -4475,11 +4475,11 @@ begin
 
                                                 //Create Graphics and Set NPC
                                                 tn := SetSkillUnit(tm, ID, xy, Tick, $6E, 0, 3000, tc);
-
                                                 tn.MSkill := MSkill;
                                                 tn.MUseLV := MUseLV;
 
                                         end else begin
+                                          SendSkillError(tc, 6); // Wrong weapon
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
@@ -11490,13 +11490,17 @@ begin
 
                 if (tc.Option and 4 <> 0) then begin
                   if ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
-                        if tc.SP > 1 then begin
+                        if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit cloaktick');
                         end else begin
                           // Colus, 20040205: Added uncloak when you run out of SP.
+                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
+                          tm := tc.MData;
+                          tc.SP := 0;
+                          SendCStat1(tc, 0, 7, SP);
                                 tc.Skill[MSkill].Tick := Tick;
                                 tc.Option := tc.Option and $FFF9;
                                 SkillTick := tc.Skill[MSkill].Tick;
@@ -11504,13 +11508,15 @@ begin
                                 tc.Hidden := false;
                                 tc.isCloaked := false;
                                 CalcStat(tc, Tick);
-                                WFIFOW(0, $0119);
+                          UpdateOption(tm, tc);
+                          UpdateIcon(tm, tc, 5, 0);
+                          {WFIFOW(0, $0119);
                                 WFIFOL(2, tc.ID);
                                 WFIFOW(6, tc.Stat1);
                                 WFIFOW(8, tc.Stat2);
                                 WFIFOW(10, tc.Option);
                                 WFIFOB(12, 0);
-                                SendBCmd(tm, tc.Point, 13);
+                          SendBCmd(tm, tc.Point, 13);}
                         end;
                   end;
                 end;
@@ -11518,13 +11524,18 @@ begin
                // Colus, 20040224: Yeah, Hide drains SP also, but at a different rate.
                if (tc.Option and 2 <> 0) then begin
                   if ((tc.CloakTick + (4000 + (tc.Skill[51].Lv * 1000))) < Tick) then begin
-                        if tc.SP > 1 then begin
+                        if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit cloaktick');
                         end else begin
+                          tm := tc.MData;
                           // Colus, 20040205: Added unhide when you run out of SP.
+                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
+                          tm := tc.MData;
+                          tc.SP := 0;
+                          SendCStat1(tc, 0, 7, SP);
                                 tc.Skill[MSkill].Tick := Tick;
                                 tc.Option := tc.Option and $FFF9;
                                 SkillTick := tc.Skill[MSkill].Tick;
@@ -11532,28 +11543,34 @@ begin
                                 tc.Hidden := false;
                                 tc.isCloaked := false;
                                 CalcStat(tc, Tick);
-                                WFIFOW(0, $0119);
+                          UpdateOption(tm, tc);
+                          UpdateIcon(tm, tc, 4, 0);
+                          {WFIFOW(0, $0119);
                                 WFIFOL(2, tc.ID);
                                 WFIFOW(6, tc.Stat1);
                                 WFIFOW(8, tc.Stat2);
                                 WFIFOW(10, tc.Option);
                                 WFIFOB(12, 0);
-                                SendBCmd(tm, tc.Point, 13);
+                          SendBCmd(tm, tc.Point, 13);}
                         end;
                   end;
                 end;
 
                 if (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
-                        if tc.SP > 1 then begin
+                        if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           tc.Skill[114].Tick := Tick + tc.Skill[114].Data.Data1[tc.Skill[114].Lv];
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit maximize tick');
                         end else begin
-                                tc.Skill[MSkill].Tick := Tick;
-                                tc.Skill[MSkill].EffectLV := 0;
-                                SkillTick := tc.Skill[MSkill].Tick;
-                                SkillTickID := MSkill;
+                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
+                          tm := tc.MData;
+                          tc.SP := 0;
+                          SendCStat1(tc, 0, 7, SP);
+                          tc.Skill[114].Tick := Tick;
+                          tc.Skill[114].EffectLV := 0;
+                          SkillTick := tc.Skill[114].Tick;
+                          SkillTickID := 114; DebugOut.Lines.Add(Format('STID %d', [SkillTickID]));
                         end;
                 end;
                 if (tc.isPoisoned = true) then begin
@@ -11941,13 +11958,14 @@ begin
 					end;
         $99: // Talkie Box Activated
           begin
-						//tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
+						tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
 						WFIFOW(0, $00c3);
 						WFIFOL(2, tn.ID);
 						WFIFOB(6, 0);
 						WFIFOB(7, tn.JID);
 						SendBCmd(tm, tn.Point, 8);
-						//tn.Tick := Tick + 60000;
+
+						tn.Tick := Tick + 60000;
           end;
         { $8c: // Talkie Box fires
           begin
@@ -11956,6 +11974,7 @@ begin
             WFIFOS(6, tn.Name, 80);
             SendBCmd(tm, tn.Point, 86);
           end;}
+
 				else
 					begin
 						//スキル効能地撤去
@@ -11996,6 +12015,13 @@ begin
              DebugOut.Lines.Add('Talkie fire self');
               WFIFOW(0, $0191);
               WFIFOL(2, tc1.ID);
+              WFIFOS(6, tn.Name, 80);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              SendBCmd(tm, tn.Point, 86);
+            end;
+            $8c: // Talkie Box fires
+            begin
+              WFIFOW(0, $0191);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              WFIFOL(2, tn.ID);
               WFIFOS(6, tn.Name, 80);
               SendBCmd(tm, tn.Point, 86);
             end;
