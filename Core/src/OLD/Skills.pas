@@ -1871,7 +1871,7 @@ Begin
 								if DamageProcessed = false then begin
 									DamageProcessed := true;
 									//SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j, 5);
-									if tc.HP > (dmg[0] * 100 div 350) then begin
+									if tc.HP > ((dmg[0] div 350) * 100) then begin
 										tc.HP := tc.HP - (dmg[0] * 100 div 350);  //Subtract Damage
 										WFIFOW( 0, $01de);
 										WFIFOW( 2, 254);

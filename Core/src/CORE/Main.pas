@@ -2517,8 +2517,11 @@ begin
 			end;//case
 
 			tc.MUseLV := Random(10) + 1;
-			SkillEffect(tc, Tick, False);
-			Exit;//safe 2004/04/27
+			if (tc.MSkill <> 0) then SkillEffect(tc, Tick, False);
+            tc.MSkill := 0;
+            tc.MUseLV := 0;
+
+			Exit;
 		end;
 
 		j := SearchCInventory(tc, tc.WeaponID, true);
@@ -2534,8 +2537,8 @@ begin
 				tc.MUseLV := WeaponSkillLv;
 
 				if tc.WeaponID = 1468 then begin
-					tc.MPoint.X := tc.Point.X;
-					tc.MPoint.Y := tc.Point.Y;
+					tc.MPoint.X := ts.Point.X;
+					tc.MPoint.Y := ts.Point.Y;
 					CreateField(tc, tick);
 				end else begin
 					SkillEffect(tc, Tick);
@@ -2898,7 +2901,7 @@ end;
 {Player Attacking Player}
 procedure TFrmMain.DamageCalc3(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; Arms:byte = 0; SkillPer:integer = 0; AElement:byte = 0; HITFix:integer = 0);
 var
-	i,m,i1 :integer;
+	i,m,i1,j :integer;
 	miss  :boolean;
 	crit  :boolean;
 	datk  :boolean;
@@ -3126,6 +3129,57 @@ begin
 		end else begin
 			dmg[4] := 1;
 		end;
+
+
+        if (tc.GungnirEquipped) and (25 >= Random(100)) and (SkillPer = 0) then begin
+			tc.MTarget := tc.ATarget;
+			tc1 := tm.CList.IndexOfObject(tc.MTarget) as TChara;
+
+			tc.MTargetType := 1;
+			tc.AData := tc1;
+
+			i := Random(4);
+			case i of
+			0:  tc.MSkill := 5;       //Bash
+			//1:  tc.MSkill := 7;       //Magnum Break
+			//2:  tc.MSkill := 56;      //Pierce
+			//3:  tc.MSkill := 59;      //Spear Boomerang
+			end;
+
+			tc.MUseLV := Random(10) + 1;
+			if (tc.MSkill <> 0) then SkillEffect(tc, Tick, False);
+            tc.MSkill := 0;
+            tc.MUseLV := 0;
+			Exit;
+		end;
+
+		j := SearchCInventory(tc, tc.WeaponID, true);
+		if tc.SkillWeapon then begin
+
+			if (j <> 0) and (Random(100) < 30) and (tc.MSkill = 0) then begin
+				tc.MTarget := tc.ATarget;
+				tc1 := tm.CList.IndexOfObject(tc.MTarget) as TChara;
+
+				tc.MTargetType := 1;
+				tc.AData := tc1;
+
+				tc.MSkill := WeaponSkill;
+				tc.MUseLV := WeaponSkillLv;
+
+				if tc.WeaponID = 1468 then begin
+					tc.MPoint.X := tc1.Point.X;
+					tc.MPoint.Y := tc1.Point.Y;
+					CreateField(tc, tick);
+				end else begin
+					SkillEffect(tc, Tick);
+				end;
+				tc.MSkill := 0;
+				tc.MUseLV := 0;
+				Exit;//safe 2004/04/27
+			end;
+			if tc.SageElementEffect then dmg[0] := dmg[0] + (dmg[0] * tc.Skill[285].Data.Data1[Skill[285].EffectLV] div 100);
+		end;
+
 	end;
 	//ó‘Ô‚P‚Í‰£‚é‚ÆŽ¡‚é
 	if tc1.Stat1 <> 0 then begin
