@@ -270,7 +270,6 @@ type
     TabSheet9: TTabSheet;
     TabSheet10: TTabSheet;
     TabSheet11: TTabSheet;
-    TabSheet12: TTabSheet;
     TabSheet13: TTabSheet;
     TabSheet14: TTabSheet;
     TabSheet6: TTabSheet;
@@ -285,6 +284,33 @@ type
     Label101: TLabel;
     Label102: TLabel;
     ListBox4: TListBox;
+    Label100: TLabel;
+    Label103: TLabel;
+    Label104: TLabel;
+    Label105: TLabel;
+    Label106: TLabel;
+    Label107: TLabel;
+    Label108: TLabel;
+    Edit60: TEdit;
+    Edit62: TEdit;
+    Edit68: TEdit;
+    Label109: TLabel;
+    Edit69: TEdit;
+    Edit70: TEdit;
+    Edit71: TEdit;
+    Edit72: TEdit;
+    Edit73: TEdit;
+    Edit74: TEdit;
+    Label114: TLabel;
+    Label110: TLabel;
+    Label111: TLabel;
+    Label112: TLabel;
+    Label113: TLabel;
+    Label115: TLabel;
+    Label116: TLabel;
+    Label117: TLabel;
+    Label118: TLabel;
+    Button21: TButton;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -389,6 +415,7 @@ type
     procedure Edit8KeyPress(Sender: TObject; var Key: Char);
     procedure Button19Click(Sender: TObject);
     procedure Button20Click(Sender: TObject);
+    procedure Button21Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11421,8 +11448,6 @@ begin
         ShowMessage('Under Development, This section does not work.');
     end else if (TabSheet13.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
-    end else if (TabSheet12.Showing) then begin
-        ShowMessage('Under Development, This section does not work.');
     end else if (TabSheet11.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
     end else if (TabSheet9.Showing) then begin
@@ -11521,6 +11546,25 @@ begin
     JCon_Characters_Online();
     DataSave(true);
 
+end;
+
+//Move a stuck character to last saved location (ex. out of a wall, or isolated area)
+procedure TfrmMain.Button21Click(Sender: TObject);
+var
+    CharacterItem : TChara;
+begin
+    if (frmMain.Label95.Caption = '') then begin
+        Exit;
+    end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
+
+        CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+        CharacterItem.tmpMap := CharacterItem.SaveMap;
+        CharacterItem.Point := CharacterItem.SavePoint;
+
+        SendCLeave(CharacterItem, 2);
+        MapMove(CharacterItem.Socket, CharacterItem.tmpMap, CharacterItem.Point);
+
+    end;
 end;
 
 end.
