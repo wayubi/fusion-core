@@ -10129,6 +10129,13 @@ begin
 							end;
 						end;
 
+                        if tpe.Data = nil then begin
+                            debugout.Lines.Add('Pet ' + tpe.Name + ' not defined in pet_db.txt');
+                            debugout.Lines.Add('Server terminated.');
+                            cmdStop.Click;
+                            Exit;
+                        end;
+
 						//Auto PetIsHungrier system
 						if tpe.Fullness > 0 then begin
 							if ( tn.HungryTick + tpe.Data.HungryDelay ) < Tick then begin
