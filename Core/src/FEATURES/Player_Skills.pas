@@ -46,6 +46,7 @@ var
     function skill_sp_recovery(tc : TChara; Tick : Cardinal) : Integer;
     function skill_sight(tc : TChara; Tick : Cardinal) : Integer;
     function skill_napalm_beat(tc : TChara; Tick : Cardinal) : Integer;
+    function skill_soul_strike(tc : TChara; Tick : Cardinal) : Integer;
 
     { Skill Procedures - Archer }
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
@@ -85,6 +86,7 @@ uses
         { 9} if (tc.Skill[9].Lv <> 0) and (effect = 1) then success := skill_sp_recovery(tc, Tick);
         {10} if (tc.MSkill = 10) and (effect = 0) then success := skill_sight(tc, Tick);
         {11} if (tc.MSkill = 11) and (effect = 0) then success := skill_napalm_beat(tc, Tick);
+        {13} if (tc.MSkill = 13) and (effect = 0) then success := skill_soul_strike(tc, Tick);
         {46} if (tc.MSkill = 46) and (effect = 0) then success := skill_double_strafe(tc, Tick);
 
         {
@@ -705,9 +707,9 @@ uses
     { -------------------------------------------------- }
     { - Job: Mage -------------------------------------- }
     { - Job ID: 2 -------------------------------------- }
-    { - Skill Name: Napalm Beat------------------------- }
-    { - Skill ID Name: MG_NAPALMBEAT-------------------- }
-    { - Skill ID: 110 ----------------------------------- }
+    { - Skill Name: Napalm Beat ------------------------ }
+    { - Skill ID Name: MG_NAPALMBEAT ------------------- }
+    { - Skill ID: 11 ----------------------------------- }
     { -------------------------------------------------- }
     function skill_napalm_beat(tc : Tchara; Tick : Cardinal) : Integer;
     begin
@@ -715,6 +717,21 @@ uses
 
         tc.MTick := Tick + 1000;
     end;
+
+    { -------------------------------------------------- }
+    { - Job: Mage -------------------------------------- }
+    { - Job ID: 2 -------------------------------------- }
+    { - Skill Name: Soul Strike ------------------------ }
+    { - Skill ID Name: MG_SOULSTRIKE ------------------- }
+    { - Skill ID: 13 ----------------------------------- }
+    { -------------------------------------------------- }
+    function skill_soul_strike(tc : Tchara; Tick : Cardinal) : Integer;
+    begin
+        SKILL_TYPE := 5;
+
+        tc.MTick := Tick +  800 + 400 * ((tc.MUseLV + 1) div 2) - 300 * (tc.MUseLV div 10);
+    end;
+
 
     { -------------------------------------------------- }
     { - Job: Archer ------------------------------------ }
