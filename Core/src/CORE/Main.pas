@@ -309,6 +309,15 @@ type
     Button21: TButton;
     Edit53: TEdit;
     Label65: TLabel;
+    Label97: TLabel;
+    Label119: TLabel;
+    Label120: TLabel;
+    Label121: TLabel;
+    CheckBox1: TCheckBox;
+    Label122: TLabel;
+    ComboBox19: TComboBox;
+    Label123: TLabel;
+    Edit58: TEdit;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -414,6 +423,7 @@ type
     procedure Button19Click(Sender: TObject);
     procedure Button20Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
+    procedure ListBox4Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11442,14 +11452,14 @@ begin
     	JCon_Characters_Online();
     end else if (TabSheet14.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
+    end else if (TabSheet9.Showing) then begin
+    	JCon_Characters_Load();
     end else if (TabSheet10.Showing) then begin
-        ShowMessage('Under Development, This section does not work.');
+        JCon_Chara_Inv_Load();
     end else if (TabSheet13.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
     end else if (TabSheet11.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
-    end else if (TabSheet9.Showing) then begin
-    	JCon_Characters_Load();
     end;
 end;
 
@@ -11461,108 +11471,45 @@ end;
 
 //online list kick
 procedure TfrmMain.Button18Click(Sender: TObject);
-var
-    CharacterItem : TChara;
 begin
-    if (frmMain.Label95.Caption = '') then begin
-        Exit;
-    end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
-        CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+    JCon_Chara_KickProcess(0);
+end;
 
-    if assigned(CharacterItem) then begin
-        if assigned(CharacterItem.Socket) then begin
-            if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
-                CharacterItem.Socket := nil;
-            end;
-        end;
-    end;
-    JCon_Characters_Online();
+//Kick Ban
+procedure TfrmMain.Button20Click(Sender: TObject);
+begin
+    JCon_Chara_KickProcess(1);
 end;
 
 //setting a temp name for the online list
 procedure TfrmMain.ListBox3Click(Sender: TObject);
-var
-    CharacterItem : TChara;
 begin
-    if (frmMain.listbox3.ItemIndex = -1) then Exit;
-    	CharacterItem := frmMain.listbox3.Items.Objects[frmMain.listbox3.ItemIndex] as TChara;
-	    frmMain.Label95.Caption := CharacterItem.Name;
+    JCon_Chara_Online_Populate();
 end;
 
 //Hitting enter for CharaPM
 procedure TfrmMain.Edit8KeyPress(Sender: TObject; var Key: Char);
-
 begin
     if Key = #13 then begin
-        button19.Click;
+        JCon_Chara_Online_PM();
     end;
 end;
 
 //charaPM
 procedure TfrmMain.Button19Click(Sender: TObject);
-var
-    str : string;
-    w : byte;
-    k : integer;
-    tc1 : TChara;
 begin
-        str := 'Server PM: ' + edit8.text;
-        w := 200;
-        WFIFOW(0, $009a);
-        WFIFOW(2, w);
-        WFIFOS(4, str, w);
-
-        if (frmMain.Label95.Caption= '') then Exit;
-        for k := 0 to CharaName.Count - 1 do begin
-            tc1 := CharaName.Objects[k] as TChara;
-            if (tc1.Login = 2) and (tc1.Name = frmMain.Label95.Caption) then tc1.Socket.SendBuf(buf, w);
-        end;
-
-        debugout.lines.add('[' + TimeToStr(Now) + '] Server Message to ' + tc1.Name + ': ' + edit8.text);
-    edit8.Clear;
-end;
-
-//Kick Ban
-procedure TfrmMain.Button20Click(Sender: TObject);
-var
-    CharacterItem : TChara;
-begin
-    if (frmMain.Label95.Caption = '') then begin
-        Exit;
-    end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
-        CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
-
-    if assigned(CharacterItem) then begin
-        if assigned(CharacterItem.Socket) then begin
-            if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
-                CharacterItem.Socket := nil;
-            end;
-        end;
-    end;
-
-    CharacterItem.PData.Banned := True;
-    JCon_Characters_Online();
-    DataSave(true);
-
+    JCon_Chara_Online_PM();
 end;
 
 //Move a stuck character to last saved location (ex. out of a wall, or isolated area)
 procedure TfrmMain.Button21Click(Sender: TObject);
-var
-    CharacterItem : TChara;
 begin
-    if (frmMain.Label95.Caption = '') then begin
-        Exit;
-    end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
+    JCon_Chara_Online_Rescue();
+end;
 
-        CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
-        CharacterItem.tmpMap := CharacterItem.SaveMap;
-        CharacterItem.Point := CharacterItem.SavePoint;
-
-        SendCLeave(CharacterItem, 2);
-        MapMove(CharacterItem.Socket, CharacterItem.tmpMap, CharacterItem.Point);
-
-    end;
+procedure TfrmMain.ListBox4Click(Sender: TObject);
+begin
+    JCon_Chara_Inv_Populate();
 end;
 
 end.

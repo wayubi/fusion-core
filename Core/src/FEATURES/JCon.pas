@@ -8,7 +8,7 @@ uses
     WSocket,
     {$ENDIF}
     {Shared}
-    SysUtils,
+    SysUtils, Classes,
     {Fusion}
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData;
 
@@ -23,6 +23,13 @@ uses
     procedure JCon_Characters_Populate();
     procedure JCon_Characters_Save();
     procedure JCon_Characters_Online();
+    procedure JCon_Chara_Online_Populate();
+    procedure JCon_Chara_KickProcess(Banflag : Integer);
+    procedure JCon_Chara_Online_Rescue();
+    procedure JCon_Chara_Online_PM();
+    procedure JCon_Chara_Inv_Load();
+    procedure JCon_Chara_Inv_Populate();
+
 
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
@@ -580,6 +587,140 @@ uses
 	    end;
     end;
 
+    procedure JCon_Chara_Online_Populate();
+    var
+        CharacterItem : TChara;
+    begin
+        if (frmMain.listbox3.ItemIndex = -1) then Exit;
+        	CharacterItem := frmMain.listbox3.Items.Objects[frmMain.listbox3.ItemIndex] as TChara;
+    	    frmMain.Label95.Caption := CharacterItem.Name;
+    end;
+
+
+    procedure JCon_Chara_KickProcess(Banflag : Integer);
+    var
+        CharacterItem : TChara;
+    begin
+        if (frmMain.Label95.Caption = '') then begin
+        Exit;
+        end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
+            CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+
+        if assigned(CharacterItem) then begin
+            if assigned(CharacterItem.Socket) then begin
+                if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
+                    CharacterItem.Socket := nil;
+                end;
+            end;
+        end;
+        if Banflag = 1 then begin
+            CharacterItem.PData.Banned := True;
+            DataSave(true);
+        end;
+        JCon_Characters_Online();
+    end;
+
+    procedure JCon_Chara_Online_Rescue();
+    var
+        CharacterItem : TChara;
+    begin
+        if (frmMain.Label95.Caption = '') then begin
+            Exit;
+        end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
+
+            CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+            CharacterItem.tmpMap := CharacterItem.SaveMap;
+            CharacterItem.Point := CharacterItem.SavePoint;
+
+            SendCLeave(CharacterItem, 2);
+            MapMove(CharacterItem.Socket, CharacterItem.tmpMap, CharacterItem.Point);
+
+            end;
+    end;
+
+
+    procedure JCon_Chara_Online_PM();
+    var
+        str : string;
+        w : byte;
+        k : integer;
+        tc1 : TChara;
+    begin
+        str := 'Server PM: ' + frmMain.edit8.text;
+        w := 200;
+        WFIFOW(0, $009a);
+        WFIFOW(2, w);
+        WFIFOS(4, str, w);
+
+        if (frmMain.Label95.Caption= '') then Exit;
+        for k := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[k] as TChara;
+            if (tc1.Login = 2) and (tc1.Name = frmMain.Label95.Caption) then tc1.Socket.SendBuf(buf, w);
+        end;
+
+        debugout.lines.add('[' + TimeToStr(Now) + '] Server Message to ' + tc1.Name + ': ' + frmMain.edit8.text);
+        frmMain.edit8.Clear;
+    end;
+
+    procedure JCon_Chara_Inv_Load();
+    var
+		j : Integer;
+    	CharacterItem : TChara;
+        itemlist : TStringList;
+        ShowItem : string;
+        Item : TItemDB;
+
+	begin
+        frmMain.ListBox4.Clear;
+
+        try
+            CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        except
+            on EStringListError do Exit;  //this error shows up when noone selects a person
+        end;
+
+        itemlist := tstringlist.Create;
+        for j := 1 to 100 do begin
+            Item := CharacterItem.Item[j].Data;
+            if CharacterItem.Item[j].ID <> 0 then
+                //itemlist.Add(IntToStr(CharacterItem.Item[j].ID));
+                ShowItem := Item.Name + ' : ' + IntToStr(CharacterItem.Item[j].ID)
+            else ShowItem := '[Empty]';
+
+            itemlist.Add(ShowItem);
+
+        end;
+
+        frmMain.ListBox4.Items.AddStrings(itemlist);
+        itemlist.Free;
+    end;
+
+    procedure JCon_Chara_Inv_Populate();
+    var
+        j : integer;
+        CharacterItem : TChara;
+
+    begin
+
+    if (frmMain.listbox2.ItemIndex = -1) then Exit;
+		CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+    if (frmMain.listbox4.ItemIndex = -1) then Exit;
+
+    j := (frmMain.Listbox4.ItemIndex + 1);  //Integer(frmMain.ListBox4.Items.Objects[frmMain.ListBox4.ItemIndex]);
+    frmMain.Label97.Caption := IntToStr(CharacterItem.Item[j].ID);
+    frmMain.Label121.Caption := CharacterItem.Item[j].Data.Name;
+{    CharacterItem.Item[j]
+    CharacterItem.Item[j].Card[0]
+    CharacterItem.Item[j].Card[1]
+    CharacterItem.Item[j].Card[2]
+    CharacterItem.Item[j].Card[3]}
+
+
+
+
+
+    end;
 
 
 end.

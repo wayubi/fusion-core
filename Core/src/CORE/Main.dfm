@@ -1319,7 +1319,7 @@ object frmMain: TfrmMain
         Left = 264
         Top = 384
         Width = 121
-        Height = 25
+        Height = 26
         TabOrder = 19
       end
     end
@@ -2044,13 +2044,51 @@ object frmMain: TfrmMain
             TabOrder = 36
           end
         end
-        object TabSheet14: TTabSheet
-          Caption = 'Skills'
-          ImageIndex = 5
-        end
         object TabSheet10: TTabSheet
           Caption = 'Inventory'
           ImageIndex = 1
+          object Label97: TLabel
+            Left = 296
+            Top = 32
+            Width = 21
+            Height = 18
+            Caption = 'N/A'
+          end
+          object Label119: TLabel
+            Left = 208
+            Top = 16
+            Width = 58
+            Height = 18
+            Caption = 'Item Name'
+          end
+          object Label120: TLabel
+            Left = 296
+            Top = 16
+            Width = 34
+            Height = 18
+            Caption = 'ItemID'
+          end
+          object Label121: TLabel
+            Left = 208
+            Top = 32
+            Width = 21
+            Height = 18
+            Caption = 'N/A'
+          end
+          object Label122: TLabel
+            Left = 208
+            Top = 80
+            Width = 74
+            Height = 18
+            Caption = 'Refined Level'
+          end
+          object Label123: TLabel
+            Left = 296
+            Top = 80
+            Width = 51
+            Height = 18
+            Caption = 'Ammount'
+          end
           object ListBox4: TListBox
             Left = 8
             Top = 16
@@ -2058,11 +2096,51 @@ object frmMain: TfrmMain
             Height = 153
             ItemHeight = 18
             TabOrder = 0
+            OnClick = ListBox4Click
+          end
+          object CheckBox1: TCheckBox
+            Left = 208
+            Top = 56
+            Width = 81
+            Height = 17
+            Caption = 'Identified'
+            TabOrder = 1
+          end
+          object ComboBox19: TComboBox
+            Left = 208
+            Top = 96
+            Width = 73
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 2
+            Items.Strings = (
+              '0'
+              '1'
+              '2'
+              '3'
+              '4'
+              '5'
+              '6'
+              '7'
+              '8'
+              '9'
+              '10')
+          end
+          object Edit58: TEdit
+            Left = 296
+            Top = 96
+            Width = 57
+            Height = 26
+            TabOrder = 3
           end
         end
         object TabSheet13: TTabSheet
           Caption = 'Cart'
           ImageIndex = 4
+        end
+        object TabSheet14: TTabSheet
+          Caption = 'Skills'
+          ImageIndex = 5
         end
         object TabSheet11: TTabSheet
           Caption = 'Flags'
