@@ -11245,6 +11245,28 @@ begin
       end;
     end;
 
+    // Spores Heal Poison
+    if (tpe.JID = 1014) and (tc.isPoisoned = true) then begin
+      if tpe.SkillTick < _Tick then begin
+        tpe.SkillTick := _Tick + 60000;
+
+        tc.isPoisoned := False;
+        tc.PoisonTick := Tick;
+        tc.Stat1 := 0;
+
+        //Show Heal
+        WFIFOW( 0, $011a);
+        WFIFOW( 2, 35);  // We cheat and use the heal skill for the gfx
+        WFIFOW( 4, 1);
+        WFIFOL( 6, tc.ID);
+        WFIFOL(10, tn1.ID);
+        WFIFOB(14, 1);
+        SendBCmd(tm, tc.Point, 15);
+
+        UpdateStatus(tm, tc, Tick);
+      end;
+    end;
+
     // Isis Magnificat: When HP/SP both are lower than 50%, she will use Level
     // 2 Magnificat once per minute, until HP/SP are higher than 50%
     if (tpe.JID = 1029) and (tc.HP < tc.MAXHP / 2) and (tc.SP < tc.MAXSP / 2) then begin

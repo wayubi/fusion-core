@@ -1271,6 +1271,17 @@ begin
     //Poison Spore Attack
     if tpe.JID = 1077 then begin
       if Random(10000) < (tpe.Relation) then begin
+        dmg[0] := 444;
+        dmg[0] := dmg[0] * (4 * (ElementTable[7][ts.Element] div 100));
+        if dmg[0] < 0 then dmg[0] := 0;
+        PetDamageProcess(tm, ts, tc, dmg[0], Tick);
+        SendPetSkillAttack(tm, tc, ts, Tick, 187);
+      end;
+    end;
+
+    //Baphomet Jr. Attack
+    if tpe.JID = 1101 then begin
+      if Random(10000) < (tpe.Relation) then begin
         if not Boolean(ts.Stat2 and 1) then
         ts.HealthTick[0] := Tick + tc.aMotion
         else ts.HealthTick[0] := ts.HealthTick[0] + 30000;
