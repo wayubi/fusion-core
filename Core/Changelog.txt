@@ -1,3 +1,6 @@
+- 04-30-04: Removed some debug statements. [Colus]
+- 04-30-04: Updated Combo Finish to monitor time to expire combo Ashura mode. [Colus]
+- 04-30-04: Updated Aqua Benedicta.  Now checks that you are on water. [Colus]
 - 04-30-04: Merged some monster AI fixes.  [Darkhelmet]
 - 04-29-04: Bughunting - Rolled back elimination of "len" variable in sv1PacketProcess [ChrstphrR]
 - 04-28-04: Fixed error with Old Blue Box / Old Violet Box Eliotsan's users mentioned. [ChrstphrR]

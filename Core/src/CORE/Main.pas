@@ -6741,6 +6741,12 @@ begin
                                         if (tc.Skill[270].Tick >= Tick) then begin
                                           tc.Skill[271].Data.SType := 4;
                                           tc.Skill[271].Data.CastTime1 := 1;
+                                          tc.Delay := (700 - (4 * tc.param[1]) - (2 * tc.param[4]) + 300);
+                                          MonkDelay(tm, tc, tc.Delay);
+                                          // Colus, 20040430: The +1000 is there just to make it more possible (the
+                                          // monk delay keeps you from moving during the delay phase.)
+                                          tc.Skill[273].Tick := Tick + tc.Delay + 1000;
+                                          tc.Skill[273].EffectLV := 1;
                                           SendCSkillList(tc);
                                         end;
                                 end;
@@ -8973,13 +8979,13 @@ begin
 
 				31: // Aqua Benedicta
 					begin
-                                                j := SearchCInventory(tc, 713, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+
+            j := SearchCInventory(tc, 713, false);
+						if (j <> 0) and (tc.Item[j].Amount >= 1) and (tm.gat[tc.Point.X][tc.Point.Y] = 3) then begin
 
 							UseItem(tc, j);
 
-
-                                                        td := ItemDB.IndexOfObject(523) as TItemDB;
+              td := ItemDB.IndexOfObject(523) as TItemDB;
 							if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
 								k := SearchCInventory(tc, td.ID, td.IEquip);
 								if k <> 0 then begin
@@ -9018,6 +9024,7 @@ begin
 
 
 						end else begin
+              SendSkillError(tc, 0);
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -12101,9 +12108,19 @@ var
 begin
 	with tc do begin
          //if Weight * 2 <> MaxWeight then begin
-                if (tc.Skill[86].Lv > 0) and (tc.Skill[86].Tick <= Tick) and (tc.Skill[86].EffectLV > 0) then begin
-                  DamageOverTime(tc.MData, tc, Tick, 86, tc.Skill[86].Effect1, tc.Skill[86].EffectLV);
-                end;
+    // Colus, 20040430: Combo Finish check to reset Ashura's combo mode after the delay period passes.
+    if (tc.Skill[273].Lv > 0) and (tc.Skill[273].Tick <= Tick) and (tc.Skill[273].EffectLV = 1) then begin
+
+      tc.Skill[273].EffectLV := 0;
+      tc.Skill[271].Data.SType := 1;
+      tc.Skill[271].Data.CastTime1 := 4500;
+      SendCSkillList(tc);
+    end;
+
+    // Recalls the Water Ball effect to do multiple hits over time.
+    if (tc.Skill[86].Lv > 0) and (tc.Skill[86].Tick <= Tick) and (tc.Skill[86].EffectLV > 0) then begin
+      DamageOverTime(tc.MData, tc, Tick, 86, tc.Skill[86].Effect1, tc.Skill[86].EffectLV);
+    end;
             {Sanctuary}
                 // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
                 //        20030127: No more heals while dead
@@ -16845,7 +16862,7 @@ begin
         //SendCMove(tc.Socket, (tv as TChara), xy, tv.Point);
         //SendBCmd(tm, tv.Point, 60, tc);
       //end else begin DebugOut.Lines.Add('Stat');
-      DebugOut.Lines.Add(Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
+      //DebugOut.Lines.Add(Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
         SetSkillUnit(tm, tv.ID, tv.Point, timeGetTime(), $2E, 0, 3000, tc);
         UpdateLivingLocation(tm, tv);
         //SendCData(tc, tc);
