@@ -755,6 +755,7 @@ type TChara = class
         GungnirEquipped :boolean;
         LVL4WeaponASPD :boolean;
         PerfectDamage   :boolean;
+        PerfectHide   :boolean;
 
         {Sage Effects}
         SageElementEffect   :boolean;
@@ -2198,6 +2199,7 @@ begin
                 GungnirEquipped := false;
                 LVL4WeaponASPD := false;
                 PerfectDamage := false;
+                PerfectHide := false;
 		for i:=0 to 4 do begin
 			SFixPer1[0][i] := 0;
 			SFixPer1[1][i] := 0;

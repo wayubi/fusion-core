@@ -5257,7 +5257,7 @@ begin
 
       if tl = nil then exit;
 
-      if (ts is TMob) then begin // Edited by AlexKreuz
+      if (ts is TMob) and (PassiveAttack = false) then begin // Edited by AlexKreuz
         if ts.isEmperium then begin
           j := GuildList.IndexOf(tc.GuildID);
           if (j <> -1) then begin
@@ -11267,6 +11267,9 @@ begin
 
     end;
 
+    //Smokie's Perfect Hide: Cannot be detected by insects or demons.
+    if tpe.JID = 1056 then tc.PerfectHide := true;
+
     //Sohee's Heal: When HP is lower than 1/3rd, she heals 400HP/Min until HP is higher than 1/3rd
     if (tpe.JID = 1170) and (tc.HP < (tc.MAXHP / 3)) then begin
       if tpe.SkillTick < _Tick then begin
@@ -12812,7 +12815,7 @@ begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and 64 = 0) and ((tc1.Option and 6 = 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race = 6) or (ts.Data.Race = 4) or (ts.Data.MEXP <> 0)))) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
+							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and 64 = 0) and ((tc1.Option and 6 = 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race = 6) or (ts.Data.Race = 4) or (ts.Data.MEXP <> 0))) and tc1.PerfectHide = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
 							//if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
 							    //if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
 							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) then begin
