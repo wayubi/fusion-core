@@ -72,6 +72,7 @@ var
     GM_ISCSON : Byte;
     GM_ISCSOFF : Byte;
     GM_AUTOLOOT : Byte;
+    GM_GSTORAGE : Byte;
     GM_RCON : Byte;
     
     GM_AEGIS_B : Byte;
@@ -194,6 +195,7 @@ var
     function command_iscson(tc : TChara) : String;
     function command_iscsoff(tc : TChara) : String;
     function command_autoloot(tc : TChara) : String;
+    function command_gstorage(tc : TChara) : String;
     function command_rcon(str : String) : String;
 
     function command_aegis_b(str : String) : String;
@@ -318,6 +320,7 @@ implementation
         GM_ISCSON := StrToIntDef(sl.Values['ISCSON'], 0);
         GM_ISCSOFF := StrToIntDef(sl.Values['ISCSOFF'], 0);
         GM_AUTOLOOT := StrToIntDef(sl.Values['AUTOLOOT'], 1);
+        GM_GSTORAGE := StrToIntDef(sl.Values['GSTORAGE'], 1);
         GM_RCON := StrToIntDef(sl.Values['RCON'], 1);
 
         ini.ReadSectionValues('Aegis GM Commands', sl);
@@ -455,6 +458,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'ISCSON', IntToStr(GM_ISCSON));
         ini.WriteString('Fusion GM Commands', 'ISCSOFF', IntToStr(GM_ISCSOFF));
         ini.WriteString('Fusion GM Commands', 'AUTOLOOT', IntToStr(GM_AUTOLOOT));
+        ini.WriteString('Fusion GM Commands', 'GSTORAGE', IntToStr(GM_GSTORAGE));
         ini.WriteString('Fusion GM Commands', 'RCON', IntToStr(GM_RCON));
 
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
@@ -594,6 +598,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('iscson')) = 'iscson') and (check_level(tc, GM_ISCSON)) ) then error_msg := command_iscson(tc)
             else if ( (copy(str, 1, length('iscsoff')) = 'iscsoff') and (check_level(tc, GM_ISCSOFF)) ) then error_msg := command_iscsoff(tc)
             else if ( (copy(str, 1, length('autoloot')) = 'autoloot') and (check_level(tc, GM_AUTOLOOT)) ) then error_msg := command_autoloot(tc)
+            else if ( (copy(str, 1, length('gstorage')) = 'gstorage') and (check_level(tc, GM_GSTORAGE)) ) then error_msg := command_gstorage(tc)
             else if ( (copy(str, 1, length('rcon')) = 'rcon') and (check_level(tc, GM_RCON)) ) then error_msg := command_rcon(str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
@@ -2586,6 +2591,25 @@ Called when we're shutting down the server *only*
             if ((tc.Auto - 4) < 0 ) then tc.Auto := 0 else tc.Auto := tc.Auto - 4;
             Result := 'GM AUTOLOOT Off.';
         end;
+    end;
+
+    function command_gstorage(tc : TChara) : String;
+    var
+        tg : TGuild;
+    begin
+        Result := 'GM_GSTORAGE Failure.';
+
+        if GuildList.IndexOf(tc.GuildID) = -1 then begin
+            Result := Result + ' Guild does not exist.';
+            Exit;
+        end;
+
+        tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+        tg.Storage.Count := open_storage(tc, tg.Storage.Item);
+
+        tc.guild_storage := True;
+
+        Result := 'GM_STORAGE Success.';
     end;
 
     function command_rcon(str : String) : String;

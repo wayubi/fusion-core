@@ -127,6 +127,7 @@ implementation
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
             retrieve_inventories(path, tp.Kafra.Item);
+            CalcInventory(tp.Kafra);
 
             if (UID <> '*') then Break;
         end;

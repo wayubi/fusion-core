@@ -1011,6 +1011,8 @@ TChara = class(TLiving)
         PvPRank       :integer;
         tmpPvPRank    :integer;
 
+        guild_storage : Boolean;
+
 	constructor Create;
 	destructor  Destroy; override;
   //procedures to get skilonbool and set skillonbool
@@ -1784,7 +1786,7 @@ Option_Font_Style : string;
     procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0); // Make a Living disappear
 
 		function  SearchCInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
-		function  SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
+		function  SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean; storage_item : array of TItem):word;
 //------------------------------------------------------------------------------
 		//モンス・NPC
 		procedure SendMData(Socket:TCustomWinSocket; ts:TMob; Use0079:boolean = false);
@@ -4502,74 +4504,10 @@ end;
 //------------------------------------------------------------------------------
 procedure SendCStoreList(tc:TChara);
 var
-	i,j :integer;
-	cnt :word;
 	tp  :TPlayer;
 begin
 	tp := tc.PData;
-	with tp do begin
-		cnt := 0;
-		//アイテムデータ
-		WFIFOW(0, $00a5);
-		j := 0;
-		for i := 1 to 100 do begin
-
-			if (tp.Kafra.Item[i].ID <> 0) then begin
-                if (not tp.Kafra.Item[i].Data.IEquip) then begin
-    				WFIFOW( 4 +j*10, i);
-	    			WFIFOW( 6 +j*10, tp.Kafra.Item[i].Data.ID);
-		    		WFIFOB( 8 +j*10, tp.Kafra.Item[i].Data.IType);
-			    	WFIFOB( 9 +j*10, tp.Kafra.Item[i].Identify);
-				    WFIFOW(10 +j*10, tp.Kafra.Item[i].Amount);
-    				if tp.Kafra.Item[i].Data.IType = 10 then
-	    				WFIFOW(12 +j*10, 32768)
-		    		else
-			    		WFIFOW(12 +j*10, 0);
-				    Inc(j);
-    				Inc(cnt);
-                end;
-			end;
-		end;
-		WFIFOW(2, 4+j*10);
-		tc.Socket.SendBuf(buf, 4+j*10);
-		//装備データ
-		WFIFOW(0, $00a6);
-		j := 0;
-		for i := 1 to 100 do begin
-			if (tp.Kafra.Item[i].ID <> 0) then begin
-                if (tp.Kafra.Item[i].Data.IEquip) then begin
-    				WFIFOW( 4 +j*20, i);
-	    			WFIFOW( 6 +j*20, tp.Kafra.Item[i].Data.ID);
-		    		WFIFOB( 8 +j*20, tp.Kafra.Item[i].Data.IType);
-			    	WFIFOB( 9 +j*20, tp.Kafra.Item[i].Identify);
-				    with tp.Kafra.Item[i].Data do begin
-    					if (tc.JID = 12) and (IType = 4) and (Loc = 2) and
-	    					 ((View = 1) or (View = 2) or (View = 6)) then
-		    				WFIFOW(10 +j*20, 34)
-			    		else
-				    		WFIFOW(10 +j*20, Loc);
-    				end;
-	    			WFIFOW(12 +j*20, tp.Kafra.Item[i].Equip);
-		    		WFIFOB(14 +j*20, tp.Kafra.Item[i].Attr);
-			    	WFIFOB(15 +j*20, tp.Kafra.Item[i].Refine);
-				    WFIFOW(16 +j*20, tp.Kafra.Item[i].Card[0]);
-    				WFIFOW(18 +j*20, tp.Kafra.Item[i].Card[1]);
-	    			WFIFOW(20 +j*20, tp.Kafra.Item[i].Card[2]);
-		    		WFIFOW(22 +j*20, tp.Kafra.Item[i].Card[3]);
-			    	Inc(j);
-				    Inc(cnt);
-                end;
-			end;
-		end;
-		WFIFOW(2, 4+j*20);
-		tc.Socket.SendBuf(buf, 4+j*20);
-		//個数表示
-		tp.Kafra.Count := cnt;
-		WFIFOW(0, $00f2);
-		WFIFOW(2, tp.Kafra.Count);
-		WFIFOW(4, 100);
-		tc.Socket.SendBuf(buf, 6);
-	end;
+    tp.Kafra.Count := open_storage(tc, tp.Kafra.Item);
 end;
 //------------------------------------------------------------------------------
 procedure SendCSkillList(tc:TChara);
@@ -5304,7 +5242,7 @@ begin
 	end;
 end;
 //------------------------------------------------------------------------------
-function SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
+function SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean; storage_item : array of TItem):word;
 var
 	i   :integer;
 	tp  :TPlayer;
@@ -5312,26 +5250,26 @@ begin
 	Result := 0;
 	tp := tc.PData;
 	if IEquip then begin
-		for i := 1 to 100 do begin
+		for i := 0 to 99 do begin
 			//空きindexを探す
-			if tp.Kafra.Item[i].ID = 0 then begin
-				tp.Kafra.Item[i].Amount := 0;
+			if storage_item[i].ID = 0 then begin
+				storage_item[i].Amount := 0;
 				Result := i;
 				break;
 			end;
 		end;
 	end else begin
-		for i := 1 to 100 do begin
+		for i := 0 to 99 do begin
 			//同じアイテムを持ってるか探す
-			if tp.Kafra.Item[i].ID = ItemID then begin
+			if storage_item[i].ID = ItemID then begin
 				Result := i;
 				exit;
 			end;
 		end;
-		for i := 1 to 100 do begin
+		for i := 0 to 99 do begin
 			//空きindexを探す
-			if tp.Kafra.Item[i].ID = 0 then begin
-				tp.Kafra.Item[i].Amount := 0;
+			if storage_item[i].ID = 0 then begin
+				storage_item[i].Amount := 0;
 				Result := i;
 				break;
 			end;

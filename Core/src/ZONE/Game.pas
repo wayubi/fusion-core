@@ -1824,6 +1824,9 @@ end;
                         end;
 					end;
 				end;
+
+                tc.guild_storage := False;
+
 			end;
 		//--------------------------------------------------------------------------
 		$00b8: //NPC会話で選択肢を選択した
@@ -2692,142 +2695,89 @@ end;
 			end;
 {取引機能追加ココまで}
 		//--------------------------------------------------------------------------
-		$00f3: //倉庫にアイテム放り込み
+		$00f3: // Add Item to Storage
 			begin
-				tp := tc.PData;
+
 				RFIFOW(2, w1);
 				RFIFOL(4, l);
-				if l > 30000 then l := 30000;
+
+                if (l > 30000) then l := 30000;
 				w2 := l;
-				if (tc.Item[w1].ID = 0) or (tc.Item[w1].Amount < w2) then begin
-					continue;
+
+                if (tc.Item[w1].ID = 0) or (tc.Item[w1].Amount < w2) then Continue;
+
+                if tc.guild_storage then begin
+                    if GuildList.IndexOf(tc.GuildID) = -1 then Continue;
+                    tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+
+                    i := addto_storage(tc, tg.Storage.Item, tg.Storage.Count, w1, w2);
+
+                    if (i = -1) then Exit
+                    else tg.Storage.Count := i;
+
+                    Inc(tg.Storage.Weight, (tc.Item[w1].Data.Weight * w2));
+                end else begin
+                    tp := tc.PData;
+
+                    i := addto_storage(tc, tp.Kafra.Item, tp.Kafra.Count, w1, w2);
+
+                    if (i = -1) then Exit
+                    else tp.Kafra.Count := i;
+
+                    Inc(tp.Kafra.Weight, (tc.Item[w1].Data.Weight * w2));
 				end;
-				j := SearchPInventory(tc, tc.Item[w1].ID, tc.Item[w1].Data.IEquip);
-				if j = 0 then begin
-					continue;
-				end;
-				if tp.Kafra.Item[j].Amount + w2 > 30000 then begin
-					continue;
-				end;
-				//倉庫にアイテム追加
-				tp.Kafra.Item[j].ID := tc.Item[w1].ID;
-				Inc(tp.Kafra.Item[j].Amount, w2);
-				tp.Kafra.Item[j].Equip := 0;
-				tp.Kafra.Item[j].Identify := tc.Item[w1].Identify;
-				tp.Kafra.Item[j].Refine := tc.Item[w1].Refine;
-				tp.Kafra.Item[j].Attr := tc.Item[w1].Attr;
-				tp.Kafra.Item[j].Card[0] := tc.Item[w1].Card[0];
-				tp.Kafra.Item[j].Card[1] := tc.Item[w1].Card[1];
-				tp.Kafra.Item[j].Card[2] := tc.Item[w1].Card[2];
-				tp.Kafra.Item[j].Card[3] := tc.Item[w1].Card[3];
-				tp.Kafra.Item[j].Data := tc.Item[w1].Data;
-				//パケ送信
-				WFIFOW( 0, $00f4);
-				WFIFOW( 2, j);
-				WFIFOL( 4, w2);//tp.Kafra.Item[j].Amount
-				WFIFOW( 8, tp.Kafra.Item[j].ID);
-				WFIFOB(10, tp.Kafra.Item[j].Identify);
-				WFIFOB(11, tp.Kafra.Item[j].Attr);
-				WFIFOB(12, tp.Kafra.Item[j].Refine);
-				WFIFOW(13, tp.Kafra.Item[j].Card[0]);
-				WFIFOW(15, tp.Kafra.Item[j].Card[1]);
-				WFIFOW(17, tp.Kafra.Item[j].Card[2]);
-				WFIFOW(19, tp.Kafra.Item[j].Card[3]);
-				Socket.SendBuf(buf, 21);
-				//倉庫アイテム数変更
-				Inc(tp.Kafra.Count);
-				WFIFOW(0, $00f2);
-				WFIFOW(2, tp.Kafra.Count);
-				WFIFOW(4, 100);
-				tc.Socket.SendBuf(buf, 6);
-				//アイテム数減少
-				Dec(tc.Item[w1].Amount, w2);
-				if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
-				WFIFOW( 0, $00af);
-				WFIFOW( 2, w1);
-				WFIFOW( 4, w2);
-				Socket.SendBuf(buf, 6);
-				//重量変更
+
 				tc.Weight := tc.Weight - tc.Item[w1].Data.Weight * w2;
-        Inc(tp.Kafra.Weight,(tc.Item[w1].Data.Weight * w2));
 				SendCStat1(tc, 0, $0018, tc.Weight);
+
 			end;
 		//--------------------------------------------------------------------------
-		$00f5: //倉庫からアイテム取り出し
+		$00f5: // Remove item from storage
 			begin
-				tp := tc.PData;
+
 				RFIFOW(2, w1);
 				RFIFOL(4, l);
+
 				if l > 30000 then l := 30000;
 				w2 := l;
-				if (tp.Kafra.Item[w1].ID = 0) or (tp.Kafra.Item[w1].Amount < w2) then begin
-					continue;
-				end;
-				weight := tp.Kafra.Item[w1].Data.Weight * w2;
 
-				if longint(tc.MaxWeight) - longint(tc.Weight) < weight then begin // AlexKreuz: Integer Overflow Protection
-					//重量オーバー
+                if (tc.guild_storage) then begin
+                    if GuildList.IndexOf(tc.GuildID) = -1 then Continue;
+                    tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+                    weight := tg.Storage.Item[w1].Data.Weight * w2;
+                    //Dec(tg.Storage.Weight, weight);
+                end else begin
+                    tp := tc.PData;
+                    weight := tp.Kafra.Item[w1].Data.Weight * w2;
+                    Dec(tp.Kafra.Weight, weight);
+				end;
+
+				if longint(tc.MaxWeight) - longint(tc.Weight) < weight then begin
 					WFIFOW(0, $00ca);
-					WFIFOB(2, 3);  //1=お金が足りない 2=重量オーバー 3=アイテム最大種類数オーバー
-					Socket.SendBuf(buf, 3);
+					WFIFOB(2, 3);
+                    tc.Socket.SendBuf(buf, 3);
 				end
 
-                                // AlexKreuz: User Overweight - Kafra Protection
-                                else begin
-	        			j := SearchCInventory(tc, tp.Kafra.Item[w1].ID, tp.Kafra.Item[w1].Data.IEquip);
-        				if j = 0 then begin
-				        	continue;
-			        	end;
-		        		if tc.Item[j].Amount + w2 > 30000 then begin
-	        				continue;
-        				end;
-		        		//倉庫からアイテム追加
-	        			tc.Item[j].ID := tp.Kafra.Item[w1].ID;
-        				Inc(tc.Item[j].Amount, w2);
-				        tc.Item[j].Equip := 0;
-			        	tc.Item[j].Identify := tp.Kafra.Item[w1].Identify;
-		        		tc.Item[j].Refine := tp.Kafra.Item[w1].Refine;
-	        			tc.Item[j].Attr := tp.Kafra.Item[w1].Attr;
-        				tc.Item[j].Card[0] := tp.Kafra.Item[w1].Card[0];
-				        tc.Item[j].Card[1] := tp.Kafra.Item[w1].Card[1];
-			        	tc.Item[j].Card[2] := tp.Kafra.Item[w1].Card[2];
-		        		tc.Item[j].Card[3] := tp.Kafra.Item[w1].Card[3];
-	        			tc.Item[j].Data := tp.Kafra.Item[w1].Data;
-        				SendCGetItem(tc, j, w2);
-				        //倉庫のアイテム数減少
-			        	Dec(tp.Kafra.Item[w1].Amount, w2);
-		        		if tp.Kafra.Item[w1].Amount = 0 then begin
-                  tp.Kafra.Item[w1].ID := 0;
-                  Dec(tp.Kafra.Count);
+                else begin
+                    if (tc.guild_storage) then begin
+                        if GuildList.IndexOf(tc.GuildID) = -1 then Continue;
+                        tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+                        takefrom_storage(tc, tg.Storage.Item, tg.Storage.Count, l, w1-1, w2);
+                    end else begin
+                        tp := tc.PData;
+                        takefrom_storage(tc, tp.Kafra.Item, tp.Kafra.Count, l, w1-1, w2);
+                    end;
                 end;
-	        			WFIFOW( 0, $00f6);
-        				WFIFOW( 2, w1);
-				        WFIFOL( 4, l);
-			        	Socket.SendBuf(buf, 8);
-		        		//倉庫アイテム数変更
-        				WFIFOW(0, $00f2);
-				        WFIFOW(2, tp.Kafra.Count);
-			        	WFIFOW(4, 100);
-		        		tc.Socket.SendBuf(buf, 6);
-	        			//重量変更
-        				tc.Weight := tc.Weight + weight;
-                                        Dec(tp.Kafra.Weight,weight);
-			        	SendCStat1(tc, 0, $0018, tc.Weight);
-                                end;
 
-                if (tc.Item[j].Card[0] = $FF00) then begin
-                    if PetList.IndexOf(tc.Item[j].Card[1]) = -1 then Continue;
-                    tpe := PetList.Objects[PetList.IndexOf(tc.Item[j].Card[1])] as TPet;
-                    tpe.Index := j;
-                    tpe.CharaID := tc.CID;
-                end;
 			end;
 		//--------------------------------------------------------------------------
-		$00f7: //倉庫閉じ
+		$00f7: // Close storage
 			begin
 				tc.AMode := 0;
 				WFIFOW( 0, $00f8);
 				Socket.SendBuf(buf, 2);
+
+                tc.guild_storage := False;
 			end;
 		//--------------------------------------------------------------------------
 		$00f9: // Request to organize a party - NOTE, 01e8 is updated version

@@ -39,6 +39,10 @@ uses
 
     function uselan(in_ip : String) : Boolean;
 
+    function open_storage(tc : TChara; storage_items : array of TItem) : Integer;
+    function addto_storage(tc : TChara; storage_items : array of TItem; amt, w1, w2: Integer) : Integer;
+    function takefrom_storage(tc : TChara; storage_items : array of TItem; cnt, l, w1, w2 : Integer) : Integer;
+
 implementation
 
 uses
@@ -497,6 +501,211 @@ uses
             Result := True;
 
         FreeAndNil(sl);
+    end;
+
+
+    function open_storage(tc : TChara; storage_items : array of TItem) : Integer;
+    var
+        storage_count : Integer;
+        i, j : Integer;
+    begin
+
+        storage_count := 0;
+
+        { -- Get list of non-equip items -- }
+        WFIFOW(0, $00a5);
+
+        j := 0;
+        for i := 0 to 99 do begin
+
+            if storage_items[i].ID = 0 then Continue;
+            if storage_items[i].Data.IEquip then Continue;
+
+            WFIFOW( 4 + j * 10, i+1);
+            WFIFOW( 6 + j * 10, storage_items[i].Data.ID);
+            WFIFOB( 8 + j * 10, storage_items[i].Data.IType);
+            WFIFOB( 9 + j * 10, storage_items[i].Identify);
+            WFIFOW(10 + j * 10, storage_items[i].Amount);
+
+            if storage_items[i].Data.IType = 10 then WFIFOW(12 + j * 10, 32768)
+            else WFIFOW(12 + j * 10, 0);
+
+            Inc(j);
+            Inc(storage_count);
+
+        end;
+
+        WFIFOW(2, 4 + j * 10);
+        tc.Socket.SendBuf(buf, 4 + j * 10);
+        { -- Get list of non-equip items -- }
+
+
+        { -- Get list of equippable items -- }
+        WFIFOW(0, $00a6);
+
+        j := 0;
+        for i := 0 to 99 do begin
+
+            if storage_items[i].ID = 0 then Continue;
+            if not storage_items[i].Data.IEquip then Continue;
+
+            WFIFOW( 4 + j * 20, i+1);
+            WFIFOW( 6 + j * 20, storage_items[i].Data.ID);
+            WFIFOB( 8 + j * 20, storage_items[i].Data.IType);
+            WFIFOB( 9 + j * 20, storage_items[i].Identify);
+
+            with storage_items[i].Data do begin
+                if (tc.JID = 12) and (IType = 4) and (Loc = 2) and ((View = 1) or (View = 2) or (View = 6)) then
+                    WFIFOW(10 + j * 20, 34)
+                else
+                    WFIFOW(10 + j * 20, storage_items[i].Data.Loc);
+            end;
+
+            WFIFOW(12 + j * 20, storage_items[i].Equip);
+            WFIFOB(14 + j * 20, storage_items[i].Attr);
+            WFIFOB(15 + j * 20, storage_items[i].Refine);
+            WFIFOW(16 + j * 20, storage_items[i].Card[0]);
+            WFIFOW(18 + j * 20, storage_items[i].Card[1]);
+            WFIFOW(20 + j * 20, storage_items[i].Card[2]);
+            WFIFOW(22 + j * 20, storage_items[i].Card[3]);
+
+            Inc(j);
+            Inc(storage_count);
+
+        end;
+
+        WFIFOW(2, 4 + j * 20);
+        tc.Socket.SendBuf(buf, 4 + j * 20);
+        { -- Get list of equippable items -- }
+
+
+        { -- Assign storage totals -- }
+        WFIFOW(0, $00f2);
+        WFIFOW(2, storage_count);
+        WFIFOW(4, 100);
+        tc.Socket.SendBuf(buf, 6);
+        { -- Assign storage totals -- }
+        
+
+        result := storage_count;
+
+    end;
+
+
+    function addto_storage(tc : TChara; storage_items : array of TItem; amt, w1, w2 : Integer) : Integer;
+    var
+        j : Integer;
+    begin
+
+        Result := -1;
+
+        j := SearchPInventory(tc, tc.Item[w1].ID, tc.Item[w1].Data.IEquip, storage_items);
+        if j < 0 then Exit;
+
+        if storage_items[j].Amount + w2 > 30000 then Exit;
+
+        storage_items[j].ID := tc.Item[w1].ID;
+        Inc(storage_items[j].Amount, w2);
+
+        storage_items[j].Equip := 0;
+        storage_items[j].Identify := tc.Item[w1].Identify;
+        storage_items[j].Refine := tc.Item[w1].Refine;
+        storage_items[j].Attr := tc.Item[w1].Attr;
+        storage_items[j].Card[0] := tc.Item[w1].Card[0];
+        storage_items[j].Card[1] := tc.Item[w1].Card[1];
+        storage_items[j].Card[2] := tc.Item[w1].Card[2];
+        storage_items[j].Card[3] := tc.Item[w1].Card[3];
+        storage_items[j].Data := tc.Item[w1].Data;
+
+        WFIFOW( 0, $00f4);
+        WFIFOW( 2, j+1);
+        WFIFOL( 4, w2);
+        WFIFOW( 8, storage_items[j].ID);
+        WFIFOB(10, storage_items[j].Identify);
+        WFIFOB(11, storage_items[j].Attr);
+        WFIFOB(12, storage_items[j].Refine);
+        WFIFOW(13, storage_items[j].Card[0]);
+        WFIFOW(15, storage_items[j].Card[1]);
+        WFIFOW(17, storage_items[j].Card[2]);
+        WFIFOW(19, storage_items[j].Card[3]);
+        tc.Socket.SendBuf(buf, 21);
+
+        Inc(amt);
+        WFIFOW(0, $00f2);
+        WFIFOW(2, amt);
+        WFIFOW(4, 100);
+        tc.Socket.SendBuf(buf, 6);
+
+        Dec(tc.Item[w1].Amount, w2);
+        if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
+        WFIFOW( 0, $00af);
+        WFIFOW( 2, w1);
+        WFIFOW( 4, w2);
+        tc.Socket.SendBuf(buf, 6);
+
+        Result := amt;
+
+    end;
+
+
+    function takefrom_storage(tc : TChara; storage_items : array of TItem; cnt, l, w1, w2 : Integer) : Integer;
+    var
+        j : Integer;
+        tpe : TPet;
+        weight : Cardinal;
+    begin
+        Result := 0;
+
+        if (storage_items[w1].ID = 0) or (storage_items[w1].Amount < w2) then Exit;
+        weight := storage_items[w1].Data.Weight * w2;
+
+        j := SearchCInventory(tc, storage_items[w1].ID, storage_items[w1].Data.IEquip);
+
+        if j = 0 then Exit;
+        if tc.Item[j].Amount + w2 > 30000 then Exit;
+
+        tc.Item[j].ID := storage_items[w1].ID;
+        Inc(tc.Item[j].Amount, w2);
+
+        tc.Item[j].Equip := 0;
+        tc.Item[j].Identify := storage_items[w1].Identify;
+        tc.Item[j].Refine := storage_items[w1].Refine;
+        tc.Item[j].Attr := storage_items[w1].Attr;
+        tc.Item[j].Card[0] := storage_items[w1].Card[0];
+        tc.Item[j].Card[1] := storage_items[w1].Card[1];
+        tc.Item[j].Card[2] := storage_items[w1].Card[2];
+        tc.Item[j].Card[3] := storage_items[w1].Card[3];
+        tc.Item[j].Data := storage_items[w1].Data;
+
+        SendCGetItem(tc, j, w2);
+
+        Dec(storage_items[w1].Amount, w2);
+        if (storage_items[w1].Amount = 0) then begin
+            storage_items[w1].ID := 0;
+            Dec(cnt);
+        end;
+
+        WFIFOW(0, $00f6);
+        WFIFOW(2, w1+1);
+        WFIFOL(4, l);
+        tc.Socket.SendBuf(buf, 8);
+
+        WFIFOW(0, $00f2);
+        WFIFOW(2, cnt);
+        WFIFOW(4, 100);
+        tc.Socket.SendBuf(buf, 6);
+
+        tc.Weight := tc.Weight + weight;
+
+        SendCStat1(tc, 0, $0018, tc.Weight);
+
+        if (tc.Item[j].Card[0] = $FF00) then begin
+            if PetList.IndexOf(tc.Item[j].Card[1]) = -1 then Exit;
+            tpe := PetList.Objects[PetList.IndexOf(tc.Item[j].Card[1])] as TPet;
+            tpe.Index := j;
+            tpe.CharaID := tc.CID;
+        end;
+
     end;
 
 end.
