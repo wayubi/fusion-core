@@ -1,3 +1,4 @@
+- 06-05-04: Added Skill Failure error checking to PSS. [AlexKreuz]
 - 06-05-04: Testing of PSS using SM_PROVOKE. [AlexKreuz]
 - 06-05-04: Creation of PSS, Partitioned Skill Structure. [AlexKreuz]
 - 06-05-04: Removed all Athena GM command ports. Will implement into ALBGM later. ALBGM completed. [AlexKreuz]
