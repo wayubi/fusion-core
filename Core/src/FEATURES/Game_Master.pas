@@ -1173,35 +1173,74 @@ Called when we're shutting down the server *only*
     function command_warp(tc : TChara; str : String) : String;
     var
         sl : TStringList;
-        i, j, k : Integer;
+        x, y, j, k : Integer;
         ta : TMapList;
+        tm : TMap;
     begin
         Result := 'GM_WARP Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 6, 256);
 
-        if sl.Count <> 3 then Exit;
-        Val(sl.Strings[1], i, k);
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-        if k <> 0 then Exit;
-        Val(sl.Strings[2], j, k);
+        if sl.Count > 0 then begin
 
-        if k <> 0 then Exit;
-        if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then Exit;
+            if MapList.IndexOf(LowerCase(sl.Strings[0])) <> -1 then begin
+                ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
 
-        ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
-        if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then Exit;
+                j := 0;
 
-        if (tc.Hidden = false) then SendCLeave(tc, 2);
-        tc.tmpMap := LowerCase(sl.Strings[0]);
-        tc.Point := Point(i,j);
-        MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(i,j));
+                repeat
+                    x := Random(tm.Size.X - 2) + 1;
+                    y := Random(tm.Size.Y - 2) + 1;
+                    Inc(j);
+                until ( ((tm.gat[x, y] <> 1) and (tm.gat[x, y] <> 5)) or (j = 100) );
 
-        Result := 'GM_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').';
+                if sl.Count >= 2 then begin
+                    Val(sl.Strings[1], x, k);
+
+                    if k <> 0 then begin
+                        sl.Free;
+                        Result := Result + ' X coordinate must be a valid integer.';
+                        Exit;
+                    end;
+                end;
+
+                if sl.Count = 3 then begin
+                    Val(sl.Strings[2], y, k);
+
+                    if k <> 0 then begin
+                        sl.Free;
+                        Result := Result + ' Y coordinate must be a valid integer.';
+                        Exit;
+                    end;
+                end;
+
+                if j <> 100 then begin
+                    if (tc.Hidden = false) then SendCLeave(tc, 2);
+                    tc.tmpMap := LowerCase(sl.Strings[0]);
+                    tc.Point := Point(x,y);
+                    MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(x,y));
+                    Result := 'GM_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(x) + ',' + IntToStr(y) + ').';
+                end
+
+                else begin
+                    Result := Result + ' Unable to find valid coordinates to warp to.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' Map does not exist.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient input. Format is <map name> [x coordinate] [y coordinate].';
+        end;
         sl.Free;
     end;
-
+    
     function command_banish(str : String) : String;
     var
         sl : TStringList;
