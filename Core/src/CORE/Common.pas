@@ -159,7 +159,7 @@ type TItem = class
 public
   Constructor Create;
   Destructor  Destroy; OverRide;
-end;
+end;//TItem
 //------------------------------------------------------------------------------
 {追加}
 type TItemList = class
@@ -169,9 +169,9 @@ type TItemList = class
 	MaxWeight :Cardinal;
 	Count     :Word;
 
-	constructor Create;
-	destructor Destroy; override;
-end;
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+end;//TItemList
 {追加ココまで}
 //------------------------------------------------------------------------------
 {アイテム製造追加}
@@ -466,29 +466,34 @@ end;
 
 // ペットデータ
 TPet = class
-        PlayerID        :cardinal;
-        CharaID         :cardinal;
-        Cart            :byte;
-        Index           :word;
-        Incubated       :byte;
-        PetID           :cardinal;
-        JID             :word;
-        Name            :string;
-        Renamed         :byte;
-        LV              :word;
+	PlayerID        :cardinal;
+	CharaID         :cardinal;
+	Cart            :byte;
+	Index           :word;
+	Incubated       :byte;
+	PetID           :cardinal;
+	JID             :word;
+	Name            :string;
+	Renamed         :byte;
+	LV              :word;
 	Relation        :integer;
-        Fullness        :integer;
-        Accessory       :word;
-        Data            :TPetDB;
+	Fullness        :integer;
+	Accessory       :word;
+	Data            :TPetDB;
 	isLooting       :boolean;  //Tracks if the pet is looting
-        ATarget         :cardinal;  //Pets attacking target as well as looting
-        Item            :array[1..25] of TItem;  //Items a pet is holding
+	ATarget         :cardinal;  //Pets attacking target as well as looting
+	Item            :array[1..25] of TItem;  //Items a pet is holding
 //	MobData         :Pointer;
 	MobData         :TMobDB; //Reference to the Pet's Monster attributes.
-        SkillTick       :cardinal;  //Tracks when to use a skill
-        SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
-        LastTick        :cardinal;  //Used for tracking a minute
-        Saved           :byte;
+	SkillTick       :cardinal;  //Tracks when to use a skill
+	SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
+	LastTick        :cardinal;  //Used for tracking a minute
+	Saved           :byte;
+
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+
 end;//TPet
 {キューペットここまで}
 //------------------------------------------------------------------------------
@@ -657,6 +662,10 @@ TeNPC = class
 
 	ATKSplash	    :Boolean; //9マス攻撃
 
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+
 end;//TeNPC
 //------------------------------------------------------------------------------
 // Character Data
@@ -664,7 +673,7 @@ end;//TeNPC
 	TNPC = class;    //forward declaration - PetNPC " " "
 	TMap = class;    //forward declaration - MData " " "
 
-	TChara = class(TLiving)
+TChara = class(TLiving)
 	// Control Variables
 	//ID	          :cardinal;
 	Socket        :TCustomWinSocket;
@@ -686,37 +695,37 @@ end;//TeNPC
 	JobLV         :word;
 	JobEXP        :cardinal;
 	SkillPoint    :word;
-  PLv           :word;
-  Plag          :word;
+	PLv           :word;
+	Plag          :word;
 	Zeny          :cardinal;
 	Stat1         :cardinal; // Status 1
 	Stat2         :cardinal; // Status 2
-  // Colus, 20040204:
-  // Option is a word-length bitmask.  The bits are for the following
-  // character status conditions:
-  //
-  // 01: Sight        02: Hide          04: Cloak         08: Cart 1
-  // 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
-  // 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
-  // 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
+	// Colus, 20040204:
+	// Option is a word-length bitmask.  The bits are for the following
+	// character status conditions:
+	//
+	// 01: Sight        02: Hide          04: Cloak         08: Cart 1
+	// 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
+	// 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
+	// 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
 
-  //  0000 | 0000 | 0000 | 0000
-  //    R    OCCC   CPPF   CCHS
-  //    w    r543   2Hel   1lig
-  //    c    c       dcc    kdt
-  //    h            eon     e
-  //
-  // OptionKeep is not necessary.  All options should be set up
-  // using ands and ors to change the bitmask.
-  //
-  // Example: Cart check: if (Option and $0788);
-  // Example: Hide check: if (Option and 2);
-  // Example: Set peco on: tc.Option := tc.Option or 32;
+	//  0000 | 0000 | 0000 | 0000
+	//    R    OCCC   CPPF   CCHS
+	//    w    r543   2Hel   1lig
+	//    c    c       dcc    kdt
+	//    h            eon     e
+	//
+	// OptionKeep is not necessary.  All options should be set up
+	// using ands and ors to change the bitmask.
+	//
+	// Example: Cart check: if (Option and $0788);
+	// Example: Hide check: if (Option and 2);
+	// Example: Set peco on: tc.Option := tc.Option or 32;
 	//Option        :cardinal;
-  //Optionkeep    :cardinal;
-  Option        :word;
-  Hidden        :boolean;
-  Paradise      :boolean;
+	//Optionkeep    :cardinal;
+	Option        :word;
+	Hidden        :boolean;
+	Paradise      :boolean;
 	Karma         :cardinal;
 	Manner        :cardinal;
 
@@ -776,12 +785,12 @@ end;//TeNPC
 	JobNextEXP    :cardinal;
 	Weight        :cardinal;
 	MaxWeight     :cardinal;
-  // Changed bonus to smallint (signed words) to prevent negative stat crashes
+	// Changed bonus to smallint (signed words) to prevent negative stat crashes
 	Bonus         :array[0..5] of SmallInt;
 	Param         :array[0..5] of word;
 	ParamUp       :array[0..5] of word;
 	WeaponType    :array[0..1] of word; // Right(0), left(1) hand weapon types
-  WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
+	WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
 {追加}
 	WeaponLv      :array[0..1] of word; // Weapon levels for right/left
 {追加ココまで}
@@ -833,35 +842,35 @@ end;//TeNPC
 	DrainPer      :array[0..1] of Integer; //吸収確率 0:HP 1:SP
 	SplashAttack  :boolean;                //Causes an Area Attack
 	SpecialAttack :integer;
-    {
-      1 = Knockback
-      2 = Fatal Blow, .1% chance of instantly killing monster
-    }
-  KnockBackSuccess  :boolean;
-        WeaponSkill   :integer;
-        WeaponSkillLv :integer;
+	{
+		1 = Knockback
+		2 = Fatal Blow, .1% chance of instantly killing monster
+	}
+	KnockBackSuccess  :boolean;
+	WeaponSkill   :integer;
+	WeaponSkillLv :integer;
 	WeaponID      :integer;
 	NoJamstone    :boolean;
-        NoTrap        :boolean;
-        LessSP        :boolean;
-        FastWalk      :boolean;
-        NoTarget      :boolean;
-        FullRecover   :boolean;
-        OrcReflect    :boolean;
-        AnolianReflect :boolean;
-        UnlimitedEndure :boolean;
-        DoppelgagnerASPD :boolean;
-        GhostArmor    :boolean;
-        NoCastInterrupt :boolean;
-        MagicReflect  :boolean;
-        SkillWeapon   :boolean;
-        GungnirEquipped :boolean;
-        LVL4WeaponASPD :boolean;
-        PerfectDamage   :boolean;
-        PerfectHide   :boolean;
+	NoTrap        :boolean;
+	LessSP        :boolean;
+	FastWalk      :boolean;
+	NoTarget      :boolean;
+	FullRecover   :boolean;
+	OrcReflect    :boolean;
+	AnolianReflect   :boolean;
+	UnlimitedEndure  :boolean;
+	DoppelgagnerASPD :boolean;
+	GhostArmor       :boolean;
+	NoCastInterrupt  :boolean;
+	MagicReflect     :boolean;
+	SkillWeapon      :boolean;
+	GungnirEquipped  :boolean;
+	LVL4WeaponASPD   :boolean;
+	PerfectDamage    :boolean;
+	PerfectHide      :boolean;
 
-        {Sage Effects}
-        SageElementEffect   :boolean;
+	{Sage Effects}
+	SageElementEffect   :boolean;
 
 	//# ステ変用
 	SFixPer1       :array[0..1] of array[0..4] of Integer; //変化確率%
@@ -883,10 +892,7 @@ end;//TeNPC
 	SkillTickID   :word; //次にどのスキルが切れるか
 
 //	MData         :Pointer;
-	MData         :TMap;//ChrstphrR - typed pointer, req. forward declaration
-	//ppos          :integer;
-	//pcnt          :integer;
-	//path          :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	MData         :TMap;//ref ChrstphrR - typed pointer, req. forward declaration
 	NextFlag      :boolean;
 	NextPoint     :TPoint;
 	MoveTick      :cardinal;
@@ -957,52 +963,50 @@ end;//TeNPC
 	PetMoveTick   :cardinal;
 //	Crusader      :Pointer;
 	Crusader      :TChara; //Reference ONLY to a Crusader for certain skills.
-        Autocastactive :Boolean;
-        noday         :Boolean;
+	Autocastactive :Boolean;
+	noday         :Boolean;
 
-        GraceTick     :Cardinal;  {Characters Grace period for not getting hit}
+	GraceTick     :Cardinal;  {Characters Grace period for not getting hit}
 
-        AnkleSnareTick :cardinal; {How long a character is trapped in ankle snare}
+	AnkleSnareTick :cardinal; {How long a character is trapped in ankle snare}
+	PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
 
-        PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
+	isCloaked     :Boolean;   {Says if Cloaking is Active}
+	CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak AND Hide}
 
-        isCloaked     :Boolean;   {Says if Cloaking is Active}
-        CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak AND Hide}
+	// Darkhelmet, I used this method so you can theoretically be poisoned
+	// and cursed at the same time, even though graphics will only show one.
+	PoisonTick    :Cardinal;  {Tracks how long a player is Poisoned}
+	isPoisoned    :Boolean;   {Says if player is Poisoned}
 
-        // Darkhelmet, I used this method so you can theoretically be poisoned
-        // and cursed at the same time, even though graphics will only show one.
-        PoisonTick    :Cardinal;  {Tracks how long a player is Poisoned}
-        isPoisoned    :Boolean;   {Says if player is Poisoned}
+	FreezeTick    :Cardinal;  {Tracks how long a player is Frozen for}
+	isFrozen      :Boolean;   {Says if player is Frozen}
 
-        FreezeTick    :Cardinal;  {Tracks how long a player is Frozen for}
-        isFrozen      :Boolean;   {Says if player is Frozen}
+	isStoned      :boolean;   {Says if a player is Stoned}
+	StoneTick     :Cardinal;   {Tracks the length of the curse}
 
-        isStoned      :boolean;   {Says if a player is Stoned}
-        StoneTick     :Cardinal;   {Tracks the length of the curse}
+	isBlind       :Boolean;   {Says if a player is blind}
+	BlindTick     :Cardinal;  {Tracks how long a player is Blind}
 
-        isBlind       :Boolean;   {Says if a player is blind}
-        BlindTick     :Cardinal;  {Tracks how long a player is Blind}
+	isSilenced    :Boolean;   {Says if a player is silenced}
+	SilencedTick  :Cardinal;  {Tracks how long a player is silenced}
 
-        isSilenced    :Boolean;   {Says if a player is silenced}
-        SilencedTick  :Cardinal;  {Tracks how long a player is silenced}
+	intimidateActive:Boolean; {Sets intimidate Active}
+	intimidateTick:cardinal;  {Used so you can delay before you intimidate}
 
-        intimidateActive:Boolean; {Sets intimidate Active}
-        intimidateTick:cardinal;  {Used so you can delay before you intimidate}
+	noHPRecovery  :Boolean;   {Player Cannot Recover HP}
+	noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 
-        noHPRecovery  :Boolean;   {Player Cannot Recover HP}
-        noSPRecovery  :Boolean;   {Player Cannot Recover SP}
+	SPRedAmount   :integer;   {Amount SP Usage is Reduced by}
+	SpellBroken   :boolean;   {Used For Spellbreaker}
 
-        SPRedAmount   :integer;   {Amount SP Usage is Reduced by}
+	LastSong      :integer;   {Last Song a Bard Cast}
+	LastSongLV    :integer;   {Level of last song a Bard Cast}
+	InField       :boolean;   {Determine if a player is in a skill field}
+	SongTick      :cardinal;   {Determines if Bard is Casting a Song}
+	SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
 
-        SpellBroken   :boolean;   {Used For Spellbreaker}
-
-        LastSong      :integer;   {Last Song a Bard Cast}
-        LastSongLV    :integer;   {Level of last song a Bard Cast}
-        InField       :boolean;   {Determine if a player is in a skill field}
-        SongTick      :cardinal;   {Determines if Bard is Casting a Song}
-        SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
-
-        //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
+	//SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1025,8 +1029,8 @@ TPlayer = class
 	Banned        :byte;
 	CID           :array[0..8] of cardinal;
 	CName         :array[0..8] of string;
-	CData         :array[0..8] of TChara;
-	Kafra         :TItemList;
+	CData         :array[0..8] of TChara; // Reference pointers
+	Kafra         :TItemList;//owned
 
 	LoginID1      :cardinal;
 	LoginID2      :cardinal;
@@ -1076,7 +1080,7 @@ end;
 TShopItem = class
 	ID    :word;
 	Price :cardinal;
-	Data  :TItemDB;
+	Data  :TItemDB;//reference
 end;
 //------------------------------------------------------------------------------
 // NPCスクリプト
@@ -1089,17 +1093,25 @@ rScript = record
 end;
 //------------------------------------------------------------------------------
 // NPCデータ
+
+(*=============================================================================*
+TNPC
+
+--
+Overview:
+--
+Derived from TLiving (this change made by Colus, for the common attributes
+for NPC, Mob, and Chara objects.
+
+ChrstphrR - question for other devs -- What does an NPC represent?
+Just the Kafra babes, and townsfolk?  Can it represent NPC associated monsters,
+like the one in Prontera?  My description here bites, so someone feel free to
+expand on what the class -represents-
+
+*=============================================================================*)
 TNPC = class(TLiving)
-	//ID          :cardinal;
-	//Name        :string;
-{NPCイベント追加}
-	//JID         :word;
-	//JID         :integer;  // Why make it integer?
-{NPCイベント追加ココまで}
-	//Map         :string;
-  Reg         :string;
-	//Point       :TPoint;
-	//Dir         :byte;
+public
+	Reg         :string;
 	CType       :byte; //0=warp 1=shop 2=script 3=item 4=skill
 	//warp
 	WarpSize    :TPoint;
@@ -1111,10 +1123,11 @@ TNPC = class(TLiving)
 	Script      :array of rScript;
 	ScriptCnt   :integer;
 	ScriptLabel :string;
+
 {NPCイベント追加}
 	ScriptInitS  :integer; //OnInitステップ
 	ScriptInitD  :Boolean; //OnInit実行済フラグ
-  ScriptInitMS :integer;
+	ScriptInitMS :integer;
 
 	ChatRoomID  :cardinal; //チャットルームID
 	Enable      :Boolean; //有効スイッチ
@@ -1123,30 +1136,33 @@ TNPC = class(TLiving)
 {アジト機能追加ココまで}
 {NPCイベント追加ココまで}
 	//item
-	Item        :TItem;
+	Item        :TItem; //owned.
 	SubX        :byte;
 	SubY        :byte;
 	Tick        :cardinal;
 	//skill
 	Count       :word;
-	CData       :TChara;
-	MData       :TMob;
+	CData       :TChara; //ref
+	MData       :TMob;   //ref
 {追加}
 	MSkill      :Word;
 {追加ココまで}
 	MUseLV      :word;
 {キューペット}
-        //pet
-        HungryTick  :cardinal;
-        NextPoint   :TPoint;
-        MoveTick    :cardinal;
-        //ppos        :integer;
-	//pcnt        :integer;
-        //path        :array[0..999] of byte; //キャラの経路(向きで記録されてます)
+	//pet
+	HungryTick  :cardinal;
+	NextPoint   :TPoint;
+	MoveTick    :cardinal;
 
-        //AnkleTick   :cardinal;  //How long ankle snare lasts.
+	//AnkleTick   :cardinal;  //How long ankle snare lasts.
 {キューペットここまで}
-end;
+
+	Constructor Create;
+	Destructor  Destroy; OverRide;
+
+End;(* TNPC
+*=============================================================================*)
+
 //------------------------------------------------------------------------------
 {NPCイベント追加}
 // タイマーデータ
@@ -1157,6 +1173,9 @@ NTimer = class
 	Idx       :array of integer;//インデックス
 	Step      :array of integer;//分岐先
 	Done      :array of byte;//実行済みフラグ
+public
+	Constructor Create;
+	Destructor  Destroy; OverRide;
 end;
 //マップ設定データ
 MapTbl = class
@@ -1180,9 +1199,9 @@ end;
 //------------------------------------------------------------------------------
 // マップブロックデータ
 TBlock = class
-	NPC         :TIntList32;
-	Mob         :TIntList32;
-	CList       :TIntList32;
+	NPC         :TIntList32;//Reference list
+	Mob         :TIntList32;//Reference list
+	CList       :TIntList32;//Reference list
 	//MobProcess  :boolean;
 	MobProcTick :cardinal;
 
@@ -1442,7 +1461,7 @@ var
 {パーティー機能追加ココまで}
 {キューペット}
 	PetDB      :TIntList32;
-        PetList    :TIntList32;
+	PetList    :TIntList32;
 {キューペットここまで}
 {チャットルーム機能追加}
 	ChatRoomList :TIntList32;
@@ -1481,18 +1500,18 @@ var
 	ItemDBName :TStringList;
 	MobDB      :TIntList32;
 	MobDBName  :TStringList;
-        {Monster Skill Database}
-        MobAIDB    :TIntList32;
-        //MobAIDBAegis:TStringList;
-        MobAIDBFusion:TIntList32;
-        GlobalVars:TStringList;
-        //PharmacyDB :TIntList32;
-  SlaveDBName:TStringList;
-  MArrowDB   :TIntList32;
-  WarpDatabase:TStringList;
-  IDTableDB  :TIntList32;
+	{Monster Skill Database}
+	MobAIDB    :TIntList32;
+	//MobAIDBAegis:TStringList;
+	MobAIDBFusion:TIntList32;
+	GlobalVars:TStringList;
+	//PharmacyDB :TIntList32;//Merged with MaterialDB
+	SlaveDBName:TStringList;
+	MArrowDB   :TIntList32;
+	WarpDatabase:TStringList;
+	IDTableDB  :TIntList32;
 	SkillDB    :TIntList32;
-  SkillDBName:TStringlist;
+	SkillDBName:TStringlist;
 	Player     :TIntList32;
 	PlayerName :TStringList;
 	Chara      :TIntList32;
@@ -1538,7 +1557,7 @@ var
 	mm              :array[0..30] of array[0..30] of rSearchMap;
 
 	buf             :array[0..32767] of byte;
-  buf2            :array[0..32767] of byte;
+//	buf2            :array[0..32767] of byte; {ChrstphrR 2004/04/24 - not used!}
 	stra            :array[0..32767] of char;
 {Things related to Options}
 	//キャラクター初期データ関連
@@ -9791,6 +9810,44 @@ end;
 {チャットルーム機能追加ココまで}
 
 
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/23
+
+- Placeholder constructor -- will fill with creation of owned objects like
+Item : TItemList AFTER I trace down what code manipulates this object already.
+
+*-----------------------------------------------------------------------------*)
+Constructor TeNPC.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+	{ChrstphrR 2004/04/23 - would create TItemList here...}
+End;(* TeNPC.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/23
+
+Freeing up Item(list)
+
+*-----------------------------------------------------------------------------*)
+Destructor TeNPC.Destroy;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	Item.Free;
+
+	inherited;
+End;(* T.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+
+
+
+
+
 destructor TChara.Destroy;
 var
 	i :integer;
@@ -9811,23 +9868,38 @@ begin
   Kafra.MaxWeight := 4000000000;
 end;
 
-destructor TPlayer.Destroy;
-begin
-  Kafra.Free;
+(*-----------------------------------------------------------------------------*
+ChrstphrR - 2004/04/24
+TPlayer.Destroy
+
+Properly clean up all it's owned items.
+*-----------------------------------------------------------------------------*)
+Destructor TPlayer.Destroy;
+Begin
+	//Owned item cleanup...
+	Kafra.Free; //Defer to ItemList to clean itself up...
+
+	{ChrstphrR - Referenced items don't affect memory leaks,
+	code to NIL them out found to be unnecessary.}
 	inherited;
-end;
+End;(* TPlayer.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+
 
 constructor TBlock.Create;
 begin
 	inherited;
 
-	NPC := TIntList32.Create;
+	NPC   := TIntList32.Create;
 	CList := TIntList32.Create;
-	Mob := TIntList32.Create;
+	Mob   := TIntList32.Create;
 end;
 
 destructor TBlock.Destroy;
 begin
+	//These are all reference lists.
 	NPC.Free;
 	CList.Free;
 	Mob.Free;
@@ -9839,10 +9911,10 @@ constructor TMap.Create;
 begin
 	inherited;
 
-	NPC := TIntList32.Create;
+	NPC      := TIntList32.Create;
 	NPCLabel := TStringList.Create;
-	CList := TIntList32.Create;
-	Mob := TIntList32.Create;
+	CList    := TIntList32.Create;
+	Mob      := TIntList32.Create;
 {NPCイベント追加}
 	TimerAct := TIntList32.Create;
 	TimerDef := TIntList32.Create;
@@ -9850,15 +9922,36 @@ begin
 end;
 
 destructor TMap.Destroy;
+var
+	Idx : Integer;
+	Idy : Integer;
 begin
+	for Idx := NPC.Count-1 downto 0 do
+		if Assigned(NPC.Objects[Idx]) then
+			(NPC.Objects[Idx] AS TNPC).Free;
 	NPC.Free;
 	NPCLabel.Free;
 	CList.Free;
 	Mob.Free;
 {NPCイベント追加}
+
+	for Idx := TimerAct.Count-1 downto 0 do
+		if Assigned(TimerAct.Objects[Idx]) then
+			(TimerAct.Objects[Idx] AS NTimer).Free;
 	TimerAct.Free;
+	for Idx := TimerDef.Count-1 downto 0 do
+		if Assigned(TimerDef.Objects[Idx]) then
+			(TimerDef.Objects[Idx] AS NTimer).Free;
 	TimerDef.Free;
 {NPCイベント追加ココまで}
+
+	//Block is an array it's extents are an odd range, need to find out
+	// if the "border" around the block needs freeing, or not.
+	for Idx := BlockSize.X-1 downto 0 do
+		for Idy := BlockSize.Y-1 downto 0 do
+			if Assigned(Block[Idx][Idy]) then
+				(Block[Idx][Idy] AS TBlock).Free;
+
 
 	inherited;
 end;
@@ -9891,5 +9984,109 @@ begin
 end;
 {ギルド機能追加ココまで}
 //==============================================================================
+
+
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/24
+
+Will fold in owned object creation into the constructor, is a placeholder right
+now.
+*-----------------------------------------------------------------------------*)
+Constructor TNPC.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+End;(* TNPC.Create
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor TNPC.Destroy;
+Var
+	Idx : Integer;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+
+	Item.Free;
+	for Idx := Low(ShopItem) to High(ShopItem) do
+		if Assigned(ShopItem[Idx]) then
+			ShopItem[Idx].Free;
+
+
+	inherited;
+End;(* TNPC.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+
+(*-----------------------------------------------------------------------------*
+Placeholder..
+*-----------------------------------------------------------------------------*)
+Constructor NTimer.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+
+End;(* NTimer.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor NTimer.Destroy;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	{
+	SetLength(Idx,0);
+	SetLength(Step,0)
+	SetLength(Done,0)
+	}
+
+	inherited;
+End;(* NTimer.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Constructor TPet.Create;
+Begin
+	inherited;
+	// Always call ancestor's routines first in Create
+
+	//CR will create items here, later.
+End;(* TPet.Create
+*-----------------------------------------------------------------------------*)
+
+(*-----------------------------------------------------------------------------*
+
+*-----------------------------------------------------------------------------*)
+Destructor TPet.Destroy;
+Var
+	Idx : Integer;
+Begin
+	// Always call ancestor's routines after you clean up
+	// objects you created as part of this class
+	for Idx := Low(Item) to High(Item) do
+		if Assigned(Item[Idx]) then
+			Item[Idx].Free;
+
+	inherited;
+End;(* TPet.Destroy
+*-----------------------------------------------------------------------------*)
+
+
+
+
+
+
+
 end.
- 
+

@@ -3091,7 +3091,8 @@ Begin(* Proc sv3PacketProcess() *)
 											ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FA‚É30%‰ÁŽZ
 										end;
 
-										tm.Mob.AddObject(ts.ID, ts);
+										// Link monster to Map it's now on.
+										tm.Mob.AddObject(ts.ID, ts); //Owned here.
 										tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 
 										ts.isSummon := True;
