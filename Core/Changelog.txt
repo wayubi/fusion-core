@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Fixed cart lockup/dupe bug (#230). [Colus]
 - 01-22-04: Fixed Adrenaline Rush Effect doesn't wear off with weapon change. [AlexKreuz]
 - 01-22-04: Fixed Spear Quicken Effect doesn't wear off with weapon change. [AlexKreuz]
 - 01-22-04: Fixed 2HQ Effect doesn't wear off with weapon change. [AlexKreuz]

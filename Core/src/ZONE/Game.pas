@@ -462,8 +462,9 @@ begin
 				Socket.SendBuf(buf, 4);
 
 				//カートデータ送信
-
-				if (tc.Option = 8) then begin
+        // Colus, 20040123: Other carts weren't getting checked.
+        w3 := tc.Option and $0788;
+				if (w3 <> 0) then begin
 				    SendCart(tc);
 				end;
 
@@ -6758,6 +6759,7 @@ end;
 				//SendBCmd(tc.MData, tc.Point, 13);
 																SendBCmd(tm, tc.Point, 13);
 					SendCStat(tc);
+
                         end;
 		//--------------------------------------------------------------------------
 {露店スキル追加}
