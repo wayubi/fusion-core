@@ -909,6 +909,7 @@ type TNPC = class
 	//skill
 	Count       :word;
 	CData       :TChara;
+        MData       :TMob;    
 {追加}
 	MSkill      :Word;
 {追加ココまで}
@@ -1227,8 +1228,6 @@ var
 	DealingList :TIntList32;
 	DealMaxID  :cardinal;
 {取引機能追加ココまで}
-	{Monster Skill Database}
-    MobAIDB      :TIntList32;
 {氏{箱追加}
 	SummonMobList :TIntList32;
 	SummonIOBList :TIntList32;
@@ -1251,6 +1250,8 @@ var
 	ItemDBName :TStringList;
 	MobDB      :TIntList32;
 	MobDBName  :TStringList;
+        {Monster Skill Database}
+        MobAIDB    :TIntList32;
   SlaveDBName:TStringList;
   MArrowDB   :TIntList32;
   IDTableDB  :TIntList32;

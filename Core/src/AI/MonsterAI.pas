@@ -10,9 +10,12 @@ uses
         procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
         procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-
+        procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
+
+        function MonsterNPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
+        function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
 
 dmg           :array[0..7] of integer;
@@ -294,8 +297,8 @@ end;
 
 procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
 
-var
-        tc:TChara;
+//var
+        //tc:TChara;
 
 
 begin
@@ -303,7 +306,8 @@ begin
                 if tsAI.PercentChance[0] > Random(100) then begin
                         DebugOut.Lines.Add('Success');
                         MobSkills(tm, ts, tsAI, Tick);
-                end else DebugOut.Lines.Add('Fail');;
+                        MobFieldSkills(tm, ts, tsAI, Tick);
+                end else DebugOut.Lines.Add('Fail');
         end;
 end;
 
@@ -314,6 +318,7 @@ var
         tc  :TChara;
         i   :integer;
 begin
+
         for i := 0 to 3 do begin
         tc := ts.AData;
         case tsAI.Skill[i] of
@@ -353,6 +358,53 @@ begin
 
 end;
 
+//------------------------------------------------------------------------------
+
+procedure MobFieldSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+var
+        tl  :TSkillDB;
+        sl  :TStringList;
+        tc  :TChara;
+        i   :integer;
+        j   :integer;
+        AttackData :TChara;
+        xy  :TPoint;
+	bb  :array of byte;
+        tn  :TNPC;
+
+begin
+
+        for i := 0 to 3 do begin
+                tc := ts.AData;
+                case tsAI.Skill[i] of
+                        83:     {Meteor}
+                        begin
+                                AttackData := ts.AData;
+
+                                xy.X := AttackData.Point.X;
+                                xy.Y := AttackData.Point.Y;
+
+                                //Place the Effect
+                                tn := SetSkillUnit(tm, ts.ID, xy, Tick, $88, 0, 3000);
+
+                                tn.MSkill := tsAI.Skill[i];
+                                tn.MUseLV := tsAI.SkillLV[i];
+
+                                for j := 1 to tc.Skill[83].Data.Data2[tsAI.SkillLV[i]] do begin;
+                                        WFIFOW( 0, $0117);
+                                        WFIFOW( 2, tsAI.Skill[i]);
+                                        WFIFOL( 4, ts.ID);
+                                        WFIFOW( 8, tsAI.SkillLV[i]);
+                                        WFIFOW(10, (AttackData.Point.X - 4 + Random(12)));
+                                        WFIFOW(12, (AttackData.Point.Y - 4 + Random(12)));
+                                        WFIFOL(14, 1);
+                                        SendBCmd(tm, xy, 18);
+                                end;
+
+                        end;
+                end;
+        end;
+end;
 //------------------------------------------------------------------------------
 
 procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
@@ -652,7 +704,346 @@ begin
 	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
+function MonsterNPCAction(tm:TMap; tn:TNPC; Tick:cardinal) : Integer;
 
+var
+	k,m,c,c1: Integer;
+	i,j:Integer;
+	i1,j1,k1:integer;
+	i2,j2,k2:integer;
+        p1,p2:integer;
+	tc1:TChara;
+        ts:TMob;
+	ts1:TMob;
+        tc2:TChara;
+	tl	:TSkillDB;
+	xy:TPoint;
+        b:integer;
+	bb:array of byte;
+	sl:TStringList;
+        sl2:TStringList;
+	flag:Boolean;
+        mi :MapTbl;
+        tsAI :TMobAIDB;
+
+begin
+        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+	k := 0;
+	if (tn.CType = 3) and (tn.Tick <= Tick) then begin
+                if tn.JID  = $F1 then begin
+                        WFIFOW(0, $00a1);
+		        WFIFOL(2, 1118);
+		        SendBCmd(tm, tn.Point, 6);
+                        with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
+			        Delete(IndexOf(1118));
+                        tn.Free;
+                end;
+		//アイテム撤去
+		WFIFOW(0, $00a1);
+		WFIFOL(2, tn.ID);
+		SendBCmd(tm, tn.Point, 6);
+		//アイテム削除
+		tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
+		with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
+			Delete(IndexOf(tn.ID));
+			tn.Free;
+	end else if (tn.CType = 4) then begin //スキル効能地
+		if tn.Tick <= Tick then begin
+			case tn.JID of
+                                141:
+                                        begin
+						DelSkillUnit(tm, tn);
+						Dec(k);
+                        			tm.gat[tn.Point.X][tn.Point.Y] := 0;
+                    			end;
+				$81://ポータル発動前->発動後
+					begin
+						tn.JID := $80;
+						WFIFOW(0, $00c3);
+						WFIFOL(2, tn.ID);
+						WFIFOB(6, 0);
+						WFIFOB(7, tn.JID);
+						SendBCmd(tm, tn.Point, 8);
+						tn.Tick := Tick + 20000;
+					end;
+				$8F://ブラスト発動前
+					begin
+						tn.JID := $74;
+						WFIFOW(0, $00c3);
+						WFIFOL(2, tn.ID);
+						WFIFOB(6, 0);
+						WFIFOB(7, tn.JID);
+						SendBCmd(tm, tn.Point, 8);
+						tn.Tick := Tick + 2000;
+					end;
+				else
+					begin
+						//スキル効能地撤去
+						DelSkillUnit(tm, tn);
+						Dec(k);
+					end;
+			end;
+		end else begin
+			//スキル効能地効果 Chara踏み型
+			c := 0;
+			while (c >= 0) and (c < tm.Block[tn.Point.X div 8][tn.Point.Y div 8].CList.Count) do begin
+				tc1 := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].CList.Objects[c] as TChara;
+				Inc(c);
+				if tc1 = nil then continue;
+				if (tc1.pcnt = 0) and (tc1.Point.X = tn.Point.X) and (tc1.Point.Y = tn.Point.Y) then begin
+					case tn.JID of
+						$80: //ポータル発動後
+							begin
+                                                                {チャットルーム機能追加}
+								if (tc1.ChatRoomID <> 0) then continue;
+                                                                {チャットルーム機能追加ココまで}
+								SendCLeave(tc1, 0);
+								tc1.tmpMap := tn.WarpMap;
+								tc1.Point := tn.WarpPoint;
+								MapMove(tc1.Socket, tn.WarpMap, tn.WarpPoint);
+								Dec(tn.Count);
+								if tn.Count = 0 then begin //ここの処理がうまくいくかどうか謎
+									DelSkillUnit(tm, tn);
+									Dec(k);
+									c := -1;
+									continue;
+								end else begin
+									Dec(c);
+								end;
+							end;
+					end;
+				end;
+			end;
+
+			ts := tn.MData;
+			tl := SkillDB.IndexOfObject(tn.MSkill) as TSkillDB;
+			if tl <> nil then begin
+				m := tl.Range2;
+			end else begin
+				m := 0;
+			end;
+
+                        sl2 := TStringList.Create;
+                        for p1 := (tn.Point.Y - m) div 8 to (tn.Point.Y + m) div 8 do begin
+				for i1 := (tn.Point.X - m) div 8 to (tn.Point.X + m) div 8 do begin
+					for c1 := 0 to tm.Block[i1][p1].Clist.Count -1 do begin
+                                                if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
+						tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
+						if tc2 = nil then Continue;
+						if (abs(tc2.Point.X - tn.Point.X) <= m) and (abs(tc2.Point.Y - tn.Point.Y) <= m) then
+							sl2.AddObject(IntToStr(tc2.ID),tc2);
+						if (tc2.Point.X = tn.Point.X) and (tc2.Point.Y = tn.Point.Y) then
+							flag := True;
+					end;
+				end;
+			end;
+			end;
+                        if sl2.Count <> 0 then begin
+                                for c1 := 0 to sl2.Count - 1 do begin
+                                        tc2 := sl2.Objects[c1] as TChara;
+                                        case tn.JID of
+
+                                                $74://ブラストマイン発動
+							begin
+								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
+								dmg[0] := dmg[0] * tn.Count;
+								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+								tn.Tick := Tick;
+								WFIFOW( 0, $01de);
+								WFIFOW( 2, $74);
+								WFIFOL( 4, tn.ID);
+								WFIFOL( 8, tc2.ID);
+								WFIFOL(12, Tick);
+								WFIFOL(16, tc1.aMotion);
+								WFIFOL(20, tc2.dMotion);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
+								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
+							end;
+
+						$86: //LoV
+							begin
+								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									//dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									//dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
+									if dmg[0] < 1 then dmg[0] := 1;
+									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+									WFIFOW( 0, $01de);
+									WFIFOW( 2, 85);
+									WFIFOL( 4, tn.ID);
+									WFIFOL( 8, tc2.ID);
+									WFIFOL(12, Tick);
+									WFIFOL(16, tc1.aMotion);
+									WFIFOL(20, tc2.dMotion);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tn.Point, 33);
+									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
+									if c1 = (sl2.Count -1) then begin
+										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										if tn.Count = 3 then tn.Tick := Tick
+									end;
+								end;
+							end;
+						$87: //FP
+							begin
+								//DebugOut.Lines.Add('Hit') ;
+								{if not flag then Break;} //踏んでない
+								tn.Tick := Tick;
+								dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tc1.MATKFix div 500 + 50;
+								if dmg[0] < 51 then dmg[0] := 51;
+								dmg[0] := dmg[0] * tl.Data2[tn.Count];
+								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+								//無理やりエフェクトを出してみる
+								{SetSkillUnit(tm,tc1.ID,tn.Point,Tick,$88,0,4000);}
+
+								WFIFOW( 0, $01de);
+								WFIFOW( 2, tn.JID);
+								WFIFOL( 4, tn.ID);
+								WFIFOL( 8, tc2.ID);
+								WFIFOL(12, Tick);
+								WFIFOL(16, tc1.aMotion);
+								WFIFOL(20, tc2.dMotion);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, tl.Data2[tn.Count]);
+								WFIFOB(32, 8);
+								SendBCmd(tm, tn.Point, 33);
+								DamageProcess2(tm,tc1,tc2,dmg[0],Tick);
+							end;
+
+                                                $88: //Meteor
+							begin
+								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
+									//dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									//dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									//dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
+                                                                        MobSkillDamageCalc(tm, tc2, tn.MData, tsAI, Tick);
+									if dmg[0] < 1 then dmg[0] := 1;
+									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+									WFIFOW( 0, $01de);
+									WFIFOW( 2, 83);
+									WFIFOL( 4, tn.ID);
+									WFIFOL( 8, tc2.ID);
+									WFIFOL(12, Tick);
+									WFIFOL(16, tc1.aMotion);
+									WFIFOL(20, tc2.dMotion);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
+									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
+									if c1 = (sl2.Count -1) then begin
+										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										if tn.Count = 3 then tn.Tick := Tick
+									end;
+								end;
+                                                        end;
+                                                end;
+                                        end;
+                                end;
+                        end;
+                end;
+        end;
+
+
+function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
+var
+        {Random Variables}
+	i :integer;
+        w :Cardinal;
+begin
+	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
+
+  if Dmg = 0 then begin  //Miss, no damage
+		Result := False;
+		Exit;
+	end else begin
+    // AlexKreuz: Hidden character unhides when they
+    // get hit.
+    if tc1.Skill[51].Tick > Tick then begin
+      tc1.Skill[51].Tick := Tick;
+      tc1.SkillTick := Tick;
+    end;
+  end;
+
+	if (tc1.Stat1 <> 0) then tc1.BodyTick := Tick + tc.aMotion;
+
+	WFIFOW(0, $0088);
+	WFIFOL(2, tc1.ID);
+	WFIFOW(6, tc1.Point.X);
+	WFIFOW(8, tc1.Point.Y);
+	SendBCmd(tm, tc1.Point, 10);
+
+	tc1.HP := tc1.HP - Dmg;
+        SendCStat1(tc1, 0, 5, tc1.HP);
+	//for i := 0 to 31 do begin
+		//if (ts.EXPDist[i].CData = nil) or (ts.EXPDist[i].CData = tc) then begin
+			//ts.EXPDist[i].CData := tc;
+			//Inc(ts.EXPDist[i].Dmg, Dmg);
+			//break;
+		//end;
+	//end;
+	//if ts.Data.MEXP <> 0 then begin
+		//for i := 0 to 31 do begin
+			//if (ts.MVPDist[i].CData = nil) or (ts.MVPDist[i].CData = tc) then begin
+				//ts.MVPDist[i].CData := tc;
+				//Inc(ts.MVPDist[i].Dmg, Dmg);
+				//break;
+			//end;
+		//end;
+	//end;
+
+	if tc1.HP > 0 then begin
+		if EnableMonsterKnockBack then begin
+			tc1.pcnt := 0;
+			if tc1.ATarget = 0 then begin
+				w := Tick + tc1.dMotion + tc.aMotion;
+				tc1.ATick := Tick + tc1.dMotion + tc.aMotion;
+			end else begin
+				w := Tick + tc1.dMotion div 2;
+			end;
+			if w > tc1.DmgTick then tc1.DmgTick := w;
+		end else begin
+			if tc1.ATarget = 0 then tc1.ATick := Tick;
+			if tc1.ATarget <> tc.ID then
+				tc1.pcnt := 0
+			else if tc1.pcnt <> 0 then begin
+				//DebugOut.Lines.Add('Character Knockback!');
+				//SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
+				SendBCmd(tm, tc1.Point, 58, tc,True);
+			end;
+			tc1.DmgTick := 0;
+		end;
+		//ts.ATarget := tc.ID;
+		//ts.AData := tc;
+		//ts.isLooting := False;
+
+		Result := False;
+	end else begin
+                tc1.Sit := 1;
+                tc1.HP := 0;
+                SendCStat1(tc1, 0, 5, tc1.HP);
+                WFIFOW(0, $0080);
+                WFIFOL(2, tc1.ID);
+                WFIFOB(6, 1);
+                tc1.Socket.SendBuf(buf, 7);
+                WFIFOW( 0, $0080);
+                WFIFOL( 2, tc1.ID);
+                WFIFOB( 6, 1);
+                 SendBCmd(tm, tc1.Point, 7);
+		Result := True;
+	end;
+end;
 
 end.
 

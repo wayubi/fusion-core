@@ -10472,30 +10472,32 @@ begin
                                                 $88: //Meteor
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
-									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-									if dmg[0] < 1 then dmg[0] := 1;
-									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
-									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $01de);
-									WFIFOW( 2, 83);
-									WFIFOL( 4, tn.ID);
-									WFIFOL( 8, ts1.ID);
-									WFIFOL(12, Tick);
-									WFIFOL(16, tc1.aMotion);
-									WFIFOL(20, ts1.Data.dMotion);
-									WFIFOL(24, dmg[0]);
-									WFIFOW(28, tn.MUseLV);
-									WFIFOW(30, tl.Data2[tn.MUseLV]);
-									WFIFOB(32, 8);
-                                                                        SendBCmd(tm, tn.Point, 33);
-									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
-									if c = (sl.Count -1) then begin
-										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 3 then tn.Tick := Tick
-									end;
+                                                                        if tc1 <> nil then begin
+									        dmg[0] := tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1) * tc1.MATKFix div 100 * tl.Data1[tn.MUseLV] div 100;
+									        dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+									        dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+									        if dmg[0] < 1 then dmg[0] := 1;
+									        dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+									        dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									        if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+									        WFIFOW( 0, $01de);
+									        WFIFOW( 2, 83);
+									        WFIFOL( 4, tn.ID);
+									        WFIFOL( 8, ts1.ID);
+									        WFIFOL(12, Tick);
+									        WFIFOL(16, tc1.aMotion);
+									        WFIFOL(20, ts1.Data.dMotion);
+									        WFIFOL(24, dmg[0]);
+									        WFIFOW(28, tn.MUseLV);
+									        WFIFOW(30, tl.Data2[tn.MUseLV]);
+									        WFIFOB(32, 8);
+                                                                                SendBCmd(tm, tn.Point, 33);
+									        DamageProcess1(tm,tc1,ts1,dmg[0],tick);
+									        if c = (sl.Count -1) then begin
+										        Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+										        if tn.Count = 3 then tn.Tick := Tick
+									        end;
+                                                                        end;
 								end;
 							end;
                                                 $89: //Quagmire
