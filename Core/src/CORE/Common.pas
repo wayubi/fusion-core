@@ -2968,20 +2968,12 @@ begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
 		SkillTick := $FFFFFFFF;
-		for i := 1 to 336 do begin
+		for i := 1 to 330 do begin
 			if Skill[i].Tick > Tick then begin
 				if SkillTick > Skill[i].Tick then begin
 					SkillTick := Skill[i].Tick;
 					SkillTickID := i;
 				end;
-                                end else begin 
-                                if Skill[i].Tick <> 0 then begin 
-                                        if SkillTick > Skill[i].Tick then begin 
-                                                SkillTick := Skill[i].Tick; 
-                                                SkillTickID := i; 
-                                        end; 
-                                end; 
-
 			end;
 		end;
 	end;

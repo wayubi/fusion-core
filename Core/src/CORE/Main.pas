@@ -11867,13 +11867,15 @@ begin
                                                         end;
 					end;
 					//アイコン表示解除
-		                        if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
-						//DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
-						WFIFOW(0, $0196);
-						WFIFOW(2, tc.Skill[SkillTickID].Data.Icon);
-						WFIFOL(4, tc.ID);
-						WFIFOB(8, 0);
-						Socket.SendBuf(buf, 9);
+          if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
+            if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
+  						//DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
+	  					WFIFOW(0, $0196);
+		  				WFIFOW(2, tc.Skill[SkillTickID].Data.Icon);
+			  			WFIFOL(4, tc.ID);
+				  		WFIFOB(8, 0);
+					  	Socket.SendBuf(buf, 9);
+            end;
 					end;
 
 					CalcStat(tc, Tick);
