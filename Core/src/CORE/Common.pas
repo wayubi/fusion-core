@@ -3414,13 +3414,13 @@ begin
   if (mi.PvP = true) and (tc1 <> nil) then begin
     tc1.PvPPoints := tc1.PvPPoints + 1;
     tc.PvPPoints := tc.PvPPoints - 5;
+    CalcPvPRank(tm);
     if tc.PvPPoints < 0 then begin
         SendCLeave(tc.Socket.Data, 2);
         tc.Map := tc.SaveMap;
         tc.Point := tc.SavePoint;
         MapMove(tc.Socket, tc.Map, tc.Point);
     end;
-    CalcPvPRank(tm);
   end;
 
 end;

@@ -3927,16 +3927,16 @@ with tc do begin
                         if tn.CType = 3 then begin
                             WFIFOW(0, $00a1);
                             WFIFOL(2, tn.ID);
-                            Socket.SendBuf(buf, 6);
+                            if tc.Login <> 0 then Socket.SendBuf(buf, 6);
                         end else if tn.CType = 4 then begin
                             WFIFOW(0, $0120);
                             WFIFOL(2, tn.ID);
-                            Socket.SendBuf(buf, 6);
+                            if tc.Login <> 0 then Socket.SendBuf(buf, 6);
                         end else begin
                             WFIFOW(0, $0080);
                             WFIFOL(2, tn.ID);
                             WFIFOB(6, 0);
-                            Socket.SendBuf(buf, 7);
+                            if tc.Login <> 0 then Socket.SendBuf(buf, 7);
                         end;
                     end;
                     
