@@ -1195,6 +1195,27 @@ else if (Copy(str, 1, 4) = 'ban ') then begin
       end;
     end;
   finally
+  end
+end
+
+else if (Copy(str, 1, 5) = 'kick ') then begin
+  s := Copy(str, 6, 256);
+  s := Trim(s);
+
+  try
+    if CharaName.Indexof(s) <> -1 then begin
+      tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+      if tc1.Login = 2 then begin
+        tc1.Socket.Close;
+
+        str := tc.Name +' has kicked ' + s;
+        WFIFOW (0, $009a);
+        WFIFOW (2, 256);
+        WFIFOS (4, str, 256);
+        tc.socket.sendbuf(buf, 256);
+      end;
+    end;
+  finally
 end;
 
 					end else if (Copy(str, 1, 4) = 'job ') and ((DebugCMD and $0010) <> 0) and (tid.ChangeJob = 1) then begin

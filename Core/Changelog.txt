@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-25-03: Added "#kick charaname" command. [AlexKreuz]
 - 12-25-03: Added "#ban charaname" command. [AlexKreuz]
 - 12-25-03: Fixed Empelium can be hit by LoV/Storm Gust without guild. [AlexKreuz]
 - 12-25-03: Added #banish when the user is offline. [AlexKreuz]
