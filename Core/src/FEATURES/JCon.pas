@@ -285,6 +285,7 @@ uses
     	frmMain.Edit20.Text := IntToStr(sv1port);
     	frmMain.Edit21.Text := IntToStr(sv2port);
 	    frmMain.Edit22.Text := IntToStr(sv3port);
+        frmMain.Edit5.Text := IntToStr(wacport);
 
         frmMain.ComboBox1.ItemIndex := abs(StrToInt(BoolToStr(UseSQL)));
         frmMain.Edit24.Text := DBHost;
@@ -344,6 +345,8 @@ uses
     		frmMain.sv2.Active := True;
 	    	frmMain.sv3.Active := True;
 	    end;
+
+        if (frmMain.Edit5.Text <> frmMain.Edit20.Text) and (frmMain.Edit5.Text <> frmMain.Edit21.Text) and (frmMain.Edit5.Text <> frmMain.Edit22.Text) then wacport := StrToInt(frmMain.Edit5.Text);
 
         UseSQL := StrToBool(IntToStr(abs(frmMain.ComboBox1.ItemIndex)));
         DBHost := frmMain.Edit24.Text;

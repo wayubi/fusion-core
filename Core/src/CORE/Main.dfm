@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 238
-  Top = 608
+  Left = 184
+  Top = 173
   Width = 408
   Height = 518
   Caption = '#33'
@@ -62,25 +62,25 @@ object frmMain: TfrmMain
       DesignSize = (
         392
         412)
-  object txtDebug: TMemo
-    Left = 0
+      object txtDebug: TMemo
+        Left = 0
         Top = 0
         Width = 392
         Height = 383
         Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = 14071432
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -12
-    Font.Name = 'Trebuchet MS'
-    Font.Style = []
-    ParentFont = False
-    ReadOnly = True
-    ScrollBars = ssVertical
+        Color = 14071432
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
+        ReadOnly = True
+        ScrollBars = ssVertical
         TabOrder = 0
-  end
+      end
       object Edit1: TEdit
-    Left = 0
+        Left = 0
         Top = 385
         Width = 392
         Height = 26
@@ -92,43 +92,43 @@ object frmMain: TfrmMain
         Font.Style = []
         MaxLength = 200
         ParentFont = False
-    TabOrder = 1
+        TabOrder = 1
         OnKeyPress = Edit1KeyPress
       end
-    object cmdStart: TButton
-      Left = 5
+      object cmdStart: TButton
+        Left = 5
         Top = 61
-      Width = 68
-      Height = 24
-      Caption = 'Start'
-      Enabled = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Trebuchet MS'
-      Font.Style = []
-      ParentFont = False
+        Width = 68
+        Height = 24
+        Caption = 'Start'
+        Enabled = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 2
         Visible = False
-      OnClick = cmdStartClick
-    end
-    object cmdStop: TButton
+        OnClick = cmdStartClick
+      end
+      object cmdStop: TButton
         Left = 5
         Top = 85
-      Width = 68
-      Height = 24
-      Caption = 'Stop'
-      Enabled = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Trebuchet MS'
-      Font.Style = []
-      ParentFont = False
+        Width = 68
+        Height = 24
+        Caption = 'Stop'
+        Enabled = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 3
         Visible = False
-      OnClick = cmdStopClick
-    end
+        OnClick = cmdStopClick
+      end
       object Button1: TButton
         Left = 5
         Top = 109
@@ -136,12 +136,12 @@ object frmMain: TfrmMain
         Height = 24
         Anchors = [akTop, akRight]
         Caption = 'Send Message'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Trebuchet MS'
-      Font.Style = []
-      ParentFont = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 4
         Visible = False
         OnClick = Button1Click
@@ -161,7 +161,7 @@ object frmMain: TfrmMain
         OnChange = PageControl2Change
         object TabSheet4: TTabSheet
           Caption = 'Server Options'
-      object Label17: TLabel
+          object Label17: TLabel
             Left = 4
             Top = 8
             Width = 57
@@ -315,6 +315,13 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'Enable Lower Dyes'
           end
+          object Label60: TLabel
+            Left = 260
+            Top = 136
+            Width = 64
+            Height = 18
+            Caption = 'W.A.C. Port'
+          end
           object Edit17: TEdit
             Left = 4
             Top = 24
@@ -358,7 +365,7 @@ object frmMain: TfrmMain
             TabOrder = 1
           end
           object Button5: TButton
-            Left = 260
+            Left = 276
             Top = 328
             Width = 75
             Height = 25
@@ -518,6 +525,13 @@ object frmMain: TfrmMain
               'No'
               'Yes')
           end
+          object Edit5: TEdit
+            Left = 260
+            Top = 152
+            Width = 121
+            Height = 26
+            TabOrder = 23
+          end
         end
         object TabSheet5: TTabSheet
           Caption = 'Game Options'
@@ -630,8 +644,8 @@ object frmMain: TfrmMain
           object Label39: TLabel
             Left = 4
             Top = 184
-        Width = 70
-        Height = 18
+            Width = 70
+            Height = 18
             Caption = 'Default Zeny'
           end
           object Label40: TLabel
@@ -852,8 +866,8 @@ object frmMain: TfrmMain
             Items.Strings = (
               'No'
               'Yes')
-      end
-    end
+          end
+        end
       end
     end
     object TabSheet3: TTabSheet
@@ -884,7 +898,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-    end
+      end
       object Label3: TLabel
         Left = 264
         Top = 88
@@ -1048,12 +1062,12 @@ object frmMain: TfrmMain
         Height = 18
         Caption = 'Delete Character 9:'
         Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
+        Font.Color = clWindowText
+        Font.Height = -12
         Font.Name = 'Trebuchet MS'
-      Font.Style = []
-      ParentFont = False
-    end
+        Font.Style = []
+        ParentFont = False
+      end
       object Label16: TLabel
         Left = 8
         Top = 8
@@ -1061,11 +1075,11 @@ object frmMain: TfrmMain
         Height = 18
         Caption = 'Account List:'
         Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
+        Font.Color = clWindowText
+        Font.Height = -12
         Font.Name = 'Trebuchet MS'
-      Font.Style = []
-      ParentFont = False
+        Font.Style = []
+        ParentFont = False
       end
       object ListBox1: TListBox
         Left = 8
@@ -1094,7 +1108,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-      TabOrder = 1
+        TabOrder = 1
       end
       object Edit3: TEdit
         Left = 264

@@ -193,6 +193,8 @@ type
     S1: TMenuItem;
     ConnecttoISCS1: TMenuItem;
     EnableWebAccountCreator1: TMenuItem;
+    Label60: TLabel;
+    Edit5: TEdit;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
