@@ -69,6 +69,8 @@ var
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
     GM_AEGIS_BB : Byte;
+    GM_AEGIS_ITEM : Byte;
+    GM_AEGIS_MONSTER : Byte;
     GM_AEGIS_HIDE : Byte;
     GM_AEGIS_RESETSTATE : Byte;
     GM_AEGIS_RESETSKILL : Byte;
@@ -172,6 +174,8 @@ var
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
     function command_aegis_nb(str : String) : String;
+    function command_aegis_item(tc : TChara; str : String) : String;
+    function command_aegis_monster(tc : Tchara; str : String) : String;
 
     function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_kami(tc : TChara; str : String) : String;
@@ -275,6 +279,8 @@ implementation
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
         GM_AEGIS_BB := StrToIntDef(sl.Values['AEGIS_BB'], 1);
+        GM_AEGIS_ITEM := StrToIntDef(sl.Values['AEGIS_ITEM'], 1);
+        GM_AEGIS_MONSTER := StrToIntDef(sl.Values['AEGIS_MONSTER'], 1);
         GM_AEGIS_HIDE := StrToIntDef(sl.Values['AEGIS_HIDE'], 1);
         GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_RESETSKILL := StrToIntDef(sl.Values['AEGIS_RESETSKILL'], 1);
@@ -390,6 +396,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
         ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
         ini.WriteString('Aegis GM Commands', 'AEGIS_BB', IntToStr(GM_AEGIS_BB));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_ITEM', IntToStr(GM_AEGIS_ITEM));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_MONSTER', IntToStr(GM_AEGIS_MONSTER));
         ini.WriteString('Aegis GM Commands', 'AEGIS_HIDE', IntToStr(GM_AEGIS_HIDE));
         ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSTATE', IntToStr(GM_AEGIS_RESETSTATE));
         ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSKILL', IntToStr(GM_AEGIS_RESETSKILL));
@@ -541,11 +549,13 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
             else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
             else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
-            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_SKPOINT(tc, str)
+            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_skpoint(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc. ID, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
+            else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level (tc.ID, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
+            else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level (tc.ID, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2587,6 +2597,211 @@ Called when we're shutting down the server *only*
     	end;
 
         Result := 'GM_AEGIS_BB Success.';
+    end;
+
+    function command_aegis_item(tc : TChara; str : String) : String;
+    var
+        td : TItemDB;
+        j, k : Integer;
+    begin
+        Result := 'GM_AEGIS_ITEM Failure.';
+        td := ItemDBName.Objects[ItemDBName.IndexOf(str)] as TItemDB;
+
+        if td.IEquip then begin
+            j := 1;
+        end else begin
+            j := 30;
+        end;
+
+        if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) * cardinal(j) then begin
+            k := SearchCInventory(tc, td.ID, td.IEquip);
+            if k <> 0 then begin
+                if tc.Item[k].Amount + j > 30000 then Exit;
+                tc.Item[k].ID := td.ID;
+                tc.Item[k].Amount := tc.Item[k].Amount + j;
+                tc.Item[k].Equip := 0;
+                tc.Item[k].Identify := 1;
+                tc.Item[k].Refine := 0;
+                tc.Item[k].Attr := 0;
+                tc.Item[k].Card[0] := 0;
+                tc.Item[k].Card[1] := 0;
+                tc.Item[k].Card[2] := 0;
+                tc.Item[k].Card[3] := 0;
+                tc.Item[k].Data := td;
+                tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
+                SendCStat1(tc, 0, $0018, tc.Weight);
+                SendCGetItem(tc, k, j);
+                Result := 'GM_AEGIS_ITEM Success.';
+            end;
+        end else begin
+            WFIFOW( 0, $00a0);
+            WFIFOB(22, 2);
+            tc.Socket.SendBuf(buf, 23);
+        end;
+    end;
+
+    function command_aegis_monster(tc : TChara; str : String) : String;
+    var
+        ts, ts1 : TMob;
+        tm : TMap;
+        tss : TSlaveDB;
+        h, i, j, k : Integer;
+    begin
+        Result := 'GM_AEGIS_MONSTER Failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        ts := TMob.Create;
+        ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
+        ts.ID := NowMobID;
+        Inc(NowMobID);
+        ts.Name := ts.Data.JName;
+        ts.JID := ts.Data.ID;
+        ts.Map := tc.Map;
+        ts.Data.isLink :=false;
+        //ts.Data.isLoot :=false;
+        //プレイヤーの周囲9マスのどこかに召還
+        ts.Point.X := tc.Point.X + Random(2) - 1;
+        ts.Point.Y := tc.Point.Y + Random(2) - 1;
+
+        ts.Dir := Random(8);
+        ts.HP := ts.Data.HP;
+        ts.Speed := ts.Data.Speed;
+
+        //沸き間隔を極大に設定
+        //ここはちょっと処理が適当かな？
+
+        ts.SpawnDelay1 := $7FFFFFFF;
+        ts.SpawnDelay2 := 0;
+
+        ts.SpawnType := 0;
+        ts.SpawnTick := 0;
+        if ts.Data.isDontMove then
+            ts.MoveWait := $FFFFFFFF
+        else
+            ts.MoveWait := timeGetTime();
+        ts.ATarget := 0;
+        ts.ATKPer := 100;
+        ts.DEFPer := 100;
+        ts.DmgTick := 0;
+
+        ts.Element := ts.Data.Element;
+
+        if (SummonMonsterName = true) then begin
+            ts.Name := ts.Data.JName;
+        end else begin
+            ts.Name := 'Summon Monster';
+        end;
+
+        if (SummonMonsterExp = false) then begin
+            ts.Data.MEXP := 0;
+            ts.Data.EXP := 0;
+            ts.Data.JEXP := 0;
+        end;
+
+        if (SummonMonsterAgo = true) then begin
+            ts.isActive := true;
+        end else begin
+            ts.isActive := ts.Data.isActive;
+        end;
+
+        ts.MoveWait := timeGetTime();
+
+        for j := 0 to 31 do begin
+            ts.EXPDist[j].CData := nil;
+            ts.EXPDist[j].Dmg := 0;
+        end;
+        if ts.Data.MEXP <> 0 then begin
+            for j := 0 to 31 do begin
+                ts.MVPDist[j].CData := nil;
+                ts.MVPDist[j].Dmg := 0;
+            end;
+            ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+        end;
+        ts.isSummon := True;
+        ts.EmperiumID := 0;
+
+        tm.Mob.AddObject(ts.ID, ts);
+        tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+
+        SendMData(tc.Socket, ts);
+        //周囲に送信
+        SendBCmd(tm,ts.Point,41,tc,False);
+
+        Result := 'GM_AEGIS_MONSTER Success.';
+
+        if (SummonMonsterMob = true) then begin
+            k := SlaveDBName.IndexOf(str);
+            if (k <> -1) then begin
+                ts.isLeader := true;
+
+                tss := SlaveDBName.Objects[k] as TSlaveDB;
+                if str = tss.Name then begin
+
+                    h := tss.TotalSlaves;
+                    ts.SlaveCount := h;
+                    repeat
+                        for i := 0 to 4 do begin
+                            if (tss.Slaves[i] <> -1) and (h <> 0) then begin
+                                ts1 := TMob.Create;
+                                ts1.Data := MobDBName.Objects[tss.Slaves[i]] as TMobDB;
+                                ts1.ID := NowMobID;
+                                Inc(NowMobID);
+                                ts1.Name := ts1.Data.JName;
+                                ts1.JID := ts1.Data.ID;
+                                ts1.LeaderID := ts.ID;
+                                ts1.Data.isLink := false;
+                                ts1.Map := ts.Map;
+                                ts1.Point.X := ts.Point.X;
+                                ts1.Point.Y := ts.Point.Y;
+                                ts1.Dir := ts.Dir;
+                                ts1.HP := ts1.Data.HP;
+                                if ts.Data.Speed < ts1.Data.Speed then begin
+                                    ts1.Speed := ts.Data.Speed;
+                                end else begin
+                                    ts1.Speed := ts1.Data.Speed;
+                                end;
+                                ts1.SpawnDelay1 := $7FFFFFFF;
+                                ts1.SpawnDelay2 := 0;
+                                ts1.SpawnType := 0;
+                                ts1.SpawnTick := 0;
+                                if ts1.Data.isDontMove then
+                                    ts1.MoveWait := $FFFFFFFF
+                                else
+                                    ts1.MoveWait := timeGetTime();
+                                ts1.ATarget := 0;
+                                ts1.ATKPer := 100;
+                                ts1.DEFPer := 100;
+                                ts1.DmgTick := 0;
+                                ts1.Element := ts1.Data.Element;
+                                ts1.isActive := false;
+                                for j := 0 to 31 do begin
+                                    ts1.EXPDist[j].CData := nil;
+                                    ts1.EXPDist[j].Dmg := 0;
+                                end;
+                                if ts1.Data.MEXP <> 0 then begin
+                                    for j := 0 to 31 do begin
+                                        ts1.MVPDist[j].CData := nil;
+                                        ts1.MVPDist[j].Dmg := 0;
+                                    end;
+                                        ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100; //FAに30%加算
+                                end;
+                                tm.Mob.AddObject(ts1.ID, ts1);
+                                tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
+                                ts1.isSummon := true;
+                                ts1.isSlave := true;
+                                ts1.EmperiumID := 0;
+
+                                SendMData(tc.Socket, ts1);
+                                //周囲に送信
+                                SendBCmd(tm,ts1.Point,41,tc,False);
+
+                                h := h - 1;
+                            end;
+                        end;
+                    until (h <= 0);
+                end;
+            end;
+        end;
     end;
 
     function command_athena_alive(tc : TChara) : String;
