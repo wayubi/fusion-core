@@ -2070,13 +2070,36 @@ begin
         for i := 0 to tc.Item[idx].Data.Slot - 1 do begin
         	td2 := ItemDB.IndexOfObject(tc.Item[idx].Card[i]) as TItemDB;
             if assigned(td2) then begin
-				for j := 1 to MAX_SKILL_NUMBER do begin
-					if td2.AddSkill[j] <> 0 then begin
-						//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
-        		        if (not DisableSkillLimit) then begin
-		                	if (td.IEquip) and (tc.Skill[j].Lv = 0) then begin
-								tc.Skill[j].Lv := td2.AddSkill[j];
-								tc.Skill[j].Card := True;
+            	if (td.IEquip) then begin
+
+					if td2.SplashAttack then SplashAttack := true;
+					if td2.SpecialAttack = 1 then tc.SpecialAttack := 1;
+		    		if td2.SpecialAttack = 2 then tc.SpecialAttack := 2;
+        	        if td2.NoJamstone then  NoJamstone := true;
+            	    if td2.AnolianReflect then AnolianReflect := true;
+                	if td2.FullRecover then FullRecover := true;
+	                if td2.FastWalk then FastWalk := true;
+    	            if td2.NoTarget then NoTarget := true;
+        	        if td2.LessSP then LessSP := true;
+            	    if td2.OrcReflect then OrcReflect := true;
+	                if td2.UnlimitedEndure then UnlimitedEndure := true;
+    	            if td2.DoppelgagnerASPD then DoppelgagnerASPD := true;
+        	        if td2.MagicReflect then MagicReflect := true;
+            	    if td2.NoCastInterrupt then  NoCastInterrupt := true;
+	                if td2.GhostArmor then GhostArmor := true;
+    	            if td2.SkillWeapon then SkillWeapon := true;
+        	        if td2.GungnirEquipped then GungnirEquipped := true;
+            	    if td2.LVL4WeaponASPD then LVL4WeaponASPD := true;
+                	if td2.PerfectDamage then PerfectDamage := true;
+
+					for j := 1 to MAX_SKILL_NUMBER do begin
+						if td2.AddSkill[j] <> 0 then begin
+                        	if (tc.Skill[j].Lv = 0) then begin
+								//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
+	        			        if (not DisableSkillLimit) then begin
+									tc.Skill[j].Lv := td2.AddSkill[j];
+									tc.Skill[j].Card := True;
+                                end;
 		                    end;
 						end;
 					end;
