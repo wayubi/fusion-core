@@ -1,3 +1,5 @@
+- 04-10-04: Started Fusion's own AI database. [Darkhelmet]
+- 04-10-04: Added IF_ENEMYCOUNT code. [Darkhelmet]
 - 04-10-04: Fixed Bug 689, Guildsmen average level not calculated on change. [AlexKreuz]
 - 04-10-04: Added Magic Crasher PVP (Bug#753-7). [Eliot]
 - 04-10-04: Added #mothball GM command (Because we need more useless commands). [AlexKreuz]

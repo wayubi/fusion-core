@@ -213,13 +213,14 @@ end;
 //------------------------------------------------------------------------------
 type TMobAIDBAegis = class
 // Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
+  ID  :cardinal;
         Number  :integer;
         Name    :string;
         Status  :string;
         SkillID :string;
         SkillLV :integer;
         Percent :integer;
-        Casting :integer;
+        //Casting :integer;
         Cast_Time :integer;
         Cool_Time :integer;
         Dispel  :string;

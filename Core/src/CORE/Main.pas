@@ -211,8 +211,8 @@ begin
         MobAIDBAegis:= TIntList32.Create;
         MobAIDBAegis.Sorted := true;
 
-        PharmacyDB := TIntList32.Create;
-        PharmacyDB.Sorted := true;
+       // PharmacyDB := TIntList32.Create;
+       // PharmacyDB.Sorted := true;
 
 	MobDBName := TStringList.Create;
 	MobDBName.CaseSensitive := True;
@@ -889,7 +889,7 @@ begin
         WarpDatabase.Free;
         MobAIDB.Free;
         MobAIDBAegis.Free;
-        PharmacyDB.Free;
+  //      PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
 	SkillDB.Free;
@@ -15872,7 +15872,7 @@ begin
                     SkillDBName.Clear; 
                     GSkillDB.Clear;
                     SlaveDBName.Clear;
-                    PharmacyDB.Clear;
+                    //PharmacyDB.Clear;
                     MobAIDB.Clear;
                     MobAIDBAegis.Clear;
                     MArrowDB.Clear;

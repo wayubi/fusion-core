@@ -1373,10 +1373,16 @@ end;
 //------------------------------------------------------------------------------
 procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
 var
-  sl:TStringList;
-  i,j:integer;
+  tc2 :TChara;
+  sl, sl2:TStringList;
+  k,m,c,c1: Integer;
+  p1,p2:integer;
+	i,j:Integer;
+	i1,j1,k1:integer;
+	i2,j2,k2:integer;
   HPCount:integer;
   tsAI2 :TMobAIDBAegis;
+  EnemyCount:word;
 
 begin
   sl := TStringList.Create;
@@ -1405,7 +1411,26 @@ begin
     end else if tsAI2.IfState = 'IF_HIDING' then begin
       if ts.Hidden = true then CheckSkill(tm, ts, tsAI2, Tick);
     end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
-
+    end else if tsAI2.IfState = 'IF_ENEMYCOUNT' then begin
+      sl2 := TStringList.Create;
+      m := 9;
+      // Get Players in Area
+      for p1 := (ts.Point.Y - m) div 8 to (ts.Point.Y + m) div 8 do begin
+				for i1 := (ts.Point.X - m) div 8 to (ts.Point.X + m) div 8 do begin
+					for c1 := 0 to tm.Block[i1][p1].Clist.Count -1 do begin
+            if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
+						  tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
+              if tc2 = nil then Continue;
+						  if (abs(tc2.Point.X - ts.Point.X) <= m) and (abs(tc2.Point.Y - ts.Point.Y) <= m) then
+							  sl2.AddObject(IntToStr(tc2.ID),tc2);
+            end;
+					end;
+				end;
+			end;
+      EnemyCount := sl2.Count;
+      //Check if enemy count meets the if condition
+      if EnemyCount >= StrToInt(tsAI2.IfCond) then CheckSkill(tm, ts, tsAI2, Tick);
+      //DebugOut.Lines.Add('Enemy Count: ' + IntToStr(EnemyCount));
     end else
       CheckSkill(tm, ts, tsAI2, Tick);
 

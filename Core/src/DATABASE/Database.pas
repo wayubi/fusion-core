@@ -34,6 +34,10 @@ var
 	xy	:TPoint;
 	str :string;
 	txt :TextFile;
+  { Variables for creating the new AI list
+  txt2:TextFile;
+  str1:string;
+  }
 	sl  :TStringList;
 	sl1 :TStringList;
 	ta	:TMapList;
@@ -57,6 +61,7 @@ var
 	mi  :MapTbl;
 {NPCイベント追加ココまで}
 	tb  :TMobDB;
+  ts  :TMobDB;
 	tsAI :TMobAIDB;
   tsAI2 :TMobAIDBAegis;
   twp :TWarpDatabase;
@@ -311,7 +316,7 @@ begin
             // Super Novices get all Novice equipments.
             if Boolean(Job and $0001) then Job := Job or $800000;
 
-            //Monk 
+            //Monk
             if IType = 5 then begin //Same as aco 
                if Boolean(Job and $0010) or Boolean(Job and $0100) then Job := Job or $8000;
             end else if IType = 4 then begin //weapons same as aco, knuckle system 
@@ -756,6 +761,10 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	AssignFile(txt, AppPath + 'database\NpcAddSkillInfo.txt');
 	Reset(txt);
 	Readln(txt, str);
+
+  //AssignFile(txt2, 'NpcAddSkillInfo.txt');
+  //Rewrite(txt2);
+  //Writeln(txt2, 'ID,Name,STATUS,SKILL_ID,SKILL_LV,PERCENT,CASTING_TIME,COOLDOWN_TIME,DISPEL,IF,IfCondition');
   j := 1;
 	while not eof(txt) do begin
 		sl.Clear;
@@ -785,11 +794,21 @@ DebugOut.Lines.Add('Monster AI database loading...');
       tsAI2.IfCond := sl.Strings[9];
       j := j + 1;
       //DebugOut.Lines.Add(Format('%d', [j]));
+      {if MobDBName.IndexOf(tsAI2.Name) <> -1 then begin
+        ts := MobDBName.Objects[MobDBName.IndexOf(tsAI2.Name)] as TMobDB;
 
-      MobAIDBAegis.AddObject(tsAI2.Number, tsAI2);
+        //str1 := IntToStr(ts.ID) + ',' + str;
+        str1 := IntToStr(ts.ID) + ',' + tsAI2.Name + ',' + tsAI2.Status + ',' + tsAI2.SkillID + ',' + IntToStr(tsAI2.SkillLv) + ',' +  IntToStr(tsAI2.Percent) + ',' +  IntToStr(tsAI2.Cast_Time) + ',' +  IntToStr(tsAI2.Cool_Time) + ',' +  tsAI2.Dispel + ',' +  tsAI2.IfState + ',' +  tsAI2.IfCond;
+	      Writeln(txt2, str1);
+      end else if tsAI2.Name <> '0' then begin
+        str1 := 'ID ERROR' + ',' + tsAI2.Name;
+	      Writeln(txt2, str1);
+      end;
+      MobAIDBAegis.AddObject(tsAI2.Number, tsAI2); }
       end;
     end;
 	end;
+  //CloseFile(txt2);
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDBAegis.Count]));
 	Application.ProcessMessages;
