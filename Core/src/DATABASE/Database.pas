@@ -2353,10 +2353,12 @@ begin
                     tp.CName[j] := tp.CName[j] + '_';
                 end;}
 				if k <> -1 then begin
+          tc := CharaName.Objects[k] as TChara;
 					tp.CData[j] := CharaName.Objects[k] as TChara;
 					tp.CData[j].CharaNumber := j;
 					tp.CData[j].ID := tp.ID;
 					tp.CData[j].Gender := tp.Gender;
+          tc.PData := tp;
 				end else begin
 					tp.CName[j] := '';
 					tp.CData[j] := nil;
