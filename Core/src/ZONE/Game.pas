@@ -8,15 +8,6 @@ uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
 	Windows, MMSystem, ScktComp, Forms,
-	
-	{Replace with QForms soon, and place in common}
-	{
-	Alex: NO! We are not using any Q Components in VCL windows
-	because that will require us to distribute the 4 MB dll file
-	please dont make such drastic decisions without thinking ahead.
-	We are sticking with Forms and not QForms
-	}
-    
     {$ENDIF}
     {Kylix/Delphi CLX}
     {$IFDEF LINUX}
@@ -528,7 +519,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 
         // Is this map PvP?  Then set that mode and ladder status.
-        if (mi.Pvp = true) then begin
+        if (mi.PvP = true) then begin
         if tc.CheckpointMap <> tc.Map then tc.PvPPoints := 5;
         CalcPvPRank(tm);
         end;
@@ -542,6 +533,10 @@ Begin(* Proc sv3PacketProcess() *)
             tc1.Socket.SendBuf(buf, 4);
           end;
         end;
+
+        // Is this map PvP Nightmare and have PvP?  If PvPN is on and no PvP, kill PvPN
+        if ((mi.PvPN = true) and (mi.PvP = false)) then mi.PvPN := false;
+
 
         // Colus, 20040118: Update Spirit Spheres for monks
         if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);

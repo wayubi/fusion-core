@@ -3309,6 +3309,7 @@ var
 	StartI  : cardinal;
   EndI    : cardinal;}
 begin
+  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
   // Set Hit Points to 0
   tc.HP := 0;
   // Display the character as dead
@@ -3319,7 +3320,7 @@ begin
   // Sit = 1 lets monsters know the char is dead and the player cannot move
   tc.Sit := 1;
 
-  if (tc1 = nil) or ( (tc1 <> nil) and (Option_PVP_XPLoss) ) then begin
+  if (tc1 = nil) or ( (tc1 <> nil) and ( (Option_PVP_XPLoss) or (mi.PvPN = true) ) ) then begin
       // Subtract the Experience loss from the .ini
 
       { Wow, major mistake on my behalf. Fatal N version. }
@@ -3409,7 +3410,7 @@ begin
     end;
   end; }
 
-  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+//  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;  //moved to the top of procedure
   if (mi.PvP = true) and (tc1 <> nil) then begin
     tc1.PvPPoints := tc1.PvPPoints + 1;
     tc.PvPPoints := tc.PvPPoints - 5;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-14-04: PvP Nightmare EXP loss added. [Tsusai]
 - 08-14-04: W.A.C: Implemented initial Web Account Creator. Built in HTTP Server. [AlexKreuz]
 - 08-13-04: Fusion returns to tray on startup if crashed or closed while in tray. [AlexKreuz]
 - 08-13-04: Monster disappeared for player when another player walked off-screen. [BieL®]
