@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
-- 08-12-04: Integer overflow in guild calculations due to too high xp rate. [AlexKreuz]
+- 08-12-04: Integer overflow in guild calculations due to too high xp rate crashed server. [AlexKreuz]
 - 08-12-04: Freeing scriptlist on close form crashed server. Added error-handling. [AlexKreuz]
 - 08-12-04: Database load with character on missing map crashed server. [AlexKreuz]
 - 08-11-04: I.S.C.S: Non ISCS user, on disconnect, crashed server. [AlexKreuz]
