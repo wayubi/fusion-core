@@ -17,7 +17,7 @@ uses
     {Shared}
     SysUtils,
     {Fusion}
-    Common, SQLData, FusionSQL, Database, PlayerData, Globals;
+    Common, SQLData, FusionSQL, Database, Globals, REED_DELETE;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -480,7 +480,7 @@ begin
                         CharaName.Delete(CharaName.IndexOf(tc.Name));
                         Chara.Delete(i);
 
-                        PD_Delete_Characters(tc);
+                        PD_Delete_Character(tc.CID);
 
                         tc.Free;
                         WFIFOW(0, $006f);
