@@ -40,7 +40,7 @@ var
     function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
     function skill_provoke(tc : TChara) : Integer;
     function skill_magnum_break(tc : TChara; sl : TStringList) : TStringList;
-    function skill_endure(tc :TChara) : Integer;
+    function skill_endure() : Integer;
 
     { Skill Procedures - Mage }
     function skill_sp_recovery(tc : TChara; Tick : Cardinal) : Integer;
@@ -89,7 +89,7 @@ uses
         { 5} if (tc.MSkill = 5) and (effect = 0) then success := skill_bash(tc, Tick);
         { 6} if (tc.MSkill = 6) and (effect = 0) then success := skill_provoke(tc);
         { 7} if (tc.MSkill = 7) and (effect = 0) then targets := skill_magnum_break(tc, targets);
-        { 8} if (tc.MSkill = 8) and (effect = 0) then success := skill_endure(tc);
+        { 8} if (tc.MSkill = 8) and (effect = 0) then success := skill_endure();
         { 9} if (tc.Skill[9].Lv <> 0) and (effect = 1) then success := skill_sp_recovery(tc, Tick);
         {10} if (tc.MSkill = 10) and (effect = 0) then success := skill_sight(tc, Tick);
         {11} if (tc.MSkill = 11) and (effect = 0) then success := skill_napalm_beat(tc, Tick);
@@ -626,7 +626,7 @@ uses
     { - Skill ID Name: SM_ENDURE ----------------------- }
     { - Skill ID: 8 ------------------------------------ }
     { -------------------------------------------------- }
-    function skill_endure(tc : TChara) : Integer;
+    function skill_endure() : Integer;
     begin
         SKILL_TYPE := 2;
         Result := -1;

@@ -1600,8 +1600,11 @@ uses
         datafile := TStringList.Create;
 
     	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
+            if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
 
             if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\*.txt', faAnyFile, searchPetResult) = 0 then repeat
+                if (searchPetResult.Name = '.') or (searchPetResult.Name = '..') then Continue;
+
                 try
                     if FileExists(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\' + searchPetResult.Name) then begin
                         datafile.LoadFromFile(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\' + searchPetResult.Name);
@@ -1610,8 +1613,9 @@ uses
                             tpe := TPet.Create;
                         end else begin
                             for i := 0 to PetList.Count - 1 do begin
+                                if PetList.IndexOf(i) = -1 then Continue;
                                 tpe := PetList.IndexOfObject(i) as TPet;
-                                if tpe.Name+'.txt' = searchPetResult.Name then begin
+                                if IntToStr(tpe.PetID)+'.txt' = searchPetResult.Name then begin
                                     Break;
                                 end else begin
                                     tpe := nil;
@@ -1646,7 +1650,10 @@ uses
             FindClose(searchPetResult);
 
         	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
+                if (searchResult2.Name = '.') or (searchResult2.Name = '..') then Continue;
+
                 if FindFirst(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Pets\*.txt', faAnyFile, searchPetResult) = 0 then repeat
+                    if (searchPetResult.Name = '.') or (searchPetResult.Name = '..') then Continue;
 
                     try
                         if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Pets\' + searchPetResult.Name) then begin
@@ -1656,8 +1663,9 @@ uses
                                 tpe := TPet.Create;
                             end else begin
                                 for i := 0 to PetList.Count - 1 do begin
+                                    if PetList.IndexOf(i) = -1 then Continue;
                                     tpe := PetList.IndexOfObject(i) as TPet;
-                                    if tpe.Name+'.txt' = searchPetResult.Name then begin
+                                    if IntToStr(tpe.PetID)+'.txt' = searchPetResult.Name then begin
                                         Break;
                                     end else begin
                                         tpe := nil;
@@ -1804,14 +1812,15 @@ uses
             tp := PlayerName.Objects[i] as TPlayer;
 
             // Delete Junk Pets
-            SetCurrentDir(AppPath+'gamedata\Accounts\' + tp.Name + '\Pets\');
+            SetCurrentDir(AppPath+'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\');
             if FindFirst('*.txt', faAnyFile,searchResult) = 0 then repeat
 
                 petdelete := True;
 
                 for k := 0 to PetList.Count - 1 do begin
+                    if PetList.IndexOf(k) = -1 then Continue;
                     tpe := PetList.IndexOfObject(k) as TPet;
-                    if tpe.Name+'.txt' = searchResult.Name then begin
+                    if IntToStr(tpe.PetID)+'.txt' = searchResult.Name then begin
                         petdelete := False;
                         Break;
                     end;
@@ -1819,7 +1828,7 @@ uses
 
                 if petdelete then begin
                     DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + searchResult.Name);
-                    //RmDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets');
+                    //RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
                 end;
 
             until FindNext(searchResult) <> 0;
@@ -1854,11 +1863,11 @@ uses
                                     datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
 
                                     CreateDir(AppPath + 'gamedata\Accounts');
-                                    CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name);
-                                    CreateDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Pets');
+                                    CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
+                                    CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
 
                                     try
-                                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
+                                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
                                         //debugout.Lines.Add(tpe.Name + ' player pets data saved.');
                                     except
                                         DebugOut.Lines.Add('Player pets data could not be saved.');
@@ -1878,7 +1887,7 @@ uses
                 if (tc = nil) then continue;
 
                 // Delete Junk Pets
-                if FindFirst(AppPath+'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets\*.txt', faAnyFile,searchResult) = 0 then repeat
+                if FindFirst(AppPath+'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\*.txt', faAnyFile,searchResult) = 0 then repeat
 
                     petdelete := True;
 
@@ -1887,7 +1896,7 @@ uses
 
                         if tpe.Saved = 1 then Continue;
 
-                        if tpe.Name+'.txt' = searchResult.Name then begin
+                        if IntToStr(tpe.PetID)+'.txt' = searchResult.Name then begin
                             petdelete := False;
                             Break;
                         end;
@@ -1895,7 +1904,7 @@ uses
 
                     if petdelete then begin
                         DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + searchResult.Name);
-                        //RmDir(AppPath + 'gamedata\Accounts\' + tp.Name + '\Characters\' + tc.Name + '\Pets');
+                        //RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
                     end;
                     
                 until FindNext(searchResult) <> 0;
@@ -1934,9 +1943,9 @@ uses
                                         CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
 
                                         try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + tpe.Name + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
+                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
+                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt', faAnyFile,searchResult) = 0 then
+                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
                                         	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
                                     	except
                                 	    	DebugOut.Lines.Add('Character pets data could not be saved.');
@@ -1979,9 +1988,9 @@ uses
                                         CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
 
                                         try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + tpe.Name + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + tpe.Name + '.txt');
+                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
+                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt', faAnyFile,searchResult) = 0 then
+                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
                                         	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
                                     	except
                                 	    	DebugOut.Lines.Add('Character pets data could not be saved.');

@@ -5214,8 +5214,9 @@ end;
                                                                         WFIFOB( 6, 0 );
                                                                         SendBCmd( tm, tn.Point, 7 );
 
+                                                                        tpe.Incubated := 0;
+
                                                                         if UseSQL then begin
-                                                                          tpe.Incubated := 0;
                                                                           SavePetData(tpe, i, 1);
                                                                         end;
                                                                         //ÉyÉbÉgçÌèú

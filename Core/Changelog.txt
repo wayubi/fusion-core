@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-23-04: Minor overhaul of REED Pets. [AlexKreuz]
+- 08-23-04: Updated PSS Endure. TC not needed as parameter. [AlexKreuz]
 - 08-23-04: Fixed the Endure Skill to work in all fields. [BieL®]
 - 08-23-04: Percentdamage finished. [Tsusai]
 		Usage: percentdamage HPpercent,SPpercent;
