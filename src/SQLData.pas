@@ -17,13 +17,19 @@ uses
 		function  GetPlayerData(userid: String) : Boolean; {取得帐号资料}
 		function  GetCharaData(AID: cardinal) : Boolean; {取得帐号的人物资料}
 		function  GetPetData(AID: cardinal) : Boolean; {取得帐号的宠物资料}
+		function  GetCharaGuildData(GID: cardinal) : Boolean; {取得人物的工会资料}
 		function  DeleteChar(GID: cardinal) : Boolean; {从数据库删除人物}
+		function  DeleteGuildMember(GID: cardinal; mtype: Integer; tgb: TGBan; GDID: cardinal) : Boolean; {从数据库删除工会成员}
+		function  DeleteParty(Name: string) : Boolean; {从数据库删除组队}
+		function  DeleteGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean; {删除同盟、敌对工会资料}
+		function  DeleteGuildInfo(GDID: cardinal) : Boolean; {删除工会资料}
 		function  CheckUserExist(userid: String) : Boolean; {检查人物是否存在}
 		function  GetNowLoginID() : cardinal; {取得当前的帐号ID编号}
 		function  GetNowCharaID() : cardinal; {取得当前的人物ID编号}
 		function  GetNowPetID() : cardinal; {取得当前的宠物ID编号}
 		function  SavePetData(tpe : Tpet; PIndex: Integer; place: Integer) : Boolean; {保存宠物资料}
-		function  SaveGuildMPosition(tg: TGuild) : Boolean; {保存工会头衔资料}
+		function  SaveGuildMPosition(GDID: cardinal; PosName: string; PosInvite: boolean; PosPunish: boolean; PosEXP: byte; Grade: Integer) : Boolean; {保存工会头衔资料}
+		function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean; {保存同盟、敌对工会资料}
 //==============================================================================
 
 implementation
@@ -300,7 +306,7 @@ begin
 		with tg do
 		begin
 		  {读取工会成员资料}
-		  if ExecuteSqlCmd(Format('SELECT * FROM guildMinfo WHERE GDID=''%d''', [ID])) then
+		  if ExecuteSqlCmd(Format('SELECT * FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [ID])) then
 			begin
 			  j := 0;
 			  while not SQLDataSet.Eof do
@@ -318,12 +324,11 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会称号资料}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildMPosition WHERE GDID=''%d''', [ID])) then
+			if ExecuteSqlCmd(Format('SELECT * FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [ID])) then
 			begin
 			  j := 0;
 				while not SQLDataSet.Eof do
 				begin
-				  if j < 19 then continue;
 					PosName[j]   := SQLDataSet.FieldValues['PosName'];
 				  PosInvite[j] := StrToBool(SQLDataSet.FieldValues['PosInvite']);
 				  PosPunish[j] := StrToBool(SQLDataSet.FieldValues['PosPunish']);
@@ -613,7 +618,7 @@ begin
 
 	Application.ProcessMessages;
 
-	{保存组队资料 --解散组队时需要删除相应的组队记录}
+	{保存组队资料 --需要优化下}
   if PartyNameList.Count <> 0 then
 	begin
 	  for i := 0 to PartyNameList.Count - 1 do
@@ -622,7 +627,7 @@ begin
       tpa := PartyNameList.Objects[i] as TParty;
       with tpa do
       begin
-			  sl.Add(IntToStr(i));
+			  sl.Add(IntToStr(i + 1));
         sl.Add('"' + Name + '"');
         sl.Add(IntToStr(EXPShare));
         sl.Add(IntToStr(ITEMShare));
@@ -662,7 +667,7 @@ begin
 				  DebugOut.Lines.Add('*** Save Guild data error.');
 				end;
 
-				{保存工会成员资料 --唯一索引有问题，将会只记录一条，开除成员时需要删除相应的记录}
+				{保存工会成员资料}
 			  for j := 0 to 35 do begin
 				  if MemberID[j] <> 0 then
 					begin
@@ -672,31 +677,6 @@ begin
 				    end;
 					end;
 			  end;
-
-				{保存工会开除会员记录 --唯一索引有问题，将会只记录一条}
-			  for j := 0 to GuildBanList.Count - 1 do begin
-				  tgb := GuildBanList.Objects[j] as TGBan;
-				  if not ExecuteSqlCmd(Format('REPLACE INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [ID, tgb.Name, tgb.AccName, tgb.Reason])) then
-				  begin
-				    DebugOut.Lines.Add('*** Save Guild BanishInfo data error.');
-				  end;
-			  end;
-
-				{保存同盟、敌对工会资料 --唯一索引有问题，将会只记录一条，去除时需要删除相应记录}
-			  for j := 0 to RelAlliance.Count - 1 do begin
-				  tgl := RelAlliance.Objects[j] as TGRel;
-  		    if not ExecuteSqlCmd(Format('REPLACE INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''1'')', [ID, tgl.GuildName])) then
-				  begin
-				    DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
-				  end;
-				end;
-			  for j := 0 to RelHostility.Count - 1 do begin
-				  tgl := RelHostility.Objects[j] as TGRel;
-  		    if not ExecuteSqlCmd(Format('REPLACE INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''0'')', [ID, tgl.GuildName])) then
-				  begin
-				    DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
-				  end;
-				end;
       end;
     end;
 	end;
@@ -767,6 +747,7 @@ begin
 	begin
 	  if PlayerName.IndexOf(userid) <> -1 then
 		begin
+		  Result := True;
 		  Exit;
 		end;
 	end;
@@ -790,6 +771,7 @@ begin
     Gender := SQLDataSet.FieldValues['Gender'];
     Mail := SQLDataSet.FieldValues['Mail'];
     GMMode := SQLDataSet.FieldValues['GMMode'];
+		ver2 := 9;
 
 		if SQLDataSet.FieldValues['storeitem'] <> '' then
 		begin
@@ -839,6 +821,7 @@ var
 	tc, tc2 : TChara;
 	ta : TMapList;
 	tp  :TPlayer;
+	tpa :TParty;
 begin
   Result := False;
 
@@ -909,6 +892,16 @@ begin
 		    PLv           := StrToInt(SQLDataSet.FieldValues['PLv']);
 		    ID            := StrToInt(SQLDataSet.FieldValues['AID']);
 
+				{读取人物组队资料}
+				for i := 0 to PartyNameList.Count - 1 do begin
+					tpa := PartyNameList.Objects[i] as TParty;
+					for j := 0 to 11 do begin
+						if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = CID) then begin
+						  PartyName := tpa.Name;
+							tpa.Member[j] := tc;
+						end;
+					end;
+				end;
 				{读取MEMO记录点资料}
 				for i := 0 to 2 do begin
 					MemoMap[i]     := SQLDataSet.FieldValues['mapName' + IntToStr(i)];
@@ -1043,6 +1036,17 @@ begin
 
 	{读取宠物资料}
 	GetPetData(AID);
+	{读取人物工会资料}
+	tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
+	for j := 0 to 8 do begin
+    if tp.CName[j] <> '' then begin
+			k := CharaName.IndexOf(tp.CName[j]);
+			if k <> -1 then begin
+				tc := CharaName.Objects[k] as TChara;
+				GetCharaGuildData(tc.CID);
+			end;
+		end;
+	end;
 end;
 
 //------------------------------------------------------------------------------
@@ -1273,21 +1277,165 @@ end;
 //------------------------------------------------------------------------------
 // 保存工会头衔资料
 //------------------------------------------------------------------------------
-function  SaveGuildMPosition(tg: TGuild) : Boolean;
-var
-  i : Integer;
+function  SaveGuildMPosition(GDID: cardinal; PosName: string; PosInvite: boolean; PosPunish: boolean; PosEXP: byte; Grade: Integer) : Boolean;
 begin
   Result := False;
 
   {删除旧资料}
-	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d''', [tg.ID]));
-	{保存工会头衔资料 --唯一索引有问题，将会只记录一条}
-	for i := 0 to 19 do begin
-	  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%s'',''%s'',''%s'',''%d'')', [tg.ID, tg.PosName[i], BoolToStr(tg.PosInvite[i]), BoolToStr(tg.PosPunish[i]), tg.PosEXP[i]])) then
-	  begin
-	    DebugOut.Lines.Add('*** Save Guild Position data error.');
-			Exit;
+	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
+  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, PosName, BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
+	begin
+	  DebugOut.Lines.Add('*** Save Guild Position data error.');
+	  Exit;
+	end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 取得人物的工会资料
+//------------------------------------------------------------------------------
+function  GetCharaGuildData(GID: cardinal) : Boolean;
+var
+  j  : Integer;
+  tc : TChara;
+	tg : TGuild;
+begin
+  Result := False;
+	
+	if not ExecuteSqlCmd(Format('SELECT GDID FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+		Exit;
+	end;
+  SQLDataSet.First;
+
+	tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
+  if SQLDataSet.Eof then begin
+	  tc.GuildID := 0;
+		tc.GuildName := '';
+		tc.ClassName := '';
+		tc.GuildPos := 0;
+	  exit;
+	end;
+
+  tg := GuildList.Objects[GuildList.IndexOf(SQLDataSet.FieldValues['GDID'])] as TGuild;
+	with tg do begin
+		for j := 0 to 35 do begin
+			if MemberID[j] = tc.CID then begin
+				tc.GuildName := Name;
+				tc.GuildID := ID;
+				tc.ClassName := PosName[MemberPos[j]];
+				tc.GuildPos := j;
+				Member[j] := tc;
+				if (j = 0) then MasterName := tc.Name;
+				SLV := SLV + tc.BaseLV;
+			end;
+		end;
+	end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 从数据库删除工会成员(mtype=1为退会，mtype=2为开除)
+//------------------------------------------------------------------------------
+function  DeleteGuildMember(GID: cardinal; mtype: Integer; tgb: TGBan; GDID: cardinal) : Boolean;
+begin
+  Result := False;
+	
+	if mtype = 2 then begin
+	  if not ExecuteSqlCmd(format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, tgb.Name, tgb.AccName, tgb.Reason])) then begin
+      DebugOut.Lines.Add(format('INSERT guildBanishInfo data to MySQL Error: %d', [GID]));
+//		  Exit;
 	  end;
+	end;
+
+	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+    DebugOut.Lines.Add(format('Delete guildMinfo data from MySQL Error: %d', [GID]));
+		Exit;
+	end;
+
+  Result := True;;
+end;
+
+//------------------------------------------------------------------------------
+// 从数据库删除组队
+//------------------------------------------------------------------------------
+function  DeleteParty(Name: string) : Boolean;
+begin
+  Result := False;
+	
+	if not ExecuteSqlCmd(format('DELETE FROM party WHERE Name=''%s'' LIMIT 1', [Name])) then begin
+    DebugOut.Lines.Add(format('Delete party data from MySQL Error: %s', [Name]));
+		Exit;
+	end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 保存同盟、敌对工会资料(mtype=1同盟，mtype=2敌对)
+//------------------------------------------------------------------------------
+function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean;
+begin
+  Result := False;
+
+  if not ExecuteSqlCmd(Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, GuildName, mtype])) then
+	begin
+	  DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
+		exit;
+	end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 删除同盟、敌对工会资料(mtype=1同盟，mtype=2敌对)
+//------------------------------------------------------------------------------
+function  DeleteGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean;
+begin
+  Result := False;
+	
+	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, GuildName, mtype])) then begin
+    DebugOut.Lines.Add(format('Delete guildAllyInfo data from MySQL Error: %s', [GuildName]));
+		Exit;
+	end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 删除工会资料
+//------------------------------------------------------------------------------
+function  DeleteGuildInfo(GDID: cardinal) : Boolean;
+begin
+  Result := False;
+
+	DebugOut.Lines.Add(format('Delete Guild data from MySQL: %d', [GDID]));
+
+  {删除工会资料}
+	if not ExecuteSqlCmd(format('DELETE FROM guildinfo WHERE GDID=''%d'' LIMIT 1', [GDID])) then begin
+    DebugOut.Lines.Add(format('Delete Guild data from MySQL Error: %d', [GDID]));
+		Exit;
+	end;
+  {删除工会成员资料}
+	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [GDID])) then begin
+    DebugOut.Lines.Add(format('Delete Guild Member data from MySQL Error: %d', [GDID]));
+		Exit;
+	end;
+  {删除工会头衔资料}
+	if not ExecuteSqlCmd(format('DELETE FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [GDID])) then begin
+    DebugOut.Lines.Add(format('Delete Guild Position data from MySQL Error: %d', [GDID]));
+		Exit;
+	end;
+  {删除工会开除成员记录资料}
+	if not ExecuteSqlCmd(format('DELETE FROM guildBanishInfo WHERE GDID=''%d''', [GDID])) then begin
+    DebugOut.Lines.Add(format('Delete Guild BanishInfo data from MySQL Error: %d', [GDID]));
+		Exit;
+	end;
+  {删除工会同盟、敌对资料}
+	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d''', [GDID])) then begin
+    DebugOut.Lines.Add(format('Delete Guild AllyInfo data from MySQL Error: %d', [GDID]));
+		Exit;
 	end;
 
 	Result := True;

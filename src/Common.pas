@@ -1460,6 +1460,8 @@ DbName            :String;
 
 implementation
 
+uses SQLData;
+
 //==============================================================================
 {’Ç‰Á}
 procedure PickUpItem(tc:TChara; l:Cardinal);
@@ -5532,6 +5534,7 @@ begin
 		j := tg.RelAlliance.IndexOf(tg1.Name);
 		if (j <> -1) then begin
 			tgl := tg.RelAlliance.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg.ID,tg1.Name,1);
 			tg.RelAlliance.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg1.ID);
@@ -5542,6 +5545,7 @@ begin
 		j := tg1.RelAlliance.IndexOf(tg.Name);
 		if (j <> -1) then begin
 			tgl := tg1.RelAlliance.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg1.ID,tg.Name,1);
 			tg1.RelAlliance.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg.ID);
@@ -5553,6 +5557,7 @@ begin
 		j := tg.RelHostility.IndexOf(tg1.Name);
 		if (j <> -1) then begin
 			tgl := tg.RelHostility.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg.ID,tg1.Name,2);
 			tg.RelHostility.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg1.ID);

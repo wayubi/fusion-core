@@ -12890,6 +12890,7 @@ end;
 
 procedure TfrmMain.Edit1KeyPress(Sender: TObject; var Key: Char);
 
+
 begin
 
         if Key = #13 then begin
