@@ -852,6 +852,7 @@ var
 	tc : TChara;
 	ta : TMapList;
 	tp  :TPlayer;
+	tpa :TParty;
 begin
   Result := False;
 
@@ -1046,10 +1047,25 @@ begin
       GetPlayerData('', tc.ID);
 
 			tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+			tp.CID[tc.CharaNumber] := tc.CID;
+			tp.CName[tc.CharaNumber] := tc.Name;
 			tp.CData[tc.CharaNumber] := tc;
 			tp.CData[tc.CharaNumber].Gender := tp.Gender;
 			{读取宠物资料}
 			GetPetData(tc.ID);
+			{读取人物工会资料}
+			GetCharaGuildData(tc.CID);
+			// 读取人物组队资料
+			for i := 0 to PartyNameList.Count - 1 do begin
+				tpa := PartyNameList.Objects[i] as TParty;
+				for j := 0 to 11 do begin
+					if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
+						tc.PartyName := tpa.Name;
+						tpa.Member[j] := tc;
+						break;
+					end;
+				end;
+			end;
 
 //	    SQLDataSet.Next;
 	  end;
@@ -1338,6 +1354,7 @@ begin
 				Member[j] := tc;
 				if (j = 0) then MasterName := tc.Name;
 				SLV := SLV + tc.BaseLV;
+				break;
 			end;
 		end;
 	end;
@@ -1486,9 +1503,9 @@ end;
 //------------------------------------------------------------------------------
 function  GetCharaPartyGuild(GID: cardinal) : Boolean;
 var
-  i,j,k : Integer;
+  i,k : Integer;
 	tpa   : TParty;
-	tc,tc1: TChara;
+	tc    : TChara;
 	tg    : TGuild;
 begin
   Result := False;
@@ -1497,55 +1514,30 @@ begin
 	if k = -1 then exit;
 
 	tc := Chara.Objects[k] as TChara;
-	// 读取人物组队资料
-	for i := 0 to PartyNameList.Count - 1 do begin
-		tpa := PartyNameList.Objects[i] as TParty;
-		for j := 0 to 11 do begin
-			if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
-			  tc.PartyName := tpa.Name;
-				tpa.Member[j] := tc;
-				break;
-			end;
-		end;
-	end;
 	if tc.PartyName <> '' then begin
   	// 读取组队中其它队员的资料
-		tpa := PartyNameList.Objects[PartyNameList.IndexOf(tc.PartyName)] as TParty;
-		for i := 0 to 11 do begin
-	    if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] <> tc.CID) then begin
-				if Chara.IndexOf(tpa.MemberID[i]) <> -1 then begin
-            tc1 := Chara.Objects[Chara.IndexOf(tpa.MemberID[i])] as TChara;
-						tc1.PartyName := tpa.Name;
-						tpa.Member[i] := tc1;
-				  continue;
-  			end else begin
-			    if GetCharaData(tpa.MemberID[i]) then begin
-            tc1 := Chara.Objects[Chara.IndexOf(tpa.MemberID[i])] as TChara;
-						tc1.PartyName := tpa.Name;
-						tpa.Member[i] := tc1;
+		k := PartyNameList.IndexOf(tc.PartyName);
+		if k <> -1 then begin
+			tpa := PartyNameList.Objects[k] as TParty;
+			for i := 0 to 11 do begin
+				if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] <> tc.CID) then begin
+					if Chara.IndexOf(tpa.MemberID[i]) <> -1 then begin
+						GetCharaData(tpa.MemberID[i]);
 					end;
 				end;
-	  	end;
+			end;
 	  end;
 	end;
 	// 读取人物工会资料
-	if GetCharaGuildData(tc.CID) then begin
+	if tc.GuildID <> 0 then begin
 	  // 读取工会中其它成员的资料
-		tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
 		k := GuildList.IndexOf(tc.GuildID);
 		if k <> -1 then begin
 	    tg := GuildList.Objects[k] as TGuild;
   	  for i := 0 to 35 do begin
 		    if (tg.MemberID[i] <> 0) AND (tg.MemberID[i] <> tc.CID) then begin
-				  if Chara.IndexOf(tg.MemberID[i]) <> -1 then begin
-            tc1 := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
-					  GetCharaGuildData(tc1.CID);
-					  continue;
-  				end else begin
-			      if GetCharaData(tg.MemberID[i]) then begin
-              tc1 := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
-					    GetCharaGuildData(tc1.CID);
-						end;;
+				  if Chara.IndexOf(tg.MemberID[i]) = -1 then begin
+			      GetCharaData(tg.MemberID[i]);
 					end;
         end;
 			end;
