@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-03-04: Added server flags (status.txt) to backup files. [AlexKreuz]
+- 07-03-04: #1036 - Server flag loading and saving had issues. [AlexKreuz]
 - 07-03-04: Game_Master cleanup. [AlexKreuz]
 - 07-03-04: No more 10053/10054. Replaced with user friendly messages. [AlexKreuz]
 - 07-03-04: Modified #changes to support oscripts and cscripts flags. [AlexKreuz]

@@ -131,7 +131,6 @@ uses
         l : Cardinal;
         i, j : Integer;
         tg : TGuild;
-        tgb : TGBan;
     begin
     	RFIFOL( 2, l);
         str := RFIFOS(14, 40);
@@ -279,6 +278,7 @@ uses
 	    fileslist.Add(AppPath + 'party.txt');
     	fileslist.Add(AppPath + 'pet.txt');
 	    fileslist.Add(AppPath + 'player.txt');
+        fileslist.Add(AppPath + 'status.txt');
 
 	    zfile.FileSpecList := fileslist;
     	zfile.Add;

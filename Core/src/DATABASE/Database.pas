@@ -3004,9 +3004,9 @@ begin
             variables stop working because the '\' in front is permanently removed. Bad coding. }
             //ServerFlag[j] := Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1);
 
-		  	if ((Copy(ServerFlag[j], 1, 1) <> '@') and (Copy(ServerFlag[j], 1, 2) <> '$@'))
+		  	if ( copy(serverflag[j],2,1) <> '@' )
   			and ((ServerFlag.Values[ServerFlag.Names[j]] <> '') and (ServerFlag.Values[ServerFlag.Names[j]] <> '0')) then begin
-	  			sl.Add(ServerFlag[j]);
+	  			sl.Add(Copy(ServerFlag[j], 2, Length(ServerFlag[j]) - 1));
 		  		Inc(cnt);
 			  end;
   		end;
