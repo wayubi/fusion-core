@@ -181,6 +181,7 @@ uses
         end;
 
         JCon_Accounts_Load();
+        DataSave();
         frmMain.Button3.Click;
     end;
 

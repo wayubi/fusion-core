@@ -137,9 +137,11 @@ uses
             tc.GuildPos := 0;
         end else begin
         	for i := 0 to tg.RegUsers - 1 do begin
-            	tg.Member[i].GuildID := 0;
-                tg.Member[i].GuildName := '';
-                tg.Member[i].GuildPos := 0;
+            	if assigned(tg.Member[i]) then begin
+	            	tg.Member[i].GuildID := 0;
+    	            tg.Member[i].GuildName := '';
+        	        tg.Member[i].GuildPos := 0;
+                end;
             end;
         	guildlist.Delete(j);
         end;

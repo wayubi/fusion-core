@@ -2617,6 +2617,11 @@ Begin
 				Exit;
 			end;
       //Check if your target is in range
+
+            { Placed here for protection. One of my users managed to transfer Ice property
+            from a falchion to Damascus. Attacking under such conditions undefines tl. }
+			if not assigned(tl) then Exit;
+
 			if (abs(Point.X - tc1.Point.X) <= tl.Range) and (abs(Point.Y - tc1.Point.Y) <= tl.Range) then begin
 
 				case tc.MSkill of
