@@ -297,7 +297,7 @@ begin
                 sl.DelimitedText := SQLDataSet.FieldValues['skill'];
 
                 for i := 0 to ((sl.Count div 2) - 1) do begin
-                    if (GSkillDB.IndexOf(strtoint(sl.Strings[0+1*2])) <> -1) then begin
+                    if (GSkillDB.IndexOf(strtoint(sl.Strings[0+i*2])) <> -1) then begin
                         GSkill[strtoint(sl.Strings[0+i*2])].Lv := strtoint(sl.Strings[1+i*2]);
                         GSkill[strtoint(sl.Strings[0+i*2])].Card := false;
                     end;
@@ -857,20 +857,19 @@ begin
 
 				{读取MEMO记录点资料}
 				for i := 0 to 2 do begin
+					if SQLDataSet.FieldByName('mapName' + inttostr(1)).IsNull then continue;
 					MemoMap[i]     := unaddslashes(SQLDataSet.FieldValues['mapName' + IntToStr(i)]);
 					MemoPoint[i].X := StrToInt(SQLDataSet.FieldValues['xPos' + IntToStr(i)]);
 					MemoPoint[i].Y := StrToInt(SQLDataSet.FieldValues['yPos' + IntToStr(i)]);
-					{检查MEMO记录点地图是否有效}
+
 					if (MemoMap[i] <> '') and (MapList.IndexOf(MemoMap[i]) = -1) then begin
 						DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d "%s"', [Name, i, MemoMap[i]]));
 						MemoMap[i] := '';
 						MemoPoint[i].X := 0;
 						MemoPoint[i].Y := 0;
 					end else if MemoMap[i] <> '' then begin
-						{检查MEMO记录点地图坐标是否有效}
 						ta := MapList.Objects[MapList.IndexOf(MemoMap[i])] as TMapList;
-						if (MemoPoint[i].X < 0) or (MemoPoint[i].X >= ta.Size.X) or
-							 (MemoPoint[i].Y < 0) or (MemoPoint[i].Y >= ta.Size.Y) then begin
+                        if (MemoPoint[i].X < 0) or (MemoPoint[i].X >= ta.Size.X) or (MemoPoint[i].Y < 0) or (MemoPoint[i].Y >= ta.Size.Y) then begin
 							DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [Name, i, MemoMap[i], ta.Size.X, ta.Size.Y, MemoPoint[i].X, MemoPoint[i].Y]));
 							MemoMap[i] := '';
 							MemoPoint[i].X := 0;
@@ -927,7 +926,7 @@ begin
                 sl.DelimitedText := SQLDataSet.FieldValues['skillInfo'];
 
                 for i := 0 to ((sl.Count div 2) - 1) do begin
-                    if (SkillDB.IndexOf(strtoint(sl.Strings[0+1*2])) <> -1) then begin
+                    if (SkillDB.IndexOf(strtoint(sl.Strings[0+i*2])) <> -1) then begin
                         Skill[strtoint(sl.Strings[0+i*2])].Lv := strtoint(sl.Strings[1+i*2]);
                         Skill[strtoint(sl.Strings[0+i*2])].Card := false;
                         Skill[strtoint(sl.Strings[0+i*2])].Plag := false;
