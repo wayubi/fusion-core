@@ -2428,13 +2428,18 @@ begin
 		if sl.Count <> 13 then continue;
 		tpa := TParty.Create;
 		with tpa do begin
-			Name := remove_badsavechars(sl.Strings[0]);
+			Name := (sl.Strings[0]);
+
+            ID := NowPartyID;
+            Inc(NowPartyID);
+
 			for i := 0 to 11 do begin
 				MemberID[i] := StrToInt(sl.Strings[i+1]);
 			end;
 			EXPShare := False;
 		end;
 		PartyNameList.AddObject(tpa.Name, tpa);
+        PartyList.AddObject(tpa.ID, tpa);
 		// debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name : %s.', [tpa.Name]));
 	end;
 	CloseFile(txt);
@@ -2450,6 +2455,7 @@ begin
 				if k <> -1 then begin
 					tc := Chara.Objects[k] as TChara;
 					tc.PartyName := tpa.Name; //パーティ名はココで入れる
+                    tc.PartyID := tpa.ID;
 					tpa.Member[j] := tc;
 				end;
 			end;

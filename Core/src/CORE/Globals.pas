@@ -65,6 +65,7 @@ uses
         NowItemID := 10000;
         NowMobID := 1000000;
         NowCharaID := 0;
+        NowPartyID := 10000;
         NowPetID := 0;
 
         DebugOut := frmMain.txtDebug;
@@ -121,6 +122,9 @@ uses
 
         PartyNameList := TStringList.Create;
         PartyNameList.CaseSensitive := True;
+
+        PartyList := TIntList32.Create;
+        PartyList.Sorted := True;
 
         CastleList := TStringList.Create;
         CastleList.CaseSensitive := True;
@@ -244,6 +248,7 @@ uses
             SendPCmd(tc,31);
 
             tc.PartyName := '';
+            tc.PartyID := 0;
 
             j := -1;
             for i := 0 to 11 do begin;

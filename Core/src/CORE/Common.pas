@@ -896,6 +896,7 @@ TChara = class(TLiving)
 	MoveTick      :cardinal;
 
 	PartyName     :string; //これらはそのうちデータファイルから読むようにすること
+    PartyID       :cardinal;
 	GuildName     :string;
 	GuildID       :word;
 	ClassName     :string;
@@ -1082,6 +1083,8 @@ protected
 	procedure SetName(Value : string);
 
 public
+
+    ID          :cardinal;
 
 //	EXPShare    : Word;//Experience sharing (0 = Not shared, 1 = Shared)
 //	ITEMShare   : Word;//Item sharing       (0 = Not Shared, 1 = Shared)
@@ -1515,6 +1518,7 @@ var
 {アイテム製造追加ココまで}
 {パーティー機能追加}
 	PartyNameList	:TStringList;
+    PartyList     :TIntList32;
   CastleList    :TStringList;
   TerritoryList :TStringList;
   EmpList       :TStringList;
@@ -1587,6 +1591,7 @@ var
 	NowNPCID      :cardinal;
 	NowItemID     :cardinal;
 	NowMobID      :cardinal;
+    NowPartyID    :cardinal;
 {キューペット}
 	NowPetID      :cardinal;
 {キューペットここまで}

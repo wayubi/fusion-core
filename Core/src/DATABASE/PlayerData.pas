@@ -17,7 +17,8 @@ uses
     Common, REED_Support,
     REED_LOAD_ACCOUNTS,
     REED_LOAD_CHARACTERS,
-    REED_LOAD_PETS;
+    REED_LOAD_PETS,
+    REED_LOAD_PARTIES;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -62,7 +63,6 @@ uses
 
 
     { Party Data - Member Data }
-    procedure PD_Load_Parties_Members(UID : String = '*');
     procedure PD_Save_Parties_Members(forced : Boolean = False);
 
 
@@ -130,7 +130,7 @@ uses
         PD_Load_Pets_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Parties ­');
-        PD_Load_Parties_Members(UID);
+        PD_Load_Parties_Pre_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Guilds ­');
         PD_Load_Guilds(UID);
@@ -556,6 +556,7 @@ uses
                 datafile.Add('PLV : ' + IntToStr(tc.PLv));
                 
                 datafile.Add('GID : ' + IntToStr(tc.GuildID));
+                datafile.Add('PID : ' + IntToStr(tc.PartyID));
 
                 CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
                 CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
@@ -1120,113 +1121,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Party Data - Member Data ---------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Members(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        tp : TPlayer;
-        tpa : TParty;
-        i, j : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Parties');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt') then begin
-
-            	try
-                    saveflag := False;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt');
-                    sl.delimiter := ':';
-
-                    // Delete empty parties.
-                    if (datafile.Count < 3) then begin
-                    	DeleteFile(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt');
-                    	RmDir(AppPath + 'gamedata\Parties\' + searchResult.Name);
-                        Continue;
-                    end;
-                    // Delete empty parties.
-
-                    tpa := nil;
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-
-                            for j := 0 to datafile.Count - 3 do begin
-                            	sl.delimitedtext := datafile[j+2];
-                            	if tp.CData[i].CID = StrToInt(sl.Strings[0]) then begin
-        		                    if PartyNameList.IndexOf(searchResult.Name) = -1 then Continue;
-		                            tpa := PartyNameList.Objects[PartyNameList.IndexOf(searchResult.Name)] as TParty;
-                                    Break;
-                                end;
-                            end;
-                        end;
-
-                        if tpa = nil then Continue;
-
-                    end else begin
-                    	tpa := TParty.Create;
-                    end;
-
-                    tpa.Name := searchResult.Name;
-                    for i := 0 to 11 do begin
-            			if (tpa.MemberID[i] <> 0) then begin
-                        	if tpa.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 0 to 11 do begin
-                    	tpa.MemberID[i] := 0;
-                    end;
-
-                    for i := 2 to datafile.Count - 1 do begin
-                    	sl.delimitedtext := datafile[i];
-                        tpa.MemberID[i-2] := StrToInt(sl.Strings[0]);
-
-                        if tpa.MemberID[i-2] <> 0 then begin
-                        	if Chara.IndexOf(tpa.MemberID[i-2]) <> -1 then begin
-                            	tc := Chara.Objects[Chara.IndexOf(tpa.MemberID[i-2])] as TChara;
-                                tc.PartyName := tpa.Name;
-                                tpa.Member[i-2] := tc;
-                            end;
-                        end;
-                    end;
-
-                    if (UID = '*') then
-                    	PartyNameList.AddObject(tpa.Name, tpa);
-
-                    //debugout.Lines.Add(tpa.Name + ' party members variables data loaded.');
-                except
-                	DebugOut.Lines.Add('Party members data could not be loaded.');
-                end;
-            end else if (searchResult.Name <> '.') and (searchResult.Name <> '..') then begin
-            	DeleteFile(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt');
-                if FileExists(AppPath + 'gamedata\Parties\' + searchResult.Name) then
-                	RmDir(AppPath + 'gamedata\Parties\' + searchResult.Name);
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Parties_Members(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -1235,13 +1129,12 @@ uses
         str : String;
         saveflag : Boolean;
 
-        trashparty : Boolean;
         searchResult : TSearchRec;
     begin
         if FindFirst(AppPath + 'gamedata\Parties\*', faDirectory, searchResult) = 0 then repeat
             if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
 
-            trashparty := True;
+            {trashparty := True;
             for i := 0 to PartyNameList.Count - 1 do begin
                 tpa := PartyNameList.Objects[i] as TParty;
                 if tpa.Name = searchResult.Name then begin
@@ -1253,9 +1146,8 @@ uses
                 //debugout.lines.add(tpa.Name + ' deleted');
                 DeleteFile(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt');
                 RmDir(AppPath + 'gamedata\Parties\' + searchResult.Name);
-            end;
+            end;}
 
-            tpa := nil;
         until FindNext(searchResult) <> 0;
         FindClose(searchResult);
 
@@ -1295,14 +1187,20 @@ uses
 			end;
 
             CreateDir(AppPath + 'gamedata\Parties');
-            CreateDir(AppPath + 'gamedata\Parties\' + tpa.Name);
+            CreateDir(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID));
 
             try
-                datafile.SaveToFile(AppPath + 'gamedata\Parties\' + tpa.Name + '\Members.txt');
+                datafile.SaveToFile(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID) + '\Members.txt');
                 //debugout.Lines.Add(tpa.Name + ' party members data saved.');
             except
                 DebugOut.Lines.Add('Parties members data could not be saved.');
             end;
+
+            datafile.Clear;
+            datafile.Add('NAM : ' + tpa.Name);
+            datafile.Add('PID : ' + IntToStr(tpa.ID));
+            datafile.SaveToFile(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID) + '\Settings.txt');
+
         end;
 
         datafile.Clear;

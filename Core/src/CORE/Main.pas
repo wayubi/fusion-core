@@ -1236,6 +1236,7 @@ begin
         end;
         PartyNameList.Free;
     end;
+    if PartyList.Count > 0 then PartyList.Free;
 
     if CastleList.Count > 0 then begin
         for Idx := 0 to CastleList.Count - 1 do begin

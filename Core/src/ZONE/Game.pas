@@ -2856,6 +2856,8 @@ end;
 					end else begin
 						//パーティー名が重複してはいけない
 						tpa := TParty.Create;
+						tpa.ID := NowPartyID;
+						Inc(NowPartyID);
 						tpa.Name := str;
 						tpa.EXPShare := False;
 						tpa.ITEMShare := True;
@@ -2869,7 +2871,9 @@ end;
 							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
 						end;
 						tc.PartyName := tpa.Name;
+                        tc.PartyID := tpa.ID;
 						PartyNameList.AddObject(tpa.Name, tpa);
+                        PartyList.AddObject(tpa.ID, tpa);
 						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
 						SendPartyList(tc);
 						i := 0;
@@ -2935,6 +2939,7 @@ end;
                                                                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                         end;
 							tc.PartyName := tpa.Name;
+                            tc.PartyID := tpa.ID;
 							if (tc.BaseLV < tpa.MinLV) then tpa.MinLV := tc.BaseLV;
 							if (tc.BaseLV > tpa.MaxLV) then tpa.MaxLV := tc.BaseLV;
 							j := i;
@@ -3000,6 +3005,7 @@ end;
 						SendPCmd(tc1,31);
 
 						tc1.PartyName := '';
+                        tc1.PartyID := 0;
 
 						j := -1;
 						for i := 0 to 11 do begin;
@@ -3021,6 +3027,7 @@ end;
 						if (tpa.MemberID[0] = 0) then begin
 						  if UseSQL then DeleteParty(tpa.Name);
 							PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
+                            PartyList.Delete(PartyList.IndexOf(tpa.ID));
 							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
 							tpa.Free;
 						end else begin
@@ -5702,6 +5709,10 @@ end;
 					end else begin
 						//パーティー名が重複してはいけない
 						tpa := TParty.Create;
+
+                        tpa.ID := NowPartyID;
+                        Inc(NowPartyID);
+
 						tpa.Name := str;
 						tpa.EXPShare := False;
 						tpa.ITEMShare := True;
@@ -5715,7 +5726,9 @@ end;
                                                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end;
 						tc.PartyName := tpa.Name;
+                        tc.PartyID := tpa.ID;
 						PartyNameList.AddObject(tpa.Name, tpa);
+                        PartyList.AddObject(tpa.ID, tpa);
 						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
 						SendPartyList(tc);
 						i := 0;

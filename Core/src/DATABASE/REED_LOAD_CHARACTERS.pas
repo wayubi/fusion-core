@@ -140,6 +140,7 @@ implementation
             tc.Plag := retrieve_data(42, path, 1);
             tc.PLv := retrieve_data(43, path, 1);
             tc.GuildID := retrieve_data(44, path, 1);
+            tc.PartyID := retrieve_data(45, path, 1);
 
             tc.PData := tp;
             { -- End - Retrieve and assign values to character. -- }

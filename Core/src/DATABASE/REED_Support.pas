@@ -239,7 +239,7 @@ uses
     { Parameters:                                                                           }
     {  - path : String, Represents the path to the file to be opened.                       }
     { Result:                                                                               }
-    {  - Result: TStringList, Represent the stringlist to return.                           }
+    {  - Result : TStringList, Represent the stringlist to return.                          }
     { ------------------------------------------------------------------------------------- }
     function stringlist_load(path : String) : TStringList;
     var
