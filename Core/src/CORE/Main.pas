@@ -3745,18 +3745,18 @@ begin
 						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
 
               if NoJamstone = False then UseItem(tc, j);
-              // Colus, 20031229: Corrected size/shape of Sanctuary field
+              // Colus, 20040117: Corrected position of Sanctuary field
               for j1 := 1 to 5 do begin
 							      for i1 := 1 to 5 do begin
 								        if ((i1 < 2) or (i1 > 4)) and ((j1 < 2) or (j1 > 4)) then Continue;
-								        xy.X := (MPoint.X) -2 + i1;
-								        xy.Y := (MPoint.Y) -2 + j1;
+								        xy.X := (MPoint.X) -3 + i1;
+								        xy.Y := (MPoint.Y) -3 + j1;
 
 								        if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
 								        tn := SetSkillUnit(tm, ID, xy, Tick, $46, 10, tl.Data1[MUseLV] * 1000);
-                                                                        tn.CType := 4;
+                        tn.CType := 4;
 								        tn.CData := tc;
-					                                tn.MSkill := MSkill;
+					              tn.MSkill := MSkill;
 								        tn.MUseLV := MUseLV;
 						        	end;
 						        end;
@@ -9939,10 +9939,20 @@ begin
                         tc.HP := tc.HP + j;
                         if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
 
+{                        // Colus, 20040117: Nobody else sees the heal, use 011a:
+  							        WFIFOW( 0, $011a);
+  							        WFIFOW( 2, 28);  // Cheat with heal
+  							        WFIFOW( 4, j);
+  							        WFIFOL( 6, ID);
+  							        WFIFOL(10, 0); // Not sure what to do about this (NPC's ID?)
+  							        WFIFOB(14, 1);
+  							        SendBCmd(tc.MData, tc.Point, 15);}
                         WFIFOW( 0, $013d);
                         WFIFOW( 2, $0005);
                         WFIFOW( 4, j);
-                        Socket.SendBuf(buf, 6);
+                        //Socket.SendBuf(buf, 6);
+                        SendBCmd(tc.MData, tc.Point, 6);
+
                         WFIFOW( 0, $00b0);
                         WFIFOW( 2, $0005);
                         WFIFOL( 4, HP);
@@ -9959,10 +9969,20 @@ begin
                         tc.HP := tc.HP + j;
                         if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
 
+                        {// Colus, 20040117: Nobody else sees the heal, use 011a:
+  							        WFIFOW( 0, $011a);
+  							        WFIFOW( 2, 28);  // Cheat with heal
+  							        WFIFOW( 4, j);
+  							        WFIFOL( 6, ID);
+  							        WFIFOL(10, ID); // Not sure what to do about this (NPC's ID?)
+  							        WFIFOB(14, 1);
+  							        SendBCmd(tc.MData, tc.Point, 15);}
                         WFIFOW( 0, $013d);
                         WFIFOW( 2, $0005);
                         WFIFOW( 4, j);
-                        Socket.SendBuf(buf, 6);
+                        //Socket.SendBuf(buf, 6);
+                        SendBCmd(tc.MData, tc.Point, 6);
+                        
                         WFIFOW( 0, $00b0);
                         WFIFOW( 2, $0005);
                         WFIFOL( 4, HP);
@@ -10412,6 +10432,7 @@ begin
                                                                 if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
                                                                         tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
                                                                         tc2.SkillTickID := tn.MSkill;
+
                                                                 end;
                                                                 tc2.InField := true;
                                                         end;

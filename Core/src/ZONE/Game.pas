@@ -5951,15 +5951,37 @@ end;
 					end;
 
 					//製造エフェクトパケット送信
+          // Colus, 20040117: Send results to creator (fixed packet composition)
+          // flag = 00 is success of Forging
+          // flag = 01 is failure of Forging
+          // flag = 02 is success of Pharmacy
+          // flag = 03 is failure of Pharmacy
 					WFIFOW(0, $018f);
-					WFIFOB(2, i);
-					WFIFOB(3, 0);
+					WFIFOW(2, i);
 					WFIFOW(4, m1);
-					SendBCmd(tm, tc.Point, 6);
+          Socket.SendBuf(buf, 6);
+
+          // ...now send the results to others with $019b.
+          // (Nice messed-up types here...)
+          // type=2 Refining failure
+          // type=3 Refining success
+          // type=4 ?
+          // type=5 Pharmacy success
+          // type=6 Pharmacy failure
+
+          WFIFOW(0, $019b);
+          WFIFOL(2, tc.ID);
+          if (i = 0) then begin
+            WFIFOL(6, 3);
+          end else begin
+            WFIFOL(6, 2);          
+          end;
+
+					SendBCmd(tm, tc.Point, 10);
 
 				end;
 			end;
-      
+
 		//--------------------------------------------------------------------------
     $0190: {Graffiti/Talkie Box}
       begin
