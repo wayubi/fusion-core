@@ -1,6 +1,13 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-25-04: Fixed crash on die due to fix #994. [AlexKreuz]
+- 06-25-04: Fixed #992 - Chara may not warp/exit for 10 seconds after damage. [AlexKreuz]
+- 06-25-04: Added to Globals.pas -> message_blue. [AlexKreuz]
+- 06-25-04: Added to Globals.pas -> message_yellow. [AlexKreuz]
+- 06-25-04: Added to Globals.pas -> message_green. [AlexKreuz]
+- 06-25-04: Added to Globals.pas -> check_attack_lag. [AlexKreuz]
+- 06-25-04: Created Globals.pas for new global functions. [AlexKreuz]
 - 06-25-04: Updated @die, #die to use CharaDie procedure. [AlexKreuz]
 - 06-25-04: Fixed #994 - All skill buffs expire on death now. [AlexKreuz]
 - 06-25-04: Modified script validation of waitingroom's maxsize from 2 to 1. [Tsusai]

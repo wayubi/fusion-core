@@ -9672,11 +9672,13 @@ begin
 							end;
 						end;//case
 						// Remove icon if the skill has one...
-						if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
-							if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('(Icon remove, skilltickid %d)',[SkillTickID]));
-								UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
-							end;
+                        if assigned(tc.Skill[tc.SkillTickID].Data) then begin
+							if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
+								if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
+									//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('(Icon remove, skilltickid %d)',[SkillTickID]));
+									UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
+								end;
+                            end;
 						end;
 
 						CalcStat(tc, Tick);
