@@ -1012,6 +1012,7 @@ TChara = class(TLiving)
         tmpPvPRank    :integer;
 
         guild_storage : Boolean;
+        NPC_Touch     : Boolean; //to make sure you don't keep setting off the same npc ontouch script.
 
 	constructor Create;
 	destructor  Destroy; override;

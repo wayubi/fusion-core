@@ -4169,7 +4169,7 @@ with tc do begin
                 
                 for k := 0 to tm.Block[m][n].CList.Count - 1 do begin
                     tc1 := tm.Block[m][n].CList.Objects[k] as TChara;
-                    
+
                     if tc <> tc1 then begin
                         if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
                         ((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
@@ -4192,7 +4192,7 @@ with tc do begin
                             
                             if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
                                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
-    
+
                                 SendCMove(tc1.Socket, tc, Point, tgtPoint);
                             end;
                         end;
@@ -4235,7 +4235,7 @@ with tc do begin
                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
                 Delete(IndexOf(ID));
             end;
-            
+
             tm.Block[Point.X div 8][Point.Y div 8].CList.AddObject(ID, tc);
             //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '		BlockMove OK');
         end;
@@ -4271,18 +4271,22 @@ with tc do begin
 
                             if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
                             (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
-                                tc.TalkNPCID := tn.ID;
-                                if tn.OnTouchLabel <> 0 then tc.ScriptStep := tn.OnTouchLabel
-                                else tc.ScriptStep := 0;
-                                tc.AMode := 3;
-                                if (tc.Option and 6 <> 0) then begin
-                                    tc.Option := tc.Option and $FFF9;
-                                    //å©ÇΩñ⁄ïœçX  Lit. "The eye modification which you saw"
-                                    UpdateOption(tm, tc);
+                                if not tc.NPC_Touch then begin
+                                    tc.TalkNPCID := tn.ID;
+                                    if tn.OnTouchLabel <> 0 then tc.ScriptStep := tn.OnTouchLabel
+                                    else tc.ScriptStep := 0;
+                                    tc.AMode := 3;
+                                    if (tc.Option and 6 <> 0) then begin
+                                        tc.Option := tc.Option and $FFF9;
+                                        //å©ÇΩñ⁄ïœçX  Lit. "The eye modification which you saw"
+                                        UpdateOption(tm, tc);
+                                    end;
+                                    tc.AData := tn;
+                                    NPCScript(tc);
+                                    tc.NPC_Touch := true; // trigger once
                                 end;
-                                tc.AData := tn;
-                                NPCScript(tc);
-                            end;
+                            end else if tc.NPC_Touch then
+                              tc.NPC_Touch := false; //disable after leaving (i hope)
                         end;
 
 
@@ -11559,13 +11563,13 @@ end;
 //online list kick
 procedure TfrmMain.Button18Click(Sender: TObject);
 begin
-    JCon_Chara_KickProcess(0);
+    JCon_Chara_KickProcess(False);
 end;
 
 //Kick Ban
 procedure TfrmMain.Button20Click(Sender: TObject);
 begin
-    JCon_Chara_KickProcess(1);
+    JCon_Chara_KickProcess(True);
 end;
 
 //setting a temp name for the online list

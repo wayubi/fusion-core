@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-03-04: Added a countermeasure for preventing setting off OnTouch multiple times. [Tsusai]
+- 11-03-04: JCon: Minor tweak to kick/ban procedure. [Tsusai]
 - 11-01-04: Cleaned up the structure of #changeskill. [Trihan]
 - 11-01-04: Cleaned up the structure of #zeny. [Trihan]
 - 11-01-04: Cleaned up the structure of #superstats. [Trihan]

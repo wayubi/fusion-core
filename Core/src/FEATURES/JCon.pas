@@ -24,7 +24,7 @@ uses
     procedure JCon_Characters_Save();
     procedure JCon_Characters_Online();
     procedure JCon_Chara_Online_Populate();
-    procedure JCon_Chara_KickProcess(Banflag : Integer);
+    procedure JCon_Chara_KickProcess(Ban : boolean);
     procedure JCon_Chara_Online_Rescue();
     procedure JCon_Chara_Online_PM();
     procedure JCon_Chara_Inv_Load();
@@ -552,7 +552,7 @@ uses
     end;
 
 
-    procedure JCon_Chara_KickProcess(Banflag : Integer);
+    procedure JCon_Chara_KickProcess(Ban : Boolean);
     var
         tc : TChara;
     begin
@@ -568,7 +568,7 @@ uses
                 end;
             end;
         end;
-        if Banflag = 1 then begin
+        if Ban then begin
             tc.PData.Banned := True;
             DataSave(true);
         end;
