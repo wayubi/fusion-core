@@ -29,8 +29,10 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            if (UID = '*') then path := basepath + resultlist[i] + '\Pets\'
-            else begin
+            if (UID = '*') then begin
+                path := basepath + resultlist[i] + '\Pets\';
+                resultlist[i] := '*';
+            end else begin
                 path := basepath + UID + '\Pets\';
                 resultlist[i] := UID;
             end;
