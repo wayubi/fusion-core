@@ -10631,8 +10631,9 @@ begin
 						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
 							StatCalc2(tc, tc1, Tick);
 					end;
-      6: //プロボック
+      6: // PVP Provoke
 					begin
+            DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 						tc1.ATarget := tc.ID;
 						tc1.AData := tc;
 						//パケ送信
@@ -10642,7 +10643,8 @@ begin
 						WFIFOL( 6, MTarget);
 						WFIFOL(10, ID);
             WFIFOB(14, 0);
-
+            //tc1.ATK[1][2] := word(tl.Data1[MUseLV]) * tc1.ATK[1][2] div 100;  // Unimplemented ATK increase.
+            tc1.DEF1 := word(tl.Data2[MUseLV]) * tc1.DEF1 div 100;
 						SendBCmd(tm, tc1.Point, 15);
 					end;
 				7: //MB、アローシャワー、グリム

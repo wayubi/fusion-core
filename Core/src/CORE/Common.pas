@@ -556,8 +556,8 @@ TSkill = class
 end;//TSkill
 //------------------------------------------------------------------------------
 TeNPC = class
-	ID            :Cardinal;  //ID
-	JID           :Word;      //(Chara)ジョブ (Mob)スプライト
+	ID            :Cardinal;  //ID - Identification Number for Character or Mob
+	JID           :Word;      //(Chara)ジョブ (Mob)スプライト - Character Job ID or Mob
 	CID           :Cardinal;
 	Name          :string;    //名前
 	Sit           :Byte;
@@ -568,7 +568,7 @@ TeNPC = class
 	ADelay        :Word;
 	aMotion       :Word;
 	dMotion       :Word;
-	Speed         :Word;      //移動速度[msec/1マス]
+	Speed         :Word;      //移動速度[msec/1マス] - Movement Speed millisecond per tile?
 
 	Item          :TItemList;
 
@@ -585,22 +585,22 @@ TeNPC = class
 	HPRTick       :Cardinal;
 	SPRTick       :Cardinal;
 
-	Hair          :Word;      //(Chara)髪型
-	Weapon        :Word;      //(Chara)武器の見た目
-	Shield        :Word;      //(Chara)盾の見た目
-	Head1         :Word;      //(Chara)頭装備-上段の見た目
-	Head2         :Word;      //(Chara)頭装備-中段の見た目
-	Head3         :Word;      //(Chara)頭装備-下段の見た目
-	HairColor     :Word;      //(Chara)髪の色
-	ClothesColor  :Word;      //(Chara)服の色
-	HeadDir       :Word;      //(Chara)頭の向き
-	GuildID       :Word;      //(Chara)所属ギルドのID
+	Hair          :Word;      //(Chara)髪型 - Hair Style
+	Weapon        :Word;      //(Chara)武器の見た目 - Weapon Style
+	Shield        :Word;      //(Chara)盾の見た目 - Shield Style
+	Head1         :Word;      //(Chara)頭装備-上段の見た目 - Upper Head Style
+	Head2         :Word;      //(Chara)頭装備-中段の見た目 - Middle Head Style
+	Head3         :Word;      //(Chara)頭装備-下段の見た目 - Lower Head Style
+	HairColor     :Word;      //(Chara)髪の色 - Hair Color
+	ClothesColor  :Word;      //(Chara)服の色 - Dye Color
+	HeadDir       :Word;      //(Chara)頭の向き - Head Direction
+	GuildID       :Word;      //(Chara)所属ギルドのID - Character's Guild ID
 	__0           :Word;      //不明1
 	__1           :Word;      //不明2
 	Manner        :Word;      //(Chara)マナーポイント
 	Karma         :Word;      //(Chara)カルマポイント
 	__2           :Byte;      //不明3
-	Gender        :Byte;      //(Chara)性別
+	Gender        :Byte;      //(Chara)性別 - Character's Gender
 
 	Map           :string;    //今居るマップ
 	Point         :TPoint;    //今居る座標(左下が(0,0))
@@ -808,18 +808,18 @@ end;//TeNPC
 	ParamUp       :array[0..5] of word;
 	WeaponType    :array[0..1] of word; // Right(0), left(1) hand weapon types
   WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
-{追加}
+{追加 - Weapon Levels}
 	WeaponLv      :array[0..1] of word; // Weapon levels for right/left
-{追加ココまで}
+{追加ココまで - Attaclpower and Weapon Fixes}
 	ArmsFix       :array[0..1] of word; // Right/left training (mastery?)
 	ATK           :array[0..1] of array[0..5] of word; // Displayed ATK power
 	ATKFix        :array[0..1] of array[0..2] of integer; // Weapon correction based on enemy size
-{変更}
+{変更 - Damage Modifiers and Fixes}
 	AttPower      :Word; // Attack power additions from cards, etc.
 	DamageFixR    :array[0..1] of array[0..9] of Integer; //Race correction %: 0=weapon, 1=armor
 	DamageFixE    :array[0..1] of array[0..9] of Integer; //Element correction %: 0=weapon, 1=armor
 	DamageFixS    :array[0..2] of Integer;                //Size correction %: 0=S, 1=M, 2=L
-{変更ココまで}
+{変更ココまで - Battle Stats?}
 	DAPer         :integer; //DA発動確率
 	DAFix         :integer; //DA発動時の2発合計攻撃力%
 	Arrow         :word; //装備中の矢のID
@@ -852,8 +852,8 @@ end;//TeNPC
 	Range         :word;
 	WElement      :array[0..1] of byte; // Weapon elements
 	ArmorElement  :byte; // Armor element (from card or armor type)
-	HPR           :word; //HP回復スキルの回復値
-	SPR           :word; //SP回復スキルの回復値
+	HPR           :word; //HP Recovery Rate
+	SPR           :word; //SP Recovery Rate
 {変更}
 	DrainFix      :array[0..1] of Integer; //吸収量   0:HP 1:SP
 	DrainPer      :array[0..1] of Integer; //吸収確率 0:HP 1:SP
