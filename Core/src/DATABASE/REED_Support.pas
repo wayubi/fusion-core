@@ -658,7 +658,6 @@ uses
 
             for j := 0 to cdirlist.Count - 1 do begin
                 for k := 0 to clist.Count - 1 do begin
-                    breakloop := False;
 
                     if (cdirlist[j] = clist[k]) then begin
                         path := basepath + resultlist[i] + '\Characters\' + cdirlist[j] + '\Character.txt';
@@ -697,9 +696,13 @@ uses
 
                         clist.Delete(k);
 
-                        breakloop := True;
+                        Break;
 
                     end;
+
+                end;
+
+                for k := 0 to plist.Count - 1 do begin
 
                     if (cdirlist[j] = plist[k]) then begin
                         path := basepath + resultlist[i] + '\Characters\' + cdirlist[j] + '\Character.txt';
@@ -727,10 +730,8 @@ uses
 
                         plist.Delete(k);
 
-                        breakloop := True;
+                        Break;
                     end;
-
-                    if (breakloop) then Break;
 
                 end;
 

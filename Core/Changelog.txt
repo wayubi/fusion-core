@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-25-04: Guild member outside of party caused Pre-Link crash. [AlexKreuz]
 - 12-25-04: Fixed broadcast handling using the broadcast procedure & scripts. [Tsusai]
 - 12-22-04: Accesslevel field did not clear on JCon Accounts page. [AlexKreuz]
 - 12-22-04: Major performance increase to startup times. [AlexKreuz]
