@@ -417,14 +417,14 @@ Begin(* Proc sv3PacketProcess() *)
         {Colus, 20040113: This buffer makes no sense.  Why is it here?
          It causes items to screw up, rather badly.}
          {
-                                WFIFOW( 2, 4+37*j);
-                                Socket.SendBuf(buf, 4+37*j);
+        WFIFOW( 2, 4+37*j);
+        Socket.SendBuf(buf, 4+37*j);
          }
-				//ÉpÉâÉÅÅ[É^
+				//ÉpÉâÉÅÅ[É^  Lit. "Parameter"
 				CalcStat(tc);
 				SendCStat(tc, true);
 
-				//ÉAÉCÉeÉÄÉfÅ[É
+				//ÉAÉCÉeÉÄÉfÅ[É  Lit. "Item Data"
 				WFIFOW(0, $00a3);
 				j := 0;
 				for i := 1 to 100 do begin
@@ -443,7 +443,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 				WFIFOW(2, 4+j*10);
 				Socket.SendBuf(buf, 4+j*10);
-				//ëïîıÉfÅ[É^
+				//ëïîıÉfÅ[É^  Lit. "Equipment data"
 				WFIFOW(0, $00a4);
 				j := 0;
 				for i := 1 to 100 do begin
@@ -471,7 +471,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 				WFIFOW(2, 4+j*20);
 				Socket.SendBuf(buf, 4+j*20);
-				//ëïîıÇµÇƒÇ¢ÇÈã|
+				//ÇµÇƒÇ¢ÇÈã|  Lit. "The bow which it has done"
 				j := 0;
 				for i := 1 to 100 do begin
 					if (tc.Item[i].ID <> 0) and (tc.Item[i].Equip = 32768) then begin
@@ -483,11 +483,11 @@ Begin(* Proc sv3PacketProcess() *)
 				WFIFOW(2, j);
 				Socket.SendBuf(buf, 4);
 
-				//ÉJÅ[ÉgÉfÅ[É^ëóêM
-        // Colus, 20040123: Other carts weren't getting checked.
-        w3 := tc.Option and $0788;
+				//ÉJÅ[ÉgÉfÅ[É^ëóêM Lit. "Cart data transmission"
+				// Colus, 20040123: Other carts weren't getting checked.
+				w3 := tc.Option and $0788;
 				if (w3 <> 0) then begin
-				    SendCart(tc);
+					SendCart(tc);
 				end;
 
 				tc.HPTick := timeGetTime();
@@ -499,10 +499,10 @@ Begin(* Proc sv3PacketProcess() *)
 				tc.DmgTick := 0;
 
 				tc.Login := 2;
-{ÉpÅ[ÉeÉBÅ[ã@î\í«â¡}
+{ÉpÅ[ÉeÉBÅ[ã@î\í«â¡} {Lit. "Party functional addition"}
 				SendPartyList(tc);
-{ÉpÅ[ÉeÉBÅ[ã@î\ÉRÉRÇ‹Ç≈}
-{ÉLÉÖÅ[ÉyÉbÉg}
+{ÉpÅ[ÉeÉBÅ[ã@î\ÉRÉRÇ‹Ç≈} {Lit. "To party functional coconut"}
+{ÉLÉÖÅ[ÉyÉbÉg} {Lit. "Queue pet" or "Cute pet"}
         j := 0;
         for i := 1 to 100 do begin
           if ( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
@@ -627,61 +627,59 @@ Begin(* Proc sv3PacketProcess() *)
             if (tc.Map <> tn.Map) OR (abs(tc.Point.X - tn.Point.X) > 15) OR
                (abs(tc.Point.Y - tn.Point.Y) > 15) then begin
               Continue;
-            end;
-					  case tn.CType of
-					    1:	//shop
-				    		begin
-				    			WFIFOW(0, $00c4);
-				    			WFIFOL(2, l);
+						end;
+						case tn.CType of
+							1:	//shop
+								begin
+									WFIFOW(0, $00c4);
+									WFIFOL(2, l);
 									Socket.SendBuf(buf, 6);
-				    		end;
-				    	2:	//script
-				    		begin
-				    			tc.TalkNPCID := tn.ID;
-					    		tc.ScriptStep := 0;
-						    	tc.AMode := 3;
-								// Option Reset
-                // Colus, 20040204: WHY?  You will lose your peco/falcon when
-                // talking/shopping...you want to unhide, perhaps, but not
-                // completely reset your options.
+								end;
+							2:	//script
+								begin
+									tc.TalkNPCID := tn.ID;
+									tc.ScriptStep := 0;
+									tc.AMode := 3;
+									// Option Reset
+									// Colus, 20040204: WHY?  You will lose your peco/falcon when
+									// talking/shopping...you want to unhide, perhaps, but not
+									// completely reset your options.
 									if (tc.Option and 6 <> 0) then begin
 										tc.Option := tc.Option and $FFF9;
 										//å©ÇΩñ⁄ïœçX  Lit. "The eye modification which you saw"
-                  UpdateOption(tm, tc);
+										UpdateOption(tm, tc);
 									end;
-							    tc.AData := tn;
-					    		NPCScript(tc);
-					    	end;
-                { 4: // Skillunit
-                  begin
-                  if (tn.JID = $8d) then begin
+									tc.AData := tn;
+									NPCScript(tc);
+								end;
+							{ 4: // Skillunit
+								begin
+									if (tn.JID = $8d) then begin
 										if tc.pcnt <> 0 then xy := tc.tgtPoint else xy := tc.Point;
 										if (abs(xy.X - tn.Point.X) > tc.Range) or (abs(xy.Y - tn.Point.Y) > tc.Range) then begin
-											//ãóó£Ç™âìÇ∑Ç¨ÇÈ
-											WFIFOW( 0, $0139);
-											WFIFOL( 2, tn.ID);
-											WFIFOW( 6, tn.Point.X);
-											WFIFOW( 8, tn.Point.Y);
-											WFIFOW(10, tc.Point.X);
-											WFIFOW(12, tc.Point.Y);
-							WFIFOW(14, tc.Range); //éÀíˆ
-							Socket.SendBuf(buf, 16);
-						end else begin
-							//çUåÇâ¬î\
-							if b = 7 then tc.AMode := 2 else tc.AMode := 1;
-							tc.ATarget := tn.ID;
-							tc.AData := tn;
-							if tc.ATick + tc.ADelay - 200 < timeGetTime() then
-								tc.ATick := timeGetTime() - tc.ADelay + 200;
-						end;
-                      end;
-                    end;}
-					        end;
-			        	end;
-                                        //ÉÇÉìÉXÉ^Å[å^NPCÅ@Ç±Ç±Ç‹Ç≈
-////////////////////////////////////
-
-
+										//ãóó£Ç™âìÇ∑Ç¨ÇÈ
+										WFIFOW( 0, $0139);
+										WFIFOL( 2, tn.ID);
+										WFIFOW( 6, tn.Point.X);
+										WFIFOW( 8, tn.Point.Y);
+										WFIFOW(10, tc.Point.X);
+										WFIFOW(12, tc.Point.Y);
+										WFIFOW(14, tc.Range); //éÀíˆ
+										Socket.SendBuf(buf, 16);
+									end else begin
+										//çUåÇâ¬î\
+										if b = 7 then tc.AMode := 2 else tc.AMode := 1;
+										tc.ATarget := tn.ID;
+										tc.AData := tn;
+										if tc.ATick + tc.ADelay - 200 < timeGetTime() then
+											tc.ATick := timeGetTime() - tc.ADelay + 200;
+									end;//if (tn.JID) else
+								end;//case-4
+								end;}
+						end;//case tn.CType
+					end;//if tm.NPC.IndexOf(l)
+					//ÉÇÉìÉXÉ^Å[å^NPCÅ@Ç±Ç±Ç‹Ç≈
+					////////////////////////////////////
 					if tm.Mob.IndexOf(l) <> -1 then begin
 						//ëŒÉÇÉìÉXÉ^Å[
 						ts := tm.Mob.IndexOfObject(l) as TMob;
@@ -705,11 +703,10 @@ Begin(* Proc sv3PacketProcess() *)
 								tc.ATick := timeGetTime() - tc.ADelay + 200;
 						end;
 					end else begin
-                                            //ÉÇÉìÉXÉ^Å[Ç≈Ç»Ç¢
-          end;
+						//ÉÇÉìÉXÉ^Å[Ç≈Ç»Ç¢
+					end;
 
-
-          if tm.CList.IndexOf(l) <> -1 then begin
+					if tm.CList.IndexOf(l) <> -1 then begin
 						tc1 := tm.CList.IndexOfObject(l) as TChara;
 						if tc.pcnt <> 0 then xy := tc.tgtPoint else xy := tc.Point;
 						if (abs(xy.X - tc1.Point.X) > tc.Range) or (abs(xy.Y - tc1.Point.Y) > tc.Range) then begin
@@ -730,57 +727,55 @@ Begin(* Proc sv3PacketProcess() *)
 							if tc.ATick + tc.ADelay - 200 < timeGetTime() then
 								tc.ATick := timeGetTime() - tc.ADelay + 200;
 						end;
-           end;
+					end;//if tm.CList.IndexOf(l)
 
 				end else if (b = 2) or (b = 3) then begin
-        if (tc.Skill[1].Lv >= 3) then begin
-					//ç¿ÇË
-					tc.Sit := b;
-					tm := tc.MData;
-					WFIFOW(0, $008a);
-					WFIFOL(2, tc.ID);
-					WFIFOB(26, b);
+					if (tc.Skill[1].Lv >= 3) then begin
+						//ç¿ÇË
+						tc.Sit := b;
+						tm := tc.MData;
+						WFIFOW(0, $008a);
+						WFIFOL(2, tc.ID);
+						WFIFOB(26, b);
 
-					SendBCmd(tm, tc.Point, 29);
-        end else begin
-          w := tc.MSkill;
-          tc.MSkill := 1;
-          SendSkillError(tc, 0, 2);
-          tc.MSkill := w;
-        end;
+						SendBCmd(tm, tc.Point, 29);
+					end else begin
+						w := tc.MSkill;
+						tc.MSkill := 1;
+						SendSkillError(tc, 0, 2);
+						tc.MSkill := w;
+					end;//if-else
 				end;
-			end;
+			end;//$0089
 		//--------------------------------------------------------------------------
 		$008c: //ÇµÇ·Ç◊ÇÈ
 			begin
-					tm := tc.MData;
-        h := IDTableDB.IndexOf(tc.ID);
+				tm := tc.MData;
+				h := IDTableDB.IndexOf(tc.ID);
 
 				RFIFOW(2, w);
 				str := RFIFOS(4, w - 4);
 {Edit - Miyuki}
-        if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
+				if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
 					str := Copy(str, Pos(' : ', str) + 4, 256);
 					//#Ç≈énÇ‹ÇÈÉRÉ}ÉìÉh(éÂÇ…Ç≈ÇŒÇÆóp)
-          tid := IDTableDB.Objects[h] as TIDTbl;
+					tid := IDTableDB.Objects[h] as TIDTbl;
 
 
-// NEW GM COMMANDS
-if (Copy(str, 1, 8) = 'greaper') then begin
-        WFIFOW(0, $0119);
-        WFIFOL(2, tc.ID);
-        WFIFOW(6, 0);
-        WFIFOW(8, 2);
-        WFIFOW(10, 64);
-        WFIFOB(12, 0);
-        SendBCmd(tm, tc.Point, 13);
-        tc.Stat1 := 0;
-        tc.Stat2 := 2;
-        tc.Option := 64;
-end
-// NEW GM COMMANDS
-
-
+					// NEW GM COMMANDS
+					if (Copy(str, 1, 8) = 'greaper') then begin
+						WFIFOW(0, $0119);
+						WFIFOL(2, tc.ID);
+						WFIFOW(6, 0);
+						WFIFOW(8, 2);
+		        WFIFOW(10, 64);
+		        WFIFOB(12, 0);
+		        SendBCmd(tm, tc.Point, 13);
+		        tc.Stat1 := 0;
+		        tc.Stat2 := 2;
+						tc.Option := 64;
+					end
+					// NEW GM COMMANDS
 
 					else if (Copy(str, 1, 4) = 'save') and ((DebugCMD and $0001) <> 0) and (tid.SaveReturn = 1) then begin
 						//åªç›ínÇÉZÅ[ÉuÇ∑ÇÈ
@@ -788,7 +783,7 @@ end
 						tc.SavePoint.X := tc.Point.X;
 						tc.SavePoint.Y := tc.Point.Y;
 
-            //Mitch 01-29-2004: Tell the user its saved
+						//Mitch 01-29-2004: Tell the user its saved
             str2 := 'Saved at ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
             w := Length(str2) + 4;
             WFIFOW(0, $009a);
@@ -805,78 +800,78 @@ end
 						Val(Copy(str, 8, 256), i, k);
 						if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc.BaseLV) then begin
 
-              //if (i >= 100) and (tc.ParamBase[2] >= 111) then begin
-              //tc.ParamBase[2] := 110;
-              //end;
+							//if (i >= 100) and (tc.ParamBase[2] >= 111) then begin
+							//tc.ParamBase[2] := 110;
+							//end;
 
-              if tc.BaseLV > i then begin
-							tc.BaseLV := i;
+							if tc.BaseLV > i then begin
+								tc.BaseLV := i;
 
-              for i := 0 to 5 do begin
-						  tc.ParamBase[i] := 1;
-					    end;
-					    tc.StatusPoint := 48;
-					    for i := 1 to tc.BaseLV - 1 do begin
-						  tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-				      end;
+								for i := 0 to 5 do begin
+									tc.ParamBase[i] := 1;
+								end;//for
+								tc.StatusPoint := 48;
+								for i := 1 to tc.BaseLV - 1 do begin
+									tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+								end;//for
 
-              end else begin
-              w3 := tc.BaseLV;
-              tc.BaseLV := i;
-					    for i := w3 to tc.BaseLV - 1 do begin
-						  tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-				      end;
-              end;
+							end else begin
+								w3 := tc.BaseLV;
+								tc.BaseLV := i;
+								for i := w3 to tc.BaseLV - 1 do begin
+									tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+								end;//for
+							end;//if-else
 
-              tc.BaseEXP := tc.BaseNextEXP - 1;
-              tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
-              CalcStat(tc);
-              SendCStat(tc);
-              SendCStat1(tc, 0, $000b, tc.BaseLV);
-              SendCStat1(tc, 0, $0009, tc.StatusPoint);
-              SendCStat1(tc, 1, $0001, tc.BaseEXP);
+							tc.BaseEXP := tc.BaseNextEXP - 1;
+							tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+							CalcStat(tc);
+							SendCStat(tc);
+							SendCStat1(tc, 0, $000b, tc.BaseLV);
+							SendCStat1(tc, 0, $0009, tc.StatusPoint);
+							SendCStat1(tc, 1, $0001, tc.BaseEXP);
 						end;
-            end else if (Copy(str, 1, 7) = 'jlevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
+					end else if (Copy(str, 1, 7) = 'jlevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
 						//ÉXÉsÅ[ÉhïœçX
 						Val(Copy(str, 8, 256), i, k);
 						if (k = 0) and (i >= 1) and (i <= 99) then begin
 							tc.JobLV := i;
 
-              for i := 2 to MAX_SKILL_NUMBER do begin
-              if not tc.Skill[i].Card then
-							tc.Skill[i].Lv := 0;
-					    end;
-					    if tc.JID = 0 then begin
-					    end else if tc.JID < 7 then tc.SkillPoint := tc.JobLV -1
-					    else tc.SkillPoint := tc.JobLV -1 + 49;
-              SendCSkillList(tc);
+							for i := 2 to MAX_SKILL_NUMBER do begin
+							  if not tc.Skill[i].Card then
+									tc.Skill[i].Lv := 0;
+							end;
+							if tc.JID = 0 then begin
+							end else if tc.JID < 7 then tc.SkillPoint := tc.JobLV -1
+							else tc.SkillPoint := tc.JobLV -1 + 49;
+							SendCSkillList(tc);
 
-              tc.JobEXP := tc.JobNextEXP - 1;
-              if tc.JID < 13 then begin
-				      j := (tc.JID + 5) div 6 + 1;
-			        end else begin
-				      j := 3;
-			        end;
-              tc.JobNextEXP := ExpTable[j][tc.JobLV];
-              
-              CalcStat(tc);
-              SendCStat(tc);
-              SendCStat1(tc, 0, $0037, tc.JobLV);
-              SendCStat1(tc, 0, $000c, tc.SkillPoint);
-              SendCStat1(tc, 1, $0002, tc.JobEXP);
+							tc.JobEXP := tc.JobNextEXP - 1;
+							if tc.JID < 13 then begin
+								j := (tc.JID + 5) div 6 + 1;
+							end else begin
+								j := 3;
+							end;//if else
+							tc.JobNextEXP := ExpTable[j][tc.JobLV];
+
+							CalcStat(tc);
+							SendCStat(tc);
+							SendCStat1(tc, 0, $0037, tc.JobLV);
+							SendCStat1(tc, 0, $000c, tc.SkillPoint);
+							SendCStat1(tc, 1, $0002, tc.JobEXP);
 						end;
 					end else if (Copy(str, 1, 5) = 'warp ') and ((DebugCMD and $0004) <> 0) and (tid.Warp = 1) then begin
 						//îCà”ÇÃèÍèäÇ…ÉèÅ[Év
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 6, 256);
+						SL := TStringList.Create;
+						SL.DelimitedText := Copy(str, 6, 256);
 						try
-							if sl.Count <> 3 then continue;
-							Val(sl.Strings[1], i, k);
+							if SL.Count <> 3 then continue;
+							Val(SL.Strings[1], i, k);
 							if k <> 0 then continue;
 							Val(sl.Strings[2], j, k);
 							if k <> 0 then continue;
 							//É}ÉbÉvë∂ç›É`ÉFÉbÉN
-              // Colus, 20040122: Lower-case to prevent problems with 'Prontera' mapname
+							// Colus, 20040122: Lower-case to prevent problems with 'Prontera' mapname
 							if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then continue;
 							//ç¿ïWÉ`ÉFÉbÉN
 							ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
@@ -888,7 +883,7 @@ end
 							MapMove(Socket, LowerCase(sl.Strings[0]), Point(i,j));
 
 						finally
-							sl.Free();
+							SL.Free();
 						end;
 
           end else if (Copy(str, 1, 11) = 'skillpoint ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
@@ -899,275 +894,290 @@ end
             end;
 
           end else if (Copy(str, 1, 11) = 'changestat ') and ((DebugCMD and $0004) <> 0) and (tid.ChangeStatSkill = 1) then begin
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 12, 256);
+						SL := TStringList.Create;
+						SL.DelimitedText := Copy(str, 12, 256);
 						try
-							if sl.Count = 2 then begin
-							Val(sl.Strings[0], i, k);
-              if(i >= 0) and (i <= 5) then begin
-							Val(sl.Strings[1], j, k);
-							if(j >= 1) and (j <= 99) then begin
+							if SL.Count = 2 then begin
+								Val(SL[0], i, k); //CRW - default index in StringList is Strings
+								if(i >= 0) and (i <= 5) then begin
+									Val(SL[1], j, k);
+									if(j >= 1) and (j <= 99) then begin
 
-              //if (i = 2) and (j >= 111) and (tc.BaseLV >= 100) then begin
-              //j := 110 - tc.Bonus[2];
-              //end;
+			              //if (i = 2) and (j >= 111) and (tc.BaseLV >= 100) then begin
+			              //  j := 110 - tc.Bonus[2];
+			              //end;
 
-							tc.ParamBase[i] := j;
-              CalcStat(tc);
-              SendCStat(tc);
-              SendCStat1(tc, 0, $0009, tc.StatusPoint);
-              end;
-              end;
-              end;
+										tc.ParamBase[i] := j;
+			              CalcStat(tc);
+			              SendCStat(tc);
+			              SendCStat1(tc, 0, $0009, tc.StatusPoint);
+									end;
+								end;
+							end;
 						finally
-							sl.Free();
+							SL.Free();
 						end;
 
-					end else if (Copy(str, 1, 6) = 'speed ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
+					end
+					else if (Copy(str, 1, 6) = 'speed ') AND
+									((DebugCMD and $0008) <> 0) AND (tid.ChangeStatSkill = 1) then
+					begin
 						//ÉXÉsÅ[ÉhïœçX
 						Val(Copy(str, 6, 256), i, k);
-						if (k = 0) and (i >= 25) and (i <= 1000) then begin
+						if (k = 0) AND (i >= 25) AND (i <= 1000) then begin
 							tc.DefaultSpeed := i;
 							CalcStat(tc);
 							SendCStat1(tc, 0, 0, tc.Speed);
 						end;
 
-      end else if (Copy(str, 1, 5) = 'whois') and ((DebugCMD and $0002) <> 0) and (tid.Whois = 1) then begin
-        str2 := 'Users Currently Logged in:';
-        for i := 0 to CharaName.Count - 1 do begin
-				tc1 := CharaName.Objects[i] as TChara;
-				if tc1.Login = 2 then begin
-        if str2 = 'Users Currently Logged in:' Then begin
-        str2 := str2 + tc1.Name;
-        end else begin
-        str2 := str2 + ',' + tc1.Name;
-				end;
-        end;
-        end;
-        DebugOut.Lines.Add(str2);
+					end
+					else if (Copy(str, 1, 5) = 'whois') AND
+									((DebugCMD AND $0002) <> 0) AND (tid.Whois = 1) then
+					begin
+						str2 := 'Users Currently Logged in:';
+						for i := 0 to CharaName.Count - 1 do begin
+							tc1 := CharaName.Objects[i] as TChara;
+							if tc1.Login = 2 then begin
+								if str2 = 'Users Currently Logged in:' Then begin
+									str2 := str2 + tc1.Name;
+								end else begin
+									str2 := str2 + ',' + tc1.Name;
+								end;//if-else
+							end;
+						end;//for i
+						DebugOut.Lines.Add(str2);
 
-        {Mitch 01-29-2004: Make w the correct length of the packet instead of just 200 }
-        w := Length(str2) + 4;
-        WFIFOW(0, $009a);
-        WFIFOW(2, w);
-        WFIFOS(4, str2, w - 4);
-        tc.Socket.SendBuf(buf, w);
-  end else if (Copy(str, 1, 8) = 'monster ') and ((DebugCMD and $0004) <> 0) and (tid.MonsterSummon = 1) then begin
-      sl := TStringList.Create;
-      sl.DelimitedText := Copy(str, 9, 256);
-							if sl.Count = 2 then begin
-              if (MobDBName.IndexOf(sl.Strings[0]) <> -1) then begin
-							Val(sl.Strings[1], j, k);
-							if(j >= 1) and (j <= 20) then begin
+						{Mitch 01-29-2004: Make w the correct length of the packet instead of just 200 }
+						w := Length(str2) + 4;
+						WFIFOW(0, $009a);
+		        WFIFOW(2, w);
+						WFIFOS(4, str2, w - 4);
+						tc.Socket.SendBuf(buf, w);
+					end //cmd /whois
+					else if (Copy(str, 1, 8) = 'monster ') AND
+									((DebugCMD AND $0004) <> 0) AND (tid.MonsterSummon = 1) then
+					begin
+						SL := TStringList.Create;
+						SL.DelimitedText := Copy(str, 9, 256);
+						if SL.Count = 2 then begin
+							if (MobDBName.IndexOf(sl.Strings[0]) <> -1) then begin
+								Val(sl.Strings[1], j, k);
+								if(j >= 1) and (j <= 20) then begin
 
-          for l := 1 to j do begin
-          tm := tc.MData;
+									for l := 1 to j do begin
+										tm := tc.MData;
 
-          ts := TMob.Create;
-					ts.Data := MobDBName.Objects[MobDBName.IndexOf(sl.Strings[0])] as TMobDB;
-					ts.ID := NowMobID;
-					Inc(NowMobID);
-					ts.Name := ts.Data.JName;
-					ts.JID := ts.Data.ID;
-					ts.Map := tc.Map;
-          ts.Data.isLink :=false;
-          //ts.Data.isLoot :=false;
-					//ÉvÉåÉCÉÑÅ[ÇÃé¸àÕ9É}ÉXÇÃÇ«Ç±Ç©Ç…è¢ä“
-					ts.Point.X := tc.Point.X + Random(2) - 1;
-					ts.Point.Y := tc.Point.Y + Random(2) - 1;
+										ts := TMob.Create;
+										ts.Data := MobDBName.Objects[MobDBName.IndexOf(sl.Strings[0])] as TMobDB;
+										ts.ID := NowMobID;
+										Inc(NowMobID);
+										ts.Name := ts.Data.JName;
+										ts.JID := ts.Data.ID;
+										ts.Map := tc.Map;
+										ts.Data.isLink :=false;
+										//ts.Data.isLoot :=false;
+										//ÉvÉåÉCÉÑÅ[ÇÃé¸àÕ9É}ÉXÇÃÇ«Ç±Ç©Ç…è¢ä“
+										ts.Point.X := tc.Point.X + Random(2) - 1;
+										ts.Point.Y := tc.Point.Y + Random(2) - 1;
 
-					ts.Dir := Random(8);
-					ts.HP := ts.Data.HP;
-					ts.Speed := ts.Data.Speed;
+										ts.Dir := Random(8);
+										ts.HP := ts.Data.HP;
+										ts.Speed := ts.Data.Speed;
 
-					//ï¶Ç´ä‘äuÇã…ëÂÇ…ê›íË
-					//Ç±Ç±ÇÕÇøÇÂÇ¡Ç∆èàóùÇ™ìKìñÇ©Ç»ÅH
+										//ï¶Ç´ä‘äuÇã…ëÂÇ…ê›íË
+										//Ç±Ç±ÇÕÇøÇÂÇ¡Ç∆èàóùÇ™ìKìñÇ©Ç»ÅH
 
-					ts.SpawnDelay1 := $7FFFFFFF;
-					ts.SpawnDelay2 := 0;
+										ts.SpawnDelay1 := $7FFFFFFF;
+										ts.SpawnDelay2 := 0;
 
-					ts.SpawnType := 0;
-					ts.SpawnTick := 0;
-					if ts.Data.isDontMove then
-						ts.MoveWait := $FFFFFFFF
-					else
-          ts.MoveWait := timeGetTime();
-					ts.ATarget := 0;
-					ts.ATKPer := 100;
-					ts.DEFPer := 100;
-					ts.DmgTick := 0;
+										ts.SpawnType := 0;
+										ts.SpawnTick := 0;
+										if ts.Data.isDontMove then
+											ts.MoveWait := $FFFFFFFF
+										else
+											ts.MoveWait := timeGetTime;
+										ts.ATarget := 0;
+										ts.ATKPer := 100;
+										ts.DEFPer := 100;
+										ts.DmgTick := 0;
 
-          ts.Element := ts.Data.Element;
+					          ts.Element := ts.Data.Element;
 
-          if (SummonMonsterName = true) then begin
-          ts.Name := ts.Data.JName;
-          end else begin
-					ts.Name := 'Summon Monster';
-          end;
+					          if (SummonMonsterName = true) then begin
+						          ts.Name := ts.Data.JName;
+					          end else begin
+											ts.Name := 'Summon Monster';
+					          end;
 
-          if (SummonMonsterExp = false) then begin
-					ts.Data.MEXP := 0;
-					ts.Data.EXP := 0;
-					ts.Data.JEXP := 0;
-          end;
+										if (SummonMonsterExp = false) then begin
+											ts.Data.MEXP := 0;
+											ts.Data.EXP := 0;
+											ts.Data.JEXP := 0;
+										end;
 
-          if (SummonMonsterAgo = true) then begin
-					ts.isActive := true;
-          end else begin
-          ts.isActive := ts.Data.isActive;
-          end;
+										if (SummonMonsterAgo = true) then begin
+											ts.isActive := true;
+										end else begin
+											ts.isActive := ts.Data.isActive;
+										end;
 
-					ts.MoveWait := timeGetTime();
+										ts.MoveWait := timeGetTime();
 
-					for j := 0 to 31 do begin
-						ts.EXPDist[j].CData := nil;
-						ts.EXPDist[j].Dmg := 0;
-					end;
-					if ts.Data.MEXP <> 0 then begin
-						for j := 0 to 31 do begin
-							ts.MVPDist[j].CData := nil;
-							ts.MVPDist[j].Dmg := 0;
+										for j := 0 to 31 do begin
+											ts.EXPDist[j].CData := nil;
+											ts.EXPDist[j].Dmg := 0;
+										end;
+										if ts.Data.MEXP <> 0 then begin
+											for j := 0 to 31 do begin
+												ts.MVPDist[j].CData := nil;
+												ts.MVPDist[j].Dmg := 0;
+											end;
+											ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAÇ…30%â¡éZ
+										end;
+										ts.isSummon := True;
+										ts.EmperiumID := 0;
+
+										tm.Mob.AddObject(ts.ID, ts);
+										tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+
+										SendMData(tc.Socket, ts);
+										//é¸àÕÇ…ëóêM
+										SendBCmd(tm,ts.Point,41,tc,False);
+
+
+										if (SummonMonsterMob = true) then begin
+											k := SlaveDBName.IndexOf(sl.Strings[0]);
+											if (k <> -1) then begin
+												ts.isLeader := true;
+
+												tss := SlaveDBName.Objects[k] as TSlaveDB;
+												if sl.Strings[0] = tss.Name then begin
+
+													h := tss.TotalSlaves;
+													ts.SlaveCount := h;
+													repeat
+														for i := 0 to 4 do begin
+															if (tss.Slaves[i] <> -1) AND
+																 (h <> 0) then
+															begin
+											          ts1 := TMob.Create;
+																ts1.Data := MobDBName.Objects[tss.Slaves[i]] as TMobDB;
+																ts1.ID := NowMobID;
+											          ts.Slaves[h] := ts1.ID;
+																Inc(NowMobID);
+																ts1.Name := ts1.Data.JName;
+																ts1.JID := ts1.Data.ID;
+																ts1.LeaderID := ts.ID;
+																ts1.Data.isLink := false;
+																ts1.Map := ts.Map;
+																//CRW - tested, can copy point as a whole.
+																ts1.Point := ts.Point;
+																ts1.Dir := ts.Dir;
+																ts1.HP := ts1.Data.HP;
+																if ts.Data.Speed < ts1.Data.Speed then begin
+																	ts1.Speed := ts.Data.Speed;
+																end else begin
+																	ts1.Speed := ts1.Data.Speed;
+																end;
+																ts1.SpawnDelay1 := $7FFFFFFF;
+																ts1.SpawnDelay2 := 0;
+																ts1.SpawnType := 0;
+																ts1.SpawnTick := 0;
+																if ts1.Data.isDontMove then
+																	ts1.MoveWait := $FFFFFFFF
+																else
+																	ts1.MoveWait := ts.MoveWait;
+																ts1.ATarget := 0;
+																ts1.ATKPer := 100;
+																ts1.DEFPer := 100;
+																ts1.DmgTick := 0;
+																ts1.Element := ts1.Data.Element;
+																ts1.isActive := false;
+																for j := 0 to 31 do begin
+																	ts1.EXPDist[j].CData := nil;
+																	ts1.EXPDist[j].Dmg := 0;
+																end;
+																if ts1.Data.MEXP <> 0 then begin
+																	for j := 0 to 31 do begin
+																		ts1.MVPDist[j].CData := nil;
+																		ts1.MVPDist[j].Dmg := 0;
+																	end;
+																	ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100; //FAÇ…30%â¡éZ
+																end;
+																tm.Mob.AddObject(ts1.ID, ts1);
+																tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
+
+																ts1.isSummon := true;
+																ts1.isSlave := true;
+																ts1.EmperiumID := 0;
+
+																SendMData(tc.Socket, ts1);
+																//é¸àÕÇ…ëóêM
+																SendBCmd(tm,ts1.Point,41,tc,False);
+
+																h := h - 1;
+															end;
+														end;
+													until (h <= 0);
+												end;
+											end;
+										end;
+									end;
+								end;
+							end;
 						end;
-						ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAÇ…30%â¡éZ
-					end;
-          ts.isSummon := True;
-          ts.EmperiumID := 0;
-          
-					tm.Mob.AddObject(ts.ID, ts);
-					tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+					end //GM cmd #monster
 
-					SendMData(tc.Socket, ts);
-					//é¸àÕÇ…ëóêM
-					SendBCmd(tm,ts.Point,41,tc,False);
-
-
-if (SummonMonsterMob = true) then begin
-    k := SlaveDBName.IndexOf(sl.Strings[0]);
-    if (k <> -1) then begin
-     ts.isLeader := true;
-     
-     tss := SlaveDBName.Objects[k] as TSlaveDB;
-     if sl.Strings[0] = tss.Name then begin
-
-     h := tss.TotalSlaves;
-     ts.SlaveCount := h;
-     repeat
-      for i := 0 to 4 do begin
-        if (tss.Slaves[i] <> -1) and (h <> 0) then begin
-          ts1 := TMob.Create;
-					ts1.Data := MobDBName.Objects[tss.Slaves[i]] as TMobDB;
-					ts1.ID := NowMobID;
-          ts.Slaves[h] := ts1.ID;
-					Inc(NowMobID);
-					ts1.Name := ts1.Data.JName;
-					ts1.JID := ts1.Data.ID;
-          ts1.LeaderID := ts.ID;
-          ts1.Data.isLink := false;
-					ts1.Map := ts.Map;
-					ts1.Point.X := ts.Point.X;
-					ts1.Point.Y := ts.Point.Y;
-					ts1.Dir := ts.Dir;
-					ts1.HP := ts1.Data.HP;
-          if ts.Data.Speed < ts1.Data.Speed then begin
-					ts1.Speed := ts.Data.Speed;
-          end else begin
-          ts1.Speed := ts1.Data.Speed;
-          end;
-					ts1.SpawnDelay1 := $7FFFFFFF;
-					ts1.SpawnDelay2 := 0;
-					ts1.SpawnType := 0;
-					ts1.SpawnTick := 0;
-					if ts1.Data.isDontMove then
-						ts1.MoveWait := $FFFFFFFF
-					else
-          ts1.MoveWait := ts.MoveWait;
-					ts1.ATarget := 0;
-					ts1.ATKPer := 100;
-					ts1.DEFPer := 100;
-					ts1.DmgTick := 0;
-          ts1.Element := ts1.Data.Element;
-          ts1.isActive := false;
-					for j := 0 to 31 do begin
-						ts1.EXPDist[j].CData := nil;
-						ts1.EXPDist[j].Dmg := 0;
-					end;
-					if ts1.Data.MEXP <> 0 then begin
-						for j := 0 to 31 do begin
-							ts1.MVPDist[j].CData := nil;
-							ts1.MVPDist[j].Dmg := 0;
-						end;
-						ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100; //FAÇ…30%â¡éZ
-					end;
-					tm.Mob.AddObject(ts1.ID, ts1);
-					tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
-					ts1.isSummon := true;
-          ts1.isSlave := true;
-          ts1.EmperiumID := 0;
-          
-					SendMData(tc.Socket, ts1);
-					//é¸àÕÇ…ëóêM
-					SendBCmd(tm,ts1.Point,41,tc,False);
-
-          h := h - 1;
-        end;
-      end;
-     until (h <= 0);
-
-     end;
-    end;
-end;
-end;
-end;
-end;
-end;
-          end else if (Copy(str, 1, 5) = 'zeny ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
+					else if (Copy(str, 1, 5) = 'zeny ') AND
+									((DebugCMD and $0008) <> 0) AND (tid.ChangeStatSkill = 1) then
+					begin
 						Val(Copy(str, 6, 256), i, k);
-            // Colus, 20040203: Zeny limit was off by a 0.  Bumped the limit up to 1BZ (it can handle it!)
+						// Colus, 20040203: Zeny limit was off by a 0.  Bumped the limit up to 1BZ (it can handle it!)
 						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + cardinal(i) <= 999999999) then begin
-                                                        if tc.Zeny > 1000000000 then exit;
+							if tc.Zeny > 1000000000 then exit;
 							tc.Zeny := tc.Zeny + cardinal(i);
-              SendCStat1(tc, 1, $0014, tc.Zeny);
+							SendCStat1(tc, 1, $0014, tc.Zeny);
 						end;
+					end //gm cmd #zeny
 
-          end else if (Copy(str, 1, 5) = 'goto ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
-            s := Copy(str, 6, 256);
+					else if (Copy(str, 1, 5) = 'goto ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
+						s := Copy(str, 6, 256);
 						try
 							if CharaName.Indexof(s) <> -1 then begin
-              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-							if (tc.Hidden = false) then SendCLeave(tc, 2);
-							tc.tmpMap := tc1.Map;
-							tc.Point := tc1.Point;
-							MapMove(Socket, tc1.Map, tc1.Point);
-              end;
+								tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+								if (tc.Hidden = false) then SendCLeave(tc, 2);
+								tc.tmpMap := tc1.Map;
+								tc.Point := tc1.Point;
+								MapMove(Socket, tc1.Map, tc1.Point);
+							end;
 						finally
-
 						end;
-
-          end else if (Copy(str, 1, 5) = 'kill ') and ((DebugCMD and $0008) <> 0) and (tid.KillDieAlive = 1) then begin
-            s := Copy(str, 6, 256);
+					end //gm cmd #goto
+					else if (Copy(str, 1, 5) = 'kill ') AND
+									((DebugCMD and $0008) <> 0) AND (tid.KillDieAlive = 1) then
+					begin
+						s := Copy(str, 6, 256);
 						try
 							if CharaName.Indexof(s) <> -1 then begin
-              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-              tc1.HP := 0;
-						  tc1.Sit := 1;
-						  SendCStat1(tc1, 0, 5, tc1.HP);
-						  WFIFOW(0, $0080);
-						  WFIFOL(2, tc1.ID);
-						  WFIFOB(6, 1);
-              Socket.SendBuf(buf, 7);
-              WFIFOW( 0, $0080);
-					    WFIFOL( 2, tc1.ID);
-					    WFIFOB( 6, 1);
-					    SendBCmd(tm, tc1.Point, 7);
-              end;
+	              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+	              tc1.HP := 0;
+								tc1.Sit := 1;
+							  SendCStat1(tc1, 0, 5, tc1.HP);
+							  WFIFOW(0, $0080);
+							  WFIFOL(2, tc1.ID);
+							  WFIFOB(6, 1);
+	              Socket.SendBuf(buf, 7);
+	              WFIFOW( 0, $0080);
+						    WFIFOL( 2, tc1.ID);
+						    WFIFOB( 6, 1);
+						    SendBCmd(tm, tc1.Point, 7);
+							end;
 						finally
-
 						end;
-
-
-        end else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
-            s := Copy(str, 7, 256);
-            if s = '' then begin
+					end //GM cmd #kill
+					else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
+						s := Copy(str, 7, 256);
+						if s = '' then begin
               //Location of self
               str := tc.Name + ' located at: ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
               w := Length(str) + 4;
@@ -1200,59 +1210,66 @@ end;
               WFIFOS (4, str, w - 4);
               tc.socket.sendbuf(buf, w);
             end;
-        { Mitch 01-29-2004: Revive goes under "killdiealive" }
-        end else if (Copy(str, 1, 7) = 'revive ') and ((DebugCMD and $0008) <> 0) and (tid.KillDieAlive = 1) then begin
-            s := Copy(str, 8, 256);
-            try
-              if CharaName.IndexOf(s) <> -1 then begin
-                tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
-                tc1.HP := tc1.MAXHP;
-                tc1.SP := tc1.MAXSP;
-                tc1.Sit := 3;
-                SendCStat1(tc1,0,5,tc1.HP);
-                SendCStat1(tc1,0,7,tc1.SP);
-						    WFIFOW( 0, $0148);
-						    WFIFOL( 2, tc1.ID);
-						    WFIFOW( 6, 100);
-						    SendBCmd(tm, tc1.Point, 8);
-              end;
+				end // cmd /where
 
-              str := tc.Name + ' revived ' + tc1.Name + '!';
-              w := Length(str) + 4;
-              WFIFOW (0, $009a);
-              WFIFOW (2, w);
-              WFIFOS (4, str, w - 4);
-              tc.socket.sendbuf(buf, w);
-              if tc1.Login = 2 then begin
-                tc1.Socket.SendBuf(buf, w);
-              end;
-            finally
-
+				{ Mitch 01-29-2004: Revive goes under "killdiealive" }
+				else if (Copy(str, 1, 7) = 'revive ') AND
+								((DebugCMD AND $0008) <> 0) AND (tid.KillDieAlive = 1) then
+				begin
+          s := Copy(str, 8, 256);
+          try
+            if CharaName.IndexOf(s) <> -1 then begin
+              tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
+              tc1.HP := tc1.MAXHP;
+              tc1.SP := tc1.MAXSP;
+              tc1.Sit := 3;
+              SendCStat1(tc1,0,5,tc1.HP);
+              SendCStat1(tc1,0,7,tc1.SP);
+              WFIFOW( 0, $0148);
+              WFIFOL( 2, tc1.ID);
+              WFIFOW( 6, 100);
+              SendBCmd(tm, tc1.Point, 8);
             end;
 
-        end else if (Copy(str, 1, 7) = 'summon ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
-            s := Copy(str, 8, 256);
-						try
-							if CharaName.Indexof(s) <> -1 then begin
-              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-              if tc1.Login = 2 then begin
-							SendCLeave(tc1, 2);
-							tc1.tmpMap := tc.Map;
-							tc1.Point := tc.Point;
-							MapMove(tc1.Socket, tc.Map, tc.Point);
-              end;
-              end;
-						finally
+            str := tc.Name + ' revived ' + tc1.Name + '!';
+            w := Length(str) + 4;
+            WFIFOW (0, $009a);
+            WFIFOW (2, w);
+            WFIFOS (4, str, w - 4);
+            tc.socket.sendbuf(buf, w);
+            if tc1.Login = 2 then begin
+              tc1.Socket.SendBuf(buf, w);
+            end;
+          finally
+          end;
+        end //GM cmd #revive
+        else if (Copy(str, 1, 7) = 'summon ') AND
+        				((DebugCMD AND $0008) <> 0) and (tid.GotoSummonBanish = 1) then
+				begin
+          s := Copy(str, 8, 256);
+          try
+            if CharaName.Indexof(s) <> -1 then begin
+		          tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+			        if tc1.Login = 2 then begin
+			          SendCLeave(tc1, 2);
+			          tc1.tmpMap := tc.Map;
+			          tc1.Point := tc.Point;
+					      MapMove(tc1.Socket, tc.Map, tc.Point);
+		          end;
+            end;
+          finally
+          end;
+				end //GM cmd #summon
 
-						end;
+				else if (Copy(str, 1, 7) = 'banish ') AND
+								((DebugCMD AND $0008) <> 0) AND (tid.GotoSummonBanish = 1) then
+				begin
+					SL := TStringList.Create;
+					SL.DelimitedText := Copy(str, 8, 256);
+					try
+					Val(sl.Strings[sl.Count - 2], i, k);
+					if k <> 0 then continue;
 
-end else if (Copy(str, 1, 7) = 'banish ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
-  sl := TStringList.Create;
-  sl.DelimitedText := Copy(str, 8, 256);
-  try
-    Val(sl.Strings[sl.Count - 2], i, k);
-    if k <> 0 then continue;
-  
     Val(sl.Strings[sl.Count - 1], j, k);
     if k <> 0 then continue;
   
