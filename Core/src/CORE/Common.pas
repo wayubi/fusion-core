@@ -6146,6 +6146,22 @@ begin
         end;
     end;
     for i := 0 to tm.CList.Count - 1 do begin
+    {
+
+        This causes major crashes because it tries to send packets
+        to characters that have been disconnected. Very sloppy code.
+        I've been cleaning up after this for quite some time and will
+        simply comment it out for now to prevent further problems.
+
+        Another major problem was found when a player ALT-F4s out, he
+        causes a infiniti loop, freezing the server.
+
+        You can not send a packet to a player that is not on a specific
+        map or on the server.
+
+        -Alex
+
+
         if not assigned(tm.CList.Objects[i]) then Continue;
         tc1 := tm.CList.Objects[i] as TChara;
         WFIFOW( 0, $0199);
@@ -6156,6 +6172,7 @@ begin
         WFIFOL( 6, tc1.PvPRank);
         WFIFOL( 10, tm.CList.Count);
         tc1.Socket.SendBuf(buf, 14);
+    }
     end;
 end;
 

@@ -1167,7 +1167,8 @@ begin
     fnl_lists(SkillDBName, SkillDB);
     fnl_lists(PlayerName, Player);
     fnl_lists(CharaName, Chara);
-    fnl_lists(nil, CharaPID);
+    //fnl_lists(nil, CharaPID);
+    FreeAndNil(CharaPID);
     fnl_lists(nil, ChatRoomList);
     fnl_lists(PartyNameList, PartyList);
     fnl_lists(CastleList, nil);
@@ -1630,33 +1631,21 @@ end;
 procedure TfrmMain.sv3ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
-//var
-//	tc  :TChara;
-//	tp  :TPlayer;
 begin
 
     iscs_console_disconnect(Socket.Data);
     DataSave();
 
 	if UseSQL then SQLDataSave();
-	if ErrorCode = 10053 then begin
-    	Socket.Close;
-        { Alex: Server owners do not need to see this. It'll make them
-        think something is wrong and start bitching.
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player did not exit via Exit button');
-        }
-    end;
-	if ErrorCode = 10054 then begin
-    	Socket.Close;
-        { Alex: Server owners do not need to see this. It'll make them
-        think something is wrong and start bitching.
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player tried to log in twice with the same account');
-        }
-    end;
+
+    //DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
+	if ErrorCode = 10053 then Socket.Close;
+	if ErrorCode = 10054 then Socket.Close;
 
 	ErrorCode := 0;
 	NowUsers := sv3.Socket.ActiveConnections;
 end;
+
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv3ClientRead(Sender: TObject;
 	Socket: TCustomWinSocket);
@@ -10350,6 +10339,15 @@ begin
 			end;
 
             {Check to unload maps}
+{
+
+Alex:
+
+This stuff doesnt work,
+don't uncomment.
+
+
+
         if tm.UnloadTime > 0 then begin
             for k := 0 to Map.Count - 1 do begin
                 tm := Map.Objects[k] as TMap;
@@ -10366,6 +10364,8 @@ begin
                 end;
             end;
         end; 
+
+        }
 
 	{NPCƒCƒxƒ“ƒg’Ç‰Á}
 			for k := 0 to Map.Count - 1 do begin

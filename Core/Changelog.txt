@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-27-04: Fixed 100% CPU usage on player ALT-F4 disconnect. Infinite loop. [AlexKreuz]
+- 09-27-04: Commented out Map unloading. Not working properly. [AlexKreuz]
+- 09-27-04: Commented out PVP Calculations. Causes too many fatal problems. [AlexKreuz]
 - 09-27-04: REED: Corruption of guild storage caused load error. [AlexKreuz]
 - 09-27-04: #146: Can not exit chat room if multple users in it. [AlexKreuz]
 - 09-27-04: Optimized memory clearing procedures. [AlexKreuz]
