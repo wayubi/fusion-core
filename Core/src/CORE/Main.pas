@@ -633,6 +633,11 @@ begin
                 end else begin
                         Option_PartyShare_Level := 10;
                 end;
+    if sl.IndexOfName('Option_GM_Logs') > -1 then begin
+                        Option_GM_Logs := StrToBool(sl.Values['Option_GM_Logs']);
+                end else begin
+                        Option_GM_Logs := False;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -940,6 +945,7 @@ begin
 	ini.WriteString('Fusion', 'Option_MOTD', BoolToStr(Option_MOTD));
 	ini.WriteString('Fusion', 'Option_MOTD_Athena', BoolToStr(Option_MOTD_Athena));
 	ini.WriteString('Fusion', 'Option_MOTD_File', Option_MOTD_File);
+    ini.WriteString('Fusion', 'Option_GM_Logs', BoolToStr(Option_GM_Logs));
 	ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
 	ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
 	ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);

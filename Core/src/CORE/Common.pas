@@ -1659,6 +1659,8 @@ Option_MOTD_Athena : Boolean;//Allows Athena-style MOTD message
 Option_MOTD_File   : string; //File for reading MOTD entries
 // If Athena style is chosen, the limit on the text is 1 line vs 4 without.
 
+Option_GM_Logs     :Boolean;
+
 Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;

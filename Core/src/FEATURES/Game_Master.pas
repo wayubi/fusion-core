@@ -85,6 +85,7 @@ var
     procedure parse_commands(tc : TChara; str : String);
     function check_level(id : Integer; cmd : Integer) : Boolean;
     procedure error_message(tc : TChara; str : String);
+    procedure save_gm_log(tc : TChara; str : String);
 
     function command_alive(tc : TChara) : String;
     function command_item(tc : TChara; str : String) : String;
@@ -149,6 +150,7 @@ implementation
         error_msg : String;
     begin
         str := Copy(str, Pos(' : ', str) + 4, 256);
+        error_msg := '';
 
         if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
         else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
@@ -162,7 +164,8 @@ implementation
         else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
         ;
 
-        error_message(tc, error_msg);
+        if (error_msg <> '') then error_message(tc, error_msg);
+        if (Option_GM_Logs) then save_gm_log(tc, error_msg);
     end;
 
     function check_level(id : Integer; cmd : Integer) : Boolean;
@@ -186,6 +189,26 @@ implementation
         WFIFOW(2, length(str) + 4);
         WFIFOS(4, str, length(str));
         tc.Socket.SendBuf(buf, length(str) + 4);
+    end;
+
+    procedure save_gm_log(tc : TChara; str : String);
+    var
+        logfile : TStringList;
+        timestamp : TDateTime;
+        filename : String;
+    begin
+        timestamp := Now;
+        filename := StringReplace(DateToStr(timestamp), '/', '_', [rfReplaceAll, rfIgnoreCase]);
+        logfile := TStringList.Create;
+
+        if FileExists(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt') then begin
+            logfile.LoadFromFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+		end;
+
+        str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
+        logfile.Add(str);
+        logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+        logfile.Free;
     end;
 
     function command_alive(tc : TChara) : String;
@@ -382,17 +405,26 @@ implementation
         Result := 'GM_KILL Activated';
 
         s := Copy(str, 6, 256);
-        if CharaName.Indexof(s) <> -1 then begin
+        if (CharaName.Indexof(s) <> -1) then begin
             tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-            tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
-            tc1.HP := 0;
-            tc1.Sit := 1;
-            SendCStat1(tc1, 0, 5, tc1.HP);
 
-            WFIFOW( 0, $0080);
-            WFIFOL( 2, tc1.ID);
-            WFIFOB( 6, 1);
-            SendBCmd(tm, tc1.Point, 7);
+            if (tc1.Login = 2) then begin
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+                tc1.HP := 0;
+                tc1.Sit := 1;
+                SendCStat1(tc1, 0, 5, tc1.HP);
+
+                WFIFOW( 0, $0080);
+                WFIFOL( 2, tc1.ID);
+                WFIFOB( 6, 1);
+                SendBCmd(tm, tc1.Point, 7);
+
+                Result := 'GM_KILL Success. ' + s + ' has been killed.';
+            end else begin
+                Result := 'GM_KILL Failure. ' + s + ' is not logged in.';
+            end;
+        end else begin
+            Result := 'GM_KILL Failure. ' + s + ' is an invalid character name.';
         end;
     end;
 
