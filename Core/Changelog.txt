@@ -1,10 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.208 - December 25th, 2003
 --------------------------------------------------------------------------------
-- 12-24-03: Fixed Bug with Blitz beat Auto Disconnecting people. Damage calc maybe be to little-[Oatmeal12345]
+- 12-24-03: Fixed Bug with Blitz beat Auto Disconnecting people (bad dmg calc?). [Oatmeal12345]
 - 12-24-03: Commented out PassiveIcon function. Bandwidth Drain. [Elliot]
-- 12-24-03: Added Dancer SKill Service For You. [Darkhelmet]
-	      *Note, testing was not cooperating so it may be buggy.
+- 12-24-03: Added Dancer SKill Service For You (may be buggy). [Darkhelmet]
 - 12-24-03: Added Auto-Generating addplayer.txt file to prevent errors. [AlexKreuz]
 - 12-24-03: Added Option_MaxUsers to weiss.ini. Maximum allowed online. [AlexKreuz]
 - 12-24-03: Removed MAP & DWM compatibility (Bugs in Maps). [AlexKreuz]
