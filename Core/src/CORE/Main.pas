@@ -2458,9 +2458,11 @@ begin
     xy := ts.Point;
     j := SearchPath2(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y);
     if j <> 0 then begin
+        if (ts.ATarget = 0) or (ts.isActive) then begin
 		ts.ATarget := tc.ID;
 		ts.AData := tc;
 		ts.isLooting := False;
+        end;
     end;
 		Result := False;
 	end else begin
