@@ -307,6 +307,8 @@ type
     Label117: TLabel;
     Label118: TLabel;
     Button21: TButton;
+    Edit53: TEdit;
+    Label65: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);

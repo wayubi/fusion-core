@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-29-04: Can now modify accesslevel from server window. [Tsusai]
 - 09-29-04: Memo Map retrieval and save done. [Tsusai]
 - 09-29-04: Added @doom command to the ALBGM system. Kills all non-GM characters on the server. [Tiko]
 - 09-29-04: Removed HP/SP character tab modification.  Just displays. [Tsusai]

@@ -87,6 +87,8 @@ uses
         else frmMain.Button14.Caption := '';
         if AccountItem.CName[8] <> '' then frmMain.Button15.Caption := AccountItem.CName[8]
         else frmMain.Button15.Caption := '';
+
+        frmMain.Edit53.Text := IntToStr(AccountItem.AccessLevel);
     end;
 
 
@@ -137,6 +139,7 @@ uses
     	    AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
         	AccountItem.Mail := frmMain.Edit6.Text;
 	        AccountItem.Banned := StrToBool(IntToStr(abs(frmMain.ComboBox18.ItemIndex)));
+            AccountItem.AccessLevel := StrToInt(frmMain.Edit53.Text);
 		    DataSave(True);
         end else begin
             create_account(frmMain.Edit3.Text, frmMain.Edit4.Text, frmMain.Edit6.Text, IntToStr(frmMain.ComboBox15.ItemIndex));

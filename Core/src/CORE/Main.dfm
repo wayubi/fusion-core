@@ -1116,6 +1116,13 @@ object frmMain: TfrmMain
         Font.Style = []
         ParentFont = False
       end
+      object Label65: TLabel
+        Left = 264
+        Top = 368
+        Width = 66
+        Height = 18
+        Caption = 'AccessLevel'
+      end
       object ListBox1: TListBox
         Left = 8
         Top = 24
@@ -1307,6 +1314,13 @@ object frmMain: TfrmMain
         Height = 25
         TabOrder = 15
         OnClick = Button15Click
+      end
+      object Edit53: TEdit
+        Left = 264
+        Top = 384
+        Width = 121
+        Height = 25
+        TabOrder = 19
       end
     end
     object TabSheet7: TTabSheet
