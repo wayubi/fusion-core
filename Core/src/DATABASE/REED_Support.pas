@@ -35,6 +35,8 @@ uses
         str : String;
         datafile : TStringList;
     begin
+        if not FileExists(path) then Exit;
+
         datafile := TStringList.Create;
         datafile.LoadFromFile(path);
         
@@ -100,6 +102,8 @@ uses
         columns : TStringList;
         i : Integer;
     begin
+        if not FileExists(path) then Exit;
+
         datafile := TStringList.Create;
         columns := TStringList.Create;
         columns.Delimiter := ':';

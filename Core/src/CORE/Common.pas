@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = 'Fusion 1.212 K -- R.E.E.D Alpha 7 Release';
+	RELEASE_VERSION = '1.212 I -- R.E.E.D Alpha 8 Release';
     MAXINTEGER = 2147483647;
 
 	// Colus, 20040304: Let's see if this is truly global scope.
