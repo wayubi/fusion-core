@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-23-03: Fixed IceWall > Monsters dont bounce off the Ice anymore. [AlexKreuz]
+- 12-23-03: Fixed IceWall > Players now get stuck behind the Ice. [AlexKreuz]
 - 12-23-03: Added MonsterAI.pas but did not Refrence it or Load the Database [Darkhelmet]
 - 12-22-03: Flywings don't teleport you to be stuck anymore. [AlexKreuz]
 - 12-22-03: Added ItemDropMultiplier for people who can't divide :) [Colus]

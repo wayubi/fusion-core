@@ -9397,6 +9397,7 @@ begin
 						//スキル効能地撤去
 						DelSkillUnit(tm, tn);
 						Dec(k);
+                                                tm.gat[tn.Point.X][tn.Point.Y] := 1;
 					end;
 			end;
 		end else begin

@@ -3888,6 +3888,7 @@ begin
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
+        tm.gat[tn.Point.X][tn.Point.Y] := 0;
 
         if tn.JID = $46 then begin
                 WFIFOW( 0, $011f);
