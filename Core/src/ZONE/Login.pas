@@ -153,14 +153,11 @@ var
 	addtxt    : TextFile;
 	txt       : TextFile;
 	option_mf : string;
-	Idx       : Integer;
-    tp        : TPlayer;
+	Idx, i       : Integer;
+    tp, tp2        : TPlayer;
 	//index used for freeing player/playername lists
 begin
 	Result := False;
-
-
-
 
 		if (Option_Username_MF = True) then begin
 			option_mf := copy(userid, length(userid) - 1, 2);
@@ -168,23 +165,33 @@ begin
             if (option_mf = '_M') or (option_mf = '_F') then begin
 				userid := copy(userid, 0, length(userid) - 2);
 
+                for i := 0 to PlayerName.Count - 1 do begin
+                	tp2 := PlayerName.Objects[i] as TPlayer;
+                    if (tp2.ID <> i + 100101) then begin
+                    	Idx := i + 100101;
+                        Break;
+                    end;
+                end;
+
+                if (i = playername.count) then Idx := 100101 + PlayerName.Count;
+
 	            if (option_mf = '_M') then begin
     	        	tp := TPlayer.Create;
-        		    tp.ID := PlayerName.Count + 100101;
+        		    tp.ID := Idx;
     	    	    tp.Name := userid;
 	            	tp.Pass := userpass;
 	            	tp.Gender := 1;
     	    	    tp.Mail := '-@-';
-    		        PlayerName.AddObject(tp.Name, tp);
+    		        PlayerName.InsertObject(i, tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
 	            end else if (option_mf = '_F') then begin
     	        	tp := TPlayer.Create;
-        		    tp.ID := PlayerName.Count + 100101;
+        		    tp.ID := Idx;
     	    	    tp.Name := userid;
 	            	tp.Pass := userpass;
 	            	tp.Gender := 0;
     	    	    tp.Mail := '-@-';
-    		        PlayerName.AddObject(tp.Name, tp);
+    		        PlayerName.InsertObject(i, tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
                 end;
             end;

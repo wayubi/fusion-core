@@ -2021,7 +2021,8 @@ Called when we're shutting down the server *only*
     function command_newplayer(str : String) : String;
     var
         sl : TStringList;
-        tp1 : TPlayer;
+        tp1, tp2 : TPlayer;
+        i, Idx : Integer;
     begin
         Result := 'GM_NEWPLAYER Failure.';
 
@@ -2036,8 +2037,19 @@ Called when we're shutting down the server *only*
             end else if (sl.strings[2] <> '1') and (sl.strings[2] <> '0') then begin
                 Result := Result + ' Gender can only be 1 (Male) or 2 (Female).';
             end else begin
+
+    	    	for i := 0 to PlayerName.Count - 1 do begin
+	            	tp2 := PlayerName.Objects[i] as TPlayer;
+                	if (tp2.ID <> i + 100101) then begin
+            	    	Idx := i + 100101;
+        	            Break;
+    	            end;
+	            end;
+
+            	if (i = PlayerName.Count) then Idx := 100101 + PlayerName.Count;
+
                 tp1 := TPlayer.Create;
-                tp1.ID := 100100 + PlayerName.Count;
+                tp1.ID := Idx;
                 tp1.Name := sl.Strings[0];
                 tp1.Pass := sl.Strings[1];
                 tp1.Mail := sl.Strings[3];
@@ -2045,7 +2057,7 @@ Called when we're shutting down the server *only*
                 tp1.Banned := 0;
                 tp1.ver2 := 9;
 
-                PlayerName.AddObject(tp1.Name, tp1);
+                PlayerName.InsertObject(i, tp1.Name, tp1);
                 Player.AddObject(tp1.ID, tp1);
 
                 Result := 'GM_NEWPLAYER Success. ' + tp1.Name + ' has been added successfully.';

@@ -10,6 +10,7 @@ uses
     procedure JCon_Accounts_Populate();
     procedure JCon_Accounts_Clear();
     procedure JCon_Accounts_Save();
+    procedure JCon_Accounts_Delete();
 
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
@@ -42,13 +43,15 @@ uses
 	var
     	AccountItem : TPlayer;
 	begin
+    	if (frmMain.listbox1.ItemIndex = -1) then Exit;
+
 		AccountItem := frmMain.listbox1.Items.Objects[frmMain.listbox1.ItemIndex] as TPlayer;
 	    frmMain.Edit2.Text := IntToStr(AccountItem.ID);
     	frmMain.Edit3.Text := AccountItem.Name;
 	    frmMain.Edit4.Text := AccountItem.Pass;
-    	frmMain.Edit5.Text := IntToStr(AccountItem.Gender);
+        frmMain.ComboBox15.ItemIndex := AccountItem.Gender;
 	    frmMain.Edit6.Text := AccountItem.Mail;
-    	frmMain.Edit7.Text := IntToStr(AccountItem.Banned);
+        frmMain.ComboBox18.ItemIndex := AccountItem.Banned;
 	    frmMain.Edit8.Text := AccountItem.CName[0];
     	frmMain.Edit9.Text := AccountItem.CName[1];
 	    frmMain.Edit10.Text := AccountItem.CName[2];
@@ -66,9 +69,9 @@ uses
 	    frmMain.Edit2.Clear;
     	frmMain.Edit3.Clear;
 	    frmMain.Edit4.Clear;
-    	frmMain.Edit5.Clear;
+    	frmMain.ComboBox15.Text := '';
 	    frmMain.Edit6.Clear;
-    	frmMain.Edit7.Clear;
+    	frmMain.ComboBox18.Text := '';
 	    frmMain.Edit8.Clear;
     	frmMain.Edit9.Clear;
 	    frmMain.Edit10.Clear;
@@ -83,9 +86,9 @@ uses
 
     procedure JCon_Accounts_Save();
 	var
-	    AccountItem : TPlayer;
+	    AccountItem, tp2 : TPlayer;
     	tc : TChara;
-	    i : Integer;
+	    i, Idx : Integer;
 	begin
     	if (frmMain.Edit3.Text = '') then begin
         	Exit;
@@ -105,22 +108,47 @@ uses
 		    AccountItem.ID := StrToInt(frmMain.Edit2.Text);
         	AccountItem.Name := frmMain.Edit3.Text;
 	        AccountItem.Pass := frmMain.Edit4.Text;
-    	    AccountItem.Gender := StrToInt(frmMain.Edit5.Text);
+    	    AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
         	AccountItem.Mail := frmMain.Edit6.Text;
-	        AccountItem.Banned := StrToInt(frmMain.Edit7.Text);
+	        AccountItem.Banned := frmMain.ComboBox18.ItemIndex;
 		    DataSave();
         end else begin
+
+        	for i := 0 to PlayerName.Count - 1 do begin
+            	tp2 := PlayerName.Objects[i] as TPlayer;
+                if (tp2.ID <> i + 100101) then begin
+                	Idx := i + 100101;
+                    Break;
+                end;
+            end;
+
+            if (i = PlayerName.Count) then Idx := 100101 + PlayerName.Count;
+
     		AccountItem := TPlayer.Create;
-	    	AccountItem.ID := PlayerName.Count + 100101;
+	    	AccountItem.ID := Idx;
 	        AccountItem.Name := frmMain.Edit3.Text;
     	    AccountItem.Pass := frmMain.Edit4.Text;
-        	AccountItem.Gender := StrToInt(frmMain.Edit5.Text);
+        	AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
 	        AccountItem.Mail := frmMain.Edit6.Text;
-    		PlayerName.AddObject(AccountItem.Name, AccountItem);
+    		PlayerName.InsertObject(i, AccountItem.Name, AccountItem);
     		Player.AddObject(AccountItem.ID, AccountItem);
 	        DataSave();
     	    frmMain.Button3.Click;
         end;
+
+        JCon_Accounts_Load();
+    end;
+
+    procedure JCon_Accounts_Delete();
+    begin
+    	if (frmMain.Edit3.Text = '') then begin
+        	Exit;
+        end else begin
+        	PlayerName.Delete(PlayerName.IndexOf(frmMain.Edit3.Text));
+        end;
+
+        JCon_Accounts_Load();
+        frmMain.Button3.Click;
     end;
 
 

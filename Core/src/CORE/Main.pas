@@ -56,10 +56,8 @@ type
     Label3: TLabel;
     Edit4: TEdit;
     Label4: TLabel;
-    Edit5: TEdit;
     Label5: TLabel;
     Edit6: TEdit;
-    Edit7: TEdit;
     Label6: TLabel;
     Edit8: TEdit;
     Label7: TLabel;
@@ -178,6 +176,9 @@ type
     Database1: TMenuItem;
     Save1: TMenuItem;
     Backup1: TMenuItem;
+    Button6: TButton;
+    ComboBox15: TComboBox;
+    ComboBox18: TComboBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -257,6 +258,7 @@ type
     procedure MinimizetoTray2Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
     procedure Backup1Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -10945,6 +10947,11 @@ end;
 procedure TfrmMain.Button4Click(Sender: TObject);
 begin
 	JCon_Accounts_Save();
+end;
+
+procedure TfrmMain.Button6Click(Sender: TObject);
+begin
+	JCon_Accounts_Delete();
 end;
 
 procedure TfrmMain.Button5Click(Sender: TObject);

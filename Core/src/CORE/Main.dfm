@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 169
-  Top = 126
+  Left = 196
+  Top = 125
   Width = 408
   Height = 518
   Caption = '#33'
@@ -1123,20 +1123,6 @@ object frmMain: TfrmMain
         ParentFont = False
         TabOrder = 3
       end
-      object Edit5: TEdit
-        Left = 264
-        Top = 144
-        Width = 121
-        Height = 26
-        Color = 12582911
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 4
-      end
       object Edit6: TEdit
         Left = 264
         Top = 184
@@ -1149,20 +1135,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 5
-      end
-      object Edit7: TEdit
-        Left = 264
-        Top = 224
-        Width = 121
-        Height = 26
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -12
-        Font.Name = 'Trebuchet MS'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 6
+        TabOrder = 4
       end
       object Edit8: TEdit
         Left = 8
@@ -1175,7 +1148,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 7
+        TabOrder = 5
       end
       object Edit9: TEdit
         Left = 136
@@ -1188,7 +1161,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 8
+        TabOrder = 6
       end
       object Edit10: TEdit
         Left = 264
@@ -1201,7 +1174,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 9
+        TabOrder = 7
       end
       object Edit11: TEdit
         Left = 8
@@ -1214,7 +1187,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 10
+        TabOrder = 8
       end
       object Edit12: TEdit
         Left = 136
@@ -1227,7 +1200,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 11
+        TabOrder = 9
       end
       object Edit13: TEdit
         Left = 264
@@ -1240,7 +1213,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 12
+        TabOrder = 10
       end
       object Edit14: TEdit
         Left = 8
@@ -1253,7 +1226,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 13
+        TabOrder = 11
       end
       object Edit15: TEdit
         Left = 136
@@ -1266,7 +1239,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 14
+        TabOrder = 12
       end
       object Edit16: TEdit
         Left = 264
@@ -1279,25 +1252,56 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 15
+        TabOrder = 13
       end
       object Button3: TButton
         Left = 8
         Top = 376
         Width = 75
         Height = 25
-        Caption = 'Clear'
-        TabOrder = 16
+        Caption = '&Clear'
+        TabOrder = 14
         OnClick = Button3Click
       end
       object Button4: TButton
+        Left = 168
+        Top = 376
+        Width = 75
+        Height = 25
+        Caption = '&Save'
+        TabOrder = 15
+        OnClick = Button4Click
+      end
+      object Button6: TButton
         Left = 88
         Top = 376
         Width = 75
         Height = 25
-        Caption = 'Save'
+        Caption = '&Delete'
+        TabOrder = 16
+        OnClick = Button6Click
+      end
+      object ComboBox15: TComboBox
+        Left = 264
+        Top = 144
+        Width = 121
+        Height = 26
+        ItemHeight = 18
         TabOrder = 17
-        OnClick = Button4Click
+        Items.Strings = (
+          'Female'
+          'Male')
+      end
+      object ComboBox18: TComboBox
+        Left = 263
+        Top = 224
+        Width = 121
+        Height = 26
+        ItemHeight = 18
+        TabOrder = 18
+        Items.Strings = (
+          'No'
+          'Yes')
       end
     end
   end
