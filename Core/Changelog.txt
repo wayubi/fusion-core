@@ -1,14 +1,15 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-07-04: Made PvPN act like PvP. [Tsusai]
+- 07-06-04: Fixed Skill Sight. [Darkhelmet]
+- 07-06-04: Fixed Compile Error. [Darkhelmet]
 - 07-05-04: Added PVPN mapinfo_db tag that can be overidden by Option_pvp. [Tsusai]
 
 
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
-- 07-06-04: Fixed Skill Sight. [Darkhelmet]
-- 07-06-04: Fixed Compile Error. [Darkhelmet]
 - 07-03-04: Added server flags (status.txt) to backup files. [AlexKreuz]
 - 07-03-04: #1036 - Server flag loading and saving had issues. [AlexKreuz]
 - 07-03-04: Game_Master cleanup. [AlexKreuz]
