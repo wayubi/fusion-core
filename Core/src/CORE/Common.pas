@@ -8428,11 +8428,25 @@ var
   tm    :TMap;
 begin
   tm := tc.MData;
-  modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
-  modfix := modfix * StealMultiplier div 100;
 
-  k := SlaveDBName.IndexOf(ts.Data.Name);
-  if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
+  // Modifier calc:
+  // adjusted drop ratio = (10 + 3*skill + cdex - mdex)% * drop
+  // This is really draconian even for high drops.  A poring drops jellopies 70%,
+  // but a normal thief rarely has a mod over 50 (steal 5, 30 dex).  So 35% just for jellopy?  Bah.
+  // So, we added a multiplier.  However: If your multiplier was negative, multiplying
+  // made it more negative!  Oh, sweet irony!
+  // Therefore the effect of the multiplier is calculated a bit differently now.
+  //
+  // Old:
+  //modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
+  //modfix := modfix * StealMultiplier div 100;
+  modfix := ((tc.Skill[50].Data.Data1[tc.Skill[50].Lv] * StealMultiplier div 100) + tc.Param[4] - ts.Data.Param[4]);
+
+  // This isn't the right check!  It checks for leaders.  We have
+  // isLeader and isSlave now for that...
+  //k := SlaveDBName.IndexOf(ts.Data.Name);
+  //if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
+  if ((ts.isSlave) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
     Result := false;
     exit;
   end;
@@ -8440,13 +8454,13 @@ begin
   for i := 0 to 7 do begin
     mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
     rand := Random(20000) mod 10000;
-   // DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
+    //DebugOut.Lines.Add(Format('Drop %d, dropid %d, modfix %d, mdrop %d, rand %d',[i,ts.Data.Drop[i].ID,modfix,mdrop[i],rand]));
     if rand <= mdrop[i] then begin
                                      // Graphic send
                                      WFIFOW( 0, $011a);
                                      WFIFOW( 2, 50);
                                      WFIFOW( 4, 0);
-                                     WFIFOL( 6, tc.ID);
+                                     WFIFOL( 6, ts.ID);
                                      WFIFOL(10, tc.ID);
                                      WFIFOB(14, 1);
                                      SendBCmd(tm,ts.Point,15);
@@ -8460,7 +8474,7 @@ begin
                                           //アイテム追加
                                           UpdateWeight(tc, k, td);
 
-                                          tc.Socket.SendBuf(buf, 8);
+                                          //tc.Socket.SendBuf(buf, 8);
                                           //アイテムゲット通知
                                           SendCGetItem(tc, k, 1);
                                           ts.Stolen := tc.ID;

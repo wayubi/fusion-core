@@ -2828,6 +2828,14 @@ begin
     if tc1.Skill[51].Tick > Tick then begin
       tc1.Skill[51].Tick := Tick;
       tc1.SkillTick := Tick;
+      // Adding the skilltick ID...
+      tc1.SkillTickID := 51;
+    end;
+    if tc1.Skill[135].Tick > Tick then begin
+      tc1.Skill[135].Tick := Tick;
+      tc1.SkillTick := Tick;
+      // Adding the skilltick ID...
+      tc1.SkillTickID := 135;
     end;
   end;
 
@@ -5957,10 +5965,11 @@ begin
                                     tc.SkillTickID := 51;
                                     CalcStat(tc, Tick);
                                     UpdateOption(tm, tc);
-                                  end else begin
+                                  // Colus, 20040319: Actually you can Backstab while visible.
+                                  {end else begin
                                     SendSkillError(tc, 0);
                                     tc.MMode := 4;
-                                    Exit;
+                                    Exit;}
                                   end;
                                     DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                         if dmg[0] < 0 then dmg[0] := 0;
@@ -9399,10 +9408,11 @@ begin
                                     tc.SkillTickID := 51;
                                     CalcStat(tc, Tick);
                                     UpdateOption(tm, tc);
-                                  end else begin
+                                  // Colus, 20040319: Actually you can Backstab while visible.
+                                  {end else begin
                                     SendSkillError(tc, 0);
                                     tc.MMode := 4;
-                                    Exit;
+                                    Exit;}
                                   end;
                                   DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                   if dmg[0] < 0 then dmg[0] := 0;
@@ -11453,27 +11463,7 @@ begin
                                 if (j = 1) or (j = 5) then begin
                                   // Colus, 20040205: Moved this to the actual skill.
                                   // Too many updates.
-                                        {tc.isCloaked := true;
-                                        //tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
 
-                                        //if SkillTick > tc1.Skill[MSkill].Tick then begin
-                                        //        SkillTick := tc1.Skill[MSkill].Tick;
-                                        //        SkillTickID := MSkill;
-                                        //end;
-
-                                        //tc.Optionkeep := tc.Option;
-                                        //tc.Option := 6;
-                                        tc.Hidden := true;
-
-                                        CalcStat(tc, Tick);
-
-                                        WFIFOW(0, $0119);
-                                        WFIFOL(2, tc.ID);
-                                        WFIFOW(6, tc.Stat1);
-                                        WFIFOW(8, tc.Stat2);
-                                        WFIFOW(10, tc.Option);
-                                        WFIFOB(12, 0);
-                                        SendBCmd(tm, tc.Point, 13);   }
                                         k := 1;
                                 end;
                           end;
@@ -11494,7 +11484,7 @@ begin
                 end;
 
                 if (tc.Option and 4 <> 0) then begin
-                  if ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
+                  if (tc.Skill[135].Lv > 0) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
                         if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
@@ -11514,7 +11504,7 @@ begin
                                 tc.isCloaked := false;
                                 CalcStat(tc, Tick);
                           UpdateOption(tm, tc);
-                          UpdateIcon(tm, tc, 5, 0);
+                          //UpdateIcon(tm, tc, 5, 0);
                           {WFIFOW(0, $0119);
                                 WFIFOL(2, tc.ID);
                                 WFIFOW(6, tc.Stat1);
@@ -11528,7 +11518,7 @@ begin
 
                // Colus, 20040224: Yeah, Hide drains SP also, but at a different rate.
                if (tc.Option and 2 <> 0) then begin
-                  if ((tc.CloakTick + (4000 + (tc.Skill[51].Lv * 1000))) < Tick) then begin
+                  if (tc.Skill[51].Lv > 0) and ((tc.CloakTick + (4000 + (tc.Skill[51].Lv * 1000))) < Tick) then begin
                         if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
@@ -11549,7 +11539,7 @@ begin
                                 tc.isCloaked := false;
                                 CalcStat(tc, Tick);
                           UpdateOption(tm, tc);
-                          UpdateIcon(tm, tc, 4, 0);
+                          //UpdateIcon(tm, tc, 4, 0);
                           {WFIFOW(0, $0119);
                                 WFIFOL(2, tc.ID);
                                 WFIFOW(6, tc.Stat1);
@@ -11561,7 +11551,7 @@ begin
                   end;
                 end;
 
-                if (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
+                if (tc.Skill[114].Lv > 0) and (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
                         if tc.SP >= 1 then begin
                           tc.SP := tc.SP - 1;
                           tc.Skill[114].Tick := Tick + tc.Skill[114].Data.Data1[tc.Skill[114].Lv];
@@ -13744,23 +13734,23 @@ begin
 				tc1.Skill[255].Tick := Tick;
 			end;
 		end;
-		
+
 		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Option and 64 <> 0) or ((tc1.Option and 6 <> 0) and ((ts.Data.Race <> 4) and (ts.Data.Race <> 6) and (ts.Data.MEXP = 0))) ) and (ts.isLooting = false) then begin
 		{ Stops attack if target is dead, not logged in, or hidden }
 			ATarget := 0;
 			ARangeFlag := false;
 		end
-		
+
 		else if (abs(ts.Point.X - tc1.Point.X) <= ts.Data.Range1) and (abs(ts.Point.Y - tc1.Point.Y) <= ts.Data.Range1) then begin
 		{ Attacks if monster and player are within range of each other }
-			
+
 			if (ATick + Data.ADelay < Tick) then begin
 				ATick := Tick - Data.ADelay;
 			end;
-			
+
 			if ATick + Data.ADelay <= Tick then begin
 				UpdateMonsterLocation(tm, ts);
-				
+
 				for j := 1 to (Tick - ATick) div Data.ADelay do begin
 					if tc1.Skill[255].Tick > Tick then begin
 						DamageCalc2(tm, tc1, ts, Tick);
@@ -13772,14 +13762,14 @@ begin
 						WFIFOL(18, tc2.dMotion);
 						WFIFOW(22, dmg[0]);
 						WFIFOW(24, dmg[4]);
-					
+
 						// 4->9 for Endure damage, allow lucky hit gfx
 						if ((tc2.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;
-					
+
 						WFIFOB(26, dmg[5]);
 						WFIFOW(27, 0);
 						SendBCmd(tm, tc2.Point, 29);
-					
+
 						if (dmg[0] <> 0) and (tc2.pcnt <> 0) and (tc2.dMotion <> 0) then begin
 							tc2.Sit := 3;
 							tc2.HPTick := Tick;
@@ -13787,11 +13777,11 @@ begin
 							tc2.SPRTick := Tick;
 							tc2.pcnt := 0;
 							UpdatePlayerLocation(tm, tc2);
-						
+
 							// Colus, 20040129: Reset Lex Aeterna here
 							tc2.Skill[78].Tick := 0;
 						end;
-					
+
 						if ts.Data.MEXP <> 0 then begin
 							for c := 0 to 31 do begin
 								if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc2) then begin
@@ -13801,7 +13791,7 @@ begin
 								end;
 							end;
 						end;
-					
+
 						if tc2.HP > dmg[0] then begin
 							{ Player has more HP than damage done to him or her }
 							tc2.HP := tc2.HP - dmg[0];
@@ -13809,12 +13799,18 @@ begin
 								tc2.DmgTick := Tick + tc2.dMotion div 2;
 							end;
 
-				if (tc2.Option and 6 <> 0) then begin
+			    	if (tc2.Option and 2 <> 0) then begin
                 tc2.SkillTick := Tick;
                 tc2.SkillTickID := 51;
+                tc2.Skill[tc2.SkillTickID].Tick := Tick;
               end;
+                if (tc2.Option and 4 <> 0) then begin
+                  tc2.SkillTick := Tick;
+                  tc2.SkillTickID := 135;
+                  tc2.Skill[tc2.SkillTickID].Tick := Tick;
+                end;
 						end
-					
+
 						else begin
 							{ Player has run out of HP and dies }
 							tc2.HP := 0;
@@ -13823,33 +13819,39 @@ begin
 							WFIFOB( 6, 1);
 							SendBCmd(tm, tc2.Point, 7);
 							tc2.Sit := 1;
-						
+
 							i := (100 - DeathBaseLoss);
 							tc2.BaseEXP := Round(tc2.BaseEXP * (i / 100));
 							i := (100 - DeathJobLoss);
 							tc2.JobEXP := Round(tc2.JobEXP * (i / 100));
-						
+
 							SendCStat1(tc2, 1, $0001, tc2.BaseEXP);
 							SendCStat1(tc2, 1, $0002, tc2.JobEXP);
-						
+
 							tc2.pcnt := 0;
 							if (tc2.AMode = 1) or (tc2.AMode = 2) then tc2.AMode := 0;
 							ATarget := 0;
 							ARangeFlag := false;
-				if (tc2.Option and 6 <> 0) then begin
+      				if (tc2.Option and 2 <> 0) then begin
                 tc2.SkillTick := Tick;
                 tc2.SkillTickID := 51;
+                tc2.Skill[tc2.SkillTickID].Tick := Tick;
               end;
+                if (tc2.Option and 4 <> 0) then begin
+                  tc2.SkillTick := Tick;
+                  tc2.SkillTickID := 135;
+                  tc2.Skill[tc2.SkillTickID].Tick := Tick;
+                end;
 						end;
 
 						SendCStat1(tc2, 0, 5, tc2.HP);
 						ts.ATick := ts.ATick + abs(ts.Data.ADelay);
 					end
-					
+
 					else if tc1.Skill[255].Tick <= Tick then begin
 						DamageCalc2(tm, tc1, ts, Tick);
 						if dmg[0] <= 0 then dmg[0] := 0;
-						
+
 						WFIFOW( 0, $008a);
 						WFIFOL( 2, ID);
 						WFIFOL( 6, ATarget);
@@ -13861,7 +13863,7 @@ begin
 						
 						// 4->9 for Endure damage, allow lucky hit gfx						
 						if ((tc1.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;
-						
+
 						WFIFOB(26, dmg[5]);
 						WFIFOW(27, 0);
 						SendBCmd(tm, tc1.Point, 29);
@@ -13877,7 +13879,7 @@ begin
 							// Colus, 20040129: Reset Lex Aeterna here
 							tc1.Skill[78].Tick := 0;
 						end;
-						
+
 						if ts.Data.MEXP <> 0 then begin
 							for c := 0 to 31 do begin
 								if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc1) then begin
@@ -13887,14 +13889,14 @@ begin
 								end;
 							end;
 						end;
-						
+
 						if tc1.HP > dmg[0] then begin
 							tc1.HP := tc1.HP - dmg[0];
 							if dmg[0] <> 0 then begin
 								tc1.DmgTick := Tick + tc1.dMotion div 2;
-								
+
 								{Colus, 20031216: Cancel casting timer on hit. Also, phen card handling.}
-								
+
 								if tc1.NoCastInterrupt = False then begin
 									tc1.MMode := 0;
 									tc1.MTick := 0;
@@ -13902,15 +13904,21 @@ begin
 									WFIFOL(2, tc1.ID);
 									SendBCmd(tm, tc1.Point, 6);
 								end;
-								
+
 								{Colus, 20031216: end cast-timer cancel}
-if (tc1.Option and 6 <> 0) then begin
-                tc1.SkillTick := Tick;
-                tc1.SkillTickID := 51;
-              end;
+                if (tc1.Option and 2 <> 0) then begin
+                  tc1.SkillTick := Tick;
+                  tc1.SkillTickID := 51;
+                  tc1.Skill[tc1.SkillTickID].Tick := Tick;
+                end;
+                if (tc1.Option and 4 <> 0) then begin
+                  tc1.SkillTick := Tick;
+                  tc1.SkillTickID := 135;
+                  tc1.Skill[tc1.SkillTickID].Tick := Tick;
+                end;
 							end;
 						end
-						
+
 						else begin
 							tc1.HP := 0;
 							WFIFOW( 0, $0080);
@@ -13918,7 +13926,7 @@ if (tc1.Option and 6 <> 0) then begin
 							WFIFOB( 6, 1);
 							SendBCmd(tm, tc1.Point, 7);
 							tc1.Sit := 1;
-							
+
 							i := (100 - DeathBaseLoss);
 							tc1.BaseEXP := Round(tc1.BaseEXP * (i / 100));
 							i := (100 - DeathJobLoss);
@@ -13932,9 +13940,15 @@ if (tc1.Option and 6 <> 0) then begin
 							if (tc1.AMode = 1) or (tc1.AMode = 2) then tc1.AMode := 0;
 							ATarget := 0;
 							ARangeFlag := false;
-							if (tc1.Option and 6 <> 0) then begin
+							if (tc1.Option and 2 <> 0) then begin
                 				tc1.SkillTick := Tick;
                 				tc1.SkillTickID := 51;
+                  tc1.Skill[tc1.SkillTickID].Tick := Tick;
+							end;
+							if (tc1.Option and 4 <> 0) then begin
+                				tc1.SkillTick := Tick;
+                				tc1.SkillTickID := 135;
+                  tc1.Skill[tc1.SkillTickID].Tick := Tick;
 							end;
 							
 						end;
@@ -14781,7 +14795,7 @@ begin
 								//Skill[24].Tick := 0;
 							end;
           
-						51,135: //ハイド、クローキング
+						51,135: // Hiding and Cloaking
 							begin
                 // AlexKreuz: Changed to expire Hide Skill
                 if (tc.Option and 6 <> 0) then begin
@@ -14803,16 +14817,17 @@ begin
                 //UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
               end;
 					end;
-					//アイコン表示解除
+					// Remove icon if the skill has one...
           if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
             if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
-  						//DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
-	  					WFIFOW(0, $0196);
+  						//DebugOut.Lines.Add(Format('(Icon remove, skilltickid %d)',[SkillTickID]));
+              UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
+	  					{WFIFOW(0, $0196);
 		  				WFIFOW(2, tc.Skill[SkillTickID].Data.Icon);
 			  			WFIFOL(4, tc.ID);
-				  		WFIFOB(8, 0);
-                        	  		//Socket.SendBuf(buf, 9);
-                        	  		SendBCmd(tm, tc.Point, 9);
+				  		WFIFOB(8, 0);}
+              //Socket.SendBuf(buf, 9);
+              //SendBCmd(tm, tc.Point, 9);
             end;
 					end;
 
