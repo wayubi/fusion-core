@@ -10273,7 +10273,9 @@ begin
 									WFIFOW(28, tn.MUseLV);
 									WFIFOW(30, tl.Data2[tn.MUseLV]);
 									WFIFOB(32, 8);
-									SendBCmd(tm, tn.Point, 33);
+									if ts1.isEmperium = false then begin
+									  SendBCmd(tm, tn.Point, 33);
+									end;
 									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
 									if c = (sl.Count -1) then begin
 										Inc(tn.Count);	//Count‚ğ”­“®”­”‚ÆSkillLV‚Ég—p
