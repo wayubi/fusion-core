@@ -52,6 +52,7 @@ The following files were not checked for here - are they really just optional?
 	special_db.txt
 	mapinfo_db.txt
 
+2004/05/29 - AlexKreuz added gm_access.txt to the required list.
 *-----------------------------------------------------------------------------*)
 Function  DataBaseFilesExist : Boolean;
 Begin
@@ -77,7 +78,7 @@ Begin
 		FileExists(AppPath + 'database\make_arrow.txt') AND
 
 		FileExists(AppPath + 'database\id_table.txt') AND
-        FileExists(AppPath + 'database\gm_access.txt') AND
+		FileExists(AppPath + 'database\gm_access.txt') AND
 
 		FileExists(AppPath + 'database\job_db1.txt') AND
 		FileExists(AppPath + 'database\job_db2.txt') AND
@@ -2408,7 +2409,7 @@ begin
 			for i := 0 to 11 do begin
 				MemberID[i] := StrToInt(sl.Strings[i+1]);
 			end;
-			EXPShare := 0;
+			EXPShare := False;
 		end;
 		PartyNameList.AddObject(tpa.Name, tpa);
 		// debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name : %s.', [tpa.Name]));

@@ -2557,11 +2557,11 @@ end;
 				RFIFOW(4, w2);
 				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Index:%d EquipType:%d', [w1, w2]));
 {修正}
-        // Colus, 20040304: Upper classes able to equip things now?
-        i := tc.JID;
-        if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
-        // wjob := 1 shl tc.JID;
-        wjob := Int64(1) shl i;
+				// Colus, 20040304: Upper classes able to equip things now?
+				i := tc.JID;
+				if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
+				// wjob := 1 shl tc.JID;
+				wjob := Int64(1) shl i;
 {修正ココまで}
 				if (not DisableEquipLimit) and
 					 ((tc.Item[w1].Identify = 0) or (tc.BaseLV < tc.Item[w1].Data.eLV) or
@@ -2586,12 +2586,12 @@ end;
 							if (tc.Item[i].Equip = $80) then begin w := (w and $8);	j := i; end;
 						end;
 					end;
-					if w = 0 then begin //両方埋まってるときは右側をはずす
-						WFIFOW(0, $00ac);
+					if w = 0 then begin //When both 'buried' RHS is removed
+						WFIFOW(0, $00ac);//Remove Equipment
 						WFIFOW(2, j);
 						WFIFOW(4, tc.Item[j].Equip);
 						tc.Item[j].Equip := 0;
-						WFIFOB(6, 1);
+						WFIFOB(6, 1);//Successful Remove.
 						Socket.SendBuf(buf, 7);
 						w := $80;
 					end;
@@ -2609,9 +2609,9 @@ end;
 					j := 0;
 					for i := 1 to 100 do begin //装備箇所があいてるかチェック
 						if (tc.Item[i].ID <> 0) and tc.Item[i].Data.IEquip then begin
-							if (tc.Item[i].Equip = $2)	then begin w := (w and $20);				 end;
-							if (tc.Item[i].Equip = $20) then begin w := (w and $2);	j := i; end;
-							if (tc.Item[i].Equip = $22) then begin w := 0;					 j := i; end;
+							if (tc.Item[i].Equip = $2)  then begin w := (w and $20);         end;
+							if (tc.Item[i].Equip = $20) then begin w := (w and $2);  j := i; end;
+							if (tc.Item[i].Equip = $22) then begin w := 0;           j := i; end;
 						end;
 					end;
 					if w = 0 then begin //両方埋まってるときは右側あるいはカタールをはずす
@@ -2632,99 +2632,99 @@ end;
 					WFIFOB(6, 1);
 					Socket.SendBuf(buf, 7);
 {キューペット}
-                                // ペットアクセサリ
-                                end else if tc.Item[w1].Data.Effect = 123 then begin
+					// ペットアクセサリ
+					end else if tc.Item[w1].Data.Effect = 123 then begin
 
-                                        if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
+						if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
 
-                                                tpe := tc.PetData;
-                                                tn := tc.PetNPC;
+							tpe := tc.PetData;
+							tn := tc.PetNPC;
 
-                                                if tc.Item[w1].Data.ID = tpe.Data.AcceID then begin
+							if tc.Item[w1].Data.ID = tpe.Data.AcceID then begin
 
-                                                        // アイテム減少
-                                                        Dec(tc.Item[w1].Amount);
-                                                        if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
-                                                        tc.Weight := tc.Weight - tc.Item[w1].Data.Weight;
+								// アイテム減少
+								Dec(tc.Item[w1].Amount);
+								if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
+								tc.Weight := tc.Weight - tc.Item[w1].Data.Weight;
 
-                                                        //アイテム数減少
-                                                        WFIFOW( 0, $00af);
-                                                        WFIFOW( 2, w1);
-                                                        WFIFOW( 4, 1);
-                                                        Socket.SendBuf( buf, 6 );
+									//アイテム数減少
+									WFIFOW( 0, $00af);
+									WFIFOW( 2, w1);
+									WFIFOW( 4, 1);
+									Socket.SendBuf( buf, 6 );
 
-                                                        //Update weight
-                                                        SendCStat1(tc, 0, $0018, tc.Weight);
+									//Update weight
+									SendCStat1(tc, 0, $0018, tc.Weight);
 
-                                                        if ( tpe.Accessory <> 0 ) and ( ItemDB.IndexOf( tpe.Accessory ) <> -1 ) then begin
-                                                                td := ItemDB.IndexOfObject( tpe.Accessory ) as TItemDB;
+									if ( tpe.Accessory <> 0 ) and ( ItemDB.IndexOf( tpe.Accessory ) <> -1 ) then begin
+										td := ItemDB.IndexOfObject( tpe.Accessory ) as TItemDB;
 
-                                                                if tc.MaxWeight >= tc.Weight + td.Weight then begin
-                                                                        j := SearchCInventory(tc, td.ID, td.IEquip );
-                                                                        if j <> 0 then begin
-                                                                                //アイテム追加
-                                                                                tc.Item[j].ID := td.ID;
-                                                                                tc.Item[j].Amount := tc.Item[j].Amount + 1;
-                                                                                tc.Item[j].Equip := 0;
-                                                                                tc.Item[j].Identify := 1;
-                                                                                tc.Item[j].Refine := 0;
-                                                                                tc.Item[j].Attr := 0;
-                                                                                tc.Item[j].Card[0] := 0;
-                                                                                tc.Item[j].Card[1] := 0;
-                                                                                tc.Item[j].Card[2] := 0;
-                                                                                tc.Item[j].Card[3] := 0;
+										if tc.MaxWeight >= tc.Weight + td.Weight then begin
+											j := SearchCInventory(tc, td.ID, td.IEquip );
+											if j <> 0 then begin
+												//アイテム追加
+												tc.Item[j].ID := td.ID;
+												tc.Item[j].Amount := tc.Item[j].Amount + 1;
+												tc.Item[j].Equip := 0;
+												tc.Item[j].Identify := 1;
+												tc.Item[j].Refine := 0;
+												tc.Item[j].Attr := 0;
+												tc.Item[j].Card[0] := 0;
+												tc.Item[j].Card[1] := 0;
+												tc.Item[j].Card[2] := 0;
+												tc.Item[j].Card[3] := 0;
 
-                                                                                tc.Item[j].Data := td;
-                                                                                //アイテムゲット通知
-                                                                                SendCGetItem(tc, j, 1);
+												tc.Item[j].Data := td;
+												//アイテムゲット通知
+												SendCGetItem(tc, j, 1);
 
-                                                                                //重量追加
-                                                                                tc.Weight := tc.Weight + td.Weight;
-                                                                                SendCStat1(tc, 0, $0018, tc.Weight);
-                                                                        end else begin
-                                                                                //これ以上もてない
-                                                                                WFIFOW( 0, $00a0);
-                                                                                WFIFOB(22, 1);
-                                                                                Socket.SendBuf(buf, 23);
-                                                                        end;
-                                                                end else begin
-                                                                        //重量オーバー
-                                                                        WFIFOW( 0, $00a0);
-                                                                        WFIFOB(22, 2);
-                                                                        Socket.SendBuf(buf, 23);
-                                                                end;
-                                                        end;
+												//重量追加
+												tc.Weight := tc.Weight + td.Weight;
+												SendCStat1(tc, 0, $0018, tc.Weight);
+											end else begin
+												//これ以上もてない
+												WFIFOW( 0, $00a0);
+												WFIFOB(22, 1);
+												Socket.SendBuf(buf, 23);
+											end;
+										end else begin
+											//重量オーバー
+											WFIFOW( 0, $00a0);
+											WFIFOB(22, 2);
+											Socket.SendBuf(buf, 23);
+										end;
+									end;
 
-                                                        tm := tc.MData;
-                                                        tpe.Accessory := tc.Item[w1].Data.ID;
-                                                        WFIFOW( 0, $01a4 );
-                                                        WFIFOB( 2, 3 );
-                                                        WFIFOL( 3, tn.ID );
-                                                        WFIFOL( 7, tpe.Accessory );
+									tm := tc.MData;
+									tpe.Accessory := tc.Item[w1].Data.ID;
+									WFIFOW( 0, $01a4 );
+									WFIFOB( 2, 3 );
+									WFIFOL( 3, tn.ID );
+									WFIFOL( 7, tpe.Accessory );
 
-                                                        SendBCmd( tm, tn.Point, 11 );
-                                                end else begin
-                                                        WFIFOW(0, $00aa);
-					                WFIFOW(2, w1);
-					                WFIFOW(4, 0);
-					                WFIFOB(6, 0);
-					                Socket.SendBuf(buf, 7);
-                                                end;
-                                        end else begin
-                                                WFIFOW(0, $00aa);
-                                                WFIFOW(2, w1);
-                                                WFIFOW(4, 0);
-                                                WFIFOB(6, 0);
-                                                Socket.SendBuf(buf, 7);
-                                        end;
+									SendBCmd( tm, tn.Point, 11 );
+								end else begin
+									WFIFOW(0, $00aa);
+									WFIFOW(2, w1);
+									WFIFOW(4, 0);
+									WFIFOB(6, 0);
+									Socket.SendBuf(buf, 7);
+								end;
+							end else begin
+								WFIFOW(0, $00aa);
+								WFIFOW(2, w1);
+								WFIFOW(4, 0);
+								WFIFOB(6, 0);
+								Socket.SendBuf(buf, 7);
+							end;
 {キューペットここまで}
-				end else begin
-					if tc.Item[w1].Data.IType = 10 then begin
-            //arrow equip
-						WFIFOW(0, $013c);
-						WFIFOW(2, 0);
-						Socket.SendBuf(buf, 4);
-					end;
+						end else begin
+							if tc.Item[w1].Data.IType = 10 then begin
+							//arrow equip
+							WFIFOW(0, $013c);
+							WFIFOW(2, 0);
+							Socket.SendBuf(buf, 4);
+						end;
 					for i := 1 to 100 do begin
 						if (tc.Item[i].ID <> 0) and (tc.Item[i].Data.IEquip or (tc.Item[i].Data.IType = 10)) then begin
 							if (tc.Item[i].Equip and tc.Item[w1].Data.Loc) <> 0 then begin
@@ -2748,12 +2748,12 @@ end;
 						WFIFOW(2, w1);
 						Socket.SendBuf(buf, 4);
 					end else begin
-            //equip wep
-            //if (tc.Item[w1].Data.IType <> 0) then begin
-            //WFIFOW(0, $013b);
+						//equip wep
+						//if (tc.Item[w1].Data.IType <> 0) then begin
+						//WFIFOW(0, $013b);
 						//WFIFOW(2, 3);
 						//Socket.SendBuf(buf, 4);
-            //end;
+						//end;
 						WFIFOW(0, $00aa);
 						WFIFOW(2, w1);
 						WFIFOW(4, tc.Item[w1].Data.Loc);
@@ -2763,13 +2763,11 @@ end;
 				end;
 
 				CalcStat(tc);
-        SendCSkillList(tc);
+				SendCSkillList(tc);
 
-        // Recalculate stats with sprite update
-        SendCStat(tc, true);
-
-
-      end;
+				// Recalculate stats with sprite update
+				SendCStat(tc, true);
+			end;
 		//--------------------------------------------------------------------------
 		$00ab: //アイテム装備解除
 			begin
@@ -3840,17 +3838,17 @@ end;
 						//パーティー名が重複してはいけない
 						tpa := TParty.Create;
 						tpa.Name := str;
-						tpa.EXPShare := 0;
-						tpa.ITEMShare := 1;
+						tpa.EXPShare := False;
+						tpa.ITEMShare := True;
 						tpa.MemberID[0] := tc.CID; //リーダ:0
 						tpa.Member[0] := tc;
-                                                if tc.JID = 19 then begin
-                                                        tpa.PartyBard[0] := tc;
-                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
-                                                end else if tc.JID = 20 then begin
-                                                        tpa.PartyDancer[0] := tc;
-                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
-                                                end;
+						if tc.JID = 19 then begin
+							tpa.PartyBard[0] := tc;
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+						end else if tc.JID = 20 then begin
+							tpa.PartyDancer[0] := tc;
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+						end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);
 						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
@@ -3986,10 +3984,10 @@ end;
 					if (tpa.MaxLV - tpa.MinLV > Option_PartyShare_Level) then begin
 						w1 := 2;
 					end else begin
-						tpa.EXPShare := w1;
+						tpa.EXPShare := WordBool(w1);
 					end;
 
-					tpa.ITEMShare := w2;
+					tpa.ITEMShare := WordBool(w2);
 
 					WFIFOW( 0, $0101);
 					WFIFOW( 2, w1);
@@ -3998,8 +3996,8 @@ end;
 
 					if (w1 = 2) then begin
 						WFIFOW(0, $0101);
-						WFIFOW(2, tpa.EXPShare);
-						WFIFOW(4, tpa.ITEMShare);
+						WFIFOW(2, Word(tpa.EXPShare));
+						WFIFOW(4, Word(tpa.ITEMShare));
 						SendPCmd(tc, 6);
 					end;
 				end;
@@ -7060,8 +7058,8 @@ end;
 						//パーティー名が重複してはいけない
 						tpa := TParty.Create;
 						tpa.Name := str;
-						tpa.EXPShare := 0;
-						tpa.ITEMShare := 1;
+						tpa.EXPShare := False;
+						tpa.ITEMShare := True;
 						tpa.MemberID[0] := tc.CID; //リーダ:0
 						tpa.Member[0] := tc;
                                                 if tc.JID = 19 then begin

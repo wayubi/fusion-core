@@ -3,80 +3,80 @@ unit FusionSQL;
 interface
 
 uses
-        Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
+	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
 
-        function MySQL_Query(sqlcmd: String) : Boolean;
-        function Assign_AccountID() : cardinal;
-        function Load_Accounts(userid: String; AID: cardinal = 0) : Boolean;
-        function Call_Characters(AID: cardinal) : Boolean;
-        function Load_Characters(GID: cardinal) : Boolean;
-        function Load_Parties(GID: cardinal) : Boolean;
-        function Load_Pets(AID: cardinal) : Boolean;
-        function Load_Guilds(GID: cardinal) : Boolean;
-        function Preload_GuildMembers() : Boolean;
-        function Create_Account(username: String; userpass: String; sex: integer) : Boolean;
+	function MySQL_Query(sqlcmd: String) : Boolean;
+	function Assign_AccountID() : cardinal;
+	function Load_Accounts(userid: String; AID: cardinal = 0) : Boolean;
+	function Call_Characters(AID: cardinal) : Boolean;
+	function Load_Characters(GID: cardinal) : Boolean;
+	function Load_Parties(GID: cardinal) : Boolean;
+	function Load_Pets(AID: cardinal) : Boolean;
+	function Load_Guilds(GID: cardinal) : Boolean;
+	function Preload_GuildMembers() : Boolean;
+	function Create_Account(username: String; userpass: String; sex: integer) : Boolean;
 
 implementation
 
 var
-        SQLDataSet : TSQLDataSet;
-        SQLConnection : TSQLConnection;
+	SQLDataSet : TSQLDataSet;
+	SQLConnection : TSQLConnection;
 
 function MySQL_Query(sqlcmd: String) : Boolean;
 begin
-        Result := False;
+	Result := False;
 
-        if not assigned(SQLConnection) then begin
-                SQLConnection := TSQLConnection.Create(nil);
-                SQLConnection.ConnectionName := 'MySQLConnection';
-                SQLConnection.DriverName := 'MySQL';
-                SQLConnection.GetDriverFunc := 'getSQLDriverMYSQL';
-                SQLConnection.KeepConnection := True;
-                SQLConnection.LibraryName := 'dbexpmysql.dll';
-                SQLConnection.LoginPrompt := False;
-                SQLConnection.VendorLib := 'libmysql.dll';
-                SQLConnection.Params.Values['HostName'] := DbHost;
-                SQLConnection.Params.Values['Database'] := DbName;
-                SQLConnection.Params.Values['User_Name'] := DbUser;
-                SQLConnection.Params.Values['Password'] := DbPass;
-        end;
+	if not assigned(SQLConnection) then begin
+		SQLConnection := TSQLConnection.Create(nil);
+		SQLConnection.ConnectionName := 'MySQLConnection';
+		SQLConnection.DriverName := 'MySQL';
+		SQLConnection.GetDriverFunc := 'getSQLDriverMYSQL';
+		SQLConnection.KeepConnection := True;
+		SQLConnection.LibraryName := 'dbexpmysql.dll';
+		SQLConnection.LoginPrompt := False;
+		SQLConnection.VendorLib := 'libmysql.dll';
+		SQLConnection.Params.Values['HostName'] := DbHost;
+		SQLConnection.Params.Values['Database'] := DbName;
+		SQLConnection.Params.Values['User_Name'] := DbUser;
+		SQLConnection.Params.Values['Password'] := DbPass;
+	end;
 
-        if not SQLConnection.Connected then begin
-                try
-                        SQLConnection.Connected := True;
-                except
-                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '*** Error on MySQL Connect.');
-                        Exit;
-                end;
-        end;
-
-        if not assigned(SQLDataSet) then begin
-                SQLDataSet := TSQLDataSet.Create(nil);
-                SQLDataSet.SQLConnection := SQLConnection;
-        end;
-
-        if SQLDataSet.Active then SQLConnection.Close;
-
-        SQLDataSet.CommandText := sqlcmd;
-
-        if UpperCase(copy(SQLDataSet.CommandText,1,6)) <> 'SELECT' then begin
-                try
-                        SQLDataSet.ExecSQL;
+	if not SQLConnection.Connected then begin
+		try
+			SQLConnection.Connected := True;
 		except
-                        debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Execute SQL Error: %s', [sqlcmd] ) );
-                        exit;
-                end;
-                Result := True;
-                Exit;
-        end;
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + '*** Error on MySQL Connect.');
+			Exit;
+		end;
+	end;
 
-        try
-                SQLDataSet.Open;
-        except
-                debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Open SQL Data Error: %s', [sqlcmd] ) );
-                exit;
-        end;
-        Result := True;
+	if not assigned(SQLDataSet) then begin
+		SQLDataSet := TSQLDataSet.Create(nil);
+		SQLDataSet.SQLConnection := SQLConnection;
+	end;
+
+	if SQLDataSet.Active then SQLConnection.Close;
+
+	SQLDataSet.CommandText := sqlcmd;
+
+	if UpperCase(copy(SQLDataSet.CommandText,1,6)) <> 'SELECT' then begin
+		try
+			SQLDataSet.ExecSQL;
+		except
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Execute SQL Error: %s', [sqlcmd] ) );
+			exit;
+		end;
+		Result := True;
+		Exit;
+	end;
+
+	try
+		SQLDataSet.Open;
+	except
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Open SQL Data Error: %s', [sqlcmd] ) );
+		exit;
+	end;
+	Result := True;
 end;
 
 function Assign_AccountID() : cardinal;
@@ -177,44 +177,44 @@ end;
 
 function Call_Characters(AID: cardinal) : Boolean;
 var
-        i : integer;
-        tp : TPlayer;
-        query : string;
+	i : integer;
+	tp : TPlayer;
+	query : string;
 begin
-        Result := False;
+	Result := False;
 
-        tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
+	tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
 
-        query := 'SELECT GID, Name, CharaNumber FROM characters WHERE AID='+''''+inttostr(AID)+''''+' LIMIT 9';
-        if MySQL_Query(query) then begin
-                while not SQLDataSet.Eof do begin
-                        tp.CID[StrToInt(SQLDataSet.FieldValues['CharaNumber'])] := StrToInt(SQLDataSet.FieldValues['GID']);
-                        SQLDataSet.Next;
-                end;
-        end else begin
-                Exit;
-        end;
+	query := 'SELECT GID, Name, CharaNumber FROM characters WHERE AID='+''''+inttostr(AID)+''''+' LIMIT 9';
+	if MySQL_Query(query) then begin
+		while not SQLDataSet.Eof do begin
+			tp.CID[StrToInt(SQLDataSet.FieldValues['CharaNumber'])] := StrToInt(SQLDataSet.FieldValues['GID']);
+			SQLDataSet.Next;
+		end;
+	end else begin
+		Exit;
+	end;
 
-        for i := 0 to 8 do begin
-                if (tp.CID[i] <> 0) then begin
-                        Load_Characters(tp.CID[i]);
-                end;
-        end;
-        Result := True;
+	for i := 0 to 8 do begin
+		if (tp.CID[i] <> 0) then begin
+			Load_Characters(tp.CID[i]);
+		end;
+	end;
+	Result := True;
 end;
 
 function Load_Characters(GID: cardinal) : Boolean;
 var
-        i : integer;
-        tc : TChara;
-        ta : TMapList;
-        tp  : TPlayer;
-        tpa : TParty;
-        sl  : TStringList;
-        str : string;
-        query : string;
-        query2 : string;
-        addkey : boolean;
+	i : integer;
+	tc : TChara;
+	ta : TMapList;
+	tp  : TPlayer;
+//	tpa : TParty;
+	sl  : TStringList;
+	str : string;
+	query : string;
+	query2 : string;
+	addkey : boolean;
 begin
         sl := TStringList.Create;
         sl.QuoteChar := '"';
@@ -399,7 +399,7 @@ begin
                         sl.Clear;
                         sl.DelimitedText := SQLDataSet.FieldValues['flagdata'];
 
-                        for i := 0 to (sl.Count - 1) do begin
+												for i := 0 to (sl.Count - 1) do begin
                                 tc.Flag.Add(sl.Strings[i]);
                         end;
 
@@ -423,63 +423,65 @@ begin
 end;
 
 function Load_Parties(GID: cardinal) : Boolean;
+const
+	MEMBERID_OFFSET =  4;
 var
-        i, k : integer;
-        query : string;
-        tpa : TParty;
-        tc : TChara;
-        addkey : Boolean;
+	i      : Integer;
+	MIdx   : Integer; //MemberID Iterator
+	query  : string;
+	tpa    : TParty;
+	tc     : TChara;
+	addkey : Boolean;
 begin
-        Result := False;
-        addkey := True;
+	Result := False;
+	addkey := True;
 
-        query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''' + ' OR MemberID2 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID3 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID4 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID5 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID6 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID7 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID8 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID9 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID10 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID11 = '+ '''' + inttostr(GID) + '''';
-        if (MySQL_Query (query)) then begin
-                if SQLDataSet.FieldByName('Name').IsNull then begin
-                end else begin
-                        tpa := TParty.Create;
-                        with tpa do begin
-                                Name := (SQLDataSet.FieldValues['Name']);
-                                if assigned (PartyNameList) then begin
-                                        if (PartyNameList.IndexOf(tpa.Name) <> -1) then begin
-                                                tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
-                                                addkey := False;
-                                        end;
-                                end;
-                                EXPShare := StrToInt(SQLDataSet.FieldValues['EXPShare']);
-                                ITEMShare := StrToInt(SQLDataSet.FieldValues['ITEMShare']);
-                                MemberID[0] := StrToInt(SQLDataSet.FieldValues['MemberID0']);
-                                MemberID[1] := StrToInt(SQLDataSet.FieldValues['MemberID1']);
-                                MemberID[2] := StrToInt(SQLDataSet.FieldValues['MemberID2']);
-                                MemberID[3] := StrToInt(SQLDataSet.FieldValues['MemberID3']);
-                                MemberID[4] := StrToInt(SQLDataSet.FieldValues['MemberID4']);
-                                MemberID[5] := StrToInt(SQLDataSet.FieldValues['MemberID5']);
-                                MemberID[6] := StrToInt(SQLDataSet.FieldValues['MemberID6']);
-                                MemberID[7] := StrToInt(SQLDataSet.FieldValues['MemberID7']);
-                                MemberID[8] := StrToInt(SQLDataSet.FieldValues['MemberID8']);
-                                MemberID[9] := StrToInt(SQLDataSet.FieldValues['MemberID9']);
-                                MemberID[10] := StrToInt(SQLDataSet.FieldValues['MemberID10']);
-                                MemberID[11] := StrToInt(SQLDataSet.FieldValues['MemberID11']);
-                        end;
+	query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''' + ' OR MemberID2 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID3 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID4 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID5 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID6 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID7 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID8 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID9 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID10 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID11 = '+ '''' + inttostr(GID) + '''';
+	if (MySQL_Query (query)) then begin
+		if SQLDataSet.FieldByName('Name').IsNull then begin
+		end else begin
+			tpa := TParty.Create;
+			with tpa do begin
+				Name := (SQLDataSet.FieldValues['Name']);
+				if assigned (PartyNameList) then begin
+					if (PartyNameList.IndexOf(tpa.Name) <> -1) then begin
+						tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
+						addkey := False;
+					end;
+				end;
+				EXPShare  := StrToBool(SQLDataSet.FieldValues['EXPShare']);
+				ITEMShare := StrToBool(SQLDataSet.FieldValues['ITEMShare']);
 
-                        if (addkey) then begin
-                                PartyNameList.AddObject(tpa.Name, tpa);
-                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Add Party Name : %s.', [tpa.Name]));
-                        end;
+				{ChrstphrR 2004/05/31 - changing code here to avoid using variants,
+				since FieldValues[] returns a variant type, which is much slower to use
+				and access vs more direct methods - esp. when we're querying a larger
+				list...}
+				for MIdx := Low(MemberID) to High(MemberID) do
+				begin
+					MemberID[MIdx] := SQLDataSet.Fields[MIdx+MEMBERID_OFFSET].AsInteger;
+				end;
 
-                        tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
-                        for i := 0 to 11 do begin
-                                if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] = tc.CID) then begin
-                                        tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
-                                        tc.PartyName := tpa.Name;
-                                        tpa.Member[i] := tc;
-                                        break;
-                                end;
-                        end;
-                end;
-        end;
+//				MemberID[0] := StrToInt(SQLDataSet.FieldValues['MemberID0']);
+			end;
 
-        Result := True;
+			if (addkey) then begin
+				PartyNameList.AddObject(tpa.Name, tpa);
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Add Party Name : %s.', [tpa.Name]));
+			end;
+
+			tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
+			for i := 0 to 11 do begin
+				if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] = tc.CID) then begin
+					tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
+					tc.PartyName := tpa.Name;
+					tpa.Member[i] := tc;
+					break;
+				end;
+			end;
+		end;
+	end;
+
+	Result := True;
 end;
 
 function Load_Pets(AID: cardinal) : Boolean;

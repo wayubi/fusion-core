@@ -11,12 +11,12 @@ uses
 	List32;
 
 const
-  // Colus, 20040304: Let's see if this is truly global scope.
-  MAX_SKILL_NUMBER = 411;
-  MAX_JOB_NUMBER = 45;
-  LOWER_JOB_END = 23;
-  UPPER_JOB_BEGIN = 4000;
-  MONSTER_ATK_RANGE = 9;
+	// Colus, 20040304: Let's see if this is truly global scope.
+	MAX_SKILL_NUMBER = 411;
+	MAX_JOB_NUMBER = 45;
+	LOWER_JOB_END = 23;
+	UPPER_JOB_BEGIN = 4000;
+	MONSTER_ATK_RANGE = 9;
 
 	MAX_PARTY_SIZE = 12;
 
@@ -29,7 +29,7 @@ const
 	NPC_TYPE_SKILL  = $04;
 
   // Colus, 20040503: This is the default JID for invisible (non-displayed) NPCs.
-  // callmob and SendNData will look for this.
+	// callmob and SendNData will look for this.
   NPC_INVISIBLE = 32767;
 
 	//ChrstphrR source: http://www.stud.ntnu.no/~magnusrk/calc/
@@ -62,6 +62,10 @@ const
 	SIZE_MED = 1;
 	SIZE_LRG = 2;
 
+	//MapList Constants for Mode Field.
+	MAP_NOTLOADED = 0;
+	MAP_LOADING   = 1;
+	MAP_LOADED    = 2;
 
 type TLiving = class
 	public
@@ -154,33 +158,33 @@ type TItemDB = class
 	AddSkill   :array[0..MAX_SKILL_NUMBER] of Word; // Skill addition
 	SplashAttack  :boolean;          // Splash attack
 	SpecialAttack :integer;
-    {
-      1 = Knockback
-      2 = Fatal Blow, .1% chance of instantly killing monster
-    }
-        WeaponSkill   :integer;
-        WeaponSkillLV :integer;
-        WeaponID      :integer;
+	{
+	1 = Knockback
+	2 = Fatal Blow, .1% chance of instantly killing monster
+	}
+	WeaponSkill   :integer;
+	WeaponSkillLV :integer;
+	WeaponID      :integer;
 	NoJamstone    :boolean;
 
-        FastWalk      :boolean;
-        NoTarget      :boolean;
-        FullRecover   :boolean;
-        LessSP        :boolean;
-        OrcReflect    :boolean;
-        AnolianReflect :boolean;
-        UnlimitedEndure :boolean;
-        DoppelgagnerASPD :boolean;
-        GhostArmor    :boolean;
-        NoCastInterrupt :boolean;
-        MagicReflect  :boolean;
-				SkillWeapon   :boolean;
-        GungnirEquipped :boolean;
-        LVL4WeaponASPD :boolean;
-        PerfectDamage   :boolean;
+	FastWalk      :boolean;
+	NoTarget      :boolean;
+	FullRecover   :boolean;
+	LessSP        :boolean;
+	OrcReflect    :boolean;
+	AnolianReflect :boolean;
+	UnlimitedEndure :boolean;
+	DoppelgagnerASPD :boolean;
+	GhostArmor    :boolean;
+	NoCastInterrupt :boolean;
+	MagicReflect  :boolean;
+	SkillWeapon   :boolean;
+	GungnirEquipped :boolean;
+	LVL4WeaponASPD :boolean;
+	PerfectDamage   :boolean;
 
-  public
-    Procedure Assign(Source : TItemDB);
+	public
+		Procedure Assign(Source : TItemDB);
 End;(* TItenDB *)
 
 
@@ -195,7 +199,7 @@ type TItem = class
 	Attr      : Byte;
 	Card      : Array[0..3] of Word;
 	Data      : TItemDB;
-  Stolen    : Cardinal;
+	Stolen    : Cardinal;
 
 public
 	Constructor Create;
@@ -239,41 +243,41 @@ end;
 //------------------------------------------------------------------------------
 // MapName, TerritoryName
 type TTerritoryDB = class
-  MapName       :ShortString;
-  TerritoryName :ShortString;
+	MapName       :ShortString;
+	TerritoryName :ShortString;
 end;
 
 //------------------------------------------------------------------------------
 type TMobAIDB = class
 // ID,SKILL1,LEVEL1,PERCENT1,TYPE1,SKILL2,LEVEL2,PERCENT2,TYPE2,SKILL3,LEVEL3,PERCENT3,TYPE3,SKILL4,LEVEL4,PERCENT4,TYPE4
-        ID              :cardinal;
-        Skill           :array[0..7] of integer;
-        SkillLv         :array[0..7] of integer;
-        PercentChance   :array[0..7] of integer;
-        //SkillType       :array[0..3] of integer;
+	ID            : Cardinal;
+	Skill         : array[0..7] of integer;
+	SkillLv       : array[0..7] of integer;
+	PercentChance : array[0..7] of integer;
+	//SkillType     : array[0..3] of integer;
 end;
 //------------------------------------------------------------------------------
 type TMobAIDBFusion = class
 // ID, Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
-  ID  :cardinal;
-        Number  :integer;
-        Name    :string;
-        Status  :string;
-        SkillID :string;
-        SkillLV :integer;
-        Percent :integer;
-        //Casting :integer;
-        Cast_Time :integer;
-        Cool_Time :integer;
-        Dispel  :string;
-        IfState :string;
-        IfCond :string
+	ID        : cardinal;
+	Number    : integer;
+	Name      : string;
+	Status    : string;
+	SkillID   : string;
+	SkillLV   : integer;
+	Percent   : integer;
+	//Casting   : integer;
+	Cast_Time : integer;
+	Cool_Time : integer;
+	Dispel    : string;
+	IfState   : string;
+	IfCond    : string
 end;
 //------------------------------------------------------------------------------
 type TGlobalVars = class
 // Variable, Value
-  Variable:String;
-  Value:integer;
+	Variable : String;
+	Value    : Integer;
 end;
 
 // モンスターデータベース
@@ -295,7 +299,7 @@ type TMobDB = class
 	ATK2        :word;
 	DEF         :byte; //New
 	MDEF        :byte; //New
-        LUK            :byte; //クリ補正用LUK
+	LUK         :byte; //クリ補正用LUK
 	HIT         :integer;
 	FLEE        :integer;
 	Param       :array[0..5] of byte; //New
@@ -323,56 +327,56 @@ type TMobDB = class
 	isLoot      :boolean; //Mode &  2 : ルート
 	isLink      :boolean; //Mode &  8 : リンク
 	AISkill     :TMobAIDB;
-  SkillLocations :string;  //Gives a list of where the monsters skills are located
-  SkillCount  :integer;
-  WaitTick :integer;
-  Loaded  :boolean;
-  DebugFlag :boolean;
+	SkillLocations :string;  //Gives a list of where the monsters skills are located
+	SkillCount  :integer;
+	WaitTick :integer;
+	Loaded  :boolean;
+	DebugFlag :boolean;
 {追加ココまで}
 end;
 //------------------------------------------------------------------------------
 // MNAME,SLAVE_1,SLAVE_2,SLAVE_3,SLAVE_4,SLAVE_5,TOTALNUMSLAVES
 type TSlaveDB = class
-  Name        :string;
-  Slaves      :array[0..4] of integer;
-  TotalSlaves :integer;
+	Name        : string;
+	Slaves      : array[0..4] of Integer;
+	TotalSlaves : Integer;
 end;
 //------------------------------------------------------------------------------
 // ID,BROADCAST,ITEMSUMMON,MONSTERSUMMON,CHANGESTATSKILL,CHANGEOPTION,SAVERETURN,CHANGELEVEL,WARP,WHOIS,GOTOSUMMONBANISH,KILLDIEALIVE,CHANGEJOB,CHANGECOLORSTYLE,AUTORAWUNIT,REFINE
 type TIDTbl = class
-  ID               :integer;
-  BroadCast        :integer;
-  ItemSummon       :integer;
-  MonsterSummon    :integer;
-  ChangeStatSkill  :integer;
-  ChangeOption     :integer;
-  SaveReturn       :integer;
-  ChangeLevel      :integer;
-  Warp             :integer;
-  Whois            :integer;
-  GotoSummonBanish :integer;
-  KillDieAlive     :integer;
-  ChangeJob        :integer;
-  ChangeColorStyle :integer;
-  AutoRawUnit      :integer;
-  Refine           :integer;
-  PVPControl       :integer;
-  UserControl      :integer;
+	ID               :integer;
+	BroadCast        :integer;
+	ItemSummon       :integer;
+	MonsterSummon    :integer;
+	ChangeStatSkill  :integer;
+	ChangeOption     :integer;
+	SaveReturn       :integer;
+	ChangeLevel      :integer;
+	Warp             :integer;
+	Whois            :integer;
+	GotoSummonBanish :integer;
+	KillDieAlive     :integer;
+	ChangeJob        :integer;
+	ChangeColorStyle :integer;
+	AutoRawUnit      :integer;
+	Refine           :integer;
+	PVPControl       :integer;
+	UserControl      :integer;
 end;
 //------------------------------------------------------------------------------
 // ID,Create ID,Number Created
 type TMArrowDB = class
-  ID        :integer;
-  CID       :array[0..2] of integer;
-  CNum      :array[0..2] of integer;
+	ID        :integer;
+	CID       :array[0..2] of integer;
+	CNum      :array[0..2] of integer;
 end;
 //------------------------------------------------------------------------------
 type TWarpDatabase = class
-  NAME:String;  //Name that player will type
-  MAP :String;  //Name of the Actual Map
-  X   :integer; //X Coordinate to warp to
-  Y   :integer; //Y Coordinate to warp to
-  Cost:integer; //Amount of zeny the warp takes
+	NAME:String;  //Name that player will type
+	MAP :String;  //Name of the Actual Map
+	X   :integer; //X Coordinate to warp to
+	Y   :integer; //Y Coordinate to warp to
+	Cost:integer; //Amount of zeny the warp takes
 end;
 //------------------------------------------------------------------------------
 // 経験値配分用カウンタ
@@ -474,38 +478,94 @@ type TMob = class(TLiving)
 {追加ココまで}
 end;
 //------------------------------------------------------------------------------
-{キューペット}
+{Cute Pet Classes}
 // Pet Database
+
+(*=============================================================================*
+TPetDB
+
+--
+Overview:
+--
+Represents the data that defines a pet's stats. This info is static,
+determined by \database\pet_db.txt
+
+ChrstphrR 2004/05/26 I'm trying to determine the ranges of the values allowed
+for these values, so that the object safety checks itself.
+
+At first look, translating the comments... the data seems odd - I'm going to
+check into the DB and how it's loaded/used to see if the comments are
+-accurate-
+
+--
+Revisions:
+--
+2004/05/26 v0.2 [ChrstphrR] - Initial 'import' of this class.
+"/"/26 [ChrstphrR] - Translate SJIS comments to help explain class fields.
+"/"/26 [ChrstphrR] - explicity private/protected/public sections in
+ preparation for converting fields into properties with methods to keep ranges
+ within values and/or direct SQL queries (once we learn the proper ranges).
+*=============================================================================*)
 TPetDB = class
+private
+
+protected
+
+public
 	MobID       : Word; // ID number
 	ItemID      : Word; // Capture Item ID
 	EggID       : Word; // Egg Item ID
-	AcceID      : Word; // アクセサリのアイテムID
-	FoodID      : Word; // エサのアイテムID
-	Fullness    : Word; // 餌やりによる満腹度上昇
-	HungryDelay : Word; // 満腹度減少時間(msec/-1)
-	Hungry      : Word; // 空腹時餌やりによる親密度上昇
-	Full        : Word; // 満腹時餌やりによる親密度減少
-	Reserved    : Word; // ??? 時の親密度上昇
-	Die         : Word; // degree reduction of intimacy when owner dies
-	Capture     : Word; // Basic Capture Ratio (0.1% units)
+	AcceID      : Word; // Accessory ID
+	FoodID      : Word; // ItemID of Food Pet eats.
+	Fullness    : Word; // Degree of Fullness (ChrstphrR - what's the range??)
+	HungryDelay : Word; // Time delay in milliseconds per Hunger change.
+	Hungry      : Word; // Intimacy gain when pet is REALLY hungry
+	Full        : Word; // Intimacy reduction when pet is over-fed.
+	Reserved    : Word; // Time that an intimacy increase lasts ???
+	Die         : Word; // Degree of intimacy lost when owner dies
+	Capture     : Word; // Basic Capture Ratio (0.1% units - 1000 = 100%)
 	SkillTime   : Cardinal;  //Tracks how long a skill lasts
-end;
 
-// ペットデータ
-TPet = class
-	PlayerID      : Cardinal;
-	CharaID       : Cardinal;
+//	Constructor Create;
+//	Destructor  Destroy; OverRide;
+End;(* TPetDB ================================================================*)
+
+
+(*=============================================================================*
+TPet
+
+--
+Overview:
+--
+Represents the pets (as eggs, or fullgrown) that Characters own.
+Links to the TPetDB for each species' particular characteristics.
+
+--
+Revisions:
+--
+2004/05/26 v0.2 [ChrstphrR] - Initial 'import' of this class.
+"/"/26 [ChrstphrR] - Fullness now a property - range protected 0..100
+*=============================================================================*)
+Type TPet = class
+private
+	fFullness : Byte; // Range 0..100 (It's a percentage, in other words)
+protected
+	function  GetFullness : Byte;
+	procedure SetFullness(Value : Byte);
+
+public
+	PlayerID      : Cardinal; // Account the pet is tied to
+	CharaID       : Cardinal; // Actual Character that has pet.
 	Cart          : Byte;
 	Index         : Word;
-	Incubated     : byte;
+	Incubated     : Byte;
 	PetID         : Cardinal;
 	JID           : Word;
 	Name          : string;
-	Renamed       : Byte;
+	Renamed       : Byte; // 0 - default pet species name 1 - renamed(fixed)
 	LV            : Word;
-	Relation      : Integer;
-	Fullness      : Integer;
+	Relation      : Integer; //. Level of intimacy? (Range 0..1000)
+	//Fullness      : Integer; //. Level of Hunger/Fullness (Range 0..100)
 	Accessory     : Word;
 	Data          : TPetDB;
 	isLooting     : Boolean;  //Tracks if the pet is looting
@@ -517,12 +577,20 @@ TPet = class
 	LastTick      : Cardinal;  //Used for tracking a minute
 	Saved         : Byte;
 
-public
 	Constructor Create;
 	Destructor  Destroy; OverRide;
 
-end;//TPet
-{キューペットここまで}
+	//Level of Hunger/Fullness - shown at 5 levels on client side, but
+	// range is between 0..100%
+	property Fullness : Byte
+		read  GetFullness
+		write SetFullness
+		default 25; //Default Fullness level when pet first made.
+	
+End;(* TPet ==================================================================*)
+
+
+{End of Cute Pet Classes}
 //------------------------------------------------------------------------------
 // スキルデータベース
 //N,ID,JName,Type,MLV,SP1,2,3,4,5,6,7,8,9,10,HP,Cast,Lv+,AR,Ele,
@@ -709,7 +777,7 @@ TChara = class(TLiving)
 
 	// Data saved and loaded to/from chara.txt
 	// Line 1:
-	CID	          :cardinal;
+	CID           :cardinal; //CRW - used with party members.
 	Gender        :byte;
 
 	BaseLV        :word;
@@ -1085,18 +1153,23 @@ Revisions:
 2004/05/23 [ChrstphrR] - changing fields into properties, in preparation for
 	SQL awareness in this object.
 
+2004/05/31 [ChrstphrR] - Grouping fields into state information during gameplay
+	and data that persists between sessions -- the latter become properties.
 *=============================================================================*)
 TParty = class
 private
 	fName        : String[24]; //24 characters max.
+	fExpShare    : WordBool;
+	fItemShare   : WordBool;
+
 protected
 	function  GetName : string;
 	procedure SetName(Value : string);
 
 public
 
-	EXPShare    : Word;//Experience sharing (0 = Not shared, 1 = Shared)
-	ITEMShare   : Word;//Item sharing       (0 = Not Shared, 1 = Shared)
+//	EXPShare    : Word;//Experience sharing (0 = Not shared, 1 = Shared)
+//	ITEMShare   : Word;//Item sharing       (0 = Not Shared, 1 = Shared)
 	MemberID    : array[0..MAX_PARTY_SIZE-1] of Cardinal;//Character IDs
 	Member      : array[0..MAX_PARTY_SIZE-1] of TChara;  //References
 
@@ -1113,6 +1186,13 @@ public
 		read  GetName
 		write SetName;
 
+	//Semi-converted, need methods to work with SQL code.
+	property ExpShare : WordBool
+		read  fExpShare
+		write fExpShare;
+	property ItemShare : WordBool
+		read  fItemShare
+		write fItemShare;
 End;(* <TClassName> ==========================================================*)
 
 
@@ -1292,7 +1372,7 @@ end;//TMap
 // マップリストデータ
 type TMapList = class
 	Name      :string;
-  Ext       :string;
+	Ext       :string;
 	Size      :TPoint;
 	Mode      :byte; // 0 = not loaded, 1 = loading, 2 = load complete
 end;
@@ -2415,43 +2495,45 @@ end;
 
 procedure CalcStat(tc:TChara; Tick:cardinal = 0);
 var{ChrstphrR 2004/04/28  Eliminating unused variables.}
-	i,j,k :integer;
-	tl        :TSkillDB;
+	i       : Integer;
+	j       : Integer;
+	k       : Integer;
+	tl      : TSkillDB;
 //g         :double;//unused - code using it commented out.
-	JIDFix    :word; // JID correction for upper classes.
-	tg        :tguild;
+	JIDFix  : Word; // JID correction for upper classes.
+	tg      : TGuild;
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
 
-                if (tc.guildid > 0) then begin
-                        //tg := tguild.create;
-                        {ChrstphrR 2004/04/21 Memory Leak!}
-                        tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+		if (tc.guildid > 0) then begin
+			//tg := tguild.create;
+			{ChrstphrR 2004/04/21 Memory Leak!}
+			tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
 
-                        tg.SLV := 0;
-												for i := 0 to (tg.RegUsers - 1) do begin
-                                tg.SLV := tg.SLV + tg.Member[i].BaseLV;
-                        end;
-                end;
+			tg.SLV := 0;
+			for i := 0 to (tg.RegUsers - 1) do begin
+				tg.SLV := tg.SLV + tg.Member[i].BaseLV;
+			end;
+		end;
 
 
-    JIDFix := tc.JID;
-    if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
-                {g := int (Tick / 3600000);
-                 // Darkhelmet Auto Day/Night
-                if (Tick / 3600000) <= 110 then begin
-                        tc.noDay := true;
-                end;}
+		JIDFix := tc.JID;
+		if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
+		{g := int (Tick / 3600000);
+		 // Darkhelmet Auto Day/Night
+		if (Tick / 3600000) <= 110 then begin
+			tc.noDay := true;
+		end;}
 
-                SPRedAmount := 0;
+		SPRedAmount := 0;
 		Weight := 0;
 		Range := 0;
 		WeaponType[0] := 0;
 		WeaponType[1] := 0;
-    {Colus, 20040114: Initialize weapon sprites}
- 		WeaponSprite[0] := 0;
+		{Colus, 20040114: Initialize weapon sprites}
+		WeaponSprite[0] := 0;
 		WeaponSprite[1] := 0;
 		Arrow := 0;
 		Head1 := 0;
@@ -2459,14 +2541,14 @@ begin
 		Head3 := 0;
 		Shield := 0;
 		for i := 0 to 1 do
-                        for j := 0 to 5 do
-                                ATK[i][j] := 0;
-                DEF1 := 0;
-                MDEF1 := 0;
-                for i := 0 to 5 do begin //ボーナス値の初期化
-												Bonus[i] := 0;
-                        for j := 1 to JobLV do begin
-                                if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
+			for j := 0 to 5 do
+				ATK[i][j] := 0;
+		DEF1 := 0;
+		MDEF1 := 0;
+		for i := 0 to 5 do begin //ボーナス値の初期化
+			Bonus[i] := 0;
+			for j := 1 to JobLV do begin
+				if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
 			end;
 		end;
 
@@ -2485,13 +2567,13 @@ begin
 		MATK2 := 0;
 		MATKFix := 0;
 {Colus, 20031217: Initting MCastTimeFix to fix cast timer calc}
-    MCastTimeFix := 100;
+		MCastTimeFix := 100;
 {Colus, 20031217: End MCastTimeFix init}
 		HIT := 0;
 		Lucky := 1;
 		Critical := 1;
-                FLEE1 := 1;
-                FLEE2 := 0;
+		FLEE1 := 1;
+		FLEE2 := 0;
 		MaxWeight := 20000;
 		DEF1 := 0;
 		for i:=0 to 1 do begin
@@ -2500,9 +2582,9 @@ begin
 			DrainPer[i] := 0;
 		end;
 
-    // Colus, 20040127: Initialize armor element
-    ArmorElement := 0;
-    
+		// Colus, 20040127: Initialize armor element
+		ArmorElement := 0;
+
 		for i:=0 to 9 do begin
 			DamageFixR[0][i] := 100;
 			DamageFixR[1][i] := 0;
@@ -2512,25 +2594,25 @@ begin
 		DamageFixS[0] := 100;
 		DamageFixS[1] := 100;
 		DamageFixS[2] := 100;
-                FastWalk := false;
+		FastWalk := false;
 		SplashAttack := false;
 		SpecialAttack := 0;
-								NoJamstone := false;
-                NoCastInterrupt := false;
-                FullRecover := false;
-                UnlimitedEndure := false;
-                NoTarget := false;
-                OrcReflect := false;
-                AnolianReflect := false;
-                DoppelgagnerASPD := false;
-                LessSP := false;
-                MagicReflect := false;
-                GhostArmor := false;
-                SkillWeapon := false;
-                GungnirEquipped := false;
-                LVL4WeaponASPD := false;
-                PerfectDamage := false;
-                PerfectHide := false;
+		NoJamstone := false;
+		NoCastInterrupt := false;
+		FullRecover := false;
+		UnlimitedEndure := false;
+		NoTarget := false;
+		OrcReflect := false;
+		AnolianReflect := false;
+		DoppelgagnerASPD := false;
+		LessSP := false;
+		MagicReflect := false;
+		GhostArmor := false;
+		SkillWeapon := false;
+		GungnirEquipped := false;
+		LVL4WeaponASPD := false;
+		PerfectDamage := false;
+		PerfectHide := false;
 		for i:=0 to 4 do begin
 			SFixPer1[0][i] := 0;
 			SFixPer1[1][i] := 0;
@@ -2551,12 +2633,12 @@ begin
 			if SkillPoint > 714 then SkillPoint := 714; //これだけ有れば十分
 		end;
 		CalcEquip(tc);
-    DEF2 := Param[2];
+		DEF2 := Param[2];
 		CalcSkill(tc,Tick);
 		for i := 0 to 5 do begin
 			ParamUp[i] := ((ParamBase[i] - 1) div 10) + 2;
-      // Colus, 20040321: Negative bonus for stats might crash server?
-      if (Bonus[i] < 0) then Bonus[i] := 0;
+			// Colus, 20040321: Negative bonus for stats might crash server?
+			if (Bonus[i] < 0) then Bonus[i] := 0;
 			Param[i] := ParamBase[i] + Bonus[i];
 		end;
 
@@ -2567,39 +2649,39 @@ begin
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
 		if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
-        MAXHP := 65535;
-    //end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
-      //  MAXHP := 65535;
-    end else begin
+				MAXHP := 65535;
+		//end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
+			//  MAXHP := 65535;
+		end else begin
 
-		tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
-           //     if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
+			tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
+			//if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
 
-    end;
-
-    if (Skill[107].Lv <> 0) then begin
-        tc.HIT := tc.HIT + (skill[107].Lv * 2);
-    end;
-
-    if (Skill[248].Lv <> 0) then begin
-    tl := Skill[248].Data;
-    if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
-        MAXHP := 65535;
-    end else begin
-        MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
-    end;
 		end;
-       if Skill[360].Tick > Tick then begin
-       tl := Skill[360].Data;
-    if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
-      MAXHP := 65535;
-    end else begin
-        MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
-    end;
-    end;
+
+		if (Skill[107].Lv <> 0) then begin
+			tc.HIT := tc.HIT + (skill[107].Lv * 2);
+		end;
+
+		if (Skill[248].Lv <> 0) then begin
+			tl := Skill[248].Data;
+			if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
+				MAXHP := 65535;
+			end else begin
+				MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
+			end;
+		end;
+		if Skill[360].Tick > Tick then begin
+			 tl := Skill[360].Data;
+			if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
+				MAXHP := 65535;
+			end else begin
+				MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
+			end;
+		end;
 
 		MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
-               // if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
+		// if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
 		MATK1 := Param[3] + (Param[3] div 7) * (Param[3] div 7);
 		MATK2 := Param[3] + (Param[3] div 5) * (Param[3] div 5);
 		MATKFix := MATKFix + 100; //杖などによるMATK補正
@@ -2613,12 +2695,12 @@ begin
 		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
 
 
-                if Skill[270].Tick > Tick then begin //Explosion Spirits
-                        tc.Critical := word(tc.Critical + (tc.Critical * tc.Skill[270].Effect1 div 1000) + 1);
-                end;
-                if Skill[380].Tick > Tick then begin //Sight
-                        tc.Critical := word(tc.Critical + (tc.Critical * (100 + 1 * Skill[380].Lv) div 1000));
-                end;
+		if Skill[270].Tick > Tick then begin //Explosion Spirits
+			tc.Critical := word(tc.Critical + (tc.Critical * tc.Skill[270].Effect1 div 1000) + 1);
+		end;
+		if Skill[380].Tick > Tick then begin //Sight
+			tc.Critical := word(tc.Critical + (tc.Critical * (100 + 1 * Skill[380].Lv) div 1000));
+		end;
 
 		if WeaponType[1] = 0 then begin
 			Weapon := WeaponType[0];
@@ -2671,90 +2753,87 @@ begin
 
 		if WeaponType[1] = 0 then begin
 			ADelay := 20*WeaponASPDTable[JIDFix][Weapon];
-                 //       if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
+			//if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else if WeaponType[0] = 0 then begin
 			ADelay := 20*WeaponASPDTable[JIDFix][WeaponType[1]];
-                   //     if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
+			//if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else begin //二刀流
 			ADelay := 14*(WeaponASPDTable[JIDFix][WeaponType[0]] + WeaponASPDTable[JIDFix][WeaponType[1]]);
-                     //   if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
+			//if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
 		end;
 		i := ( ( ADelay * Param[1] div 500 ) * 2 + ADelay * Param[4] div 1000 );
 		if ADelay < i then ADelay := 200
 		else begin
 			ADelay := ADelay - i;
-                        {if (JID = 23) then begin  //Super Novice ASPD
-                                case tc.Weapon of
-                                        1:  ADelay := ADelay * 60 div 100;
-                                        2:  ADelay := ADelay * 50 div 100;
-                                        6:  ADelay := ADelay * 35 div 100;
-                                        8:  ADelay := ADelay * 40 div 100;
-                                        10: ADelay := ADelay * 40 div 100;
-																end;
-                        end;}
-                     Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
+			{if (JID = 23) then begin  //Super Novice ASPD
+				case tc.Weapon of
+				1:  ADelay := ADelay * 60 div 100;
+				2:  ADelay := ADelay * 50 div 100;
+				6:  ADelay := ADelay * 35 div 100;
+				8:  ADelay := ADelay * 40 div 100;
+				10: ADelay := ADelay * 40 div 100;
+				end;
+			end;}
+			Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
-
-    
 			if (Skill[60].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
-                        if (Skill[360].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 60 div 100;
-                        if (Skill[359].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 60 div 100;
+			if (Skill[360].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 60 div 100;
+			if (Skill[359].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 60 div 100;
 			if (Skill[111].Tick > Tick) and ((tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8))then ADelay := ADelay * 70 div 100; //Adrenaline Rush
-{Editted By AppleGirl}  if (Skill[258].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
-                        if Skill[268].Tick > Tick then ADelay := ADelay * 2;    {Steel Body}
-                        if Skill[291].Tick > Tick then ADelay := ADelay * tc.Skill[291].Effect1 div 100;  {Attack Speed Potions}
-                        if Skill[320].Tick > Tick then ADelay := ADelay * tc.Skill[291].Effect1 div 100;
-                        if tc.DoppelgagnerASPD then ADelay := ADelay * 70 div 100;  {Doppelgagner Card}
-                        if tc.LVL4WeaponASPD then ADelay := ADelay * 75 div 100;     {Level 4 kro new weapon aspd haste effect}
+{Editted By AppleGirl}
+			if (Skill[258].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
+			if Skill[268].Tick > Tick then ADelay := ADelay * 2;    {Steel Body}
+			if Skill[291].Tick > Tick then ADelay := ADelay * tc.Skill[291].Effect1 div 100;  {Attack Speed Potions}
+			if Skill[320].Tick > Tick then ADelay := ADelay * tc.Skill[291].Effect1 div 100;
+			if tc.DoppelgagnerASPD then ADelay := ADelay * 70 div 100;  {Doppelgagner Card}
+			if tc.LVL4WeaponASPD then ADelay := ADelay * 75 div 100;     {Level 4 kro new weapon aspd haste effect}
 			if ADelay < 200 then ADelay := 200;
 		end;
 		ASpeed := ADelay div 2;
 
-                if (Skill[60].Tick > Tick) and (tc.Weapon <> 3) then begin
-                    Skill[60].Tick := Tick;
-                    SkillTick := Tick;
-                    SkillTickID := 60;
-                end;
+		if (Skill[60].Tick > Tick) and (tc.Weapon <> 3) then begin
+			Skill[60].Tick := Tick;
+			SkillTick := Tick;
+			SkillTickID := 60;
+		end;
 
 
-                if (Skill[360].Tick > Tick) and (tc.Weapon <> 3) then begin
-                    Skill[360].Tick := Tick;
-                    SkillTick := Tick;
-                    SkillTickID := 360;
-                end;
+		if (Skill[360].Tick > Tick) and (tc.Weapon <> 3) then begin
+			Skill[360].Tick := Tick;
+			SkillTick := Tick;
+			SkillTickID := 360;
+		end;
 
-                if (Skill[359].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
-										Skill[359].Tick := Tick;
-                    SkillTick := Tick;
-                    SkillTickID := 359;
-                end;
+		if (Skill[359].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
+			Skill[359].Tick := Tick;
+			SkillTick := Tick;
+			SkillTickID := 359;
+		end;
 
+		if (Skill[111].Tick > Tick) and ((tc.Weapon <> 6) and (tc.Weapon <> 7) and (tc.Weapon <> 8)) then begin
+			Skill[111].Tick := Tick;
+			SkillTick := Tick;
+			SkillTickID := 111;
+		end;
 
-                if (Skill[111].Tick > Tick) and ((tc.Weapon <> 6) and (tc.Weapon <> 7) and (tc.Weapon <> 8)) then begin
-                    Skill[111].Tick := Tick;
-                    SkillTick := Tick;
-                    SkillTickID := 111;
-                end;
+		if (Skill[258].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
+			Skill[258].Tick := Tick;
+			SkillTick := Tick;
+			SkillTickID := 258;
+		end;
 
-                if (Skill[258].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
-                    Skill[258].Tick := Tick;
-                    SkillTick := Tick;
-                    SkillTickID := 258;                    
-                end;
-
-
-        if ((Option and 32) <> 0) then begin
-        // AlexKreuz: Skill[64].Lv = 0 caused Crash: Needs else begin.
-                if Skill[64].Lv > 0 then begin
-                        ASpeed := Round(ASpeed * (Skill[64].Data.Data1[Skill[64].Lv] / 100));
-                end else begin
-                        ASpeed := Round(ASpeed * (50/100));
-                end;
-        end;
+		if ((Option and 32) <> 0) then begin
+			// AlexKreuz: Skill[64].Lv = 0 caused Crash: Needs else begin.
+			if Skill[64].Lv > 0 then begin
+				ASpeed := Round(ASpeed * (Skill[64].Data.Data1[Skill[64].Lv] / 100));
+			end else begin
+				ASpeed := Round(ASpeed * (50/100));
+			end;
+		end;
 
 		if Param[4] <= 150 then begin
 {Colus, 20031217: MCastTimeFix correction to involve cards}
- 			MCastTimeFix := (100 - (Param[4] * 100) div 150) * MCastTimeFix div 100;
+			MCastTimeFix := (100 - (Param[4] * 100) div 150) * MCastTimeFix div 100;
 {Colus, 20031217: End MCastTimeFix correction}
 		end else begin
 			MCastTimeFix := 0;
@@ -2762,7 +2841,7 @@ begin
 		//サイズ補正
 		for i := 0 to 1 do begin
 			for j := 0 to 2 do begin
-                                ATKFix[i][j] := WeaponTypeTable[j][WeaponType[i]];
+				ATKFix[i][j] := WeaponTypeTable[j][WeaponType[i]];
 			end;
 		end;
 
@@ -2788,46 +2867,48 @@ begin
 				end;
 			end;
 		end;
-                	if Skill[357].Tick > Tick then begin
 
+		if Skill[357].Tick > Tick then begin
 			for i := 0 to 1 do begin
 				for j := 0 to 2 do begin
 					ATKFix[i][j] := ATKFix[i][j] * (100 + 5 * Skill[357].Lv) div 100;
 				end;
 			end;
 		end;
-                if Skill[380].Tick > Tick then begin
 
+		if Skill[380].Tick > Tick then begin
 			for i := 0 to 1 do begin
 				for j := 0 to 2 do begin
 					ATKFix[i][j] := ATKFix[i][j] * (100 + 2 * Skill[380].Lv) div 100;
 				end;
 			end;
 		end;
-                	if Skill[357].Tick > Tick then begin
-					tc.HIT := tc.HIT * (100 + 10 * Skill[357].Lv) div 100;
-				end;
-                        if Skill[380].Tick > Tick then begin
-					tc.HIT := tc.HIT * (100 + 3 * Skill[380].Lv) div 100;
-				end;
+
+		if Skill[357].Tick > Tick then begin
+			tc.HIT := tc.HIT * (100 + 10 * Skill[357].Lv) div 100;
+		end;
+
+		if Skill[380].Tick > Tick then begin
+			tc.HIT := tc.HIT * (100 + 3 * Skill[380].Lv) div 100;
+		end;
 
 
 {:code}
 		//移動速度
 		i := tc.DefaultSpeed;
 		if ((Option and 32) <> 0) and (Skill[63].Lv > 0) then begin
-                        i := i - 40;
-                end;
+			i := i - 40;
+		end;
 
-                if FastWalk then i := i - 30;
+		if FastWalk then i := i - 30;
 
-    // Colus, 20040126: Added alchemist to pushcart calc, cleaned it up
-    if (((Option and $0788) <> 0) and ((JIDFix = 10) or (JIDFix = 5) or (JIDFix = 19))) then begin // Pushcart
-      if Skill[39].Lv = 0 then begin
-        i := i + Skill[39].Data.Data1[1];
-      end else begin
+		// Colus, 20040126: Added alchemist to pushcart calc, cleaned it up
+		if (((Option and $0788) <> 0) and ((JIDFix = 10) or (JIDFix = 5) or (JIDFix = 19))) then begin // Pushcart
+			if Skill[39].Lv = 0 then begin
+				i := i + Skill[39].Data.Data1[1];
+			end else begin
 				i := i + Skill[39].Data.Data1[Skill[39].Lv];
-      end;
+			end;
 		end;
 
 		if Skill[29].Tick > Tick then begin // AGI Up
@@ -2836,24 +2917,24 @@ begin
 			else
 				i := i - 30;
 		end;
-    if Skill[387].Tick > Tick then begin // Cart boost  // I think this should do it.
-				i := i - 45;
+		if Skill[387].Tick > Tick then begin // Cart boost  // I think this should do it.
+			i := i - 45;
 		end;
-    if Skill[383].Tick > Tick then begin // Wind Walk AGI effect
-				i := i - 45;
+		if Skill[383].Tick > Tick then begin // Wind Walk AGI effect
+			i := i - 45;
 		end;
-    { Colus, 20040224: You didn't listen to how I explained the skill. :/
+		{ Colus, 20040224: You didn't listen to how I explained the skill. :/
 			This is so not right it's not even funny.
-        //BS Maximun codes
-        //beita 20040206
-    if (Skill[114].Lv <> 0) then begin
-       if getSkillOnBool then begin
-       //set param[4] to be 200 for maximun effect
-       tc.Param[4] := 200;
-     end;
-     end;
-    //end of BS Maximun codes
-    }
+				//BS Maximun codes
+				//beita 20040206
+		if (Skill[114].Lv <> 0) then begin
+			if getSkillOnBool then begin
+			//set param[4] to be 200 for maximun effect
+				tc.Param[4] := 200;
+			end;
+		end;
+		//end of BS Maximun codes
+		}
 		if Skill[30].Tick > Tick then begin // AGI down
 			if Skill[30].EffectLV > 5 then
 				i := i + 45
@@ -2861,27 +2942,25 @@ begin
 				i := i + 30;
 		end;
 
-    if Skill[257].Tick > Tick then begin // Defender
-      i := i + 30;
-    end;
+		if Skill[257].Tick > Tick then begin // Defender
+			i := i + 30;
+		end;
 
-    //Tunnel Drive
-    // Colus, 20031228: Moved this mod from CalcSkill b/c CalcStat
-    // won't take its value into account otherwise.
+		//Tunnel Drive
+		// Colus, 20031228: Moved this mod from CalcSkill b/c CalcStat
+		// won't take its value into account otherwise.
 
-    if ((tc.Option and 2 <> 0) and (tc.Skill[213].Lv <> 0)) then begin
-       i := (Skill[213].Data.Data2[Skill[213].Lv] * i) div 100;
-    end;
+		if ((tc.Option and 2 <> 0) and (tc.Skill[213].Lv <> 0)) then begin
+			i := (Skill[213].Data.Data2[Skill[213].Lv] * i) div 100;
+		end;
 
 		if i < 25 then i := 25;
 		Speed := i;
 
-
-
-    //if (Skill[39].Lv <> 0) and (Option = 8) then begin
-      //tl := Skill[39].Data;
-      //Speed := Round(Speed * (tl.Data2[Skill[39].Lv] / 100));
-    //end;
+		//if (Skill[39].Lv <> 0) and (Option = 8) then begin
+			//tl := Skill[39].Data;
+			//Speed := Round(Speed * (tl.Data2[Skill[39].Lv] / 100));
+		//end;
 		//030323
 		aMotion := ADelay div 2;
 		if (Skill[8].Tick > Tick) or (UnlimitedEndure = true) then begin // Endure
@@ -2904,9 +2983,10 @@ begin
 		end else begin
 			HPDelay[0] := 3000 - (14 * (BaseLV + Param[2])); //暫定
 		end;}
-                //The old SP regen was only used in Comodo, after 6.0 the sp regen become 8 secs to regen and 6 for hp you also get more
-                HPDelay[0] := 6000;
-                SPDelay[0] := 8000;
+
+		//The old SP regen was only used in Comodo, after 6.0 the sp regen become 8 secs to regen and 6 for hp you also get more
+		HPDelay[0] := 6000;
+		SPDelay[0] := 8000;
 
 		//---
 {:code}
@@ -2949,16 +3029,16 @@ begin
 		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('WElement: %d/%d', [WElement[0], WElement[1]]));
 		if Weapon = 16 then Critical := Critical * 2;
 		Inc(Range);
-    if ((MAXHP * MAXHPPer div 100) > 65535) then begin
-    MAXHP := 65535;
-    end else begin
-		MAXHP := MAXHP * MAXHPPer div 100;
-    end;
-    if ((MAXSP * MAXSPPer div 100) > 65535) then begin
-    MAXSP := 65535;
-    end else begin
-		MAXSP := MAXSP * MAXSPPer div 100;
-    end;
+		if ((MAXHP * MAXHPPer div 100) > 65535) then begin
+			MAXHP := 65535;
+		end else begin
+			MAXHP := MAXHP * MAXHPPer div 100;
+		end;
+		if ((MAXSP * MAXSPPer div 100) > 65535) then begin
+			MAXSP := 65535;
+		end else begin
+			MAXSP := MAXSP * MAXSPPer div 100;
+		end;
 		if HP > MAXHP then HP := MAXHP;
 		if SP > MAXSP then SP := MAXSP;
 		if Critical > 100 then Critical := 100;
@@ -2977,81 +3057,82 @@ var
 	i,j      :integer;
 	//Side      :byte;
 	//td        :TItemDB;
-        tl        :TSkillDB;
-        //mi        :MapTbl;
-        //g         :double;
-  JIDFix     :word;   // JID correction.
+	tl        :TSkillDB;
+	//mi        :MapTbl;
+	//g         :double;
+	JIDFix     :word;   // JID correction.
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
-    JIDFix := tc.JID;
-    if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-                SPRedAmount := 0;
+		JIDFix := tc.JID;
+		if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+		SPRedAmount := 0;
 
-                NoJamstone := false;
-                NoTrap := false;
+		NoJamstone := false;
+		NoTrap := false;
 
-                {Initialize to 0}
-                DEF1 := 0;
-                FLEE1 := 1;
+		{Initialize to 0}
+		DEF1 := 0;
+		FLEE1 := 1;
 
-                MAXHP := 0;
-                MAXSP := 0;
+		MAXHP := 0;
+		MAXSP := 0;
 
-                for i := 0 to 1 do
-                        for j := 0 to 5 do
-                                ATK[i][j] := 0;
-                for i := 0 to 5 do begin        {Bonus Calculation}
-                        Bonus[i] := 0;
-                        for j := 1 to JobLV do begin
-                                if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
+		for i := 0 to 1 do begin
+			for j := 0 to 5 do begin
+				ATK[i][j] := 0;
+			end;
+		end;
+		for i := 0 to 5 do begin        {Bonus Calculation}
+			Bonus[i] := 0;
+			for j := 1 to JobLV do begin
+				if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
 			end;
 		end;
 
-                {Calculate Needed Skills}
-                DEF2 := Param[2];
+		{Calculate Needed Skills}
+		DEF2 := Param[2];
 
-                MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
+		MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
 
-                if ((MAXSP * MAXSPPer div 100) > 65535) then begin
-                        MAXSP := 65535;
-                end else begin
-	        	MAXSP := MAXSP * MAXSPPer div 100;
-                end;
+		if ((MAXSP * MAXSPPer div 100) > 65535) then begin
+			MAXSP := 65535;
+		end else begin
+			MAXSP := MAXSP * MAXSPPer div 100;
+		end;
 
-                if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
-                        MAXHP := 65535;
-                end else begin
-		        tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
-                end;
+		if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
+			MAXHP := 65535;
+		end else begin
+			tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
+		end;
 
-                if (Skill[248].Lv <> 0) then begin
-                        tl := Skill[248].Data;
-                        if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
-                                MAXHP := 65535;
-                        end else begin
-                                MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
-                        end;
-                end;
-                  if Skill[360].Tick > Tick then begin
+		if (Skill[248].Lv <> 0) then begin
+			tl := Skill[248].Data;
+			if (MAXHP + tl.Data1[Skill[248].Lv] > 65535) then begin
+				MAXHP := 65535;
+			end else begin
+				MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
+			end;
+		end;
+		if Skill[360].Tick > Tick then begin
+			if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
+				MAXHP := 65535;
+			end else begin
+				MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
+			end;
+		end;
 
-                        if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
-                                MAXHP := 65535;
-                        end else begin
-                                MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
-                        end;
-                end;
+		if Skill[322].Tick > Tick then begin
+			//tl := Skill[322].Data;
+			if (MAXHP + tc.Skill[322].Effect1 > 65535) then begin
+				MAXHP := 65535;
+			end else begin
+				MAXHP := MAXHP + tc.Skill[322].Effect1;
+			end;
+		end;
 
-                if Skill[322].Tick > Tick then begin
-                        //tl := Skill[322].Data;
-                        if (MAXHP + tc.Skill[322].Effect1 > 65535) then begin
-                                MAXHP := 65535;
-                        end else begin
-                                MAXHP := MAXHP + tc.Skill[322].Effect1;
-                        end;
-                end;
-
-                if Weapon = 11 then begin
+		if Weapon = 11 then begin
 			ATK[0][0] := ATK[0][0] + Param[4]; //ステータスに表示される数字。弓の時はDEX+武器ATK
 			ATK[0][2] := Param[4] + (Param[4] div 10) * (Param[4] div 10) + (Param[0] div 5) + (Param[5] div 5) + ATTPOWER;
 		end else begin
@@ -3060,7 +3141,7 @@ begin
 			ATK[1][2] := Param[0] + (Param[0] div 10) * (Param[0] div 10) + (Param[4] div 5) + (Param[5] div 5) + ATTPOWER;
 		end;
 
-                for i := 0 to 5 do begin
+		for i := 0 to 5 do begin
 			ParamUp[i] := ((ParamBase[i] - 1) div 10) + 2;
 			Param[i] := ParamBase[i] + Bonus[i];
 		end;
@@ -3072,22 +3153,22 @@ begin
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
 
-                FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
+		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
 
-                if Skill[66].Tick > Tick then begin
+		if Skill[66].Tick > Tick then begin
 			ATK[0][3] := ATK[0][3] + 5 * Skill[66].EffectLV;
 			ATK[1][3] := ATK[1][3] + 5 * Skill[66].EffectLV;
 		end;
 
-                if ((MAXHP * MAXHPPer div 100) > 65535) then begin
-                        MAXHP := 65535;
-                end else begin
-		        MAXHP := MAXHP * MAXHPPer div 100;
-                end;
+		if ((MAXHP * MAXHPPer div 100) > 65535) then begin
+			MAXHP := 65535;
+		end else begin
+			MAXHP := MAXHP * MAXHPPer div 100;
+		end;
 
-                NoJamStone := false;
-                NoTrap := false;
-        end;
+		NoJamStone := false;
+		NoTrap := false;
+	end;
 
 end;
 
@@ -3271,11 +3352,11 @@ procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
 // Killed by player triggers for a token to be dropped... one of Krietor's Ideas
 var
   i : integer;
-  j : integer;
-  mi : MapTbl;
-  item : cardinal;
-  StartI  : cardinal;
-  EndI    : cardinal;
+{  j : integer;
+	mi : MapTbl;
+	item : cardinal;
+	StartI  : cardinal;
+  EndI    : cardinal;}
 begin
   // Set Hit Points to 0
   tc.HP := 0;
@@ -3316,20 +3397,20 @@ begin
   // Krietor's idea for his server, can be commented out
   // Drop items - Only when killed by a player
   // I'll leave this commented out on the CVS
-  {if (StartDeathDropItem <> 0) and (KilledbyP = 1) then begin
-    StartI := StartDeathDropItem;
-    EndI   := EndDeathDropItem;
-    while (StartI <= EndI) do begin
-      j := SearchCInventory(tc, StartI, false);
-      if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
-					//UseItem(tc, j);  //Use Item Function
-        ItemDrop(tm, tc, j, 1);
-        break;
-      end;
-      StartI := StartI + 1;
-    end;
-  end;
+	{if (StartDeathDropItem <> 0) and (KilledbyP = 1) then begin
+		StartI := StartDeathDropItem;
+		EndI   := EndDeathDropItem;
+		while (StartI <= EndI) do begin
+			j := SearchCInventory(tc, StartI, false);
+			if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
+				//UseItem(tc, j);  //Use Item Function
+				ItemDrop(tm, tc, j, 1);
+				break;
+			end;
+		StartI := StartI + 1;
+		end;
+	end;
   { 11006,PvP_Token,"PvP Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     11007,GvG_Token,"GvG Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     11008,CTF_Token,"CTF Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -3596,7 +3677,7 @@ end;
 procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);  //Kills a monster or updates its status
 
 begin
-        WFIFOW( 0, $0080);
+	WFIFOW( 0, $0080);
 	WFIFOL( 2, ts.ID);
 	WFIFOB( 6, k);
 	SendBCmd(tm, ts.Point, 7);
@@ -3605,73 +3686,73 @@ end;
 procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
 
 begin
-        WFIFOW(0, $0088);
-        WFIFOL(2, tn.ID);
-        WFIFOW(6, tn.Point.X);
-        WFIFOW(8, tn.Point.Y);
-        SendBCmd(tm, tn.Point, 10);
+	WFIFOW(0, $0088);
+	WFIFOL(2, tn.ID);
+	WFIFOW(6, tn.Point.X);
+	WFIFOW(8, tn.Point.Y);
+	SendBCmd(tm, tn.Point, 10);
 end;
 //------------------------------------------------------------------------------
 procedure SendPetRelocation(tm:TMap; tc:TChara; i:integer); //Move a pet
 var
-  tpe:TPet;
-  tn:TNPC;
+	tpe:TPet;
+	tn:TNPC;
 begin
-  tpe := PetList.Objects[i] as TPet;
-  if tpe.CharaID = tc.CID then begin
-  tn := TNPC.Create;
-  tn.ID := NowNPCID;
+	tpe := PetList.Objects[i] as TPet;
+	if tpe.CharaID = tc.CID then begin
+		tn := TNPC.Create;
+		tn.ID := NowNPCID;
 
-  Inc(NowNPCID);
+		Inc(NowNPCID);
 
-  tn.Name := tpe.Name;
-  tn.JID := tpe.JID;
-  tn.Map := tc.Map;
-  tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
+		tn.Name := tpe.Name;
+		tn.JID := tpe.JID;
+		tn.Map := tc.Map;
+		tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
 
-  repeat
-    tn.Point.X := tc.Point.X + Random (5);
-    tn.Point.Y := tc.Point.Y + Random (5);
-  until (( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y )) and ((tm.gat[tn.Point.X, tn.Point.Y] <> 1) and (tm.gat[tn.Point.X, tn.Point.Y] <> 5));
+		repeat
+			tn.Point.X := tc.Point.X + Random (5);
+			tn.Point.Y := tc.Point.Y + Random (5);
+		until (( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y )) and ((tm.gat[tn.Point.X, tn.Point.Y] <> 1) and (tm.gat[tn.Point.X, tn.Point.Y] <> 5));
 
-  tn.Dir := Random(8);
-	tn.CType := NPC_TYPE_SCRIPT;
-  tn.HungryTick := timeGettime();
+		tn.Dir := Random(8);
+		tn.CType := NPC_TYPE_SCRIPT;
+		tn.HungryTick := timeGettime();
 
-  tm.NPC.AddObject(tn.ID, tn);
-  tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+		tm.NPC.AddObject(tn.ID, tn);
+		tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-  SendNData(tc.Socket, tn, tc.ver2 );
-  SendBCmd(tm, tn.Point, 41, tc, False);
+		SendNData(tc.Socket, tn, tc.ver2 );
+		SendBCmd(tm, tn.Point, 41, tc, False);
 
-  tc.PetData := tpe;
-  tc.PetNPC := tn;
+		tc.PetData := tpe;
+		tc.PetNPC := tn;
 
-  WFIFOW( 0, $01a4 );
-  WFIFOB( 2, 0 );
-  WFIFOL( 3, tn.ID );
-  WFIFOL( 7, 0 );
-  tc.Socket.SendBuf( buf, 11 );
+		WFIFOW( 0, $01a4 );
+		WFIFOB( 2, 0 );
+		WFIFOL( 3, tn.ID );
+		WFIFOL( 7, 0 );
+		tc.Socket.SendBuf( buf, 11 );
 
-  if tpe.Accessory <> 0 then begin
-    WFIFOB( 2, 3 );
-    WFIFOL( 7, tpe.Accessory );
-    tc.Socket.SendBuf( buf, 11 );
-  end;
+		if tpe.Accessory <> 0 then begin
+			WFIFOB( 2, 3 );
+			WFIFOL( 7, tpe.Accessory );
+			tc.Socket.SendBuf( buf, 11 );
+		end;
 
-  WFIFOB( 2, 5 );
-  WFIFOL( 7, 20 ); // 謎
-  tc.Socket.SendBuf( buf, 11 );
+		WFIFOB( 2, 5 );
+		WFIFOL( 7, 20 ); // 謎
+		tc.Socket.SendBuf( buf, 11 );
 
-  WFIFOW( 0, $01a2 );
-  WFIFOS( 2, tpe.Name, 24 );
-  WFIFOB( 26, tpe.Renamed );
-  WFIFOW( 27, tpe.LV );
-  WFIFOW( 29, tpe.Fullness );
-  WFIFOW( 31, tpe.Relation );
-  WFIFOW( 33, tpe.Accessory );
-  tc.Socket.SendBuf( buf, 35 );
-  end;
+		WFIFOW( 0, $01a2 );
+		WFIFOS( 2, tpe.Name, 24 );
+		WFIFOB( 26, tpe.Renamed );
+		WFIFOW( 27, tpe.LV );
+		WFIFOW( 29, tpe.Fullness );
+		WFIFOW( 31, tpe.Relation );
+		WFIFOW( 33, tpe.Accessory );
+		tc.Socket.SendBuf( buf, 35 );
+	end;
 end;
 //------------------------------------------------------------------------------
 {ChrstphrR 2004/04/28
@@ -3691,50 +3772,49 @@ var
   tc  :TChara;
 begin
   //if ts.AData <> nil then tc := ts.AData
- for k := 0 to tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Count - 1 do begin
-  tc := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Objects[k] as TChara;
+	for k := 0 to tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Count - 1 do begin
+		tc := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Objects[k] as TChara;
 
-  WFIFOW( 0, $011a);
-  WFIFOW( 2, 26);
-  WFIFOW( 4, 1);
-  WFIFOL( 6, ts.ID);
-  WFIFOL(10, ts.ID);
-  WFIFOB(14, 1);
-  tc.Socket.SendBuf(buf, 15);
-  UpdateMonsterDead(tm, ts, 0);
-  //Delete block
-  l := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.IndexOf(ts.ID);
-  if l <> -1 then begin
-    tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.Delete(l);
-  end;
+		WFIFOW( 0, $011a);
+		WFIFOW( 2, 26);
+		WFIFOW( 4, 1);
+		WFIFOL( 6, ts.ID);
+		WFIFOL(10, ts.ID);
+		WFIFOB(14, 1);
+		tc.Socket.SendBuf(buf, 15);
+		UpdateMonsterDead(tm, ts, 0);
+		//Delete block
+		l := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.IndexOf(ts.ID);
+		if l <> -1 then begin
+			tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.Delete(l);
+		end;
 
-  l := tm.MOB.IndexOf( ts.ID );
-  if l <> -1 then begin
-    tm.Mob.Delete(l);
-  end;
-  ts.ATarget := 0;
-  ts.AData := nil;
-  ts.AMode := 0;
-  ts.MMode := 4;
-  //ts.Free;
-  j := 1;
-  if l <> -1 then begin
-    repeat
-      xy.X := Random(tm.Size.X - 2) + 1;
-      xy.Y := Random(tm.Size.Y - 2) + 1;
-      Inc(j);
-    until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
-  ts.Point.X := xy.X;
-  ts.Point.Y := xy.Y;
+		l := tm.MOB.IndexOf( ts.ID );
+		if l <> -1 then begin
+			tm.Mob.Delete(l);
+		end;
+		ts.ATarget := 0;
+		ts.AData := nil;
+		ts.AMode := 0;
+		ts.MMode := 4;
+		//ts.Free;
+		j := 1;
+		if l <> -1 then begin
+			repeat
+				xy.X := Random(tm.Size.X - 2) + 1;
+				xy.Y := Random(tm.Size.Y - 2) + 1;
+				Inc(j);
+			until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+		ts.Point := xy;
 
-  tm.Mob.AddObject(ts.ID, ts);
-  tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.AddObject(ts.ID, ts);
-  UpdateMonsterLocation(tm, ts);
-  //SendNData(tc.Socket, tn, tc.ver2 );
-  SendBCmd(tm, ts.Point, 41, tc, False);
+		tm.Mob.AddObject(ts.ID, ts);
+		tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.AddObject(ts.ID, ts);
+		UpdateMonsterLocation(tm, ts);
+		//SendNData(tc.Socket, tn, tc.ver2 );
+		SendBCmd(tm, ts.Point, 41, tc, False);
 
-  end;
- end;
+		end;
+	end;
 end;
 
 //------------------------------------------------------------------------------
@@ -4057,7 +4137,7 @@ var
 	j   :integer;
 	w   :word;
 	tg  :TGuild;
-        //Tick :cardinal;
+	//Tick :cardinal;
 {ギルド機能追加ココまで}
 begin
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
@@ -4122,9 +4202,9 @@ var
 	i, j, k :integer;
 	tm      :TMap;
 	tc1     :TChara;
-        mi      :MapTbl;
+	mi      :MapTbl;
 {キューペット}
-        tn      :TNPC;
+	tn      :TNPC;
 {キューペットここまで}
 begin
 {パーティー機能追加}
@@ -4145,64 +4225,64 @@ begin
 	tc.AMode := 0;
 	tc.MMode := 0;
 	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 {キューペット}
-        if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
-                tn := tc.PetNPC;
+	if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
+		tn := tc.PetNPC;
 
-                WFIFOW( 0, $0080 );
-                WFIFOL( 2, tn.ID );
-                WFIFOB( 6, 0 );
-                SendBCmd( tm, tn.Point, 7 ,tc);
+		WFIFOW( 0, $0080 );
+		WFIFOL( 2, tn.ID );
+		WFIFOB( 6, 0 );
+		SendBCmd( tm, tn.Point, 7 ,tc);
 
 
-                //ペット削除
-                i := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
-                if i <> -1 then begin
-                        tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(i);
-                end;
+		//ペット削除
+		i := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
+		if i <> -1 then begin
+			tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(i);
+		end;
 
-								i := tm.NPC.IndexOf( tn.ID );
-								if i <> -1 then begin
-												tm.NPC.Delete(i);
-								end;
+		i := tm.NPC.IndexOf( tn.ID );
+		if i <> -1 then begin
+			tm.NPC.Delete(i);
+		end;
 
-								tn.Free;
-								tc.PetNPC := nil;
-        end;
+		tn.Free;
+		tc.PetNPC := nil;
+	end;
 {キューペットここまで}
 
 {チャットルーム機能追加}
-		//入室中メンバーの削除処理
-		if (tc.ChatRoomID <> 0) then begin
-			if (mode = 2) then ChatRoomExit(tc, true)
-			else ChatRoomExit(tc);
-			tc.ChatRoomID := 0;
-		end;
+	//入室中メンバーの削除処理
+	if (tc.ChatRoomID <> 0) then begin
+		if (mode = 2) then ChatRoomExit(tc, true)
+		else ChatRoomExit(tc);
+		tc.ChatRoomID := 0;
+	end;
 {チャットルーム機能追加ココまで}
 {露店スキル追加}
-		//露店を終了する
-		if (tc.VenderID <> 0) then begin
-			if (mode = 2) then VenderExit(tc, true)
-			else VenderExit(tc);
-			tc.VenderID := 0;
-		end;
+	//露店を終了する
+	if (tc.VenderID <> 0) then begin
+		if (mode = 2) then VenderExit(tc, true)
+		else VenderExit(tc);
+		tc.VenderID := 0;
+	end;
 {露店スキル追加ココまで}
 {取引機能追加}
-		if (tc.DealingID <> 0) then begin
-			if (mode = 2) then CancelDealings(tc, true)
-			else CancelDealings(tc);
-			tc.DealingID := 0;
-			tc.PreDealID := 0;
-		end;
+	if (tc.DealingID <> 0) then begin
+		if (mode = 2) then CancelDealings(tc, true)
+		else CancelDealings(tc);
+		tc.DealingID := 0;
+		tc.PreDealID := 0;
+	end;
 {取引機能追加ココまで}
 {ギルド機能追加}
-		//メンバーに通知
-		WFIFOW( 0, $016d);
-		WFIFOL( 2, tc.ID);
-		WFIFOL( 6, tc.CID);
-		WFIFOL(10, 0);
-		SendGuildMCmd(tc, 14, true);
+	//メンバーに通知
+	WFIFOW( 0, $016d);
+	WFIFOL( 2, tc.ID);
+	WFIFOL( 6, tc.CID);
+	WFIFOL(10, 0);
+	SendGuildMCmd(tc, 14, true);
 {ギルド機能追加ココまで}
 
 	if tm.Clist.IndexOf(tc.ID) <> -1 then begin //二重処理はしない
@@ -4220,30 +4300,30 @@ begin
  				end;
 			end;
 		end;
-              //if (mi.noPvP = false) then begin
-              //for j := 0 to tm.CList.Count - 1 do begin
-              //tc1 := tm.CList.Objects[j] as TChara;
-              //WFIFOW( 0, $0199);
-							//WFIFOW( 2, 1);
-							//tc1.Socket.SendBuf(buf, 4);
-              //k := j + 1;
-              //i := tm.CList.Count - 1;
-              //WFIFOW( 0, $019a);
-              //WFIFOL( 2, tc1.ID);
-              //WFIFOL( 6, k);
-              //WFIFOL( 10, i);
-              //tc1.Socket.SendBuf(buf, 14);
-              //end;
-              //end;
+		//if (mi.noPvP = false) then begin
+		//for j := 0 to tm.CList.Count - 1 do begin
+		//tc1 := tm.CList.Objects[j] as TChara;
+		//WFIFOW( 0, $0199);
+		//WFIFOW( 2, 1);
+		//tc1.Socket.SendBuf(buf, 4);
+		//k := j + 1;
+		//i := tm.CList.Count - 1;
+		//WFIFOW( 0, $019a);
+		//WFIFOL( 2, tc1.ID);
+		//WFIFOL( 6, k);
+		//WFIFOL( 10, i);
+		//tc1.Socket.SendBuf(buf, 14);
+		//end;
+		//end;
 
 		//マップから自分のデータを消去
 		tm.CList.Delete(tm.Clist.IndexOf(tc.ID));
 		with tm.Block[tc.Point.X div 8][tc.Point.Y div 8] do begin
-                        if Clist.IndexOf(tc.ID) <> -1 then
-			        CList.Delete(Clist.IndexOf(tc.ID));
+			if Clist.IndexOf(tc.ID) <> -1 then
+				CList.Delete(Clist.IndexOf(tc.ID));
 		end;
-                if CharaPID.IndexOf(tc.ID) <> -1 then
-                	CharaPID.Delete(CharaPID.IndexOf(tc.ID));
+		if CharaPID.IndexOf(tc.ID) <> -1 then
+			CharaPID.Delete(CharaPID.IndexOf(tc.ID));
 	end;
 end;
 //------------------------------------------------------------------------------
@@ -4260,32 +4340,32 @@ begin
 	for j := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
 		for i := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 			//周囲の人に通知(tc <> nilの場合は自分を除く)
-                        if assigned(tm) then begin // AlexKreuz
-                                if assigned(tm.Block[i][j]) then begin
-		                	for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
-			                	tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
+			if assigned(tm) then begin // AlexKreuz
+					if assigned(tm.Block[i][j]) then begin
+						for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
+							tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
 
-				                if tc1 = nil then continue;
-        				        if (tc = nil) or (tc <> tc1) then begin
-        	        				if (abs(Point.X - tc1.Point.X) < 50) and (abs(Point.Y - tc1.Point.Y) < 50) then begin
-	        	        				if tail and (tc1.Stat2 = 9) then begin
-		        	        				tc1.Socket.SendBuf(buf, (PacketLen+2));
-			        	        		end else begin
-				        	        		tc1.Socket.SendBuf(buf, PacketLen);
-					        	        end;
-        					        end;
-                                                end;
-	        			end;
+							if tc1 = nil then continue;
+							if (tc = nil) or (tc <> tc1) then begin
+								if (abs(Point.X - tc1.Point.X) < 50) and (abs(Point.Y - tc1.Point.Y) < 50) then begin
+									if tail and (tc1.Stat2 = 9) then begin
+										tc1.Socket.SendBuf(buf, (PacketLen+2));
+									end else begin
+										tc1.Socket.SendBuf(buf, PacketLen);
+									end;
+								end;
+							end;
+						end;
 {修正ココまで}
-		        	end;
-                        end;
-	        end;
-        end;
-  end
+					end;
+				end;
+			end;
+		end;
+	end
 
-  else begin
-     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Attempted Battle Command Crash. Temporary Bypass. -AlexKreuz');
-  end;
+	else begin
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Attempted Battle Command Crash. Temporary Bypass. -AlexKreuz');
+	end;
 end;
 
 //------------------------------------------------------------------------------
@@ -6016,7 +6096,7 @@ var
 begin
 	Inc(tpa.EXP,EXP);
 	Inc(tpa.JEXP,JEXP);
-	if tpa.EXPShare = 1 then begin
+	if tpa.EXPShare then begin
 		m := 1;
 		for i := 0 to 11 do begin
 			if tpa.MemberID[i] = 0 then Continue;
@@ -6112,12 +6192,12 @@ begin
 
 		//パーティー共有設定の送信(0101パケット)
 		//ここの公平可能レベルはiniから読みこみにするといいかも
-		if (tpa.MaxLV - tpa.MinLV > Option_PartyShare_Level) and (tpa.EXPShare = 1) then begin
-			tpa.EXPShare := 0;//公平可能レベルを超えていたら無条件に個別取得にする
+		if (tpa.MaxLV - tpa.MinLV > Option_PartyShare_Level) and (tpa.EXPShare) then begin
+			tpa.EXPShare := False;//公平可能レベルを超えていたら無条件に個別取得にする
 		end;
 		WFIFOW(0, $0101);
-		WFIFOW(2, tpa.EXPShare);
-		WFIFOW(4, tpa.ITEMShare);
+		WFIFOW(2, Word(tpa.EXPShare));
+		WFIFOW(4, Word(tpa.ITEMShare));
 		SendPCmd(tc, 6);
 
 		for i := 0 to 11 do begin
@@ -7929,6 +8009,10 @@ Var
 	m          : Integer;
 	mcnt       : Integer;
 
+	X : Integer;
+	Y : Integer;
+	{Used in callmob code...}
+
 	tn    : TNPC;
 	tm    : TMap; //ref only
 	tr    : NTimer;
@@ -7990,7 +8074,7 @@ Begin
 
 	Idx := Map.IndexOf(MapName);
 	if Idx > -1 then
-		tm  := Map.Objects[Idx] AS TMap
+		tm := Map.Objects[Idx] AS TMap
 	else
 		tm := NIL;
 
@@ -8154,8 +8238,8 @@ Begin
 						//Reading Script.
 						Readln(txt, str);
 						Inc(lines);
-						if str = '}' then break; //注：スクリプト終了文字「}」は１行にそれのみ書くこと
-
+						if str = '}' then break;
+						//Closing curly brace means the script definition is done.
 
 						//Convert Multiple tabs to one tab, then convert remaining tabs to spaces
 						while Pos(#9#9, str) <> 0 do str := StringReplace(str, #9#9, #9, [rfReplaceAll]);
@@ -8174,6 +8258,11 @@ Begin
 						end;
 
 						case SL.Count of
+						0: //Blank Line.
+							begin
+								str := '//';
+								SL.Add('//');
+							end;
 						1:	SL1.Clear;
 						2:	SL1.DelimitedText := SL[1];
 						else
@@ -8821,7 +8910,7 @@ Begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
 							end;
-							val(SL1[0], i, j);
+							Val(SL1[0], i, j);
 							if (j = 0) AND ((i < 0) OR (i > 8)) then begin
 								ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
@@ -8834,6 +8923,9 @@ Begin
 {髪色変更追加ココまで}
 {NPCイベント追加}
 						end else if str = 'callmob' then begin //------- 33 callmob
+						// callmob "force_map1",25,25,"AREA1",1002,0,"area1";
+						// Experimental Mod:  x,y as 0,0 (technically if one of is 0),
+						// will make a random point selected.
 							if (sl1.Count = 6) then sl1.Add('');
 							if (sl1.Count <> 7) then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
@@ -8852,8 +8944,27 @@ Begin
 							SetLength(tn.Script[k].Data2, 1);
 							SetLength(tn.Script[k].Data3, 4);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
-							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
-							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+							{Coords X,Y -- special values - if X or Y are Zero, use random
+							points w/in the map}
+							X := StrToInt(SL1[1]);
+							Y := StrToInt(SL1[2]);
+							if (X = 0) OR (Y = 0) then begin
+								//ChrstphrR 2004/05/22
+								//Tied to map extents - map X/Y range is 0..Mapsize-1
+								//We known accessing Map here is safe -- the map was JUST
+								//added in the MapLoad routine before this one was called.
+								repeat
+									X := Random( tm.Size.X );
+									Y := Random( tm.Size.Y );
+								until NOT (tm.gat[X,Y] IN [1,5]);
+
+								//N.B - this random point selection MAY spawn a point
+								// that is stuck where it shouldn't -- ideally, a
+								// function to set the X/Y coords randomly on a VALID point
+								// should be made, and then used here...
+							end;
+							tn.Script[k].Data3[0] := X; //X Coord
+							tn.Script[k].Data3[1] := Y; //Y Coord
 							tn.Script[k].Data1[1] := SL1[3];
 							tn.Script[k].Data3[2] := StrToInt(SL1[4]);
 							tn.Script[k].Data3[3] := StrToInt(SL1[5]);
@@ -10791,6 +10902,46 @@ Begin
 
 End;(* Proc SendMOTD()
 *-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+TPet.GetFullness
+
+Pre:
+	None.
+Post:
+	Returns Fullness (a percentage between 0..100) in a 1-byte unsigned integer.
+*-----------------------------------------------------------------------------*)
+Function  TPet.GetFullness : Byte;
+Begin
+	Result := fFullness;
+End;(* Func TPet.GetFullness
+*-----------------------------------------------------------------------------*)
+
+
+
+(*-----------------------------------------------------------------------------*
+TPet.SetFullness()
+
+Pre:
+	Value passed must be between 0 and 100
+	Value must be different from stored Fullness
+Post:
+	Value will be chopped to fit the range 0..100 if it exceeds it, and,
+	Value will be put into Fullness if it's not already the same.
+
+*-----------------------------------------------------------------------------*)
+Procedure TPet.SetFullness(
+		Value : Byte
+	);
+Begin
+	if (Value >= 0) AND (Value <= 100) AND (Value <> fFullness) then begin
+		fFullness := Value;
+	end;
+End;(* Proc TPet.SetFullness()
+*-----------------------------------------------------------------------------*)
+
+
 
 
 end.

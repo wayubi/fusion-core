@@ -136,14 +136,14 @@ end;
 //------------------------------------------------------------------------------
 procedure SQLDataLoad();
 var
-	i,j,k :integer;
-	i1  :integer;
+	i,j :integer;
+//	i1  :integer;
 	sl  :TStringList;
-	tpa	:TParty;
+//	tpa	:TParty;
   tgc :TCastle;
-	tg  :TGuild;
-	tgb :TGBan;
-	tgl :TGRel;
+//	tg  :TGuild;
+//	tgb :TGBan;
+//	tgl :TGRel;
 	txt :TextFile;
 	str :string;
 begin
@@ -535,26 +535,26 @@ begin
 	Application.ProcessMessages;
 
 	{保存组队资料 --需要优化下}
-  if PartyNameList.Count <> 0 then
+	if PartyNameList.Count <> 0 then
 	begin
-	  for i := 0 to PartyNameList.Count - 1 do
-    begin
-      tpa := PartyNameList.Objects[i] as TParty;
-      with tpa do
-      begin
-			  bindata := IntToStr(i + 1);
-			  bindata := bindata + ' ,''' + addslashes(Name) + '''';
-			  bindata := bindata + ' ,' + IntToStr(EXPShare);
-			  bindata := bindata + ' ,' + IntToStr(ITEMShare);
-			  for j := 0 to 11 do begin
-			    bindata := bindata + ' ,' + IntToStr(MemberID[j]);
-			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [bindata])) then
-				begin
-				  debugout.lines.add('[' + TimeToStr(Now) + '] ' + '*** Save Party data error.');
+		for i := 0 to PartyNameList.Count - 1 do
+		begin
+			tpa := PartyNameList.Objects[i] as TParty;
+			with tpa do
+			begin
+				bindata := IntToStr(i + 1);
+				bindata := bindata + ' ,''' + addslashes(Name) + '''';
+				bindata := bindata + ' ,' + IntToStr(Integer(EXPShare));
+				bindata := bindata + ' ,' + IntToStr(Integer(ITEMShare));
+				for j := 0 to 11 do begin
+					bindata := bindata + ' ,' + IntToStr(MemberID[j]);
 				end;
-      end;
-    end;
+				if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [bindata])) then
+				begin
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' + '*** Save Party data error.');
+				end;
+			end;
+		end;
 	end;
 
 	Application.ProcessMessages;
@@ -655,7 +655,7 @@ end;
 function GetPlayerData(userid : String; AID: cardinal = 0) : Boolean;
 var
   tp  :TPlayer;
-	i,j,k : Integer;
+	i,j : Integer;
   sl  :TStringList;
 begin
   Result := False;
@@ -777,13 +777,13 @@ end;
 //------------------------------------------------------------------------------
 function GetCharaData(GID: cardinal) : Boolean;
 var
-  i,j,k,tmp  : Integer;
-	tc : TChara;
-	ta : TMapList;
-	tp  :TPlayer;
-	tpa :TParty;
-	sl  :TStringList;
-    str :string;
+	i,j : Integer;
+	tc  : TChara;
+	ta  : TMapList;
+	tp  : TPlayer;
+	tpa : TParty;
+	sl  : TStringList;
+	str : string;
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
@@ -1517,9 +1517,9 @@ end;
 //------------------------------------------------------------------------------
 function  SaveCharaData(tc : TChara) : Boolean;
 var
-  bindata : String;
-	j :integer;
-    sl :TStringList;
+	bindata : String;
+	j  : Integer;
+	sl : TStringList;
 begin
         if (tc.ID <> 0) then begin
 	sl := TStringList.Create;
