@@ -2444,7 +2444,7 @@ Begin
 
 				11,13,14,19,20,90,156:
 				{11  : Napalm Beat
-				.13  : Soul Strike
+                .13  : Soul Strike
 				.14  : Cold Bolt
 				.19  : Fire Bolt
 				.20  : Lightning Bolt
@@ -2468,7 +2468,7 @@ Begin
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
 						case MSkill of
-						11,90:     tc.MTick := Tick + 1000;
+						90:     tc.MTick := Tick + 1000;
 						13:        tc.MTick := Tick +  800 + 400 * ((MUseLV + 1) div 2) - 300 * (MUseLV div 10);
 						14,19,20 : tc.MTick := Tick +  800 + 200 * MUseLV;
 						else       tc.MTick := Tick + 1000;
