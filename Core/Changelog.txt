@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-13-04: Changed BannedIPs.txt's native location and added it to backup. [Tsusai]
 - 12-13-04: Upgraded the double login procedure. [Tsusai]
 - 12-13-04: Booleanized TPlayer.Login  [Tsusai]
 - 12-12-04: Massive optimization of REED Loading structure. [AlexKreuz]

@@ -461,6 +461,7 @@ uses
             // fileslist.Add(AppPath + 'player.txt');
             //fileslist.Add(AppPath + 'status.txt');
             fileslist.Add(AppPath + 'servervars.txt');
+            fileslist.Add(AppPath + 'BannedIPs.txt');
 
             zfile.FileSpecList := fileslist;
             zfile.Add;

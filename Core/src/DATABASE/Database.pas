@@ -1845,13 +1845,13 @@ begin
     { -- Server Flags -- }
 
     { -- Banned IPs -- }
-    if FileExists(AppPath + 'gamedata\BannedIPs.txt') then begin
+    if FileExists(AppPath + 'BannedIPs.txt') then begin
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Loading Banned IP List...');
-        BanList.LoadFromFile(AppPath + 'gamedata\BannedIPs.txt');
+        BanList.LoadFromFile(AppPath + 'BannedIPs.txt');
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** %d Banned IPs Loaded', [BanList.Count]));
     end else begin
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Creating Banned IP List...');
-		AssignFile(txt, AppPath + 'gamedata\BannedIPs.txt');
+		AssignFile(txt, AppPath + 'BannedIPs.txt');
 		Rewrite(txt);
 		CloseFile(txt);
 	end;
@@ -1894,7 +1894,7 @@ begin
 
     { -- Server Flags -- }
 
-    BanList.SaveToFile(AppPath + 'gamedata\BannedIPs.txt');
+    BanList.SaveToFile(AppPath + 'BannedIPs.txt');
 
 end;
 //------------------------------------------------------------------------------
