@@ -2016,7 +2016,7 @@ end;
 								end;
 							2: // Fly Wings - Rewritten by AlexKreuz
 								begin
-                                                                        if tc.item[w].Amount <= 0 then exit;
+                  if ((tc.item[w].Amount <= 0) or (tc.Sit = 1) or (tc.Option = 6)) then exit;
 									i := MapInfo.IndexOf(tc.Map);
 									j := -1;
 									if (i <> -1) then begin
@@ -4020,11 +4020,11 @@ end;
 				j := -1;
 				if (i <> -1) then begin
 					mi := MapInfo.Objects[i] as MapTbl;
-					if (mi.noTele = true) then j := 0;
+					if ((mi.noTele = true) or (mi.noPortal = true) or (tc.Option = 6)) then j := 0;
 				end;
 				if (tc.MSkill = 26) and (j = 0) then continue;
 {アジト機能追加ココまで}
-
+{Colus, 20040116: This whole section seems redundant...
 				RFIFOW(2, tc.MUseLV);
 				RFIFOW(4, tc.MSkill);
 				RFIFOL(6, tc.MTarget);
@@ -4032,9 +4032,10 @@ end;
 				tc.MPoint.Y := 0;
 
 				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
-{アジト機能追加}
+// Japanese comment: 'Begin agit consideration'
 				if (tc.MSkill = 26) and mi.noPortal then continue;
-{アジト機能追加ココまで}
+// Japanese comment: 'Agit consideration ends here.'  We rolled this into the above checks.
+}
 {修正}	if (tc.ver2 = 9) and (tc.MUseLV > 30) then tc.MUseLV := tc.MUseLV - 30;
 				if ((tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0)) then begin
 					tk := tc.Skill[tc.MSkill];
@@ -4082,7 +4083,7 @@ end;
 
 				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
 {アジト機能追加}
-				if (tc.MSkill = 27) and mi.noTele then continue;
+				if ((tc.MSkill = 27) and (mi.noTele or (tc.Option = 6))) then continue;
 {アジト機能追加ココまで}
 {修正}	if (tc.ver2 = 9) and (tc.MUseLV > 30) then tc.MUseLV := tc.MUseLV - 30;
 				if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin

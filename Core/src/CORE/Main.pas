@@ -3648,7 +3648,7 @@ begin
 							tn.MSkill := MSkill;
 
 						end else begin
-                                                        SendItemError(tc, 8); //No Blue Gemstone
+              SendSkillError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3762,7 +3762,7 @@ begin
 						        end;
 
 						end else begin
-                                                        SendItemError(tc, 8); //No Blue Gemstone
+              SendSkillError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3789,7 +3789,7 @@ begin
 						        end;
 
 						end else begin  //Doesn't have Gemstone
-                                                        SendItemError(tc, 8); //No Blue Gemstone
+              SendSkillError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -3808,7 +3808,7 @@ begin
                                                         tn.MSkill := MSkill;
                                                         tn.MUseLV := MUseLV;
 						end else begin
-                                                        SendItemError(tc, 8); //No Blue Gemstone
+              SendSkillError(tc, 8); //No Blue Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -4023,7 +4023,7 @@ begin
 	      		tn.MSkill := MSkill;
       			tn.MUseLV := MUseLV;
 						end else begin
-                                                        SendItemError(tc, 7); //No Red Gemstone
+              SendSkillError(tc, 7); //No Red Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -5750,63 +5750,87 @@ begin
                                         Skilleffect(tc, Tick);
                                 end;
 
-                                {CODE-ERROR: You have got to be joking...}
+        {CODE-ERROR: You have got to be joking...}
+        {Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
+          abort for the skills which require certain weapon types.}
 				5,42,46,316,324:
-                                { 5   : Bash
-                                  42  : Mammonite
-                                  46  : Double Stafing
-                                  316 : Musical Strike
-                                  324 : Throw Arrow}
+        { 5   : Bash
+          42  : Mammonite
+          46  : Double Stafing
+          316 : Musical Strike
+          324 : Throw Arrow}
 				begin
 				//ダメージ算出
-                                        if (MSkill = 5) then begin
+          j := 1; // Moved # of hits up here to initialize.
+
+          if (MSkill = 5) then begin
 						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 					end else begin
 						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 					end;
-                                        if (MSkill = 316) and (Weapon = 13) then begin
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					end else begin
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					end;
-                                        if (MSkill = 324) and (Weapon = 14) then begin
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					end else begin
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					end;
-					if (MSkill = 46) and (Weapon = 11) then begin       {Double Strafing}
-						dmg[0] := dmg[0] * 2;
-						j := 2;
-					end else if MSkill = 56 then begin //ピアースはts.Data.Scale + 1回hit
+
+          if (MSkill = 316) or (MSkill = 324) then begin
+            if (Weapon = 13) or (Weapon = 14) then begin
+  						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+  					end else begin
+	  					//DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+              SendSkillError(tc, 6);
+  						tc.MMode := 4;
+  						Exit;
+  					end;
+          end;
+
+					if (MSkill = 46) then begin       {Double Strafing}
+            if (Weapon = 11) then begin
+  						dmg[0] := dmg[0] * 2;
+  						j := 2;
+            end else begin
+              SendSkillError(tc, 6);
+  						tc.MMode := 4;
+  						Exit;
+            end;
+          end;
+
+					if (MSkill = 56) then begin //ピアースはts.Data.Scale + 1回hit
 						j := ts.Data.Scale + 1;
 						dmg[0] := dmg[0] * j;
-					end else begin
-						j := 1;
 					end;
+
 					//Mammonite
 					if MSkill = 42 then begin
-						Dec(Zeny, tl.Data2[MUseLV]);
-						//所持金更新
-						WFIFOW(0, $00b1);
-						WFIFOW(2, $0014);
-						WFIFOL(4, Zeny);
-						Socket.SendBuf(buf, 8);
+            // Should check to see if we have the money!
+            if (Zeny >= tl.Data2[MUseLV]) then begin
+  						Dec(Zeny, tl.Data2[MUseLV]);
+  						//所持金更新
+  						WFIFOW(0, $00b1);
+  						WFIFOW(2, $0014);
+  						WFIFOL(4, Zeny);
+  						Socket.SendBuf(buf, 8);
+            end else begin
+              SendSkillError(tc, 5);
+  						tc.MMode := 4;
+  						Exit;
+            end;
 					end;
+
 					if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
 						//パケ送信
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-						if (Skill[145].Lv <> 0) and (MSkill = 5) and (MUseLV > 5) then begin //急所突き
-							if Random(1000) < Skill[145].Data.Data1[MUseLV] * 10 then begin
-								if (ts.Stat1 <> 3) then begin
-									ts.nStat := 3;
-									ts.BodyTick := Tick + tc.aMotion;
-								end else
-                                                                        ts.BodyTick := ts.BodyTick + 30000;
-							end;
-						end;
-						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+
+					if (Skill[145].Lv <> 0) and (MSkill = 5) and (MUseLV > 5) then begin //急所突き
+						if Random(1000) < Skill[145].Data.Data1[MUseLV] * 10 then begin
+							if (ts.Stat1 <> 3) then begin
+								ts.nStat := 3;
+								ts.BodyTick := Tick + tc.aMotion;
+							end else
+                ts.BodyTick := ts.BodyTick + 30000;
+            end;
+          end;
+
+					if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
 					end;
+
 				6:      {Provoke}
 				begin
 					ts.ATarget := tc.ID;
@@ -5946,7 +5970,7 @@ begin
 				        		end;
 					        end;
                                         end else begin
-                                                SendItemError(tc, 7); //No Red Gemstone
+                                                SendSkillError(tc, 7); //No Red Gemstone
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
@@ -6206,7 +6230,7 @@ begin
 							        DamageProcess1(tm, tc, ts, dmg[0], Tick);
 							        tc.MTick := Tick + 3000;
 						        end else begin
-                                                                SendItemError(tc, 8); //No Blue Gemstone
+                      SendSkillError(tc, 8); //No Blue Gemstone
 							        tc.MMode := 4;
 							        tc.MPoint.X := 0;
 							        tc.MPoint.Y := 0;
@@ -6226,6 +6250,7 @@ begin
 						                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                                         StatCalc1(tc, ts, Tick);
                                                         end else begin
+                                                          SendSkillError(tc, 6);
                                                                 MMode := 4;
                                                                 Exit;
                                                         end;
@@ -6283,6 +6308,7 @@ begin
 							                StatCalc1(tc, ts, Tick);
 
                                                         end else begin
+                                                          SendSkillError(tc, 6);
                                                                 MMode := 4;
                                                                 Exit;
                                                         end;
@@ -6360,6 +6386,7 @@ begin
                                                         if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
 
                                                         end else begin
+                                                          SendSkillError(tc, 6);
                                                                 MMode := 4;
                                                                 Exit;
                                                         end;
@@ -6374,6 +6401,7 @@ begin
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
           end else begin
+            SendSkillError(tc, 6);          
             MMode := 4;
             Exit;
           end;
@@ -7531,7 +7559,7 @@ begin
 							SendBCmd(tm, tc1.Point, 8);
 						        ProcessType := 0;
 						end else begin
-                                                        SendItemError(tc, 8); //No Blue Gemstone
+                                                        SendSkillError(tc, 8); //No Blue Gemstone
                                                         dmg[0] := 0;
                                                         tc.MMode := 4;
 							Exit;
@@ -8534,17 +8562,39 @@ begin
                                                 tc.MTick := Tick + 1000;
                                                 tc.Skill[MSkill].Tick := Tick + cardinal(2) * 1000;
 					end;
-        5,42,46,253: //バッシュ、メマー、DS、ピアース、SB
+        5,42,46,253,316,324: //バッシュ、メマー、DS、ピアース、SB
 					begin
+
+            j := 1;
+
 						//ダメージ算出
 						if (MSkill = 5) or (MSkill = 253) then begin
 							DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 						end else begin
 							DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						end;
-						if (MSkill = 46) and (Weapon = 11) then begin //DSは2連撃
-							dmg[0] := dmg[0] * 2;
-							j := 2;
+
+            if (MSkill = 316) or (MSkill = 324) then begin
+              if (Weapon = 13) or (Weapon = 14) then begin
+                // Is 2 or 3 correct?
+    						DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+    					end else begin
+  	  					//DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                SendSkillError(tc, 6);
+    						tc.MMode := 4;
+    						Exit;
+    					end;
+            end;
+
+						if (MSkill = 46) then begin //DSは2連撃
+              if (Weapon = 11) then begin
+  							dmg[0] := dmg[0] * 2;
+  							j := 2;
+              end else begin
+                SendSkillError(tc, 6);
+                MMode := 4;
+                exit;
+              end;
 						end else if MSkill = 56 then begin //ピアースはts.Data.Scale + 1回hit
 							j := 1;
 							dmg[0] := dmg[0] * j;
@@ -8553,15 +8603,24 @@ begin
 						end else begin
 							j := 1;
 						end;
+
 						//メマーのZeny消費
 						if MSkill = 42 then begin
-							Dec(Zeny, tl.Data2[MUseLV]);
-							//所持金更新
-							WFIFOW(0, $00b1);
-							WFIFOW(2, $0014);
-							WFIFOL(4, Zeny);
-							Socket.SendBuf(buf, 8);
+              // Should check to see if we have the money!
+              if (Zeny >= tl.Data2[MUseLV]) then begin
+    						Dec(Zeny, tl.Data2[MUseLV]);
+    						//所持金更新
+    						WFIFOW(0, $00b1);
+    						WFIFOW(2, $0014);
+    						WFIFOL(4, Zeny);
+    						Socket.SendBuf(buf, 8);
+              end else begin
+                SendSkillError(tc, 5);
+    						tc.MMode := 4;
+    						Exit;
+              end;
 						end;
+            
 						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
 						//パケ送信
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
@@ -8693,7 +8752,7 @@ begin
 							end;
 						end;
 						end else begin
-                                                        SendItemError(tc, 7); //No Red Gemstone
+                                                        SendSkillError(tc, 7); //No Red Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;

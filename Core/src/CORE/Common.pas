@@ -1415,7 +1415,7 @@ Option_GraceTime_PvPG :cardinal;
 		procedure SendBCmd(tm:TMap; Point:TPoint; PacketLen:word; tc:TChara = nil; tail:boolean = False);
 
 		procedure SendItemSkill(tc:TChara; s:Cardinal; L:Cardinal = 1);
-		procedure SendSkillError(tc:TChara; Code:Cardinal);
+		procedure SendSkillError(tc:TChara; EType:byte; BType:word = 0);
                 procedure SendItemError(tc:TChara; Code:Cardinal);
 		function  UseFieldSkill(tc:TChara; Tick:Cardinal) : Integer;
 		function  UseTargetSkill(tc:TChara; Tick:Cardinal) : Integer;
@@ -3472,11 +3472,69 @@ begin
 end;
 
 //------------------------------------------------------------------------------
-procedure SendSkillError(tc:TChara; Code:Cardinal);
+procedure SendSkillError(tc:TChara; EType:byte; BType:word = 0);
 begin
+  {Colus, 20040116: This is how it works.
+    R 0110 <skill ID>.w <basic type>.w ?.w <fail>.B <type>.B
+
+    	Result of trying to use a skill.
+
+	When fail=00, the skill could not be used.   (So, always 0...)
+  The ?.w is also always 0.
+
+  What's left?  Skill, basic type, and type.
+  When type is 0, then the message is determined by the basictype variable.
+
+	type 00: basic type skill
+	type 01: Not enough SP
+	type 02: Not enough HP
+	type 03: No memo
+	type 04: In cast delay
+	type 05: Not enough money (Mammonite)
+	type 06: Weapon is not usable with the skill
+	type 07: No red gemstone
+	type 08: No blue gemstone
+	type 09: Unknown.  (GUESS: 'No yellow gemstone', maybe?)
+
+  When type is 00, basic type is looked at:
+	basic type=00: Trade
+	basic type=01: Emotion
+	basic type=02: Sit
+	basic type=03: Chat
+	basic type=04: Party
+	basic type=05: Shout(?)
+	basic type=06: PK
+	basic type=07: Manner Point
+
+  Now there are some other types of messages that we are going to parse.
+  Messages such as overweight, arrows need equipping, etc. are done with
+  013b.  We'll signify those by adding 10 to the parameter passed in.
+
+  I think these are the 013b following codes and values:
+
+  0 - Equip arrows first (?)
+  1 - Can't attack b/c of weight (?)
+  2 - Can't skill b/c of weight.
+  3 - Arrows equipped.
+
+  }
 	with tc do begin
-		case Code of
-			1: //SP不足
+    if (EType < 10) then begin
+      WFIFOW( 0, $0110);
+  		WFIFOW( 2, MSkill);
+  		WFIFOW( 4, BType);
+  		WFIFOW( 6, 0);
+  		WFIFOB( 8, 0);
+  		WFIFOB( 9, EType);
+      Socket.SendBuf(buf, 10);
+    end else begin
+      WFIFOW(0, $013b);
+      WFIFOW(2, EType - 10);
+      Socket.SendBuf(buf, 4);
+    end;
+    {
+		case EType of
+			1: // No SP
 				begin
 					WFIFOW( 0, $0110);
 					WFIFOW( 2, MUseLV);
@@ -3486,13 +3544,13 @@ begin
 					WFIFOB( 9, 1);
 					Socket.SendBuf(buf, 10);
 				end;
-			2: //重量オーバー
+			2: //Overweight msg.  We need to handle this separately?
 				begin
 					WFIFOW(0, $013b);
 					WFIFOW(2, 2);
 					Socket.SendBuf(buf, 4);
 				end;
-			3: //金欠メマー
+			3: // Not enough money for Mammonite
 				begin
 					WFIFOW( 0, $0110);
 					WFIFOW( 2, tc.MUseLV);
@@ -3503,13 +3561,13 @@ begin
 					Socket.SendBuf(buf, 10);
 				end;
 			else //何も無し
-		end;
+		end; }
 	end;
 end;
 //------------------------------------------------------------------------------
 procedure SendItemError(tc:TChara; Code:Cardinal);
 {
-        type 00: basic type skill
+  type 00: basic type skill
 	type 01: Not enough SP
 	type 02: Not enough HP
 	type 03: No memo
@@ -3523,7 +3581,7 @@ procedure SendItemError(tc:TChara; Code:Cardinal);
 begin
         with tc do begin
                 WFIFOW( 0, $0110);
-                WFIFOW( 2, MUseLV);
+                WFIFOW( 2, MSkill);
                 WFIFOW( 4, 0);
                 WFIFOW( 6, 0);
                 WFIFOB( 8, 0);
@@ -3561,7 +3619,7 @@ begin
 				Exit;
 			end;
 			if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
-				Result := 2;
+				Result := 12;
 				Exit;
 			end;
 			if tm.Mob.IndexOf(tc.MTarget) <> -1 then begin
@@ -3636,7 +3694,7 @@ begin
 
 		if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
 			//重量オーバー
-			Result := 2;
+			Result := 12;
 			Exit;
 		end;
 
@@ -3645,7 +3703,7 @@ begin
 
 		if (tc.MSkill = 42) and (tc.Zeny < cardinal(tl.Data2[tc.MUseLV])) then begin
 			//金欠メマー
-			Result := 3;
+			Result := 5;
 			Exit;
 		end;
 
