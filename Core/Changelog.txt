@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-12-04: Fixed Passive weapon skills, now display amount of ATK increased. [Darkhelmet]
 - 02-11-04: Fixed SQL-Crash when viewing Guild information. [AlexKreuz]
 - 02-11-04: Fusion now allows editing Player and Character Data while Fusion is running. [AlexKreuz]
 - 02-11-04: Fixed being able to Pharmacy w/o books. [Colus]

@@ -2976,7 +2976,7 @@ begin
 		WFIFOB(i*2+5, tc.ParamUp[i]);
 	end;
 	WFIFOW(16, tc.ATK[0][0]);
-	WFIFOW(18, tc.ATK[1][0]);
+	WFIFOW(18, tc.ATK[1][0] + tc.ATK[0][4]);
 	WFIFOW(20, tc.MATK2);
 	WFIFOW(22, tc.MATK1);
 	WFIFOW(24, tc.DEF1);
