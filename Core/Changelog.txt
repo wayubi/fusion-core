@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-26-04: REED: Proper deletion of Pets on Character delete. [AlexKreuz]
 - 10-26-04: REED: Restructured Deletion Algorithms (66%). [AlexKreuz]
 - 10-26-04: Finalised the improvements to #warp. [Trihan]
 - 10-26-04: Added ini option to turn off auto-dye of Adv 2nd classes for those using sprites. [Tsusai]

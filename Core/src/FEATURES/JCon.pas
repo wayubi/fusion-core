@@ -199,25 +199,16 @@ uses
         tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
         if (not assigned(tp)) then Exit;
 
-        for i := 0 to 8 do begin
-        	if (tp.CName[i] = tc.Name) then begin
-            	tp.CName[i] := '';
-                tp.CData[i] := nil;
-
-                case i of
-                	0: frmMain.Button7.Caption := '';
-                    1: frmMain.Button8.Caption := '';
-                    2: frmMain.Button9.Caption := '';
-                    3: frmMain.Button10.Caption := '';
-                    4: frmMain.Button11.Caption := '';
-                    5: frmMain.Button12.Caption := '';
-                    6: frmMain.Button13.Caption := '';
-                    7: frmMain.Button14.Caption := '';
-                    8: frmMain.Button15.Caption := '';
-                end;
-
-                Break;
-            end;
+        case tc.CharaNumber of
+            0: frmMain.Button7.Caption := '';
+            1: frmMain.Button8.Caption := '';
+            2: frmMain.Button9.Caption := '';
+            3: frmMain.Button10.Caption := '';
+            4: frmMain.Button11.Caption := '';
+            5: frmMain.Button12.Caption := '';
+            6: frmMain.Button13.Caption := '';
+            7: frmMain.Button14.Caption := '';
+            8: frmMain.Button15.Caption := '';
         end;
 
         if assigned(tc.Socket) then begin
@@ -228,6 +219,9 @@ uses
         end;
 
         PD_Delete_Character(tc.CID);
+        tp.CName[tc.CharaNumber] := '';
+        tp.CData[tc.CharaNumber] := nil;
+
         DataSave(True);
     end;
 

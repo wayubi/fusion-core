@@ -72,7 +72,6 @@ implementation
                         tpe := PetList.IndexOfObject(l) as TPet;
 
                         if tc.Item[k].Card[1] <> tpe.PetID then Continue;
-                        if tpe.CharaID <> tc.CID then Continue;
                         if tpe.Saved <> 0 then Continue;
 
                         datafile.Clear;
