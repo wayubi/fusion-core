@@ -639,7 +639,7 @@ var
 begin
   Result := False;
 
-  if AID = 0 then begin
+  {if AID = 0 then begin
 		if assigned(PlayerName) then
 		begin
 			if PlayerName.IndexOf(userid) <> -1 then begin
@@ -667,13 +667,29 @@ begin
 			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %d', [AID]));
 			Exit;
 		end
+	end;}
+
+    if AID = 0 then begin
+        if PlayerName.IndexOf(userid) <> -1 then begin
+            tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
+        end else begin
+            tp := TPlayer.Create;
+        end;
+    end else begin
+        if assigned(PlayerName) then begin
+			if Player.IndexOf(AID) <> -1 then begin
+				Result := True;
+				Exit;
+			end;
+        end;
 	end;
+
+	if ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then
+	begin
   SQLDataSet.First;
+    if not SQLDataSet.Eof then begin
 
-  if SQLDataSet.Eof then // 没有数据返回
-    exit;
 
-  tp := TPlayer.Create;
   with tp do begin
     ID := StrToInt(SQLDataSet.FieldValues['AID']);
     Name := unaddslashes(SQLDataSet.FieldValues['ID']);
@@ -717,10 +733,19 @@ begin
 		tp.CData[j] := nil;
 	end;
 
+    if AID = 0 then begin
+        if PlayerName.IndexOf(userid) <> -1 then begin
+
+        end else begin
   PlayerName.AddObject(tp.Name, tp);
   Player.AddObject(tp.ID, tp);
+        end;
+    end;
+
 
 	Result := True;
+end;
+    end;
 end;
 
 //------------------------------------------------------------------------------
@@ -733,6 +758,7 @@ var
 	ta : TMapList;
 	tp  :TPlayer;
 	tpa :TParty;
+    str :string;
 begin
   Result := False;
 
@@ -743,17 +769,20 @@ begin
 		SQLDataSet.First;
     if not SQLDataSet.Eof then begin
 	  //while not SQLDataSet.Eof do begin
+
       tc := TChara.Create;
       with tc do begin
 				CID           := StrToInt(SQLDataSet.FieldValues['GID']);
 				Name          := unaddslashes(SQLDataSet.FieldValues['Name']);
+                str := Name;
 				
 				if assigned(CharaName) then {如果该人物已经读入，就不用再读了}
 				begin
 					if CharaName.IndexOf(Name) <> -1 then
 					begin
-					  Result := True;
-						Exit;
+                        tc := CharaName.Objects[CharaName.Indexof(str)] as TChara;
+					  {Result := True;
+						Exit;           }
 					  //SQLDataSet.Next;
 						//continue;
 					end;
