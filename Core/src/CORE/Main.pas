@@ -4260,6 +4260,124 @@ begin
 			                        tn.MUseLV := MUseLV;
 					end;
 
+        404: // Fog Wall
+					begin
+						xy.X := MPoint.X - Point.X;
+						xy.Y := MPoint.Y - Point.Y;
+						if Abs(xy.X) > Abs(xy.Y) * 3 then begin
+
+							if xy.X > 0 then b := 6 else b := 2;
+						end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
+
+							if xy.Y > 0 then b := 0 else b := 4;
+						end else begin
+							if xy.X > 0 then begin
+								if xy.Y > 0 then b := 7 else b := 5;
+							end else begin
+								if xy.Y > 0 then b := 1 else b := 3;
+							end;
+						end;
+
+						SetLength(bb, 1);
+
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						bb[0] := 2;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+    				DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 6;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+					end;
+
+        405: // Spider Web
+					begin
+						xy.X := MPoint.X - Point.X;
+						xy.Y := MPoint.Y - Point.Y;
+						if Abs(xy.X) > Abs(xy.Y) * 3 then begin
+
+							if xy.X > 0 then b := 6 else b := 2;
+						end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
+
+							if xy.Y > 0 then b := 0 else b := 4;
+						end else begin
+							if xy.X > 0 then begin
+								if xy.Y > 0 then b := 7 else b := 5;
+							end else begin
+								if xy.Y > 0 then b := 1 else b := 3;
+							end;
+						end;
+
+						SetLength(bb, 1);
+
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						bb[0] := 2;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+    				DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 6;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
+					end;
+          
 				87:     {Ice Wall}
 					begin
 						xy.X := MPoint.X - Point.X;
@@ -7745,6 +7863,66 @@ begin
 							StatCalc1(tc, ts, Tick);
 
           end;
+				397: // Spiral Pierce
+					begin
+						//tc1 := tc;
+						//ProcessType := 1;
+            SendCSkillAtk1(tm, tc, ts, Tick, 1, 1);
+						tc.MTick := Tick + 2000;
+					end;
+				398: // Head Crush
+					begin
+						//tc1 := tc;
+						//ProcessType := 1;
+            SendCSkillAtk1(tm, tc, ts, Tick, 1, 1);
+						tc.MTick := Tick + 2000;
+					end;
+				399: // Joint Beat
+					begin
+						//tc1 := tc;
+						//ProcessType := 1;
+            SendCSkillAtk1(tm, tc, ts, Tick, 1, 1);
+						tc.MTick := Tick + 2000;
+					end;
+				400: // Napalm Vulcan
+					begin
+						//tc1 := tc;
+						//ProcessType := 1;
+            SendCSkillAtk1(tm, tc, ts, Tick, 100, tc.Skill[MSkill].Data.Data2[MUseLV]);
+						tc.MTick := Tick + 2000;
+					end;
+
+        402: // Mind Breaker
+					begin
+					ts.ATarget := tc.ID;
+					ts.ARangeFlag := false;
+					ts.AData := tc;
+					//ÉpÉPëóêM
+					WFIFOW( 0, $011a);
+					WFIFOW( 2, MSkill);
+					WFIFOW( 4, MUseLV);
+					WFIFOL( 6, MTarget);
+					WFIFOL(10, ID);
+					if ts.Data.Race <> 1 then begin
+						WFIFOB(14, 1);
+						ts.ATKPer := word(tl.Data1[MUseLV]);
+						ts.DEFPer := word(tl.Data2[MUseLV]);
+					end else begin
+						WFIFOB(14, 0);
+					end;
+					SendBCmd(tm, ts.Point, 15);
+
+					tc.MTick := Tick + 2000;
+
+					end;
+
+        403: // Memorize
+					begin
+            tc1 := tc;
+            ProcessType := 1;
+
+					end;
+
 				152: //êŒìäÇ∞
 					begin
             j := SearchCInventory(tc, 7049, false);
@@ -7909,6 +8087,14 @@ begin
             ProcessType := 3;
             MTick := Tick + 100;
           end;
+ 				401: // Gather Souls
+					begin
+            tc1 := tc;
+            ProcessType := 1;
+            tc.spiritSpheres := 5;
+            UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+					end;
 
         //Alchemist Skills
         231:  //Potion Pitcher
@@ -8754,6 +8940,35 @@ begin
 							tc.MPoint.Y := 0;
 							Exit;
 						end;
+        406: // Meteor Assault
+					begin
+						//tc1 := tc;
+						//ProcessType := 1;
+                  xy := tc.Point;
+                  sl.Clear;
+                  j := tl.Range2;
+                  for j1 := (xy.Y - j) div 8 to (xy.Y + j) div 8 do begin
+                  for i1 := (xy.X - j) div 8 to (xy.X + j) div 8 do begin
+                  for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                  if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+                  if (abs(ts1.Point.X - xy.X) <= j) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+                  sl.AddObject(IntToStr(ts1.ID),ts1);
+                  end;
+                  end;
+                  end;
+                  if sl.Count <> 0 then begin
+                  for k1 := 0 to sl.Count - 1 do begin
+                  ts1 := sl.Objects[k1] as TMob;
+                  DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                  if dmg[0] < 1 then dmg[0] := 1;
+                  if dmg[0] < 0 then dmg[0] := 0;
+                  k := 1;
+                  SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+                  DamageProcess1(tm, tc, ts1, dmg[0], Tick);
+                  end;
+                  end;
+
+          end;
                   214: //Raid
                   begin
                   // Colus, 20040204: Option change, testing option 2 instead of 4+2
