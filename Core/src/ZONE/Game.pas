@@ -1334,11 +1334,16 @@ end;
 					      end;
 
             					//tc.SkillPoint := 0;
-                      if (i > LOWER_JOB_END) then
+                      if (i > LOWER_JOB_END) then begin
                         i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-						        	tc.JID := i;
+  											tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+                      end else begin
+                        tc.ClothesColor := 0; // Reset the clothes color to the default value.
+                      end;
+
+						        	tc.JID := i; // Set the JID to the corrected value.
 											//ステータス再計算
-											tc.ClothesColor := 0; //強制的に初期値
+
 											//オプション初期化
 											if (tc.Option <> 0) then begin
 												tc.Option := 0;
@@ -1488,9 +1493,9 @@ end;
 							tc.Option := tc.Option or 8;
 							//カートデータ送信
 {追加}				SendCart(tc);
-						end else if (((tc.JID = 11) or (tc.JID = 4015)) and (Copy(str, 8, 6) = 'falcon')) then begin
+						end else if (((tc.JID = 11) or (tc.JID = 4012)) and (Copy(str, 8, 6) = 'falcon')) then begin
 							tc.Option := tc.Option or $10;
-						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peko')) then begin
+						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then begin
 							tc.Option := tc.Option or $20;
 						end else if Copy(str, 8, 3) = 'off' then begin
 							tc.Option := 0;

@@ -808,6 +808,9 @@ begin
 				end;
 
 				JID           := StrToInt(SQLDataSet.FieldValues['JID']);
+        // Colus, 20040305: JID becomes the 'proper' value.
+        if (JID > LOWER_JOB_END) then JID := JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
+
 				BaseLV        := StrToInt(SQLDataSet.FieldValues['BaseLV']);
 				BaseEXP       := StrToInt(SQLDataSet.FieldValues['BaseEXP']);
 				StatusPoint   := StrToInt(SQLDataSet.FieldValues['StatusPoint']);
@@ -1517,7 +1520,10 @@ begin
 		bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID) VALUES (';
     bindata := bindata + IntToStr(CID);
     bindata := bindata + ' ,''' + addslashes(Name) + '''';
-    bindata := bindata + ' ,' + IntToStr(JID);
+    // Colus, 20040305: JID becomes the 'proper' value.
+    j := JID;
+    if (JID > UPPER_JOB_BEGIN) then j := JID - UPPER_JOB_BEGIN + LOWER_JOB_END;
+    bindata := bindata + ' ,' + IntToStr(j);
     bindata := bindata + ' ,' + IntToStr(BaseLV);
     bindata := bindata + ' ,' + IntToStr(BaseEXP);
     bindata := bindata + ' ,' + IntToStr(StatusPoint);

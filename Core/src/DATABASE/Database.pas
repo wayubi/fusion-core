@@ -1731,6 +1731,8 @@ begin
 			CID           := StrToInt(sl.Strings[ 0]);
 			Name          :=          sl.Strings[ 1];
 			JID           := StrToInt(sl.Strings[ 2]);
+      // Colus, 20040305: JID becomes the 'proper' value.
+      if (JID > LOWER_JOB_END) then JID := JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
 			BaseLV        := StrToInt(sl.Strings[ 3]);
 			BaseEXP       := StrToInt(sl.Strings[ 4]);
 			StatusPoint   := StrToInt(sl.Strings[ 5]);
@@ -2462,7 +2464,10 @@ begin
 			with tc do begin
 				sl.Add(IntToStr(CID));
 				sl.Add(Name);
-				sl.Add(IntToStr(JID));
+        // Colus, 20040305: JID becomes the 'proper' value.
+        j := JID;
+        if (JID > UPPER_JOB_BEGIN) then j := JID - UPPER_JOB_BEGIN + LOWER_JOB_END;
+				sl.Add(IntToStr(j));
 				sl.Add(IntToStr(BaseLV));
 				sl.Add(IntToStr(BaseEXP));
 				sl.Add(IntToStr(StatusPoint));

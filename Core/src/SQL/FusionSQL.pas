@@ -235,6 +235,9 @@ begin
                                 end;
                         end;
                         tc.JID := StrToInt(SQLDataSet.FieldValues['JID']);
+                        // Colus, 20040305: JID becomes the 'proper' value.
+                        if (tc.JID > LOWER_JOB_END) then tc.JID := tc.JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
+
                         tc.BaseLV := StrToInt(SQLDataSet.FieldValues['BaseLV']);
                         tc.BaseEXP := StrToInt(SQLDataSet.FieldValues['BaseEXP']);
                         tc.StatusPoint := StrToInt(SQLDataSet.FieldValues['StatusPoint']);

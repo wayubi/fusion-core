@@ -1714,11 +1714,11 @@ end;
 procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 var
 	j :Integer;
-  JID :word; // Sneaky scope change...
+  JIDFix :word; // JID correction
 begin
 	with tc do begin
-    JID := tc.JID;
-    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+    JIDFix := tc.JID;
+    if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
     
 		if td.IType = 6 then begin
 			Inc(ATTPOWER, td.ATK);
@@ -1812,7 +1812,7 @@ begin
 
 		for j :=1 to MAX_SKILL_NUMBER do begin // Add card skills
 			if td.AddSkill[j] <> 0 then begin
-				if (not Skill[j].Data.Job1[JID]) and (not Skill[j].Data.Job2[JID]) and (not DisableSkillLimit) then begin
+				if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
 					Skill[j].Lv := td.AddSkill[j];
 					Skill[j].Card := True;
 				end;
@@ -2119,12 +2119,13 @@ var
         tl        :TSkillDB;
         mi        :MapTbl;
         g         :double;
-  JID       :word; // Scope trickery.
+  JIDFix    :word; // JID correction for upper classes.
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
-    JID := tc.JID;
-    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+    JIDFix := tc.JID;
+    if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+    //DebugOut.Lines.Add(Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
                 {g := int (Tick / 3600000);
                  // Darkhelmet Auto Day/Night
                 if (Tick / 3600000) <= 110 then begin
@@ -2152,7 +2153,7 @@ begin
                 for i := 0 to 5 do begin //ボーナス値の初期化
                         Bonus[i] := 0;
                         for j := 1 to JobLV do begin
-                                if JobBonusTable[JID][j] = i + 1 then Inc(Bonus[i]);
+                                if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
 			end;
 		end;
 
@@ -2225,7 +2226,7 @@ begin
 
 		if not DisableSkillLimit then begin //スキルツリーの再構築
 			for i := 1 to MAX_SKILL_NUMBER do begin
-				if (not Skill[i].Data.Job1[JID]) and (not Skill[i].Data.Job2[JID]) then begin
+				if (not Skill[i].Data.Job1[JIDFix]) and (not Skill[i].Data.Job2[JIDFix]) then begin
 					if not Skill[i].Card then begin
 						//SkillPoint := SkillPoint + Skill[i].Lv;
 					end;
@@ -2249,13 +2250,13 @@ begin
 			Bonus[4] := Bonus[4] + Param[4] * (2 + Skill[45].EffectLV) div 100;
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
-    if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JID] div 100) * (100 + Param[2]) div 100) > 65535) then begin
+    if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
         MAXHP := 65535;
     //end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
       //  MAXHP := 65535;
     end else begin
 
-		tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JID] div 100) * (100 + tc.Param[2]) div 100;
+		tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
            //     if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
 
     end;
@@ -2268,7 +2269,7 @@ begin
     end;
     end;
 
-		MAXSP := MAXSP + BaseLV * SPTable[JID] * (100 + Param[3]) div 100;
+		MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
                // if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
 		MATK1 := Param[3] + (Param[3] div 7) * (Param[3] div 7);
 		MATK2 := Param[3] + (Param[3] div 5) * (Param[3] div 5);
@@ -2277,7 +2278,7 @@ begin
 		Lucky := Lucky + (Param[5] div 10);
 		Critical := Critical + 1 + (Param[5] div 3);
 
-		MaxWeight := MaxWeight + cardinal((Param[0]- Bonus[0]) * 300 + WeightTable[JID]);
+		MaxWeight := MaxWeight + cardinal((Param[0]- Bonus[0]) * 300 + WeightTable[JIDFix]);
 
 		MDEF2 := Param[3];
 		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
@@ -2337,13 +2338,13 @@ begin
 
 
 		if WeaponType[1] = 0 then begin
-			ADelay := 20*WeaponASPDTable[JID][Weapon];
+			ADelay := 20*WeaponASPDTable[JIDFix][Weapon];
                  //       if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else if WeaponType[0] = 0 then begin
-			ADelay := 20*WeaponASPDTable[JID][WeaponType[1]];
+			ADelay := 20*WeaponASPDTable[JIDFix][WeaponType[1]];
                    //     if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else begin //二刀流
-			ADelay := 14*(WeaponASPDTable[JID][WeaponType[0]] + WeaponASPDTable[JID][WeaponType[1]]);
+			ADelay := 14*(WeaponASPDTable[JIDFix][WeaponType[0]] + WeaponASPDTable[JIDFix][WeaponType[1]]);
                      //   if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
 		end;
 		i := ( ( ADelay * Param[1] div 500 ) * 2 + ADelay * Param[4] div 1000 );
@@ -2446,7 +2447,7 @@ begin
                 if FastWalk then i := i - 30;
 
     // Colus, 20040126: Added alchemist to pushcart calc, cleaned it up
-    if (((Option and $0788) <> 0) and ((JID = 10) or (JID = 5) or (JID = 19))) then begin // Pushcart
+    if (((Option and $0788) <> 0) and ((JIDFix = 10) or (JIDFix = 5) or (JIDFix = 19))) then begin // Pushcart
       if Skill[39].Lv = 0 then begin
         i := i + Skill[39].Data.Data1[1];
       end else begin
@@ -2556,8 +2557,8 @@ begin
 		end;
 
 		BaseNextEXP := ExpTable[0][BaseLV];
-		if      JID = 0 then i := 1
-		else if JID < 7 then i := 2
+		if      JIDFix = 0 then i := 1
+		else if JIDFix < 7 then i := 2
 		else                 i := 3;
 		JobNextEXP := ExpTable[i][JobLV];
 
@@ -2598,12 +2599,12 @@ var
         tl        :TSkillDB;
         //mi        :MapTbl;
         //g         :double;
-  JID     :word;
+  JIDFix     :word;   // JID correction.
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
-    JID := tc.JID;
-    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+    JIDFix := tc.JID;
+    if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
                 SPRedAmount := 0;
 
                 NoJamstone := false;
@@ -2622,14 +2623,14 @@ begin
                 for i := 0 to 5 do begin        {Bonus Calculation}
                         Bonus[i] := 0;
                         for j := 1 to JobLV do begin
-                                if JobBonusTable[JID][j] = i + 1 then Inc(Bonus[i]);
+                                if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
 			end;
 		end;
 
                 {Calculate Needed Skills}
                 DEF2 := Param[2];
 
-                MAXSP := MAXSP + BaseLV * SPTable[JID] * (100 + Param[3]) div 100;
+                MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
 
                 if ((MAXSP * MAXSPPer div 100) > 65535) then begin
                         MAXSP := 65535;
@@ -2637,10 +2638,10 @@ begin
 	        	MAXSP := MAXSP * MAXSPPer div 100;
                 end;
 
-                if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JID] div 100) * (100 + Param[2]) div 100) > 65535) then begin
+                if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
                         MAXHP := 65535;
                 end else begin
-		        tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JID] div 100) * (100 + tc.Param[2]) div 100;
+		        tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + tc.Param[2]) div 100;
                 end;
 
                 if (Skill[248].Lv <> 0) then begin
@@ -3721,17 +3722,17 @@ procedure SendCSkillList(tc:TChara);
 var
 	i, j, k :integer;
 	b       :byte;
-  JID     :word; // Scope trickery.
+  JIDFix     :word; // JID correction.
 begin
-  JID := tc.JID;
-  if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+  JIDFix := tc.JID;
+  if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
   //DebugOut.Lines.Add(Format('JID = %d',[JID]));
 	//スキル送信
 	WFIFOW( 0, $010f);
 	j := 0;
 	for i := 1 to MAX_SKILL_NUMBER do begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
-		if ((not (tc.Skill[i].Data.Job1[JID])) and (not (tc.Skill[i].Data.Job2[JID])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
+		if ((not (tc.Skill[i].Data.Job1[JIDFix])) and (not (tc.Skill[i].Data.Job2[JIDFix])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
     //if (tc.Skill[i].Data.Job1[JID]) then DebugOut.Lines.Add(Format('Skill %d is true for JID %d',[i, JID]));
 		WFIFOW( 0+37*j+4, i);
@@ -3755,14 +3756,14 @@ begin
 		end else if (tc.Skill[i].Data.MasterLV <> 0) then begin
 			b := 1;
 			for k := 0 to 4 do begin
-                if tc.Skill[i].Data.Job1[JID] and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
+                if tc.Skill[i].Data.Job1[JIDFix] and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
 					b := 0;
 					continue;
 				end;
 			end;
       if (b <> 0) then begin
         for k := 0 to 4 do begin
-                if tc.Skill[i].Data.Job2[JID] and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
+                if tc.Skill[i].Data.Job2[JIDFix] and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
 					b := 0;
 					continue;
 				end;
@@ -7240,7 +7241,7 @@ begin
 									exit;
 								end;
 								val(sl1.Strings[0], i, j);
-								if (j <> 0) or (i < 0) or (i > 44) then begin
+								if (j <> 0) or (i < 0) or (i > MAX_JOB_NUMBER) then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [jobchange] range error (1)', [ScriptPath, lines]));
 									exit;
 								end;
