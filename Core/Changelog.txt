@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-06-04: Replaced CharacterItem with tc. Let's try to follow existing standards. [AlexKreuz]
 - 10-06-04: REED: Restructured Characters (1/2) Saving procedures. [AlexKreuz]
 - 10-05-04: Undefined stringlists clearing on close caused crashes. [AlexKreuz]
 - 10-05-04: JCon: Cleaned my mess & Inventory work. [Tsusai]

@@ -441,14 +441,14 @@ uses
 	procedure JCon_Characters_Load();
     var
 		i : Integer;
-    	CharacterItem : TChara;
+    	tc : TChara;
 	begin
 
 		frmMain.ListBox2.Clear;
 
 		for i := 0 to (CharaName.Count - 1) do begin
-			CharacterItem := CharaName.Objects[i] as TChara;
-	        frmMain.listbox2.Items.AddObject(CharaName.Strings[i], CharacterItem);
+			tc := CharaName.Objects[i] as TChara;
+	        frmMain.listbox2.Items.AddObject(CharaName.Strings[i], tc);
     	    frmMain.listbox2.Sorted := True;
 	    end;
     end;
@@ -456,114 +456,114 @@ uses
 
     procedure JCon_Characters_Populate();
 	var
-    	CharacterItem : TChara;
+    	tc : TChara;
 
 	begin
     	if (frmMain.listbox2.ItemIndex = -1) then Exit;
 
-		CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
-	    frmMain.Edit7.Text := CharacterItem.Name;
-    	frmMain.Edit9.Text := IntToStr(CharacterItem.CID);
-        frmMain.Edit10.Text := IntToStr(CharacterItem.JID);
-        frmMain.Edit14.Text := IntToStr(CharacterItem.BaseLV);
-        frmMain.Edit12.Text := IntToStr(CharacterItem.JobLV);
-        frmMain.Edit15.Text := IntToStr(CharacterItem.BaseEXP);
-        frmMain.Edit13.Text := IntToStr(CharacterItem.JobEXP);
-        frmMain.Edit36.Text := IntToStr(CharacterItem.Zeny);
+		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+	    frmMain.Edit7.Text := tc.Name;
+    	frmMain.Edit9.Text := IntToStr(tc.CID);
+        frmMain.Edit10.Text := IntToStr(tc.JID);
+        frmMain.Edit14.Text := IntToStr(tc.BaseLV);
+        frmMain.Edit12.Text := IntToStr(tc.JobLV);
+        frmMain.Edit15.Text := IntToStr(tc.BaseEXP);
+        frmMain.Edit13.Text := IntToStr(tc.JobEXP);
+        frmMain.Edit36.Text := IntToStr(tc.Zeny);
 
-        frmMain.Edit41.Text := IntToStr(CharacterItem.Speed);
-        frmMain.Edit16.Text := IntToStr(CharacterItem.SkillPoint);
-        frmMain.Edit11.Text := IntToStr(CharacterItem.StatusPoint);
-        frmMain.Edit49.Text := CharacterItem.SaveMap;
-        frmMain.Edit50.Text := IntToStr(CharacterItem.SavePoint.X);
-        frmMain.Edit51.Text := IntToStr(CharacterItem.SavePoint.Y);
-        frmMain.Edit46.Text := IntToStr(CharacterItem.Hair);
-        frmMain.Edit47.Text := IntToStr(CharacterItem.HairColor);
-        frmMain.Edit48.Text := IntToStr(CharacterItem.ClothesColor);
-        frmMain.Edit52.Text := CharacterItem.Map;
-        frmMain.Edit57.Text := IntToStr(CharacterItem.Point.X);
-        frmMain.Edit59.Text := IntToStr(CharacterItem.Point.Y);
-        frmMain.Edit56.Text := IntToStr(CharacterItem.Stat1);
-        frmMain.Edit55.Text := IntToStr(CharacterItem.Stat2);
-        frmMain.Edit54.Text := IntToStr(CharacterItem.Option);
-        frmMain.Edit67.Text := IntToStr(CharacterItem.Parambase[0]);
-        frmMain.Edit66.Text := IntToStr(CharacterItem.Parambase[1]);
-        frmMain.Edit65.Text := IntToStr(CharacterItem.Parambase[2]);
-        frmMain.Edit63.Text := IntToStr(CharacterItem.Parambase[3]);
-        frmMain.Edit64.Text := IntToStr(CharacterItem.Parambase[4]);
-        frmMain.Edit61.Text := IntToStr(CharacterItem.Parambase[5]);
-        frmMain.Label98.Caption := IntToStr(CharacterItem.HP);
-        frmMain.Label99.Caption := IntToStr(CharacterItem.SP);
-        frmMain.Label102.Caption := CharacterItem.PData.Name;
-        frmMain.Edit68.Text := CharacterItem.MemoMap[0];
-        frmMain.Edit62.Text := IntToStr(CharacterItem.MemoPoint[0].X);
-        frmMain.Edit60.Text := IntToStr(CharacterItem.MemoPoint[0].Y);
-        frmMain.Edit69.Text := CharacterItem.MemoMap[1];
-        frmMain.Edit70.Text := IntToStr(CharacterItem.MemoPoint[1].X);
-        frmMain.Edit71.Text := IntToStr(CharacterItem.MemoPoint[1].Y);
-        frmMain.Edit74.Text := CharacterItem.MemoMap[2];
-        frmMain.Edit73.Text := IntToStr(CharacterItem.MemoPoint[2].X);
-        frmMain.Edit72.Text := IntToStr(CharacterItem.MemoPoint[2].Y);
-        if CharacterItem.GuildID <> 0 then frmMain.Label105.Caption := CharacterItem.GuildName;
-        if CharacterItem.PartyID <> 0 then frmMain.Label103.Caption := CharacterItem.PartyName;
+        frmMain.Edit41.Text := IntToStr(tc.Speed);
+        frmMain.Edit16.Text := IntToStr(tc.SkillPoint);
+        frmMain.Edit11.Text := IntToStr(tc.StatusPoint);
+        frmMain.Edit49.Text := tc.SaveMap;
+        frmMain.Edit50.Text := IntToStr(tc.SavePoint.X);
+        frmMain.Edit51.Text := IntToStr(tc.SavePoint.Y);
+        frmMain.Edit46.Text := IntToStr(tc.Hair);
+        frmMain.Edit47.Text := IntToStr(tc.HairColor);
+        frmMain.Edit48.Text := IntToStr(tc.ClothesColor);
+        frmMain.Edit52.Text := tc.Map;
+        frmMain.Edit57.Text := IntToStr(tc.Point.X);
+        frmMain.Edit59.Text := IntToStr(tc.Point.Y);
+        frmMain.Edit56.Text := IntToStr(tc.Stat1);
+        frmMain.Edit55.Text := IntToStr(tc.Stat2);
+        frmMain.Edit54.Text := IntToStr(tc.Option);
+        frmMain.Edit67.Text := IntToStr(tc.Parambase[0]);
+        frmMain.Edit66.Text := IntToStr(tc.Parambase[1]);
+        frmMain.Edit65.Text := IntToStr(tc.Parambase[2]);
+        frmMain.Edit63.Text := IntToStr(tc.Parambase[3]);
+        frmMain.Edit64.Text := IntToStr(tc.Parambase[4]);
+        frmMain.Edit61.Text := IntToStr(tc.Parambase[5]);
+        frmMain.Label98.Caption := IntToStr(tc.HP);
+        frmMain.Label99.Caption := IntToStr(tc.SP);
+        frmMain.Label102.Caption := tc.PData.Name;
+        frmMain.Edit68.Text := tc.MemoMap[0];
+        frmMain.Edit62.Text := IntToStr(tc.MemoPoint[0].X);
+        frmMain.Edit60.Text := IntToStr(tc.MemoPoint[0].Y);
+        frmMain.Edit69.Text := tc.MemoMap[1];
+        frmMain.Edit70.Text := IntToStr(tc.MemoPoint[1].X);
+        frmMain.Edit71.Text := IntToStr(tc.MemoPoint[1].Y);
+        frmMain.Edit74.Text := tc.MemoMap[2];
+        frmMain.Edit73.Text := IntToStr(tc.MemoPoint[2].X);
+        frmMain.Edit72.Text := IntToStr(tc.MemoPoint[2].Y);
+        if tc.GuildID <> 0 then frmMain.Label105.Caption := tc.GuildName;
+        if tc.PartyID <> 0 then frmMain.Label103.Caption := tc.PartyName;
 
     end;
 
     procedure JCon_Characters_Save();
     var
-        CharacterItem : TChara;
+        tc : TChara;
 	begin
     	if (frmMain.Edit7.Text = '') then begin
         	Exit;
         end else if CharaName.IndexOf(frmMain.Edit7.Text) <> -1 then begin
-			CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Edit7.Text)] as TChara;
+			tc := CharaName.Objects[CharaName.IndexOf(frmMain.Edit7.Text)] as TChara;
 
-        if assigned(CharacterItem) then begin
-            if assigned(CharacterItem.Socket) then begin
-                if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
-                    CharacterItem.Socket := nil;
+        if assigned(tc) then begin
+            if assigned(tc.Socket) then begin
+                if tc.Login <> 0 then tc.Socket.Close;
+                    tc.Socket := nil;
                 end;
             end;
         end;
 
-        CharacterItem.Name := frmMain.Edit7.Text;
-        CharacterItem.CID := StrToInt(frmMain.Edit9.Text);
-        CharacterItem.JID := StrToInt(frmMain.Edit10.Text);
-        CharacterItem.BaseLV := StrToInt(frmMain.Edit14.Text);
-        CharacterItem.BaseEXP := StrToInt(frmMain.Edit15.Text);
-        CharacterItem.StatusPoint := StrToInt(frmMain.Edit11.Text);
-        CharacterItem.JobLV := StrToInt(frmMain.Edit12.Text);
-        CharacterItem.JobEXP := StrToInt(frmMain.Edit13.Text);
-        CharacterItem.SkillPoint := StrToInt(frmMain.Edit16.Text);
-        CharacterItem.Zeny := StrToInt(frmMain.Edit36.Text);
-        CharacterItem.Stat1 := StrToInt(frmMain.Edit55.Text);
-        CharacterItem.Stat2 := StrToInt(frmMain.Edit56.Text);
-        CharacterItem.Option := StrToInt(frmMain.Edit54.Text);
-        CharacterItem.Speed := StrToInt(frmMain.Edit41.Text);
-        CharacterItem.Hair := StrToInt(frmMain.Edit46.Text);
-        CharacterItem.HairColor := StrToInt(frmMain.Edit47.Text);
-        CharacterItem.ClothesColor := StrToInt(frmMain.Edit48.Text);
-        CharacterItem.ParamBase[0] := StrToInt(frmMain.Edit67.Text);
-        CharacterItem.ParamBase[1] := StrToInt(frmMain.Edit66.Text);
-        CharacterItem.ParamBase[2] := StrToInt(frmMain.Edit65.Text);
-        CharacterItem.ParamBase[3] := StrToInt(frmMain.Edit63.Text);
-        CharacterItem.ParamBase[4] := StrToInt(frmMain.Edit63.Text);
-        CharacterItem.ParamBase[5] := StrToInt(frmMain.Edit61.Text);
-        CharacterItem.Map := frmMain.Edit52.Text;
-        CharacterItem.Point.X := StrToInt(frmMain.Edit57.Text);
-        CharacterItem.Point.Y := StrToInt(frmMain.Edit59.Text);
-        CharacterItem.SaveMap := frmMain.Edit49.Text;
-        CharacterItem.SavePoint.X := StrToInt(frmMain.Edit50.Text);
-        CharacterItem.SavePoint.X := StrToInt(frmMain.Edit51.Text);
-        CharacterItem.MemoMap[0] :=  frmMain.Edit68.Text;
-        CharacterItem.MemoPoint[0].X := StrToInt(frmMain.Edit62.Text);
-        CharacterItem.MemoPoint[0].Y := StrToInt(frmMain.Edit63.Text);
-        CharacterItem.MemoMap[1] := frmMain.Edit69.Text;
-        CharacterItem.MemoPoint[1].X := StrToInt(frmMain.Edit70.Text);
-        CharacterItem.MemoPoint[1].Y := StrToInt(frmMain.Edit71.Text);
-        CharacterItem.MemoMap[2] := frmMain.Edit74.Text;
-        CharacterItem.MemoPoint[2].X := StrToInt(frmMain.Edit73.Text);
-        CharacterItem.MemoPoint[2].Y := StrToInt(frmMain.Edit72.Text);
+        tc.Name := frmMain.Edit7.Text;
+        tc.CID := StrToInt(frmMain.Edit9.Text);
+        tc.JID := StrToInt(frmMain.Edit10.Text);
+        tc.BaseLV := StrToInt(frmMain.Edit14.Text);
+        tc.BaseEXP := StrToInt(frmMain.Edit15.Text);
+        tc.StatusPoint := StrToInt(frmMain.Edit11.Text);
+        tc.JobLV := StrToInt(frmMain.Edit12.Text);
+        tc.JobEXP := StrToInt(frmMain.Edit13.Text);
+        tc.SkillPoint := StrToInt(frmMain.Edit16.Text);
+        tc.Zeny := StrToInt(frmMain.Edit36.Text);
+        tc.Stat1 := StrToInt(frmMain.Edit55.Text);
+        tc.Stat2 := StrToInt(frmMain.Edit56.Text);
+        tc.Option := StrToInt(frmMain.Edit54.Text);
+        tc.Speed := StrToInt(frmMain.Edit41.Text);
+        tc.Hair := StrToInt(frmMain.Edit46.Text);
+        tc.HairColor := StrToInt(frmMain.Edit47.Text);
+        tc.ClothesColor := StrToInt(frmMain.Edit48.Text);
+        tc.ParamBase[0] := StrToInt(frmMain.Edit67.Text);
+        tc.ParamBase[1] := StrToInt(frmMain.Edit66.Text);
+        tc.ParamBase[2] := StrToInt(frmMain.Edit65.Text);
+        tc.ParamBase[3] := StrToInt(frmMain.Edit63.Text);
+        tc.ParamBase[4] := StrToInt(frmMain.Edit63.Text);
+        tc.ParamBase[5] := StrToInt(frmMain.Edit61.Text);
+        tc.Map := frmMain.Edit52.Text;
+        tc.Point.X := StrToInt(frmMain.Edit57.Text);
+        tc.Point.Y := StrToInt(frmMain.Edit59.Text);
+        tc.SaveMap := frmMain.Edit49.Text;
+        tc.SavePoint.X := StrToInt(frmMain.Edit50.Text);
+        tc.SavePoint.X := StrToInt(frmMain.Edit51.Text);
+        tc.MemoMap[0] :=  frmMain.Edit68.Text;
+        tc.MemoPoint[0].X := StrToInt(frmMain.Edit62.Text);
+        tc.MemoPoint[0].Y := StrToInt(frmMain.Edit63.Text);
+        tc.MemoMap[1] := frmMain.Edit69.Text;
+        tc.MemoPoint[1].X := StrToInt(frmMain.Edit70.Text);
+        tc.MemoPoint[1].Y := StrToInt(frmMain.Edit71.Text);
+        tc.MemoMap[2] := frmMain.Edit74.Text;
+        tc.MemoPoint[2].X := StrToInt(frmMain.Edit73.Text);
+        tc.MemoPoint[2].Y := StrToInt(frmMain.Edit72.Text);
 
         DataSave(true);
         JCon_Characters_Load();
@@ -572,16 +572,16 @@ uses
     procedure JCon_Characters_Online();
     var
 		i : Integer;
-    	CharacterItem : TChara;
+    	tc : TChara;
 	begin
 
 		frmMain.ListBox3.Clear;
 
 		for i := 0 to (CharaName.Count - 1) do begin
-			CharacterItem := CharaName.Objects[i] as TChara;
-            if (CharacterItem.Login = 2) then begin
+			tc := CharaName.Objects[i] as TChara;
+            if (tc.Login = 2) then begin
 
-    	        frmMain.listbox3.Items.AddObject(CharaName.Strings[i], CharacterItem);
+    	        frmMain.listbox3.Items.AddObject(CharaName.Strings[i], tc);
         	    frmMain.listbox3.Sorted := True;
             end;
 	    end;
@@ -589,32 +589,32 @@ uses
 
     procedure JCon_Chara_Online_Populate();
     var
-        CharacterItem : TChara;
+        tc : TChara;
     begin
         if (frmMain.listbox3.ItemIndex = -1) then Exit;
-        	CharacterItem := frmMain.listbox3.Items.Objects[frmMain.listbox3.ItemIndex] as TChara;
-    	    frmMain.Label95.Caption := CharacterItem.Name;
+        	tc := frmMain.listbox3.Items.Objects[frmMain.listbox3.ItemIndex] as TChara;
+    	    frmMain.Label95.Caption := tc.Name;
     end;
 
 
     procedure JCon_Chara_KickProcess(Banflag : Integer);
     var
-        CharacterItem : TChara;
+        tc : TChara;
     begin
         if (frmMain.Label95.Caption = '') then begin
         Exit;
         end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
-            CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+            tc := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
 
-        if assigned(CharacterItem) then begin
-            if assigned(CharacterItem.Socket) then begin
-                if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
-                    CharacterItem.Socket := nil;
+        if assigned(tc) then begin
+            if assigned(tc.Socket) then begin
+                if tc.Login <> 0 then tc.Socket.Close;
+                    tc.Socket := nil;
                 end;
             end;
         end;
         if Banflag = 1 then begin
-            CharacterItem.PData.Banned := True;
+            tc.PData.Banned := True;
             DataSave(true);
         end;
         JCon_Characters_Online();
@@ -622,18 +622,18 @@ uses
 
     procedure JCon_Chara_Online_Rescue();
     var
-        CharacterItem : TChara;
+        tc : TChara;
     begin
         if (frmMain.Label95.Caption = '') then begin
             Exit;
         end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
 
-            CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
-            CharacterItem.tmpMap := CharacterItem.SaveMap;
-            CharacterItem.Point := CharacterItem.SavePoint;
+            tc := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+            tc.tmpMap := tc.SaveMap;
+            tc.Point := tc.SavePoint;
 
-            SendCLeave(CharacterItem, 2);
-            MapMove(CharacterItem.Socket, CharacterItem.tmpMap, CharacterItem.Point);
+            SendCLeave(tc, 2);
+            MapMove(tc.Socket, tc.tmpMap, tc.Point);
 
             end;
     end;
@@ -665,7 +665,7 @@ uses
     procedure JCon_Chara_Inv_Load();
     var
 		j : Integer;
-    	CharacterItem : TChara;
+    	tc : TChara;
         itemlist : TStringList;
         ShowItem : string;
         Item : TItemDB;
@@ -674,17 +674,17 @@ uses
         frmMain.ListBox4.Clear;
 
         try
-            CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+            tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
         except
             on EStringListError do Exit;  //this error shows up when noone selects a person
         end;
 
         itemlist := tstringlist.Create;
         for j := 1 to 100 do begin
-            Item := CharacterItem.Item[j].Data;
-            if CharacterItem.Item[j].ID <> 0 then
-                //itemlist.Add(IntToStr(CharacterItem.Item[j].ID));
-                ShowItem := Item.Name + ' : ' + IntToStr(CharacterItem.Item[j].ID)
+            Item := tc.Item[j].Data;
+            if tc.Item[j].ID <> 0 then
+                //itemlist.Add(IntToStr(tc.Item[j].ID));
+                ShowItem := Item.Name + ' : ' + IntToStr(tc.Item[j].ID)
             else ShowItem := '[Empty]';
 
             itemlist.Add(ShowItem);
@@ -698,23 +698,23 @@ uses
     procedure JCon_Chara_Inv_Populate();
     var
         j : integer;
-        CharacterItem : TChara;
+        tc : TChara;
 
     begin
 
     if (frmMain.listbox2.ItemIndex = -1) then Exit;
-		CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
 
     if (frmMain.listbox4.ItemIndex = -1) then Exit;
 
     j := (frmMain.Listbox4.ItemIndex + 1);  //Integer(frmMain.ListBox4.Items.Objects[frmMain.ListBox4.ItemIndex]);
-    frmMain.Label97.Caption := IntToStr(CharacterItem.Item[j].ID);
-    frmMain.Label121.Caption := CharacterItem.Item[j].Data.Name;
-{    CharacterItem.Item[j]
-    CharacterItem.Item[j].Card[0]
-    CharacterItem.Item[j].Card[1]
-    CharacterItem.Item[j].Card[2]
-    CharacterItem.Item[j].Card[3]}
+    frmMain.Label97.Caption := IntToStr(tc.Item[j].ID);
+    frmMain.Label121.Caption := tc.Item[j].Data.Name;
+{    tc.Item[j]
+    tc.Item[j].Card[0]
+    tc.Item[j].Card[1]
+    tc.Item[j].Card[2]
+    tc.Item[j].Card[3]}
 
 
 
