@@ -10485,7 +10485,7 @@ begin
 						end;
                                                 tc.MTick := Tick + 1000;
 					end;
-				86: //ウォーターボール
+				86: {Water Ball PvP}
 					begin
                                                 k := tl.Data1[MUseLV];
                                                 for m := 0 to k - 1 do begin
@@ -10494,7 +10494,7 @@ begin
                                                         dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
                                                         dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
                                                         if dmg[0] < 1 then dmg[0] := 1;
-                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
+                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
                                                         if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
                                                         if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
