@@ -1920,7 +1920,11 @@ begin
 			if not mvpitem then begin
 				//MVPåoå±ílälìæï\é¶ é¿ç€ÇÃâ¡éZÇÕå„Ç≈Ç‹Ç∆ÇﬂÇƒ
 
-                bonus := (ts.Data.EXP * (ts.Data.MEXP + (3 * (n - 1))) * BaseExpMultiplier) div 100;
+                { Alex: we're temporarily hardcoding it because AppleGirl was being a baby about
+                how she already fixed it [not] so we don't want to give away the key that helped
+                us solve it. }
+                //bonus := (ts.Data.EXP * (ts.Data.MEXP + (3 * (n - 1))) * BaseExpMultiplier) div 100;
+                bonus := (ts.Data.EXP * (120 + (3 * (n - 1))) * BaseExpMultiplier) div 100;
 
 				WFIFOW( 0, $010b);
 				WFIFOL( 2, bonus);

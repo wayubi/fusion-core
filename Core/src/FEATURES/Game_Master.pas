@@ -645,13 +645,7 @@ Called when we're shutting down the server *only*
         Result := 'GM_DIE Activated';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        tc.Sit := 1;
-        tc.HP := 0;
-        SendCStat1(tc, 0, 5, tc.HP);
-        WFIFOW( 0, $0080);
-        WFIFOL( 2, tc.ID);
-        WFIFOB( 6, 1);
-        SendBCmd(tm, tc.Point, 7);
+        CharaDie(tm, tc, 1);
     end;
 
     function command_auto(tc : TChara; str : String) : String;
@@ -2305,13 +2299,7 @@ Called when we're shutting down the server *only*
 		Result := 'GM_ATHENA_DIE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        tc.Sit := 1;
-        tc.HP := 0;
-        SendCStat1(tc, 0, 5, tc.HP);
-        WFIFOW( 0, $0080);
-        WFIFOL( 2, tc.ID);
-        WFIFOB( 6, 1);
-        SendBCmd(tm, tc.Point, 7);
+        CharaDie(tm, tc, 1);
       end;
       
     function command_athena_help(tc : TChara) : String;

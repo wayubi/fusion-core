@@ -3271,7 +3271,16 @@ begin
   tc.pcnt := 0;
 
   if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
-  if (tc.Option and 2 <> 0) then begin
+
+  for i := 1 to MAX_SKILL_NUMBER do begin
+  	if tc.Skill[i].Tick >= Tick then begin
+    	tc.Skill[i].Tick := 0;
+        tc.SkillTick := 0;
+    end;
+  end;
+
+  { Alex: not needed since we're doing a full check for all buffs now. }
+  {if (tc.Option and 2 <> 0) then begin
     tc.SkillTick := Tick;
     tc.SkillTickID := 51;
     tc.Skill[tc.SkillTickID].Tick := Tick;
@@ -3281,7 +3290,8 @@ begin
     tc.SkillTick := Tick;
     tc.SkillTickID := 135;
     tc.Skill[tc.SkillTickID].Tick := Tick;
-  end;
+  end;}
+  
   // Krietor's idea for his server, can be commented out
   // Drop items - Only when killed by a player
   // I'll leave this commented out on the CVS
