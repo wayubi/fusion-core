@@ -5403,7 +5403,7 @@ end;
                                 tpe.Relation := 250;
                                 tpe.Fullness := 25;
                                 tpe.Accessory := 0;
-                                tpe.Index := w;
+                                //tpe.Index := w;
 
 
                                 PetList.AddObject( tpe.PetID, tpe );

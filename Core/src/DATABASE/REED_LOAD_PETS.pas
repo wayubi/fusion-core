@@ -70,18 +70,18 @@ implementation
             tpe.PlayerID := retrieve_data(0, path, 1);
             tpe.CharaID := retrieve_data(1, path, 1);
             tpe.Cart := retrieve_data(2, path, 1);
-            tpe.Index := retrieve_data(3, path, 1);
-            tpe.Incubated := retrieve_data(4, path, 1);
-            tpe.PetID := retrieve_data(5, path, 1);
-            tpe.JID := retrieve_data(6, path, 1);
-            tpe.Name := retrieve_data(7, path);
-            tpe.Renamed := retrieve_data(8, path, 1);
-            tpe.LV := retrieve_data(9, path, 1);
-            tpe.Relation := retrieve_data(10, path, 1);
-            tpe.Fullness := retrieve_data(11, path, 1);
-            tpe.Accessory := retrieve_data(12, path, 1);
+            //tpe.Index := get_pet_index(retrieve_data(3, path, 1), tpe.PetID);
+            tpe.Incubated := retrieve_data(3, path, 1);
+            tpe.PetID := retrieve_data(4, path, 1);
+            tpe.JID := retrieve_data(5, path, 1);
+            tpe.Name := retrieve_data(6, path);
+            tpe.Renamed := retrieve_data(7, path, 1);
+            tpe.LV := retrieve_data(8, path, 1);
+            tpe.Relation := retrieve_data(9, path, 1);
+            tpe.Fullness := retrieve_data(10, path, 1);
+            tpe.Accessory := retrieve_data(11, path, 1);
 
-            if (tpe.Index < 1) or (tpe.Index > 100) then Continue;
+            //if (tpe.Index < 1) or (tpe.Index > 100) then Continue;
             if (tpe.PlayerID = 0) then Continue;
 
             PD_Load_Pets_Finalize(tpe);
@@ -105,16 +105,16 @@ implementation
         tc : TChara;
     begin
 
-        if tpe.Incubated = 0 then begin
+        if (tpe.Incubated = 0) and (tpe.CharaID = 0) then begin
             tp := Player.IndexOfObject(tpe.PlayerID) as TPlayer;
-            PD_Load_Pets_Data(tpe, tp.Kafra.Item[tpe.Index]);
+            PD_Load_Pets_Data(tpe, tp.Kafra.Item[get_pet_index(tp.Kafra.Item, tpe.PetID)]);
         end
 
         else begin
             tc := Chara.IndexOfObject(tpe.CharaID) as TChara;
 
-            if (tpe.Cart = 0) then PD_Load_Pets_Data(tpe, tc.Item[tpe.Index])
-            else PD_Load_Pets_Data(tpe, tc.Cart.Item[tpe.Index])
+            if (tpe.Cart = 0) then PD_Load_Pets_Data(tpe, tc.Item[get_pet_index(tc.Item, tpe.PetID)])
+            else PD_Load_Pets_Data(tpe, tc.Cart.Item[get_pet_index(tc.Cart.Item, tpe.PetID)]);
         end;
         
     end;

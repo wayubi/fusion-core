@@ -22,6 +22,7 @@ uses
     function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
     function party_is_current(partyid : Integer) : Boolean;
     function guild_is_current(guildid : Integer) : Boolean;
+    function get_pet_index(inventory_item : array of TItem; pet_id : Integer) : Integer;
 
 implementation
 
@@ -581,6 +582,22 @@ uses
         end;
     end;
     { ------------------------------------------------------------------------------------- }
+
+
+    function get_pet_index(inventory_item : array of TItem; pet_id : Integer) : Integer;
+    var
+        i : Integer;
+        tpe : TPet;
+    begin
+        for i := 0 to 99 do begin
+            if (inventory_item[i].Card[0] = $FF00) then begin
+                if (inventory_item[i].Card[1] = pet_id) then begin
+                    Result := i + 1;
+                    Break;
+                end;
+            end;
+        end;
+    end;
 
 end.
 

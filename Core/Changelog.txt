@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-05-04: Fixed pet caused database error when not hatched but in inventory. [AlexKreuz]
+- 12-05-04: Fixed pet undefined errors. [AlexKreuz]
+- 12-05-04: Disabled mercenaries. No mercenary database provided in the CVS. [AlexKreuz]
 - 12-05-04: Fixed Fusion form yet again. Stop committing main.dfm and update the cvs first. [AlexKreuz]
 - 12-03-04: Revived my #call_mercenary beta/mercenary system.  (Still in Beta) [Darkhelmet]
 - 12-01-04: Removed redundant line in universal broadcast procedure. [Tsusai]

@@ -24,7 +24,7 @@ uses
     	ini : TIniFile;
     begin
         ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
-        ini.WriteString('Version', 'VER', RELEASE_VERSION);
+        ini.WriteString('Version', 'VER', '1.212 S - R.E.E.D Beta 4 Release');
         ini.WriteString('Server', 'WAN_IP', WAN_IP);
         ini.WriteString('Server', 'Name', ServerName);
         ini.WriteString('Server', 'NPCID', IntToStr(DefaultNPCID));

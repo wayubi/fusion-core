@@ -49,7 +49,7 @@ implementation
 
                         tpe.Incubated := 0;
                         tpe.CharaID := 0;
-                        tpe.Index := 0;
+                        //tpe.Index := 0;
 
                         datafile.Clear;
                         path := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets';
@@ -103,7 +103,7 @@ implementation
         datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
         datafile.Add('CID : ' + IntToStr(tpe.CharaID));
         datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-        datafile.Add('IDX : ' + IntToStr(tpe.Index));
+        //datafile.Add('IDX : ' + IntToStr(tpe.Index));
         datafile.Add('INC : ' + IntToStr(tpe.Incubated));
         datafile.Add('PID : ' + IntToStr(tpe.PetID));
         datafile.Add('JID : ' + IntToStr(tpe.JID));

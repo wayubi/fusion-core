@@ -1128,7 +1128,7 @@ begin
 	Application.ProcessMessages;
 
   {Mercenaries Load}
-  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mercenary database loading...');
+  {debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mercenary database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\mercenary.txt');
 	Reset(txt);
@@ -1152,7 +1152,7 @@ begin
 
 	CloseFile(txt);
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Mercenaries loaded.', [MercenariesList.Count]));
-	Application.ProcessMessages;
+	Application.ProcessMessages;}
 
   {Global Variables Load}
   if not FileExists(AppPath + 'Global_Vars.txt') then begin
