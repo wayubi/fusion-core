@@ -468,7 +468,7 @@ begin
 		  tc := CharaName.Objects[i] as TChara;
 			with tc do begin
 				sl.Add(IntToStr(CID));
-				sl.Add('"' + Name + '"');
+				sl.Add(''' + Name + ''');
 				sl.Add(IntToStr(JID));
 				sl.Add(IntToStr(BaseLV));
 				sl.Add(IntToStr(BaseEXP));
@@ -502,10 +502,10 @@ begin
 				for j := 0 to 5 do
 					sl.Add(IntToStr(ParamBase[j]));
 				sl.Add(IntToStr(CharaNumber));
-				sl.Add('"' + Map + '"');
+				sl.Add(''' + Map + ''');
 				sl.Add(IntToStr(Point.X));
 				sl.Add(IntToStr(Point.Y));
-				sl.Add('"' + SaveMap + '"');
+				sl.Add(''' + SaveMap + ''');
 				sl.Add(IntToStr(SavePoint.X));
 				sl.Add(IntToStr(SavePoint.Y));
         sl.Add(IntToStr(Plag));
@@ -612,10 +612,10 @@ begin
       tgc := CastleList.Objects[i] as TCastle;
       with tgc do
       begin
-			  sl.Add('"' + Name + '"');
+			  sl.Add(''' + Name + ''');
 			  sl.Add(IntToStr(GID));
-        sl.Add('"' + GName + '"');
-        sl.Add('"' + GMName + '"');
+        sl.Add(''' + GName + ''');
+        sl.Add(''' + GMName + ''');
         sl.Add(IntToStr(GKafra));
         sl.Add(IntToStr(EDegree));
         sl.Add(IntToStr(ETrigger));
@@ -644,7 +644,7 @@ begin
       with tpa do
       begin
 			  sl.Add(IntToStr(i + 1));
-        sl.Add('"' + Name + '"');
+        sl.Add(''' + Name + ''');
         sl.Add(IntToStr(EXPShare));
         sl.Add(IntToStr(ITEMShare));
 			  for j := 0 to 11 do begin
@@ -1127,6 +1127,7 @@ begin
 
   if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [userid])) then begin
     DebugOut.Lines.Add(format('Get character data from MySQL Error: %s', [userid]));
+		Result := True;
 		Exit;
 	end;
 	if SQLDataSet.FieldValues['count'] = 0 then
@@ -1479,7 +1480,7 @@ begin
   Result := False;
 
   tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
-	if ExecuteSqlCmd(Format('SELECT GID, Name, CharaNumber FROM characters WHERE AID=''%d'' LIMIT 9', [AID])) then
+	if ExecuteSqlCmd(Format('SELECT GID, Name, CharaNumber FROM Characters WHERE AID=''%d'' LIMIT 9', [AID])) then
 	begin
 	  while not SQLDataSet.Eof do
     begin

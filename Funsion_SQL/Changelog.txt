@@ -1,40 +1,21 @@
 --------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 30th, 2003
+Fusion_SQL 1.0.0.0 - 
 --------------------------------------------------------------------------------
-- Fixed reading guild member data error. [Michen]
-- Fixed Party member will auto delete after reboot. [Michen]
-- Modify get chara data by gid not aid. [Michen]
-
---------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 29th, 2003
---------------------------------------------------------------------------------
-- Fixed ExecuteSqlCmd function. [Michen]
-
---------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 28th, 2003
---------------------------------------------------------------------------------
-- Fixed: Relogin can't see party info. [Michen]
-- Fixed: Fix bug MySQL only save one character. [Michen]
-
---------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 27th, 2003
---------------------------------------------------------------------------------
-- Fixed: Guild member list doesn't show member without login. [Michen]
-
---------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 25th, 2003
---------------------------------------------------------------------------------
-- Fixed: Fix bug MySQL only save one character. [Michen]
-- Fixed: Guild member list doesn't show member without login. [Michen]
-- Modify: SavePet. [Michen]
-- Modify: Get NowLoginID,NowCharaID,NowPetID from DB. [Michen]
-- Fixed: Muti party save bug. [Michen]
-- Fixed: When user disconnect, can't login again. [Michen]
-- Fixed: Party Data read error. [Michen]
-
---------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 24th, 2003
---------------------------------------------------------------------------------
-- Added: MySQL SUPPORT, all MySQL Function in SQLData.pas, use UseSQL=1 to open
-         it. [Michen]
+- 01-01-04: Fixed Chara name has special char bug. [Michen]
+- 12-30-03: Fixed reading guild member data error. [Michen]
+- 12-30-03: Fixed Party member will auto delete after reboot. [Michen]
+- 12-30-03: Modify get chara data by gid not aid. [Michen]
+- 12-29-03: Fixed ExecuteSqlCmd function. [Michen]
+- 12-28-03: Fixed: Relogin can't see party info. [Michen]
+- 12-28-03: Fixed: Fix bug MySQL only save one character. [Michen]
+- 12-27-03: Fixed: Guild member list doesn't show member without login. [Michen]
+- 12-25-03: Fixed: Fix bug MySQL only save one character. [Michen]
+- 12-25-03: Fixed: Guild member list doesn't show member without login. [Michen]
+- 12-25-03: Modify: SavePet. [Michen]
+- 12-25-03: Modify: Get NowLoginID,NowCharaID,NowPetID from DB. [Michen]
+- 12-25-03: Fixed: Muti party save bug. [Michen]
+- 12-25-03: Fixed: When user disconnect, can't login again. [Michen]
+- 12-25-03: Fixed: Party Data read error. [Michen]
+- 12-24-03: Added: MySQL SUPPORT, all MySQL Function in SQLData.pas, use UseSQL=1
+                   to open it. [Michen]
 --------------------------------------------------------------------------------
