@@ -1647,6 +1647,8 @@ DbName            :String;
 // Fusion INI Declarations
 Option_PVP        :boolean;
 Option_PVP_Steal  :boolean;
+Option_PartyShare_Level :word;
+
 Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_AutoBackup   :word;
@@ -6105,7 +6107,7 @@ begin
 
 		//パーティー共有設定の送信(0101パケット)
 		//ここの公平可能レベルはiniから読みこみにするといいかも
-		if (tpa.MaxLV - tpa.MinLV > 10) and (tpa.EXPShare = 1) then begin
+		if (tpa.MaxLV - tpa.MinLV > Option_PartyShare_Level) and (tpa.EXPShare = 1) then begin
 			tpa.EXPShare := 0;//公平可能レベルを超えていたら無条件に個別取得にする
 		end;
 		WFIFOW(0, $0101);

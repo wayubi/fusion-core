@@ -625,6 +625,11 @@ begin
                 end else begin
                         Option_PVP_Steal := False;
                 end;
+    if sl.IndexOfName('Option_PartyShare_Level') > -1 then begin
+                        Option_PartyShare_Level := StrToInt(sl.Values['Option_PartyShare_Level']);
+                end else begin
+                        Option_PartyShare_Level := 10;
+                end;
 
                 sl.Clear;
                 sl1.Clear;
@@ -922,6 +927,7 @@ begin
 	// Fusion INI Lines
 	ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
     ini.WriteString('Fusion', 'Option_PVP_Steal', BoolToStr(Option_PVP_Steal));
+    ini.WriteString('Fusion', 'Option_PartyShare_Level', IntToStr(Option_PartyShare_Level));
 	ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
 	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
 	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));

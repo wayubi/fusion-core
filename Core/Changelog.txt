@@ -1,6 +1,6 @@
+- 05-28-04: Added Option_Party_Share_Level - INI option for custom party share levels. [AlexKreuz]
 - 05-28-04: Error checking for MOTD file added to prevent errors. [ChrstphrR]
 - 05-28-04: Added Option_MOTD_Athena for an Athena style MOTD message - 1 line only. [ChrstphrR]
-(F1211C beta build)
 - 05-27-04: Added #888 - Feature Request: Option_PVP_Steal - INI option to steal from players. [AlexKreuz]
 - 05-27-04: Added Option_MOTD (0/1) to enable on the fly messages. FeatureReq #445 [ChrstphrR]
 - 05-27-04: Added Option_MOTD_File (RelativePath, 4 lines, 195char per, max) [ChrstphrR]

@@ -4790,7 +4790,7 @@ end;
 					tpa := PartyNameList.Objects[PartyNameList.IndexOf(tc.PartyName)] as TParty;
 
 					//公平可能レベルの設定はここ。iniで設定できたほうが便利かな？
-					if (tpa.MaxLV - tpa.MinLV > 10) then begin
+					if (tpa.MaxLV - tpa.MinLV > Option_PartyShare_Level) then begin
 						w1 := 2;
 					end else begin
 						tpa.EXPShare := w1;
