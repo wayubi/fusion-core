@@ -25,6 +25,7 @@ uses
     procedure npc_timer(tm:TMap; tn:TNPC; OnOff : boolean);
     procedure npc_add_statskill(tc :TChara; stat,skill :integer);
     procedure npc_warp(tc :TChara; destination :string; x,y :integer);
+    procedure npc_set(tc :TChara; tm :TMap; left :string; mathop :byte; right :string; setlimit :integer);
     function var_substitute(tc: TChara; tn: TNPC; str: string):string;
 
 {==============================================================================}
@@ -52,8 +53,8 @@ var
     str,str1        :string;
     txt2            :TextFile;
     sl              :TStringList;
-    p               :pointer;
     len,Tick        :cardinal;
+    p               :pointer;
     flag            :boolean;
     tn,tn1          :TNPC;
     td              :TItemDB;
@@ -217,70 +218,7 @@ begin
             end;
         11: //set
             begin
-                str := tn.Script[tc.ScriptStep].Data1[0];
-                p := nil;
-                len := 0;
-                if str = 'zeny'             then begin p := @tc.Zeny;       len := 4; end
-                //Job is obsolete with jobchange and (base/job)level
-                //won't work without relogin
-                //else if str = 'job'         then begin p := @tc.JID;        len := 2; end
-                //else if str = 'baselevel'   then begin p := @tc.BaseLV;     len := 2; end
-                //else if str = 'joblevel'    then begin p := @tc.JobLV;      len := 2; end
-                else if str = 'statuspoint' then begin p := @tc.StatusPoint;len := 2; end
-                else if str = 'skillpoint'  then begin p := @tc.SkillPoint; len := 2; end
-                else if str = 'option'      then begin p := @tc.Option;     len := 4; end
-                else if str = 'speed'       then begin p := @tc.Speed;      len := 2; end
-                else if str = 'str'         then begin p := @tc.Parambase[0]; len := 2; end
-                else if str = 'agi'         then begin p := @tc.Parambase[1]; len := 2; end
-                else if str = 'dex'         then begin p := @tc.Parambase[2]; len := 2; end
-                else if str = 'vit'         then begin p := @tc.Parambase[3]; len := 2; end
-                else if str = 'int'         then begin p := @tc.Parambase[4]; len := 2; end
-                else if str = 'luk'         then begin p := @tc.Parambase[5]; len := 2; end;
-
-				if len <> 0 then begin
-                    j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
-                    i := 0;
-                    if tn.Script[tc.ScriptStep].Data3[0] <> 0 then CopyMemory(@i, p, len);
-                    case tn.Script[tc.ScriptStep].Data3[0] of
-                    0,1:	i := i + j;
-                    2:		i := i - j;
-                    3:		i := i * j;
-                    4:		i := i div j;
-                    end;
-                    if i < 0 then i := 0;
-                    if (tn.Script[tc.ScriptStep].Data3[1] <> 0) and
-                        (i > tn.Script[tc.ScriptStep].Data3[1]) then
-                            i := tn.Script[tc.ScriptStep].Data3[1];
-                    CopyMemory(p, @i, len);
-                    SendCStat(tc);
-                end else begin
-                    //convert variables
-                    j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
-                    if (tn.Script[tc.ScriptStep].Data3[0] = 0) then i := 0
-                    else i := ConvFlagValue(tc, str)
-                end;
-                //Math Operators
-                case tn.Script[tc.ScriptStep].Data3[0] of
-                0,1:  i := i + j;
-                2:    i := i - j;
-                3:    i := i * j;
-                4:    i := i div j;
-                end;
-                if i < 0 then i := 0;
-                if (tn.Script[tc.ScriptStep].Data3[1] <> 0) and
-                    (i > tn.Script[tc.ScriptStep].Data3[1]) then
-                        i := tn.Script[tc.ScriptStep].Data3[1];
-                //Variable check
-                if (Copy(str, 1, 1) <> '\') then tc.Flag.Values[str] := IntToStr(i)
-                else ServerFlag.Values[str] := IntToStr(i);
-
-                if (str = 'str') or (str = 'agi') or (str = 'dex') or (str = 'vit') or
-                (str = 'int') or (str = 'luk') then begin
-                    CalcStat(tc);
-                    SendCStat(tc);
-                end else if (str = 'option') then UpdateOption(tm, tc);
-
-
+                npc_set(tc,tm,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data1[1],tn.Script[tc.ScriptStep].Data3[1]);
                 Inc(tc.ScriptStep);
             end;
         12: //additem
@@ -1762,6 +1700,25 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
+        85: //areaset
+            begin
+                i := tn.Script[tc.ScriptStep].Data3[1]; //x1
+                j := tn.Script[tc.ScriptStep].Data3[2]; //y1
+                k := tn.Script[tc.ScriptStep].Data3[3]; //x2
+                l := tn.Script[tc.ScriptStep].Data3[4]; //y2
+                tm := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[2])] as TMap;
+                for cnt := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[cnt] as TChara;
+                    if tc1.Login = 2 then begin
+                        if (tc1.Point.X >= i) and
+                        (tc1.Point.X <= k) and
+                        (tc1.Point.Y >= j) and
+                        (tc1.Point.Y <= l) then
+                            npc_set(tc1,tm,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data1[1],tn.Script[tc.ScriptStep].Data3[5]);
+                    end;
+                end;
+                Inc(tc.ScriptStep);
+            end;
 
 
 
@@ -1956,6 +1913,71 @@ begin
     str := StringReplace(str, '$joblevel', IntToStr(tc.JobLV), [rfReplaceAll]);
     str := StringReplace(str, '$$', '$', [rfReplaceAll]);
     Result := str;
+end;
+
+procedure npc_set(tc :TChara; tm :TMap; left :string; mathop :byte; right :string; setlimit :integer);
+var
+    p : pointer;
+    len : byte;
+    i,j : integer;
+begin
+    //left := tn.Script[tc.ScriptStep].Data1[0];
+    p := nil;
+    len := 0;
+    if left = 'zeny'             then begin p := @tc.Zeny;       len := 4; end
+    else if left = 'statuspoint' then begin p := @tc.StatusPoint;len := 2; end
+    else if left = 'skillpoint'  then begin p := @tc.SkillPoint; len := 2; end
+    else if left = 'option'      then begin p := @tc.Option;     len := 4; end
+    else if left = 'speed'       then begin p := @tc.Speed;      len := 2; end
+    else if left = 'str'         then begin p := @tc.Parambase[0]; len := 2; end
+    else if left = 'agi'         then begin p := @tc.Parambase[1]; len := 2; end
+    else if left = 'dex'         then begin p := @tc.Parambase[2]; len := 2; end
+    else if left = 'vit'         then begin p := @tc.Parambase[3]; len := 2; end
+    else if left = 'int'         then begin p := @tc.Parambase[4]; len := 2; end
+    else if left = 'luk'         then begin p := @tc.Parambase[5]; len := 2; end;
+
+    if len <> 0 then begin
+        j := ConvFlagValue(tc, right);
+        i := 0;
+        if mathop <> 0 then CopyMemory(@i, p, len);
+        case mathop of
+            0,1:	i := i + j;
+            2:		i := i - j;
+            3:		i := i * j;
+            4:		i := i div j;
+        end;
+        if i < 0 then i := 0;
+        if (setlimit <> 0) and
+        (i > setlimit) then
+            i := setlimit;
+        CopyMemory(p, @i, len);
+        SendCStat(tc);
+    end else begin
+        //convert variables
+        j := ConvFlagValue(tc, right);
+        if (mathop = 0) then i := 0
+        else i := ConvFlagValue(tc, left)
+    end;
+    //Math Operators
+    case mathop of
+        0,1:  i := i + j;
+        2:    i := i - j;
+        3:    i := i * j;
+        4:    i := i div j;
+    end;
+    if i < 0 then i := 0;
+    if (setlimit <> 0) and
+    (i > setlimit) then
+        i := setlimit;
+    //Variable check
+    if (Copy(left, 1, 1) <> '\') then tc.Flag.Values[left] := IntToStr(i)
+    else ServerFlag.Values[left] := IntToStr(i);
+
+    if (left = 'str') or (left = 'agi') or (left = 'dex') or (left = 'vit') or
+        (left = 'int') or (left = 'luk') then begin
+        CalcStat(tc);
+        SendCStat(tc);
+    end else if (left = 'option') then UpdateOption(tm, tc);
 end;
 
 end.

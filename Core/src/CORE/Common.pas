@@ -9946,6 +9946,58 @@ Begin
 							tn.Script[k].Data1[0] := SL1[0];
                             tn.Script[k].Data2[0] := SL1[1];
 							Inc(k);
+                        end else if str = 'areaset' then begin //------- 11 set
+							SL[0] := StringReplace(SL[0], '+=', '+', []);
+							SL[0] := StringReplace(SL[0], '-=', '-', []);
+							SL[0] := StringReplace(SL[0], '*=', '*', []);
+							SL[0] := StringReplace(SL[0], '/=', '/', []);
+							SL[0] := StringReplace(SL[0], '+', ',1,', []);
+							SL[0] := StringReplace(SL[0], '-', ',2,',	[]);
+							SL[0] := StringReplace(SL[0], '=', ',0,', []);
+							SL[0] := StringReplace(SL[0], '*', ',3,', []);
+							SL[0] := StringReplace(SL[0], '/', ',4,', []);
+							while Pos('- ', SL[0]) <> 0 do
+								SL[0] := StringReplace(SL[0], '- ', '-',	[]);
+							sl1.DelimitedText := SL[0];
+							if sl1.Count = 8 then sl1.Add('0');
+							if sl1.Count <> 9 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[1], i, j);
+							if (j <> 0) or (i < 0) or (i > 4) then begin
+								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[2], i, j);
+							if j = 0 then begin
+								if (i < -999999999) or (i > 999999999) then begin
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
+								end else if (StrToInt(SL1[1]) = 3) and (i = 0) then begin
+									ScriptErr(SCRIPT_DIV_Z3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
+								end;
+							end;
+							val(SL1[3], i, j);
+							if (j <> 0) or (i < -999999999) or (i > 999999999) then begin
+								ScriptErr(SCRIPT_RANGE4_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 11;
+							SetLength(tn.Script[k].Data1, 3);
+							SetLength(tn.Script[k].Data3, 6);
+							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+                            tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+							tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+                            tn.Script[k].Data1[2] := LowerCase(SL1[3]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[4]);
+                            tn.Script[k].Data3[2] := StrToInt(SL1[5]);
+                            tn.Script[k].Data3[3] := StrToInt(SL1[6]);
+                            tn.Script[k].Data3[4] := StrToInt(SL1[7]);
+                            tn.Script[k].Data3[5] := StrToInt(SL1[8]);
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
