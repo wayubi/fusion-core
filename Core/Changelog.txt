@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-28-04: Prevented problem with sending a server->chara pm when none selected. [Tsusai]
 - 09-28-04: Bugs in account creation algorithm. Updated all account creation methods. [AlexKreuz]
 - 09-27-04: Can now kickban an online user from the server. [Tsusai].
 - 09-27-04: REED: Abnormally missing database files crashed server. [AlexKreuz]

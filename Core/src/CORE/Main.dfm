@@ -1288,7 +1288,7 @@ object frmMain: TfrmMain
         Top = 0
         Width = 393
         Height = 433
-        ActivePage = TabSheet9
+        ActivePage = TabSheet6
         TabOrder = 0
         OnChange = PageControl3Change
         object TabSheet6: TTabSheet
@@ -1297,9 +1297,8 @@ object frmMain: TfrmMain
           object Label95: TLabel
             Left = 8
             Top = 368
-            Width = 100
+            Width = 4
             Height = 18
-            Caption = 'Name Placeholder'
             Visible = False
           end
           object Label96: TLabel
@@ -1349,7 +1348,7 @@ object frmMain: TfrmMain
             Top = 352
             Width = 105
             Height = 17
-            Caption = 'Send Placeholder'
+            Caption = 'Send'
             TabOrder = 4
             Visible = False
             OnClick = Button19Click

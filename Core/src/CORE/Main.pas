@@ -11409,7 +11409,7 @@ begin
     JCon_Characters_Save();
 end;
 
-
+//character tabs
 procedure TfrmMain.PageControl3Change(Sender: TObject);
 begin
 	if (TabSheet6.Showing) then begin
@@ -11429,11 +11429,13 @@ begin
     end;
 end;
 
+//online refresh
 procedure TfrmMain.Button17Click(Sender: TObject);
 begin
     JCon_Characters_Online();
 end;
 
+//online list kick
 procedure TfrmMain.Button18Click(Sender: TObject);
 var
     CharacterItem : TChara;
@@ -11453,6 +11455,7 @@ begin
     JCon_Characters_Online();
 end;
 
+//setting a temp name for the online list
 procedure TfrmMain.ListBox3Click(Sender: TObject);
 var
     CharacterItem : TChara;
@@ -11462,6 +11465,7 @@ begin
 	    frmMain.Label95.Caption := CharacterItem.Name;
 end;
 
+//Hitting enter for CharaPM
 procedure TfrmMain.Edit8KeyPress(Sender: TObject; var Key: Char);
 
 begin
@@ -11470,6 +11474,7 @@ begin
     end;
 end;
 
+//charaPM
 procedure TfrmMain.Button19Click(Sender: TObject);
 var
     str : string;
@@ -11483,6 +11488,8 @@ begin
         WFIFOW(2, w);
         WFIFOS(4, str, w);
 
+        if (frmMain.Edit7.Text = '') then begin
+        	Exit;
         for k := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[k] as TChara;
             if (tc1.Login = 2) and (tc1.Name = frmMain.Label95.Caption) then tc1.Socket.SendBuf(buf, w);
@@ -11492,6 +11499,7 @@ begin
     edit8.Clear;
 end;
 
+//Kick Ban
 procedure TfrmMain.Button20Click(Sender: TObject);
 var
     CharacterItem : TChara;
