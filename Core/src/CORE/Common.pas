@@ -3234,6 +3234,10 @@ var
 	i, j, k :integer;
 	tc1     :TChara;
 begin
+
+  if (Point.X >= 0) and (Point.X <= 511) and
+     (Point.X >= 0) and (Point.X <= 511) then begin
+
 	for j := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
 		for i := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 			//üˆÍ‚Ìl‚É’Ê’m(tc <> nil‚Ìê‡‚Í©•ª‚ğœ‚­)
@@ -3258,6 +3262,11 @@ begin
                         end;
 	        end;
         end;
+  end
+
+  else begin
+     debugout.lines.add('Attempted Battle Command Crash. Temporary Bypass. -AlexKreuz');
+  end;
 end;
 
 //------------------------------------------------------------------------------

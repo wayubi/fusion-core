@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-16-04: Fixed major crash bug in Battle Command procedure. [AlexKreuz]
 - 01-15-04: Updated SendCMove, aura display [Colus]
 - 01-15-04: Updated Snatcher and Steal again [Colus]
 - 01-14-04: Fixed inability to forge metals (bug #275) [Colus]
