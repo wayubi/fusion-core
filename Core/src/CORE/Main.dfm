@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 248
-  Top = 358
+  Left = 105
+  Top = 363
   Width = 765
   Height = 435
   Caption = '#33'
@@ -44,20 +44,36 @@ object frmMain: TfrmMain
     TabOrder = 0
     OnClick = cmdStartClick
   end
-  object Edit1: TEdit
-    Left = 80
+  object cmdStop: TButton
+    Left = 77
     Top = 5
-    Width = 529
+    Width = 68
+    Height = 24
+    Caption = 'Stop'
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Trebuchet MS'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    OnClick = cmdStopClick
+  end
+  object Edit1: TEdit
+    Left = 154
+    Top = 5
+    Width = 455
     Height = 24
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -12
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     MaxLength = 83
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 3
     OnKeyPress = Edit1KeyPress
   end
   object Button1: TButton
@@ -105,13 +121,13 @@ object frmMain: TfrmMain
     Color = 14071432
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssVertical
-    TabOrder = 1
+    TabOrder = 2
   end
   object Button2: TButton
     Left = 729
@@ -126,7 +142,7 @@ object frmMain: TfrmMain
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 6
     OnClick = cmdMinTray
   end
   object sv1: TServerSocket

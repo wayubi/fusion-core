@@ -24,6 +24,7 @@ type
 		sv2          :TServerSocket;
 		sv3          :TServerSocket;
 		cmdStart     :TButton;
+		cmdStop      :TButton;
                 lbl00        :TLabel;
 		txtDebug     :TMemo;
 		DBsaveTimer  :TTimer;
@@ -91,6 +92,7 @@ type
 		procedure sv3ClientRead(Sender: TObject; Socket: TCustomWinSocket);
 		procedure sv3ClientError(Sender: TObject; Socket: TCustomWinSocket; ErrorEvent: TErrorEvent; var ErrorCode: Integer);
 		procedure cmdStartClick(Sender: TObject);
+		procedure cmdStopClick(Sender: TObject);
                 procedure Button1Click(Sender: TObject);
                 procedure Edit1KeyPress(Sender: TObject; var Key: Char);
 
@@ -694,7 +696,7 @@ begin
     end;
 
 	if ServerRunning then begin
-		//cmdStop.Enabled := false;
+		cmdStop.Enabled := false;
 		CancelFlag := true;
 		repeat
 			Application.ProcessMessages;
@@ -11170,14 +11172,14 @@ var
   sl:TStringList;
   tl:TSkillDB;
   i1,j1,k1:integer;
-  bonusregen:Integer;
+  // BADREGEN bonusregen:Integer;
   tm:TMap;
 begin
 	with tc do begin
 		//HPSPâÒïúèàóù
 		if Weight * 2 < MaxWeight then begin
-
-
+{
+// BADREGEN
 if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) and  (tc.Option and 6 = 0) then begin
 if HP <> MAXHP then begin
 bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
@@ -11220,13 +11222,15 @@ end else begin
 SPTick := Tick;
 end;
 end;
+}
       if Weight * 2 <> MaxWeight then begin
 
-
+{
+// BADREGEN
 if Weight * 2 < MaxWeight then begin
 
 
-
+}
 			//HPé©ìÆâÒïú
 
                         {SP Usage For Songs}
@@ -11311,7 +11315,7 @@ if Weight * 2 < MaxWeight then begin
     end;
   end;
 end;
-end;
+// BADREGEN end;
 //------------------------------------------------------------------------------
    procedure TfrmMain.SkillPassive(tc:TChara;Tick:cardinal);
 var
@@ -14460,23 +14464,18 @@ var
 label ExitWarpSearch;
 begin
 
-if (cmdStart.Caption = 'Start') then begin
-
         edit1.SetFocus;
-
-        cmdStart.Caption := 'Stop';
-        debugout.Lines.add('Server has been started.');
 
 	sl := TStringList.Create;
 	try
-	//cmdStart.Enabled := false;
+	cmdStart.Enabled := false;
   
 	sv1.Active := true;
 	sv2.Active := true;
 	sv3.Active := true;
 
 	ServerRunning := true;
-	//cmdStop.Enabled := true;
+	cmdStop.Enabled := true;
 	TickCheckCnt := 0;
 
         OnlineTime := timeGetTime(); // AlexKreuz
@@ -15210,24 +15209,19 @@ if (cmdStart.Caption = 'Start') then begin
 	for i := 0 to sv3.Socket.ActiveConnections - 1 do
 		sv3.Socket.Disconnect(i);
 	sv3.Active := false;
-	//cmdStop.Enabled := false;
+	cmdStop.Enabled := false;
 	ServerRunning := false;
 	CancelFlag := false;
-	//cmdStart.Enabled := true;
+	cmdStart.Enabled := true;
 	//lbl00.Caption := '(ÅL-ÅM)';
 	end;
+end;
 
-end
-
-else if (cmdStart.Caption = 'Stop') then begin
-        cmdStart.Caption := 'Start';
-        debugout.Lines.add('Server has been stopped.');
+procedure TfrmMain.cmdStopClick(Sender: TObject);
+begin
 	CancelFlag := true;
-	//cmdStop.Enabled := false;
+	cmdStop.Enabled := false;
 end;
-
-end;
-
 //------------------------------------------------------------------------------
 {U0x003b}
 procedure TfrmMain.DBsaveTimerTimer(Sender: TObject);

@@ -1,7 +1,10 @@
+
+
 --------------------------------------------------------------------------------
 Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
-
+- 03-15-04: Fixed Abnormal HP & SP Natural Recovery Rate. [AlexKreuz]
+- 03-15-04: Fixed incompatibility with FusionManager and Auto-Restart. [AlexKreuz]
 - 03-14-04: Commented out debugout of Steal, too much server window flooding [Eliot]
 - 03-13-04: Fixed bug regarding pets changing to other pets. [Colus]
 - 03-13-04: Added EnablePetSkills option to attack skills. [Colus]
