@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-05-04: Added Graphic support for LK_Fury, LK_Berserk, LK_Aurablad -[Oatmeal]
 - 03-05-04: Updated equipment handling for upper jobs. [Colus]
 - 03-05-04: More upper class support (job numbers, charaselect, data save) [Colus]
 - 03-05-04: Added upper job support (experimental) [Colus]
