@@ -9708,6 +9708,30 @@ Begin
 							tn.Script[k].Data1[1] := lowercase(SL1[1]);
 							//tn.Script[k].Data3[0] := StrToInt(SL1[2]);
 							Inc(k);
+//percentheal needs to go here
+						end else if str = 'checkpoint' then begin //------- 74 checkpoint
+							if sl1.Count <> 3 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[1], i, j);
+							if (j <> 0) or (i < 0) or (i > 511) then begin
+								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[2], i, j);
+							if (j <> 0) or (i < 0) or (i > 511) then begin
+								ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 74;
+							SetLength(tn.Script[k].Data1, 1);
+							SetLength(tn.Script[k].Data3, 2);
+							tn.Script[k].Data1[0] := SL1[0];
+							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
