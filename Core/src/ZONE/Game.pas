@@ -941,6 +941,28 @@ Begin(* Proc sv3PacketProcess() *)
                                                 end;
                                         end
 
+                                        else if (copy(str, 1, 5) = 'speed') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if (strtoint(sl.Strings[1]) >= 25) and (strtoint(sl.Strings[1]) <= 1000) then begin
+                                                        str := 'Walking speed is now ' + sl.Strings[1];
+                                                        tc.DefaultSpeed := strtoint(sl.strings[1]);
+                                                        CalcStat(tc);
+                                                        SendCStat1(tc, 0, 0, tc.Speed);
+                                                end else begin
+                                                        str := 'Requested speed out of range. Must be 25-1000';
+                                                end;
+
+                                                w := Length(str) + 4;
+                                                WFIFOW (0, $009a);
+                                                WFIFOW (2, w);
+                                                WFIFOS (4, str, w - 4);
+                                                tc.socket.sendbuf(buf, w);
+
+                                                sl.Free;
+                                        end
+
                                         else begin
                                         end;
                                                                                 
