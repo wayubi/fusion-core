@@ -1,3 +1,5 @@
+- 05-28-04: Switched GM Command, #alive to ALBGM system. [AlexKreuz]
+- 05-28-04: Created access level based GM system (ALBGM) structure. [AlexKreuz]
 - 05-28-04: Fixed Assassin can not equip two daggers. [AlexKreuz]
 - 05-28-04: Added Option_Party_Share_Level - INI option for custom party share levels. [AlexKreuz]
 - 05-28-04: Error checking for MOTD file added to prevent errors. [ChrstphrR]

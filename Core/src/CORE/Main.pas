@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL, Math;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL, Math, Game_Master;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;                      
@@ -162,6 +162,11 @@ var
   
 begin
 
+    AppPath := ExtractFilePath(ParamStr(0));
+
+    load_commands();
+    GM_Access_DB := TIntList32.Create;
+
 	Randomize;
 	timeBeginPeriod(1);
 	timeEndPeriod(1);
@@ -184,8 +189,6 @@ begin
 	//NowNPCID := 50000;
 
         NowPetID := 0;
-
-	AppPath := ExtractFilePath(ParamStr(0));
 
 	DebugOut := txtDebug;
 
@@ -852,6 +855,8 @@ var
 	sr  : TSearchRec;
 	Idx : Integer; // Loop Iterator for freeing our global lists.
 begin
+
+    save_commands();
 
 	if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
 		repeat

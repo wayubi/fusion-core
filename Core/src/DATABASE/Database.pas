@@ -24,7 +24,7 @@ uses
 implementation
 
 uses
-	Common, GlobalLists, Zip;
+	Common, Game_Master, GlobalLists, Zip;
 
 
 (*-----------------------------------------------------------------------------*
@@ -77,6 +77,8 @@ Begin
 		FileExists(AppPath + 'database\make_arrow.txt') AND
 
 		FileExists(AppPath + 'database\id_table.txt') AND
+        FileExists(AppPath + 'database\gm_access.txt') AND
+
 		FileExists(AppPath + 'database\job_db1.txt') AND
 		FileExists(AppPath + 'database\job_db2.txt') AND
 		FileExists(AppPath + 'database\wp_db.txt') AND
@@ -403,6 +405,8 @@ var
 {氏{箱追加}
 	tss : TSlaveDB;
 	tid : TIDTbl;
+    tGM : TGM_Table;
+
 	ma  : TMArrowDB;
 {氏{箱追加ココまで}
 {キューペット}
@@ -1461,6 +1465,27 @@ begin
 	DebugOut.Lines.Add(Format('-> Total %d ID Table List loaded.', [j]));
 	Application.ProcessMessages;
 
+
+	DebugOut.Lines.Add('GM Access List loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\gm_access.txt');
+	Reset(txt);
+	Readln(txt, str);
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+		sl.DelimitedText := str;
+
+		tGM := TGM_Table.Create;
+		with tGM do begin
+			ID := StrToInt(sl.Strings[0]);
+            Level := StrToInt(sl.Strings[1]);
+		end;
+        GM_Access_DB.AddObject(tGM.ID, tGM);
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d GM Access List loaded.', [j]));
+	Application.ProcessMessages;
 
 
 	//ギルド経験値テーブル読み込み

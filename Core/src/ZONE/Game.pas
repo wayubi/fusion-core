@@ -6,7 +6,7 @@ interface
 
 uses
 	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common, Zip, SQLData, FusionSQL;
+	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -733,6 +733,13 @@ Begin(* Proc sv3PacketProcess() *)
 				RFIFOW(2, w);
 				str := RFIFOS(4, w - 4);
 
+                // Temporary Code to implement new GM System
+                if (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
+                    parse_commands (tc, str);
+                    str := ''; { Temporarily included to cancel out text message }
+                end;
+                // Temporary Code to implement new GM System
+
                                 // Athena GM Commands Port - To Shut Them Up. Courtesy of AlexKreuz.
                                 if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '@') then begin
                                         str := Copy(str, Pos(' : ', str) + 4, 256);
@@ -1145,18 +1152,6 @@ Begin(* Proc sv3PacketProcess() *)
                                                 tc.socket.sendbuf(buf, w);
 
                                                 sl.Free;
-                                        end
-
-                                        else if (copy(str, 1, 5) = 'alive') then begin
-                                                tc.HP := tc.MAXHP;
-                                                tc.SP := tc.MAXSP;
-                                                tc.Sit := 3;
-                                                SendCStat1(tc, 0, 5, tc.HP);
-                                                SendCStat1(tc, 0, 7, tc.SP);
-                                                WFIFOW( 0, $0148);
-                                                WFIFOL( 2, tc.ID);
-                                                WFIFOW( 6, 100);
-                                                SendBCmd(tm, tc.Point, 8);
                                         end
 
                                         else if (copy(str, 1, 4) = 'kami') or (copy(str, 1, 5) = 'kamib') then begin
@@ -2580,6 +2575,8 @@ Begin(* Proc sv3PacketProcess() *)
 				else begin
 					tm := tc.MData;
 
+                    if (length(str) > 0) then begin
+
 					WFIFOW(0, $008e);
 					WFIFOW(2, w);
 					WFIFOS(4, str, w - 4);
@@ -2596,6 +2593,7 @@ Begin(* Proc sv3PacketProcess() *)
 					end else begin
 						SendNCrCmd(tm, tc.Point, w + 4, tc, true, true);
 					end;
+                    end;
 
           
 
