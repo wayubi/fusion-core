@@ -1624,7 +1624,8 @@ begin
 	if ts.Data.isDontMove then
 		ts.MoveWait := $FFFFFFFF
 	else
-		ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
+
+    ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
 	ts.Speed := ts.Data.Speed;
 	ts.ATarget := 0;
 	ts.ARangeFlag := false;
@@ -1632,6 +1633,7 @@ begin
 	ts.DEFPer := 100;
 	ts.DmgTick := 0;
 	ts.Status := 'IDLE_ST';
+    ts.pcnt := 0;
 	if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
 	for j := 0 to 31 do begin
 		ts.EXPDist[j].CData := nil;
