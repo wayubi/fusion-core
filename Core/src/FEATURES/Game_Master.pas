@@ -2548,8 +2548,8 @@ Called when we're shutting down the server *only*
     	    end;
 
 	        if changefile.Count > 150 then length := 150 else length := changefile.Count;
-    	    for i := 0 to length do begin
-        		message_green(tc, changefile[150-i]);
+    	    for i := 1 to length do begin
+        		message_green(tc, changefile[length-i]);
 	        end;
         end else begin
         	message_green(tc, 'Command Syntax:');
