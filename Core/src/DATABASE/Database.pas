@@ -1392,9 +1392,14 @@ begin
 			//if (i <> 0) and (sl.Strings[i] = '') then sl.Strings[i] := '0';
 		if (sl.Count = 7) then begin
 		tss := TSlaveDB.Create;
+
 		with tss do begin
             Name := sl.Strings[0];
             TotalSlaves := StrToInt(sl.Strings[6]);
+
+            for i := 0 to 4 do begin
+                Slaves[i] := -1;
+            end;
 
             for i := 1 to 5 do begin
                 if MobDBName.IndexOf(sl.Strings[i]) = -1 then
@@ -1402,7 +1407,9 @@ begin
                 else
                     Slaves[i-1] := MobDBName.IndexOf(sl.Strings[i]);
             end;
+
         end;
+
 		SlaveDBName.AddObject(tss.Name,tss);
 		end;
 	end;
