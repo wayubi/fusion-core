@@ -1,5 +1,41 @@
 12-23-03: Just a thought [Darkhelmet]
 
+
+All Right Guys. I don't know why we are discussing this here.
+There is a bugtracker at http://bugtracker.izlude.net for discussing bugs, assigning priority, etc.
+
+Let's move over there.
+
+This is only a To Do List of Ideas. General concepts, not fine details.
+
+There should be no more posts to this. Post responses and continuations on the bugtracker if you have to.
+
+--------------------------
+
+    Ok, I will try to make this easy to understand. There are many bugs dealing with map issues.
+
+    I found out that the problem was the maps were not loaded properly in the source code.
+
+    Harbinger based his DWM maps on the source code. Therefore Harbinger's maps contained the bug IN them
+    because they were NOT properly converted.
+
+    I fixed the bug in the source code and made new maps which are 100% identical to GAT (minus data
+    that we dont need).
+
+    This does not ALL bugs have been fixed.  Even though the AFMs are 100% A-OK, there are MORE bugs in the
+    source (does this surprise anyone). Just because some things dont work (like Teleport gets you stuck)
+    doesn't mean the AFMs are bad. It means there are more bugs to fix in the source.
+
+    For example, after I made AFM, You could still walk through IceWall.  I edited the code, so now it works.
+    This means to fix IceWall I needed 2 things. A) Fix the Mapload source. B) Make new bug-less maps.
+    C) Fix the IceWall code.
+
+    Got It? The AFM Maps are FINE!
+
+
+
+
+
 -----------------------------------------------
 December 24, 2003
 
