@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 105
-  Top = 363
+  Left = 470
+  Top = 219
   Width = 765
   Height = 435
   Caption = '#33'
@@ -64,7 +64,7 @@ object frmMain: TfrmMain
     Left = 154
     Top = 5
     Width = 455
-    Height = 24
+    Height = 26
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -121,7 +121,7 @@ object frmMain: TfrmMain
     Color = 14071432
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -13
+    Font.Height = -12
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False

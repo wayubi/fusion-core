@@ -11172,14 +11172,13 @@ var
   sl:TStringList;
   tl:TSkillDB;
   i1,j1,k1:integer;
-  // BADREGEN bonusregen:Integer;
+  bonusregen:Integer;
   tm:TMap;
 begin
 	with tc do begin
 		//HPSP‰ñ•œˆ—
 		if Weight * 2 < MaxWeight then begin
-{
-// BADREGEN
+
 if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) and  (tc.Option and 6 = 0) then begin
 if HP <> MAXHP then begin
 bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
@@ -11222,15 +11221,10 @@ end else begin
 SPTick := Tick;
 end;
 end;
-}
       if Weight * 2 <> MaxWeight then begin
 
-{
-// BADREGEN
 if Weight * 2 < MaxWeight then begin
 
-
-}
 			//HP©“®‰ñ•œ
 
                         {SP Usage For Songs}
@@ -11315,7 +11309,7 @@ if Weight * 2 < MaxWeight then begin
     end;
   end;
 end;
-// BADREGEN end;
+end;
 //------------------------------------------------------------------------------
    procedure TfrmMain.SkillPassive(tc:TChara;Tick:cardinal);
 var
