@@ -1484,7 +1484,14 @@ begin
 		Readln(txt, str);
 		sl.DelimitedText := str;
 		if sl.Count = 4 then begin
-			for j := 0 to 3 do ExpTable[j][i] := StrToInt(sl.Strings[j]);
+			for j := 0 to 3 do begin
+                try
+                    ExpTable[j][i] := StrToInt(sl.Strings[j]);
+                except
+                    on EConvertError do
+                        ExpTable[j][i] := 2147483647;
+                end;
+            end;
 			Inc(i);
 			if i > 255 then break;
 		end;
