@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 131
-  Top = 169
-  Width = 680
-  Height = 344
+  Left = 275
+  Top = 94
+  Width = 691
+  Height = 435
   Caption = 'c'
   Color = clCream
   Font.Charset = SHIFTJIS_CHARSET
@@ -15,8 +15,8 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnResize = FormResize
   DesignSize = (
-    672
-    310)
+    683
+    401)
   PixelsPerInch = 96
   TextHeight = 15
   object lbl00: TLabel
@@ -63,7 +63,7 @@ object frmMain: TfrmMain
   object Edit1: TEdit
     Left = 144
     Top = 5
-    Width = 425
+    Width = 409
     Height = 24
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
@@ -77,7 +77,7 @@ object frmMain: TfrmMain
     OnKeyPress = Edit1KeyPress
   end
   object Button1: TButton
-    Left = 573
+    Left = 558
     Top = 5
     Width = 93
     Height = 22
@@ -94,8 +94,8 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 291
-    Width = 672
+    Top = 382
+    Width = 683
     Height = 19
     Color = clCream
     Panels = <
@@ -113,8 +113,8 @@ object frmMain: TfrmMain
   object txtDebug: TMemo
     Left = 0
     Top = 32
-    Width = 672
-    Height = 259
+    Width = 683
+    Height = 350
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = 14071432
@@ -127,6 +127,22 @@ object frmMain: TfrmMain
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 2
+  end
+  object Button2: TButton
+    Left = 658
+    Top = 5
+    Width = 22
+    Height = 22
+    Anchors = []
+    Caption = 'T'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Trebuchet MS'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+    OnClick = cmdMinTray
   end
   object sv1: TServerSocket
     Active = False

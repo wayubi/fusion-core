@@ -30,6 +30,7 @@ type
                 Edit1: TEdit;
                 Button1: TButton;
                 StatusBar1: TStatusBar;
+    Button2: TButton;
                 
                 procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -93,24 +94,14 @@ type
                 procedure Edit1KeyPress(Sender: TObject; var Key: Char);
 
                 //Iconify procedures
-                procedure WMSysCommand(var Message : TWMSysCommand); message WM_SYSCOMMAND ;
-                procedure CMClickIcon(var msg: TMessage); message WM_NOTIFYICON;
+    procedure cmdMinTray(Sender: TObject);
+    procedure CMClickIcon(var msg: TMessage); message WM_NOTIFYICON;
 
 		//procedure cbxPriorityClick(Sender: TObject);
     //procedure cbxPriorityChange(Sender: TObject);
 
 
 	private
-		TitleButton : TRect;
-                procedure DrawTitleButton;
-                {Paint-related messages}
-                procedure WMSetText(var Msg : TWMSetText); message WM_SETTEXT;
-                procedure WMNCPaint(var Msg : TWMNCPaint); message WM_NCPAINT;
-                procedure WMNCActivate(var Msg : TWMNCActivate); message WM_NCACTIVATE;
-               {Mouse down-related messages}
-                procedure WMNCHitTest(var Msg : TWMNCHitTest); message WM_NCHITTEST;
-                procedure WMNCLButtonDown(var Msg : TWMNCLButtonDown); message WM_NCLBUTTONDOWN;
-                function GetVerInfo : DWORD;
 
 	public
 		{ Public êÈåæ }
@@ -12864,113 +12855,7 @@ begin
 
 end;
 
-procedure TfrmMain.WMSysCommand(var Message : TWMSysCommand) ;
-begin
-        if Message.CmdType <> SC_MINIMIZE then
-                Shell_NotifyIcon(NIM_DELETE, @TrayIcon);
-                //Make sure all icons are gone...
-                //This is unclean
-        inherited ;
-end ;
-
-procedure TfrmMain.CMClickIcon(var msg: TMessage);
-begin
-  if msg.lparam = WM_LBUTTONDBLCLK then begin
-        frmMain.Visible := true;
-        Application.BringToFront;
-        ShowWindow(Application.Handle, SW_SHOWNORMAL);
-        SetWindowLong(Application.Handle, GWL_EXSTYLE,WS_EX_APPWINDOW);
-        //Unhide and return to previous state
-        //Shell_NotifyIcon(NIM_DELETE, @TrayIcon);
-        //Delete Icon from Tray
-  end;
-end;
-procedure TfrmMain.DrawTitleButton;
-var
-  bmap : TBitmap; {Bitmap to be drawn - 16 X 16 : 16 Colors}
-  XFrame,  {X and Y size of Sizeable area of Frame}
-  YFrame,
-  XTtlBit, {X and Y size of Bitmaps in caption}
-  YTtlBit  : Integer;
-begin
-  {Get size of form frame and bitmaps in title bar}
-  XFrame  := GetSystemMetrics(SM_CXFRAME);
-  YFrame  := GetSystemMetrics(SM_CYFRAME);
-  XTtlBit := GetSystemMetrics(SM_CXSIZE);
-  YTtlBit := GetSystemMetrics(SM_CYSIZE);
-
-  {$IFNDEF WIN32}
-    TitleButton := Bounds(Width - (3 * XTtlBit+15) - ((XTtlBit div 2) - 2),
-                          YFrame + 7,
-                          XTtlBit - 20,
-                          YTtlBit - 20);
-
-  {$ELSE}     {Delphi 2.0 positioning}
-    if (GetVerInfo = VER_PLATFORM_WIN32_NT) then
-      TitleButton := Bounds(Width - (3 * XTtlBit+15) - ((XTtlBit div 2) - 2),
-                            YFrame +7,
-                            XTtlBit - 10,
-                            YTtlBit - 10);
-  {$ENDIF}
-
-
-  Canvas.Handle := GetWindowDC(Self.Handle); {Get Device context for drawing}
-  try
-    {Draw a button face on the TRect}
-    DrawButtonFace(Canvas, TitleButton, 1, bsAutoDetect, False, False, False);
-    bmap := TBitmap.Create;
-    //bmap.LoadFromFile('period.bmp');
-    with TitleButton do
-      {$IFNDEF WIN32}
-        Canvas.Draw(Left + 8, Top + 8, bmap);
-      {$ELSE}
-        if (GetVerInfo = VER_PLATFORM_WIN32_NT) then
-          Canvas.Draw(Left + 8, Top + 8, bmap)
-        else
-          Canvas.StretchDraw(TitleButton, bmap);
-      {$ENDIF}
-
-  finally
-    ReleaseDC(Self.Handle, Canvas.Handle);
-    bmap.Free;
-    Canvas.Handle := 0;
-  end;
-end;
-
-{Paint triggering events}
-procedure TfrmMain.WMNCActivate(var Msg : TWMNCActivate);
-begin
-  Inherited;
-  DrawTitleButton;
-end;
-
-{Painting events}
-procedure TfrmMain.WMNCPaint(var Msg : TWMNCPaint);
-begin
-  Inherited;
-  DrawTitleButton;
-end;
-
-procedure TfrmMain.WMSetText(var Msg : TWMSetText);
-begin
-  Inherited;
-  DrawTitleButton;
-end;
-
-{Mouse-related procedures}
-procedure TfrmMain.WMNCHitTest(var Msg : TWMNCHitTest);
-begin
-  Inherited;
-  {Check to see if the mouse was clicked in the area of the button}
-  with Msg do
-    if PtInRect(TitleButton, Point(XPos - Left, YPos - Top)) then
-      Result := htTitleBtn;
-end;
-
-procedure TfrmMain.WMNCLButtonDown(var Msg : TWMNCLButtonDown);
-begin
-  inherited;
-  if (Msg.HitTest = htTitleBtn) then
+procedure TfrmMain.cmdMinTray(Sender: TObject);
   begin
     //Add Icon to System Tray
                 TrayIcon.cbSize := SizeOf(TrayIcon);
@@ -12988,20 +12873,20 @@ begin
                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
                 //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
                 // (Don't ToolWindows don't show in taskbar by default)
-    end;
+
 end;
 
-function TfrmMain.GetVerInfo : DWORD;
-var
- verInfo : TOSVERSIONINFO;
+procedure TfrmMain.CMClickIcon(var msg: TMessage);
 begin
-  verInfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
-  if GetVersionEx(verInfo) then
-    Result := verInfo.dwPlatformID;
-    {Returns:
-      VER_PLATFORM_WIN32s             Win32s on Windows 3.1
-      VER_PLATFORM_WIN32_WINDOWS        Win32 on Windows 95
-      VER_PLATFORM_WIN32_NT           Windows NT }
+  if msg.lparam = WM_LBUTTONDBLCLK then begin
+        frmMain.Visible := true;
+        Application.BringToFront;
+        ShowWindow(Application.Handle, SW_SHOWNORMAL);
+        SetWindowLong(Application.Handle, GWL_EXSTYLE,WS_EX_APPWINDOW);
+        //Unhide and return to previous state
+        //Shell_NotifyIcon(NIM_DELETE, @TrayIcon);
+        //Delete Icon from Tray
+  end;
 end;
 
 end.
