@@ -339,9 +339,9 @@ begin
 	end;
 	if sl.IndexOfName('JobExpMultiplier') > -1 then begin
 		JobExpMultiplier := StrToInt(sl.Values['JobExpMultiplier']);
-        	if (JobExpMultiplier > 999) then begin
-            		JobExpMultiplier := 999;
-        	end;
+		if (JobExpMultiplier > 999) then begin
+			JobExpMultiplier := 999;
+		end;
 	end else begin
 		JobExpMultiplier := 1;
 	end;
@@ -681,19 +681,37 @@ begin
 	end else begin
 		GMCheck := $FF;
 	end;
+	SL.Clear;
 
-  //Darkhelmet's Toys
-  ini.ReadSectionValues('Toys', sl);
-  if sl.IndexOfName('EnabledUWarp') <> -1 then begin
-    WarpEnabled := StrToBool(sl.Values['EnabledUWarp']);
+	//Darkhelmet's Toys
+	ini.ReadSectionValues('Toys', sl);
+	if sl.IndexOfName('EnabledUWarp') <> -1 then begin
+		WarpEnabled := StrToBool(sl.Values['EnabledUWarp']);
 	end else begin
 		WarpEnabled := False;
 	end;
-  if sl.IndexOfName('EUWarpItem') <> -1 then begin
-    WarpItem := StrToInt(sl.Values['EUWarpItem']);
+	if sl.IndexOfName('EUWarpItem') <> -1 then begin
+		WarpItem := StrToInt(sl.Values['EUWarpItem']);
 	end else begin
 		WarpItem := 0;
 	end;
+
+	{ChrstphrR 2004/05/09 - Debug section added to INI file
+	Controls options that allow/supress when errors occur - these features
+	will be useful to Devs in Core/DB/Scripts, and people modifying both
+	Database and Script files for testing.}
+	SL.Clear;
+	ini.ReadSectionValues('Debug', SL);
+	{Current Options:
+	ShowDebugErrors - boolean, default False - if true, outputs error messages
+	during Script Validation phase of MapLoad
+	}
+	if SL.IndexOfName('ShowDebugErrors') <> -1 then begin
+		ShowDebugErrors := StrToBool(SL.Values['ShowDebugErrors']);
+	end else begin
+		ShowDebugErrors := False;
+	end;
+
 
 	//cbxPriority.ItemIndex := Priority;
   case Priority of
@@ -742,7 +760,7 @@ begin
 
 
 	ini.Free;
-	sl.Free;
+	SL.Free;
 
 	Show;
 	//ÉfÅ[É^ì«Ç›çûÇ›
@@ -882,6 +900,13 @@ begin
 	ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
 	ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
 	// MySQL Server Lines
+
+	{ChrstphrR 2004/05/09 - Debug section added to INI file
+	Controls options that allow/supress when errors occur - these features
+	will be useful to Devs in Core/DB/Scripts, and people modifying both
+	Database and Script files for testing.}
+	ini.WriteString('Debug', 'ShowDebugErrrors', BoolToStr(ShowDebugErrors));
+
 
 	ini.Free;
 

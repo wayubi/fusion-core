@@ -1,3 +1,4 @@
+- 05-09-04: Bug Fix #852 (prev 5 entries + Ini option ShowDebugErrors) [ChrstphrR]
 - 05-09-04: Main unit - MapLoad changed - no more char freezes. [ChrstphrR]
 - 05-09-04: ScriptValidated does checking for MapLoad. [ChrstphrR]
 - 05-09-04: ScriptValidated parses comment lines in scripts proper. [ChrstphrR]

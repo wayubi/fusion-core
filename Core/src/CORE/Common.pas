@@ -1557,6 +1557,9 @@ var
 
 	DebugOut      :TMemo;
 
+	ShowDebugErrors : Boolean;
+	{ChrstphrR - added 2004/05/09 for Debug messages for Script validation}
+
 
 	//exp_db
 	ExpTable        :array[0..3] of array[0..255] of cardinal;
@@ -7507,7 +7510,8 @@ Begin
 	//DebugOut.Lines.Add('Loading script...');
 	Tick := timeGetTime;
 	for Idx := 0 to ScriptList.Count - 1 do begin
-		if NOT ScriptValidated(MapName, ScriptList[Idx], Tick) then begin
+		if NOT ScriptValidated(MapName, ScriptList[Idx], Tick) AND
+		   ShowDebugErrors then begin
 			DebugOut.Lines.Add(Format(
 				'*** Error with script "%s" on map "%s"',
 				[ScriptList[Idx], MapName]
@@ -7637,36 +7641,38 @@ Var
 	var
 		EMsg : String;
 	begin
-		case ScriptErrType of
-		SCRIPT_SYNTAX_ERR : //Syntax Error (2 params in Args)
-			EMsg := Format('%s %.4d: syntax error', Args);
-		SCRIPT_SYNT_2_ERR : //Syntax Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] syntax error (2)', Args);
-		SCRIPT_FUNCTN_ERR : //Function Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] function error', Args);
-		SCRIPT_SELECT_ERR : //Too Many Selections (3 params in ARgs)
-			EMsg := Format('%s %.4d: [%s] too many selections', Args);
-		SCRIPT_RANGE1_ERR : //Range Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] range error (1)', Args);
-		SCRIPT_RANGE2_ERR : //Range Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] range error (2)', Args);
-		SCRIPT_RANGE3_ERR : //Range Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] range error (3)', Args);
-		SCRIPT_RANGE4_ERR : //Range Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] range error (4)', Args);
-		SCRIPT_DIV_Z3_ERR : //Div by Zero Error (3 params in Args)
-			EMsg := Format('%s %.4d: [%s] div 0 error (3)', Args);
-		SCRIPT_LBLNOT_ERR : //Label not found (2 params in Args)
-			EMsg := Format('%s : label "%s" not found', Args);
-		SCRIPT_NONCMD_ERR : //Invalid command (3 params in Args)
-			EMsg := Format('%s %.4d: Invalid Command "%s"', Args);
+		if ShowDebugErrors then begin
+			case ScriptErrType of
+			SCRIPT_SYNTAX_ERR : //Syntax Error (2 params in Args)
+				EMsg := Format('%s %.4d: syntax error', Args);
+			SCRIPT_SYNT_2_ERR : //Syntax Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] syntax error (2)', Args);
+			SCRIPT_FUNCTN_ERR : //Function Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] function error', Args);
+			SCRIPT_SELECT_ERR : //Too Many Selections (3 params in ARgs)
+				EMsg := Format('%s %.4d: [%s] too many selections', Args);
+			SCRIPT_RANGE1_ERR : //Range Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] range error (1)', Args);
+			SCRIPT_RANGE2_ERR : //Range Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] range error (2)', Args);
+			SCRIPT_RANGE3_ERR : //Range Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] range error (3)', Args);
+			SCRIPT_RANGE4_ERR : //Range Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] range error (4)', Args);
+			SCRIPT_DIV_Z3_ERR : //Div by Zero Error (3 params in Args)
+				EMsg := Format('%s %.4d: [%s] div 0 error (3)', Args);
+			SCRIPT_LBLNOT_ERR : //Label not found (2 params in Args)
+				EMsg := Format('%s : label "%s" not found', Args);
+			SCRIPT_NONCMD_ERR : //Invalid command (3 params in Args)
+				EMsg := Format('%s %.4d: Invalid Command "%s"', Args);
 
-		else
-			begin
-			end;//else-case
-		end;//case
+			else
+				begin
+				end;//else-case
+			end;//case
 
-		DebugOut.Lines.Add(EMsg);
+			DebugOut.Lines.Add(EMsg);
+		end;//if ShowDebugErrors
 		SL.Free;
 		SL1.Free;
 		SL2.Free;
@@ -9219,11 +9225,23 @@ Begin
 						SL[3] has 5 tokens.
 					initially here, SL1[] = SL[0]
 
-					Fixing SL1 Count checks properly now - first round fix:
-					Pad missing values with zeros.
+					Fixing SL1 Count checks properly now -
+					2004/05/09 - 2nd fix - exit gracefully, note error.
 					*)
 
-					for i := SL1.Count to 5 do SL1.Add('0');
+					if SL1.Count <> 5 then begin
+						if ShowDebugErrors then
+							DebugOut.Lines.Add(Format(
+								'%s %.4d: Monster Definition Error: %s',
+								[ScriptPath, Lines, Str]
+							));
+						SL.Free;
+						SL1.Free;
+						SL2.Free;
+						Result := False;
+						Exit; //safe 2004/05/09
+					end;
+
 					ts0 := TMob.Create;
 					ts0.Name := SL[2];
 					//DebugOut.Lines.Add('-> adding mob ' + ts0.Name);
@@ -9235,8 +9253,22 @@ Begin
 					ts0.Point2.Y := StrToInt(SL1[4]);
 
 					{ChrstphrR 2004/05/06 - Colus, your hunch was right, this loop here
-					SL1 was not checked properly - since at least the EWeiss project! }
-					sl1.DelimitedText := SL[3];
+					SL1 was not checked properly - since at least the EWeiss project!
+					2004/05/09 - instead of Padding, flagging error, exit gracefully}
+					SL1.DelimitedText := SL[3];
+					if SL1.Count <> 5 then begin
+						if ShowDebugErrors then
+							DebugOut.Lines.Add(Format(
+								'%s %.4d: Monster Definition Error: %s',
+								[ScriptPath, Lines, Str]
+							));
+						SL.Free;
+						SL1.Free;
+						SL2.Free;
+						Result := False;
+						ts0.Free; // Made a TMob, need to clean it up now too.
+						Exit; //safe 2004/05/09
+					end;
 					for i := SL1.Count to 5 do SL1.Add('0');
 					ts0.JID := StrToInt(SL1[0]);
 					mcnt            := StrToInt(SL1[1]);
@@ -9287,16 +9319,7 @@ Begin
 
 						ts.isLooting := False;
 						for j:= 1 to 10 do begin
-							ts.Item[j].ID := 0;
-							ts.Item[j].Amount := 0;
-							ts.Item[j].Equip := 0;
-							ts.Item[j].Identify := 0;
-							ts.Item[j].Refine := 0;
-							ts.Item[j].Attr := 0;
-							ts.Item[j].Card[0] := 0;
-							ts.Item[j].Card[1] := 0;
-							ts.Item[j].Card[2] := 0;
-							ts.Item[j].Card[3] := 0;
+							ts.Item[j].ZeroItem;
 						end;
 {í«â¡ÉRÉRÇ‹Ç≈}
 						j := 0;
