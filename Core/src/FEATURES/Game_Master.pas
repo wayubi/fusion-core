@@ -89,6 +89,8 @@ var
     GM_ATHENA_HEAL : Byte;
     GM_ATHENA_KAMI : Byte;
     GM_ATHENA_ALIVE : Byte;
+    GM_ATHENA_SAVE : Byte;
+    GM_ATHENA_LOAD : Byte;
     GM_ATHENA_KILL : Byte;
     GM_ATHENA_DIE : Byte;
     GM_ATHENA_JOBCHANGE : Byte;
@@ -215,6 +217,8 @@ var
     function command_athena_heal(tc : TChara; str : String) : String;
     function command_athena_kami(tc : TChara; str : String) : String;
     function command_athena_alive(tc : TChara) : String;
+    function command_athena_save(tc : TChara) : String;
+    function command_athena_load(tc : TChara) : String;
     function command_athena_kill(tc: TChara; str : String) : String;
     function command_athena_die(tc : TChara) : String;
     function command_athena_jobchange(tc : TChara; str : String) : String;
@@ -347,6 +351,8 @@ implementation
         GM_ATHENA_HEAL := StrToIntDef(sl.Values['ATHENA_HEAL'], 1);
         GM_ATHENA_KAMI := StrToIntDef(sl.Values['ATHENA_KAMI'], 1);
         GM_ATHENA_ALIVE := StrToIntDef(sl.Values['ATHENA_ALIVE'], 1);
+        GM_ATHENA_SAVE := StrToIntDef(sl.Values['ATHENA_SAVE'], 1);
+        GM_ATHENA_LOAD := StrToIntDef(sl.Values['ATHENA_LOAD'], 1);
         GM_ATHENA_KILL := StrToIntDef(sl.Values['ATHENA_KILL'], 1);
         GM_ATHENA_DIE := StrToIntDef(sl.Values['ATHENA_DIE'], 1);
         GM_ATHENA_JOBCHANGE := StrToIntDef(sl.Values['ATHENA_JOBCHANGE'], 1);
@@ -484,6 +490,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_HEAL', IntToStr(GM_ATHENA_HEAL));
         ini.WriteString('Athena GM Commands', 'ATHENA_KAMI', IntToStr(GM_ATHENA_KAMI));
         ini.WriteString('Athena GM Commands', 'ATHENA_ALIVE', IntToStr(GM_ATHENA_ALIVE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_SAVE', IntToStr(GM_ATHENA_SAVE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_LOAD', IntToStr(GM_ATHENA_LOAD));
         ini.WriteString('Athena GM Commands', 'ATHENA_KILL', IntToStr(GM_ATHENA_KILL));
         ini.WriteString('Athena GM Commands', 'ATHENA_DIE', IntToStr(GM_ATHENA_DIE));
         ini.WriteString('Athena GM Commands', 'ATHENA_JOBCHANGE', IntToStr(GM_ATHENA_JOBCHANGE));
@@ -618,6 +626,8 @@ Called when we're shutting down the server *only*
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
             else if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc, GM_ATHENA_ALIVE)) ) then error_msg := command_athena_alive(tc)
+            else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc, GM_ATHENA_SAVE)) ) then error_msg := command_athena_save(tc)
+            else if ( (copy(str, 1, length('load')) = 'load') and (check_level(tc, GM_ATHENA_LOAD)) ) then error_msg := command_athena_load(tc)
             else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
 			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
@@ -3141,6 +3151,27 @@ Called when we're shutting down the server *only*
         WFIFOL(2, tc.ID);
         WFIFOW(6, 100);
         SendBCmd(tm, tc.Point, 8);
+    end;
+
+    function command_athena_save(tc : TChara) : String;
+    begin
+        Result := 'GM_ATHENA_SAVE Success.';
+
+        tc.SaveMap := tc.Map;
+        tc.SavePoint.X := tc.Point.X;
+        tc.SavePoint.Y := tc.Point.Y;
+
+        Result := Result + ' Saved at ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
+    end;
+
+    function command_athena_load(tc : TChara) : String;
+    begin
+        Result := 'GM_ATHENA_LOAD Success.';
+
+        SendCLeave(tc.Socket.Data, 2);
+        tc.Map := tc.SaveMap;
+        tc.Point := tc.SavePoint;
+        MapMove(tc.Socket, tc.Map, tc.Point);
     end;
 
     function command_athena_kill(tc : TChara; str : String) : String;
