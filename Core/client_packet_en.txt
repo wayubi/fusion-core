@@ -27,6 +27,8 @@ Version History:
 
 2004/01/23: Added 012a, corrected some 0119 values.
 
+2004/01/25: Corrected more 0119 values.
+
 Credits:
 
 - The Japanese Athena dev team, for providing the original list.
@@ -1249,12 +1251,29 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param3=0f ペコペコ乗り
 
 	Change how you look (based on status).
-	(NOTE: The Japanese info is out of date.  I am correcting param3 values below:)
 
 	param1=02 Frost Driver?
 
 	param2=01 Poison?
 	param2=20 Angelus condition?
+	(NOTE: The Japanese info is out of date.  I am correcting values below:)
+
+	Param1 values are statuses that keep you from moving:
+
+	param1=01   Stone
+	param1=02   Freeze
+	param1=03   Stun
+	param1=04   Sleep
+
+	Param2 values are statuses that affect you physically:
+
+	param2=01   Poison        (x01)
+	param2=02   Curse         (x02)
+	param2=04   Silence       (x04)
+	param2=08   Confusion     (x08)
+	param2=08   Blind         (x10)
+
+	Param3 values are visual effects upon the player.
 
 	param3=01   Sight/Ruwach  (x01)
 	param3=02   Hidden        (x02)
@@ -1267,6 +1286,7 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param3=256  Cart (#3)     (x100)
 	param3=512  Cart (#4)     (x200)
 	param3=1024 Cart (#5)     (x400)
+	param3=8192 Ruwach (???)  (x2000)
 
 R 011a <skill ID>.w <val>.w <dst ID>.l <src ID>.l <fail>.B
 	非ダメージ系スキル表示。ヒールの場合valは回復量
