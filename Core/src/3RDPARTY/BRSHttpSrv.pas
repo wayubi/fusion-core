@@ -50,7 +50,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  WSocket, WinSock;
+  WSocket; //WinSock
 
 type
 
