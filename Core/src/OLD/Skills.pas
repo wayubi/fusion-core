@@ -3591,6 +3591,7 @@ Begin
 			end;
 			tc.MTick := Tick + 1600;
 							end else begin
+                            SendSkillError(tc,0);
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
