@@ -129,7 +129,7 @@ uses
 
     procedure destroy_wac(forced : Boolean = False);
     begin
-        if (not (Option_Enable_WAC) and assigned(BRSHttpSrv1)) or (forced) then begin
+        if (not (Option_Enable_WAC) and assigned(BRSHttpSrv1)) or (forced and assigned(BRSHttpSrv1))  then begin
             BRSHttpSrv1.Stop;
             BRSHttpSrv1 := nil;
         end;
