@@ -8,7 +8,7 @@ uses
     WSocket,
     {$ENDIF}
     {Shared}
-    SysUtils, Classes,
+    SysUtils,
     {Fusion}
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData;
 
@@ -638,7 +638,6 @@ uses
             end;
     end;
 
-
     procedure JCon_Chara_Online_PM();
     var
         str : string;
@@ -666,33 +665,22 @@ uses
     var
 		j : Integer;
     	tc : TChara;
-        itemlist : TStringList;
         ShowItem : string;
         Item : TItemDB;
 
 	begin
         frmMain.ListBox4.Clear;
 
-        try
-            tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
-        except
-            on EStringListError do Exit;  //this error shows up when noone selects a person
-        end;
-
-        itemlist := tstringlist.Create;
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
         for j := 1 to 100 do begin
             Item := tc.Item[j].Data;
             if tc.Item[j].ID <> 0 then
-                //itemlist.Add(IntToStr(tc.Item[j].ID));
                 ShowItem := Item.Name + ' : ' + IntToStr(tc.Item[j].ID)
             else ShowItem := '[Empty]';
 
-            itemlist.Add(ShowItem);
-
+            frmMain.ListBox4.Items.Add(ShowItem);
         end;
-
-        frmMain.ListBox4.Items.AddStrings(itemlist);
-        itemlist.Free;
     end;
 
     procedure JCon_Chara_Inv_Populate();
@@ -701,24 +689,22 @@ uses
         tc : TChara;
 
     begin
-
-    if (frmMain.listbox2.ItemIndex = -1) then Exit;
-		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
-
-    if (frmMain.listbox4.ItemIndex = -1) then Exit;
-
-    j := (frmMain.Listbox4.ItemIndex + 1);  //Integer(frmMain.ListBox4.Items.Objects[frmMain.ListBox4.ItemIndex]);
-    frmMain.Label97.Caption := IntToStr(tc.Item[j].ID);
-    frmMain.Label121.Caption := tc.Item[j].Data.Name;
-{    tc.Item[j]
-    tc.Item[j].Card[0]
-    tc.Item[j].Card[1]
-    tc.Item[j].Card[2]
-    tc.Item[j].Card[3]}
-
-
-
-
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+    		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        if (frmMain.listbox4.ItemIndex = -1) then Exit;
+        j := (frmMain.Listbox4.ItemIndex + 1);
+        if (tc.Item[j].ID <> 0) then begin
+            frmMain.Label97.Caption := IntToStr(tc.Item[j].ID);
+            frmMain.Label121.Caption := tc.Item[j].Data.Name;
+            frmMain.CheckBox1.Checked := StrToBool(IntToStr(tc.Item[j].Identify));
+        {    tc.Item[j]
+            tc.Item[j].Card[0]
+            tc.Item[j].Card[1]
+            tc.Item[j].Card[2]
+            tc.Item[j].Card[3]}
+        end else begin
+            //empty items population
+        end;
 
     end;
 
