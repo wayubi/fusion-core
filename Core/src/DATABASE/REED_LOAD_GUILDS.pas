@@ -141,9 +141,13 @@ implementation
             tg.MemberID[i] := retrieve_value(path, i, 0);
             tg.MemberPos[i] := retrieve_value(path, i, 1);
             tg.MemberEXP[i] := retrieve_value(path, i, 2);
-            if ((tg.MemberID[i]) <> 0) then Inc(tg.RegUsers, 1);
 
-            if Chara.IndexOf(tg.MemberID[i]) = -1 then Continue;
+            if Chara.IndexOf(tg.MemberID[i]) = -1 then begin
+                tg.MemberID[i] := 0;
+                Continue;
+            end;
+
+            if ((tg.MemberID[i]) <> 0) then Inc(tg.RegUsers, 1);
             tc := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
 
             tc.GuildName := tg.Name;

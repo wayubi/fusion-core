@@ -46,6 +46,7 @@ uses
     procedure fnl_lists(stringlist : TStringList; intlist : TIntList32);
 
     procedure create_account(username : String; password : String; email : String; sex : String);
+    function get_accountid() : Integer;
 
 implementation
 
@@ -754,32 +755,12 @@ uses
 
     procedure create_account(username : String; password : String; email : String; sex : String);
     var
-        last : Integer;
         i : Integer;
         tp, tp2 : TPlayer;
     begin
 
-        last := 100099;
-
-        for i := 0 to Player.Count do begin
-
-            if (i = Player.Count) then begin
-                Inc(last, 2);
-                Break;
-            end;
-
-            tp2 := Player.Objects[i] as TPlayer;
-
-            if (tp2.ID < 100101) then Continue;
-            Inc(last);
-            if ( (tp2.ID - last) <= 1 ) then Continue;
-            Inc(last);
-            Break;
-
-        end;
-
         tp := TPlayer.Create;
-        tp.ID := last;
+        tp.ID := get_accountid();
         tp.Name := username;
         tp.Pass := password;
 
@@ -793,6 +774,34 @@ uses
         Player.AddObject(tp.ID, tp);
 
         PD_Save_Accounts_Parse(True);
+    end;
+
+    function get_accountid() : Integer;
+    var
+        last : Integer;
+        i : Integer;
+        tp : TPlayer;
+    begin
+        last := 100099;
+
+        for i := 0 to Player.Count do begin
+
+            if (i = Player.Count) then begin
+                Inc(last, 2);
+                Break;
+            end;
+
+            tp := Player.Objects[i] as TPlayer;
+
+            if (tp.ID < 100101) then Continue;
+            Inc(last);
+            if ( (tp.ID - last) <= 1 ) then Continue;
+            Inc(last);
+            Break;
+
+        end;
+
+        Result := last;
     end;
 
 end.

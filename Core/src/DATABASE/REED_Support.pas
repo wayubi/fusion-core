@@ -338,6 +338,7 @@ uses
 
         for i := 0 to tg.RegUsers - 1 do begin
             if (tg.MemberID[i] <> 0) then begin
+                if (tg.Member[i] = nil) then Continue;
                 if tg.Member[i].Login <> 0 then begin
                     Result := True;
                     Break;
@@ -548,7 +549,7 @@ uses
         Result := False;
 
         for i := 0 to 11 do begin
-            if (tpa.MemberID[i] = 0) or (not (tpa.Member[i].PartyName = tpa.Name)) then Continue;
+            if (tpa.MemberID[i] = 0) or (tpa.Member[i].PData = nil) or (not (tpa.Member[i].PartyName = tpa.Name)) then Continue;
             Result := True;
             Break;
         end;
@@ -574,7 +575,7 @@ uses
         Result := False;
 
         for i := 0 to tg.RegUsers - 1 do begin
-            if (tg.MemberID[i] = 0) or (not (tg.Member[i].GuildID = tg.ID)) then Continue;
+            if (tg.MemberID[i] = 0) or (tg.Member[i] = nil) or (not (tg.Member[i].GuildID = tg.ID)) then Continue;
             Result := True;
             Break;
         end;

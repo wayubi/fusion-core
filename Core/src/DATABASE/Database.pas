@@ -1972,105 +1972,84 @@ begin
 		sl.Clear;
 		Readln(txt, str);
 		sl.DelimitedText := str;
+
 		if ver >= 1 then begin
 {修正}
 			if (sl.Count = 9) or (sl.Count = 15) then begin
-				tp := TPlayer.Create;
-				with tp do begin
-					ID := StrToInt(sl.Strings[0]);
-					Name := sl.Strings[1];
+                if (PlayerName.IndexOf(sl.Strings[1]) = -1) then begin
 
-                    {Name := remove_badsavechars(Name);}
+			    	tp := TPlayer.Create;
+		    		with tp do begin
+	    				ID := get_accountid();
+    					Name := sl.Strings[1];
 
-					Pass := sl.Strings[2];
-					Gender := StrToInt(sl.Strings[3]);
-					Mail := sl.Strings[4];
-					Banned := StrToBool(sl.Strings[5]);
-					CName[0] := sl.Strings[6];
-					CName[1] := sl.Strings[7];
-					CName[2] := sl.Strings[8];
-					if sl.Count = 15 then begin
-						CName[3] := sl.Strings[9];
-						CName[4] := sl.Strings[10];
-						CName[5] := sl.Strings[11];
-						CName[6] := sl.Strings[12];
-						CName[7] := sl.Strings[13];
-						CName[8] := sl.Strings[14];
-					end;
+		    			Pass := sl.Strings[2];
+	    				Gender := StrToInt(sl.Strings[3]);
+    					Mail := sl.Strings[4];
+				    	Banned := StrToBool(sl.Strings[5]);
+			    		CName[0] := sl.Strings[6];
+		    			CName[1] := sl.Strings[7];
+	    				CName[2] := sl.Strings[8];
+    					if sl.Count = 15 then begin
+						    CName[3] := sl.Strings[9];
+					    	CName[4] := sl.Strings[10];
+				    		CName[5] := sl.Strings[11];
+			    			CName[6] := sl.Strings[12];
+		    				CName[7] := sl.Strings[13];
+	    					CName[8] := sl.Strings[14];
+    					end;
 
-                    {for i := 0 to 8 do begin
-                        CName[i] := remove_badsavechars(CName[i]);
-                    end;}
-
-				end;
+    				end;
 {修正ココまで}
-				if ver >= 2 then begin
-					//アイテムロード
-					sl.Clear;
-					Readln(txt, str);
-					sl.DelimitedText := str;
-					j := StrToInt(sl.Strings[0]);
-					for i := 1 to j do begin
-						if ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1])) <> -1 then begin
-							//tc.Item[i] := TItem.Create;
-							tp.Kafra.Item[i].ID := StrToInt(sl.Strings[(i-1)*10+1]);
-							tp.Kafra.Item[i].Amount := StrToInt(sl.Strings[(i-1)*10+2]);
-							tp.Kafra.Item[i].Equip := StrToInt(sl.Strings[(i-1)*10+3]);
-							tp.Kafra.Item[i].Identify := StrToInt(sl.Strings[(i-1)*10+4]);
-							tp.Kafra.Item[i].Refine := StrToInt(sl.Strings[(i-1)*10+5]);
-							tp.Kafra.Item[i].Attr := StrToInt(sl.Strings[(i-1)*10+6]);
-							for k := 0 to 3 do begin
-								tp.Kafra.Item[i].Card[k] := StrToInt(sl.Strings[(i-1)*10+7+k]);
-							end;
-							tp.Kafra.Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1]))] as TItemDB;
-						end;
-					end;
-					CalcInventory(tp.Kafra);
-				end;
+	    			if ver >= 2 then begin
+    					//アイテムロード
+					    sl.Clear;
+				    	Readln(txt, str);
+			    		sl.DelimitedText := str;
+		    			j := StrToInt(sl.Strings[0]);
+	    				for i := 1 to j do begin
+    						if ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1])) <> -1 then begin
+						    	//tc.Item[i] := TItem.Create;
+					    		tp.Kafra.Item[i].ID := StrToInt(sl.Strings[(i-1)*10+1]);
+				    			tp.Kafra.Item[i].Amount := StrToInt(sl.Strings[(i-1)*10+2]);
+			    				tp.Kafra.Item[i].Equip := StrToInt(sl.Strings[(i-1)*10+3]);
+		    					tp.Kafra.Item[i].Identify := StrToInt(sl.Strings[(i-1)*10+4]);
+	    						tp.Kafra.Item[i].Refine := StrToInt(sl.Strings[(i-1)*10+5]);
+    							tp.Kafra.Item[i].Attr := StrToInt(sl.Strings[(i-1)*10+6]);
+							    for k := 0 to 3 do begin
+								    tp.Kafra.Item[i].Card[k] := StrToInt(sl.Strings[(i-1)*10+7+k]);
+							    end;
+							    tp.Kafra.Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(StrToInt(sl.Strings[(i-1)*10+1]))] as TItemDB;
+						    end;
+					    end;
+					    CalcInventory(tp.Kafra);
+				    end;
 
-                {redo := True;
-                while (redo) do begin
-                    redo := False;
-                    for i := 0 to PlayerName.Count - 1 do begin
-                        if AnsiLowerCase(tp.Name) = AnsiLowerCase(PlayerName[i]) then begin
-                            tp.Name := tp.Name + '_';
-                            redo := True;
-                        end;
-                    end;
-                end;}
+	    			PlayerName.AddObject(tp.Name, tp);
+    				Player.AddObject(tp.ID, tp);
 
-				PlayerName.AddObject(tp.Name, tp);
-				Player.AddObject(tp.ID, tp);
+                end;
 			end;
 		end else begin
 			if sl.Count = 8 then begin
-				tp := TPlayer.Create;
-				with tp do begin
-					ID := StrToInt(sl.Strings[0]);
-					Name := sl.Strings[1];
-                    {Name := remove_badsavechars(Name);}
-					Pass := sl.Strings[2];
-					Gender := StrToInt(sl.Strings[3]);
-					Mail := sl.Strings[4];
-					Banned := False;
-					CName[0] := (sl.Strings[5]);
-					CName[1] := (sl.Strings[6]);
-					CName[2] := (sl.Strings[7]);
-				end;
+                if (PlayerName.IndexOf(sl.Strings[1]) = -1) then begin
+    				tp := TPlayer.Create;
+	    			with tp do begin
+		    			ID := get_accountid();
+			    		Name := sl.Strings[1];
+                        {Name := remove_badsavechars(Name);}
+					    Pass := sl.Strings[2];
+    					Gender := StrToInt(sl.Strings[3]);
+	    				Mail := sl.Strings[4];
+		    			Banned := False;
+			    		CName[0] := (sl.Strings[5]);
+				    	CName[1] := (sl.Strings[6]);
+					    CName[2] := (sl.Strings[7]);
+    				end;
 
-                {redo := True;
-                while (redo) do begin
-                    redo := False;
-                    for i := 0 to PlayerName.Count - 1 do begin
-                        if AnsiLowerCase(tp.Name) = AnsiLowerCase(PlayerName[i]) then begin
-                            tp.Name := tp.Name + '_';
-                            redo := True;
-                        end;
-                    end;
-                end;}
-
-				PlayerName.AddObject(tp.Name, tp);
-				Player.AddObject(tp.ID, tp);
+    				PlayerName.AddObject(tp.Name, tp);
+	    			Player.AddObject(tp.ID, tp);
+                end;
 			end;
 		end;
 	end;
@@ -2456,9 +2435,16 @@ begin
 				k := Chara.IndexOf(tpa.MemberID[j]);
 				if k <> -1 then begin
 					tc := Chara.Objects[k] as TChara;
-					tc.PartyName := tpa.Name; //パーティ名はココで入れる
-                    tc.PartyID := tpa.ID;
-					tpa.Member[j] := tc;
+
+                    if not (tc.PartyID = 0) then begin
+                        tpa.MemberID[j] := 0;
+                    end
+
+                    else begin
+    					tc.PartyName := tpa.Name; //パーティ名はココで入れる
+                        tc.PartyID := tpa.ID;
+		    			tpa.Member[j] := tc;
+                    end;
 				end;
 			end;
 		end;
@@ -2599,13 +2585,21 @@ begin
 					k := Chara.IndexOf(MemberID[j]);
 					if k <> -1 then begin
 						tc := Chara.Objects[k] as TChara;
-						tc.GuildName := (Name);
-						tc.GuildID := ID;
-						tc.ClassName := PosName[MemberPos[j]];
-						tc.GuildPos := j;
-						Member[j] := tc;
-						if (j = 0) then MasterName := tc.Name;
-						SLV := SLV + tc.BaseLV;
+
+                        if not assigned(tc.PData) then begin
+                            tg.MemberID[j] := 0;
+                        end
+
+                        else begin
+                            tc.GuildName := (Name);
+                            tc.GuildID := ID;
+                            tc.ClassName := PosName[MemberPos[j]];
+                            tc.GuildPos := j;
+                            Member[j] := tc;
+                            if (j = 0) then MasterName := tc.Name;
+                            SLV := SLV + tc.BaseLV;
+                        end;
+
 					end;
 				end;
 			end;
