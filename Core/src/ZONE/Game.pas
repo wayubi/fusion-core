@@ -1331,24 +1331,25 @@ Begin(* Proc sv3PacketProcess() *)
 							SendCStat1(tc, 0, $000b, tc.BaseLV);
 							SendCStat1(tc, 0, $0009, tc.StatusPoint);
 							SendCStat1(tc, 1, $0001, tc.BaseEXP);
-						end;        // Kyuubi - Glevel Command  Under Development
-					//end else if (Copy(str,1, 7) = 'glevel ') then begin
-               //   tg := GuildList.Objects[j] as TGuild;
-               //  if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
-                // Val(Copy(str, 8 , 256), i, k);
-                // if (k = 0) and (i >= 1) and (i <= 99) then begin
-                 // tg.LV := i;
-                 // for j := 10000 to 10004 do begin
-                 // tg.GSkill[j].Lv := 0;
-                 // end;  // For J
-                 // tg.GSkillPoint := tg.LV -1;
-                 // tg.EXP := tg.NextEXP -1;
-                 // SendGuildInfo(tc, 3, true);
-                 // end;
-                 // tg.NextEXP := GExpTable[tg.LV];
-                 // SendGuildInfo(tc, 0, true);
-                  // SendGuildInfo(tc, 1, true);
-                   // end;
+						end;        //Kyuubi - Glevel Command  Under Development
+					end else if (Copy(str,1, 7) = 'glevel ') then begin
+                  j := GuildList.IndexOf(tc.GuildID);
+                  tg := GuildList.Objects[j] as TGuild;
+                 if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
+                 Val(Copy(str, 8 , 256), i, k);
+                 if (k = 0) and (i >= 1) and (i <= 99) then begin
+                  tg.LV := i;
+                  for j := 10000 to 10004 do begin
+                  tg.GSkill[j].Lv := 0;
+                  end;  // For J
+                  tg.GSkillPoint := tg.LV -1;
+                  tg.EXP := tg.NextEXP -1;
+                  SendGuildInfo(tc, 3, true);
+                  end;
+                  tg.NextEXP := GExpTable[tg.LV];
+                  SendGuildInfo(tc, 0, true);
+                  SendGuildInfo(tc, 1, true);
+                    end;
           end else if (Copy(str, 1, 7) = 'jlevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
 						//スピード変更
 						Val(Copy(str, 8, 256), i, k);
