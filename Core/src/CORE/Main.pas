@@ -8944,7 +8944,9 @@ begin
 						SendBCmd(tm, tc1.Point, 15);
 
             if (tc1.MSkill = 51) then begin
+
               if tc1.Option = 6 then begin
+                tc1.Skill[MSkill].Tick := Tick;
 	    					tc1.Option := tc1.Optionkeep;
                 SkillTick := tc1.Skill[MSkill].Tick;
                 SkillTickID := MSkill;
@@ -8965,6 +8967,7 @@ begin
                 tc1.Option := 6;
                 tc1.Hidden := true;
               end;
+
               WFIFOW(0, $0119);
     					WFIFOL(2, tc1.ID);
     					WFIFOW(6, tc1.Stat1);
