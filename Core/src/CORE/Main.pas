@@ -9472,11 +9472,11 @@ begin
 						//ÉpÉPëóêM
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
-						WFIFOW( 4, dmg[0]);
-						WFIFOL( 6, tc1.ID);
-						WFIFOL(10, ID);
-						WFIFOB(14, 1);
-						SendBCmd(tm, tc1.Point, 15);
+						WFIFOL( 4, dmg[0]);
+						WFIFOL( 8, tc1.ID);
+						WFIFOL(12, ID);
+						WFIFOB(16, 1);
+						SendBCmd(tm, tc1.Point, 17);
                                         end;
                                 1:
 					begin

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
-- 01-11-04: Converted all dmg[0] packets to long. Fixes many Range Errors. [AlexKreuz]
+- 01-11-04: Set ProcessType 0 dmg[0] fifo to L. Fixed Extremity Fist Crash. [AlexKreuz]
 - 01-11-04: Backsliding Now works properly [Darkhelmet]
 - 01-11-04: Added procedure UpdatePlayerLocation to simplify packet sending [Darkhelmet]
 - 01-11-04: Began Resolving warnings in main.pas [Darkhelmet]
