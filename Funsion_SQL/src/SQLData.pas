@@ -1020,16 +1020,6 @@ begin
 				end;
       end;
 			
-			{读取人物组队资料}
-			for i := 0 to PartyNameList.Count - 1 do begin
-				tpa := PartyNameList.Objects[i] as TParty;
-				for j := 0 to 11 do begin
-					if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
-					  tc.PartyName := tpa.Name;
-						tpa.Member[j] := tc;
-					end;
-				end;
-			end;
 			tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
 			tp.CName[tc.CharaNumber] := tc.Name;
 			tp.CData[tc.CharaNumber] := tc;
@@ -1043,6 +1033,27 @@ begin
 			GetPetData(tc.ID);
 			{读取人物工会资料}
 			GetCharaGuildData(tc.CID);
+			{读取人物组队资料}
+			for i := 0 to PartyNameList.Count - 1 do begin
+				tpa := PartyNameList.Objects[i] as TParty;
+				for j := 0 to 11 do begin
+					if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
+					  tc.PartyName := tpa.Name;
+						tpa.Member[j] := tc;
+						break;
+					end;
+				end;
+			end;
+			if tc.PartyName <> '' then begin
+  			{读取组队中其它队员的资料}
+	  		tpa := PartyNameList.Objects[PartyNameList.IndexOf(tc.PartyName)] as TParty;
+		  	for i := 0 to 11 do begin
+			    if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[i] <> tc.CID) then begin
+			  	  GetCharaData(tpa.MemberID[j]);
+			  	end;
+			  end;
+			end;
+
 //	    SQLDataSet.Next;
 	  end;
 	end else begin
