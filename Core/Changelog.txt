@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-27-04: Restructuring SQL Format; Part 3/3 - Binary Storage to Text. [AlexKreuz]
 - 02-27-04: Removed a few unnecessary vars and functions. [Colus]
 - 02-27-04: Updated a few inline code bits to use existing functions. [Colus]
 - 02-27-04: Updated some Japanese comments. [Colus]

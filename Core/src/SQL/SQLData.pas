@@ -10,7 +10,8 @@ uses
 
 //==============================================================================
 // 过程&函数
-    function  HexToInt(Hex : string) : Cardinal; 
+
+    //function  HexToInt(Hex : string) : Cardinal; 
     function  ExecuteSqlCmd(sqlcmd: String) : Boolean;
 		procedure SQLDataLoad();
 		procedure SQLDataSave();
@@ -46,21 +47,23 @@ var
 //------------------------------------------------------------------------------
 // 十六进制转十进制
 //------------------------------------------------------------------------------
-function HexToInt(Hex : string) : Cardinal; 
+
+{ Obsolete - Poor Design - Alex }
+{function HexToInt(Hex : string) : Cardinal;
 const
-  cHex = '0123456789ABCDEF'; 
+  cHex = '0123456789ABCDEF';
 var
-  mult,i,loop : integer; 
-begin 
-  result := 0; 
-  mult := 1; 
-  for loop := length(Hex) downto 1 do begin 
-    i := pos(Hex[loop],cHex)-1; 
-    if (i < 0) then i := 0; 
-    inc(result,(i*mult)); 
-  mult := mult * 16; 
-  end; 
-end;
+  mult,i,loop : integer;
+begin
+  result := 0;
+  mult := 1;
+  for loop := length(Hex) downto 1 do begin
+    i := pos(Hex[loop],cHex)-1;
+    if (i < 0) then i := 0;
+    inc(result,(i*mult));
+  mult := mult * 16;
+  end;
+end;}
 
 //------------------------------------------------------------------------------
 // 执行数据库查询
@@ -277,6 +280,9 @@ begin
 					MemberPos[i] := 0;
 					MemberEXP[i] := 0;
 				end;
+
+
+
 			  for i := 10000 to 10004 do
 				begin
 			  	if GSkillDB.IndexOf(i) <> -1 then
@@ -285,18 +291,18 @@ begin
 			  	end;
 			  end;
 
-				{读取工会技能}
-				j := Round(Length(SQLDataSet.FieldValues['skill']) div 8);
-			  for i := 1 to j do
-				begin
-				  k := (i-1)*8 + 1;
-				  if GSkillDB.IndexOf(HexToInt(MidStr(SQLDataSet.FieldValues['skill'], k, 4))) <> -1 then
-					begin
-					  i1 := HexToInt(MidStr(SQLDataSet.FieldValues['skill'], k, 4));
-					  GSkill[i1].Lv := HexToInt(MidStr(SQLDataSet.FieldValues['skill'], k+4, 4));
-					  GSkill[i1].Card := false;
-				  end;
-			  end;
+
+
+                sl.Clear;
+                sl.DelimitedText := SQLDataSet.FieldValues['skill'];
+
+                for i := 0 to ((sl.Count div 2) - 1) do begin
+                    if (GSkillDB.IndexOf(strtoint(sl.Strings[0+1*2])) <> -1) then begin
+                        GSkill[strtoint(sl.Strings[0+i*2])].Lv := strtoint(sl.Strings[1+i*2]);
+                        GSkill[strtoint(sl.Strings[0+i*2])].Card := false;
+                    end;
+                end;
+
       end;
 
       GuildList.AddObject(tg.ID, tg);
@@ -422,32 +428,35 @@ begin
   begin
     for i := 0 to PlayerName.Count - 1 do
     begin
-		  bindata := '';
-      tp := PlayerName.Objects[i] as TPlayer;
-      with tp do
-      begin
-			  if not ExecuteSqlCmd(Format('REPLACE INTO accounts (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, addslashes(Name), addslashes(Pass), Gender, addslashes(Mail), Banned])) then begin
-          DebugOut.Lines.Add('*** Save Player Account data error.');
-				end;
+        bindata := '';
+        tp := PlayerName.Objects[i] as TPlayer;
 
-				for j := 1 to 100 do begin
-				  if Kafra.Item[j].ID <> 0 then begin
-					  bindata := bindata + IntToHex(Kafra.Item[j].ID,4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Amount,4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Equip,4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Identify,2);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Refine,2);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Attr,2);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Card[0],4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Card[1],4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Card[2],4);
-					  bindata := bindata + IntToHex(Kafra.Item[j].Card[3],4);
-					end;
-				end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO storage (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) then begin
-				  DebugOut.Lines.Add('*** Save Player Kafra data error.');
-				end;
-      end;
+        with tp do begin
+
+                if not ExecuteSqlCmd(Format('REPLACE INTO accounts (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, addslashes(Name), addslashes(Pass), Gender, addslashes(Mail), Banned])) then begin
+                    DebugOut.Lines.Add('*** Save Player Account data error.');
+                end;
+
+                for j := 1 to 100 do begin
+                    if Kafra.Item[j].ID <> 0 then begin
+                        if j > 1 then bindata := bindata + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].ID) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Amount) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Equip) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Identify) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Refine) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Attr) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Card[0]) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Card[1]) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Card[2]) + ',';
+                        bindata := bindata + inttostr(Kafra.Item[j].Card[3]);
+                    end;
+                end;
+
+            if not ExecuteSqlCmd(Format('REPLACE INTO storage (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) then begin
+                DebugOut.Lines.Add('*** Save Player Kafra data error.');
+            end;
+        end;
     end;
   end;
 
@@ -548,16 +557,17 @@ begin
       tg := GuildList.Objects[i] as TGuild;
       with tg do
       begin
-			  {保存工会基本资料，解散工会时需要删除相应的记录}
-				bindata := '';
-				for j := 10000 to 10004 do
-				begin
-				  if GSkill[j].Lv <> 0 then
-					begin
-					  bindata := bindata + IntToHex(j, 4);
-					  bindata := bindata + IntToHex(GSkill[j].Lv, 4);
-				  end;
-			  end;
+
+                bindata := '';
+                for j := 10000 to 10004 do begin
+                    if GSkill[j].Lv <> 0 then begin
+                        if j > 10000 then bindata := bindata + ',';
+                        bindata := bindata + inttostr(j) + ',';
+                        bindata := bindata + inttostr(GSkill[j].Lv);
+                    end;
+                end;
+
+
 			  if not ExecuteSqlCmd(Format('REPLACE INTO guild_info (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, addslashes(Name), LV, EXP, GSkillPoint, addslashes(Notice[0]), addslashes(Notice[1]), addslashes(Agit), Emblem, present, DisposFV, DisposRW, bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Guild data error.');
@@ -636,8 +646,12 @@ function GetPlayerData(userid : String; AID: cardinal = 0) : Boolean;
 var
   tp  :TPlayer;
 	i,j,k : Integer;
+  sl  :TStringList;
 begin
   Result := False;
+  sl := TStringList.Create;
+  sl.QuoteChar := '"';
+  sl.Delimiter := ',';
 
   {if AID = 0 then begin
 		if assigned(PlayerName) then
@@ -699,29 +713,29 @@ begin
     Banned := StrToInt(SQLDataSet.FieldValues['Banned']);
 		ver2 := 9;
 
-		if SQLDataSet.FieldValues['storeitem'] <> '' then
-		begin
-		  with SQLDataSet do
-			begin
-			  j := Integer(Length(FieldValues['storeitem']) div 34);
-		    for i := 1 to j do begin
-				  k := (i-1)*34 + 1;
-					if ItemDB.IndexOf(HexToInt(MidStr(FieldValues['storeitem'], k, 4))) <> -1 then
-					begin
-			      Kafra.Item[i].ID := HexToInt(MidStr(FieldValues['storeitem'], k, 4));
-			      Kafra.Item[i].Amount := HexToInt(MidStr(FieldValues['storeitem'], k+4, 4));
-			      Kafra.Item[i].Equip := HexToInt(MidStr(FieldValues['storeitem'], k+8, 4));
-			      Kafra.Item[i].Identify := HexToInt(MidStr(FieldValues['storeitem'], k+12, 2));
-			      Kafra.Item[i].Refine := HexToInt(MidStr(FieldValues['storeitem'], k+14, 2));
-			      Kafra.Item[i].Attr := HexToInt(MidStr(FieldValues['storeitem'], k+16, 2));
-			      Kafra.Item[i].Card[0] := HexToInt(MidStr(FieldValues['storeitem'], k+18, 4));
-			      Kafra.Item[i].Card[1] := HexToInt(MidStr(FieldValues['storeitem'], k+22, 4));
-			      Kafra.Item[i].Card[2] := HexToInt(MidStr(FieldValues['storeitem'], k+26, 4));
-			      Kafra.Item[i].Card[3] := HexToInt(MidStr(FieldValues['storeitem'], k+30, 4));
-			      Kafra.Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(Kafra.Item[i].ID)] as TItemDB;
-//					  DebugOut.Lines.Add(format('Kafra Data: ID(%d), Amount(%d), Equip(%d), Identify(%d), Refine(%d), Attr(%d), Card[0](%d), Card[1](%d), Card[2](%d), Card[3](%d)', [Kafra.Item[i].ID, Kafra.Item[i].Amount, Kafra.Item[i].Equip, Kafra.Item[i].Identify, Kafra.Item[i].Refine, Kafra.Item[i].Attr, Kafra.Item[i].Card[0], Kafra.Item[i].Card[1], Kafra.Item[i].Card[2], Kafra.Item[i].Card[3]]));
-					end;
-				end;
+		if SQLDataSet.FieldValues['storeitem'] <> '' then begin
+            with SQLDataSet do begin
+
+
+                sl.Clear;
+                sl.DelimitedText := SQLDataSet.FieldValues['storeitem'];
+
+                for i := 0 to ((sl.Count div 10) - 1) do begin
+                    Kafra.Item[i+1].ID := strtoint(sl.Strings[0+i*10]);
+                    Kafra.Item[i+1].Amount := strtoint(sl.Strings[1+i*10]);
+                    Kafra.Item[i+1].Equip := strtoint(sl.Strings[2+i*10]);
+                    Kafra.Item[i+1].Identify := strtoint(sl.Strings[3+i*10]);
+                    Kafra.Item[i+1].Refine := strtoint(sl.Strings[4+i*10]);
+                    Kafra.Item[i+1].Attr := strtoint(sl.Strings[5+i*10]);
+                    Kafra.Item[i+1].Card[0] := strtoint(sl.Strings[6+i*10]);
+                    Kafra.Item[i+1].Card[1] := strtoint(sl.Strings[7+i*10]);
+                    Kafra.Item[i+1].Card[2] := strtoint(sl.Strings[8+i*10]);
+                    Kafra.Item[i+1].Card[3] := strtoint(sl.Strings[9+i*10]);
+                    Kafra.Item[i+1].Data := ItemDB.Objects[ItemDB.IndexOf(Kafra.Item[i+1].ID)] as TItemDB;
+                end;
+
+                sl.Free;
+
 				CalcInventory(Kafra);
 			end;
 		end;
@@ -769,7 +783,7 @@ begin
 
 	DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
-	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem, V.flagdata FROM characters AS C ' + format('LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) LEFT JOIN character_flags AS T ON (V.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
+	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem, V.flagdata FROM characters AS C ' + format('LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) LEFT JOIN character_flags AS V ON (V.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
 	begin
 		SQLDataSet.First;
     if not SQLDataSet.Eof then begin
@@ -907,57 +921,55 @@ begin
           Skill[tc.Plag].Plag := true;
         end;
 				{读取人物技能等级}
-				j := Integer(Length(SQLDataSet.FieldValues['skillInfo']) div 8);
-			  for i := 1 to j do begin
-				  k := (i-1)*8 + 1;
-					tmp := HexToInt(MidStr(SQLDataSet.FieldValues['skillInfo'], k, 4));
-					if SkillDB.IndexOf(tmp) <> -1 then
-					begin
-					  Skill[tmp].Lv   := HexToInt(MidStr(SQLDataSet.FieldValues['skillInfo'], k+4, 4));
-            Skill[tmp].Card := false;
-						Skill[tmp].Plag := false;
-					end;
-				end;
-				{读取人物身上物品}
-				j := Integer(Length(SQLDataSet.FieldValues['equipItem']) div 34);
-			  for i := 1 to j do begin
-				  k := (i-1)*34 + 1;
-					if ItemDB.IndexOf(HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k, 4))) <> -1 then
-					begin
-				    Item[i].ID := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k, 4));
-				    Item[i].Amount := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+4, 4));
-				    Item[i].Equip := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+8, 4));
-				    Item[i].Identify := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+12, 2));
-				    Item[i].Refine := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+14, 2));
-				    Item[i].Attr := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+16, 2));
-				    Item[i].Card[0] := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+18, 4));
-				    Item[i].Card[1] := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+22, 4));
-				    Item[i].Card[2] := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+26, 4));
-				    Item[i].Card[3] := HexToInt(MidStr(SQLDataSet.FieldValues['equipItem'], k+30, 4));
-				    Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(Item[i].ID)] as TItemDB;
-					end;
-				end;
-				{读取人物手推车里的物品}
-				j := Integer(Length(SQLDataSet.FieldValues['cartitem']) div 34);
-			  for i := 1 to j do begin
-				  k := (i-1)*34 + 1;
-					if ItemDB.IndexOf(HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k, 4))) <> -1 then
-					begin
-				    Cart.Item[i].ID := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k, 4));
-				    Cart.Item[i].Amount := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+4, 4));
-				    Cart.Item[i].Equip := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+8, 4));
-				    Cart.Item[i].Identify := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+12, 2));
-				    Cart.Item[i].Refine := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+14, 2));
-				    Cart.Item[i].Attr := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+16, 2));
-				    Cart.Item[i].Card[0] := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+18, 4));
-				    Cart.Item[i].Card[1] := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+22, 4));
-				    Cart.Item[i].Card[2] := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+26, 4));
-				    Cart.Item[i].Card[3] := HexToInt(MidStr(SQLDataSet.FieldValues['cartitem'], k+30, 4));
-				    Cart.Item[i].Data := ItemDB.Objects[ItemDB.IndexOf(Cart.Item[i].ID)] as TItemDB;
-					end;
-				end;
-      end;
 
+
+                sl.Clear;
+                sl.DelimitedText := SQLDataSet.FieldValues['skillInfo'];
+
+                for i := 0 to ((sl.Count div 2) - 1) do begin
+                    if (SkillDB.IndexOf(strtoint(sl.Strings[0+1*2])) <> -1) then begin
+                        Skill[strtoint(sl.Strings[0+i*2])].Lv := strtoint(sl.Strings[1+i*2]);
+                        Skill[strtoint(sl.Strings[0+i*2])].Card := false;
+                        Skill[strtoint(sl.Strings[0+i*2])].Plag := false;
+                    end;
+                end;
+
+                sl.Clear;
+                sl.DelimitedText := SQLDataSet.FieldValues['equipItem'];
+
+                for i := 0 to ((sl.Count div 10) - 1) do begin
+                    Item[i+1].ID := strtoint(sl.Strings[0+i*10]);
+                    Item[i+1].Amount := strtoint(sl.Strings[1+i*10]);
+                    Item[i+1].Equip := strtoint(sl.Strings[2+i*10]);
+                    Item[i+1].Identify := strtoint(sl.Strings[3+i*10]);
+                    Item[i+1].Refine := strtoint(sl.Strings[4+i*10]);
+                    Item[i+1].Attr := strtoint(sl.Strings[5+i*10]);
+                    Item[i+1].Card[0] := strtoint(sl.Strings[6+i*10]);
+                    Item[i+1].Card[1] := strtoint(sl.Strings[7+i*10]);
+                    Item[i+1].Card[2] := strtoint(sl.Strings[8+i*10]);
+                    Item[i+1].Card[3] := strtoint(sl.Strings[9+i*10]);
+                    Item[i+1].Data := ItemDB.Objects[ItemDB.IndexOf(Item[i+1].ID)] as TItemDB;
+                end;
+
+                sl.Clear;
+                sl.DelimitedText := SQLDataSet.FieldValues['cartitem'];
+
+                for i := 0 to ((sl.Count div 10) - 1) do begin
+                    Cart.Item[i+1].ID := strtoint(sl.Strings[0+i*10]);
+                    Cart.Item[i+1].Amount := strtoint(sl.Strings[1+i*10]);
+                    Cart.Item[i+1].Equip := strtoint(sl.Strings[2+i*10]);
+                    Cart.Item[i+1].Identify := strtoint(sl.Strings[3+i*10]);
+                    Cart.Item[i+1].Refine := strtoint(sl.Strings[4+i*10]);
+                    Cart.Item[i+1].Attr := strtoint(sl.Strings[5+i*10]);
+                    Cart.Item[i+1].Card[0] := strtoint(sl.Strings[6+i*10]);
+                    Cart.Item[i+1].Card[1] := strtoint(sl.Strings[7+i*10]);
+                    Cart.Item[i+1].Card[2] := strtoint(sl.Strings[8+i*10]);
+                    Cart.Item[i+1].Card[3] := strtoint(sl.Strings[9+i*10]);
+                    Cart.Item[i+1].Data := ItemDB.Objects[ItemDB.IndexOf(Cart.Item[i+1].ID)] as TItemDB;
+                end;
+            end;
+
+            sl.Clear;
             sl.DelimitedText := SQLDataSet.FieldValues['flagdata'];
 			for i := 0 to (sl.Count - 1) do begin
                 tc.Flag.Add(sl.Strings[i]);
@@ -997,6 +1009,8 @@ begin
 	  DebugOut.Lines.Add(format('Get Character data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
+
+    sl.Free;
 end;
 
 //------------------------------------------------------------------------------
@@ -1555,64 +1569,71 @@ begin
 			Exit;
 		end;
 
-		{保存技能资料}
+
 		bindata := '';
 		for j := 1 to 336 do begin
 		  if Skill[j].Lv <> 0 then begin
-			  bindata := bindata + IntToHex(j, 4);
-			  bindata := bindata + IntToHex(Skill[j].Lv, 4);
+                if j > 1 then bindata := bindata + ',';
+                bindata := bindata + inttostr(j) + ',';
+                bindata := bindata + inttostr(Skill[j].Lv);
 		  end;
-	  end;
+	    end;
+
 	  if not ExecuteSqlCmd(Format('REPLACE INTO skills (GID,skillInfo) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character Skill data error.');
 			Exit;
 		end;
 
 		{保存人物身上物品资料}
-		bindata := '';
+      bindata := '';
 	  for j := 1 to 100 do begin
-		  if Item[j].ID <> 0 then begin
-			  bindata := bindata + IntToHex(Item[j].ID, 4);
-			  bindata := bindata + IntToHex(Item[j].Amount, 4);
-			  bindata := bindata + IntToHex(Item[j].Equip, 4);
-			  bindata := bindata + IntToHex(Item[j].Identify, 2);
-			  bindata := bindata + IntToHex(Item[j].Refine, 2);
-			  bindata := bindata + IntToHex(Item[j].Attr, 2);
-			  bindata := bindata + IntToHex(Item[j].Card[0], 4);
-			  bindata := bindata + IntToHex(Item[j].Card[1], 4);
-			  bindata := bindata + IntToHex(Item[j].Card[2], 4);
-			  bindata := bindata + IntToHex(Item[j].Card[3], 4);
-		  end;
-	  end;
+            if Item[j].ID <> 0 then begin
+                if j > 1 then bindata := bindata + ',';
+                bindata := bindata + inttostr(Item[j].ID) + ',';
+                bindata := bindata + inttostr(Item[j].Amount) + ',';
+                bindata := bindata + inttostr(Item[j].Equip) + ',';
+                bindata := bindata + inttostr(Item[j].Identify) + ',';
+                bindata := bindata + inttostr(Item[j].Refine) + ',';
+                bindata := bindata + inttostr(Item[j].Attr) + ',';
+                bindata := bindata + inttostr(Item[j].Card[0]) + ',';
+                bindata := bindata + inttostr(Item[j].Card[1]) + ',';
+                bindata := bindata + inttostr(Item[j].Card[2]) + ',';
+                bindata := bindata + inttostr(Item[j].Card[3]);
+            end;
+		end;
+
 	  if not ExecuteSqlCmd(Format('REPLACE INTO inventory (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character Item data error.');
 			Exit;
 		end;
 
 		{保存人物手推车中物品的资料}
-		bindata := '';
+
+      bindata := '';
 	  for j := 1 to 100 do begin
-			if Cart.Item[j].ID <> 0 then begin
-			  bindata := bindata + IntToHex(Cart.Item[j].ID, 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Amount, 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Equip, 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Identify, 2);
-			  bindata := bindata + IntToHex(Cart.Item[j].Refine, 2);
-			  bindata := bindata + IntToHex(Cart.Item[j].Attr, 2);
-			  bindata := bindata + IntToHex(Cart.Item[j].Card[0], 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Card[1], 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Card[2], 4);
-			  bindata := bindata + IntToHex(Cart.Item[j].Card[3], 4);
-			end;
+            if Cart.Item[j].ID <> 0 then begin
+                if j > 1 then bindata := bindata + ',';
+                bindata := bindata + inttostr(Cart.Item[j].ID) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Amount) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Equip) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Identify) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Refine) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Attr) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Card[0]) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Card[1]) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Card[2]) + ',';
+                bindata := bindata + inttostr(Cart.Item[j].Card[3]);
+            end;
 		end;
-	  if not ExecuteSqlCmd(Format('REPLACE INTO cart (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
-		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
+
+	    if not ExecuteSqlCmd(Format('REPLACE INTO cart (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+            DebugOut.Lines.Add('*** Save Character CartItem data error.');
 			Exit;
 		end;
 
 		{保存人物MEMO记录点资料}
 		if not ExecuteSqlCmd(Format('REPLACE INTO warpmemo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, addslashes(MemoMap[0]), MemoPoint[0].X, MemoPoint[0].Y, addslashes(MemoMap[1]), MemoPoint[1].X, MemoPoint[1].Y, addslashes(MemoMap[2]), MemoPoint[2].X, MemoPoint[2].Y])) then begin
-		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
+		  DebugOut.Lines.Add('*** Save Character Warp Memo data error.');
 			Exit;
 		end;
 

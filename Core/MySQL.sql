@@ -1,9 +1,10 @@
+Database cobax_mako running on localhost 
 # phpMyAdmin SQL Dump
 # version 2.5.2
 # http://www.phpmyadmin.net
 #
 # Host: localhost
-# Generation Time: Feb 27, 2004 at 10:22 PM
+# Generation Time: Feb 28, 2004 at 02:13 AM
 # Server version: 4.0.15
 # PHP Version: 4.2.3
 # 
@@ -15,8 +16,8 @@
 #
 # Table structure for table `account_flags`
 #
-# Creation: Feb 27, 2004 at 10:21 PM
-# Last update: Feb 27, 2004 at 10:21 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `account_flags`;
@@ -32,7 +33,7 @@ CREATE TABLE `account_flags` (
 # Table structure for table `accounts`
 #
 # Creation: Feb 26, 2004 at 05:38 AM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Last update: Feb 28, 2004 at 02:05 AM
 # Last check: Feb 27, 2004 at 06:42 PM
 #
 
@@ -54,14 +55,14 @@ CREATE TABLE `accounts` (
 #
 # Table structure for table `cart`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 12:53 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `cart`;
 CREATE TABLE `cart` (
   `GID` bigint(10) unsigned NOT NULL default '0',
-  `cartitem` blob,
+  `cartitem` longtext,
   UNIQUE KEY `GID` (`GID`)
 ) TYPE=MyISAM;
 
@@ -70,8 +71,8 @@ CREATE TABLE `cart` (
 #
 # Table structure for table `character_flags`
 #
-# Creation: Feb 27, 2004 at 10:21 PM
-# Last update: Feb 27, 2004 at 10:21 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `character_flags`;
@@ -86,8 +87,8 @@ CREATE TABLE `character_flags` (
 #
 # Table structure for table `characters`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `characters`;
@@ -146,8 +147,8 @@ CREATE TABLE `characters` (
 #
 # Table structure for table `guild_allies`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `guild_allies`;
@@ -164,8 +165,8 @@ CREATE TABLE `guild_allies` (
 #
 # Table structure for table `guild_banish`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `guild_banish`;
@@ -181,8 +182,8 @@ CREATE TABLE `guild_banish` (
 #
 # Table structure for table `guild_castle`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `guild_castle`;
@@ -212,8 +213,8 @@ CREATE TABLE `guild_castle` (
 #
 # Table structure for table `guild_info`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 01:53 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `guild_info`;
@@ -230,7 +231,7 @@ CREATE TABLE `guild_info` (
   `present` bigint(10) unsigned default NULL,
   `DisposFV` int(4) default NULL,
   `DisposRW` int(4) default NULL,
-  `skill` blob,
+  `skill` longtext,
   PRIMARY KEY  (`GDID`)
 ) TYPE=MyISAM AUTO_INCREMENT=2 ;
 
@@ -239,8 +240,8 @@ CREATE TABLE `guild_info` (
 #
 # Table structure for table `guild_members`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `guild_members`;
@@ -257,8 +258,8 @@ CREATE TABLE `guild_members` (
 #
 # Table structure for table `guild_positions`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 01:59 AM
 #
 
 DROP TABLE IF EXISTS `guild_positions`;
@@ -278,14 +279,15 @@ CREATE TABLE `guild_positions` (
 #
 # Table structure for table `inventory`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 01:28 AM
+# Last update: Feb 28, 2004 at 02:06 AM
+# Last check: Feb 28, 2004 at 02:06 AM
 #
 
 DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE `inventory` (
   `GID` bigint(10) unsigned NOT NULL default '0',
-  `equipItem` blob,
+  `equipItem` longtext,
   UNIQUE KEY `GID` (`GID`)
 ) TYPE=MyISAM;
 
@@ -294,8 +296,8 @@ CREATE TABLE `inventory` (
 #
 # Table structure for table `party`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `party`;
@@ -318,15 +320,15 @@ CREATE TABLE `party` (
   `MemberID11` bigint(10) unsigned default NULL,
   PRIMARY KEY  (`GRID`),
   KEY `Name` (`Name`)
-) TYPE=MyISAM AUTO_INCREMENT=21 ;
+) TYPE=MyISAM AUTO_INCREMENT=1 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `pet`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `pet`;
@@ -352,8 +354,8 @@ CREATE TABLE `pet` (
 #
 # Table structure for table `server_flags`
 #
-# Creation: Feb 27, 2004 at 10:21 PM
-# Last update: Feb 27, 2004 at 10:21 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `server_flags`;
@@ -368,14 +370,15 @@ CREATE TABLE `server_flags` (
 #
 # Table structure for table `skills`
 #
-# Creation: Feb 27, 2004 at 10:21 PM
-# Last update: Feb 27, 2004 at 10:21 PM
+# Creation: Feb 28, 2004 at 01:40 AM
+# Last update: Feb 28, 2004 at 02:08 AM
+# Last check: Feb 28, 2004 at 02:08 AM
 #
 
 DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
   `GID` bigint(10) unsigned NOT NULL default '0',
-  `skillInfo` blob,
+  `skillInfo` longtext,
   UNIQUE KEY `GID` (`GID`)
 ) TYPE=MyISAM;
 
@@ -384,14 +387,14 @@ CREATE TABLE `skills` (
 #
 # Table structure for table `storage`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 01:28 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `storage`;
 CREATE TABLE `storage` (
   `AID` bigint(10) unsigned NOT NULL default '0',
-  `storeitem` blob,
+  `storeitem` longtext,
   `money` int(4) unsigned NOT NULL default '0',
   UNIQUE KEY `AID` (`AID`)
 ) TYPE=MyISAM;
@@ -401,15 +404,14 @@ CREATE TABLE `storage` (
 #
 # Table structure for table `temptable`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:19 PM
+# Creation: Feb 28, 2004 at 01:54 AM
+# Last update: Feb 28, 2004 at 01:54 AM
 #
 
 DROP TABLE IF EXISTS `temptable`;
 CREATE TABLE `temptable` (
   `AID` int(11) NOT NULL default '0',
-  `CNAME` text NOT NULL,
-  `asdf` longblob NOT NULL
+  `CNAME` text NOT NULL
 ) TYPE=MyISAM;
 
 # --------------------------------------------------------
@@ -417,8 +419,8 @@ CREATE TABLE `temptable` (
 #
 # Table structure for table `warpmemo`
 #
-# Creation: Feb 27, 2004 at 10:19 PM
-# Last update: Feb 27, 2004 at 10:20 PM
+# Creation: Feb 28, 2004 at 12:50 AM
+# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `warpmemo`;
