@@ -23,7 +23,8 @@ uses
     REED_LOAD_CASTLES,
     REED_SAVE_ACCOUNTS,
     REED_SAVE_CHARACTERS,
-    REED_SAVE_PETS;
+    REED_SAVE_PETS,
+    REED_SAVE_PARTIES;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -39,10 +40,6 @@ uses
 
     { Character Data - Basic Data }
     procedure PD_Delete_Characters(tc : TChara);
-
-
-    { Party Data - Member Data }
-    procedure PD_Save_Parties_Members(forced : Boolean = False);
 
 
     { Guild Data - Basic Data }
@@ -122,9 +119,7 @@ uses
         PD_Save_Accounts_Parse(forced);
         PD_Save_Characters_Parse(forced);
         PD_Save_Pets_Parse(forced);
-
-
-        PD_Save_Parties_Members(forced);
+        PD_Save_Parties_Parse(forced);
 
         PD_Save_Guilds(forced);
         PD_Save_Guilds_Members(forced);
@@ -266,94 +261,7 @@ uses
     end;
 
 
-    { -------------------------------------------------------------------------------- }
-    { -- Party Data - Member Data ---------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Parties_Members(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tpa : TParty;
-    	i, j : Integer;
-        str : String;
-        saveflag : Boolean;
 
-        searchResult : TSearchRec;
-    begin
-        if FindFirst(AppPath + 'gamedata\Parties\*', faDirectory, searchResult) = 0 then repeat
-            if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
-
-            {trashparty := True;
-            for i := 0 to PartyNameList.Count - 1 do begin
-                tpa := PartyNameList.Objects[i] as TParty;
-                if tpa.Name = searchResult.Name then begin
-                    trashparty := False;
-                end;
-            end;
-
-            if trashparty then begin
-                //debugout.lines.add(tpa.Name + ' deleted');
-                DeleteFile(AppPath + 'gamedata\Parties\' + searchResult.Name + '\Members.txt');
-                RmDir(AppPath + 'gamedata\Parties\' + searchResult.Name);
-            end;}
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-    	saveflag := False;
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PartyNameList.Count - 1 do begin
-			tpa := PartyNameList.Objects[i] as TParty;
-
-            for j := 0 to 11 do begin
-                if not assigned(tpa.Member[j]) then tpa.MemberID[j] := 0;
-            	if tpa.MemberID[j] = 0 then Break;
-
-                if (tpa.Member[j].Login <> 0) or (forced) then begin
-                	saveflag := True;
-                    Break;
-                end;
-            end;
-
-            if not saveflag then Continue;
-
-        	datafile.Clear;
-            datafile.Add(' CID    : NAME');
-            datafile.Add('-------------------------------------------------');
-
-            for j := 0 to 11 do begin
-            	if tpa.MemberID[j] = 0 then Continue;
-                if not assigned(tpa.Member[j]) then Continue;
-                if tpa.Member[j].PartyName <> tpa.Name then Continue;                
-
-            	str := ' ';
-                str := str + IntToStr(tpa.MemberID[j]);
-                str := str + ' : ';
-                str := str + tpa.Member[j].Name;
-
-            	datafile.Add(str);
-			end;
-
-            CreateDir(AppPath + 'gamedata\Parties');
-            CreateDir(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID));
-
-            try
-                datafile.SaveToFile(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID) + '\Members.txt');
-                //debugout.Lines.Add(tpa.Name + ' party members data saved.');
-            except
-                DebugOut.Lines.Add('Parties members data could not be saved.');
-            end;
-
-            datafile.Clear;
-            datafile.Add('NAM : ' + tpa.Name);
-            datafile.Add('PID : ' + IntToStr(tpa.ID));
-            datafile.SaveToFile(AppPath + 'gamedata\Parties\' + IntToStr(tpa.ID) + '\Settings.txt');
-
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
 
 
     { -------------------------------------------------------------------------------- }

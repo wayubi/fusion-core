@@ -18,6 +18,7 @@ uses
     function guild_is_online(tg : TGuild) : Boolean;
     procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
     procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
+    function party_is_online(tpa : TParty) : Boolean;
 
 implementation
 
@@ -444,9 +445,37 @@ uses
                 
             end;
         end;
-        { ------------------------------------------------------------------------------------- }
-        
     end;
+    { ------------------------------------------------------------------------------------- }
+    
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - party_is_online                                                             }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To see if any party members are online for loading purposes.                 }
+    { Parameters:                                                                           }
+    {  - tpa : TParty, Represents the party data to check.                                  }
+    { Results:                                                                              }
+    {  - Result : Boolean, Represents the return value of whether or not onnline.           }
+    { ------------------------------------------------------------------------------------- }
+    function party_is_online(tpa : TParty) : Boolean;
+    var
+        i : Integer;
+    begin
+        Result := False;
+
+        for i := 0 to 11 do begin
+            if not assigned(tpa.Member[i]) then tpa.MemberID[i] := 0;
+            if (tpa.MemberID[i] <> 0) then begin
+                if tpa.Member[i].Login <> 0 then begin
+                    Result := True;
+                    Break;
+                end;
+            end;
+        end;
+
+    end;
+    { ------------------------------------------------------------------------------------- }
         
 end.
 
