@@ -1,4 +1,6 @@
 Fusion 1.2.0.8 - December ????, 2003
+- 12-19-03: Updated Interface to ease Eye Strain. [AlexKreuz]
+- 12-19-03: Fixed Overweight NPC Purchase Bug (#59). [AlexKreuz]
 - 12-18-03: Updated damage display packet to new format, allows >32Kdmg [Colus]
 - 12-18-03: Set up CVS Server. Follow this Log Format. [AlexKreuz]
 - 12-17-03: Updated Packet Length Table [Colus]
