@@ -875,8 +875,13 @@ type TChara = class
         SongTick      :cardinal;   {Determines if Bard is Casting a Song}
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
 
+        SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
+
 	constructor Create;
 	destructor  Destroy; override;
+  //procedures to get skilonbool and set skillonbool
+  procedure setSkillOnBool(temp:Boolean);
+  function getSkillOnBool:Boolean;
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
@@ -2146,6 +2151,7 @@ begin
 			if SkillPoint > 714 then SkillPoint := 714; //これだけ有れば十分
 		end;
 		CalcEquip(tc);
+    DEF2 := Param[2];
 		CalcSkill(tc,Tick);
 		for i := 0 to 5 do begin
 			ParamUp[i] := ((ParamBase[i] - 1) div 10) + 2;
@@ -2188,7 +2194,6 @@ begin
 
 		MaxWeight := MaxWeight + cardinal((Param[0]- Bonus[0]) * 300 + WeightTable[JID]);
 
-		DEF2 := Param[2];
 		MDEF2 := Param[3];
 		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
 
@@ -2367,6 +2372,16 @@ begin
 			else
 				i := i - 30;
 		end;
+
+        //BS Maximun codes
+        //beita 20040206
+    if (Skill[114].Lv <> 0) then begin
+       if getSkillOnBool then begin
+       //set param[4] to be 200 for maximun effect
+       tc.Param[4] := 200;
+     end;
+     end;
+    //end of BS Maximun codes
 
 		if Skill[30].Tick > Tick then begin // AGI down
 			if Skill[30].EffectLV > 5 then
@@ -8136,7 +8151,20 @@ begin
 	Move(bb[0], buf[index], 5);
 end;
 //==============================================================================
+//get boolean procedure for boolean SkillOnBool
+//beita 20040206
+procedure TChara.setSkillOnBool(temp : Boolean);
+begin;
+SkillOnBool := temp;
+end;
 
+//==============================================================================
+//set boolean function for boolean SkillOnBool
+//beita 20040206
+function TChara.getSkillOnBool : Boolean;
+begin
+Result := SkillOnBool;
+end;
 
 
 

@@ -2,6 +2,9 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-06-04: BlackSmith skill Maximun fully functional now. [beita]
+- 02-06-04: Fixed bug #347: Certain moves in Blacksmiths increase ASPD [beita]
+- 02-06-04: Fixed bug #45: priest angelus no effect. [beita]
 - 02-06-04: Fixed bug #442: Blank Guild Members after Char Delete. [Mitch]
 - 02-06-04: Updated Autospell PvP again. [Darkhelmet]
 - 02-06-04: Updated Autocast to behave 'properly' based on skills/level. [Colus]
@@ -403,7 +406,7 @@ Fusion 1.207 - November 27th, 2003
 - Weapon: Brionic cast level 3 soul strike-[Darkhelmet]
 - Weapon: FireBrand now auto casts Firebolt level 3-[Darkhelmet]
 - Weapon: IceFalcion now auto casts Cold Bolt levle 3-[Darkhelmet]
-- Weapon: Hellfire now auto casts Fireball level 3 – [Darkhelmet]
+- Weapon: Hellfire now auto casts Fireball level 3 ?[Darkhelmet]
 - Card: Doppelganger-Adds 33 percent aspd-[Darkhelmet] 
 - Card: Mistress Card-No gemstone effect -[Darkhelmet]
 - Card: Eddga Card-Unlimited Endure (it doesnt' show icon on side but it works) -[Darkhelmet]

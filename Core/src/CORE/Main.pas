@@ -917,6 +917,7 @@ begin
         // AlexKreuz: Random 10053 Bug Fix
         if Assigned(Socket.Data) then begin
         	tc := Socket.Data;
+          tc.setSkillOnBool(False); //set SkillOnBool when character log off
         	SendCLeave(tc, 2);
                 {NPCイベント追加}
         	i := MapInfo.IndexOf(tc.Map);
@@ -3157,6 +3158,29 @@ begin
 {追加}
 	Result := False;
 {追加ココまで}
+        //BS Maximun skill code while character is walking
+        if (tc.Skill[114].Lv <> 0) and (tc.getSkillOnBool) then begin
+            if tc.SP <> 0 then begin
+            //sp drain
+            if tc.Skill[114].Tick+1000<=Tick then begin
+            tc.SP := tc.SP - 1;
+            WFIFOW( 0, $00b0);
+						WFIFOW( 2, $0007);
+						WFIFOL( 4, tc.SP);
+						tc.Socket.SendBuf(buf, 8);
+            tc.Skill[114].Tick := Tick;
+            end;
+            end else begin
+            //when sp reaches 0, reset boolean, icon, and recalculate character status
+            tc.setSkillOnBool(False);
+            tc.Skill[114].Tick := 0;
+            tc.MSkill := 114;
+            tc.SkillTick := tc.Skill[114].Tick;
+            tc.SkillTickID := tc.MSkill;
+            CalcStat(tc);
+            end;
+        end;
+        //end of BS Maximun skill code
 end;
 //------------------------------------------------------------------------------
 //分割２
@@ -10128,6 +10152,7 @@ begin
                                                 if (tc1.MSkill = 51) then begin {Hiding}
 
                                                         if (tc1.Option and 2 <> 0) then begin
+                                                        tc1.setSkillOnBool(False); //set SkillOnBool for icon update //beita 20040206
                                                                 tc1.Skill[MSkill].Tick := Tick;
 	    					                tc1.Option := tc1.Option and $FFFD;
                                                                 SkillTick := tc1.Skill[MSkill].Tick;
@@ -10136,7 +10161,7 @@ begin
                                                                 tc1.Hidden := false;
                                                                 //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
                                                         end else begin
-
+                                                        tc1.setSkillOnBool(True); //set SkillOnBool for icon update //beita 20040206
                                                                 // Required to place Hide on a timer.
 						                tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
 
@@ -10173,6 +10198,8 @@ begin
 
             if (tc1.MSkill = 143) then begin
                 if tc1.Sit = 1 then begin
+                //set SkillOnBool for icon update //beita 20040206
+                tc1.setSkillOnBool(False);
 						tc1.Sit := 3;
             SkillTick := tc1.Skill[MSkill].Tick;
             SkillTickID := MSkill;
@@ -10180,22 +10207,29 @@ begin
             //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
             CalcStat(tc1, Tick);
 						end else begin
+            //set SkillOnBool for icon update //beita 20040206
+            tc1.setSkillOnBool(True);
 							tc1.Sit := 1;
 						end;
             end;
             if (tc1.MSkill = 114) then begin
-            // Colus, 20040204: This needs changing to a Skill[114].Tick method
-            if (tc1.Option and 4096 <> 0) then begin
-						tc1.Option := tc1.Option and $EFFF;
+            if tc1.getSkillOnBool then begin
+            //set boolean to be false when trigger skill again, reset icon and recalculate status.
+            //beita 20040206
+            tc1.setSkillOnBool(False);
             SkillTick := tc1.Skill[MSkill].Tick;
             SkillTickID := MSkill;
-            CalcStat(tc1, Tick);
+            CalcStat(tc1);
 						end else begin
-              //tc1.Optionkeep := tc1.Option;
-							tc1.Option := tc1.Option or 4096;
+            //set boolean to be true, calculate character status for maximun effect
+            //set skill[114].tick to be Tick for sp drain according to time.
+            //beita 20040206
+              tc1.setSkillOnBool(True);
+              CalcStat(tc1);
+            tc1.Skill[114].Tick :=Tick;
 						end;
             end;
-            if tl.Icon <> 0 then begin
+            if (tl.Icon <> 0) and (getSkillOnBool) then begin
 							WFIFOW(0, $0196);
 							WFIFOW(2, tl.Icon);
 							WFIFOL(4, ID);
@@ -10363,6 +10397,32 @@ begin
 					end;
 					SPRTick := Tick;
 				end;
+
+        //BS Maximun skill code when character is not walking
+        //beita 20020406
+        if (tc.Skill[114].Lv <> 0) and (tc.getSkillOnBool) then begin
+            if SP <> 0 then begin
+            //sp drain
+            if tc.Skill[114].Tick+1000<=Tick then begin
+            SP := SP - 1;
+            WFIFOW( 0, $00b0);
+						WFIFOW( 2, $0007);
+						WFIFOL( 4, SP);
+						Socket.SendBuf(buf, 8);
+            tc.Skill[114].Tick := Tick;
+            end;
+            end else begin
+            //when sp reaches 0, reset boolean,icon, and recalculate character status
+            tc.setSkillOnBool(False);
+            tc.Skill[114].Tick := 0;
+            tc.MSkill := 114;
+            tc.SkillTick := tc.Skill[114].Tick;
+            tc.SkillTickID := tc.MSkill;
+            CalcStat(tc);
+            end;
+        end;
+        //end of BS Maximun skill code
+
 
 				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) then begin
 					if SP <> MAXSP then begin
