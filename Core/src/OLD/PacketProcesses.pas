@@ -11,7 +11,7 @@ uses
     Types, QStdCtrls,
     {$ENDIF}
     {Shared}
-    Classes, SysUtils, Types, QStdCtrls,
+    Classes, SysUtils,
     {Fusion}
 	GlobalLists, Common, List32;
 

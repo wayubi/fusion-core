@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-08-04: Fusion would not run without qtintf70.dll. Please be more careful in your work. [AlexKreuz]
 - 08-07-04: Updated weiss.dpr for linux directory structure. [Tsusai]
 - 08-07-04: Took out 10053/10054 error messages. Confusing the server admins. [AlexKreuz]
 - 08-07-04: Modified default font style. [AlexKreuz]
