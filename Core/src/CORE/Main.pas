@@ -4758,6 +4758,51 @@ begin
 							Exit;
 						end;
 					end;
+        130:
+          begin
+            xy.X := tc.MPoint.X;
+            xy.Y := tc.MPoint.Y;
+            i1 := abs(tc.Point.X - xy.X);
+            j1 := abs(tc.Point.Y - xy.Y);
+            i := (1 + (2 * tc.Skill[130].Lv));
+
+            if (tc.Option and 16 <> 0) and (i1 <= i) and (j1 <= i) then begin
+
+						sl.Clear;
+
+						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+									if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue;
+                  ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+                    sl.AddObject(IntToStr(ts1.ID),ts1);
+								end;
+							end;
+						end;
+
+						if sl.Count <> 0 then begin
+							for k1 := 0 to sl.Count - 1 do begin
+								ts1 := sl.Objects[k1] as TMob;
+                if (ts1.Hidden = true) then begin
+                  ts1.Hidden := false;
+                  WFIFOW(0, $0119);
+    					    WFIFOL(2, ts1.ID);
+    					    WFIFOW(6, 0);
+    					    WFIFOW(8, 0);
+    					    WFIFOW(10, 0);
+    					    WFIFOB(12, 0);
+    					    SendBCmd(tm, ts1.Point, 13);
+
+                end;
+							end;
+						end;
+          end else begin
+          SendSkillError(tc, 0);
+          tc.MMode := 4;
+          Exit;
+          end;
+          end;
                                 229:    {Demonstration}
 					begin
                                                 j := SearchCInventory(tc, 7135, false);
@@ -8788,15 +8833,22 @@ begin
 					end;
         130:
           begin
-            if (tc.Option and 16 <> 0) then begin
-            xy := tc.Point;
+            xy.X := tc.MPoint.X;
+            xy.Y := tc.MPoint.Y;
+            i1 := abs(tc.Point.X - xy.X);
+            j1 := abs(tc.Point.Y - xy.Y);
+            i := (1 + (2 * tc.Skill[130].Lv));
+
+            if (tc.Option and 16 <> 0) and (i1 <= i) and (j1 <= i) then begin
+
 						sl.Clear;
-            
-						for j1 := (xy.Y - tl.Range) div 8 to (xy.Y + tl.Range) div 8 do begin
-							for i1 := (xy.X - tl.Range) div 8 to (xy.X + tl.Range) div 8 do begin
+
+						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
 								for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
-									if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then continue; tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-									if (abs(tc1.Point.X - xy.X) <= tl.Range) and (abs(tc1.Point.Y - xy.Y) <= tl.Range) then
+									if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then continue;
+                  tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
+									if (abs(tc1.Point.X - xy.X) <= tl.Range2) and (abs(tc1.Point.Y - xy.Y) <= tl.Range2) then
                     sl.AddObject(IntToStr(tc1.ID),tc1);
 								end;
 							end;
@@ -8820,6 +8872,7 @@ begin
 							end;
 						end;
           end else begin
+          SendSkillError(tc, 0);
           tc.MMode := 4;
           Exit;
           end;
@@ -13021,7 +13074,7 @@ begin
 								ts1.pcnt := 0;
 
                                                                 UpdateMonsterLocation(tm, ts1);
-                   
+                      
 							end;
 
                                                 $90: //アイスウォール

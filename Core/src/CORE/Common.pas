@@ -15,6 +15,12 @@ const
   LOWER_JOB_END = 23;
   UPPER_JOB_BEGIN = 4000;
 
+type TLiving = class
+  public
+    ID      :cardinal;
+    Name    :string;
+    Point   :TPoint;
+end;
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
 type rPoint = record
@@ -278,12 +284,12 @@ type rEXPDist = record
 end;
 //------------------------------------------------------------------------------
 // モンスターデータ
-type TMob = class
-	ID          :cardinal;
-	Name        :string;
+type TMob = class(TLiving)
+	//ID          :cardinal;
+	//Name        :string;
 	JID         :word;
 	Map         :string;
-	Point       :TPoint;
+	//Point       :TPoint;
 	tgtPoint    :TPoint;
   NextPoint   :TPoint;
 	Dir         :byte;
@@ -578,9 +584,9 @@ type TeNPC = class
 end;
 //------------------------------------------------------------------------------
 // Character Data
-type TChara = class
+type TChara = class(TLiving)
 	// Control Variables
-	ID	          :cardinal;
+	//ID	          :cardinal;
 	Socket        :TCustomWinSocket;
 	PData         :Pointer;
 	IP            :string;
@@ -589,7 +595,7 @@ type TChara = class
 	// Data saved and loaded to/from chara.txt
 	// Line 1:
 	CID	          :cardinal;
-	Name          :string;
+	//Name          :string;
 	Gender        :byte;
 
 	JID           :Word;
@@ -666,7 +672,7 @@ type TChara = class
 	_4            :word;
 
 	Map           :string;
-	Point         :TPoint;
+	//Point         :TPoint;
 	SaveMap       :string;
 	SavePoint     :TPoint;
 	MemoMap       :array[0..2] of string;
@@ -988,16 +994,16 @@ type rScript = record
 end;
 //------------------------------------------------------------------------------
 // NPCデータ
-type TNPC = class
-	ID          :cardinal;
-	Name        :string;
+type TNPC = class(TLiving)
+	//ID          :cardinal;
+	//Name        :string;
 {NPCイベント追加}
 //	JID         :word;
 	JID         :integer;
 {NPCイベント追加ココまで}
 	Map         :string;
   Reg         :string;
-	Point       :TPoint;
+	//Point       :TPoint;
 	Dir         :byte;
 	CType       :byte; //0=warp 1=shop 2=script 3=item 4=skill
 	//warp

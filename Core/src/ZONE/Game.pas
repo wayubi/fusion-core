@@ -634,6 +634,30 @@ end;
 							        tc.AData := tn;
 					        		NPCScript(tc);
 					        	end;
+                 { 4: // Skillunit
+                    begin
+                      if (tn.JID = $8d) then begin
+						if tc.pcnt <> 0 then xy := tc.tgtPoint else xy := tc.Point;
+						if (abs(xy.X - tn.Point.X) > tc.Range) or (abs(xy.Y - tn.Point.Y) > tc.Range) then begin
+							//距離が遠すぎる
+							WFIFOW( 0, $0139);
+							WFIFOL( 2, tn.ID);
+							WFIFOW( 6, tn.Point.X);
+							WFIFOW( 8, tn.Point.Y);
+							WFIFOW(10, tc.Point.X);
+							WFIFOW(12, tc.Point.Y);
+							WFIFOW(14, tc.Range); //射程
+							Socket.SendBuf(buf, 16);
+						end else begin
+							//攻撃可能
+							if b = 7 then tc.AMode := 2 else tc.AMode := 1;
+							tc.ATarget := tn.ID;
+							tc.AData := tn;
+							if tc.ATick + tc.ADelay - 200 < timeGetTime() then
+								tc.ATick := timeGetTime() - tc.ADelay + 200;
+						end;
+                      end;
+                    end;}
 					        end;
 			        	end;
                                         //モンスター型NPC　ここまで

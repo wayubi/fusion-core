@@ -1,3 +1,5 @@
+- 03-16-04: Rearranged object hierarchy slightly. [Colus]
+- 03-16-04: Added Detect effect on monsters. [Colus]
 - 03-16-04: Added some documentation on new options. [Colus]
 
 --------------------------------------------------------------------------------
