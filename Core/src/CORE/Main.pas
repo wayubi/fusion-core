@@ -6235,43 +6235,92 @@ begin
 						end;
 						DamageProcess1(tm, tc, ts, dmg[0], Tick);
 					end;
-				88: //フロストノヴァ
-					begin
-          SendCSkillAtk1(tm, tc, ts, 15, 35000, 1, 6);
-						xy := ts.Point;
-						sl.Clear;
-						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-									if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-									if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
-									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-										sl.AddObject(IntToStr(ts1.ID),ts1);
-                                                                end;
-                                                        end;
-						end;
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count - 1 do begin
-								ts1 := sl.Objects[k1] as TMob;
-								dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
-								dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-								dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-								if dmg[0] < 1 then dmg[0] := 1;
-								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1 , 5);
-                                                                if (ts1.Data.race <> 1) and (ts1.Data.MEXP = 0) and (dmg[0] <> 0)then begin
-                                                                        if Random(1000) < tl.Data1[MUseLV] * 10 then begin
-								                ts1.nStat := 2;
-								                ts1.BodyTick := Tick + tc.aMotion;
-                                                                        end;
-						                end;
-								//ダメージ処理
-								DamageProcess1(tm, tc, ts1, dmg[0], Tick);
-							end;
-						end;
-                                                tc.MTick := Tick + 1000;
-					end;
+                    
+    88: // Frost Nova
+    begin
+
+        dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+        dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+        dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+
+        if dmg[0] < 1 then
+          dmg[0] := 1;
+
+        dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
+          
+        if dmg[0] < 0 then
+          dmg[0] := 0;
+
+        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1 , 5);
+
+        if (ts.Data.race <> 1) and (ts.Data.MEXP = 0) and (dmg[0] <> 0) then begin
+          if Random(1000) < tl.Data1[MUseLV] * 10 then begin
+            ts.nStat := 2;
+            ts.BodyTick := Tick + tc.aMotion;
+          end;
+        end;
+
+        
+        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+
+        tc.MTick := Tick + 1000;
+  
+    end;
+
+
+    {
+
+    AlexKreuz: I don't know why all this code is even here, esp. since
+    SendCSkillAtk1 is determined with fixed dmg of 35000.
+
+    SendCSkillAtk1(tm, tc, ts, 15, 35000, 1, 6);
+    xy := ts.Point;
+    sl.Clear;
+    for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+      for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+        for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+
+          if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then
+            Continue;
+
+          ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+
+          if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then
+            Continue;
+
+          if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+            sl.AddObject(IntToStr(ts1.ID),ts1);
+        end;
+      end;
+    end;
+    
+    if sl.Count <> 0 then begin
+      for k1 := 0 to sl.Count - 1 do begin
+        ts1 := sl.Objects[k1] as TMob;
+        dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+        dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+        dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+
+        if dmg[0] < 1 then
+          dmg[0] := 1;
+
+        dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+          
+        if dmg[0] < 0 then
+          dmg[0] := 0;
+
+        SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1 , 5);
+
+        if (ts1.Data.race <> 1) and (ts1.Data.MEXP = 0) and (dmg[0] <> 0) then begin
+          if Random(1000) < tl.Data1[MUseLV] * 10 then begin
+            ts1.nStat := 2;
+            ts1.BodyTick := Tick + tc.aMotion;
+          end;
+        end;
+
+      end;
+    end;}
+
 				86: //ウォーターボール
 					begin
                                                 k := tl.Data1[MUseLV];
