@@ -6,27 +6,44 @@ uses
   {$IFDEF MSWINDOWS}
   madExcept,
   Forms,
-  List32 in '..\lib\List32.pas',
   {$ENDIF}
   {$IFDEF LINUX}
   QForms,
-  List32 in '../lib/List32.pas',
   {$ENDIF}
-  Main in 'Main.pas' {frmMain},
-  Common in 'Common.pas',
-  Path in 'Path.pas',
-  Login in 'Login.pas',
-  CharaSel in 'CharaSel.pas',
-  Game in 'Game.pas',
-  Database in 'Database.pas',
-  Script in 'Script.pas',
-  Skills in 'Skills.pas',
-  WeissINI in 'WeissINI.pas',
-  JCon in 'JCon.pas',
-  PlayerData in 'PlayerData.pas',
-  SQLData in 'SQLData.pas',
-  FusionSQL in 'FusionSQL.pas',
-  TrimStr in 'TrimStr.pas';
+
+  Main in 'CORE\Main.pas' {frmMain},
+  Common in 'CORE\Common.pas',
+  Globals in 'CORE\Globals.pas',
+
+  Login in 'ZONE\Login.pas',
+  CharaSel in 'ZONE\CharaSel.pas',
+  Game in 'ZONE\Game.pas',
+
+  Database in 'DATABASE\Database.pas',
+  PlayerData in 'DATABASE\PlayerData.pas',
+
+  FusionSQL in 'SQL\FusionSQL.pas',
+  SQLData in 'SQL\SQLData.pas',
+
+  MonsterAI in 'AI\MonsterAI.pas',
+  Path in 'AI\Path.pas',
+
+  Game_Master in 'FEATURES\Game_Master.pas',
+  JCon in 'FEATURES\JCon.pas',
+  Player_Skills in 'FEATURES\Player_Skills.pas',
+  WeissINI in 'FEATURES\WeissINI.pas',
+
+  GlobalLists in 'OLD\GlobalLists.pas',
+  Manifest in 'OLD\Manifest.pas',
+  PacketProcesses in 'OLD\PacketProcesses.pas',
+  Script in 'OLD\Script.pas',
+  Skills in 'OLD\Skills.pas',
+  Skill_Constants in 'OLD\Skill_Constants.pas',
+  TrimStr in 'OLD\TrimStr.pas',
+
+  Zip in '3RDPARTY\Zip.pas',
+  ZipDlls in '3RDPARTY\ZipDlls.pas',
+  List32 in '3RDPARTY\List32.pas';
 
 {$R *.res}
 
