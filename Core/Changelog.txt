@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-20-03: Added intelligent error handling. Auto-Resume & Auto-Restart. [AlexKreuz]
 - 12-20-03: Updated interface with cleaner MinToTray Button. [AlexKreuz]
 - 12-20-03: New Movement logic. Increases performance for mob/player heavy maps. [AlexKreuz]
 - 12-20-03: Fixed bad item decrease calculations in storage. Caused crash. [AlexKreuz]
