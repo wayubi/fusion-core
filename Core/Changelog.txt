@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-07-04: Took out 10053/10054 error messages. Confusing the server admins. [AlexKreuz]
+- 08-07-04: Modified default font style. [AlexKreuz]
+- 08-07-04: Cleaned up source code file structure. [AlexKreuz]
 - 08-06-04: Cleaned up cross platform USES. [Tsusai]
 - 08-05-04: Another class type usage cross platform fix. [Tsusai]
 - 08-05-04: Forgot to update how directories work in Linux. [Tsusai]

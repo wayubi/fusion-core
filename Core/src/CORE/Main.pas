@@ -794,17 +794,17 @@ begin
 	if sl.IndexOfName('Option_Font_Color') > -1 then begin
                         Option_Font_Color := sl.Values['Option_Font_Color'];
                 end else begin
-                        Option_Font_Color := '797979';
+                        Option_Font_Color := '666666';
                 end;
 	if sl.IndexOfName('Option_Font_Size') > -1 then begin
                         Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
                 end else begin
-                        Option_Font_Size := 9;
+                        Option_Font_Size := 8;
                 end;
 	if sl.IndexOfName('Option_Font_Face') > -1 then begin
                         Option_Font_Face := sl.Values['Option_Font_Face'];
                 end else begin
-                        Option_Font_Face := 'Century Gothic';
+                        Option_Font_Face := 'Trebuchet MS';
                 end;
 	if sl.IndexOfName('Option_Font_Style') > -1 then begin
 		Option_Font_Style := sl.Values['Option_Font_Style'];
@@ -1347,7 +1347,10 @@ procedure TfrmMain.sv1ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
+    { Alex: Server owners do not need to see this. It'll make them
+    think something is wrong and start bitching.
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Player has been disconnected from server. Player did not exit via Exit button');
+    }
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1392,7 +1395,10 @@ procedure TfrmMain.sv2ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
+    { Alex: Server owners do not need to see this. It'll make them
+    think something is wrong and start bitching.
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Player has been disconnected from server. Player did not exit via Exit button');
+    }
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1488,11 +1494,17 @@ begin
 	if UseSQL then SQLDataSave();
 	if ErrorCode = 10053 then begin
     	Socket.Close;
+        { Alex: Server owners do not need to see this. It'll make them
+        think something is wrong and start bitching.
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player did not exit via Exit button');
+        }
     end;
 	if ErrorCode = 10054 then begin
     	Socket.Close;
+        { Alex: Server owners do not need to see this. It'll make them
+        think something is wrong and start bitching.
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Player has been disconnected from server. Player tried to log in twice with the same account');
+        }
     end;
 
 	ErrorCode := 0;
