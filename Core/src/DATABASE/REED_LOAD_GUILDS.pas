@@ -13,6 +13,9 @@ uses
     procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Skills(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_BanList(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_Diplomacy(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_Storage(tg : TGuild; path : String);
 
     function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
@@ -83,6 +86,15 @@ implementation
 
             pfile := 'Skills.txt';
             PD_Load_Guilds_Skills(tg, path + pfile);
+
+            pfile := 'BanList.txt';
+            PD_Load_Guilds_BanList(tg, path + pfile);
+
+            pfile := 'Diplomacy.txt';
+            PD_Load_Guilds_Diplomacy(tg, path + pfile);
+
+            pfile := 'Storage.txt';
+            PD_Load_Guilds_Storage(tg, path + pfile);
 
 
             NowGuildID := (tg.ID + 1);
@@ -172,7 +184,7 @@ implementation
 
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Guilds Members ----------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Positions --------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
     var
@@ -196,7 +208,7 @@ implementation
     
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Guilds Members ----------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Skills ------------------------------------------------------ }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Guilds_Skills(tg : TGuild; path : String);
     var
@@ -219,6 +231,94 @@ implementation
         if (tg.GSkill[10004].Lv > 0) then
             tg.MaxUsers := tg.MaxUsers + tg.GSkill[10004].Data.Data1[tg.GSkill[10004].Lv];
             
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Guilds BanList ----------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Guilds_BanList(tg : TGuild; path : String);
+    var
+        i : Integer;
+        tgb : TGBan;
+    begin
+
+        { -- Clear existing BanList -- }
+        if (tg.GuildBanList.Count > 0) then begin
+            for i := 0 to tg.GuildBanList.Count - 1 do begin
+                if assigned(tg.GuildBanList.Objects[i]) then
+                    tg.GuildBanList.Objects[i].Free;
+            end;
+            tg.GuildBanList.Free;
+        end;
+        { -- Clear existing BanList -- }
+
+        for i := 0 to retrieve_length(path) do begin
+            tgb := TGBan.Create;
+
+            tgb.Name := retrieve_value(path, i, 0);
+            tgb.AccName := retrieve_value(path, i, 1);
+            tgb.Reason := retrieve_value(path, i, 2);
+
+            tg.GuildBanList.AddObject(tgb.Name, tgb);
+        end;
+
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Diplomacy --------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Guilds_Diplomacy(tg : TGuild; path : String);
+    var
+        i : Integer;
+        tgl : TGRel;
+    begin
+
+        { -- Clear existing Diplomacy List -- }
+        if (tg.RelAlliance.Count > 0) then begin
+            for i := 0 to tg.RelAlliance.Count - 1 do begin
+                if assigned(tg.RelAlliance.Objects[i]) then
+                    tg.RelAlliance.Objects[i].Free;
+            end;
+            tg.RelAlliance.Free;
+        end;
+
+        if (tg.RelHostility.Count > 0) then begin
+            for i := 0 to tg.RelHostility.Count - 1 do begin
+                if assigned(tg.RelHostility.Objects[i]) then
+                    tg.RelHostility.Objects[i].Free;
+            end;
+            tg.RelHostility.Free;
+        end;
+        { -- Clear existing Diplomacy List -- }
+
+        for i := 0 to retrieve_length(path) do begin
+            tgl := TGRel.Create;
+
+            tgl.ID := retrieve_value(path, i, 0);
+            tgl.GuildName := retrieve_value(path, i, 2);
+
+            if (retrieve_value(path, i, 1) = 'A') then
+                tg.RelAlliance.AddObject(tgl.GuildName, tgl)
+            else if (retrieve_value(path, i, 1) = 'H') then
+                tg.RelHostility.AddObject(tgl.GuildName, tgl)
+            else
+                Continue;
+        end;
+
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Storage ----------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Guilds_Storage(tg : TGuild; path : String);
+    begin
+        retrieve_inventories(path, tg.Storage.Item);
     end;
     { ------------------------------------------------------------------------------------- }
 

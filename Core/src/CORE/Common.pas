@@ -1395,6 +1395,7 @@ type TGuild = class
 	GuildBanList :TStringList;//追放者リスト
 	RelAlliance  :TStringList;//同盟ギルドリスト
 	RelHostility :TStringList;//敵対ギルドリスト
+    Storage      :TItemList;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -10865,6 +10866,7 @@ begin
 	GuildBanList := TStringList.Create;
 	RelAlliance := TStringList.Create;
 	RelHostility := TStringList.Create;
+    Storage := TItemList.Create;
 end;
 
 destructor TGuild.Destroy;
@@ -10888,6 +10890,8 @@ begin
 		if Assigned(RelHostility.Objects[Idx]) then
 			(RelHostility.Objects[Idx] AS TGRel).Free;
 	RelHostility.Free;
+
+    Storage.Free;
 
 	inherited;
 end;

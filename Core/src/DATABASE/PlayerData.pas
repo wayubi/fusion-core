@@ -81,12 +81,12 @@ uses
     procedure PD_Save_Guilds_Skills(forced : Boolean = False);
 
     { Guild Data - Ban List Data }
-    procedure PD_Load_Guilds_BanList(UID : String = '*');
     procedure PD_Save_Guilds_BanList(forced : Boolean = False);
 
     { Guild Data - Diplomacy Data }
-    procedure PD_Load_Guilds_Diplomacy(UID : String = '*');
     procedure PD_Save_Guilds_Diplomacy(forced : Boolean = False);
+
+    procedure PD_Save_Guilds_Storage(forced : Boolean = False);
 
 
     { Castle Data - Basic Data }
@@ -132,9 +132,6 @@ uses
         if UID = '*' then debugout.Lines.add('­ Guilds ­');
         PD_Load_Guilds_Pre_Parse(UID);
 
-        PD_Load_Guilds_BanList(UID);
-        PD_Load_Guilds_Diplomacy(UID);
-
         if UID = '*' then debugout.Lines.add('­ Castles ­');
         PD_Load_Castles(UID);
     end;
@@ -165,6 +162,7 @@ uses
         PD_Save_Guilds_Skills(forced);
         PD_Save_Guilds_BanList(forced);
         PD_Save_Guilds_Diplomacy(forced);
+        PD_Save_Guilds_Storage(forced);
 
         PD_Save_Castles(forced);
 
@@ -1512,102 +1510,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Ban List Data -------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_BanList(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        tgb : TGBan;
-        i : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\BanList.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\BanList.txt');
-                    sl.delimiter := ':';
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-                            if tp.CData[i] = nil then Continue;
-
-                            if tp.CData[i].GuildName <> searchResult.Name then Continue
-                            else tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-
-                            if assigned(tg) then Break;
-                        end;
-
-                        if tg = nil then Continue;
-
-                    end else begin
-                        for i := 0 to GuildList.Count - 1 do begin
-                            tg := GuildList.Objects[i] as TGuild;
-                            if tg.ID = StrToInt(searchResult.Name) then Break;
-                        end;
-                    end;
-
-                    if not assigned(tg) then Continue;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                        if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
-                    	if tg.MemberID[i] <> 0 then begin
-                        	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 0 to tg.GuildBanList.Count - 1 do begin
-                        tgb := tg.GuildBanList.Objects[0] as TGBan;
-                        tg.GuildBanList.Delete(0);
-                        tgb.Free;
-                    end;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                    	sl.delimiter := ':';
-
-                        sl.delimitedtext  := space_in(datafile[i+2]);
-
-                        tgb := TGBan.Create;
-                        tgb.Name := trim(space_out(sl.Strings[0]));
-                        tgb.AccName := trim(space_out(sl.Strings[1]));
-                        tgb.Reason := trim(space_out(sl.Strings[2]));
-
-                        tg.GuildBanList.AddObject(tgb.Name, tgb);
-                    end;
-
-                    //debugout.Lines.Add(tg.Name + ' guild ban data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild ban data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
     procedure PD_Save_Guilds_BanList(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -1685,110 +1587,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Diplomacy Data ------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_Diplomacy(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        tgl : TGRel;
-        i : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Diplomacy.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Diplomacy.txt');
-                    sl.delimiter := ':';
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-                            if tp.CData[i] = nil then Continue;
-
-                            if tp.CData[i].GuildName <> searchResult.Name then Continue
-                            else tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-
-                            if assigned(tg) then Break;
-                        end;
-
-                        if tg = nil then Continue;
-
-                    end else begin
-                        for i := 0 to GuildList.Count - 1 do begin
-                            tg := GuildList.Objects[i] as TGuild;
-                            if tg.ID = StrToInt(searchResult.Name) then Break;
-                        end;
-                    end;
-
-                    if not assigned(tg) then Continue;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                    	if tg.MemberID[i] <> 0 then begin
-                        	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 0 to tg.RelAlliance.Count - 1 do begin
-                        tgl := tg.RelAlliance.Objects[i] as TGRel;
-                        tg.RelAlliance.Delete(i);
-                        tgl.Free;
-                    end;
-
-                    for i := 0 to tg.RelHostility.Count - 1 do begin
-                        tgl := tg.RelHostility.Objects[i] as TGRel;
-                        tg.RelHostility.Delete(i);
-                        tgl.Free;
-                    end;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                    	sl.delimiter := ':';
-                        sl.delimitedtext := datafile[i+2];
-
-                        tgl := TGRel.Create;
-
-                        tgl.ID := StrToInt(sl.Strings[0]);
-                        tgl.GuildName := sl.Strings[2];
-
-                        if (sl.Strings[1] = 'A') then
-                            tg.RelAlliance.AddObject(tgl.GuildName, tgl)
-                        else if (sl.Strings[1] = 'H') then
-                            tg.RelHostility.AddObject(tgl.GuildName, tgl)
-                        else
-                            Continue;
-                    end;
-
-                    //debugout.Lines.Add(tg.Name + ' guild diplomacy data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild diplomacy data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Guilds_Diplomacy(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -1879,6 +1677,132 @@ uses
         datafile.Clear;
         datafile.Free;
     end;
+
+
+
+    procedure PD_Save_Guilds_Storage(forced : Boolean = False);
+    var
+    	datafile : TStringList;
+        tg : TGuild;
+        tgl : TGRel;
+    	i, j, k : Integer;
+        str : String;
+        len : Integer;
+        saveflag : Boolean;
+    begin
+    	saveflag := False;
+    	datafile := TStringList.Create;
+
+    	for i := 0 to GuildList.Count - 1 do begin
+        	tg := GuildList.Objects[i] as TGuild;
+
+            if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
+
+            for j := 0 to tg.RegUsers - 1 do begin
+            	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[i]) then Break;
+                if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
+                Break;
+            end;
+
+            if not saveflag then Continue;
+
+
+            datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
+            datafile.Add('---------------------------------------------------------------------------------------------------------');
+
+
+
+            for j := 1 to 100 do begin
+    	        if tg.Storage.Item[j].ID <> 0 then begin
+	            	str := ' ';
+
+					len := length(IntToStr(tg.Storage.Item[j].ID));
+	                for k := 0 to (5 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+    	            str := str + IntToStr(tg.Storage.Item[j].ID);
+	                str := str + ' : ';
+
+	                len := length(IntToStr(tg.Storage.Item[j].Amount));
+                	for k := 0 to (5 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+    	            str := str + IntToStr(tg.Storage.Item[j].Amount);
+	                str := str + ' : ';
+
+	                len := length(IntToStr(tg.Storage.Item[j].Equip));
+                	for k := 0 to (3 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+            	    str := str + IntToStr(tg.Storage.Item[j].Equip);
+        	        str := str + ' : ';
+
+    	            str := str + IntToStr(tg.Storage.Item[j].Identify);
+	                str := str + ' : ';
+
+            	    len := length(IntToStr(tg.Storage.Item[j].Refine));
+        	        for k := 0 to (2 - len) - 1 do begin
+    	            	str := str + ' ';
+	                end;
+            	    str := str + IntToStr(tg.Storage.Item[j].Refine);
+        	        str := str + ' : ';
+    	            str := str + IntToStr(tg.Storage.Item[j].Attr);
+	                str := str + ' : ';
+
+    	            len := length(IntToStr(tg.Storage.Item[j].Card[0]));
+	                for k := 0 to (5 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+    	            str := str + IntToStr(tg.Storage.Item[j].Card[0]);
+	                str := str + ' : ';
+
+    	            len := length(IntToStr(tg.Storage.Item[j].Card[1]));
+	                for k := 0 to (5 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+    	            str := str + IntToStr(tg.Storage.Item[j].Card[1]);
+	                str := str + ' : ';
+
+    	            len := length(IntToStr(tg.Storage.Item[j].Card[2]));
+	                for k := 0 to (5 - len) - 1 do begin
+            	    	str := str + ' ';
+        	        end;
+    	            str := str + IntToStr(tg.Storage.Item[j].Card[2]);
+	                str := str + ' : ';
+
+        	        len := length(IntToStr(tg.Storage.Item[j].Card[3]));
+    	            for k := 0 to (5 - len) - 1 do begin
+	                	str := str + ' ';
+                	end;
+            	    str := str + IntToStr(tg.Storage.Item[j].Card[3]);
+        	        str := str + ' : ';
+
+                    str := str + tg.Storage.Item[j].Data.Name;
+
+    	            datafile.Add(str);
+	            end;
+            end;
+
+
+
+            CreateDir(AppPath + 'gamedata\Guilds');
+            CreateDir(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID));
+
+            try
+                datafile.SaveToFile(AppPath + 'gamedata\Guilds\' + IntToStr(tg.ID) + '\Storage.txt');
+                //debugout.Lines.Add(tg.Name + ' guild diplomacy data saved.');
+            except
+                DebugOut.Lines.Add('Guild storage data could not be saved.');
+            end;
+        end;
+
+        datafile.Clear;
+        datafile.Free;
+    end;
+
+
 
 
     { -------------------------------------------------------------------------------- }
