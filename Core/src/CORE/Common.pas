@@ -1745,7 +1745,7 @@ Option_Font_Style : string;
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
-                procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);   //Kills a monster
+                procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer; tc:TChara = nil);   //Kills a monster
 				procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
                 procedure SendPetRelocation(tm:TMap; tc:TChara; i:integer); //Move a pet
                 procedure SendMonsterRelocation(tm:TMap; ts:tMob); //Move a monster
@@ -3657,13 +3657,13 @@ begin
         end;
 end;
 //------------------------------------------------------------------------------
-procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);  //Kills a monster or updates its status
-
+procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer; tc:TChara = nil); //Kills a monster or updates its status
 begin
-	WFIFOW( 0, $0080);
-	WFIFOL( 2, ts.ID);
-	WFIFOB( 6, k);
-	SendBCmd(tm, ts.Point, 7);
+    WFIFOW( 0, $0080);
+    WFIFOL( 2, ts.ID);
+    WFIFOB( 6, k);
+    if tc = nil then SendBCmd(tm, ts.Point, 7)
+    else tc.Socket.SendBuf(buf, 7);
 end;
 //------------------------------------------------------------------------------
 procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet

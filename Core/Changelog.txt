@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-13-04: Monster disappeared for player when another player walked off-screen. [BieL®]
 - 08-13-04: Enabled Trihan's Checkpoint NPC function. [Tsusai]
 - 08-13-04: Experience table integer overflow caused crash. [AlexKreuz]
 - 08-13-04: Defined but inaccessible socket caused crash. [AlexKreuz]

@@ -3986,7 +3986,7 @@ with tc do begin
                     ((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Mob %s Delete', [ts.Name]));
                         
-                        UpdateMonsterDead(tm, ts, 0);
+                        UpdateMonsterDead(tm, ts, 0, tc);
                         {WFIFOW(0, $0080);
                         WFIFOL(2, ts.ID);
                         WFIFOB(6, 0);
