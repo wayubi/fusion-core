@@ -2363,7 +2363,6 @@ var
 	tgb :TGBan;
 	tgl :TGRel;
 {ギルド機能追加ココまで}
-  mi : Maptbl;
 begin
 
 	sl := TStringList.Create;
