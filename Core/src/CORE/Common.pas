@@ -780,6 +780,8 @@ type TChara = class
         Autocastactive :Boolean;
         noday         :Boolean;
 
+        isCloaked     :Boolean;   {Says if Cloaking is Active}
+
         noHPRecovery  :Boolean;   {Player Cannot Recover HP}
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 

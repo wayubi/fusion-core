@@ -7179,10 +7179,10 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-				51: //ハイディング
+				51:     {Hiding}
 					begin
-          tc1 := tc;
-          ProcessType := 1;
+                                                tc1 := tc;
+                                                ProcessType := 1;
 					end;
         53:
           begin
@@ -7387,6 +7387,33 @@ begin
           Exit;
           end;
           end;
+                                135:    {Cloaking}
+                                        begin
+                                                tm := tc.MData;
+
+                                                xy.X := tc.Point.X;
+                                                xy.Y := tc.Point.Y;
+
+                                                k := 0;
+
+                                                for j := - 1 to 1 do begin
+                                                        if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
+                                                                tc.isCloaked := true;
+                                                                k := 1;
+                                                        end;
+                                                end;
+
+                                                if k = 0 then begin
+                                                        tc.MMode := 4;
+                                                        Exit;
+                                                end;
+
+                                                {repeat
+                                                        xy.X := (tm.Size.X - 2) + 1;
+                                                        xy.Y := Random(tm.Size.Y - 2) + 1;
+                                                        Inc(j);
+                                                until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );}
+                                        end;
 				138: //エンチャント_ポイズン
 					begin
 						ProcessType := 3;
@@ -9169,8 +9196,8 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
-          end;
-        1:
+                                        end;
+                                1:
 					begin
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
@@ -9180,54 +9207,54 @@ begin
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
 
-            if (tc1.MSkill = 51) then begin
+                                                if (tc1.MSkill = 51) then begin {Hiding}
 
-              if tc1.Option = 6 then begin
-                tc1.Skill[MSkill].Tick := Tick;
-	    					tc1.Option := tc1.Optionkeep;
-                SkillTick := tc1.Skill[MSkill].Tick;
-                SkillTickID := MSkill;
-                tc1.SP := tc1.SP + 10;
-                tc1.Hidden := false;
-                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                                        if tc1.Option = 6 then begin
+                                                                tc1.Skill[MSkill].Tick := Tick;
+	    					                tc1.Option := tc1.Optionkeep;
+                                                                SkillTick := tc1.Skill[MSkill].Tick;
+                                                                SkillTickID := MSkill;
+                                                                tc1.SP := tc1.SP + 10;
+                                                                tc1.Hidden := false;
+                                                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                                        end else begin
 
-              end else begin
-                // Required to place Hide on a timer.
-						    tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
+                                                                // Required to place Hide on a timer.
+						                tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
 
-    						if SkillTick > tc1.Skill[MSkill].Tick then begin
-							    SkillTick := tc1.Skill[MSkill].Tick;
-							    SkillTickID := MSkill;
-    						end;
+    						                if SkillTick > tc1.Skill[MSkill].Tick then begin
+							                SkillTick := tc1.Skill[MSkill].Tick;
+							                SkillTickID := MSkill;
+    					                	end;
 
-                tc1.Optionkeep := tc1.Option;
-                tc1.Option := 6;
-                tc1.Hidden := true;
+                                                                tc1.Optionkeep := tc1.Option;
+                                                                tc1.Option := 6;
+                                                                tc1.Hidden := true;
 
-              end;
+                                                        end;
 
-              CalcStat(tc1, Tick);
+                                                        CalcStat(tc1, Tick);
 
-              WFIFOW(0, $0119);
-    					WFIFOL(2, tc1.ID);
-    					WFIFOW(6, tc1.Stat1);
-    					WFIFOW(8, tc1.Stat2);
-    					WFIFOW(10, tc1.Option);
-    					WFIFOB(12, 0);
-    					SendBCmd(tm, tc1.Point, 13);
+                                                        WFIFOW(0, $0119);
+    				        	        WFIFOL(2, tc1.ID);
+    					                WFIFOW(6, tc1.Stat1);
+    					                WFIFOW(8, tc1.Stat2);
+    					                WFIFOW(10, tc1.Option);
+    					                WFIFOB(12, 0);
+    					                SendBCmd(tm, tc1.Point, 13);
 
-              // Colus, 20031228: Tunnel Drive speed update
-              if (tc1.Skill[213].Lv <> 0) then begin
-    						WFIFOW(0, $00b0);
-    						WFIFOW(2, $0000);
-    						WFIFOL(4, tc1.Speed);
-    						tc1.Socket.SendBuf(buf, 8);
-              end;
+                                                        // Colus, 20031228: Tunnel Drive speed update
+                                                        if (tc1.Skill[213].Lv <> 0) then begin
+    						                WFIFOW(0, $00b0);
+    						                WFIFOW(2, $0000);
+    						                WFIFOL(4, tc1.Speed);
+    						                tc1.Socket.SendBuf(buf, 8);
+                                                        end;
 
-            end;
+                                                end;
 
             if (tc1.MSkill = 143) then begin
-            if tc1.Sit = 1 then begin
+                if tc1.Sit = 1 then begin
 						tc1.Sit := 3;
             SkillTick := tc1.Skill[MSkill].Tick;
             SkillTickID := MSkill;
@@ -9500,6 +9527,52 @@ begin
                         Socket.SendBuf(buf, 8);
                         HPRTick := Tick;
                         tc.InField := false;
+                end;
+
+                if tc.isCloaked then begin
+                        tm := tc.MData;
+
+                        xy.X := tc.Point.X;
+                        xy.Y := tc.Point.Y;
+
+                        k := 0;
+
+                        for j := - 1 to 1 do begin
+                                if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
+                                        tc.isCloaked := true;
+                                        //tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
+
+                                        //if SkillTick > tc1.Skill[MSkill].Tick then begin
+                                        //        SkillTick := tc1.Skill[MSkill].Tick;
+                                        //        SkillTickID := MSkill;
+                                        //end;
+
+                                        tc.Optionkeep := tc.Option;
+                                        tc.Option := 6;
+                                        tc.Hidden := true;
+
+                                        CalcStat(tc, Tick);
+
+                                        WFIFOW(0, $0119);
+                                        WFIFOL(2, tc.ID);
+                                        WFIFOW(6, tc.Stat1);
+                                        WFIFOW(8, tc.Stat2);
+                                        WFIFOW(10, tc.Option);
+                                        WFIFOB(12, 0);
+                                        SendBCmd(tm, tc.Point, 13)
+                                        k := 1;
+                                end;
+                        end;
+
+                        if k <> 1 then begin
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Option := tc.Optionkeep;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := MSkill;
+                                tc.SP := tc1.SP + 10;
+                                tc.Hidden := false;
+                                tc.isCloaked := false;
+                        end;
                 end;
 
       {Colus, 20031223: Added check for Ashura recovery period.}
