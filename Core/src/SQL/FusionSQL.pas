@@ -3,7 +3,7 @@ unit FusionSQL;
 interface
 
 uses
-        Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils, SQLData;
+        Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
 
         function MySQL_Query(sqlcmd: String) : Boolean;
         function Assign_AccountID() : cardinal;
@@ -13,6 +13,7 @@ uses
         function Load_Parties(GID: cardinal) : Boolean;
         function Load_Pets(AID: cardinal) : Boolean;
         function Load_Guilds(GID: cardinal) : Boolean;
+        function Preload_GuildMembers() : Boolean;
 
 implementation
 
@@ -195,7 +196,6 @@ begin
 
         for i := 0 to 8 do begin
                 if (tp.CID[i] <> 0) then begin
-                        //GetCharaData(tp.CID[i]); // This is the problem function
                         Load_Characters(tp.CID[i]);
                 end;
         end;
@@ -220,7 +220,7 @@ begin
 
         Result := False;
 
-        DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
+        //DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
         query := 'SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem, V.flagdata FROM characters AS C LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) ';
         query2 := 'LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) LEFT JOIN character_flags AS V ON (V.GID=C.GID) WHERE C.GID='+''''+inttostr(GID)+''''+' LIMIT 1';
@@ -391,26 +391,26 @@ begin
                                 tc.Cart.Item[i+1].Card[3] := strtoint(sl.Strings[9+i*10]);
                                 tc.Cart.Item[i+1].Data := ItemDB.Objects[ItemDB.IndexOf(tc.Cart.Item[i+1].ID)] as TItemDB;
                         end;
-                end;
 
-                sl.Clear;
-                sl.DelimitedText := SQLDataSet.FieldValues['flagdata'];
+                        sl.Clear;
+                        sl.DelimitedText := SQLDataSet.FieldValues['flagdata'];
 
-                for i := 0 to (sl.Count - 1) do begin
-                        tc.Flag.Add(sl.Strings[i]);
-                end;
+                        for i := 0 to (sl.Count - 1) do begin
+                                tc.Flag.Add(sl.Strings[i]);
+                        end;
 
-                CharaName.AddObject(tc.Name, tc);
-                Chara.AddObject(tc.CID, tc);
+                        CharaName.AddObject(tc.Name, tc);
+                        Chara.AddObject(tc.CID, tc);
 
-                Load_Accounts('', tc.ID);
+                        Load_Accounts('', tc.ID);
 
-                if (Player.IndexOf(tc.ID) <> -1) then begin
-                        tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
-                        tp.CID[tc.CharaNumber] := tc.CID;
-                        tp.CName[tc.CharaNumber] := tc.Name;
-                        tp.CData[tc.CharaNumber] := tc;
-                        tp.CData[tc.CharaNumber].Gender := tp.Gender;
+                        if (Player.IndexOf(tc.ID) <> -1) then begin
+                                tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+                                tp.CID[tc.CharaNumber] := tc.CID;
+                                tp.CName[tc.CharaNumber] := tc.Name;
+                                tp.CData[tc.CharaNumber] := tc;
+                                tp.CData[tc.CharaNumber].Gender := tp.Gender;
+                        end;
                 end;
         end;
         sl.Free;
@@ -499,7 +499,7 @@ begin
                                         Incubated := StrToInt(SQLDataSet.FieldValues['Incubated']);
                                         PetID := StrToInt(SQLDataSet.FieldValues['PID']);
                                         JID := StrToInt(SQLDataSet.FieldValues['JID']);
-                                        Name := unaddslashes(SQLDataSet.FieldValues['Name']);
+                                        Name := (SQLDataSet.FieldValues['Name']);
                                         Renamed := StrToInt(SQLDataSet.FieldValues['Renamed']);
                                         LV := StrToInt(SQLDataSet.FieldValues['LV']);
                                         Relation := StrToInt(SQLDataSet.FieldValues['Relation']);
@@ -575,7 +575,6 @@ begin
         Result := False;
 
         query := 'SELECT G.*, M.* FROM guild_info AS G LEFT JOIN guild_members AS M ON (G.GDID=M.GDID) WHERE M.GID = '''+inttostr(GID)+''' LIMIT 1';
-        debugout.lines.add(query);
         if (MySQL_Query(query)) then begin
                 while not SQLDataSet.Eof do begin
                         tg := TGuild.Create;
@@ -622,7 +621,6 @@ begin
 
         with tg do begin
                 query := 'SELECT * FROM guild_members WHERE GDID = '''+inttostr(tg.ID)+'''';
-                debugout.lines.add(query);
                 if (MySQL_Query(query)) then begin
                         i := 0;
                         while not SQLDataSet.Eof do begin
@@ -637,7 +635,6 @@ begin
                 end;
 
                 query := 'SELECT * FROM guild_positions WHERE GDID = '''+inttostr(tg.ID)+''' LIMIT 20';
-                debugout.lines.add(query);
                 if (MySQL_Query(query)) then begin
                         i := 0;
                         while not SQLDataSet.Eof do begin
@@ -651,7 +648,6 @@ begin
                 end;
 
                 query := 'SELECT * FROM guild_banish WHERE GDID = '''+inttostr(tg.ID)+'''';
-                debugout.lines.add(query);
                 if (MySQL_Query(query)) then begin
                         i := 0;
                         while not SQLDataSet.Eof do begin
@@ -665,7 +661,6 @@ begin
                 end;
 
                 query := 'SELECT * FROM guild_allies WHERE GDID = '''+inttostr(tg.ID)+'''';
-                debugout.lines.add(query);
                 if (MySQL_Query(query)) then begin
                         i := 0;
                         while not SQLDataSet.Eof do begin
@@ -679,7 +674,6 @@ begin
                 end;
 
                 tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
-                debugout.lines.add('ASSIGN GUILD');
                 for j := 0 to 35 do begin
                         if MemberID[j] = tc.CID then begin
                                 tc.GuildName := Name;
@@ -692,10 +686,54 @@ begin
                                 break;
                         end;
                 end;
+
+                for j := 0 to 35 do begin
+                        if MemberID[j] <> 0 then begin
+                                i := Chara.IndexOf(MemberID[j]);
+
+                                if i = -1 then begin
+                                        Load_Characters(tg.MemberID[j]);
+                                end;
+
+                                if i <> -1 then begin
+                                        i := Chara.IndexOf(MemberID[j]);
+                                        tc := Chara.Objects[i] as TChara;
+                                        tc.GuildName := Name;
+                                        tc.GuildID := ID;
+                                        tc.ClassName := PosName[MemberPos[j]];
+                                        tc.GuildPos := j;
+                                        Member[j] := tc;
+                                        if (j = 0) then MasterName := tc.Name;
+                                        SLV := SLV + tc.BaseLV;
+                                end;
+                        end;
+                end;
         end;
 
         Result := True;
         sl.Free;
+end;
+
+function Preload_GuildMembers() : Boolean;
+var
+        query : string;
+        j, k : integer;
+        data : array[0..65535] of integer;
+begin
+        query := 'SELECT GID FROM guild_members';
+        if MySQL_Query(query) then begin
+                k := (SQLDataSet.RecordCount - 1);
+                for j := 0 to k do begin
+                        data[j] := StrToInt(SQLDataSet.FieldValues['GID']);
+                        SQLDataSet.Next;
+                end;
+        end;
+
+        debugout.Lines.add('Pre-Loading Character Data for Guilds');
+        for j := 0 to k do begin
+                Load_Characters(data[j]);
+        end;
+        debugout.Lines.add('-- Completed.');
 end;
 
 end.

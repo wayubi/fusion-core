@@ -6,7 +6,7 @@ interface
 
 uses
 	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common, Zip, SQLData;
+	Path, Script, Common, Zip, SQLData, FusionSQL;
 
 //==============================================================================
 // ä÷êîíËã`

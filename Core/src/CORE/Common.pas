@@ -1638,7 +1638,7 @@ Option_GraceTime_PvPG :cardinal;
 
 implementation
 
-uses SQLData;
+uses SQLData, FusionSQL;
 
 //==============================================================================
 {’Ç‰Á}
@@ -5671,7 +5671,12 @@ begin
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
                     if tg.Member[i] <> nil then begin
-				  if UseSQL then GetCharaData(tg.Member[i].CID);
+				                if UseSQL then begin
+                                                        j := Chara.IndexOf(tg.MemberID[i]);
+                                                        if j = -1 then begin
+                                                                Load_Characters(tg.Member[i].CID);
+                                                        end;
+                                                end;
                     end;
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin

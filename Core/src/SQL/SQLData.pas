@@ -6,7 +6,7 @@ unit SQLData;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
+	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils, FusionSQL;
 
 //==============================================================================
 // ¹ý³Ì&º¯Êý
@@ -398,6 +398,8 @@ begin
 
 	DebugOut.Lines.Add(Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
 	Application.ProcessMessages;}
+
+        Preload_GuildMembers();
 
 	sl.Free;
 end;
