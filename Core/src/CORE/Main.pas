@@ -9375,7 +9375,7 @@ begin
                                 end;
                         end;
 
-				if (Skill[4].Lv <> 0) and (HPRTick + 10000 <= Tick) then begin
+				if (Skill[4].Lv <> 0) and (HPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) then begin
 					if HP <> MAXHP then begin
 						j := (5 + MAXHP div 500) * Skill[4].Lv;
 						if HP + j > MAXHP then j := MAXHP - HP;
@@ -9416,7 +9416,7 @@ begin
 					SPRTick := Tick;
 				end;
 
-				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) then begin
+				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) then begin
 					if SP <> MAXSP then begin
 {‹Zp229}   j := (3 + MAXSP * 2 div 1000) * Skill[9].Lv;
 						if SP + j > MAXSP then j := MAXSP - SP;
