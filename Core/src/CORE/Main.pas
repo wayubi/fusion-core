@@ -5716,11 +5716,13 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, ts.Point, 15);
-						if (ts.Speed * 2 >= 65535) then begin
-            ts.Speed := 65535;
-            end else begin
-						ts.Speed := ts.Speed * 2;
-            end;
+
+						if tc.Skill[30].EffectLV > 5 then begin
+						    ts.speed := ts.speed + 45;
+						end else begin
+						    ts.speed := ts.speed + 30;
+						end;
+
 						tc.MTick := Tick + 1000;
 					end;
           
@@ -8147,19 +8149,7 @@ begin
 				
 				30: //速度減少
 					begin
-						//パケ送信
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, MSkill);
-						WFIFOW( 4, MUseLV);
-						WFIFOL( 6, tc1.ID);
-						WFIFOL(10, ID);
-						WFIFOB(14, 1);
-						SendBCmd(tm, tc1.Point, 15);
-            if (tc1.Speed * 2 >= 65535) then begin
-            tc1.Speed := 65535;
-            end else begin
-						tc1.Speed := tc1.Speed * 2;
-            end;
+						ProcessType := 3;
 						tc.MTick := Tick + 1000;
 					end;
 

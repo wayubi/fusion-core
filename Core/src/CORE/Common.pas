@@ -1752,7 +1752,11 @@ begin
 		end;
 		//‘¬“xŒ¸­(AGI-)
 		if Skill[30].Tick > Tick then begin
+		    if (byte(Skill[30].Effect1) > Bonus[1]) then begin
+		        Bonus[1] := 0;
+		    end else begin
 			Bonus[1] := Bonus[1] - byte(Skill[30].Effect1);
+		    end;
 		end;
                 if Skill[33].Tick > Tick then begin
                        i := 10 + (5 * tc.Skill[33].EffectLV);
