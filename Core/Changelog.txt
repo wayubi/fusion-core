@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-18-04: Added Cold Bolt to PSS. [Trihan]
 - 08-18-04: Added Soul Strike to PSS. [Trihan]
 - 08-18-04: Percentheal now passes script validation. [Tsusai]
 - 08-18-04: Corrupt pet in out of range inventory location caused crash. [AlexKreuz]

@@ -2442,9 +2442,8 @@ Begin
 					end;
 				end;
 
-				14,19,20,90,156:
-				{14  : Cold Bolt
-				.19  : Fire Bolt
+				19,20,90,156:
+				{19  : Fire Bolt
 				.20  : Lightning Bolt
 				.90  : Earth Spike
 				.156 : Holy Light }
@@ -2467,7 +2466,7 @@ Begin
 						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
 						case MSkill of
 						90:     tc.MTick := Tick + 1000;
-						14,19,20 : tc.MTick := Tick +  800 + 200 * MUseLV;
+						19,20 : tc.MTick := Tick +  800 + 200 * MUseLV;
 						else       tc.MTick := Tick + 1000;
 						end;
 					end;
