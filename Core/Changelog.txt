@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 11-30-04: Removed madscreenshot (my bad). [Tsusai]
+- 11-30-04: Weiss.ini auto-update now depends on the release version. [Tsusai]
 - 11-28-04: Fixed UPnP & WAC errors as reported in R. [AlexKreuz]
 - 11-27-04: Non existant character in ActiveChars caused crash. [AlexKreuz]
 - 11-26-04: Auto-updating of weiss.ini. [AlexKreuz]

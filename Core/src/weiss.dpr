@@ -3,7 +3,6 @@ program Weiss;
 {$R 'manifest.res' 'manifest.rc'}
 
 uses
-  madScreenShot,
   {$IFDEF MSWINDOWS}
   madExcept,
   Forms,

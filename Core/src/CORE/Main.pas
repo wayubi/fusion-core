@@ -560,7 +560,7 @@ begin
 
     ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
     ini.ReadSectionValues('Version', sl);
-        if not (sl.Values['VER'] = '1.212 S - R.E.E.D Beta 3 Release') then begin
+        if not (sl.Values['VER'] = RELEASE_VERSION) then begin
             DeleteFile(AppPath + 'weiss.ini');
         end;
     ini.Free;
