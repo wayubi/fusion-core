@@ -1694,29 +1694,32 @@ Called when we're shutting down the server *only*
 
     function command_skillall(tc : TChara) : String;
     var
-        j, i : Integer;
+        job, i : Integer;
     begin
         Result := 'GM_SKILLALL Failure.';
 
-        j := tc.JID;
-        if (j > UPPER_JOB_BEGIN) then j := j - UPPER_JOB_BEGIN + LOWER_JOB_END;
+        job := tc.JID;
+        if (job > UPPER_JOB_BEGIN) then job := job - UPPER_JOB_BEGIN + LOWER_JOB_END;
         // (RN 4001 - 4000 + 23 = 24)
 
         for i := 1 to 157 do begin
-            if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
+            if (tc.Skill[i].Data.Job1[job]) or (tc.Skill[i].Data.Job2[job]) then begin
                 tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
             end;
         end;
 
         for i := 210 to MAX_SKILL_NUMBER do begin
-            if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
+            if (tc.Skill[i].Data.Job1[job]) or (tc.Skill[i].Data.Job2[job]) then begin
                 tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
             end;
         end;
 
         tc.SkillPoint := 1000;
+
         SendCSkillList(tc);
+
         CalcStat(tc);
+
         SendCStat(tc);
 
         Result := 'GM_SKILLALL Success.';
