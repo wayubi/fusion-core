@@ -788,15 +788,14 @@ var
 	ini : TIniFile;
 	sr  : TSearchRec;
 	Idx : Integer; // Loop Iterator for freeing our global lists.
-	Dupe : Integer;
 begin
 
-    if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
-        repeat
-            DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
-        until FindNext(sr) <> 0;
-        FindClose(sr);
-    end;
+	if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
+		repeat
+			DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
+		until FindNext(sr) <> 0;
+		FindClose(sr);
+	end;
 
 	if ServerRunning then begin
 		cmdStop.Enabled := false;
@@ -831,70 +830,81 @@ begin
 	ini.WriteString('Server', 'ItemDropType', BoolToStr(ItemDropType, true));
 	ini.WriteString('Server', 'ItemDropDenominator', IntToStr(ItemDropDenominator));
 	ini.WriteString('Server', 'ItemDropPer', IntToStr(ItemDropPer));
- 	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
- 	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
+	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
+	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
 	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
 	ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));
-  ini.WriteString('Server', 'EnableMonsterSkills', BoolToStr(EnableMonsterSkills, true));
-	ini.WriteString('Server', 'EnableLowerClassDyes', BoolToStr(EnableLowerClassDyes, true));    
+	ini.WriteString('Server', 'EnableMonsterSkills', BoolToStr(EnableMonsterSkills, true));
+	ini.WriteString('Server', 'EnableLowerClassDyes', BoolToStr(EnableLowerClassDyes, true));
 	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
-        ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
-        ini.WriteString('Server', 'DefaultMap', DefaultMap);
-        ini.WriteString('Server', 'DefaultPoint_X', IntToStr(DefaultPoint_X));
-        ini.WriteString('Server', 'DefaultPoint_Y', IntToStr(DefaultPoint_Y));
-        ini.WriteString('Server', 'DefaultItem1', IntToStr(DefaultItem1));
-        ini.WriteString('Server', 'DefaultItem2', IntToStr(DefaultItem2));
-        ini.WriteString('Server', 'DeathBaseLoss', IntToStr(DeathBaseLoss));
-        ini.WriteString('Server', 'DeathJobLoss', IntToStr(DeathJobLoss));
-        ini.WriteString('Server', 'MonsterMob', BoolToStr(MonsterMob, true));
-        ini.WriteString('Server', 'SummonMonsterExp', BoolToStr(SummonMonsterExp, true));
-        ini.WriteString('Server', 'SummonMonsterAgo', BoolToStr(SummonMonsterAgo, true));
-        ini.WriteString('Server', 'SummonMonsterName', BoolToStr(SummonMonsterName, true));
-        ini.WriteString('Server', 'SummonMonsterMob', BoolToStr(SummonMonsterMob, true));
-        ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
-        ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
-        ini.WriteString('Server', 'MapGMsg', MapGMsg);
+	ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
+	ini.WriteString('Server', 'DefaultMap', DefaultMap);
+	ini.WriteString('Server', 'DefaultPoint_X', IntToStr(DefaultPoint_X));
+	ini.WriteString('Server', 'DefaultPoint_Y', IntToStr(DefaultPoint_Y));
+	ini.WriteString('Server', 'DefaultItem1', IntToStr(DefaultItem1));
+	ini.WriteString('Server', 'DefaultItem2', IntToStr(DefaultItem2));
+	ini.WriteString('Server', 'DeathBaseLoss', IntToStr(DeathBaseLoss));
+	ini.WriteString('Server', 'DeathJobLoss', IntToStr(DeathJobLoss));
+	ini.WriteString('Server', 'MonsterMob', BoolToStr(MonsterMob, true));
+	ini.WriteString('Server', 'SummonMonsterExp', BoolToStr(SummonMonsterExp, true));
+	ini.WriteString('Server', 'SummonMonsterAgo', BoolToStr(SummonMonsterAgo, true));
+	ini.WriteString('Server', 'SummonMonsterName', BoolToStr(SummonMonsterName, true));
+	ini.WriteString('Server', 'SummonMonsterMob', BoolToStr(SummonMonsterMob, true));
+	ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
+	ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
+	ini.WriteString('Server', 'MapGMsg', MapGMsg);
 
 	ini.WriteString('Option', 'Left', IntToStr(FormLeft));
 	ini.WriteString('Option', 'Top', IntToStr(FormTop));
 	ini.WriteString('Option', 'Width', IntToStr(FormWidth));
 	ini.WriteString('Option', 'Height', IntToStr(FormHeight));
 	ini.WriteString('Option', 'Priority', IntToStr(Priority));
-        ini.WriteString('Option', 'Priority', IntToStr(Priority));
+	ini.WriteString('Option', 'Priority', IntToStr(Priority));
 
-        // Fusion INI Lines
-        ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
-        ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
-        ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
-        ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
-        ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
-        ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
-        ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
-        ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
-        ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
-        ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
-        ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
-        // Fusion INI Lines
-        
-        // MySQL Server Lines
-        ini.WriteString('MySQL Server', 'Option_MySQL', BoolToStr(UseSQL));
-        ini.WriteString('MySQL Server', 'MySQL_Address', DbHost);
-        ini.WriteString('MySQL Server', 'MySQL_Username', DbUser);
-        ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
-        ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
-        // MySQL Server Lines
-        
+	// Fusion INI Lines
+	ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
+	ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
+	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
+	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
+	ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
+	ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
+	ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
+	ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
+	ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
+	ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
+	ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
+	// Fusion INI Lines
+
+	// MySQL Server Lines
+	ini.WriteString('MySQL Server', 'Option_MySQL', BoolToStr(UseSQL));
+	ini.WriteString('MySQL Server', 'MySQL_Address', DbHost);
+	ini.WriteString('MySQL Server', 'MySQL_Username', DbUser);
+	ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
+	ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
+	// MySQL Server Lines
+
 	ini.Free;
 
-	if UseSQL then begin
+	if UseSQL then
 		SQLDataSave;
-	end
-	else DataSave;
+	else
+		DataSave;
 
-  { Mitch: Doesnt hurt to make sure the tray icon was deleted }
-  Shell_notifyIcon(NIM_DELETE, @TrayIcon);
+	{ Mitch: Doesnt hurt to make sure the tray icon was deleted }
+	Shell_notifyIcon(NIM_DELETE, @TrayIcon);
+	{ChrstphrR 2004/04/27 -- I'm pretty sure this cleans up the 4k a bare Delphi
+	app leaks because code in the RTL that Borland hasn't fixed - Bravo!}
 
 	ScriptList.Free; //CR only stores strings, ergo safe as is.
+
+	{ChrstphrR 2004/04/27 - My apologies for such dirty fixes to the lists ...
+	Objects[] of a TSL or TIL are not freed up on Clear or Free, so the following
+	for loops do so safely and properly - the Assigned() checks ensure that the
+	object isn't NIL -- freeing NIL is one of those Zen riddles you just don't
+	want to toy with in Delphi!  The Lists are grouped with some not looped
+	through, because there often pairs or groups of lists that index the same
+	list of objects. Pure StringLists / IntLists are just free'd and are marked
+	explicitly.}
 
 	for Idx := ItemDB.Count-1 downto 0 do
 		if Assigned(ItemDB.Objects[Idx]) then
@@ -1067,7 +1077,7 @@ begin
 		if Assigned(MapList.Objects[Idx]) then
 			(MapList.Objects[Idx] AS TMapList).Free;
 	MapList.Free;
-end;
+end;//proc TfrmMain.FormCloseQuery()
 //------------------------------------------------------------------------------
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
@@ -1291,15 +1301,18 @@ end;
 
 
 //==============================================================================
+{
+ChrstphrR 2004/04/27
+- unused var cleanup
+- Checked for memory leaks - no obvious ones.
+}
 procedure TFrmMain.MonsterSpawn(tm:TMap; ts:TMob; Tick:cardinal);
 var
-	i, j, k, l, h, m, ii   :integer;
-	tc                     :TChara;
-  ts1                    :TMob;
-  tss                    :TSlaveDB;
+	i, j, k : Integer;
+	tc      : TChara;
 
 begin
-	//Spawn
+	//Repeat until Spawn Point chosen.
 	repeat
 		ts.Point.X := ts.Point1.X + Random(ts.Point2.X + 1) - (ts.Point2.X div 2);
 		ts.Point.Y := ts.Point1.Y + Random(ts.Point2.Y + 1) - (ts.Point2.Y div 2);
@@ -1310,20 +1323,25 @@ begin
 			if ts.Point.Y > tm.Size.Y - 2 then ts.Point.Y := tm.Size.Y - 2;
 		end;
 	until ( (tm.gat[ts.Point.X, ts.Point.Y] <> 1) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5) );
+	{ChrstphrR  2004/04/27 - This spawning code is pretty common...
+	could it be made into a function call and spare everyone the complexity?
+	... and is this an efficient algorithm for picking a random point?
+	}
+
 	ts.Dir := Random(8);
 	ts.HP := ts.Data.HP;
 	if ts.Data.isDontMove then
 		ts.MoveWait := $FFFFFFFF
 	else
-    ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
+		ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
 	ts.Speed := ts.Data.Speed;
 	ts.ATarget := 0;
 	ts.ARangeFlag := false;
 	ts.ATKPer := 100;
 	ts.DEFPer := 100;
 	ts.DmgTick := 0;
-  ts.Status := 'IDLE_ST';
-  if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
+	ts.Status := 'IDLE_ST';
+	if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
 	for j := 0 to 31 do begin
 		ts.EXPDist[j].CData := nil;
 		ts.EXPDist[j].Dmg := 0;
@@ -1338,6 +1356,7 @@ begin
 
 	tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 
+	//Notify Nearby Characters that Monster has spawned
 	for j := ts.Point.Y div 8 - 2 to ts.Point.Y div 8 + 2 do begin
 		for i := ts.Point.X div 8 - 2 to ts.Point.X div 8 + 2 do begin
 			//é¸ÇËÇÃêlÇ…í ím
@@ -1347,18 +1366,18 @@ begin
 				if (abs(ts.Point.X - tc.Point.X) < 16) and (abs(ts.Point.Y - tc.Point.Y) < 16) then begin
 					SendMData(tc.Socket, ts);
 				end;
-			end;
+			end;//for k1
+		end;//for i1
+	end;//for j1
+
+	if (MonsterMob = true) then begin
+		k := SlaveDBName.IndexOf(ts.Data.Name);
+		if (k <> -1) then begin
+			ts.isLeader := true;
 		end;
 	end;
+end;//proc TFrmMain.MonsterSpawn()
 
- if (MonsterMob = true) then begin
-    k := SlaveDBName.IndexOf(ts.Data.Name);
-    if (k <> -1) then begin
-     ts.isLeader := true;
-    end;
-end;
-
-end;
 //------------------------------------------------------------------------------
 
 {Spawn Monster}
