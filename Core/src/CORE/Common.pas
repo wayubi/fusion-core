@@ -21,6 +21,14 @@ const
 const
 	MAX_PARTY_SIZE = 12;
 
+	//NPC CType Constants
+	NPC_TYPE_WARP   = 0;
+	NPC_TYPE_SHOP   = 1;
+	NPC_TYPE_SCRIPT = 2;
+	NPC_TYPE_ITEM   = 3;
+	NPC_TYPE_SKILL  = 4;
+
+
 
 type TLiving = class
   public
@@ -159,12 +167,14 @@ type TItem = class
 public
 	Constructor Create;
 	Destructor  Destroy; OverRide;
+
+	Procedure ZeroItem;
 end;//TItem
 //------------------------------------------------------------------------------
 {追加}
 type TItemList = class
 	Zeny      :Cardinal;
-	Item      :Array[0..100] of TItem;
+	Item      :Array[1..100] of TItem;
 	Weight    :Cardinal;
 	MaxWeight :Cardinal;
 	Count     :Word;
@@ -3342,7 +3352,7 @@ begin
   until (( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y )) and ((tm.gat[tn.Point.X, tn.Point.Y] <> 1) and (tm.gat[tn.Point.X, tn.Point.Y] <> 5));
 
   tn.Dir := Random(8);
-  tn.CType := 2;
+	tn.CType := NPC_TYPE_SCRIPT;
   tn.HungryTick := timeGettime();
 
   tm.NPC.AddObject(tn.ID, tn);
@@ -4957,7 +4967,7 @@ var
 procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
 begin
 {NPCイベント追加}
-	if (tn.JID = -1) then exit;
+	//if (tn.JID = -1) then exit;//CR 2004/04/26 - JID is Cardinal.
 {NPCイベント追加ココまで}
 	if (tn.CType = 3) then begin
 		WFIFOW( 0, $009d);
@@ -9700,21 +9710,7 @@ Initialzes data (Zero/Nil) held in TItem
 Constructor TItem.Create;
 Begin
   inherited;
-  //init fields
-	ID        := 0;
-  Equip     := 0;
-  Identify  := 0;
-  Refine    := 0;
- 	Attr      := 0;
- 	Card[0]   := 0;
- 	Card[1]   := 0;
- 	Card[2]   := 0;
- 	Card[3]   := 0;
- 	Data      := NIL;
-  Stolen    := 0;
-
-  //init properties
-  Amount    := 0;
+	ZeroItem;
 End;(*- TItem.Create ----------------*)
 
 
@@ -9732,6 +9728,36 @@ Begin
 //	Data.Free;
 	Data := NIL; {ChrstphrR - This is a reference to TItemDB not owned.}
 End;(*- TItem.Destroy ---------------*)
+
+
+(*-----------------------------------------------------------------------------*
+Commonly used code to zero-out Items - used in Create, and whenever
+Item needs to be wiped clean.
+
+N.B - Data field is made NIL, which means calculations based on this need
+to be done BEFORE you call ZeroItem
+*-----------------------------------------------------------------------------*)
+Procedure TItem.ZeroItem;
+Begin
+  //init fields
+	ID       := 0;
+	Equip    := 0;
+	Identify := 0;
+	Refine   := 0;
+	Attr     := 0;
+	Card[0]  := 0;
+	Card[1]  := 0;
+	Card[2]  := 0;
+	Card[3]  := 0;
+	Data     := NIL;
+	Stolen   := 0;
+
+	//init properties
+	Amount   := 0;
+End;(* Proc TItem.ZeroItem
+*-----------------------------------------------------------------------------*)
+
+
 
 
 {=======================}
@@ -9928,8 +9954,9 @@ begin
 			(NPC.Objects[Idx] AS TNPC).Free;
 	NPC.Free;
 	NPCLabel.Free;
-	CList.Free;
-	Mob.Free;
+
+	CList.Free; //ref list
+	Mob.Free;   //ref list
 {NPCイベント追加}
 
 	for Idx := TimerAct.Count-1 downto 0 do
@@ -9942,13 +9969,16 @@ begin
 	TimerDef.Free;
 {NPCイベント追加ココまで}
 
-	//Block is an array it's extents are an odd range, need to find out
+	//Block is a static array it's extents are an odd range, need to find out
 	// if the "border" around the block needs freeing, or not.
-	for Idx := BlockSize.X-1 downto 0 do
-		for Idy := BlockSize.Y-1 downto 0 do
+	for Idx := BlockSize.X+3 downto -3 do
+		for Idy := BlockSize.Y+3 downto -3 do
 			if Assigned(Block[Idx][Idy]) then
 				(Block[Idx][Idy] AS TBlock).Free;
 
+	{ChrstphrR Trying another suggestion for freeing dyn arrays:
+	- no change either way}
+	gat := NIL;
 
 	inherited;
 end;
@@ -10019,11 +10049,32 @@ Begin
 	// Always call ancestor's routines after you clean up
 	// objects you created as part of this class
 
-	Item.Free;
-	for Idx := Low(ShopItem) to High(ShopItem) do
-		if Assigned(ShopItem[Idx]) then
-			ShopItem[Idx].Free;
-
+	case CType of
+	NPC_TYPE_SHOP   :
+		begin
+			for Idx := Low(ShopItem) to High(ShopItem) do
+				if Assigned(ShopItem[Idx]) then
+					ShopItem[Idx].Free;
+			SetLength(ShopItem, 0);
+		end;
+	NPC_TYPE_SCRIPT :
+		begin
+			{ChrstphrR 2004/04/26 Okay, Script is a dyn array of rScript - which
+			contains dyn arrays of string/int, so cleanup involves setting the
+			arrays to zero size -- unallocating them.}
+			for Idx := High(Script) downto Low(Script) do begin
+				SetLength(Script[Idx].Data1, 0);
+				SetLength(Script[Idx].Data2, 0);
+				SetLength(Script[Idx].Data3, 0);
+			end;
+			//Set the memory / length of the Script array to zero.
+			SetLength(Script,0);
+		end;
+	NPC_TYPE_ITEM   :
+		begin
+			Item.Free;
+		end;
+	end;//case
 
 	inherited;
 End;(* TNPC.Destroy

@@ -1,3 +1,8 @@
+- 04-28-04: Memory Leak fixes: Map free up rest of memory properly now. [ChrstphrR]
+- 04-28-04: Data Structures: NPC Destroy method fixes [ChrstphrR]
+- 04-28-04: Data Structures: ItemLists now properly have 100, not 101 Items [ChrstphrR]
+- 04-28-04: Item class method ZeroItem Zeros/Nils out ALL fields -- Time saver for coders, see Create. [ChrstphrR]
+- 04-28-04: Included Constants for types of NPC's. [ChrstphrR]
 - 04-28-04: Code Review/Comment: KnockBackLiving [ChrstphrR]
 - 04-28-04: Memory Leak fixes: AutoAction [ChrstphrR]
 - 04-28-04: Memory Leak fixes: DamageOverTime [ChrstphrR]
