@@ -2,8 +2,10 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-18-04: Added new party packet w/item/loot share (not implemented yet!) [Colus]
 - 02-18-04: Fixed most/all conditions for basic skills [Colus]
 - 02-18-04: Added error messages for basic skills [Colus]
+- 02-18-04: Re-fixed bug #394 to give proper error message for /organize [Colus]
 - 02-18-04: Updated SendSkillError [Colus]
 - 02-16-04: Looted items now go to players inventory. [Darkhelmet]
 - 02-16-04: Added Pet looting system, items cannot be recovered though. [Darkhelmet]
