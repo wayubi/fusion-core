@@ -155,7 +155,7 @@ var
 	sl1 :TStringList;
 	ini :TIniFile;
   PriorityClass :cardinal;
-  
+
 begin
 
 	Randomize;
@@ -707,7 +707,8 @@ end;
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
 	ini :TIniFile;
-    sr	:TSearchRec;
+  sr	:TSearchRec;
+  Idx : Integer;
 begin
 
     if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
@@ -805,24 +806,58 @@ begin
 
 	ScriptList.Free;
 
+  //--
+  for Idx := ItemDB.Count-1 downto 0 do
+    begin
+    (ItemDB.Objects[Idx] AS TItemDB).Free;
+    end;
 	ItemDB.Free;
+  //--
+
 {アイテム製造追加}
 	MaterialDB.Free;
 {アイテム製造追加ココまで}
 	MobDB.Free;
-        MArrowDB.Free;
-        WarpDatabase.Free;
-        MobAIDB.Free;
-        MobAIDBAegis.Free;
-        PharmacyDB.Free;
+  MArrowDB.Free;
+
+  //--
+  //CRW - trying a free on this list to reduce memory leaks.
+  for Idx := WarpDatabase.Count-1 downto 0 do
+    begin
+    (WarpDatabase.Objects[Idx] AS TWarpDatabase).Free;
+    end;
+  WarpDatabase.Free;
+  //--
+
+  MobAIDB.Free;
+  MobAIDBAegis.Free;
+  PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
+
+  //--
+  for Idx := SkillDB.Count-1 downto 0 do
+    begin
+    (SkillDB.Objects[Idx] AS TSkillDB).Free;
+    end;
 	SkillDB.Free;
   SkillDBName.Free;
-	PlayerName.Free;
-	Player.Free;
+  //--
+  for Idx := Chara.Count-1 downto 0 do
+    begin
+    (Chara.Objects[Idx] AS TChara).Free;
+    end;
+  Chara.Free;
 	CharaName.Free;
-	Chara.Free;
+  //--
+  for Idx := Player.Count-1 downto 0 do
+    begin
+    (Player.Objects[Idx] AS TPlayer).Free;
+    end;
+	Player.Free;
+	PlayerName.Free;
+  //--
+
 	CharaPID.Free;
 {チャットルーム機能追加}
 	ChatRoomList.Free;
