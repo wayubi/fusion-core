@@ -3624,7 +3624,7 @@ begin
 
 			if SplashAttack then CharaSplash2(tc,Tick);  //Splash Attack Enabled
 
-                        if tc.Skill[279].Tick > Tick then begin     {Auto Cast}
+                        if (tc.Skill[279].Tick > Tick) and (Skill[279].Lv > 0) then begin     {Auto Cast}
                                 try
                                 if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
                                         Autocastactive := true;
@@ -10524,9 +10524,9 @@ begin
 	with tc do begin
 		//HPSPâÒïúèàóù
 		if Weight * 2 < MaxWeight then begin
-                
 
-if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) then begin
+
+if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) and  (tc.Option and 6 = 0) then begin
 if HP <> MAXHP then begin
 bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
 if bonusregen = 0 then begin ;
@@ -10547,7 +10547,7 @@ HPTick := Tick;
 end;
 end;
 
-if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick)  then begin
+if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and  (tc.Option and 6 = 0) then begin
 if SP <> MAXSP then begin
 
 
@@ -10587,7 +10587,7 @@ if Weight * 2 < MaxWeight then begin
                                 end;
                         end;
 
-				if (Skill[4].Lv <> 0) and (HPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) then begin
+				if (Skill[4].Lv <> 0) and (HPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
 					if HP <> MAXHP then begin
 						j := (5 + MAXHP div 500) * Skill[4].Lv;
 						if HP + j > MAXHP then j := MAXHP - HP;
@@ -10611,7 +10611,7 @@ if Weight * 2 < MaxWeight then begin
           removing the Critical Explosion check while adding the Ashura check.
           Also, it doesn't say anything about recovering HP, so that's not
           changed...for now.}
-        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) then begin
+        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) and (tc.Option and 6 = 0) then begin
 					if (SP <> MAXSP) then begin
 {ãZèp229}   j := (3 + MAXSP * 2 div 1000) * Skill[260].Data.Data2[Skill[260].Lv];
 						if SP + j > MAXSP then j := MAXSP - SP;
@@ -10654,7 +10654,7 @@ if Weight * 2 < MaxWeight then begin
         //end of BS Maximun skill code
 
 
-				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) then begin
+				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
 					if SP <> MAXSP then begin
 {ãZèp229}   j := (3 + MAXSP * 2 div 1000) * Skill[9].Lv;
 						if SP + j > MAXSP then j := MAXSP - SP;
@@ -10831,7 +10831,8 @@ begin
                         end;
                 end;
 
-                if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
+                if Skill[135].Lv > 0 then begin
+                  if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
                         if tc.SP > 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
@@ -10854,6 +10855,7 @@ begin
                                 WFIFOB(12, 0);
                                 SendBCmd(tm, tc.Point, 13);                          
                         end;
+                  end;
                 end;
 
                 if (tc.isPoisoned = true) then begin
@@ -13749,15 +13751,11 @@ begin
 				if Boolean(MMode and $03) and (MTick <= Tick) then begin
 					tl := tc.Skill[tc.MSkill].Data;
 					tk := tc.Skill[tc.MSkill];
-					if (tc.SP < tl.SP[tc.MUseLV]) then begin
+					if (tc.SP < tl.SP[tc.MUseLV]) and
+              (((tc.MSkill <> 51) and (tc.MSkill <> 135)) or
+               (((tc.MSkill = 51) or (tc.MSkill = 135)) and (tc.Option and 6 = 0))) then begin
 						//SPïsë´
-						WFIFOW( 0, $0110);
-						WFIFOW( 2, tc.MSkill);
-						WFIFOW( 4, 0);
-						WFIFOW( 6, 0);
-						WFIFOB( 8, 0);
-						WFIFOB( 9, 1);
-						Socket.SendBuf(buf, 10);
+						SendSkillError(tc, 1);
 							if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
@@ -13821,7 +13819,7 @@ begin
                 // Colus, 20040118: Unhiding should not drain SP...
                 // Colus, 20040204: The reason we are testing that we _are_ hidden is b/c we use
                 // the mode set in the skill code previously.  This means you are hiding successfully.
-                if ((MSkill <> 51) or ((MSkill = 51) and (Option and 2 <> 0))) then begin
+                if (((MSkill <> 51) and (MSkill <> 135)) or ((MSkill = 51) and (Option and 2 <> 0)) or ((MSkill = 135) and (Option and 4 <> 0))) then begin
                   DecSP(tc, MSkill, MUseLV);
                 end;
               end else begin
