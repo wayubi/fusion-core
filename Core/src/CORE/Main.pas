@@ -11901,7 +11901,8 @@ begin
 					end;
         $99: // Talkie Box Activated
           begin
-						tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
+						tn.JID := $8c;
+                                                //DebugOut.Lines.Add('Talkie changed');
 						WFIFOW(0, $00c3);
 						WFIFOL(2, tn.ID);
 						WFIFOB(6, 0);
@@ -11955,15 +11956,17 @@ begin
 							end;
             $99: // Talkie Box fires
             begin
-             DebugOut.Lines.Add('Talkie fire self');
+             //DebugOut.Lines.Add('Talkie fire self');
               WFIFOW(0, $0191);
               WFIFOL(2, tc1.ID);
-              WFIFOS(6, tn.Name, 80);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              WFIFOS(6, tn.Name, 80);
+              //DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
               SendBCmd(tm, tn.Point, 86);
             end;
             $8c: // Talkie Box fires
             begin
-              WFIFOW(0, $0191);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              WFIFOW(0, $0191);
+              //DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
               WFIFOL(2, tn.ID);
               WFIFOS(6, tn.Name, 80);
               SendBCmd(tm, tn.Point, 86);
@@ -12552,7 +12555,8 @@ begin
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
             $99: {Talkie Box}
-              begin //  DebugOut.Lines.Add('Talkie fire pvp');
+              begin
+              //  DebugOut.Lines.Add('Talkie fire pvp');
                 WFIFOW(0, $0191);
                 WFIFOL(2, tc2.ID);
                 WFIFOS(6, tn.Name, 80);

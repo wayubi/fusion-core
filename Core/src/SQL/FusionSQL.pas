@@ -213,12 +213,14 @@ var
         str : string;
         query : string;
         query2 : string;
+        addkey : boolean;
 begin
         sl := TStringList.Create;
         sl.QuoteChar := '"';
         sl.Delimiter := ',';
 
         Result := False;
+        addkey := True;
 
         //DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
@@ -235,6 +237,7 @@ begin
                         if assigned (CharaName) then begin
                                 if (CharaName.IndexOf(tc.Name) <> -1) then begin
                                         tc := CharaName.Objects[CharaName.IndexOf(str)] as TChara;
+                                        addkey := False;
                                 end;
                         end;
                         tc.JID := StrToInt(SQLDataSet.FieldValues['JID']);
@@ -399,8 +402,10 @@ begin
                                 tc.Flag.Add(sl.Strings[i]);
                         end;
 
-                        CharaName.AddObject(tc.Name, tc);
-                        Chara.AddObject(tc.CID, tc);
+                        if (addkey) then begin
+                                CharaName.AddObject(tc.Name, tc);
+                                Chara.AddObject(tc.CID, tc);
+                        end;
 
                         Load_Accounts('', tc.ID);
 
@@ -422,8 +427,10 @@ var
         query : string;
         tpa : TParty;
         tc : TChara;
+        addkey : Boolean;
 begin
         Result := False;
+        addkey := True;
 
         query := 'SELECT * FROM party where MemberID0 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID1= '+ '''' + inttostr(GID) + '''' + ' OR MemberID2 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID3 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID4 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID5 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID6 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID7 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID8 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID9 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID10 = '+ '''' + inttostr(GID) + '''' + ' OR MemberID11 = '+ '''' + inttostr(GID) + '''';
         if (MySQL_Query (query)) then begin
@@ -435,6 +442,7 @@ begin
                                 if assigned (PartyNameList) then begin
                                         if (PartyNameList.IndexOf(tpa.Name) <> -1) then begin
                                                 tpa := PartyNameList.Objects[PartyNameList.IndexOf(tpa.Name)] as TParty;
+                                                addkey := False;
                                         end;
                                 end;
                                 EXPShare := StrToInt(SQLDataSet.FieldValues['EXPShare']);
@@ -452,8 +460,11 @@ begin
                                 MemberID[10] := StrToInt(SQLDataSet.FieldValues['MemberID10']);
                                 MemberID[11] := StrToInt(SQLDataSet.FieldValues['MemberID11']);
                         end;
-                        PartyNameList.AddObject(tpa.Name, tpa);
-                        DebugOut.Lines.Add(Format('Add Party Name : %s.', [tpa.Name]));
+
+                        if (addkey) then begin
+                                PartyNameList.AddObject(tpa.Name, tpa);
+                                DebugOut.Lines.Add(Format('Add Party Name : %s.', [tpa.Name]));
+                        end;
 
                         tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
                         for i := 0 to 11 do begin
@@ -477,8 +488,10 @@ var
         tc : TChara;
         query : string;
         i : integer;
+        addkey : Boolean;
 begin
         Result := False;
+        addkey := True;
 
         query := 'SELECT * FROM pet WHERE PlayerID = '' '+inttostr(AID)+'''';
         if (MySQL_Query(query)) then begin
@@ -490,6 +503,7 @@ begin
                                         if assigned (PetList) then begin
                                                 if (PetList.IndexOf(StrToInt(SQLDataSet.FieldValues['PID'])) <> -1) then begin
                                                         tpe := PetList.Objects[PetList.IndexOf(StrToInt(SQLDataSet.FieldValues['PID']))] as TPet;
+                                                        addkey := False;
                                                 end;
                                         end;
                                         PlayerID := StrToInt(SQLDataSet.FieldValues['PlayerID']);
@@ -507,7 +521,10 @@ begin
                                         Accessory := StrToInt(SQLDataSet.FieldValues['Accessory']);
                                         Data := PetDB.Objects[i] as TPetDB;
                                 end;
-                                PetList.AddObject(tpe.PetID, tpe);
+
+                                if (addkey) then begin
+                                        PetList.AddObject(tpe.PetID, tpe);
+                                end;
 
                                 if (tpe.PlayerID <> 0) then begin
                                         if (tpe.CharaID = 0) then begin
@@ -568,6 +585,7 @@ var
         i, j : integer;
         sl : TStringList;
         guildkey : Boolean;
+        addkey : Boolean;
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
@@ -575,6 +593,7 @@ begin
         
         Result := False;
         guildkey := False;
+        addkey := True;
 
         query := 'SELECT G.*, M.* FROM guild_info AS G LEFT JOIN guild_members AS M ON (G.GDID=M.GDID) WHERE M.GID = '''+inttostr(GID)+''' LIMIT 1';
         if (MySQL_Query(query)) then begin
@@ -586,6 +605,7 @@ begin
                                 if assigned (GuildList) then begin
                                         if (GuildList.IndexOf(tg.ID) <> -1) then begin
                                                 tg := GuildList.Objects[GuildList.IndexOf(tg.ID)] as TGuild;
+                                                addkey := False;
                                         end;
                                 end;
                                 if (ID > NowGuildID) then NowGuildID := ID;
@@ -617,7 +637,10 @@ begin
                                         end;
                                 end;
                         end;
-                        GuildList.AddObject(tg.ID, tg);
+
+                        if (addkey) then begin
+                                GuildList.AddObject(tg.ID, tg);
+                        end;
                         SQLDataSet.Next;
                 end;
         end;
@@ -724,7 +747,10 @@ function Preload_GuildMembers() : Boolean;
 var
         query : string;
         tc : TChara;
+        addkey : Boolean;
 begin
+        addkey := True;
+
         query := 'SELECT C.GID, C.Name, C.BaseLV FROM characters AS C LEFT JOIN guild_members AS G ON (C.GID=G.GID) WHERE C.GID <> 0';
         if MySQL_Query(query) then begin
                 debugout.Lines.add('Pre-Loading Character Data for Guilds');
@@ -736,11 +762,16 @@ begin
                         if assigned (CharaName) then begin
                                 if (CharaName.IndexOf(tc.Name) <> -1) then begin
                                         tc := CharaName.Objects[CharaName.IndexOf(tc.Name)] as TChara;
+                                        addkey := False;
                                 end;
                         end;
                         tc.BaseLV := StrToInt(SQLDataSet.FieldValues['BaseLV']);
-                        CharaName.AddObject(tc.Name, tc);
-                        Chara.AddObject(tc.CID, tc);
+
+                        if (addkey) then begin
+                                CharaName.AddObject(tc.Name, tc);
+                                Chara.AddObject(tc.CID, tc);
+                        end;
+                        
                         SQLDataSet.Next;
                 end;
         end;

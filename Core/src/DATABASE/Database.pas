@@ -447,7 +447,10 @@ begin
                                 1363:   FastWalk := true;       {Blood Axe}
                                 1530:   DoppelgagnerASPD := true;{Mjolnir}
                                 1814:   DoppelgagnerASPD := true; {Berserk Knuckle}
-                                4047:   GhostArmor := true;     {Ghostring Card}
+
+                                { Oat says this makes you invincible when it shouldn't. Commented out Temporarily. }
+                                //4047:   GhostArmor := true;     {Ghostring Card}
+
                                 4077:   NoCastInterrupt := true;{Phen Card}
 				4147:	SplashAttack := true;   {Baphomet Card}
                                 4123:   UnlimitedEndure := true;{Eddgar Card}
