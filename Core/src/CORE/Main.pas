@@ -7769,7 +7769,8 @@ begin
 
                 if (NoJamstone = False) and (ItemSkill = false) then UseItem(tc, j);
 
-                tc.ItemSkill := false;
+                { Mitch 02-03-2004: Fixed Ygg. Leaf uses SP! }
+                //tc.ItemSkill := false;
                 dmg[0] := ((tc1.MAXHP * tl.Data1[MUseLV]) div 100) + 1;
 
   							tc1.Sit := 3;

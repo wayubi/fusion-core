@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-03-04: Fixed bug #353: "yggdrasil leafs take up sp when used" [Mitch]
 - 02-01-04: Added Sage Skill Spell Breaker. [Darkhelmet]
 - 02-01-04: Added Sage Skill Cast Cancel. [Darkhelmet]
 - 02-01-04: Fixed Double-Login causes server crash & Freezes. [AlexKreuz]
