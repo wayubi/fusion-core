@@ -50,7 +50,7 @@ uses
 implementation
 
 uses
-	Main;
+	Main, REED_DELETE;
 
 
     procedure init_globals();
@@ -277,7 +277,8 @@ uses
             if (tpa.MemberID[0] = 0) then begin
             	if UseSQL then DeleteParty(tpa.Name);
 
-                PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
+                PD_Delete_Parties(tpa.ID);
+
                 tpa.Free;
             end else begin
             	if assigned(tpa.Member[0]) then begin
@@ -332,8 +333,8 @@ uses
         	        tg.Member[i].GuildPos := 0;
                 end;
             end;
-        	guildlist.Delete(j);
-            PD_Delete_Guilds(tg);
+
+            PD_Delete_Guilds(tg.ID);
         end;
     end;
 

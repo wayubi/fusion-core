@@ -10,7 +10,7 @@ uses
     {Shared}
     SysUtils, StrUtils,
     {Fusion}
-	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC;
+	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate();
@@ -177,45 +177,7 @@ uses
             	tp := frmMain.listbox1.Items.Objects[k] as TPlayer;
 
                 if (assigned(tp)) then begin
-		            for i := 0 to 8 do begin
-        		    	if assigned(tp.CData[i]) then begin
-
-                        	if assigned(tp.CData[i].Socket) then begin
-                        		if tp.CData[i].Login <> 0 then tp.CData[i].Socket.Close;
-			                    tp.CData[i].Socket := nil;
-    			            end;
-
-                		    leave_party(tp.CData[i]);
-		                    leave_guild(tp.CData[i]);
-
-        	    	        //I'm leaving pets out for now. They're whacked
-		    	    	    //for j := 0 to PetList.Count - 1 do begin
-		        		    //	if PetList.IndexOf(j) <> -1 then begin
-				            //    	tpe := PetList.IndexOfObject(j) as TPet;
-        		        	//	    if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
-        				    //    end;
-		        		    //end;
-
-                            if (CharaName.IndexOf(tp.CData[i].Name) <> -1) then begin
-			                    CharaName.Delete(CharaName.IndexOf(tp.CData[i].Name));
-    			                Chara.Delete(Chara.IndexOf(tp.CData[i].CID));
-                            end;
-        		        end;
-            		end;
-
-		            if (IDTableDB.IndexOf(tp.ID) <> -1) then begin
-        		    	IDTableDB.Delete(IDTableDB.IndexOf(tp.ID));
-		            end;
-
-	    	        if (GM_Access_DB.IndexOf(tp.ID) <> -1) then begin
-    		        	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
-	        	    end;
-
-                    PD_PlayerData_Delete(tp.Name);
-                    if PlayerName.IndexOf(tp.Name) <> -1 then
-    		        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
-                    if Player.IndexOf(tp.ID) <> -1 then
-    		            Player.Delete(Player.IndexOf(tp.ID));
+                    PD_Delete_Accounts(tp.ID);
 		        end;
             end;
         end;
@@ -265,22 +227,7 @@ uses
             end;
         end;
 
-    	leave_party(tc);
-        leave_guild(tc);
-
-        { I'm leaving pets out for now. They're whacked }
-        {for j := 0 to PetList.Count - 1 do begin
-        	if PetList.IndexOf(j) <> -1 then begin
-            	tpe := PetList.IndexOfObject(j) as TPet;
-                if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
-            end;
-        end;}
-
-        if CharaName.IndexOf(tc.Name) <> -1 then
-            CharaName.Delete(CharaName.IndexOf(tc.Name));
-        if Chara.IndexOf(tc.CID) <> -1 then
-            Chara.Delete(Chara.IndexOf(tc.CID));
-
+        PD_Delete_Character(tc.CID);
         DataSave(True);
     end;
 
