@@ -243,7 +243,14 @@ begin
                 else if str = 'statuspoint' then begin p := @tc.StatusPoint;len := 2; end
                 else if str = 'skillpoint'  then begin p := @tc.SkillPoint; len := 2; end
                 else if str = 'option'      then begin p := @tc.Option;     len := 4; end
-                else if str = 'speed'       then begin p := @tc.Speed;      len := 2; end;
+                else if str = 'speed'       then begin p := @tc.Speed;      len := 2; end
+                else if str = 'str'         then begin p := @tc.Parambase[0]; len := 2; end
+                else if str = 'agi'         then begin p := @tc.Parambase[1]; len := 2; end
+                else if str = 'dex'         then begin p := @tc.Parambase[2]; len := 2; end
+                else if str = 'vit'         then begin p := @tc.Parambase[3]; len := 2; end
+                else if str = 'int'         then begin p := @tc.Parambase[4]; len := 2; end
+                else if str = 'luk'         then begin p := @tc.Parambase[5]; len := 2; end;
+
 				if len <> 0 then begin
                     j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
                     i := 0;
@@ -281,8 +288,10 @@ begin
                 if (Copy(str, 1, 1) <> '\') then tc.Flag.Values[str] := IntToStr(i)
                 else ServerFlag.Values[str] := IntToStr(i);
 
-                if str = 'option' then UpdateOption(tm, tc); //update character's options after setting
-
+                //update character's options after setting
+                UpdateOption(tm, tc);
+                CalcStat(tc);
+                SendCStat(tc);
 
                 Inc(tc.ScriptStep);
             end;
