@@ -2004,6 +2004,10 @@ Begin(* Proc sv3PacketProcess() *)
                         WFIFOL( 2, 0); //failed
                         tc.Socket.SendBuf(buf, 6);
                     end;
+                end else begin
+                    WFIFOW( 0, $00cd);
+                    WFIFOL( 2, 0); //failed
+                    tc.Socket.SendBuf(buf, 6);
                 end;
             end;
 
