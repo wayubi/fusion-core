@@ -1994,18 +1994,19 @@ Begin
 					end;
       365:   //Magic Crusher
 				begin
-					//Magic Attack Calculation
-					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
-					dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
-					dmg[0] := dmg[0] - ts.Data.Param[2];
-					if dmg[0] < 1 then
-						dmg[0] := 1;
-					dmg[0] := dmg[0] * 1;
-					dmg[0] := dmg[0] * tl.Data2[MUseLV];
-					if dmg[0] < 0 then
-						dmg[0] := 0;
-
-					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+                    try
+    					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+	    				dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
+		    			dmg[0] := dmg[0] - ts.Data.Param[2];
+			    		if dmg[0] < 1 then dmg[0] := 1;
+					    dmg[0] := dmg[0] * 1;
+    					dmg[0] := dmg[0] * tl.Data2[MUseLV];
+	    				if dmg[0] < 0 then dmg[0] := 0;
+    					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+                    except
+                        on EIntOverflow do
+                            dmg[0] := 2147483647;
+                    end;
 
 					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
