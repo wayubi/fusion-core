@@ -114,7 +114,7 @@ uses
         Database and Script files for testing.}
         ini.WriteString('Debug', 'ShowDebugErrors', BoolToStr(ShowDebugErrors));
 
-        ini.WriteString('Toys', 'MapUnloadTime', IntToStr(MapUnloadTime));
+        //ini.WriteString('Toys', 'MapUnloadTime', IntToStr(MapUnloadTime));
 
         ini.Free;
     end;

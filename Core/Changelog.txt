@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-27-04: Commented out MapUnload from INI since it's disabled. [Tsusai]
 - 10-26-04: REED: Proper deletion of characters from character zone. [AlexKreuz]
 - 10-26-04: REED: Proper deletion of Pets on Character delete. [AlexKreuz]
 - 10-26-04: REED: Restructured Deletion Algorithms (66%). [AlexKreuz]
