@@ -4,6 +4,7 @@
 - 05-31-04: Switched GM Command, #UNIT to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #RAW to ALBGM system. [AlexKreuz]
 - 05-31-04: Added Option_PVP_XPLoss - INI option to turn off XP loss in PVP. [AlexKreuz]
+- 05-31-04: Added exception handling for any unexpected file I/O problems in save_gm_log [ChrstphrR]
 - 05-31-04: Switched GM Command, #option to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #whois to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #speed to ALBGM system. [AlexKreuz]
