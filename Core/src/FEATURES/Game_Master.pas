@@ -964,6 +964,7 @@ Called when we're shutting down the server *only*
                         tc.Item[j].Equip := 0;
                         WFIFOB(6, 1);
                         tc.Socket.SendBuf(buf, 7);
+                        remove_equipcard_skills(tc, j);
                     end;
                 end;
 
@@ -1653,6 +1654,7 @@ Called when we're shutting down the server *only*
                     WFIFOW(4, tc.Item[i].Equip);
                     WFIFOB(6, 1);
                     tc.Socket.SendBuf(buf, 7);
+                    remove_equipcard_skills(tc, i);
 
                     WFIFOW(0, $0188);
                     WFIFOW(2, 0);
@@ -2623,6 +2625,7 @@ Called when we're shutting down the server *only*
                     tc.Item[j].Equip := 0;
                     WFIFOB(6, 1);
                     tc.Socket.SendBuf(buf, 7);
+                    remove_equipcard_skills(tc, j);
                 end;
             end;
 

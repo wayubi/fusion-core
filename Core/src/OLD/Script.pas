@@ -348,6 +348,7 @@ begin
 							tc.Item[k].Equip := 0;
 							WFIFOB(6, 1);
 							tc.Socket.SendBuf(buf, 7);
+                            remove_equipcard_skills(tc, k);
 							CalcStat(tc);
 							SendCStat(tc);
 						end;
@@ -471,6 +472,7 @@ begin
 					                tc.Item[i].Equip := 0;
 					                WFIFOB(6, 1);
 					                tc.Socket.SendBuf(buf, 7);
+                                    remove_equipcard_skills(tc, i);
 					        end;
 					end;
 
@@ -748,6 +750,7 @@ begin
 								WFIFOW(4, tc.Item[i].Equip);
 								WFIFOB(6, 1);
            			tc.Socket.SendBuf(buf, 7);
+                                remove_equipcard_skills(tc, i);
 								//Refine sucess
 								if k = 0 then begin
 									tc.Item[i].Refine := j;
@@ -1626,6 +1629,7 @@ begin
               tc.Item[j].Equip := 0;
               WFIFOB(6, 1);
               tc.Socket.SendBuf(buf, 7);
+              remove_equipcard_skills(tc, j);
             end;
           end;
           Inc(tc.ScriptStep);

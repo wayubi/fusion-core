@@ -1590,6 +1590,7 @@ end;
 						tc.Item[j].Equip := 0;
 						WFIFOB(6, 1);//Successful Remove.
 						Socket.SendBuf(buf, 7);
+                        remove_equipcard_skills(tc, j);
 						w := $80;
 					end;
 					if w = $88 then w := $8; //óºï˚Ç†Ç¢ÇƒÇÈÇ∆Ç´ÇÕç∂Ç…
@@ -1624,6 +1625,7 @@ end;
 						tc.Item[j].Equip := 0;
 						WFIFOB(6, 1);
 						Socket.SendBuf(buf, 7);
+                        remove_equipcard_skills(tc, j);
 						w := $20;
 					end;
 					if w = $22 then w := $2; //óºï˚Ç†Ç¢ÇƒÇÈÇ∆Ç´ÇÕç∂Ç…
@@ -1739,6 +1741,7 @@ end;
 								tc.Item[i].Equip := 0;
 								WFIFOB(6, 1);
 								Socket.SendBuf(buf, 7);
+                                remove_equipcard_skills(tc, i);
 							end;
 						end;
 					end;
@@ -1796,26 +1799,8 @@ end;
                                tc.Item[w].Equip := 0;
                                WFIFOB(6, 1);
                                Socket.SendBuf(buf, 7);
+                               remove_equipcard_skills(tc, w);
                             end;
-
-		for j := 1 to MAX_SKILL_NUMBER do begin // Add card skills
-			if tc.Item[w].Data.AddSkill[j] <> 0 then begin
-            	if (tc.Skill[j].Card) then begin
-                	tc.Skill[j].Lv := tc.Skill[j].Lv - tc.Item[w].Data.AddSkill[j];
-                    tc.Skill[j].Card := False;
-				end;
-			end;
-
-            for i := 0 to tc.Item[w].Data.Slot - 1 do begin
-            	td := ItemDB.IndexOfObject(tc.Item[w].Card[i]) as TItemDB;
-                if assigned(td) then begin
-                	if (td.AddSkill[j] <> 0) and (tc.Skill[j].Card) then begin
-	                	tc.Skill[j].Lv := tc.Skill[j].Lv - td.AddSkill[j];
-    	                tc.Skill[j].Card := False;
-                    end;
-                end;
-            end;
-		end; //for j :=1 to 336 do begin
 
             CalcStat(tc);
             SendCSkillList(tc);

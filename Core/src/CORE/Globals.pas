@@ -10,6 +10,7 @@ uses
     function check_attack_lag(tc : TChara) : Boolean;
 
     procedure reset_skill_effects(tc : TChara);
+    procedure remove_equipcard_skills(tc : TChara; idx : Integer);
 
     procedure leave_party(tc : TChara);
     procedure leave_guild(tc : TChara);
@@ -46,6 +47,31 @@ uses
                 tc.SkillTick := 0;
             end;
         end;
+    end;
+
+    procedure remove_equipcard_skills(tc : TChara; idx : Integer);
+    var
+    	i, j : Integer;
+        td : TItemDB;
+    begin
+    	for j := 1 to MAX_SKILL_NUMBER do begin
+        	if tc.Item[idx].Data.AddSkill[j] <> 0 then begin
+            	if (tc.Skill[j].Card) then begin
+                	tc.Skill[j].Lv := tc.Skill[j].Lv - tc.Item[idx].Data.AddSkill[j];
+                    tc.Skill[j].Card := False;
+				end;
+			end;
+
+            for i := 0 to tc.Item[idx].Data.Slot - 1 do begin
+            	td := ItemDB.IndexOfObject(tc.Item[idx].Card[i]) as TItemDB;
+                if assigned(td) then begin
+                	if (td.AddSkill[j] <> 0) and (tc.Skill[j].Card) then begin
+	                	tc.Skill[j].Lv := tc.Skill[j].Lv - td.AddSkill[j];
+    	                tc.Skill[j].Card := False;
+                    end;
+                end;
+            end;
+		end;
     end;
 
     { -------------------------------------------------------------------------------- }

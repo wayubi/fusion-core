@@ -4319,6 +4319,7 @@ Begin
 									tc1.Item[i].Equip := 0;
 									WFIFOB(6, 1);
 									tc1.Socket.SendBuf(buf, 7);
+                                    remove_equipcard_skills(tc, i);
 									end;
 
 									CalcStat(tc1);
@@ -4349,6 +4350,7 @@ Begin
 								tc1.Item[i].Equip := 0;
 								WFIFOB(6, 1);
 								tc1.Socket.SendBuf(buf, 7);
+                                remove_equipcard_skills(tc, i);
 								end;
 
 							CalcStat(tc1);
@@ -4377,6 +4379,7 @@ Begin
 							tc1.Item[i].Equip := 0;
 							WFIFOB(6, 1);
 							tc1.Socket.SendBuf(buf, 7);
+                            remove_equipcard_skills(tc, i);
 							end;
 
 						CalcStat(tc1);
@@ -4405,6 +4408,7 @@ Begin
 								tc1.Item[i].Equip := 0;
 								WFIFOB(6, 1);
 								tc1.Socket.SendBuf(buf, 7);
+                                remove_equipcard_skills(tc, i);
 								end;
 
 							CalcStat(tc1);
