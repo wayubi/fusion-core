@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 03-07-04: Added Cart Boost Skill. [Oatmeal]
 - 03-07-04: Added Lord Knight Parry. [Oatmeal]
 - 03-07-04: Added High Wizard Magic Crush. [Oatmeal]
 - 03-07-04: Added Sniper Sniper Shot. [Oatmeal]

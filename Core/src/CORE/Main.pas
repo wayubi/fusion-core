@@ -7756,7 +7756,7 @@ begin
 							ts1.pcnt := 0;
 							//Update Monster Location
                                                         UpdateMonsterLocation(tm, ts1);
-							
+
 						end;
 								if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
     						StatCalc1(tc, ts1, Tick);
@@ -8520,11 +8520,17 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                        378: // Advance Enchat Poison
+                                        387: // Cart Boost
 					begin
+                                        if (tc.Option = 8) or (tc.Option = 128) or (tc.Option = 256) or (tc.Option = 512) or (tc.Option = 1024) then begin
 						tc1 := tc;
 						ProcessType := 3;
-					end;
+                                                end else begin
+                                                SendSkillError(tc, 0);
+                                                MMode :=4 ;
+                                                Exit;
+                                                end
+				end;
 				66: // Imposito Manus
 					begin
 						ProcessType := 3;
