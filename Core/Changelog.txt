@@ -1,3 +1,8 @@
+- 03-19-04: Updated Backstab (can be used whether hiding or not). [Colus]
+- 03-19-04: Fixed icon removal of Hide/Cloak when hit by chars/monsters. [Colus]
+- 03-19-04: Fixed potential crash problem with Hide/Cloak SP drain. [Colus]
+- 03-19-04: Changed functionality of StealMultiplier. [Colus]
+- 03-19-04: Fixed packet problem with Steal. [Colus]
 - 03-18-04: Fixed Bug 650, range check error in damagecalc1. [Darkhelmet]
 - 03-17-04: A little more object abstraction. [Colus]
 - 03-17-04: Reactivated peco/falcon/overweight icons without lag. [Colus]
