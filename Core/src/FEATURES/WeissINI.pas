@@ -30,6 +30,7 @@ uses
         ini.WriteString('Server', 'sv1port', IntToStr(sv1port));
         ini.WriteString('Server', 'sv2port', IntToStr(sv2port));
         ini.WriteString('Server', 'sv3port', IntToStr(sv3port));
+        ini.WriteString('Server', 'wacport', IntToStr(wacport));
         ini.WriteString('Server', 'WarpDebug', BoolToStr(WarpDebugFlag, true));
         ini.WriteString('Server', 'BaseExpMultiplier', IntToStr(BaseExpMultiplier));
         ini.WriteString('Server', 'JobExpMultiplier', IntToStr(JobExpMultiplier));
@@ -93,6 +94,7 @@ uses
         ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
         ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
         ini.WriteString('Fusion', 'Option_Minimize_Tray', BoolToStr(Option_Minimize_Tray));
+        ini.WriteString('Fusion', 'Option_Enable_WAC', BoolToStr(Option_Enable_WAC));
         // Fusion INI Lines
         
         // MySQL Server Lines

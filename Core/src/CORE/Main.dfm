@@ -1353,6 +1353,10 @@ object frmMain: TfrmMain
         Caption = 'Connect to ISCS'
         OnClick = ConnecttoISCS1Click
       end
+      object EnableWebAccountCreator1: TMenuItem
+        Caption = 'Enable Web Account Creator'
+        OnClick = EnableWebAccountCreator1Click
+      end
     end
   end
 end

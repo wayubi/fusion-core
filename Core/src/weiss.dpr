@@ -29,6 +29,7 @@ uses
   Player_Skills in 'FEATURES\Player_Skills.pas',
   WeissINI in 'FEATURES\WeissINI.pas',
   ISCS in 'FEATURES\ISCS.pas',
+  WAC in 'FEATURES\WAC.pas',
 
   GlobalLists in 'OLD\GlobalLists.pas',
   Manifest in 'OLD\Manifest.pas',
@@ -44,7 +45,8 @@ uses
   SlyIrc in '3RDPARTY\SlyIrc.pas',
   Response in '3RDPARTY\Response.pas',
   WSocket in '3RDPARTY\WSocket.pas',
-  WSockBuf in '3RDPARTY\WSockBuf.pas';
+  WSockBuf in '3RDPARTY\WSockBuf.pas',
+  BRSHttpSrv in '3RDPARTY\BRSHttpSrv.pas';
   {$ENDIF}
 
   {$IFDEF LINUX}

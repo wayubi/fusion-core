@@ -17,7 +17,7 @@ uses
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
-        PacketProcesses, ISCS,
+        PacketProcesses, ISCS, WAC,
     {3rd Party Units}
     	List32, Zip;
 
@@ -192,6 +192,7 @@ type
     Button15: TButton;
     S1: TMenuItem;
     ConnecttoISCS1: TMenuItem;
+    EnableWebAccountCreator1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -286,6 +287,7 @@ type
     procedure Button15Click(Sender: TObject);
     procedure S1Click(Sender: TObject);
     procedure ConnecttoISCS1Click(Sender: TObject);
+    procedure EnableWebAccountCreator1Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -329,9 +331,6 @@ var
 	spbonus       :integer;
 	//Icon
 	TrayIcon      : TNotifyIconData;
-
-
-
 
 implementation
 
@@ -522,6 +521,11 @@ begin
 		sv3port := 5121;
 	end;
 	sv3.Port := sv3port;
+	if sl.IndexOfName('wacport') > -1 then begin
+		wacport := StrToInt(sl.Values['wacport']);
+	end else begin
+		wacport := 80;
+	end;
 	if sl.IndexOfName('WarpDebug') > -1 then begin
 		WarpDebugFlag := StrToBool(sl.Values['WarpDebug']);
 	end else begin
@@ -819,11 +823,22 @@ begin
 		Option_Font_Style := 'B';
 	end;
 
+
+    if sl.IndexOfName('Option_Enable_WAC') > -1 then begin
+        try
+            Option_Enable_WAC := StrToBool(sl.Values['Option_Enable_WAC']);
+        except
+            on EConvertError do Option_Enable_WAC := False;
+        end;
+    end else begin
+        Option_Enable_WAC := False;
+    end;
+
     if sl.IndexOfName('Option_Minimize_Tray') > -1 then begin
         try
             Option_Minimize_Tray := StrToBool(sl.Values['Option_Minimize_Tray']);
         except
-            on EConvertError do Option_PVP := False;
+            on EConvertError do Option_Minimize_Tray := False;
         end;
     end else begin
         Option_Minimize_Tray := False;
@@ -1078,6 +1093,10 @@ begin
     end;
 
     frmMain.ConnecttoISCS1Click(self);
+    if (Option_Enable_WAC) then begin
+        create_wac();
+        EnableWebAccountCreator1.Caption := 'Disable Web Account Creator';
+    end;
 
 {U0x003bÉRÉRÇ‹Ç≈}
 end;
@@ -1088,6 +1107,7 @@ var
 	Idx : Integer; // Loop Iterator for freeing our global lists.
 begin
 
+    destroy_wac(True);
 	save_commands();
     weiss_ini_save();
 
@@ -11241,6 +11261,21 @@ begin
     else begin
         ConnecttoISCS1.Caption := 'Connect to ISCS';
         iscs_console_disconnect();
+    end;
+end;
+
+procedure TfrmMain.EnableWebAccountCreator1Click(Sender: TObject);
+begin
+    if not (Option_Enable_WAC) then begin
+        EnableWebAccountCreator1.Caption := 'Disable Web Account Creator';
+        Option_Enable_WAC := True;
+        create_wac();
+    end
+
+    else begin
+        Option_Enable_WAC := False;
+        EnableWebAccountCreator1.Caption := 'Enable Web Account Creator';
+        destroy_wac();
     end;
 end;
 

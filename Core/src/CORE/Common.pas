@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = '1.212 I -- I.S.C.S Alpha 4 Release';
+	RELEASE_VERSION = '1.212 I -- W.A.C Alpha 1 Release';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
@@ -1470,6 +1470,7 @@ var
 	sv1port              :word;
 	sv2port              :word;
 	sv3port              :word;
+    wacport              :word;
 	WarpDebugFlag        :boolean;
 	BaseExpMultiplier    :cardinal;
 	JobExpMultiplier     :cardinal;
@@ -1662,6 +1663,7 @@ Option_MOTD_File   : string; //File for reading MOTD entries
 
 Option_GM_Logs     :Boolean;
 
+Option_Enable_WAC : Boolean;
 Option_Minimize_Tray : Boolean;
 Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
