@@ -7898,9 +7898,9 @@ end;
 					end;
 					tn.ScriptCnt := tn1.ScriptCnt;
           // Colus, 20040130: Copy over script label data when you go to a script
-          tn.ScriptInitS := tn1.ScriptInitS;
-          tn.ScriptInitD := tn1.ScriptInitD;
-          tn.ScriptInitMS := tn1.ScriptInitMS;
+          //tn.ScriptInitS := tn1.ScriptInitS;
+          //tn.ScriptInitD := tn1.ScriptInitD;
+          //tn.ScriptInitMS := tn1.ScriptInitMS;
 
 				end;
 {NPCƒCƒxƒ“ƒg’Ç‰Á}
