@@ -1016,6 +1016,7 @@ begin
 					end;
 				end;
 			end;
+
 			tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
 			tp.CName[tc.CharaNumber] := tc.Name;
 			tp.CData[tc.CharaNumber] := tc;
