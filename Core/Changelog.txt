@@ -2,7 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
-- 01-08-04: Updated Raid - [Darkhelmet]
+- 01-08-04: Updated Intimidate, wait to warp after the attack - [Darkhelmet]
 - 01-08-04: Added Raid, commented out the old Raid - [Oatmeal12345]
 - 01-08-04: Added Acid Terror commented out the old acid terror- [Oatmeal12345]
 - 01-08-04: Added Body relocation commented out the old body relocation - [Oatmeal12345]
