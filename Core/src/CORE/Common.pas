@@ -3925,7 +3925,7 @@ begin
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
         if tn.JID = 141 then begin
-          tm.gat[tn.Point.X][tn.Point.Y] := 0;
+          tm.gat[tn.Point.X][tn.Point.Y] := 1;
         end;
 
         if tn.JID = $46 then begin
@@ -5154,7 +5154,7 @@ begin
           repeat
 					ts.Point.X := Random(tm.Size.X - 2);
 					ts.Point.Y := Random(tm.Size.y - 2);
-          until ((tm.gat[ts.Point.X][ts.Point.Y] and 1) <> 0);
+          until ( (tm.gat[ts.Point.X][ts.Point.Y] <> 1) and (tm.gat[ts.Point.X][ts.Point.Y] <> 5) );
           end else begin
 					ts.Point.X := X;
 					ts.Point.Y := Y;
@@ -5376,7 +5376,8 @@ begin
           repeat
 					ts.Point1.X := Random(tm.Size.X - 2);
 					ts.Point1.Y := Random(tm.Size.y - 2);
-          until ((tm.gat[ts.Point1.X][ts.Point1.Y] and 1) <> 0);
+                    
+          until ( (tm.gat[ts.Point1.X][ts.Point1.Y] <> 1) and (tm.gat[ts.Point1.X][ts.Point1.Y] <> 5) );
 
           ts.Point := ts.Point1;
 
@@ -7312,7 +7313,7 @@ begin
 								end;
 								//---
 								Inc(j);
-							until ((tm.gat[ts.Point.X][ts.Point.Y] and 1) <> 0) or (j = 100);
+							until ( (tm.gat[ts.Point.X][ts.Point.Y] <> 1) and (tm.gat[ts.Point.X][ts.Point.Y] <> 5) or (j = 100) );
             if j <> 100 then begin
 								ts.Dir := Random(8);
 								ts.HP := ts0.Data.HP;

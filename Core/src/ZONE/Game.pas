@@ -1967,7 +1967,7 @@ end;
 										        xy.X := Random(tm.Size.X - 2) + 1;
 										        xy.Y := Random(tm.Size.Y - 2) + 1;
 										        Inc(j);
-									        until (tm.gat[xy.X, xy.Y] and 1 <> 0) or (j = 100);
+									        until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 1)) or (j = 100) );
 
 									        if j <> 100 then begin
 										        UseUsableItem(tc, w);
@@ -2038,7 +2038,7 @@ end;
 											ts.Point.X := tc.Point.X + Random(11) - 5;
 											ts.Point.Y := tc.Point.Y + Random(11) - 5;
 											Inc(j);
-										until (tm.gat[ts.Point.X, ts.Point.Y] and 1 <> 0) or (j = 10);
+										until ( ((tm.gat[ts.Point.X, ts.Point.Y] <> 0) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5))  or (j = 10) );
 										if (j = 10) then begin
 											ts.Point.X := tc.Point.X;
 											ts.Point.Y := tc.Point.Y;
@@ -4053,7 +4053,7 @@ end;
 							xy.X := Random(tm.Size.X - 2) + 1; //画面端の隙間には飛ばないように
 							xy.Y := Random(tm.Size.Y - 2) + 1;
 							Inc(j);
-						until (tm.gat[xy.X, xy.Y] and 1 <> 0) or (j = 100);
+						until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
 						if j = 100 then begin
 							//飛べないということはないと思うけど一応、フェイルセーフ
 							WFIFOW( 0, $0110);
@@ -4164,7 +4164,7 @@ end;
 					continue;
 				end;
 {NPCイベント追加ココまで}
-				if tm.gat[tc.Point.X][tc.Point.Y] = 0 then begin //移動不能場所はメモ不可
+				if (tm.gat[tc.Point.X][tc.Point.Y] = 1) or (tm.gat[tc.Point.X][tc.Point.Y] = 5) then begin //移動不能場所はメモ不可
 					WFIFOW(0, $0189);
 					WFIFOW(2, 1);
 					Socket.SendBuf(buf, 4);

@@ -926,14 +926,13 @@ begin
 			if ts.Point.Y < 0 then ts.Point.Y := 0;
 			if ts.Point.Y > tm.Size.Y - 2 then ts.Point.Y := tm.Size.Y - 2;
 		end;
-//	until (tm.gat[ts.Point.X][ts.Point.Y] and 1) <> 0;
-	until (tm.gat[ts.Point.X, ts.Point.Y] and 1 <> 0);
+	until ( (tm.gat[ts.Point.X, ts.Point.Y] <> 1) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5) );
 	ts.Dir := Random(8);
 	ts.HP := ts.Data.HP;
 	if ts.Data.isDontMove then
 		ts.MoveWait := $FFFFFFFF
 	else
-  ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
+    ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
 	ts.Speed := ts.Data.Speed;
 	ts.ATarget := 0;
 	ts.ARangeFlag := false;
@@ -2915,7 +2914,7 @@ begin
 			//DebugOut.Lines.Add('		BlockMove OK');
 	end;
 
-	if (tm.gat[Point.X][Point.Y] and $4) <> 0 then begin
+	if (tm.gat[Point.X][Point.Y] <> 0) and (tm.gat[Point.X][Point.Y] <> 5) then begin
 			//ワープポイントに入った
 			for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
 				for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
@@ -4226,7 +4225,7 @@ begin
 					end;
                                 264:    {Body Relocation}
                                         begin
-                                                if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] and 1 <> 0) then begin
+                                                if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                         WFIFOW( 0, $011a);
                                                         WFIFOW( 2, tc.MSkill);
                                                         WFIFOW( 4, dmg[0]);
@@ -5147,7 +5146,7 @@ begin
 										xy.X := Random(tm.Size.X - 2) + 1;
 										xy.Y := Random(tm.Size.Y - 2) + 1;
 										Inc(j);
-									until (tm.gat[xy.X, xy.Y] and 1 <> 0) or (j = 100);
+									until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
 
 									if j <> 100 then begin
 
@@ -5191,7 +5190,7 @@ begin
                                 end;}
                                 264:   {Body Relocation}
                                 begin
-                                        if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] and 1 <> 0) then begin
+                                        if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                 WFIFOW( 0, $011a);
                                                 WFIFOW( 2, tc.MSkill);
                                                 WFIFOW( 4, dmg[0]);
@@ -9488,7 +9487,7 @@ begin
                                         begin
 						DelSkillUnit(tm, tn);
 						Dec(k);
-                        			tm.gat[tn.Point.X][tn.Point.Y] := 1;
+                        			tm.gat[tn.Point.X][tn.Point.Y] := 0;
                     			end;
 				$81://ポータル発動前->発動後
 					begin
@@ -10940,7 +10939,7 @@ begin
 										end;
 										//---
 										Inc(c);
-									until ((tm.gat[xy.X][xy.Y] and 1) <> 0) or (c = 100);
+									until ( ((tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5)) or (c = 100) );
 									if c <> 100 then begin
 										//ブロック移動
 										if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
@@ -11012,10 +11011,6 @@ begin
 			end;
 			Inc(ppos);
 			//DebugOut.Lines.Add(Format('	 Mob-Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, path[ppos-1], spd, Tick]));
-			if (tm.gat[Point.X][Point.Y] and 1) = 0 then begin
-				//壁めりこみ
-				//DebugOut.Lines.Add(Format('***Mob Move ERROR %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, path[ppos-1], spd, Tick]));
-			end;
 
 			//ブロック処理
 			for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
@@ -11339,7 +11334,7 @@ begin
 						//if xy.X >= tm.Size.X - 1 then xy.X := tm.Size.X - 2;
 						//if xy.Y <= 0 then xy.Y := 1;
 						//if xy.Y >= tm.Size.Y - 1 then xy.Y := tm.Size.Y - 2;
-						if (tm.gat[xy.X][xy.Y] and 1) <> 0 then break;
+						if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then break;
 						Inc(j);
 					until (j = 100);
 					//if j = 100 then DebugOut.Lines.Add('*** TraceError 1');
@@ -11366,7 +11361,7 @@ begin
 						        //if xy.X >= tm.Size.X - 1 then xy.X := tm.Size.X - 2;
 						        //if xy.Y <= 0 then xy.Y := 1;
 						        //if xy.Y >= tm.Size.Y - 1 then xy.Y := tm.Size.Y - 2;
-						        if (tm.gat[tgtPoint.X][tgtPoint.Y] and 1) <> 0 then break;
+						        if ( (tm.gat[tgtPoint.X][tgtPoint.Y] <> 1) and (tm.gat[tgtPoint.X][tgtPoint.Y] <> 5) ) then break;
 						        Inc(j);
 					        until (j = 100);
 						SendMMove(tc1.Socket, ts, Point, tgtPoint, tc1.ver2);
@@ -11746,7 +11741,7 @@ begin
 					break;
 				end;
 				//---
-				if (tm.gat[xy.X][xy.Y] and 1) <> 0 then
+				if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
 					//pcnt := SearchPath(path, tm, Point, xy);
 				i := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
 				Inc(j);
@@ -11899,7 +11894,7 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if (tc.MMode = 0) and (tm.gat[NextPoint.X][NextPoint.Y] <> 0) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0)) and (tc.SongTick < Tick) then begin
+					if (tc.MMode = 0) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0)) and (tc.SongTick < Tick) then begin
 						//追加移動
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
@@ -12211,7 +12206,7 @@ begin
 															j := 100;
 															Break;
 														end;
-														if (tm.gat[xy.X][xy.Y] and 1) <> 0 then
+														if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
 															pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
 														Inc(j);
 													until (pcnt <> 0) or (j = 100);
@@ -12233,7 +12228,7 @@ begin
 														break;
 													end;
 													//---
-													if (tm.gat[xy.X][xy.Y] and 1) <> 0 then
+													if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
 														pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
                                                                                                                 ts.DeadWait := Tick;   // mf
 													Inc(j);

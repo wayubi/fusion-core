@@ -10,9 +10,11 @@ uses
 //==============================================================================
 // ä÷êîíËã`
 		function  DirMove(tm:TMap; var xy:TPoint; Dir:byte; bb:array of byte):boolean;
+
 		function  CanMove(tm:TMap; x0, y0, x1, y1:integer):boolean;
 		procedure AddPath2(var aa:array of rHeap; var n:byte; rh:rHeap; x1, y1, x2, y2, dx, dy, dir, dist:integer);
 		function  SearchPath2(var path:array of byte; tm:TMap; x1, y1, x2, y2:cardinal):byte;
+
 		procedure PopHeap(var aa:array of rHeap;var n:byte);
 		procedure PushHeap(var d:rHeap; var aa:array of rHeap;var n:byte);
 		procedure UpHeap(x:byte; var aa:array of rHeap;var n:byte);
@@ -59,7 +61,33 @@ var
 	b1 :byte;
 	b2 :byte;
 begin
-	Result := false;
+
+    Result := false;
+
+    if (x0 - x1 < -1) or (x0 - x1 > 1) or (y0 - y1 < -1) or (y0 - y1 > 1) then exit;
+    if (x1 < 0) or (y1 < 0) or (x1 >= tm.Size.X) or (y1 >= tm.Size.Y) then exit;
+
+    b1 := tm.gat[x0][y0];
+    if (b1 = 1) or (b1 = 5) then exit;
+
+    b2 := tm.gat[x1][y1];
+    if (b2 = 1) or (b2 = 5) then exit;
+
+    if (x0 = x1) or (y0 = y1) then begin
+        Result := true;
+        exit;
+    end;
+
+    b1 := tm.gat[x0][y1];
+    b2 := tm.gat[x1][y0];
+
+    if (b1 = 1) or (b1 = 5) or (b2 = 1) or (b2 = 5) then exit;
+
+    Result := true;
+    
+end;
+
+{	Result := false;
 	if (x0 - x1 < -1) or (x0 - x1 > 1) or (y0 - y1 < -1) or (y0 - y1 > 1) then exit;
 	if (x1 < 0) or (y1 < 0) or (x1 >= tm.Size.X) or (y1 >= tm.Size.Y) then exit;
 	b1 := tm.gat[x0][y0];
@@ -74,8 +102,7 @@ begin
   b2 := tm.gat[x1][y0];
 	if ((b1 and 1) = 0) or ((b2 and 1) = 0) then exit;
 
-  Result := true;
-end;
+  Result := true;  }
 
 //------------------------------------------------------------------------------
 procedure AddPath2(var aa:array of rHeap; var n:byte; rh:rHeap; x1, y1, x2, y2, dx, dy, dir, dist:integer);

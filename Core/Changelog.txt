@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-25-03: Fixed Incorrect Map formatting (1s -> 0s, 0s -> 1s). [AlexKreuz]
 - 12-25-03: Fixed Cart Items duplicate bug. [AlexKreuz]
 - 12-25-03: Fixed Frost Nova does 35000 (0) damage. [AlexKreuz]
 - 12-25-03: Fixed Card with skills in clip gives extra skill points. [AlexKreuz]
