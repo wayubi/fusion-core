@@ -1101,6 +1101,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
       if (sl.Strings[14] <> '') then AutoRawUnit := StrToInt(sl.Strings[14]);
       if (sl.Strings[15] <> '') then Refine := StrToInt(sl.Strings[15]);
       if (sl.Strings[16] <> '') then PVPControl := StrToInt(sl.Strings[16]);
+      if (sl.Strings[17] <> '') then UserControl := StrToInt(sl.Strings[17]);
     end;
 		IDTableDB.AddObject(tid.ID,tid);
     end;

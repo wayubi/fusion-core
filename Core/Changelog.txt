@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-03-04: Added #newplayer command [Mitch]
 - 02-03-04: Corrected spirit sphere update process [Colus]
 - 02-03-04: Updated Inhale Spirits to recover proper SP amount. [Colus]
 - 02-03-04: Updated Call Spirit to rely more on DB for sphere count. [Colus]

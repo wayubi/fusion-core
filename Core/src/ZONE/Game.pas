@@ -1771,6 +1771,55 @@ end;
               WFIFOS (4, str, w - 4);
               tc1.socket.sendbuf(buf, w);
             end;
+          { Mitch 02-03-04 <== NEAT! : User Controls added for GMs (CreateUser) }
+          end else if (Copy(str, 1, 10) = 'newplayer ') and (tid.UserControl = 1) then begin
+            //Syntax: #newplayer user pass [1|0] email
+            //Gender: 1 = male // 0 = female (same as players.txt)
+            sl := TStringList.Create;
+            sl.DelimitedText := Copy(str, 11, 256);
+            try
+              if sl.Count <> 4 then continue;
+              if PlayerName.IndexOf(sl.Strings[0]) <> -1 then begin
+                str := 'Player name already exists!';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+                continue;
+              end else if (Length(sl.Strings[0]) < 4) or (Length(sl.strings[1]) < 4) then begin
+                str := 'Player name and password must be at least 4 characters long.';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+                continue;
+              end;
+              tp := TPlayer.Create;
+              tp.ID := 110000 + PlayerName.Count;
+              tp.Name := sl.Strings[0];
+              tp.Pass := sl.Strings[1];
+              tp.Mail := sl.Strings[3];
+              tp.Gender := StrToInt(sl.Strings[2]);
+              tp.Banned := 0;
+              for i := 0 to 8 do begin
+                tp.CName[i] := '';
+              end;
+              PlayerName.AddObject(tp.Name, tp);
+              Player.AddObject(tp.ID, tp);
+
+              str := tp.Name + ' has been successfully added!';
+              w := Length(str) + 4;
+              WFIFOW (0, $009a);
+              WFIFOW (2, w);
+              WFIFOS (4, str, w - 4);
+              tc.socket.sendbuf(buf, w);
+
+              tp.Free;
+            finally
+              sl.Free;
+            end;
 {’Ç‰ÁƒRƒR‚Ü‚Å}
 					end;
 

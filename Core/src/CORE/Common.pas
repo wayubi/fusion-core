@@ -254,6 +254,7 @@ type TIDTbl = class
   AutoRawUnit      :integer;
   Refine           :integer;
   PVPControl       :integer;
+  UserControl      :integer;
 end;
 //------------------------------------------------------------------------------
 // ID,Create ID,Number Created
