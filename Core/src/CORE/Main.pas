@@ -2467,7 +2467,11 @@ begin
     end;
   end;
 
+  // Lex Aeterna:
+	if ts.Stat1 = 5 then Dmg := Dmg * 2;
+
 	if ts.HP < Dmg then Dmg := ts.HP;
+
 	if Dmg = 0 then begin
 		Result := False;
 		Exit;
@@ -2476,7 +2480,7 @@ begin
 		ts.BodyTick := Tick + tc.aMotion;
 	end;
 
-        UpdateMonsterLocation(tm, ts);
+  UpdateMonsterLocation(tm, ts);
 
 	ts.HP := ts.HP - Dmg;
 	for i := 0 to 31 do begin
@@ -2541,6 +2545,10 @@ var
 	i :integer;
         w :Cardinal;
 begin
+
+  // Lex Aeterna:
+	if tc1.Stat1 = 5 then Dmg := Dmg * 2;
+  
 	if tc1.HP < Dmg then Dmg := tc1.HP;  //Damage Greater than Player's Life
 
   if Dmg = 0 then begin  //Miss, no damage
@@ -6223,28 +6231,35 @@ begin
 
 				        54:     {Resurrection}
 					        begin
-                                                        j := SearchCInventory(tc, 717, false);
-						        if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) and ((ts.Data.Race = 1) or (ts.Element mod 20 = 9)) then begin
-							
-                                                                if NoJamstone = False then begin
+                    j := SearchCInventory(tc, 717, false);
+						        if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) or (tc.ItemSkill = true) then begin
 
-							                UseItem(tc, j);
+                      //Damage Calculation
+                      // Colus, 20040123: Rearranged checks for undead, itemskill, and item usage
+                      
+                      
+                      if (ts.Data.Race = 1) or (ts.Element mod 20 = 9) then begin
 
-                                                                end;
+                        if (NoJamstone = False) and (ItemSkill = false) then UseItem(tc, j);
 
-                                                                //Damage Calculation
-							        if (Random(1000) < MUseLV * 20 + Param[3] + Param[5] + BaseLV + Trunc((1 - HP / MAXHP) * 200)) and (ts.Data.MEXP = 0) then begin
-								        dmg[0] := ts.HP;
-							        end else begin
-								        dmg[0] := (BaseLV + Param[3] + (MUseLV * 10)) * ElementTable[6][ts.Element] div 100;
-								        if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-							        end;
+							          if (Random(1000) < MUseLV * 20 + Param[3] + Param[5] + BaseLV + Trunc((1 - HP / MAXHP) * 200)) and (ts.Data.MEXP = 0) then begin
+  								        dmg[0] := ts.HP;
+  							        end else begin
+  								        dmg[0] := (BaseLV + Param[3] + (MUseLV * 10)) * ElementTable[6][ts.Element] div 100;
+  								        if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+  							        end;
 
-							        if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
+                      // Shouldn't need to cap this any more...
+							        //if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
 
-							        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-							        DamageProcess1(tm, tc, ts, dmg[0], Tick);
-							        tc.MTick := Tick + 3000;
+							          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+							          DamageProcess1(tm, tc, ts, dmg[0], Tick);
+							          tc.MTick := Tick + 3000;
+                      end else begin
+                        tc.MMode := 4;
+  							        tc.MPoint.X := 0;
+  							        tc.MPoint.Y := 0;
+                      end;
 						        end else begin
                       SendSkillError(tc, 8); //No Blue Gemstone
 							        tc.MMode := 4;
@@ -6497,7 +6512,7 @@ begin
 {追加}				StatCalc1(tc, ts, Tick);
 					end;
 {:119}
-				72: //リカバリー
+				72: // Status Recovery vs. Mob (undead)
 					begin
 						ts.ATarget := 0;
 						if ts.Element mod 20 = 9 then begin
@@ -6517,7 +6532,7 @@ begin
 							end;
 						end;
 					end;
-				76: //レックスデビーナ
+				76: // Lex Divina vs. Mob
 					begin
 						//パケ送信
 						WFIFOW( 0, $011a);
@@ -6535,7 +6550,7 @@ begin
 						end;
 					end;
 {:119}
-				77: //ターンアンデット
+				77: // Turn Undead Damage vs. Mob
 					begin
 						if (ts.Data.Race = 1) or (ts.Element mod 20 = 9) then begin
 							m := MUseLV * 20 + Param[3] + Param[5] + BaseLV + (200 - 200 * Cardinal(ts.HP) div ts.Data.HP) div 200;
@@ -6546,7 +6561,7 @@ begin
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 							end;
 							//対アンデッド
-							if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
+							//if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
 							SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 							DamageProcess1(tm, tc, ts, dmg[0], Tick);
 							tc.MTick := Tick + 3000;
@@ -6555,7 +6570,7 @@ begin
 							Exit;
 						end;
 					end;
-				78: //レックス_エーテルナ
+				78: // Lex Aeterna
 					begin
 						//パケ送信
 						WFIFOW( 0, $011a);
@@ -7598,28 +7613,33 @@ begin
           tc1 := tc;
           ProcessType := 0;
           end;
-                                54:     {Ressurection}
+          54:     {Resurrection}
 					begin
-                                                j := SearchCInventory(tc, 717, false);
-						if ((((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True)) or (tc.ItemSkill = true)) and ((tc1.Sit = 1) and (tc1.HP = 0)) then begin
+            j := SearchCInventory(tc, 717, false);
+						if ((((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True)) or (tc.ItemSkill = true)) then begin
+              if ((tc1.Sit = 1) and (tc1.HP = 0)) then begin
 
-                                                        if (NoJamstone = False) and (ItemSkill = false) then UseItem(tc, j);
+                if (NoJamstone = False) and (ItemSkill = false) then UseItem(tc, j);
 
+                tc.ItemSkill := false;
+                dmg[0] := ((tc1.MAXHP * tl.Data1[MUseLV]) div 100) + 1;
 
-                                                        tc.ItemSkill := false;
-                                                        dmg[0] := ((tc1.MAXHP * tl.Data1[MUseLV]) div 100) + 1;
-							tc1.Sit := 3;
-							tc1.HP := tc1.HP + dmg[0];
-							SendCStat1(tc1, 0, 5, tc1.HP);
-							WFIFOW( 0, $0148);
-							WFIFOL( 2, tc1.ID);
-							WFIFOW( 6, 100);
-							SendBCmd(tm, tc1.Point, 8);
-						        ProcessType := 0;
+  							tc1.Sit := 3;
+  							tc1.HP := tc1.HP + dmg[0];
+  							SendCStat1(tc1, 0, 5, tc1.HP);
+  							WFIFOW( 0, $0148);
+  							WFIFOL( 2, tc1.ID);
+  							WFIFOW( 6, 100);
+  							SendBCmd(tm, tc1.Point, 8);
+                ProcessType := 0;
+              end else begin
+                tc.MMode := 4;
+                Exit;
+              end;
 						end else begin
-                                                        SendSkillError(tc, 8); //No Blue Gemstone
-                                                        dmg[0] := 0;
-                                                        tc.MMode := 4;
+              SendSkillError(tc, 8); //No Blue Gemstone
+              dmg[0] := 0;
+              tc.MMode := 4;
 							Exit;
 
 							//tc.MPoint.X := 0;
@@ -9200,7 +9220,7 @@ begin
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 							end;
 							//対アンデッド
-							if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
+							//if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
 							SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 							DamageProcess2(tm, tc, tc1, dmg[0], Tick);
 							tc.MTick := Tick + 3000;

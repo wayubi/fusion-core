@@ -3828,6 +3828,9 @@ begin
     end;
   end;
   
+  // Moved Lex Aeterna calc up here.  It is display only!
+	if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
@@ -3841,12 +3844,16 @@ begin
 	if PType <> 0 then WFIFOB(32, PType)
 	else if k = 1 then WFIFOB(32, 6)
 	else               WFIFOB(32, 8);
-	if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+
 	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
 procedure SendCSkillAtk2(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
 begin
+
+  // Moved Lex Aeterna calc up here.  It is display only!
+	if tc1.Stat1 = 5 then dmg := dmg * 2;
+
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
@@ -3860,7 +3867,7 @@ begin
 	if PType <> 0 then WFIFOB(32, PType)
 	else if k = 1 then WFIFOB(32, 6)
 	else               WFIFOB(32, 8);
-	if tc1.Stat1 = 5 then dmg := dmg * 2;
+
 	SendBCmd(tm, tc.Point, 33);
 end;
 
