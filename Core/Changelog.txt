@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-02-04: #76 - Logging in with non primary account corrupted database. [AlexKreuz]
+- 09-02-04: Removed duplicate INI priority declaration. [AlexKreuz]
 - 08-29-04: Attempting to load nonexistant AF2 map caused crash. [AlexKreuz]
 - 08-29-04: Fixed memory leak in AF2 loading procedure. [AlexKreuz]
 - 08-29-04: REED: Added intelligent error reporting for corrupted databases. [AlexKreuz]

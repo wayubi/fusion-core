@@ -71,7 +71,6 @@ uses
         ini.WriteString('Option', 'Width', IntToStr(FormWidth));
         ini.WriteString('Option', 'Height', IntToStr(FormHeight));
         ini.WriteString('Option', 'Priority', IntToStr(Priority));
-        ini.WriteString('Option', 'Priority', IntToStr(Priority));
         
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));

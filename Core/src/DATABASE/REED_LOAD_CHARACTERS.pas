@@ -36,7 +36,8 @@ implementation
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
-            path := basepath + resultlist[i] + '\Characters\';
+            if (UID = '*') then path := basepath + resultlist[i] + '\Characters\'
+            else path := basepath + UID + '\Characters\';
 
             pfile := 'Character.txt';
             PD_Load_Characters(UID, tp, get_list(path, pfile), path, pfile);

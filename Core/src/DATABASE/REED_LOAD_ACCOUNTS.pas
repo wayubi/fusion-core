@@ -29,7 +29,8 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := basepath + resultlist[i] + '\' + pfile;
+            if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
+            else path := basepath + UID + '\' + pfile;
 
             if (UID = '*') then tp := TPlayer.Create
             else tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
@@ -78,7 +79,8 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := basepath + resultlist[i] + '\' + pfile;
+            if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
+            else path := basepath + UID + '\' + pfile;
 
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
@@ -112,7 +114,8 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := basepath + resultlist[i] + '\' + pfile;
+            if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
+            else path := basepath + UID + '\' + pfile;
 
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
