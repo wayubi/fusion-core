@@ -2525,10 +2525,12 @@ Called when we're shutting down the server *only*
     	    try
             	if sl.Strings[1] = 'core' then begin
                 	changefile.LoadFromFile(AppPath + 'documents\changes_core.txt');
-                end else if sl.Strings[1] = 'scripts' then begin
-                	changefile.LoadFromFile(AppPath + 'documents\changes_scripts.txt');
                 end else if sl.Strings[1] = 'database' then begin
                 	changefile.LoadFromFile(AppPath + 'documents\changes_database.txt');
+                end else if sl.Strings[1] = 'oscripts' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_oscripts.txt');
+                end else if sl.Strings[1] = 'cscripts' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_cscripts.txt');
                 end else if sl.Strings[1] = 'client' then begin
                 	changefile.LoadFromFile(AppPath + 'documents\changes_client.txt');
                 end else begin
@@ -2551,7 +2553,7 @@ Called when we're shutting down the server *only*
 	        end;
         end else begin
         	message_green(tc, 'Command Syntax:');
-            message_green(tc, '#changes <type> -- core | client | database | scripts');
+            message_green(tc, '#changes <type> -- core | client | database | oscripts | cscripts');
 
         	Result := Result + ' Not enough information.';
             sl.Free;
