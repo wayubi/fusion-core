@@ -5402,14 +5402,22 @@ begin
                                         end;
                                 end;
 
-                                253:    {Holy Cross}
+
+                                       253:    {Holy Cross}
                                         begin
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                                                 //Send Skill Packets
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+                                                //Byte 16 isn't Blind 32 is Chance to blind on undead
+                                        if Random(100) < Skill[253].Data.Data2[MUseLV] then begin
+                                                        if (ts.Stat2 <> 32) and (ts.Data.Race = 1)  then begin
+								ts.nStat := 32;
 
+                                                        end
+
+                                                end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
                                         end;
