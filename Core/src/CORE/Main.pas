@@ -4903,6 +4903,22 @@ begin
                                                 end;
                                         end;
 
+                                          288:    //Land protector
+                                        begin
+                                                xy.X := MPoint.X;
+                                                xy.Y := MPoint.Y;
+                                                for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+                                                        for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+                                                                xy.X := (tc.MPoint.X) - 5 + i1;
+                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $9d, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+                                                                tn.MSkill := MSkill;
+                                                                tn.MUseLV := MUseLV;
+                                                        end;
+                                                end;
+                                        end;
                                         306,307,308,309,310,311,312,313,315,316,317,319,320,321,322,325,
                                                 327,328,329,330:
                                         begin
