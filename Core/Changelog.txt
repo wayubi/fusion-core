@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-30-04: Commented out some jobchange; data that is messing up going to high classes. [Tsusai]
 - 10-30-04: REED: Tested & Updated autoconversion of sample Pre-REED data. [AlexKreuz]
 - 10-30-04: REED: Completed restructure of Deletion Algorithms. [AlexKreuz]
 - 10-28-04: Cleaned up the structure of #job. [Trihan]

@@ -464,10 +464,10 @@ begin
 
                 // Colus, 20040304: Adding job offset for upper classes
                 j := tn.Script[tc.ScriptStep].Data3[0];
-                if (j > LOWER_JOB_END) then begin
+                {if (j > LOWER_JOB_END) then begin
                     j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
                     tc.ClothesColor := 1; // Use 'default' upper job clothes color
-                end else tc.ClothesColor := 0; // Default color for regular jobs
+                end else tc.ClothesColor := 0; // Default color for regular jobs}
 
                 if (j > LOWER_JOB_END) then begin
                     j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
