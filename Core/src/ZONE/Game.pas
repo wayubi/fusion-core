@@ -1930,9 +1930,14 @@ end;
 
 								if td.HP2 <> 0 then begin
                                                                         if tc.Skill[227].Lv <> 0 then begin
-                                                                                tc.HP := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[227].Data.Data1[tc.Skill[228].Lv] div 100;  //Learning Potion
+                                                                                tc.HP := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[227].Data.Data1[tc.Skill[227].Lv] div 100;  //Learning Potion
                                                                         end else begin
-                                                                                tc.HP := tc.HP + (td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100;
+                                                                                // Added HP Recovery skill's power to the recovery calc
+                                                                                if (tc.Skill[4].Lv <> 0) then begin
+                                                                                  tc.HP := tc.HP + (td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100 * (100 + (tc.Skill[4].Lv * 10)) div 100;
+                                                                                end else begin
+                                                                                  tc.HP := tc.HP + (td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100;
+                                                                                end;
                                                                         end;
 									//030316’Ç‰Á Cardinal
 									if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
@@ -1965,14 +1970,15 @@ end;
    WFIFOW( 2, $0018); 
    WFIFOL( 4, tc.Weight);
    Socket.SendBuf(buf, 8);
- // spr effect potion by tumy {packet 01c8 <?>W <id use item>W <id>L <?>B <tick>L} 
-                      WFIFOW( 0, $01c8); 
-   WFIFOW( 2, 15); 
-   WFIFOW( 4, td.ID); 
-                     WFIFOL( 6, l); 
-   WFIFOB( 10, 35); 
-                     WFIFOL( 11,1); 
-   Socket.SendBuf(buf, 15); 
+   // spr effect potion by tumy {packet 01c8 <index>W <id use item>W <charid>l <fail>b}
+   {Colus, 20040116: This packet was all messed up...put in the proper values.}
+   WFIFOW( 0, $01c8);
+   WFIFOW( 2, w);
+   WFIFOW( 4, td.ID);
+   WFIFOL( 6, l);
+   WFIFOW( 10, tc.Item[w].Amount);
+   WFIFOB( 12, 1);
+   Socket.SendBuf(buf, 13); 
                      b := 1;
                      // Tumy
 							end;
