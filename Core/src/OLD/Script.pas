@@ -2002,7 +2002,6 @@ begin
                                 end;
                             end;
                     end;
-                    debugout.lines.add('[' + TimeToStr(Now) + '] i:);
                     Inc(tc.ScriptStep);
                 end;
 
