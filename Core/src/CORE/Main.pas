@@ -3554,44 +3554,8 @@ begin
       {TODO: Figure out proper modification of Snatcher by Steal skill.}
       if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (tc.Weapon <> 11) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
 
-        k := SlaveDBName.IndexOf(ts.Data.Name);
+        StealItem(tc, ts);
 
-        if (not ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0))) then begin
-
-          for j := 0 to 7 do begin
-            i := ts.Data.Drop[j].Per;
-            if (Random(10000) <= i) then begin
-
-              WFIFOW( 0, $011a);
-              WFIFOW( 2, 50);
-              WFIFOW( 4, dmg[0]);
-              WFIFOL( 6, tc.ID);
-              WFIFOL(10, tc.ID);
-              WFIFOB(14, 1);
-              SendBCmd(tm,ts.Point,15);
-
-              k := ts.Data.Drop[j].Data.ID;
-              td := ItemDB.IndexOfObject(k) as TItemDB;
-              if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
-                k := SearchCInventory(tc, td.ID, td.IEquip);
-                if (k <> 0) and (tc.Item[k].Amount < 30000) then begin
-                  UpdateWeight(tc, k, td);
-                  Socket.SendBuf(buf, 8);
-                  SendCGetItem(tc, k, 1);
-                  ts.Stolen := tc.ID;
-                  Break;
-	  						end else begin
-	  							//重量オーバー
-		  						WFIFOW( 0, $00a0);
-  								WFIFOB(22, 2);
-  								Socket.SendBuf(buf, 23);
-		  					end;
-
-              end;
-            end;
-
-          end;
-        end;
       end;
 
 			WFIFOW( 0, $008a);
@@ -5307,138 +5271,19 @@ begin
 
                                 50:     {Steal}
                                 begin
-                                  {Colus, 20040106: Steal changes--
-                                  Old check: if (Random(50) < tl.Data1[MUseLV]) then begin}
-                                    {New check is still a guess, but some info:
-                                     iRO Sakray skill desc says base chance is (10 + 3*level) %.
-                                     Quagmire improves steal chance (by lowering monster DEX).
-                                     Base level improves chance.
-                                     DEX improves chance (cf. Steal clips).}
-                                  {Procedure:
-                                    1a) Check if already stolen from, fail if so.
-                                    1b) Check if MVP, fail if so.
-                                    1c) Check if summoned slave, fail if so.
-                                  TODO: Confirm Steal calc, confirm steals by mult. players,
-                                         make stealing a non-aggressive action!
-                                    }
-                                  //StolenFrom := false;
-                                  {if tm.Mob.IndexOf(tc.MTarget) <> -1 then begin
-                              			ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-                                  end;}
+                                  {Colus, 20040305: Redid it all.  Again.  Using info on formulas obtained
+                                   from fansites and confirmations on algorithm from disassemblers.}
+                                  if not (StealItem(tc, ts)) then begin
+                                    SendSkillError(tc, 0);
 
-                                  k := SlaveDBName.IndexOf(ts.Data.Name);
-                                  {for i := 0 to 7 do begin
-                                    if (ts.Stolen <> 0) then begin
-                                      StolenFrom := true;
-                                    end;
-                                  end;  }
-
-                                  if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
                                     tc.MMode := 4;
                                     tc.MPoint.X := 0;
                                     tc.MPoint.Y := 0;
-
-                                    // Send failure of Steal--maybe?
-                                    {WFIFOW( 0, $011a);
-                                    WFIFOW( 2, tc.MSkill);
-                                    WFIFOW( 4, dmg[0]);
-                                    WFIFOL( 6, tc.ID);
-                                    WFIFOL(10, tc.ID);
-                                    WFIFOB(14, 0);
-
-                                    SendBCmd(tm,ts.Point,15);}
-
-                                    Exit;
+                                    DecSP(tc, 50, MUseLV);
                                   end;
+                                  // Delay after stealing
+                                  tc.MTick := Tick + 1000;
 
-                                  // Check for actual success...
-
-                                  if (Random(100) < (tl.Data1[MUseLV] + tc.BaseLV + tc.Param[4] - ts.Data.LV - ts.Data.Param[4] )) then begin
-
-
-                                   // If you succeeded, pick an item (starting with MOST COMMON)
-                                   // and do a straight drop check to see if you got it.  If you
-                                   // fall through all slots, then you failed.
-                                   for j := 0 to 7 do begin
-                                    i := ts.Data.Drop[j].Per;
-                                    if (Random(10000) <= i) then begin
-
-                                     // Graphic send
-                                     WFIFOW( 0, $011a);
-                                     WFIFOW( 2, tc.MSkill);
-                                     WFIFOW( 4, dmg[0]);
-                                     WFIFOL( 6, tc.ID);
-                                     WFIFOL(10, tc.ID);
-                                     WFIFOB(14, 1);
-                                     SendBCmd(tm,ts.Point,15);
-
-                                     k := ts.Data.Drop[j].Data.ID;
-                                     td := ItemDB.IndexOfObject(k) as TItemDB;
-                                     if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
-                                      k := SearchCInventory(tc, td.ID, td.IEquip);
-                                      if k <> 0 then begin
-                                        if tc.Item[k].Amount < 30000 then begin
-                                          //アイテム追加
-                                          UpdateWeight(tc, k, td);
-									                                                      {tc.Item[k].ID := td.ID;
-                                                                        tc.Item[k].Amount := tc.Item[k].Amount + 1;
-                                                                        tc.Item[k].Equip := 0;
-                                                                        tc.Item[k].Identify := 1;
-                                                                        tc.Item[k].Refine := 0;
-                                                                        tc.Item[k].Attr := 0;
-                                                                        tc.Item[k].Card[0] := 0;
-                                                                        tc.Item[k].Card[1] := 0;
-                                                                        tc.Item[k].Card[2] := 0;
-                                                                        tc.Item[k].Card[3] := 0;
-                                                                        tc.Item[k].Data := td;
-                                                      									//重量追加
-                                                      									tc.Weight := tc.Weight + cardinal(td.Weight);
-                                                      									WFIFOW( 0, $00b0);
-                                                      									WFIFOW( 2, $0018);
-                                                      									WFIFOL( 4, tc.Weight);}
-                                          Socket.SendBuf(buf, 8);
-                                          //アイテムゲット通知
-                                          SendCGetItem(tc, k, 1);
-                                          ts.Stolen := tc.ID;
-                                          Break;
-
-                                        end;
-                                      end;
-                                     end else begin
-                                      // Overweight, failed to get item.
-                                      WFIFOW( 0, $00a0);
-                                      WFIFOB(22, 2);
-                                      Socket.SendBuf(buf, 23);
-                                     end; {end item added}
-
-                                    end; {end drop test}
-                                   end; {end for}
-
-                                   // Once you're out here, Stolen is ID if you stole
-                                   // successfully.  If it's 0 you ran through all the
-                                   // drops and failed, or you never succeeded at all.
-
-                                  end; {end success check}
-
-                                  if (ts.Stolen = 0) then begin
-                                    {tc.MMode := 4;
-                                    tc.MPoint.X := 0;
-                                    tc.MPoint.Y := 0;}
-
-                                    // Send failure of Steal--maybe?
-                                    {
-                                    WFIFOW( 0, $011a);
-                                    WFIFOW( 2, tc.MSkill);
-                                    WFIFOW( 4, dmg[0]);
-                                    WFIFOL( 6, tc.ID);
-                                    WFIFOL(10, tc.ID);
-                                    WFIFOB(14, 0);
-
-                                    SendBCmd(tm,ts.Point,15);}
-
-                                    Exit;
-                                  end;
-                                  
                                 end; {end case}
 
                                 250:    {Shield Charge}

@@ -915,17 +915,18 @@ DebugOut.Lines.Add('Monster AI database loading...');
 			Icon := StrToInt(sl.Strings[43]);
 
 			wj := StrToInt64(sl.Strings[44]);
-			for i := 0 to LOWER_JOB_END do begin
-				Job1[i] := boolean((wj and (Int64(1) shl i)) <> 0);
+
+			for i := 0 to MAX_JOB_NUMBER do begin
+				Job1[i] := Job1[i] or boolean((wj and (Int64(1) shl i)) <> 0);
         if (i < (LOWER_JOB_END - 1)) and (Job1[i]) then begin
           Job1[i + LOWER_JOB_END + 1] := true;
         end;
         //if (Job1[i + LOWER_JOB_END + 1]) then DebugOut.Lines.Add(Format('Job1[%d] set',[i+LOWER_JOB_END+1]));
 			end;
-      {for i := 0 to MAX_JOB_NUMBER do begin
-        if (Job1[i]) and (ID = 1) then
+      for i := 0 to MAX_JOB_NUMBER do begin
+        if (Job1[i]) and (ID = 394) then
           DebugOut.Lines.Add(Format('Skill %d, job %d is set',[tl.ID, i]));
-      end;}
+      end;
 			for i := 0 to 4 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
 				ReqLV1[i] := StrToInt(sl.Strings[46+i*2]);
@@ -933,7 +934,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
 
 			wj := StrToInt64(sl.Strings[55]);
 			for i := 0 to MAX_JOB_NUMBER do begin
-				Job2[i] := boolean((wj and (Int64(1) shl i)) <> 0);
+				Job2[i] := Job2[i] or boolean((wj and (Int64(1) shl i)) <> 0);
         if (i < LOWER_JOB_END - 1) then Job2[i + LOWER_JOB_END + 1] := Job2[i];
 			end;
 			for i := 0 to 4 do begin

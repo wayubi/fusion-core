@@ -1370,6 +1370,32 @@ end;
 											SendBCmd(tm, tc.Point, 11);
 										end;
 																								end;
+					end else if (Copy(str, 1, 5) = 'icon ') and ((DebugCMD and $0040) <> 0) then begin
+            // Set the specified icon
+						Val(Copy(str, 6, 256), i, k);
+
+						if (k = 0) then begin
+            for j := i to i+10 do begin
+            WFIFOW(0, $0196);
+            WFIFOW(2, j);
+            WFIFOL(4, tc.ID);
+            WFIFOB(8, 1);
+            tc.Socket.SendBuf(buf, 9);
+            end;
+						end;
+					end else if (Copy(str, 1, 7) = 'unicon ') and ((DebugCMD and $0040) <> 0) then begin
+            // Set the specified icon
+						Val(Copy(str, 8, 256), i, k);
+
+						if (k = 0) then begin
+            for j := i to i+10 do begin
+            WFIFOW(0, $0196);
+            WFIFOW(2, j);
+            WFIFOL(4, tc.ID);
+            WFIFOB(8, 0);
+            tc.Socket.SendBuf(buf, 9);
+            end;
+						end;
 {修正ココまで}
 					end else if (Copy(str, 1, 7) = 'ccolor ') and ((DebugCMD and $0040) <> 0)  and (tid.ChangeColorStyle = 1) then begin
 						//服の色変更

@@ -1542,6 +1542,7 @@ Option_GraceTime_PvPG :cardinal;
                 function  UseUsableItem(tc:TChara; w:integer) :boolean;
                 function  UpdateWeight(tc:TChara; j:integer; td:TItemDB)  :boolean;
                 function  GetMVPItem(tc1:TChara; ts:TMob; mvpitem:boolean) :boolean;
+                function  StealItem(tc:TChara; ts:TMob) :boolean;
 
 		function  SearchCInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
 		function  SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
@@ -4071,7 +4072,8 @@ begin
 			if ts.HP = 0 then Exit;
 			tc.MTargetType := 0;
 			tc.AData := ts;
-			if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) then begin
+      // Colus, 20040306: Steal should not make anybody want to attack you.
+			if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) and (tc.MSkill <> 50) then begin
 
 				ts.ATarget := ID;
 				ts.AData := tc;
@@ -8339,6 +8341,69 @@ begin
   //Socket.SendBuf(buf, 14);
   //end;
 
+end;
+//------------------------------------------------------------------------------
+function StealItem(tc:TChara; ts:TMob) :boolean;
+var
+  i,j,k :integer;
+  mdrop :array[0..7] of integer;
+  td    :TItemDB;
+  modfix:integer;
+  rand  :integer;
+  tm    :TMap;
+begin
+  tm := tc.MData;
+  modfix := (tc.Skill[50].Data.Data1[tc.Skill[50].Lv] + tc.Param[4] - ts.Data.Param[4]);
+
+  k := SlaveDBName.IndexOf(ts.Data.Name);
+  if ((k <> -1) or (ts.Data.MEXP <> 0) or (ts.Stolen <> 0)) then begin
+    Result := false;
+    exit;
+  end;
+
+  for i := 0 to 7 do begin
+    mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
+    rand := Random(20000) mod 10000;
+    //DebugOut.Lines.Add(Format('Drop %d, modfix %d, mdrop %d, rand %d',[i,modfix,mdrop[i],rand]));
+    if rand <= mdrop[i] then begin
+                                     // Graphic send
+                                     WFIFOW( 0, $011a);
+                                     WFIFOW( 2, 50);
+                                     WFIFOW( 4, 0);
+                                     WFIFOL( 6, tc.ID);
+                                     WFIFOL(10, tc.ID);
+                                     WFIFOB(14, 1);
+                                     SendBCmd(tm,ts.Point,15);
+
+                                     k := ts.Data.Drop[i].Data.ID;
+                                     td := ItemDB.IndexOfObject(k) as TItemDB;
+                                     if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
+                                      k := SearchCInventory(tc, td.ID, td.IEquip);
+                                      if k <> 0 then begin
+                                        if tc.Item[k].Amount < 30000 then begin
+                                          //アイテム追加
+                                          UpdateWeight(tc, k, td);
+
+                                          tc.Socket.SendBuf(buf, 8);
+                                          //アイテムゲット通知
+                                          SendCGetItem(tc, k, 1);
+                                          ts.Stolen := tc.ID;
+                                          Result := true;
+                                          exit;
+
+                                        end;
+                                      end;
+                                     end else begin
+                                      // Overweight, failed to get item.
+                                      WFIFOW( 0, $00a0);
+                                      WFIFOB(22, 2);
+                                      tc.Socket.SendBuf(buf, 23);
+                                     end; {end item added}
+
+    end;
+  end;
+
+  Result := false;
 end;
 //------------------------------------------------------------------------------
 procedure RFIFOB(index:word; var b:byte);
