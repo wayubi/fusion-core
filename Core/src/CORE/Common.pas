@@ -773,6 +773,8 @@ type TChara = class
         noHPRecovery  :Boolean;   {Player Cannot Recover HP}
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 
+        SPRedAmount   :integer;   {Amount SP Usage is Reduced by}
+
         LastSong      :integer;   {Last Song a Bard Cast}
         LastSongLV    :integer;   {Level of last song a Bard Cast}
         InField       :boolean;   {Determine if a player is in a skill field}
@@ -1895,6 +1897,7 @@ begin
                         tc.noDay := true;
                 end;}
 
+                SPRedAmount := 0;
 		Weight := 0;
 		Range := 0;
 		WeaponType[0] := 0;
@@ -2321,6 +2324,8 @@ begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
 
+                SPRedAmount := 0;
+
                 NoJamstone := false;
                 NoTrap := false;
 
@@ -2329,6 +2334,8 @@ begin
                 FLEE1 := 1;
 
                 MAXHP := 0;
+                MAXSP := 0;
+
                 for i := 0 to 1 do
                         for j := 0 to 5 do
                                 ATK[i][j] := 0;
@@ -2341,6 +2348,14 @@ begin
 
                 {Calculate Needed Skills}
                 DEF2 := Param[2];
+
+                MAXSP := MAXSP + BaseLV * SPTable[JID] * (100 + Param[3]) div 100;
+
+                if ((MAXSP * MAXSPPer div 100) > 65535) then begin
+                        MAXSP := 65535;
+                end else begin
+	        	MAXSP := MAXSP * MAXSPPer div 100;
+                end;
 
                 if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JID] div 100) * (100 + Param[2]) div 100) > 65535) then begin
                         MAXHP := 65535;
@@ -2429,6 +2444,12 @@ begin
         if (tc.Skill[319].Tick > Tick) and (tc.InField) then begin
                 tc.FLEE1 := tc.FLEE1 + (tc.FLEE1 * tc.Skill[319].Effect1 div 100);
                 tc.Bonus[5] := tc.Bonus[5] + (tc.Param[5] * tc.Skill[319].Effect1 div 100);
+        end;
+
+        {Service For You}
+        if (tc.Skill[330].Tick > Tick) and (tc.InField) then begin
+                tc.MAXSP := tc.MAXSP + (tc.MAXSP * (tc.Skill[330].EffectLV + 10) div 100);
+                tc.SPRedAmount := tc.SPRedAmount +( tc.SPRedAmount * tc.Skill[330].Effect1);
         end;
 
         tc.InField := false;
@@ -3482,6 +3503,8 @@ begin
                 tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] * 70 div 100);
         end else if tc.NoJamstone then begin
                 tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] * 125 div 100);
+        end else if tc.SPRedAmount > 0 then begin
+                tc.SP := tc.SP - (tc.Skill[SkillID].Data.SP[LV] - (tc.Skill[SkillID].Data.SP[LV] * tc.SPRedAmount div 100));
         end else begin
 	        tc.SP := tc.SP - tc.Skill[SkillID].Data.SP[LV];
         end;
