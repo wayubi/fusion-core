@@ -3414,9 +3414,9 @@ var
   xy  :TPoint;
   tc  :TChara;
 begin
-  if ts.AData <> nil then tc := ts.AData
-  else
-    tc := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Objects[k] as TChara;
+  //if ts.AData <> nil then tc := ts.AData
+ for k := 0 to tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Count - 1 do begin
+  tc := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].CList.Objects[k] as TChara;
 
   WFIFOW( 0, $011a);
   WFIFOW( 2, 26);
@@ -3432,13 +3432,14 @@ begin
     tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.Delete(l);
   end;
 
-  l := tm.Mob.IndexOf( ts.ID );
+  l := tm.MOB.IndexOf( ts.ID );
   if l <> -1 then begin
     tm.Mob.Delete(l);
   end;
   ts.ATarget := 0;
   ts.AData := nil;
   ts.AMode := 0;
+  ts.MMode := 4;
   //ts.Free;
   j := 1;
   if l <> -1 then begin
@@ -3457,6 +3458,7 @@ begin
   SendBCmd(tm, ts.Point, 41, tc, False);
 
   end;
+ end;
 end;
 
 //------------------------------------------------------------------------------

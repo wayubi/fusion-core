@@ -15616,12 +15616,12 @@ begin
                                                                                 tk := tc.Skill[CastingMonster.MSkill];
 
                                                                                 //if Boolean(MMode and $02) then begin
-                                                                                if (ts.SkillType = 1) then MobSkills(tm, CastingMonster, Tick)
+                                                                                if (tl.SType = 1) then MobSkills(tm, CastingMonster, Tick)
                                                                                 //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
-                                                                                else if (ts.SkillType = 2) then MobFieldSkills(tm, CastingMonster, Tick)
+                                                                                else if (tl.SType = 2) then MobFieldSkills(tm, CastingMonster, Tick)
                                                                                 else MobStatSkills(tm, CastingMonster, Tick);
                                                                                 CastingMonster.SkillWaitTick := Tick + Cardinal(CastingMonster.Data.WaitTick);
-
+                                                                                ts.SkillType := 0;
                                                                                 //end else if Boolean(MMode and $01) then begin
                                                                                 //pcnt := 0;
 

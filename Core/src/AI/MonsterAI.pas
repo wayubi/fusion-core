@@ -484,6 +484,21 @@ something in it}
                                 SendBCmd(tm, tc.Point, 10);;
                         end;
                 end;
+                84: {Jupitel Thunder}
+                begin
+                  MobSkillDamageCalc(tm, tc, ts, Tick);
+                  if dmg[0] < 0 then dmg[0] := 0;
+                  dmg[0] := dmg[0] * tc.Skill[84].Data.Data2[ts.MLevel] div 100;
+                  SendMSkillAttack(tm, tc, ts, Tick, 1);
+                end;
+
+                86: {Water Ball}
+                begin
+                  MobSkillDamageCalc(tm, tc, ts, Tick);
+                  if dmg[0] < 0 then dmg[0] := 0;
+                  dmg[0] := dmg[0] * tc.Skill[86].Data.Data1[ts.MLevel] div 100;
+                  SendMSkillAttack(tm, tc, ts, Tick, 1);
+                end;
 
                 136:    {Sonic Blows}
                 begin
@@ -692,6 +707,7 @@ something in it}
                         dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
+                else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
             end;
         end;
 
@@ -747,7 +763,7 @@ begin
                         end;
 
                         85:     {Lord of Vermillion}
-                        begin
+                          begin
                                 AttackData := ts.AData;
                                 //Cast Point
                                 xy.X := AttackData.Point.X;
@@ -769,7 +785,9 @@ begin
                                 WFIFOW(12, (AttackData.Point.Y));
                                 WFIFOL(14, 1);
                                 SendBCmd(tm, xy, 18);
-                        end;
+                          end;
+
+                        else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
                 end;  //end case
         //end;
 end;
@@ -785,6 +803,10 @@ begin
 with ts do begin
         ProcessType := 0;
         case ts.MSKill of
+          8:  {Endure}
+            begin
+
+            end;
           26: {Teleport}
                 begin
                   // Colus, 20040506: Was this even tested?
@@ -795,9 +817,9 @@ with ts do begin
                   //
                   // Going to try to fix it like a flywing, so you see the disappear
                   // effect and the monster is moved.
-                  //SendMonsterRelocation(tm, ts);
+                  SendMonsterRelocation(tm, ts);
 
-									i := MapInfo.IndexOf(ts.Map);
+									{i := MapInfo.IndexOf(ts.Map);
 									j := -1;
 									if (i <> -1) then begin
 										mi := MapInfo.Objects[i] as MapTbl;
@@ -833,7 +855,7 @@ with ts do begin
                         tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
                       end;
 									  end;
-                  end;
+                  end; }
 
                 end;
           28:     {Heal}
@@ -850,12 +872,21 @@ with ts do begin
                   WFIFOB(14, 1);
                   SendBCmd(tm, ts.Point, 15);
                 end;
+          29: {Increase Agility}
+            begin
+              if ts.MLevel > 5 then begin
+						    ts.speed := ts.speed - 45;
+						  end else begin
+						    ts.speed := ts.speed - 30;
+						  end;
 
+            end;
 
           51:     {Hide}
                 begin
                         ProcessType := 1;
                 end;
+
 
           114:    {Power Maximize}
                 begin
@@ -873,6 +904,7 @@ with ts do begin
                     WFIFOB(6, j);
                     SendBCmd(tm, ts.Point, 7);
                   end;
+          else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
         end;
 
         case ProcessType of
@@ -1536,8 +1568,8 @@ begin
 	//if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
 	if tsAI2.SkillID = 'RUN' then begin
       ts.Status := 'RUN';
-    end else begin
-      ts.SkillType := 0;
+    end else if (ts.SkillType = 0) then begin
+      //ts.SkillType := 0;
       TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
       ts.SkillType := TempSkill.SType;
       ts.MSkill := TempSkill.ID;
