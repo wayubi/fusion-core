@@ -71,6 +71,7 @@ var
     GM_CHANGES : Byte;
     GM_ISCSON : Byte;
     GM_ISCSOFF : Byte;
+    GM_AUTOLOOT : Byte;
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
@@ -191,6 +192,7 @@ var
     function command_changes(tc : TChara; str : String) : String;
     function command_iscson(tc : TChara) : String;
     function command_iscsoff(tc : TChara) : String;
+    function command_autoloot(tc : TChata) : String;
 
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
@@ -313,6 +315,7 @@ implementation
         GM_CHANGES := StrToIntDef(sl.Values['CHANGES'], 0);
         GM_ISCSON := StrToIntDef(sl.Values['ISCSON'], 0);
         GM_ISCSOFF := StrToIntDef(sl.Values['ISCSOFF'], 0);
+        GM_AUTOLOOT := StrToIntDef(sl.Values['AUTOLOOT'], 1);
 
         ini.ReadSectionValues('Aegis GM Commands', sl);
 
@@ -448,6 +451,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'CHANGES', IntToStr(GM_CHANGES));
         ini.WriteString('Fusion GM Commands', 'ISCSON', IntToStr(GM_ISCSON));
         ini.WriteString('Fusion GM Commands', 'ISCSOFF', IntToStr(GM_ISCSOFF));
+        ini.WriteString('Fusion GM Commands', 'AUTOLOOT', IntToStr(GM_AUTOLOOT));
 
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
         ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -585,6 +589,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
             else if ( (copy(str, 1, length('iscson')) = 'iscson') and (check_level(tc, GM_ISCSON)) ) then error_msg := command_iscson(tc)
             else if ( (copy(str, 1, length('iscsoff')) = 'iscsoff') and (check_level(tc, GM_ISCSOFF)) ) then error_msg := command_iscsoff(tc)
+            else if ( (copy(str, 1, length('autoloot')) = 'autoloot') and (check_level(tc, GM_AUTOLOOT)) ) then error_msg := command_autoloot(tc)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
@@ -2567,6 +2572,16 @@ Called when we're shutting down the server *only*
         Result := 'GM_ISCSOFF Success.';
     end;
 
+    function command_autoloot(tc : TChara) : String;
+    begin
+        if (tc.Auto < 4) or ((tc.Auto > 15) and (tc.Auto < 20)) then begin //Preventing conflict with GM_AUTO
+            tc.Auto := tc.Auto + 4;
+            Result := 'GM AUTOLOOT On.';
+        end else begin
+            if ((tc.Auto - 4) < 0 ) then tc.Auto := 0 else tc.Auto := tc.Auto - 4;
+            Result := 'GM AUTOLOOT Off.';
+        end;
+    end;
 
     function command_aegis_b(str : String) : String;
     var
