@@ -159,10 +159,10 @@ var
     function command_charjlevel(tc : TChara; str : String) : String;
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
-
+    //Athena Calls
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
-
+    function command_athena_die(tc : TChara) : String;
 implementation
 
     procedure load_commands();
@@ -444,6 +444,7 @@ Called when we're shutting down the server *only*
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
+            else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2271,6 +2272,21 @@ Called when we're shutting down the server *only*
     sl.Free;
     end;
 
+    function command_athena_die(tc : TChara) : String;
+      var
+        tm : TMap;
+      begin
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        Result := 'GM_DIE_ATHENA Activated';
+        tc.Sit := 1;
+        tc.HP := 0;
+        SendCStat1(tc, 0, 5, tc.HP);
+        WFIFOW( 0, $0080);
+        WFIFOL( 2, tc.ID);
+        WFIFOB( 6, 1);
+        SendBCmd(tm, tc.Point, 7);
+      end;
+      
     function command_athena_help(tc : TChara) : String;
     var
 	    Help : TStringList;
