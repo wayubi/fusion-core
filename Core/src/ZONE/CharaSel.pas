@@ -29,7 +29,7 @@ procedure sv2PacketProcess(Socket: TCustomWinSocket);
 var
 	cmd   :word;
 	cnt   :integer;
-	i,j,k :integer;
+	i,j,k,m :integer;
 	w     :word;
 	l     :cardinal;
 	id1   :cardinal;
@@ -43,6 +43,8 @@ var
         count:integer;
 {NPCイベント追加}
 	mi    :MapTbl;
+  tg    :TGuild;
+  tc1   :TChara;
 {NPCイベント追加ココまで}
 begin
 	len := Socket.ReceiveLength;
@@ -363,6 +365,36 @@ begin
 								break;
 							end;
 						end;
+            { Mitch 02-06-2004: Fix character delete/blank char in guild bug }
+            if (tc.GuildID <> 0) then begin
+              j := GuildList.IndexOf(tc.GuildID);
+              if (j <> -1) then begin
+                tg := GuildList.Objects[j] as TGuild;
+                if (tg.MasterName <> tc.Name) then begin
+                  for k := tc.GuildPos to 35 do begin
+						        tg.MemberID[k] := tg.MemberID[k + 1];
+						        tg.Member[k] := tg.Member[k + 1];
+						        tg.MemberPos[k] := tg.MemberPos[k + 1];
+						        tg.MemberEXP[k] := tg.MemberEXP[k + 1];
+                  end;
+                end else begin
+                  //Lets delete all the members.
+                  for k := 0 to 35 do begin
+                    if tg.MemberID[k] <> 0 then begin
+                      m := Chara.IndexOf(tg.MemberID[k]);
+                      if m <> -1 then begin
+                        tc1 := Chara.Objects[m] as TChara;
+                        tc1.GuildID := 0;
+                        tc1.GuildPos := 0;
+                        tc1.GuildName := '';
+                        tc1.Classname := '';
+                      end;
+                    end;
+                  end;
+                  GuildList.Delete(j);
+                end;
+              end;
+            end;
 						CharaName.Delete(i);
 						Chara.Delete(i);
 						tc.Free;

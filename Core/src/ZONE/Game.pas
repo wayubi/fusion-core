@@ -1810,27 +1810,24 @@ end;
                 tc.socket.sendbuf(buf, w);
                 continue;
               end;
-              tp := TPlayer.Create;
-              tp.ID := 110000 + PlayerName.Count;
-              tp.Name := sl.Strings[0];
-              tp.Pass := sl.Strings[1];
-              tp.Mail := sl.Strings[3];
-              tp.Gender := StrToInt(sl.Strings[2]);
-              tp.Banned := 0;
-              for i := 0 to 8 do begin
-                tp.CName[i] := '';
-              end;
-              PlayerName.AddObject(tp.Name, tp);
-              Player.AddObject(tp.ID, tp);
+              tp1 := TPlayer.Create;
+              tp1.ID := 110000 + PlayerName.Count;
+              tp1.Name := sl.Strings[0];
+              tp1.Pass := sl.Strings[1];
+              tp1.Mail := sl.Strings[3];
+              tp1.Gender := StrToInt(sl.Strings[2]);
+              tp1.Banned := 0;
+              tp1.ver2 := 9;
 
-              str := tp.Name + ' has been successfully added!';
+              PlayerName.AddObject(tp1.Name, tp1);
+              Player.AddObject(tp1.ID, tp1);
+
+              str := tp1.Name + ' has been successfully added!';
               w := Length(str) + 4;
               WFIFOW (0, $009a);
               WFIFOW (2, w);
               WFIFOS (4, str, w - 4);
               tc.socket.sendbuf(buf, w);
-
-              tp.Free;
             finally
               sl.Free;
             end;
