@@ -174,1302 +174,21 @@ Begin
 				Exit;//safe 2004/04/26
 			end;
 
-			//éÀíˆÉ`ÉFÉbÉN
+			//If Monster is in range of the skill
 			if (abs(tc.Point.X - ts.Point.X) <= tl.Range) and (abs(tc.Point.Y - ts.Point.Y) <= tl.Range) then begin
 
 			case MSkill of  {Skill Used Against Monster}
 
-			//Blacksmith
-			{110:    Hammer Fall
-				begin
-					if (tc.Weapon = 6) or (tc.Weapon = 7) then begin
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						WFIFOW( 0, $0117);
-						WFIFOW( 2, MSkill);
-						WFIFOL( 4, ID);
-						WFIFOW( 8, MUseLV);
-						WFIFOW(10, xy.X);
-						WFIFOW(12, xy.Y);
-						WFIFOL(14, 1);
-						if Random(100) < Skill[110].Data.Data1[MUseLV] then begin
-							if (ts.Stat1 <> 3) then begin
-								ts.nStat := 3;
-								ts.BodyTick := Tick + tc.aMotion;
-							end else begin
-								ts.BodyTick := ts.BodyTick + 30000;
-							end;
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-						end;
-					end else begin
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-					end;
-				end;}
-
-			50: {Steal}
-			{Colus, 20040305: Redid it all.  Again.  Using info on formulas obtained
-			from fansites and confirmations on algorithm from disassemblers.}
-				begin
-					if not (StealItem(tc)) then begin
-						SendSkillError(tc, 0);
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-						DecSP(tc, 50, MUseLV);
-					end;
-					// Delay after stealing
-					tc.MTick := Tick + 1000;
-				end; {end Steal}
-
-			250:    {Shield Charge}
-				begin
-					if (tc.Shield > 0) then begin
-						{If Wearing Shield}
-						xy.X := ts.Point.X - Point.X;
-						xy.Y := ts.Point.Y - Point.Y;
-						if abs(xy.X) > abs(xy.Y) * 3 then begin
-							//â°å¸Ç´
-							if xy.X > 0 then
-								b := 6
-							else
-								b := 2;
-						end
-						else if abs(xy.Y) > abs(xy.X) * 3 then begin
-							//ècå¸Ç´
-							if xy.Y > 0 then
-								b := 0
-							else
-								b := 4;
-						end
-						else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then
-									b := 7
-								else
-									b := 5;
-							end else begin
-								if xy.Y > 0 then
-									b := 1
-								else
-									b := 3;
-							end;
-						end;
-
-						//íeÇ´îÚÇŒÇ∑ëŒè€Ç…ëŒÇ∑ÇÈÉ_ÉÅÅ[ÉWÇÃåvéZ
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						if dmg[0] < 0 then
-							dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-						//ÉpÉPëóêM
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-						//ÉmÉbÉNÉoÉbÉNèàóù
-						if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
-							xy := ts.Point;
-							DirMove(tm, ts.Point, b, bb);
-							//ÉuÉçÉbÉNà⁄ìÆ
-							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
-								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-									Assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
-									Delete(IndexOf(ts.ID));
-								end;
-								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-							end;
-							ts.pcnt := 0;
-							UpdateMonsterLocation(tm, ts);
-						end;
-						if Random(100) < Skill[250].Data.Data2[MUseLV] then begin
-							if (ts.Stat1 <> 3) then begin
-								ts.nStat := 3;
-								ts.BodyTick := Tick + tc.aMotion;
-							end else begin
-								ts.BodyTick := ts.BodyTick + 30000;
-							end;
-						end;
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end;
-				end;
-			251:    {Shield Boomerang}
-				begin
-					if (tc.Shield <> 0) then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then
-							dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-						tc.MTick := Tick + 1000;
-					end else begin
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;
-			230:  //acid terror
-				begin
-					j := SearchCInventory(tc, 7136, false);
-					if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-						UseItem(tc, j); //Use Item Function Call
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then
-							dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-						SL.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;
-
-			253:    {Holy Cross}
-				begin
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-					//Send Skill Packets
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
-					//Byte 16 isn't Blind 32 is Chance to blind on undead
-					if Random(100) < Skill[253].Data.Data2[MUseLV] then begin
-						if (ts.Stat2 <> 32) and (ts.Data.Race = 1)  then begin
-							ts.nStat := 32;
-						end;
-					end;
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						frmMain.StatCalc1(tc, ts, Tick);
-				end;
-
-			368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
-				begin
-				if tc.Weapon = 2 then begin
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-					if dmg[0] < 0 then dmg[0] := 0;
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						SendSkillError(tc, 6);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;
-
-			379:
-				begin
-					if tc.Weapon = 16 then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						SendSkillError(tc, 6);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/27
-					end;
-				end;
-
-			382:     {Sniper Shot}
-				begin
-					if (Arrow = 0) or (Item[Arrow].Amount < 1) then begin
-						WFIFOW(0, $013b);
-						WFIFOW(2, 0);
-						Socket.SendBuf(buf, 4);
-						ATick := ATick + ADelay;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-
-					Dec(Item[Arrow].Amount,1);
-
-					WFIFOW( 0, $00af);
-					WFIFOW( 2, Arrow);
-					WFIFOW( 4, 9);
-					Socket.SendBuf(buf, 6);
-
-					if Item[Arrow].Amount = 0 then begin
-						Item[Arrow].ID := 0;
-						Arrow := 0;
-					end;
-
-					if tc.Weapon = 11 then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						SendSkillError(tc, 6);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;{Sniper Shot}
-
-			394:     {Arrow Shower}
-				begin
-					if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
-						WFIFOW(0, $013b);
-						WFIFOW(2, 0);
-						Socket.SendBuf(buf, 4);
-						ATick := ATick + ADelay;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-
-					Dec(Item[Arrow].Amount,9);
-
-					WFIFOW( 0, $00af);
-					WFIFOW( 2, Arrow);
-					WFIFOW( 4, 9);
-					Socket.SendBuf(buf, 6);
-
-					if Item[Arrow].Amount = 0 then begin
-						Item[Arrow].ID := 0;
-						Arrow := 0;
-					end;
-
-					if tc.Weapon = 11 then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						SendSkillError(tc, 6);
-						MMode := 4;
-						tc.MTick := Tick + 500;//CR - moved ahead of Exit;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;{Arrow Shower}
-
-			381:    {Falcon Assault}
-				//Damage calc needs to be redone not much info about this skill.
-				if tc.Option and 16 <> 0 then begin
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-					if dmg[0] < 0 then dmg[0] := 0;
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						frmMain.StatCalc1(tc, ts, Tick);
-				end else begin
-					SendSkillError(tc, 0);
-					MMode := 4;
-					sl.Free;
-					Exit;//safe 2004/04/26
-				end;{Falcon Assault}
-
-			/// We can cheat and use Spear stab
-			370:     {Palm Strike}
-				begin
-					if tc.Skill[270].Tick > Tick then begin
-						xy.X := ts.Point.X - Point.X;
-						xy.Y := ts.Point.Y - Point.Y;
-						if abs(xy.X) > abs(xy.Y) * 3 then begin
-							//Knockback Distance?
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-
-						//Calculate Damage
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
-
-						//Send Attacking Packet
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
-						//Begin Knockback
-						if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
-							xy := ts.Point;
-							DirMove(tm, ts.Point, b, bb);
-
-							//Knockback Monster
-							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
-								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-									Assert(IndexOf(ts.ID) > -1, 'MobBlockDelete Error');
-									Delete(IndexOf(ts.ID));
-								end;
-								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-							end;
-							ts.pcnt := 0;
-
-							//Update Coordinates of Monster
-							UpdateMonsterLocation(tm, ts);
-						end;
-
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-					end else begin
-						SendSkillError(tc, 0);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;{Palm Strike}
-
-			365:   //Magic Crusher
-				begin
-					//Magic Attack Calculation
-					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
-					dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
-					dmg[0] := dmg[0] - ts.Data.Param[2];
-					if dmg[0] < 1 then
-						dmg[0] := 1;
-					dmg[0] := dmg[0] * 1;
-					dmg[0] := dmg[0] * tl.Data2[MUseLV];
-					if dmg[0] < 0 then
-						dmg[0] := 0;
-
-					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
-
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
-					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-				end;
-
-			367: //Pressure
-				begin
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-					j := 1;
-					if dmg[0] < 0 then dmg[0] := 0;
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						frmMain.StatCalc1(tc, ts, Tick);
-					xy := ts.Point;
-
-					sl.Clear;
-					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue;
-								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-								if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
-								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-									sl.AddObject(IntToStr(ts1.ID),ts1);
-							end;//for k1
-						end;//for i1
-					end;//for j1
-					if sl.Count > 0 then begin
-						for k1 := 0 to sl.Count - 1 do begin
-							ts1 := sl.Objects[k1] as TMob;
-							frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-							j := 1;
-							if dmg[0] < 0 then dmg[0] := 0;
-							SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 6);
-							//SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-							if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-								frmMain.StatCalc1(tc, ts1, Tick);
-						end;//for k1
-					end;//if sl.Count
-				end;
-
-			254:    {Grand Cross}
-				begin
-					PassiveAttack := false;
-					DamageProcessed := false;
-					NoCastInterrupt := true;
-					//É_ÉÅÅ[ÉWéZèo
-					xy := tc.Point;
-					sl.Clear;
-					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then
-									Continue;
-								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-								if (ts = ts1) or ((tc.GuildID > 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID > 0) and (ts1.GID = tc.GuildID)) then
-									Continue;
-								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-									sl.AddObject(IntToStr(ts1.ID),ts1);
-							end;//for k1
-						end;//for i1
-					end;//for j1
-					if sl.Count > 0 then begin
-						for k1 := 0 to sl.Count - 1 do begin
-							ts1 := sl.Objects[k1] as TMob;
-							frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-							//dmg[0] := dmg[0];
-							dmg[0] := (MATK2 - MATK1 + 20) * 35 + ATTPOWER + dmg[0];
-							j := 3;
-							if DamageProcessed = false then begin
-								DamageProcessed := true;
-								//SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j, 5);
-								if tc.HP > (dmg[0] * 100 div 350) then begin
-									tc.HP := tc.HP - (dmg[0] * 100 div 350);  //Subtract Damage
-									WFIFOW( 0, $01de);
-									WFIFOW( 2, 254);
-									WFIFOL( 4, tc.ID);
-									WFIFOL( 8, tc.ID);
-									WFIFOL(12, Tick);
-									WFIFOL(16, ts1.Data.dMotion);
-									WFIFOL(20, tc.aMotion);
-									WFIFOL(24, (dmg[0] * 100 div 350));
-									WFIFOW(28, MUseLV);
-									WFIFOW(30, 3);
-									WFIFOB(32, 8);
-									SendBCmd(tm, tc.Point, 33);
-									//SendMSkillAttack(tm, tc, ts, ts.Data.AISkill, Tick, 3, 0);
-									if dmg[0] <> 0 then begin
-										tc.DmgTick := Tick + tc.dMotion div 2;
-										{Colus, 20031216: Cancel casting timer on hit.
-										Also, phen card handling.}
-										if tc.NoCastInterrupt = False then begin
-											tc.MMode := 0;
-											tc.MTick := 0;
-											WFIFOW(0, $01b9);
-											WFIFOL(2, tc.ID);
-											SendBCmd(tm, tc.Point, 6);
-										end;
-										{Colus, 20031216: end cast-timer cancel}
-									end;
-								end else begin
-									tc.HP := 1;
-									{WFIFOW( 0, $0080);
-									WFIFOL( 2, tc.ID);
-									WFIFOB( 6, 1);
-									SendBCmd(tm, tc.Point, 7);
-									tc.Sit := 1;
-
-									i := (100 - DeathBaseLoss);
-									tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
-									i := (100 - DeathJobLoss);
-									tc.JobEXP := Round(tc.JobEXP * (i / 100));
-
-									SendCStat1(tc, 1, $0001, tc.BaseEXP);
-									SendCStat1(tc, 1, $0002, tc.JobEXP);
-
-									tc.pcnt := 0;
-									if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
-									ATarget := 0;
-									ts.ARangeFlag := false;}
-								end;
-
-								SendCStat1(tc, 0, $0005, tc.HP);
-								ATick := ATick + ts.Data.ADelay;
-							end;
-
-							//SendCStat1(tc, 0, 5, tc.HP);
-							//SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 3, 6);
-							//SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], j, 3);
-							WFIFOW( 0, $01de);
-							WFIFOW( 2, 0);
-							WFIFOL( 4, ts1.ID);
-							WFIFOL( 8, ts1.ID);
-							WFIFOL(12, Tick);
-							WFIFOL(16, tc.aMotion);
-							WFIFOL(20, ts1.Data.dMotion);
-							WFIFOL(24, dmg[0]);
-							WFIFOW(28, 1);
-							WFIFOW(30, 3);
-							WFIFOB(32, 9);
-							SendBCmd(tm, tc.Point, 33);
-							if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-								frmMain.StatCalc1(tc, ts1, Tick); {í«â¡}
-						end;
-					end;
-				end;
-
-			//New skills ---- Crusader
-			257:    {Defender}
-				begin
-					tc1 := tc;
-					ProcessType := 3;
-				end;
-
-			//New skills ---- Alchemist
-			{231:    Potion Pitcher
-				begin
-					j := SearchCInventory(tc, 501, false);
-					if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-						UseItem(tc, j);
-						if (tc.HP > 0) then begin
-							dmg[0] := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;;
-							ts.HP := ts.HP + dmg[0];
-
-							WFIFOW( 0, $011a);
-							WFIFOW( 2, MSkill);
-							WFIFOW( 4, dmg[0]);
-							WFIFOL( 6, MTarget);
-							WFIFOL(10, ID);
-							WFIFOB(14, 1);
-							SendBCmd(tm, ts.Point, 15);
-							tc.MTick := Tick + 1000;
-						end;
-					end;
-				end;}
-			{234:    {Chemical Protection --- Weapon}
-				{begin
-
-					ProcessType := 3;
-				end;
-			235:    {Chemical Protection --- Shield}
-				{begin
-					ProcessType := 3;
-				end;
-			236:    {Chemical Protection --- Armor}
-				{begin
-																				ProcessType := 3;
-																end;
-																237:    {Chemical Protection --- Helmet}
-																{begin
-																				ProcessType := 3;
-																end;}
-
-			//New skills ---- Rogue
-			211:    {Steal Coin}
-				begin
-					j := Random(7);
-					if (Random(100) < tl.Data1[MUseLV]) then begin
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, MSkill);
-						WFIFOW( 4, MUseLV);
-						WFIFOL( 6, MTarget);
-						WFIFOL(10, ID);
-						WFIFOB(14, 1);
-						SendBCmd(tm, ts.Point, 15);
-						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Steal zeny success');
-						k := ts.Data.LV * 5;
-						Inc(Zeny, k);
-						// Update Zeny
-						SendCStat1(tc, 1, $0014, tc.Zeny);
-					end;
-				end;{Steal Coin}
-			212:    {Back Stab}
-				begin
-					if ts.Dir = tc.Dir then begin
-						if (tc.Option and 2 <> 0) then begin
-							tc.Option := tc.Option and $FFFD;
-							tc.Hidden := false;
-							tc.Skill[51].Tick := Tick;
-							tc.SkillTick := Tick;
-							tc.SkillTickID := 51;
-							CalcStat(tc, Tick);
-							UpdateOption(tm, tc);
-							// Colus, 20040319: Actually you can Backstab while visible.
-						end;
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-						tc.MTick := Tick + 500;
-					end else begin
-						SendSkillError(tc, 0);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;
-
-			{214:    {Raid}
-																{begin
-																				if (tc.Option = 6) then begin
-						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then
-																												dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-						xy := ts.Point;
-						sl.Clear;
-						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-									ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-									if (ts = ts1) or ((ts1.GID = tc.GuildID) or (ts1.isGuardian = tc.GuildID) and (tc.GuildID <> 0)) then
-                                                                                Continue;
-									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-										sl.AddObject(IntToStr(ts1.ID),ts1);
-								end;//for k1
-							end;//for i1
-						end;//for j1
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count - 1 do begin
-								ts1 := sl.Objects[k1] as TMob;
-								DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								if dmg[0] < 0 then
-                                                                        dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-								//ÉpÉPëóêM
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-								//É_ÉÅÅ[ÉWèàóù
-								if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-                        						frmMain.StatCalc1(tc, ts1, Tick);
-							end;
-						end;
-                                        end else begin
-                                                tc.MMode := 4;
-                                                tc.MPoint.X := 0;
-                                                tc.MPoint.Y := 0;
-						sl.Free;
-						Exit;//safe 2004/04/26
-                                        end;
-				end;}
-
-                                215,216,217,218:
-				{ 215: Strip Weapon
-                                  216: Strip Shield
-                                  217: Strip Armor
-                                  218: Strip Helm }
-                                begin
-                                        i := (tc.Param[4] - ts.Data.Param[4]);
-                                        if i < 0 then
-                                                i := 0;
-                                        i := tl.Data2[MUseLV] + i;
-                                        if (Random(100) < i) then begin
-                                                ts.ATarget := tc.ID;
-						ts.ARangeFlag := false;
-						ts.AData := tc;
-						//ÉpÉPëóêM
-					        WFIFOW( 0, $011a);
-				       	        WFIFOW( 2, MSkill);
-				      	        WFIFOW( 4, MUseLV);
-				     	        WFIFOL( 6, MTarget);
-				    	        WFIFOL(10, ID);
-			               	        if ts.Data.Race <> 1 then begin
-			      			        WFIFOB(14, 1);
-                                                        if MSkill = 215 then begin
-                                                                ts.ATKPer := ts.ATKPer - (ts.ATKPer * 10 div 100);
-                                                        end
-																												else if MSkill = 216 then begin
-                                                                ts.DEF1 := ts.DEF1 - (ts.DEF1 * 15 div 100);
-                                                                ts.DEF2 := ts.DEF2 - (ts.DEF2 * 15 div 100);
-                                                        end
-                                                        else if MSkill = 217 then begin
-                                                                ts.Data.Param[2] := ts.Data.Param[2] - (ts.Data.Param[2] * 40 div 100);
-							end
-                                                        else if MSkill = 218 then begin
-                                                                ts.Data.Param[3] := ts.Data.Param[3] - (ts.Data.Param[3] * 40 div 100);
-                                                        end else begin
-							        WFIFOB(14, 0);
-                                                        end;
-					        	SendBCmd(tm, ts.Point, 15);
-                                                end;
-                                          end;
-                                end;
-
-			219:    {Intimidate}
-				begin
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					if dmg[0] < 0 then dmg[0] := 0;
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						frmMain.StatCalc1(tc, ts, Tick);
-
-					tc.intimidateActive := true;
-					tc.intimidateTick := Tick + 1000;
-
-					{i := MapInfo.IndexOf(tc.Map);
-					j := -1;
-					if (i <> -1) then begin
-						mi := MapInfo.Objects[i] as MapTbl;
-						if (mi.noTele) then j := 0;
-					end;
-					if (j <> 0) then begin
-							tm := tc.MData;
-						j := 0;
-						repeat
-							xy.X := Random(tm.Size.X - 2) + 1;
-							xy.Y := Random(tm.Size.Y - 2) + 1;
-							Inc(j);
-						until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
-
-						if j <> 100 then begin
-							SendCLeave(tc, 3);
-							tc.Point := xy;
-							MapMove(Socket, tc.Map, tc.Point);
-						end;
-						ts.Point.X := tc.Point.X;
-						ts.Point.Y := tc.Point.Y;
-						if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
-					end;  }
-
-				end;{Intimidate}
-
-			//New skills ---- Monk
-			{261:  Call Spirits
-				begin
-					tc1 := tc;
-					ProcessType := 3;
-					spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
-					WFIFOW( 0, $011f);
-					WFIFOL( 2, tc.ID);
-					WFIFOL( 6, ID);
-					WFIFOW(10, tc.Point.X);
-					WFIFOW(12, tc.Point.Y);
-					WFIFOB(14, $88);
-					WFIFOB(15, 1);
-					SendBCmd(tm, tc.Point, 16)
-				end;
-			262:  Absorb Spirits
-				begin
-								if spiritSpheres <> 0 then begin
-									spiritSpheres := spiritSpheres - 1;
-									tc.SP := (tc.SP + Skill[262].Data.Data2[Skill[262].Lv]);
-									if tc.SP > tc.MAXSP then
-										tc.SP := tc.MAXSP;
-					end;
-				end;}
-
-			263:   {Triple Blows}
-				begin
-					if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
-						if dmg[0] < 0 then dmg[0] := 0;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
-						UpdateIcon(tm, tc, $59);
-						Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
-						//tc.ATick := timeGetTime() + Delay;
-						MonkDelay(tm, tc, tc.Delay);
-
-						tc.ATick := Tick + Cardinal(Delay);
-
-						if NOT frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
-							frmMain.StatCalc1(tc, ts, Tick);
-						end;
-					end else begin
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;{Triple Blows}
-
-			{264:   {Body Relocation}
-				{begin
-					if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, tc.MSkill);
-						WFIFOW( 4, dmg[0]);
-						WFIFOL( 6, tc.ID);
-						WFIFOL(10, tc.ID);
-						WFIFOB(14, 1);
-						SendBCmd(tm,tc.Point,15);
-
-						SendCLeave(tc, 2);
-						tc.tmpMap := tc.Map;
-						tc.Point.X := tc.MPoint.X;
-						tc.Point.Y := tc.MPoint.Y;
-						MapMove(Socket, tc.Map, tc.Point);
-						tc.SP := tc.SP - tl.SP[tc.MUseLV];
-						MMode := 4;
-						sl.Free;//just in case...
-						Exit;//safe 2004/04/26
-					end else begin
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-						sl.Free;//just in case.
-						Exit;//safe 2004/04/26
-					end;
-				end;}
-
-			{268:    Steel Body
-				begin
-                                        if spiritSpheres = 5 then begin
-                                                tc1 := tc;
-                                                ProcessType := 3;
-                                                spiritSpheres := spiritSpheres - 5;
-                                                UpdateSpiritSpheres(tc, spiritSpheres);
-                                        end;
-																end;}
-			{270:    {Explosion Spirits
-				begin
-					if spiritSpheres = 5 then begin
-						tc1 := tc;
-						ProcessType := 3;
-						spiritSpheres := spiritSpheres - 5;
-					end;
-				end;}
-
-			271:    {Extremity Fist}
-				begin
-					if tc.Skill[270].Tick > Tick then begin
-						if (tc.Skill[271].Data.SType = 1) then begin
-							if tc.spiritSpheres = 5 then begin
-								frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-								spbonus := tc.SP;
-								dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
-								dmg[0] := dmg[0] + j;
-								if dmg[0] < 0 then begin
-									dmg[0] := 0;
-									//ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-								end;
-								{SetLength(bb, 6);
-								//bb[0] := 6;
-
-								xy := tc.Point;
-								DirMove(tm, tc.Point, tc.Dir, bb);
-
-								if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
-									with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
-										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
-										Delete(IndexOf(tc.ID));
-									end;
-									tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
-								end;
-								tc.pcnt := 0;
-
-								UpdatePlayerLocation(tm, tc);  }
-								frmMain.KnockBackLiving(tm, tc, ts, 6, 2);
-
-								SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-								frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-								tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
-								tc.spiritSpheres := tc.spiritSpheres - 5;
-								UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-
-								{20031223, Colus: Cancel Explosion Spirits after Ashura
-								 Ashura's tick will control SP lockout time}
-								tc.Skill[271].Tick := Tick + 300000;
-								tc.Skill[270].Tick := Tick;
-								tc.SkillTick := Tick;
-								tc.SkillTickID := 270;
-								tc.SP := 0;
-								SendCStat(tc);
-							end;
-						end else begin
-							if tc.spiritSpheres >= 4 then begin
-								ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-								if ts = nil then begin
-									sl.Free;
-									Exit;//safe 2004/04/26
-								end;
-								ts.IsEmperium := False;
-								tc.AData := ts;
-								PassiveAttack := False;
-								frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-								spbonus := tc.SP;
-								dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
-								dmg[0] := dmg[0] + j;
-								if dmg[0] < 0 then begin
-									dmg[0] := 0;
-									//ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-								end;
-								{SetLength(bb, 6);
-								//bb[0] := 6;
-
-								xy := tc.Point;
-								DirMove(tm, tc.Point, tc.Dir, bb);
-
-								if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
-									with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
-										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
-										Delete(IndexOf(tc.ID));
-									end;
-									tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
-								end;
-								tc.pcnt := 0;
-
-								UpdatePlayerLocation(tm, tc);   }
-								frmMain.KnockBackLiving(tm, tc, ts, 6, 2);
-								SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-								frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-								tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
-								tc.spiritSpheres := 0;
-								UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-
-								{20031223, Colus: Cancel Explosion Spirits after Ashura
-								 Ashura's tick will control SP lockout time}
-								tc.Skill[271].Tick := Tick + 300000;
-								tc.Skill[270].Tick := Tick;
-								tc.SkillTick := Tick;
-								tc.SkillTickID := 270;
-								tc.SP := 0;
-								SendCStat(tc);
-								tc.Skill[271].Data.SType := 1;
-								tc.Skill[271].Data.CastTime1 := 4500;
-								SendCSkillList(tc);
-							end;
-						end;
-					end;
-				end;
-
-			272:   {Chain Combo Effect}
-				begin
-					ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-					if ts = nil then Exit;
-					ts.IsEmperium := False;
-					tc.AData := ts;
-					PassiveAttack := False;
-
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					dmg[0] := dmg[0];
-					dmg[0] := dmg[0] + (75 div 100) * 60;
-					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
-					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-					tc.Skill[MSkill].Tick := Tick + 5000;
-
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
-						frmMain.StatCalc1(tc, ts, Tick);
-					end;
-					tc.MTick := Tick + 500;
-
-				end;
-			273:  //Combo finsher
-				begin
-					if tc.spiritSpheres >= 1 then begin
-						ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-						if ts = nil then begin
-							sl.Free;
-							Exit;//safe 2004/04/27
-						end;
-						ts.IsEmperium := False;
-						tc.AData := ts;
-						PassiveAttack := False;
-
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						dmg[0] := dmg[0];
-						dmg[0] := dmg[0] + (75 div 100) * 60;
-						if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
-						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-						tc.Skill[MSkill].Tick := Tick + 5000;
-						if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
-							tc.spiritSpheres := tc.spiritSpheres - 1;
-						end;
-						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-						frmMain.StatCalc1(tc, ts, Tick);
-						tc.MTick := Tick + 500;
-						if (tc.Skill[270].Tick >= Tick) then begin
-							tc.Skill[271].Data.SType := 4;
-							tc.Skill[271].Data.CastTime1 := 1;
-							tc.Delay := (700 - (4 * tc.param[1]) - (2 * tc.param[4]) + 300);
-							MonkDelay(tm, tc, tc.Delay);
-							// Colus, 20040430: The +1000 is there just to make it more possible (the
-							// monk delay keeps you from moving during the delay phase.)
-							tc.Skill[273].Tick := Tick + tc.Delay + 1000;
-							tc.Skill[273].EffectLV := 1;
-							SendCSkillList(tc);
-						end;
-					end;
-				end;
-
-			371:  //Tiger Crush
-				begin
-					if tc.spiritSpheres >= 1 then begin
-						ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-						if ts = nil then begin
-							sl.Free;
-							Exit;//safe 2004/04/27
-						end;
-						ts.IsEmperium := False;
-						tc.AData := ts;
-						PassiveAttack := False;
-
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						dmg[0] := dmg[0];
-						dmg[0] := dmg[0] + (75 div 100) * 60;
-						if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
-						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-						tc.Skill[MSkill].Tick := Tick + 5000;
-						if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							tc.spiritSpheres := tc.spiritSpheres - 1;
-						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-						frmMain.StatCalc1(tc, ts, Tick);
-						tc.MTick := Tick + 500;
-					end;
-				end;{Tiger Crush}
-			372:   //Chain Crush
-				if tc.spiritSpheres >= 2 then begin
-					ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-					if ts = nil then begin
-						sl.Free;
-						Exit;//safe 2004/04/27
-					end;
-					ts.IsEmperium := False;
-					tc.AData := ts;
-					PassiveAttack := False;
-
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					dmg[0] := dmg[0];
-					dmg[0] := dmg[0] + (75 div 100) * 60;
-					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
-					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-					tc.Skill[MSkill].Tick := Tick + 5000;
-
-					if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
-					tc.spiritSpheres := tc.spiritSpheres - 2;
-					UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-					frmMain.StatCalc1(tc, ts, Tick);
-
-					tc.MTick := Tick + 500;
-				end;{Chain Crush}
-
-			{273:    {Combo Finish Effect}
-				{if tc.spiritSpheres <> 0 then begin
-					PassiveAttack := False;
-					ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-					if ts = nil then begin
-						sl.Free;//just in case
-						Exit;//safe 2004/04/27
-					end;
-					ts.IsEmperium := False;
-					tc.AData := ts;
-					xy.X := ts.Point.X - Point.X;
-					xy.Y := ts.Point.Y - Point.Y;
-					if abs(xy.X) > abs(xy.Y) * 3 then begin
-						//â°å¸Ç´
-						if xy.X > 0 then
-							b := 6
-						else
-							b := 2;
-					end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-						//ècå¸Ç´
-						if xy.Y > 0 then
-							b := 0
-						else
-							b := 4;
-					end else begin
-						if xy.X > 0 then begin
-							if xy.Y > 0 then
-								b := 7
-							else
-								b := 5;
-						end else begin
-							if xy.Y > 0 then
-								b := 1
-							else
-								b := 3;
-						end;
-					end;
-
-					//Damage Calculations
-					DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					dmg[0] := dmg[0];
-					dmg[0] := dmg[0] + (14 div 10) * 70;
-					if dmg[0] < 0 then
-						dmg[0] := 0; //Negative Damage
-					//Send Attack Packets
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
-					//Knockback
-					if (dmg[0] > 0) then begin
-						SetLength(bb, 6);
-						bb[0] := 6;
-						xy := ts.Point;
-						DirMove(tm, ts.Point, b, bb);
-						//ÉuÉçÉbÉNà⁄ìÆ
-						if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
-							with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-								assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
-								Delete(IndexOf(ts.ID));
-							end;
-							tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-						end;
-						ts.pcnt := 0;
-						//Update Monster Location
-						UpdateMonsterLocation(tm, ts);
-					end;
-					if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-						tc.spiritSpheres := tc.spiritSpheres - 1;
-					UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-					frmMain.StatCalc1(tc, ts, Tick);
-
-					tc.MTick := Tick + 2000;
-				end; }
-
-			266:    {Investigate}
-				begin
-					if tc.spiritSpheres <> 0 then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-						if dmg[0] < 1 then begin
-							dmg[0] := 1;
-						end;
-						if dmg[0] < 0 then begin
-							dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-							//ÉpÉPëóêM
-						end;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
-						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-
-						tc.MTick := Tick + 1000;
-						tc.spiritSpheres := tc.spiritSpheres - 1;
-						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-					end;
-				end;
-			267:    {Finger Offensive}
-				begin
-					if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) then begin
-						if tc.spiritSpheres >= tc.MUseLV then begin
-							//É_ÉÅÅ[ÉWéZè
-							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-							if dmg[0] < 1 then begin
-								dmg[0] := 1;
-							end;
-							dmg[0] := dmg[0] * tl.Data2[MUseLV];
-							if dmg[0] < 0 then begin
-								dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-								//ÉpÉPëóêM
-							end;
-							SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
-							frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-							tc.MTick := Tick + 1000;
-							tc.spiritSpheres := tc.spiritSpheres - tc.MUseLV;
-							UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-						end;
-					end;
-				end;
-
-			//Sage
-			290:    {Abracadabra}
-				begin
-					i := Random(12);
-					i := i + 1;
-
-					{CODE-ERROR: Could be better code...}
-					case i of
-					1: tc.MSkill := 11;
-					2: tc.MSkill := 13;
-					3: tc.MSkill := 14;
-					4: tc.MSkill := 15;
-					5: tc.MSkill := 17;
-					6: tc.MSkill := 19;
-					7: tc.MSkill := 20;
-					8: tc.MSkill := 84;
-					9: tc.MSkill := 86;
-					10: tc.MSkill := 88;
-					11: tc.MSkill := 90;
-					12: tc.MSkill := 91;
-					end;//case
-					tc.MUseLV := Random(10);
-					if tc.MUseLV < 1 then tc.MUseLV := 1;
-						if tc.MUseLV > tc.Skill[i].Data.MasterLV then
-							tc.MUseLV := tc.Skill[i].Data.MasterLV;
-						{CreateField(tc, Tick);}
-						//if (tc.MSkill = 84) or (tc.MSkill = 19) or (tc.MSkill = 14) or (tc.MSkill = 13) or (tc.MSkill = 11) or (tc.MSkill = 20) then Skilleffect(tc, Tick);
-						Skilleffect(tc, Tick);
-					end;
-
-			374:  {Soul Change PvM}
-				begin
-					if ts.Burned = false then begin
-						tc.SP := tc.SP + (tc.MAXSP * 3 div 100);
-						ts.Burned := true;
-						tc.MTick := Tick + 5000;
-						SendCStat(tc);
-					end else begin
-						SendSkillError(tc, 0);
-						MMode := 4;
-						sl.Free;
-						Exit;//safe 2004/04/26
-					end;
-				end;
-				{CODE-ERROR: You have got to be joking...}
-				{Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
-					abort for the skills which require certain weapon types.}
-			5,42,46,316,324:
-				{ 5   : Bash
-					42  : Mammonite
-					46  : Double Stafing
-					316 : Musical Strike
-					324 : Throw Arrow}
-				begin
-				//É_ÉÅÅ[ÉWéZèo
-					j := 1; // Moved # of hits up here to initialize.
-
-					if (MSkill = 5) then begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-					end else begin
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-					end;
-
-					if (MSkill = 316) or (MSkill = 324) then begin
-						if (Weapon = 13) or (Weapon = 14) then begin
-							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-						end else begin
-							//DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-							SendSkillError(tc, 6);
-							tc.MMode := 4;
-							Exit;
-						end;
-					end;
-
-					if (MSkill = 46) then begin       {Double Strafing}
-						if (Weapon = 11) then begin
-							dmg[0] := dmg[0] * 2;
-							j := 2;
-						end else begin
-							SendSkillError(tc, 6);
-							tc.MMode := 4;
-							Exit;
-						end;
-					end;
-
-					if (MSkill = 56) then begin //ÉsÉAÅ[ÉXÇÕts.Data.Scale + 1âÒhit
-						j := ts.Data.Scale + 1;
-						dmg[0] := dmg[0] * j;
-					end;
-
-					//Mammonite
-					if MSkill = 42 then begin
-						// Should check to see if we have the money!
-						if (Zeny >= Cardinal(tl.Data2[MUseLV])) then begin
-							Dec(Zeny, tl.Data2[MUseLV]);
-							// Update zeny
-							SendCStat1(tc, 1, $0014, Zeny);
-						end else begin
-							SendSkillError(tc, 5);
-							tc.MMode := 4;
-							Exit;
-						end;
-					end;
-
-					if dmg[0] < 0 then dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-						//ÉpÉPëóêM
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
-
-					if (Skill[145].Lv <> 0) and (MSkill = 5) and (MUseLV > 5) then begin //ã}èäìÀÇ´
-						if Random(1000) < Skill[145].Data.Data1[MUseLV] * 10 then begin
-							if (ts.Stat1 <> 3) then begin
-								ts.nStat := 3;
-								ts.BodyTick := Tick + tc.aMotion;
-							end else
-								ts.BodyTick := ts.BodyTick + 30000;
-						end;
-					end;
-
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
-						frmMain.StatCalc1(tc, ts, Tick);
-					end;
-				end;
-
-			6:      {Provoke}
+      //June 02, 2004 - Darkhelmet, I'm going to begin cleaning and organizing all these skills,
+      //wish me luck!
+
+      {Swordman Skills Player vs monster begin}
+      6:  {Provoke}
 				begin
 					ts.ATarget := tc.ID;
 					ts.ARangeFlag := false;
 					ts.AData := tc;
-					//ÉpÉPëóêM
+					//Send graphical packet
 					WFIFOW( 0, $011a);
 					WFIFOW( 2, MSkill);
 					WFIFOW( 4, MUseLV);
@@ -1484,17 +203,17 @@ Begin
 					end;
 					SendBCmd(tm, ts.Point, 15);
 				end;
-				7:      {Magnum Break}
+      7:  {Magnum Break}
 				begin
-					//É_ÉÅÅ[ÉWéZèo1
+					//Calculate the Damage the Skill Does
 					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 					if dmg[0] < 0 then dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-					//ÉpÉPëóêM
+					//Send the Packet of character attacking
 					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
 					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 						frmMain.StatCalc1(tc, ts, Tick);
 					xy := ts.Point;
-					//É_ÉÅÅ[ÉWéZèo2
+					//Find all enemies in range
 					sl.Clear;
 					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
 						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
@@ -1512,48 +231,19 @@ Begin
 							ts1 := sl.Objects[k1] as TMob;
 							frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 							if dmg[0] < 0 then
-								dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-							//ÉpÉPëóêM
+								dmg[0] := 0; //Make sure of no negative damage
+							//Send the Packet of character attacking
 							SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-							//É_ÉÅÅ[ÉWèàóù
+							//Damage the Monster server side
 							if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
 								frmMain.StatCalc1(tc, ts1, Tick);
 						end;
 					end;
 				end;
-			11,13,14,19,20,90,156:
-				{11  : Napalm Beat
-				.13  : Soul Strike
-				.14  : Cold Bolt
-				.19  : Fire Bolt
-				.20  : Lightning Bolt
-				.90  : Earth Spike
-				.156 : Holy Light }
-				begin
-					//Magic Attack Calculation
-					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
-					dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
-					dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
-					if dmg[0] < 1 then
-						dmg[0] := 1;
-					dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
-					dmg[0] := dmg[0] * tl.Data2[MUseLV];
-					if dmg[0] < 0 then
-						dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
-					//ÉpÉPëóêM
+      {Swordman skills player vs monster end}
 
-					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
-
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
-					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
-					case MSkill of
-					11,90:     tc.MTick := Tick + 1000;
-					13:        tc.MTick := Tick +  800 + 400 * ((MUseLV + 1) div 2) - 300 * (MUseLV div 10);
-					14,19,20 : tc.MTick := Tick +  800 + 200 * MUseLV;
-					else       tc.MTick := Tick + 1000;
-					end;
-				end;
-			15:     {Frost Driver}
+      {Mage Skills Player vs Monster Begin}
+      15:     {Frost Driver}
 				begin
 					//Magic Attack Damage Calculation
 					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * ( MUseLV + 100 ) div 100;
@@ -1614,11 +304,14 @@ Begin
 						Exit;
 					end;
 				end;
-{:119}
-			17:     {Fire Ball}
+
+			17: {Fire Ball}
 				begin
 					xy := ts.Point;
 					sl.Clear;
+          // CODE-ERROR - we repeat this algorithm over and over, I think it could use
+          // a procedure
+          //Find monsters in range of fireball
 					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
 						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
 							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
@@ -1633,22 +326,24 @@ Begin
 							ts1 := sl.Objects[k1] as TMob;
 							dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
 							dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-							dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+							dmg[0] := dmg[0] - ts1.Data.Param[3]; //Accoutn for monsters MDEF
 							if dmg[0] < 1 then dmg[0] := 1;
 							dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 							dmg[0] := dmg[0] * tl.Data2[MUseLV];
-							if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+							if dmg[0] < 0 then dmg[0] := 0; //Prevent negative damage
 							if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 							if ts = ts1 then k := 0 else k := 5;
 							SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV], k);
-							//É_ÉÅÅ[ÉWèàóù
+							//Damage the monster
 							frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick);
 						end;
 					end;
 					tc.MTick := Tick + 1600;
 				end;
+      {Mage Skills Player vs Monster end}
 
-			28:     {Heal}
+      {Alcolyte Skills Player vs monster begin}
+      28:     {Heal}
 				begin
 					if (ts.HP > 0) then begin
 
@@ -1701,137 +396,24 @@ Begin
 
 					tc.MTick := Tick + 1000;
 				end;
+      {Alcolyte Skills Player vs monster end}
 
-			264:   {Body Relocation}  //New Version Oatmeal style U_U
+      {Thief Skills player vs monster begin}
+			50: {Steal}
+			{Colus, 20040305: Redid it all.  Again.  Using info on formulas obtained
+			from fansites and confirmations on algorithm from disassemblers.}
 				begin
-					// Colus, 20040225: Never called?
-					if tc.spiritSpheres <> 0 then begin
-						//Send Graphics Packet
-						WFIFOW( 0, $011a);
-						WFIFOW( 2, MSkill);
-						WFIFOW( 4, MUseLV);
-						WFIFOL( 6, ts.ID);
-						WFIFOL(10, ID);
-						WFIFOB(14, 1);
-						// Colus, 20040225: Oatmeal, until you send the packet,
-						// ANY other packet you send will overwrite what you've
-						// already done.  You cannot do the UpdateSpiritSpheres
-						// call (which makes a new packet) until you send the old one.
-						SendBCmd(tm, ts.Point, 15);
-						tc.spiritSpheres := tc.spiritSpheres - 1;
-						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-
-						if tc.Skill[264].EffectLV > 1 then begin
-							ts.speed := ts.speed - 45;
-						end else begin
-							ts.speed := ts.speed - 30;
-						end;
-
-						tc.MTick := Tick + 1000;
+					if not (StealItem(tc)) then begin
+						SendSkillError(tc, 0);
+						tc.MMode := 4;
+						tc.MPoint.X := 0;
+						tc.MPoint.Y := 0;
+						DecSP(tc, 50, MUseLV);
 					end;
-				end;
-			47:     {Arrow Shower}
-				begin
-					if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
-						WFIFOW(0, $013b);
-						WFIFOW(2, 0);
-						Socket.SendBuf(buf, 4);
-						ATick := ATick + ADelay;
-						Exit;
-					end;
-
-					Dec(Item[Arrow].Amount,9);
-
-					WFIFOW( 0, $00af);
-					WFIFOW( 2, Arrow);
-					WFIFOW( 4, 9);
-					Socket.SendBuf(buf, 6);
-
-					if Item[Arrow].Amount = 0 then begin
-						Item[Arrow].ID := 0;
-						Arrow := 0;
-					end;
-
-					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-					if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
-
-					//Send Attack Packet
-					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
-						frmMain.StatCalc1(tc, ts, Tick);
-					end;
-					xy := ts.Point;
-
-					//Begin Area Effect
-					sl.Clear;
-					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-								if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
-								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-									sl.AddObject(IntToStr(ts1.ID),ts1);
-							end;
-						end;
-					end;
-
-					if sl.Count <> 0 then begin
-						for k1 := 0 to sl.Count - 1 do begin
-							ts1 := sl.Objects[k1] as TMob;
-
-							j := 0;
-							case tc.Dir of
-							0:
-								begin
-									if ts1.Point.Y < tc.Point.Y then j := 1;
-								end;
-							1:
-								begin
-									if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-								end;
-							2:
-								begin
-									if ts1.Point.X > tc.Point.X then j := 1;
-								end;
-							3:
-								begin
-									if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y < tc.Point.Y) then j := 1;
-								end;
-							4:
-								begin
-									if ts1.Point.Y > tc.Point.Y then j := 1;
-								end;
-							5:
-								begin
-									if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-								end;
-							6:
-								begin
-									if ts1.Point.X < tc.Point.X then j := 1;
-								end;
-							7:
-								begin
-									if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
-								end;
-							end;
-
-							if j <> 1 then begin
-								frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
-
-								//Send Graphics Packet
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-
-								//Damage Process for Monster
-								if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-									frmMain.StatCalc1(tc, ts1, Tick);
-							end;
-
-						end;
-					end;
-				end;
-
-			52:     {Poison}
+					// Delay after stealing
+					tc.MTick := Tick + 1000;
+				end; {end Steal}
+      52:     {Poison}
 				begin
 					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, 100, tl.Element);
 					dmg[0] := dmg[0] + 15 * MUseLV;
@@ -1848,6 +430,7 @@ Begin
 
 					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
 				end;
+      {Thief Skills player vs monster end}
 
 			54:     {Resurrection}
 				begin
@@ -2123,13 +706,1260 @@ Begin
 									SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
 									//É_ÉÅÅ[ÉWèàóù
 									if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-{í«â¡}							frmMain.StatCalc1(tc, ts1, Tick);
+      							frmMain.StatCalc1(tc, ts1, Tick);
 								end;
 							end;
 						end;
 						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-{í«â¡}				frmMain.StatCalc1(tc, ts, Tick);
+				      frmMain.StatCalc1(tc, ts, Tick);
 					end;
+
+      //New skills ---- Rogue
+			211:    {Steal Coin}
+				begin
+					j := Random(7);
+					if (Random(100) < tl.Data1[MUseLV]) then begin
+						WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, MTarget);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, ts.Point, 15);
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Steal zeny success');
+						k := ts.Data.LV * 5;
+						Inc(Zeny, k);
+						// Update Zeny
+						SendCStat1(tc, 1, $0014, tc.Zeny);
+					end;
+				end;{Steal Coin}
+			212:    {Back Stab}
+				begin
+					if ts.Dir = tc.Dir then begin
+						if (tc.Option and 2 <> 0) then begin
+							tc.Option := tc.Option and $FFFD;
+							tc.Hidden := false;
+							tc.Skill[51].Tick := Tick;
+							tc.SkillTick := Tick;
+							tc.SkillTickID := 51;
+							CalcStat(tc, Tick);
+							UpdateOption(tm, tc);
+							// Colus, 20040319: Actually you can Backstab while visible.
+						end;
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+						tc.MTick := Tick + 500;
+					end else begin
+						SendSkillError(tc, 0);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;
+        214: //Raid
+				begin
+					// Colus, 20040204: Option change, testing option 2 instead of 4+2
+					if (tc.Option and 2 <> 0) then begin
+						tc.Option := tc.Option and $FFFD;
+						tc.Hidden := false;
+						tc.Skill[51].Tick := Tick;
+						tc.SkillTick := Tick;
+						tc.SkillTickID := 51;
+						CalcStat(tc, Tick);
+		        UpdateOption(tm, tc);
+		        xy := tc.Point;
+		        sl.Clear;
+		        j := tl.Range2;
+		        for j1 := (xy.Y - j) div 8 to (xy.Y + j) div 8 do begin
+		          for i1 := (xy.X - j) div 8 to (xy.X + j) div 8 do begin
+		            for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+		              if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+		              if (abs(ts1.Point.X - xy.X) <= j) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+		                sl.AddObject(IntToStr(ts1.ID),ts1);
+		            end;
+		          end;
+            end;
+            //If monsters were found within the range
+		        if sl.Count <> 0 then begin
+		          for k1 := 0 to sl.Count - 1 do begin
+		            ts1 := sl.Objects[k1] as TMob;
+			          frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+		            if dmg[0] < 1 then dmg[0] := 1;
+		            if dmg[0] < 0 then dmg[0] := 0;
+		            k := 1;
+		            SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+			          frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick);
+		          end;
+            end;
+	        end else begin
+	          SendSkillError(tc, 0);
+	          tc.MMode := 4;
+						tc.MPoint.X := 0;
+	          tc.MPoint.Y := 0;
+	          Exit;
+	        end;
+		    end;
+
+        215,216,217,218:
+				{ 215: Strip Weapon
+          216: Strip Shield
+          217: Strip Armor
+          218: Strip Helm }
+          begin
+            i := (tc.Param[4] - ts.Data.Param[4]);
+            if i < 0 then
+              i := 0;
+            i := tl.Data2[MUseLV] + i;
+            if (Random(100) < i) then begin
+              ts.ATarget := tc.ID;
+						  ts.ARangeFlag := false;
+						  ts.AData := tc;
+						  //Send Skill Packet
+              //CODE-ERROR - Darkhelmet, we use this packet over and over, why not make a procedure?
+              WFIFOW( 0, $011a);
+              WFIFOW( 2, MSkill);
+              WFIFOW( 4, MUseLV);
+              WFIFOL( 6, MTarget);
+              WFIFOL(10, ID);
+              if ts.Data.Race <> 1 then begin
+                WFIFOB(14, 1);
+                if MSkill = 215 then begin
+                  //Lower Monster's Attack
+                  ts.ATKPer := ts.ATKPer - (ts.ATKPer * 10 div 100);
+                end else if MSkill = 216 then begin
+                  //Lower Monster's Defense
+                  ts.DEF1 := ts.DEF1 - (ts.DEF1 * 15 div 100);
+                  ts.DEF2 := ts.DEF2 - (ts.DEF2 * 15 div 100);
+                end else if MSkill = 217 then begin
+                  //Lower Monster's Agility, should probably decrease their speed....
+                  //CODE-ERROR - Darkhelmet, agility never goes into any calcs...
+                  // we should decrease speed instead
+                  ts.Data.Param[2] := ts.Data.Param[2] - (ts.Data.Param[2] * 40 div 100);
+							  end else if MSkill = 218 then begin
+                  //Decrease Intelligence
+                  ts.Data.Param[3] := ts.Data.Param[3] - (ts.Data.Param[3] * 40 div 100);
+                end else begin  //I believe this means the monster is an MVP
+                  WFIFOB(14, 0);
+                end;
+                SendBCmd(tm, ts.Point, 15);
+              end;
+            end;
+          end;
+
+			219:    {Intimidate}
+				begin
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+					if dmg[0] < 0 then dmg[0] := 0;
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+
+					tc.intimidateActive := true;
+					tc.intimidateTick := Tick + 1000;
+
+					{i := MapInfo.IndexOf(tc.Map);
+					j := -1;
+					if (i <> -1) then begin
+						mi := MapInfo.Objects[i] as MapTbl;
+						if (mi.noTele) then j := 0;
+					end;
+					if (j <> 0) then begin
+							tm := tc.MData;
+						j := 0;
+						repeat
+							xy.X := Random(tm.Size.X - 2) + 1;
+							xy.Y := Random(tm.Size.Y - 2) + 1;
+							Inc(j);
+						until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+
+						if j <> 100 then begin
+							SendCLeave(tc, 3);
+							tc.Point := xy;
+							MapMove(Socket, tc.Map, tc.Point);
+						end;
+						ts.Point.X := tc.Point.X;
+						ts.Point.Y := tc.Point.Y;
+						if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
+					end;  }
+
+				end;{Intimidate}
+      230:  //Acid Terror
+				begin
+					j := SearchCInventory(tc, 7136, false);
+					if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+						UseItem(tc, j); //Use Item Function Call
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then
+							dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						tc.MMode := 4;
+						tc.MPoint.X := 0;
+						tc.MPoint.Y := 0;
+						SL.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;
+      {Monk skills player vs monster begin}
+      263:   {Triple Blows}
+				begin
+					if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
+						if dmg[0] < 0 then dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+						UpdateIcon(tm, tc, $59);
+						Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
+						//tc.ATick := timeGetTime() + Delay;
+						MonkDelay(tm, tc, tc.Delay);
+
+						tc.ATick := Tick + Cardinal(Delay);
+
+						if NOT frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
+							frmMain.StatCalc1(tc, ts, Tick);
+						end;
+					end else begin
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;{Triple Blows}
+      264:   {Body Relocation}  //New Version Oatmeal style U_U
+				begin
+					// Colus, 20040225: Never called?
+					if tc.spiritSpheres <> 0 then begin
+						//Send Graphics Packet
+						WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, ts.ID);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						// Colus, 20040225: Oatmeal, until you send the packet,
+						// ANY other packet you send will overwrite what you've
+						// already done.  You cannot do the UpdateSpiritSpheres
+						// call (which makes a new packet) until you send the old one.
+						SendBCmd(tm, ts.Point, 15);
+						tc.spiritSpheres := tc.spiritSpheres - 1;
+						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+						if tc.Skill[264].EffectLV > 1 then begin
+							ts.speed := ts.speed - 45;
+						end else begin
+							ts.speed := ts.speed - 30;
+						end;
+
+						tc.MTick := Tick + 1000;
+					end;
+				end;
+      266:    {Investigate}
+				begin
+					if tc.spiritSpheres <> 0 then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						if dmg[0] < 1 then begin
+							dmg[0] := 1;
+						end;
+						if dmg[0] < 0 then begin
+							dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+							//ÉpÉPëóêM
+						end;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+
+						tc.MTick := Tick + 1000;
+						tc.spiritSpheres := tc.spiritSpheres - 1;
+						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+					end;
+				end;
+			267:    {Finger Offensive}
+				begin
+					if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) then begin
+						if tc.spiritSpheres >= tc.MUseLV then begin
+							//É_ÉÅÅ[ÉWéZè
+							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+							if dmg[0] < 1 then begin
+								dmg[0] := 1;
+							end;
+							dmg[0] := dmg[0] * tl.Data2[MUseLV];
+							if dmg[0] < 0 then begin
+								dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+								//ÉpÉPëóêM
+							end;
+							SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+							frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+							tc.MTick := Tick + 1000;
+							tc.spiritSpheres := tc.spiritSpheres - tc.MUseLV;
+							UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+						end;
+					end;
+				end;
+
+			271:    {Extremity Fist}
+				begin
+					if tc.Skill[270].Tick > Tick then begin
+						if (tc.Skill[271].Data.SType = 1) then begin
+							if tc.spiritSpheres = 5 then begin
+								frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+								spbonus := tc.SP;
+								dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+								dmg[0] := dmg[0] + j;
+								if dmg[0] < 0 then begin
+									dmg[0] := 0;
+									//ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+								end;
+								{SetLength(bb, 6);
+								//bb[0] := 6;
+
+								xy := tc.Point;
+								DirMove(tm, tc.Point, tc.Dir, bb);
+
+								if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+									with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+										Delete(IndexOf(tc.ID));
+									end;
+									tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+								end;
+								tc.pcnt := 0;
+
+								UpdatePlayerLocation(tm, tc);  }
+								frmMain.KnockBackLiving(tm, tc, ts, 6, 2);
+
+								SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+								frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+								tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+								tc.spiritSpheres := tc.spiritSpheres - 5;
+								UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+								{20031223, Colus: Cancel Explosion Spirits after Ashura
+								 Ashura's tick will control SP lockout time}
+								tc.Skill[271].Tick := Tick + 300000;
+								tc.Skill[270].Tick := Tick;
+								tc.SkillTick := Tick;
+								tc.SkillTickID := 270;
+								tc.SP := 0;
+								SendCStat(tc);
+							end;
+						end else begin
+							if tc.spiritSpheres >= 4 then begin
+								ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+								if ts = nil then begin
+									sl.Free;
+									Exit;//safe 2004/04/26
+								end;
+								ts.IsEmperium := False;
+								tc.AData := ts;
+								PassiveAttack := False;
+								frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+								spbonus := tc.SP;
+								dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+								dmg[0] := dmg[0] + j;
+								if dmg[0] < 0 then begin
+									dmg[0] := 0;
+									//ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+								end;
+								{SetLength(bb, 6);
+								//bb[0] := 6;
+
+								xy := tc.Point;
+								DirMove(tm, tc.Point, tc.Dir, bb);
+
+								if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+									with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
+										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+										Delete(IndexOf(tc.ID));
+									end;
+									tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
+								end;
+								tc.pcnt := 0;
+
+								UpdatePlayerLocation(tm, tc);   }
+								frmMain.KnockBackLiving(tm, tc, ts, 6, 2);
+								SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+								frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+								tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
+								tc.spiritSpheres := 0;
+								UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+								{20031223, Colus: Cancel Explosion Spirits after Ashura
+								 Ashura's tick will control SP lockout time}
+								tc.Skill[271].Tick := Tick + 300000;
+								tc.Skill[270].Tick := Tick;
+								tc.SkillTick := Tick;
+								tc.SkillTickID := 270;
+								tc.SP := 0;
+								SendCStat(tc);
+								tc.Skill[271].Data.SType := 1;
+								tc.Skill[271].Data.CastTime1 := 4500;
+								SendCSkillList(tc);
+							end;
+						end;
+					end;
+				end;
+
+			272:   {Chain Combo Effect}
+				begin
+					ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+					if ts = nil then Exit;
+					ts.IsEmperium := False;
+					tc.AData := ts;
+					PassiveAttack := False;
+
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+					dmg[0] := dmg[0];
+					dmg[0] := dmg[0] + (75 div 100) * 60;
+					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+					tc.Skill[MSkill].Tick := Tick + 5000;
+
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
+						frmMain.StatCalc1(tc, ts, Tick);
+					end;
+					tc.MTick := Tick + 500;
+
+				end;
+			273:  //Combo finsher
+				begin
+					if tc.spiritSpheres >= 1 then begin
+						ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+						if ts = nil then begin
+							sl.Free;
+							Exit;//safe 2004/04/27
+						end;
+						ts.IsEmperium := False;
+						tc.AData := ts;
+						PassiveAttack := False;
+
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						dmg[0] := dmg[0];
+						dmg[0] := dmg[0] + (75 div 100) * 60;
+						if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+						tc.Skill[MSkill].Tick := Tick + 5000;
+						if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
+							tc.spiritSpheres := tc.spiritSpheres - 1;
+						end;
+						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+						frmMain.StatCalc1(tc, ts, Tick);
+						tc.MTick := Tick + 500;
+						if (tc.Skill[270].Tick >= Tick) then begin
+							tc.Skill[271].Data.SType := 4;
+							tc.Skill[271].Data.CastTime1 := 1;
+							tc.Delay := (700 - (4 * tc.param[1]) - (2 * tc.param[4]) + 300);
+							MonkDelay(tm, tc, tc.Delay);
+							// Colus, 20040430: The +1000 is there just to make it more possible (the
+							// monk delay keeps you from moving during the delay phase.)
+							tc.Skill[273].Tick := Tick + tc.Delay + 1000;
+							tc.Skill[273].EffectLV := 1;
+							SendCSkillList(tc);
+						end;
+					end;
+				end;
+      {Monk Skills Player vs Monster end}
+
+      {Crusader Skills Player vs Monster begin}
+			250:    {Shield Charge}
+				begin
+					if (tc.Shield > 0) then begin
+						{If Wearing Shield}
+						xy.X := ts.Point.X - Point.X;
+						xy.Y := ts.Point.Y - Point.Y;
+						if abs(xy.X) > abs(xy.Y) * 3 then begin
+							//â°å¸Ç´
+							if xy.X > 0 then
+								b := 6
+							else
+								b := 2;
+						end
+						else if abs(xy.Y) > abs(xy.X) * 3 then begin
+							//ècå¸Ç´
+							if xy.Y > 0 then
+								b := 0
+							else
+								b := 4;
+						end
+						else begin
+							if xy.X > 0 then begin
+								if xy.Y > 0 then
+									b := 7
+								else
+									b := 5;
+							end else begin
+								if xy.Y > 0 then
+									b := 1
+								else
+									b := 3;
+							end;
+						end;
+
+						//íeÇ´îÚÇŒÇ∑ëŒè€Ç…ëŒÇ∑ÇÈÉ_ÉÅÅ[ÉWÇÃåvéZ
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						if dmg[0] < 0 then
+							dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+						//ÉpÉPëóêM
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+						//ÉmÉbÉNÉoÉbÉNèàóù
+						if (dmg[0] > 0) then begin
+							SetLength(bb, 6);
+							bb[0] := 6;
+							xy := ts.Point;
+							DirMove(tm, ts.Point, b, bb);
+							//ÉuÉçÉbÉNà⁄ìÆ
+							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
+								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+									Assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
+									Delete(IndexOf(ts.ID));
+								end;
+								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+							end;
+							ts.pcnt := 0;
+							UpdateMonsterLocation(tm, ts);
+						end;
+						if Random(100) < Skill[250].Data.Data2[MUseLV] then begin
+							if (ts.Stat1 <> 3) then begin
+								ts.nStat := 3;
+								ts.BodyTick := Tick + tc.aMotion;
+							end else begin
+								ts.BodyTick := ts.BodyTick + 30000;
+							end;
+						end;
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end;
+				end;
+			251:    {Shield Boomerang}
+				begin
+					if (tc.Shield <> 0) then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then
+							dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+						tc.MTick := Tick + 1000;
+					end else begin
+						tc.MMode := 4;
+						tc.MPoint.X := 0;
+						tc.MPoint.Y := 0;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;
+
+
+			253:    {Holy Cross}
+				begin
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+					//Send Skill Packets
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+					//Byte 16 isn't Blind 32 is Chance to blind on undead
+					if Random(100) < Skill[253].Data.Data2[MUseLV] then begin
+						if (ts.Stat2 <> 32) and (ts.Data.Race = 1)  then begin
+							ts.nStat := 32;
+						end;
+					end;
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+				end;
+      254:    {Grand Cross}
+				begin
+					PassiveAttack := false;
+					DamageProcessed := false;
+					NoCastInterrupt := true;
+					//É_ÉÅÅ[ÉWéZèo
+					xy := tc.Point;
+					sl.Clear;
+					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then
+									Continue;
+								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if (ts = ts1) or ((tc.GuildID > 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID > 0) and (ts1.GID = tc.GuildID)) then
+									Continue;
+								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+									sl.AddObject(IntToStr(ts1.ID),ts1);
+							end;//for k1
+						end;//for i1
+					end;//for j1
+					if sl.Count > 0 then begin
+						for k1 := 0 to sl.Count - 1 do begin
+							ts1 := sl.Objects[k1] as TMob;
+							frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+							//dmg[0] := dmg[0];
+							dmg[0] := (MATK2 - MATK1 + 20) * 35 + ATTPOWER + dmg[0];
+							j := 3;
+							if DamageProcessed = false then begin
+								DamageProcessed := true;
+								//SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j, 5);
+								if tc.HP > (dmg[0] * 100 div 350) then begin
+									tc.HP := tc.HP - (dmg[0] * 100 div 350);  //Subtract Damage
+									WFIFOW( 0, $01de);
+									WFIFOW( 2, 254);
+									WFIFOL( 4, tc.ID);
+									WFIFOL( 8, tc.ID);
+									WFIFOL(12, Tick);
+									WFIFOL(16, ts1.Data.dMotion);
+									WFIFOL(20, tc.aMotion);
+									WFIFOL(24, (dmg[0] * 100 div 350));
+									WFIFOW(28, MUseLV);
+									WFIFOW(30, 3);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tc.Point, 33);
+									//SendMSkillAttack(tm, tc, ts, ts.Data.AISkill, Tick, 3, 0);
+									if dmg[0] <> 0 then begin
+										tc.DmgTick := Tick + tc.dMotion div 2;
+										{Colus, 20031216: Cancel casting timer on hit.
+										Also, phen card handling.}
+										if tc.NoCastInterrupt = False then begin
+											tc.MMode := 0;
+											tc.MTick := 0;
+											WFIFOW(0, $01b9);
+											WFIFOL(2, tc.ID);
+											SendBCmd(tm, tc.Point, 6);
+										end;
+										{Colus, 20031216: end cast-timer cancel}
+									end;
+								end else begin
+									tc.HP := 1;
+									{WFIFOW( 0, $0080);
+									WFIFOL( 2, tc.ID);
+									WFIFOB( 6, 1);
+									SendBCmd(tm, tc.Point, 7);
+									tc.Sit := 1;
+
+									i := (100 - DeathBaseLoss);
+									tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
+									i := (100 - DeathJobLoss);
+									tc.JobEXP := Round(tc.JobEXP * (i / 100));
+
+									SendCStat1(tc, 1, $0001, tc.BaseEXP);
+									SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+									tc.pcnt := 0;
+									if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
+									ATarget := 0;
+									ts.ARangeFlag := false;}
+								end;
+
+								SendCStat1(tc, 0, $0005, tc.HP);
+								ATick := ATick + ts.Data.ADelay;
+							end;
+
+							//SendCStat1(tc, 0, 5, tc.HP);
+							//SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 3, 6);
+							//SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], j, 3);
+							WFIFOW( 0, $01de);
+							WFIFOW( 2, 0);
+							WFIFOL( 4, ts1.ID);
+							WFIFOL( 8, ts1.ID);
+							WFIFOL(12, Tick);
+							WFIFOL(16, tc.aMotion);
+							WFIFOL(20, ts1.Data.dMotion);
+							WFIFOL(24, dmg[0]);
+							WFIFOW(28, 1);
+							WFIFOW(30, 3);
+							WFIFOB(32, 9);
+							SendBCmd(tm, tc.Point, 33);
+							if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
+								frmMain.StatCalc1(tc, ts1, Tick); {í«â¡}
+						end;
+					end;
+				end;
+
+      // CODE-ERROR - Darkhelmet, Defender should be used on a players self only,
+      // therefore it has no use being against a monster
+			257:    {Defender}
+				begin
+					tc1 := tc;
+					ProcessType := 3;
+				end;
+
+      {Crusader Skills Player vs Monster end}
+      {Sage Skills Player vs Monster begin}
+			290:    {Abracadabra}
+				begin
+					i := Random(12);
+					i := i + 1;
+
+					{CODE-ERROR: Could be better code...}
+					case i of
+					1: tc.MSkill := 11;
+					2: tc.MSkill := 13;
+					3: tc.MSkill := 14;
+					4: tc.MSkill := 15;
+					5: tc.MSkill := 17;
+					6: tc.MSkill := 19;
+					7: tc.MSkill := 20;
+					8: tc.MSkill := 84;
+					9: tc.MSkill := 86;
+					10: tc.MSkill := 88;
+					11: tc.MSkill := 90;
+					12: tc.MSkill := 91;
+					end;//case
+					tc.MUseLV := Random(10);
+					if tc.MUseLV < 1 then tc.MUseLV := 1;
+						if tc.MUseLV > tc.Skill[i].Data.MasterLV then
+							tc.MUseLV := tc.Skill[i].Data.MasterLV;
+						{CreateField(tc, Tick);}
+						//if (tc.MSkill = 84) or (tc.MSkill = 19) or (tc.MSkill = 14) or (tc.MSkill = 13) or (tc.MSkill = 11) or (tc.MSkill = 20) then Skilleffect(tc, Tick);
+						Skilleffect(tc, Tick);
+					end;
+      365:   //Magic Crusher
+				begin
+					//Magic Attack Calculation
+					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+					dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
+					dmg[0] := dmg[0] - ts.Data.Param[2];
+					if dmg[0] < 1 then
+						dmg[0] := 1;
+					dmg[0] := dmg[0] * 1;
+					dmg[0] := dmg[0] * tl.Data2[MUseLV];
+					if dmg[0] < 0 then
+						dmg[0] := 0;
+
+					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+				end;
+
+			367: //Pressure
+				begin
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+					j := 1;
+					if dmg[0] < 0 then dmg[0] := 0;
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+					xy := ts.Point;
+
+					sl.Clear;
+					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue;
+								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
+								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+									sl.AddObject(IntToStr(ts1.ID),ts1);
+							end;//for k1
+						end;//for i1
+					end;//for j1
+					if sl.Count > 0 then begin
+						for k1 := 0 to sl.Count - 1 do begin
+							ts1 := sl.Objects[k1] as TMob;
+							frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+							j := 1;
+							if dmg[0] < 0 then dmg[0] := 0;
+							SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 6);
+							//SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+							if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
+								frmMain.StatCalc1(tc, ts1, Tick);
+						end;//for k1
+					end;//if sl.Count
+				end;
+
+			368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
+				begin
+				if tc.Weapon = 2 then begin
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+					if dmg[0] < 0 then dmg[0] := 0;
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						SendSkillError(tc, 6);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;
+
+
+      /// We can cheat and use Spear stab
+			370:     {Palm Strike}
+				begin
+					if tc.Skill[270].Tick > Tick then begin
+						xy.X := ts.Point.X - Point.X;
+						xy.Y := ts.Point.Y - Point.Y;
+						if abs(xy.X) > abs(xy.Y) * 3 then begin
+							//Knockback Distance?
+							if xy.X > 0 then b := 6 else b := 2;
+						end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+							if xy.Y > 0 then b := 0 else b := 4;
+						end else begin
+							if xy.X > 0 then begin
+								if xy.Y > 0 then b := 7 else b := 5;
+							end else begin
+								if xy.Y > 0 then b := 1 else b := 3;
+							end;
+						end;
+
+						//Calculate Damage
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+
+						//Send Attacking Packet
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+
+						//Begin Knockback
+						if (dmg[0] > 0) then begin
+							SetLength(bb, 6);
+							bb[0] := 6;
+							xy := ts.Point;
+							DirMove(tm, ts.Point, b, bb);
+
+							//Knockback Monster
+							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
+								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+									Assert(IndexOf(ts.ID) > -1, 'MobBlockDelete Error');
+									Delete(IndexOf(ts.ID));
+								end;
+								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+							end;
+							ts.pcnt := 0;
+
+							//Update Coordinates of Monster
+							UpdateMonsterLocation(tm, ts);
+						end;
+
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						SendSkillError(tc, 0);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;{Palm Strike}
+      371:  //Tiger Crush
+				begin
+					if tc.spiritSpheres >= 1 then begin
+						ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+						if ts = nil then begin
+							sl.Free;
+							Exit;//safe 2004/04/27
+						end;
+						ts.IsEmperium := False;
+						tc.AData := ts;
+						PassiveAttack := False;
+
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						dmg[0] := dmg[0];
+						dmg[0] := dmg[0] + (75 div 100) * 60;
+						if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+						frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+						tc.Skill[MSkill].Tick := Tick + 5000;
+						if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							tc.spiritSpheres := tc.spiritSpheres - 1;
+						UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+						frmMain.StatCalc1(tc, ts, Tick);
+						tc.MTick := Tick + 500;
+					end;
+				end;{Tiger Crush}
+        
+			372:   //Chain Crush
+				if tc.spiritSpheres >= 2 then begin
+					ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+					if ts = nil then begin
+						sl.Free;
+						Exit;//safe 2004/04/27
+					end;
+					ts.IsEmperium := False;
+					tc.AData := ts;
+					PassiveAttack := False;
+
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+					dmg[0] := dmg[0];
+					dmg[0] := dmg[0] + (75 div 100) * 60;
+					if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+					tc.Skill[MSkill].Tick := Tick + 5000;
+
+					if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+					tc.spiritSpheres := tc.spiritSpheres - 2;
+					UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+					frmMain.StatCalc1(tc, ts, Tick);
+
+					tc.MTick := Tick + 500;
+				end;{Chain Crush}
+      {Sage Skills player vs monster begin}
+      374:  {Soul Change PvM}
+				begin
+					if ts.Burned = false then begin
+						tc.SP := tc.SP + (tc.MAXSP * 3 div 100);
+						ts.Burned := true;
+						tc.MTick := Tick + 5000;
+						SendCStat(tc);
+					end else begin
+						SendSkillError(tc, 0);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;
+			379:  {Soul_Breaker}
+				begin
+					if tc.Weapon = 16 then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						SendSkillError(tc, 6);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/27
+					end;
+				end;
+      {Sage Skills Player vs Monster End}
+      381:    {Falcon Assault}
+				//Damage calc needs to be redone not much info about this skill.
+				if tc.Option and 16 <> 0 then begin
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+					if dmg[0] < 0 then dmg[0] := 0;
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+						frmMain.StatCalc1(tc, ts, Tick);
+				end else begin
+					SendSkillError(tc, 0);
+					MMode := 4;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;{Falcon Assault}
+
+			382:     {Sniper Shot}
+				begin
+					if (Arrow = 0) or (Item[Arrow].Amount < 1) then begin
+						WFIFOW(0, $013b);
+						WFIFOW(2, 0);
+						Socket.SendBuf(buf, 4);
+						ATick := ATick + ADelay;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+
+					Dec(Item[Arrow].Amount,1);
+
+					WFIFOW( 0, $00af);
+					WFIFOW( 2, Arrow);
+					WFIFOW( 4, 9);
+					Socket.SendBuf(buf, 6);
+
+					if Item[Arrow].Amount = 0 then begin
+						Item[Arrow].ID := 0;
+						Arrow := 0;
+					end;
+
+					if tc.Weapon = 11 then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						SendSkillError(tc, 6);
+						MMode := 4;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;{Sniper Shot}
+
+			394:     {Arrow Shower}
+				begin
+					if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
+						WFIFOW(0, $013b);
+						WFIFOW(2, 0);
+						Socket.SendBuf(buf, 4);
+						ATick := ATick + ADelay;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+
+					Dec(Item[Arrow].Amount,9);
+
+					WFIFOW( 0, $00af);
+					WFIFOW( 2, Arrow);
+					WFIFOW( 4, 9);
+					Socket.SendBuf(buf, 6);
+
+					if Item[Arrow].Amount = 0 then begin
+						Item[Arrow].ID := 0;
+						Arrow := 0;
+					end;
+
+					if tc.Weapon = 11 then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							frmMain.StatCalc1(tc, ts, Tick);
+					end else begin
+						SendSkillError(tc, 6);
+						MMode := 4;
+						tc.MTick := Tick + 500;//CR - moved ahead of Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
+					end;
+				end;{Arrow Shower}
+
+			//New skills ---- Alchemist
+			{231:    Potion Pitcher
+				begin
+					j := SearchCInventory(tc, 501, false);
+					if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+						UseItem(tc, j);
+						if (tc.HP > 0) then begin
+							dmg[0] := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;;
+							ts.HP := ts.HP + dmg[0];
+
+							WFIFOW( 0, $011a);
+							WFIFOW( 2, MSkill);
+							WFIFOW( 4, dmg[0]);
+							WFIFOL( 6, MTarget);
+							WFIFOL(10, ID);
+							WFIFOB(14, 1);
+							SendBCmd(tm, ts.Point, 15);
+							tc.MTick := Tick + 1000;
+						end;
+					end;
+				end;}
+
+
+				{CODE-ERROR: You have got to be joking...}
+				{Colus, 20040116: I reorganized this because it was ugly.  It also doesn't
+					abort for the skills which require certain weapon types.}
+			5,42,46,316,324:
+				{ 5   : Bash
+					42  : Mammonite
+					46  : Double Stafing
+					316 : Musical Strike
+					324 : Throw Arrow}
+				begin
+				//É_ÉÅÅ[ÉWéZèo
+					j := 1; // Moved # of hits up here to initialize.
+
+					if (MSkill = 5) then begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+					end else begin
+						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+					end;
+
+					if (MSkill = 316) or (MSkill = 324) then begin
+						if (Weapon = 13) or (Weapon = 14) then begin
+							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+						end else begin
+							//DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+							SendSkillError(tc, 6);
+							tc.MMode := 4;
+							Exit;
+						end;
+					end;
+
+					if (MSkill = 46) then begin       {Double Strafing}
+						if (Weapon = 11) then begin
+							dmg[0] := dmg[0] * 2;
+							j := 2;
+						end else begin
+							SendSkillError(tc, 6);
+							tc.MMode := 4;
+							Exit;
+						end;
+					end;
+
+					if (MSkill = 56) then begin //ÉsÉAÅ[ÉXÇÕts.Data.Scale + 1âÒhit
+						j := ts.Data.Scale + 1;
+						dmg[0] := dmg[0] * j;
+					end;
+
+					//Mammonite
+					if MSkill = 42 then begin
+						// Should check to see if we have the money!
+						if (Zeny >= Cardinal(tl.Data2[MUseLV])) then begin
+							Dec(Zeny, tl.Data2[MUseLV]);
+							// Update zeny
+							SendCStat1(tc, 1, $0014, Zeny);
+						end else begin
+							SendSkillError(tc, 5);
+							tc.MMode := 4;
+							Exit;
+						end;
+					end;
+
+					if dmg[0] < 0 then dmg[0] := 0; //ëÆê´çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+						//ÉpÉPëóêM
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+
+					if (Skill[145].Lv <> 0) and (MSkill = 5) and (MUseLV > 5) then begin //ã}èäìÀÇ´
+						if Random(1000) < Skill[145].Data.Data1[MUseLV] * 10 then begin
+							if (ts.Stat1 <> 3) then begin
+								ts.nStat := 3;
+								ts.BodyTick := Tick + tc.aMotion;
+							end else
+								ts.BodyTick := ts.BodyTick + 30000;
+						end;
+					end;
+
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
+						frmMain.StatCalc1(tc, ts, Tick);
+					end;
+				end;
+
+			11,13,14,19,20,90,156:
+				{11  : Napalm Beat
+				.13  : Soul Strike
+				.14  : Cold Bolt
+				.19  : Fire Bolt
+				.20  : Lightning Bolt
+				.90  : Earth Spike
+				.156 : Holy Light }
+				begin
+					//Magic Attack Calculation
+					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+					dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+					dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+					if dmg[0] < 1 then
+						dmg[0] := 1;
+					dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
+					dmg[0] := dmg[0] * tl.Data2[MUseLV];
+					if dmg[0] < 0 then
+						dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+					//ÉpÉPëóêM
+
+					if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+					frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick);
+					case MSkill of
+					11,90:     tc.MTick := Tick + 1000;
+					13:        tc.MTick := Tick +  800 + 400 * ((MUseLV + 1) div 2) - 300 * (MUseLV div 10);
+					14,19,20 : tc.MTick := Tick +  800 + 200 * MUseLV;
+					else       tc.MTick := Tick + 1000;
+					end;
+				end;
+
+			47:     {Arrow Shower}
+				begin
+					if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
+						WFIFOW(0, $013b);
+						WFIFOW(2, 0);
+						Socket.SendBuf(buf, 4);
+						ATick := ATick + ADelay;
+						Exit;
+					end;
+
+					Dec(Item[Arrow].Amount,9);
+
+					WFIFOW( 0, $00af);
+					WFIFOW( 2, Arrow);
+					WFIFOW( 4, 9);
+					Socket.SendBuf(buf, 6);
+
+					if Item[Arrow].Amount = 0 then begin
+						Item[Arrow].ID := 0;
+						Arrow := 0;
+					end;
+
+					frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+					if dmg[0] < 0 then dmg[0] := 0; //No Negate Damage
+
+					//Send Attack Packet
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then begin
+						frmMain.StatCalc1(tc, ts, Tick);
+					end;
+					xy := ts.Point;
+
+					//Begin Area Effect
+					sl.Clear;
+					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
+								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+									sl.AddObject(IntToStr(ts1.ID),ts1);
+							end;
+						end;
+					end;
+
+					if sl.Count <> 0 then begin
+						for k1 := 0 to sl.Count - 1 do begin
+							ts1 := sl.Objects[k1] as TMob;
+
+							j := 0;
+							case tc.Dir of
+							0:
+								begin
+									if ts1.Point.Y < tc.Point.Y then j := 1;
+								end;
+							1:
+								begin
+									if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+								end;
+							2:
+								begin
+									if ts1.Point.X > tc.Point.X then j := 1;
+								end;
+							3:
+								begin
+									if (ts1.Point.X < tc.Point.X) and (ts1.Point.Y < tc.Point.Y) then j := 1;
+								end;
+							4:
+								begin
+									if ts1.Point.Y > tc.Point.Y then j := 1;
+								end;
+							5:
+								begin
+									if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+								end;
+							6:
+								begin
+									if ts1.Point.X < tc.Point.X then j := 1;
+								end;
+							7:
+								begin
+									if (ts1.Point.X > tc.Point.X) and (ts1.Point.Y > tc.Point.Y) then j := 1;
+								end;
+							end;
+
+							if j <> 1 then begin
+								frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+								if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+
+								//Send Graphics Packet
+								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
+
+								//Damage Process for Monster
+								if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
+									frmMain.StatCalc1(tc, ts1, Tick);
+							end;
+
+						end;
+					end;
+				end;
+
+
 {:119}
 				72: // Status Recovery vs. Mob (undead)
 					begin
@@ -3822,48 +3652,6 @@ Begin
 					end;
 
 				end;
-			214: //Raid
-				begin
-					// Colus, 20040204: Option change, testing option 2 instead of 4+2
-					if (tc.Option and 2 <> 0) then begin
-						tc.Option := tc.Option and $FFFD;
-						tc.Hidden := false;
-						tc.Skill[51].Tick := Tick;
-						tc.SkillTick := Tick;
-						tc.SkillTickID := 51;
-						CalcStat(tc, Tick);
-		  UpdateOption(tm, tc);
-		  xy := tc.Point;
-		  sl.Clear;
-		  j := tl.Range2;
-		  for j1 := (xy.Y - j) div 8 to (xy.Y + j) div 8 do begin
-		  for i1 := (xy.X - j) div 8 to (xy.X + j) div 8 do begin
-		  for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-		  if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-		  if (abs(ts1.Point.X - xy.X) <= j) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-		  sl.AddObject(IntToStr(ts1.ID),ts1);
-		  end;
-		  end;
-		  end;
-		  if sl.Count <> 0 then begin
-		  for k1 := 0 to sl.Count - 1 do begin
-		  ts1 := sl.Objects[k1] as TMob;
-			frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-		  if dmg[0] < 1 then dmg[0] := 1;
-		  if dmg[0] < 0 then dmg[0] := 0;
-		  k := 1;
-		  SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
-			frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick);
-		  end;
-		  end;
-	    end else begin
-	    SendSkillError(tc, 0);
-	    tc.MMode := 4;
-						tc.MPoint.X := 0;
-	    tc.MPoint.Y := 0;
-	    Exit;
-	    end;
-		  end;
 
 				111: // Adrenaline Rush
 					begin
@@ -6169,7 +5957,7 @@ Begin
 					end else begin
 						tc1.SP := 0;
 						//dmg[0] := dmg[0] - (tc1.MDEF1 + tc1.MDEF2);
-						DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+						frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick);
 						SendCStat(tc1);
 					end;
 				end;
