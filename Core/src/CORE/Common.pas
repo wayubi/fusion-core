@@ -3314,8 +3314,21 @@ begin
   if (KilledByP <> 1) or ( (KilledByP = 1) and (Option_PVP_XPLoss) ) then begin
       // Subtract the Experience loss from the .ini
 
-      tc.BaseEXP := tc.BaseEXP - (Round(tc.BaseNextEXP div 100) * DeathBaseLoss);
-      tc.JobEXP := tc.JobEXP - (Round(tc.JobNextEXP div 100) * DeathJobLoss);
+
+      { Wow, major mistake on my behalf. Fatal N version. }
+
+      if ( tc.BaseEXP >= (Round(tc.BaseNextEXP div 100) * DeathBaseLoss) ) then begin
+      	tc.BaseEXP := tc.BaseEXP - (Round(tc.BaseNextEXP div 100) * DeathBaseLoss);
+      end else begin
+      	tc.BaseEXP := 0;
+      end;
+
+      if ( tc.JobEXP >= (Round(tc.JobNextEXP div 100) * DeathJobLoss) ) then begin
+      	tc.JobEXP := tc.JobEXP - (Round(tc.JobNextEXP div 100) * DeathJobLoss);
+      end else begin
+      	tc.JobEXP := 0;
+      end;
+
 
       { Ghetto Harb formulas. I submitted a bug report so long ago for darkweiss.
         But he refused to fix it, saying his calc was better.
