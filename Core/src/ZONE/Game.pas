@@ -1644,28 +1644,7 @@ Begin(* Proc sv3PacketProcess() *)
 						finally
 						end;
 					end //gm cmd #goto
-					else if (Copy(str, 1, 5) = 'kill ') AND
-									((DebugCMD and $0008) <> 0) AND (tid.KillDieAlive = 1) then
-					begin
-						s := Copy(str, 6, 256);
-						try
-							if CharaName.Indexof(s) <> -1 then begin
-	              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-	              tc1.HP := 0;
-								tc1.Sit := 1;
-							  SendCStat1(tc1, 0, 5, tc1.HP);
-							  WFIFOW(0, $0080);
-							  WFIFOL(2, tc1.ID);
-							  WFIFOB(6, 1);
-	              Socket.SendBuf(buf, 7);
-	              WFIFOW( 0, $0080);
-						    WFIFOL( 2, tc1.ID);
-						    WFIFOB( 6, 1);
-						    SendBCmd(tm, tc1.Point, 7);
-							end;
-						finally
-						end;
-					end //GM cmd #kill
+
 					else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
 						s := Copy(str, 7, 256);
 						if s = '' then begin
@@ -1939,37 +1918,6 @@ Begin(* Proc sv3PacketProcess() *)
         end;
 {修正ココまで} {Lit. "To correction coconut"}
       end //GM cmd #unicon
-
-      else if (Copy(str, 1, 7) = 'ccolor ') AND ((DebugCMD AND $0040) <> 0) AND
-      				(tid.ChangeColorStyle = 1) then
-			begin
-        //服の色変更
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 77) then begin
-          tc.ClothesColor := i;
-          UpdateLook(tm, tc, 7, i, 0, true);
-        end;
-      end //GM cmd #ccolor
-
-{髪色変更追加} {Lit. "Color modification of clothes"}
-      else if (Copy(str, 1, 7) = 'hcolor ') AND
-      				(tid.ChangeColorStyle = 1) then
-			begin
-        //髪の色変更
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 8) then begin
-          tc.HairColor := i;
-          UpdateLook(tm, tc, 6, i, 0, true);
-        end;
-
-      end else if (Copy(str, 1, 7) = 'hstyle ') and (tid.ChangeColorStyle = 1) then begin
-        //髪の色変更
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 19) then begin
-          tc.Hair := i;
-          UpdateLook(tm, tc, 1, i, 0, true);
-        end;
-      end //GM cmd #hstyle
 
       else if (Copy(str, 1, 7) = 'option ') AND ((DebugCMD AND $0400) <> 0) AND
       				(tid.ChangeOption = 1) then

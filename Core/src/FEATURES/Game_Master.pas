@@ -92,6 +92,10 @@ var
     function command_return(tc : TChara) : String;
     function command_die(tc : TChara) : String;
     function command_auto(tc : TChara; str : String) : String;
+    function command_hcolor(tc : TChara; str : String) : String;
+    function command_ccolor(tc : TChara; str : String) : String;
+    function command_hstyle(tc : TChara; str : String) : String;
+    function command_kill(str : String) : String;
 
 implementation
 
@@ -111,6 +115,10 @@ implementation
         if sl.IndexOfName('RETURN') > -1 then GM_SAVE := StrToInt(sl.Values['RETURN']) else GM_RETURN := 1;
         if sl.IndexOfName('DIE') > -1 then GM_DIE := StrToInt(sl.Values['DIE']) else GM_DIE := 1;
         if sl.IndexOfName('AUTO') > -1 then GM_AUTO := StrToInt(sl.Values['AUTO']) else GM_AUTO := 1;
+        if sl.IndexOfName('HCOLOR') > -1 then GM_HCOLOR := StrToInt(sl.Values['HCOLOR']) else GM_HCOLOR := 1;
+        if sl.IndexOfName('CCOLOR') > -1 then GM_CCOLOR := StrToInt(sl.Values['CCOLOR']) else GM_CCOLOR := 1;
+        if sl.IndexOfName('HSTYLE') > -1 then GM_HSTYLE := StrToInt(sl.Values['HSTYLE']) else GM_HSTYLE := 1;
+        if sl.IndexOfName('KILL') > -1 then GM_KILL := StrToInt(sl.Values['KILL']) else GM_KILL := 1;
 
         sl.Free;
         ini.Free;
@@ -128,6 +136,10 @@ implementation
         ini.WriteString('Fusion GM Commands', 'RETURN', IntToStr(GM_RETURN));
         ini.WriteString('Fusion GM Commands', 'DIE', IntToStr(GM_DIE));
         ini.WriteString('Fusion GM Commands', 'AUTO', IntToStr(GM_AUTO));
+        ini.WriteString('Fusion GM Commands', 'HCOLOR', IntToStr(GM_HCOLOR));
+        ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
+        ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
+        ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
 
         ini.Free;
     end;
@@ -144,6 +156,10 @@ implementation
         else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
         else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
         else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
+        else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
+        else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
+        else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
+        else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
         ;
 
         error_message(tc, error_msg);
@@ -311,4 +327,73 @@ implementation
 
         sl.Free;
     end;
+
+    function command_hcolor(tc : TChara; str : String) : String;
+    var
+        tm : TMap;
+        i, k : Integer;
+    begin
+        Result := 'GM_HCOLOR Activated';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 8) then begin
+            tc.HairColor := i;
+            UpdateLook(tm, tc, 6, i, 0, true);
+        end;
+    end;
+
+    function command_ccolor(tc : TChara; str : String) : String;
+    var
+        tm : TMap;
+        i, k : Integer;
+    begin
+        Result := 'GM_CCOLOR Activated';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 77) then begin
+            tc.ClothesColor := i;
+            UpdateLook(tm, tc, 7, i, 0, true);
+        end;
+    end;
+
+    function command_hstyle(tc : TChara; str : String) : String;
+    var
+        tm : TMap;
+        i, k : Integer;
+    begin
+        Result := 'GM_HSTYLE Activated';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        Val(Copy(str, 8, 256), i, k);
+        if (k = 0) and (i >= 0) and (i <= 19) then begin
+            tc.Hair := i;
+            UpdateLook(tm, tc, 1, i, 0, true);
+        end;
+    end;
+
+    function command_kill(str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+        tm : TMap;
+    begin
+        Result := 'GM_KILL Activated';
+
+        s := Copy(str, 6, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+            tc1.HP := 0;
+            tc1.Sit := 1;
+            SendCStat1(tc1, 0, 5, tc1.HP);
+
+            WFIFOW( 0, $0080);
+            WFIFOL( 2, tc1.ID);
+            WFIFOB( 6, 1);
+            SendBCmd(tm, tc1.Point, 7);
+        end;
+    end;
+
 end.

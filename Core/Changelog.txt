@@ -1,3 +1,7 @@
+- 05-28-04: Switched GM Command, #kill to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #hstyle to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #ccolor to ALBGM system. [AlexKreuz]
+- 05-28-04: Switched GM Command, #hcolor to ALBGM system. [AlexKreuz]
 - 05-28-04: Added ALBGM command usage succes/error message. [AlexKreuz]
 - 05-28-04: Switched GM Command, #auto to ALBGM system. [AlexKreuz]
 - 05-28-04: Switched GM Command, #die to ALBGM system. [AlexKreuz]
