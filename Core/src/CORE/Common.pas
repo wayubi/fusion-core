@@ -3127,14 +3127,14 @@ begin
 		end else if (tc.Skill[i].Data.MasterLV <> 0) then begin
 			b := 1;
 			for k := 0 to 4 do begin
-                if (tc.Skill[i].Data.ReqJID1 = tc.JID) and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
+                if ((tc.Skill[i].Data.ReqJID1 = 99) or (tc.Skill[i].Data.ReqJID1 = tc.JID)) and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
 					b := 0;
 					continue;
 				end;
 			end;
       if (b <> 0) then begin
         for k := 0 to 4 do begin
-                    if (tc.Skill[i].Data.ReqJID2 = tc.JID) and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
+                    if ((tc.Skill[i].Data.ReqJID2 = 99) or (tc.Skill[i].Data.ReqJID2 = tc.JID)) and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
 					b := 0;
 					continue;
 				end;
