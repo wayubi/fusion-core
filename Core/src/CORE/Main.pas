@@ -6493,7 +6493,7 @@ begin
 	if tpe.Accessory <> 0 then begin
 		with tn1 do begin
 
-            if not assigned(tpe.Data) then Continue;
+            if not assigned(tpe.Data) then Exit;
 
 			if tpe.Data.SkillTime > 0 then begin
 				//Tick System needs to be redone
@@ -9464,9 +9464,35 @@ begin
 	try
 		cmdStart.Enabled := false;
 
-		sv1.Active := true;
-		sv2.Active := true;
-		sv3.Active := true;
+        try
+    		sv1.Active := true;
+        except
+            on ESocketError do begin
+                cmdStart.Enabled := True;
+                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                Exit;
+            end;
+        end;
+
+        try
+		    sv2.Active := true;
+        except
+            on ESocketError do begin
+                cmdStart.Enabled := True;
+                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                Exit;
+            end;
+        end;
+
+        try
+		    sv3.Active := true;
+        except
+            on ESocketError do begin
+                cmdStart.Enabled := True;
+                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                Exit;
+            end;
+        end;
 
 		ServerRunning := true;
 		cmdStop.Enabled := true;

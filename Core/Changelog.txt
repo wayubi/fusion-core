@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-13-04: Starting Fusion on used ports caused crash. [AlexKreuz]
 - 08-13-04: Damage on sacrifice without protected target caused crash. [AlexKreuz]
 - 08-13-04: Undefined pet data caused crash. [AlexKreuz]
 - 08-13-04: Map block access in SendCLeave caused crash. Added error-handling. [AlexKreuz]
