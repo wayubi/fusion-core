@@ -1630,8 +1630,11 @@ begin
         begin
           for i := 0 to 5 do begin
             tc.ParamBase[i] := 1;
-            SendCStat(tc);
           end;
+          tc.BaseLV := 1;
+          tc.BaseEXP := 0;
+          SendCStat(tc);
+
           Inc(tc.ScriptStep);
         end;
       65: //Global Variable
