@@ -2040,7 +2040,7 @@ begin
 		Lucky := Lucky + (Param[5] div 10);
 		Critical := Critical + 1 + (Param[5] div 3);
 
-		MaxWeight := MaxWeight + (Param[0]+Bonus[0]) * 300 + WeightTable[JID];
+		MaxWeight := MaxWeight + (Param[0]- Bonus[0]) * 300 + WeightTable[JID];
 
 		DEF2 := Param[2];
 		MDEF2 := Param[3];
