@@ -335,7 +335,7 @@ begin
                                 tc.SavePoint.Y := 189;
                         end;
 
-                        for i := 0 to 336 do begin
+                        for i := 0 to MAX_SKILL_NUMBER do begin
                                 if SkillDB.IndexOf(i) <> -1 then begin
                                         tc.Skill[i].Data := SkillDB.IndexOfObject(i) as TSkillDB;
                                 end;
