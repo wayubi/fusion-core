@@ -1816,7 +1816,14 @@ Begin
 					end;
 				251:    {Shield Boomerang}
 					begin
-						if (tc.Shield <> 0) then begin
+						if (tc.Shield = 0) then begin
+                            SendSkillError(tc,6);
+							tc.MMode := 4;
+							tc.MPoint.X := 0;
+							tc.MPoint.Y := 0;
+							sl.Free;
+                            exit;
+                        end else begin
 							frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 							if dmg[0] < 0 then
 								dmg[0] := 0;
@@ -1824,12 +1831,6 @@ Begin
 							if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 								frmMain.StatCalc1(tc, ts, Tick);
 							tc.MTick := Tick + 1000;
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							sl.Free;
-							Exit;//safe 2004/04/26
 						end;
 					end;
 
