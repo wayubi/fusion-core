@@ -1110,7 +1110,7 @@ Called when we're shutting down the server *only*
 
     function command_job(tc : TChara; str : String) : String;
     var
-        i, j, k : Integer;
+        i, j, k, l : Integer;
         tm : TMap;
     begin
         Result := 'GM_JOB Failure.';
@@ -1151,13 +1151,14 @@ Called when we're shutting down the server *only*
                 end;
 
                 if (i > LOWER_JOB_END) then begin
-                    i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                    l := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
                     tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
                 end else begin
+                    l := i;
                     tc.ClothesColor := 0;
                 end;
 
-                tc.JID := i;
+                tc.JID := l;
 
                 if (tc.Option <> 0) then begin
                     tc.Option := 0;
@@ -1175,7 +1176,7 @@ Called when we're shutting down the server *only*
                 SendCSkillList(tc);
 
                 // Colus, 20040303: Using newer packet to allow upper job changes
-                UpdateLook(tm, tc, 0, i);
+                UpdateLook(tm, tc, 0, l);
 
                 Result := 'GM_JOB Success. New Job ID is ' + IntToStr(i) + '.';
             end else begin

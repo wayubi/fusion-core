@@ -2146,35 +2146,35 @@ object frmMain: TfrmMain
             Top = 80
             Width = 73
             Height = 26
-            TabOrder = 3
+            TabOrder = 4
           end
           object Edit75: TEdit
             Left = 200
             Top = 120
             Width = 73
             Height = 26
-            TabOrder = 4
+            TabOrder = 5
           end
           object Edit76: TEdit
             Left = 288
             Top = 120
             Width = 73
             Height = 26
-            TabOrder = 5
+            TabOrder = 6
           end
           object Edit77: TEdit
             Left = 200
             Top = 160
             Width = 73
             Height = 26
-            TabOrder = 6
+            TabOrder = 7
           end
           object Edit78: TEdit
             Left = 288
             Top = 160
             Width = 73
             Height = 26
-            TabOrder = 7
+            TabOrder = 8
           end
           object Button22: TButton
             Left = 312
@@ -2182,7 +2182,7 @@ object frmMain: TfrmMain
             Width = 73
             Height = 25
             Caption = 'Save'
-            TabOrder = 8
+            TabOrder = 11
             Visible = False
             OnClick = Button22Click
           end
@@ -2191,7 +2191,7 @@ object frmMain: TfrmMain
             Top = 16
             Width = 73
             Height = 26
-            TabOrder = 9
+            TabOrder = 3
           end
           object ListBox5: TListBox
             Left = 8
@@ -2199,7 +2199,7 @@ object frmMain: TfrmMain
             Width = 177
             Height = 145
             ItemHeight = 18
-            TabOrder = 10
+            TabOrder = 9
           end
           object ListBox6: TListBox
             Left = 200
@@ -2207,7 +2207,7 @@ object frmMain: TfrmMain
             Width = 169
             Height = 145
             ItemHeight = 18
-            TabOrder = 11
+            TabOrder = 10
           end
         end
         object TabSheet14: TTabSheet
