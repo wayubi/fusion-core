@@ -1,10 +1,11 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
-- 12-11-04: Forgot to remove my debug stuff again... [Tsusai]
-- 12-11-04: Added static ip banning (no wildcards yet). [Tsusai]
-- 12-11-04: Updated the backup function for servervars.txt [Tsusai]
-- 12-11-04: Removed unnecessary console commands. [Tsusai]
+- 12-12-04: Account.txt now records last IP used when logging in. [Tsusai]
+- 12-12-04: Forgot to remove my debug stuff again... [Tsusai]
+- 12-12-04: Added static ip banning (no wildcards yet). [Tsusai]
+- 12-12-04: Updated the backup function for servervars.txt [Tsusai]
+- 12-12-04: Removed unnecessary console commands. [Tsusai]
 - 12-11-04: Fixed JCon Account ID list width. [AlexKreuz]
 - 12-11-04: Optimized JCon Account save speed. [AlexKreuz]
 - 12-11-04: Bug #1: Characters with Guild ID 0 could make more Guilds. [AlexKreuz]

@@ -71,6 +71,7 @@ implementation
         else if (tp.Banned = True) then datafile.Add('BANNED : YES');
 
         datafile.Add('ACCESSLEVEL : ' + IntToStr(tp.AccessLevel));
+        datafile.Add('LAST IP : ' + tp.IP);
     end;
     { ------------------------------------------------------------------------------------- }
 
