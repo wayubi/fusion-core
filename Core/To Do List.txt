@@ -1,6 +1,41 @@
 12-23-03: Just a thought [Darkhelmet]
 
 -----------------------------------------------
+December 24, 2003
+
+- Tweak New Map Format (con't)
+  - I don't understand--are you saying the .gat source, or the code source?  If it's code source
+    then we need to fix that, for certain, before releasing.  I didn't see any obvious problem,
+    but I haven't seen the new map format exploded yet either.  Athena uses...whatever they use,
+    I suppose the actual .gats, and doesn't have the problem.  If these are straight .gat ports
+    then we should be fine to fix this. (Colus)
+
+- 2-2 skill requirements (high)
+  - Someone (eliot?) added requirements in the second set of required skills for the 2-2 classes.
+    This is all fine, but right now a monk/aco can't learn anything with the latest skill DB until
+    someone fixes how requirements are read.  And I only tried the one class out.  If this is
+    going in, it also needs to be fixed today. (Colus)
+
+- Drop Rate options (low)
+  - First of all: ItemDropMultiplier works.  number = drop multiplier.  2 = 2x, 3 = 3x, 100 = 100x...
+  - I am flexible on this.  The current idea was to drop ItemDropDenominator from the options and have
+    one prop, DropRate or DropPercentage as you like.  It would default to 100 (%), so you can have 1%
+    drops or 10000% or whatever.  It would be n, in this equation.
+
+    denominator = denominator * 10000 div (n * 100)
+
+    More boring math, I know.  When I mentioned this idea somebody told me Athena is already doing
+    this method (I guess their users are also algebra-deficient like ours).  So it's not original,
+    but it would be cleaner.
+
+    ItemDropPer would become something else, but it would still have the ugly 10000 format.  The
+    effects are not linear, therefore it's not so easy to choose a format.  It could be called
+    DropRareAdjustment or something.  <shrug>
+
+    Colus
+    
+
+    
 December 23, 2003 
 
 [Suggestions by Darkhelmet]
@@ -12,6 +47,7 @@ December 23, 2003
 	  its basically 2 bugs in one. 1 bug was fixed with new maps, but for full fix, the source must be fixed
 	  for THAT section. If there is anything wrong with maps NOW, then I can do nothing because it is
 	  identical to GATs.  However, they can be edited manually using notepad. (Alex)
+
 
 - Guild Wars  (Low priority)
 - Update Triple blow (low priority)
