@@ -389,57 +389,54 @@ begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
 					end;
 				end;
-			15: //check
-				begin
-					str := tn.Script[tc.ScriptStep].Data1[0];
-							 if str = 'zeny'        then begin i := tc.Zeny;        end
-					else if str = 'job'         then begin
-            i := tc.JID;
-            if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
-          end
-					else if str = 'baselevel'   then begin i := tc.BaseLV;      end
-					else if str = 'joblevel'    then begin i := tc.JobLV;       end
-					else if str = 'statuspoint' then begin i := tc.StatusPoint; end
-					else if str = 'skillpoint'  then begin i := tc.SkillPoint;  end
-					else if str = 'option'      then begin i := tc.Option;      end
-					else if str = 'speed'       then begin i := tc.Speed;       end
-					else if str = 'gender'      then begin i := tc.Gender;      end
-{髪色変更追加}
-					else if str = 'hcolor'      then begin i := tc.HairColor;   end
-                                        else if str = 'guildid'     then begin i := GetGuildID(tn);   end
-                                        else if str = 'guildkafra'  then begin i := GetGuildKafra(tn);   end
-                                        else if str = 'ismyguild'   then begin i := CheckGuildID(tn, tc);   end
-                                        else if str = 'ismymaster'   then begin i := CheckGuildMaster(tn, tc);   end
-                                        else if str = 'etrigger'   then begin i := GetGuildETrigger(tn);   end
-                                        else if str = 'dtrigger'   then begin i := GetGuildDTrigger(tn);   end
-{髪色変更追加ココまで}
-					else begin
-{NPCイベント追加ココまで}
-						i := ConvFlagValue(tc, str);
-					end;
-					j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
-{NPCイベント追加ココまで}
+            15: //check
+                begin
+                    str := tn.Script[tc.ScriptStep].Data1[0];
+                    if str = 'zeny'        then begin i := tc.Zeny;        end
+                    else if str = 'job'         then begin
+                        i := tc.JID;
+                        if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
+                    end
+                    else if str = 'baselevel' then i := tc.BaseLV
+                    else if str = 'joblevel' then i := tc.JobLV
+                    else if str = 'statuspoint' then i := tc.StatusPoint
+                    else if str = 'skillpoint' then i := tc.SkillPoint
+                    else if str = 'option' then i := tc.Option
+                    else if str = 'speed' then i := tc.Speed
+                    else if str = 'gender' then i := tc.Gender
+                    else if str = 'hcolor' then i := tc.HairColor
+                    else if str = 'guildid' then i := GetGuildID(tn)
+                    else if str = 'guildkafra' then i := GetGuildKafra(tn)
+                    else if str = 'ismyguild' then i := CheckGuildID(tn, tc)
+                    else if str = 'ismymaster' then i := CheckGuildMaster(tn, tc)
+                    else if str = 'etrigger' then i := GetGuildETrigger(tn)
+                    else if str = 'dtrigger' then i := GetGuildDTrigger(tn)
+                    else if str = 'accesslevel' then i := tc.PData.AccessLevel
+
+					else i := ConvFlagValue(tc, str);
+
+                    j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
+
 					case tn.Script[tc.ScriptStep].Data3[2] of
-					0: flag := boolean(i >= j);
-					1: flag := boolean(i <= j);
-					2: flag := boolean(i  = j);
-					3: flag := boolean(i <> j);
-					4: flag := boolean(i >  j);
-					5: flag := boolean(i <  j);
-					else
-						begin
-							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
-							tc.ScriptStep := $FFFF;
-							break;
+    					0: flag := boolean(i >= j);
+    					1: flag := boolean(i <= j);
+    					2: flag := boolean(i  = j);
+    					3: flag := boolean(i <> j);
+    					4: flag := boolean(i >  j);
+    					5: flag := boolean(i <  j);
+                    else begin
+                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
+                            tc.ScriptStep := $FFFF;
+                            break;
 						end;
-					end;
-					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
-					if flag then begin
-						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
-					end else begin
-						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
-					end;
-				end;
+                    end;
+                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
+                    if flag then begin
+                        tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
+                    end else begin
+                        tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
+                    end;
+                end;
 			16: //checkadditem
 				begin
 {NPCイベント追加}
