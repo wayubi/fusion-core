@@ -155,6 +155,7 @@ var
 	option_mf : string;
 	Idx, i       : Integer;
     tp, tp2        : TPlayer;
+    sl : TStringList;
 	//index used for freeing player/playername lists
 begin
 	Result := False;
@@ -196,46 +197,58 @@ begin
                 end;
             end;
 
-            if UseSQL then
-            	SQLDataSave
-            else
-	            DataSave;
-
-
         end;
 
 
 	//DataSave;
 
 	sv1PacketProcessTo(Socket,w,userid,userpass);
-	AssignFile(addtxt, AppPath + 'addplayer.txt');
-	AssignFile(txt, AppPath + 'player.txt');
-	if not FileExists(AppPath + 'player.txt') then begin
-		Rewrite(txt);
-		Writeln(txt, '##Weiss.PlayerData.0x0002');
-	end else begin
-		Append(txt);
-	end;
 
+	AssignFile(addtxt, AppPath + 'addplayer.txt');
 
 	if FileExists(AppPath + 'addplayer.txt') then begin
 		Reset(addtxt);
 		count := 1;
+        sl := TStringList.Create;
 
-			while not SeekEof(addtxt) do begin
-				Readln(addtxt,userdata);
-				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userdata);
-				Writeln(txt, '0');
-				inc(count);
-			end;
+        while not SeekEof(addtxt) do begin
+        	Readln(addtxt,userdata);
+            sl.DelimitedText := userdata;
 
-		Flush(txt);  { Verifies that text REALLY was written to the file }
-		CloseFile(txt);
+            for i := 0 to PlayerName.Count - 1 do begin
+            	tp2 := PlayerName.Objects[i] as TPlayer;
+                if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
+                	Idx := i + 100101;
+                    Break;
+                end;
+            end;
 
+            if (i = playername.count) then Idx := 100101 + PlayerName.Count;
+
+            tp := TPlayer.Create;
+            tp.ID := Idx;
+            tp.Name := sl.Strings[0];
+            tp.Pass := sl.Strings[1];
+            tp.Gender := StrToInt(sl.Strings[2]);
+            tp.Mail := sl.Strings[3];
+            PlayerName.InsertObject(i, tp.Name, tp);
+            Player.AddObject(tp.ID, tp);
+
+            inc(count);
+            sl.Clear;
+        end;
+
+        sl.Free;
 		Rewrite(addtxt);
 		Flush(addtxt);  { Verifies that text REALLY was written to the file }
 		CloseFile(addtxt);
 
+
+
+        if UseSQL then
+        	SQLDataSave
+        else
+        	DataSave;
 
 		{ChrstphrR 2004/04/25 - Clear's are unsafe
 		for the TPlayer objects, unless you pre-free the Objects[]
@@ -325,24 +338,24 @@ begin
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then Load_Accounts(userid);
 
+            userid2 := userid;
+            if (Option_Username_MF = True) then begin
+            	option_mf := copy(userid, length(userid) - 1, 2);
+                if (option_mf = '_M') or (option_mf = '_F') then
+						userid := copy(userid, 0, length(userid) - 2);
+            end;
+
             if PlayerName.IndexOf(userid) > -1 then begin
             	//DebugOut.Lines.Add ('User Exists');
                 //DebugOut.Lines.Add ('ID: '+inttostr(id));
                 sv1PacketProcessSub(Socket,w,userid,userpass);
             end else begin
-            	userid2 := userid;
-				if (Option_Username_MF = True) then begin
-					option_mf := copy(userid, length(userid) - 1, 2);
-            		if (option_mf = '_M') or (option_mf = '_F') then
-						userid := copy(userid, 0, length(userid) - 2);
-
-                    //DebugOut.Lines.Add ('New User');
-                    if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
-                    	ZeroMemory(@buf[0],23);
-                        WFIFOW( 0, $006a);
-                        WFIFOB( 2, 0);//Unregistered ID
-                        Socket.SendBuf(buf, 23);
-                    end;
+            	//DebugOut.Lines.Add ('New User');
+                if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
+                	ZeroMemory(@buf[0],23);
+                    WFIFOW( 0, $006a);
+                    WFIFOB( 2, 0);//Unregistered ID
+                    Socket.SendBuf(buf, 23);
                 end;
             end;
 		end;//if buf[0]&buf[1]
