@@ -1,5 +1,4 @@
 Fusion 1.2.0.8 - December ????, 2003
-- 12-18-03: Updated item_db.txt (Phen Card, Berzebub Card) [Colus]
 - 12-18-03: Set up CVS Server. Follow this Log Format. [AlexKreuz]
 - 12-17-03: Updated Packet Length Table [Colus]
 - 12-17-03: Added Cast Timer disappearing on non-phen hit [Colus]
