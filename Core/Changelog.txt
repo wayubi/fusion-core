@@ -1,3 +1,4 @@
+- 05-26-04: Translation of comments in Login server code into english [ChrstphrR]
 - 05-26-04: Removed obsoleted TSummon class - and fixed TSummonMobListMVP [ChrstphrR]
 - 05-26-04: Added Provoke's ability to raise the target's attack in PVP. [KyuubiKitsune]
 - 05-26-04: "Objectizing" TParty in preparation for SQL improvements [ChrstphrR]

@@ -52,17 +52,17 @@ begin
 		PlayerIdx := IDTableDB.IndexOf(APlayer.ID);
 
 		if (PlayerIdx = -1) AND (NowUsers >= Option_MaxUsers) then begin
-            ZeroMemory(@buf[0],23);
-            WFIFOW( 0, $006a);
+			ZeroMemory(@buf[0],23);
+			WFIFOW( 0, $006a);
 			WFIFOB( 2, 7);//Server is full.
-            Socket.SendBuf(buf, 23);
-    end;
+			Socket.SendBuf(buf, 23);
+		end;
 
 		if (APlayer.Banned = 1) then begin
-        ZeroMemory(@buf[0],23);
-        WFIFOW( 0, $006a);
+			ZeroMemory(@buf[0],23);
+			WFIFOW( 0, $006a);
 			WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
-        Socket.SendBuf(buf, 23);
+			Socket.SendBuf(buf, 23);
 		end
 		else if APlayer.Pass = userpass then begin
 
@@ -70,44 +70,44 @@ begin
 			APlayer.Login := 1;
 			APlayer.LoginID1 := Random($7FFFFFFF) + 1;
 			if UseSQL then APlayer.LoginID2 := Assign_AccountID()
-        else begin
+			else begin
 				APlayer.LoginID2 := NowLoginID;
-                Inc(NowLoginID);
-        end;
-        if NowLoginID >= 2000000000 then NowLoginID := 0;
+				Inc(NowLoginID);
+			end;
+			if NowLoginID >= 2000000000 then NowLoginID := 0;
 
-        //DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
-        //tp.ver2 := w;
+			//DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
+			//tp.ver2 := w;
 			APlayer.ver2 := 9;
 
-        WFIFOW( 0, $0069);
-        WFIFOW( 2, 79);
+			WFIFOW( 0, $0069);
+			WFIFOW( 2, 79);
 			WFIFOL( 4, APlayer.LoginID1);
 			WFIFOL( 8, APlayer.ID);
 			WFIFOL(12, APlayer.LoginID2);
-        WFIFOL(16, 0);
-        WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
-        WFIFOW(44, 0);
+			WFIFOL(16, 0);
+			WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
+			WFIFOW(44, 0);
 			WFIFOB(46, APlayer.Gender); //sex 0=F 1=M
-        WFIFOL(47, ServerIP);
-        WFIFOW(51, sv2port);
-        WFIFOS(53, ServerName, 20);
-        WFIFOW(73, NowUsers);
-        WFIFOW(75, 0);
-        WFIFOW(77, 0);
-        Socket.SendBuf(buf, 79);
-    end else begin
-        ZeroMemory(@buf[0],23);
-        WFIFOW( 0, $006a);
+			WFIFOL(47, ServerIP);
+			WFIFOW(51, sv2port);
+			WFIFOS(53, ServerName, 20);
+			WFIFOW(73, NowUsers);
+			WFIFOW(75, 0);
+			WFIFOW(77, 0);
+			Socket.SendBuf(buf, 79);
+		end else begin
+			ZeroMemory(@buf[0],23);
+			WFIFOW( 0, $006a);
 			WFIFOB( 2, 1);//Password Incorrect
-        Socket.SendBuf(buf, 23);
-    end;
-  end else begin
-    ZeroMemory(@buf[0],23);
-    WFIFOW( 0, $006a);
+			Socket.SendBuf(buf, 23);
+		end;
+	end else begin
+		ZeroMemory(@buf[0],23);
+		WFIFOW( 0, $006a);
 		WFIFOB( 2, 0);//Unregistered ID
-    Socket.SendBuf(buf, 23);
-  end;
+		Socket.SendBuf(buf, 23);
+	end;
 end;//proc sv1PacketProcessSub()
 
 
@@ -145,6 +145,7 @@ end;//sv1PacketProcessTo()
 // addplayer.txtに書き込んだアカウントデータに
 // トランザクションIDを付け直して取り込む
 //
+// To the account data written in addplayer.txt, Transaction ID is reattached and is taken in.
 function sv1PacketProcessAdd(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string):Boolean;
 var
 	userdata  : string;
@@ -206,11 +207,11 @@ begin
 			end;
 		end;
 
-		Flush(txt);  { テキストが実際にファイルに書き込まれたことを確かめる }
+		Flush(txt);  { Verifies that text REALLY was written to the file }
 		CloseFile(txt);
 
 		Rewrite(addtxt);
-		Flush(addtxt);  { テキストが実際にファイルに書き込まれたことを確かめる }
+		Flush(addtxt);  { Verifies that text REALLY was written to the file }
 		CloseFile(addtxt);
 
 
