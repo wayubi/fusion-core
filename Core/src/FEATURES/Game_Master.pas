@@ -98,6 +98,7 @@ var
     GM_ATHENA_BASELVLUP : Byte;
     GM_ATHENA_LVUP : Byte;
     GM_ATHENA_JOBLVLUP : Byte;
+    GM_ATHENA_JOBLVUP : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -169,6 +170,7 @@ var
     function command_athena_baselvlup(tc : TChara; str : String) : String;
     function command_athena_lvup(tc : TChara; str : String) : String;
     function command_athena_joblvlup(tc : TChara; str : String) : String;
+    function command_athena_joblvup(tc : TChara; str : String) : String;
 
 implementation
 
@@ -269,6 +271,7 @@ implementation
         GM_ATHENA_BASELVLUP := StrToIntDef(sl.Values['ATHENA_BASELVLUP'], 1);
         GM_ATHENA_LVUP := StrToIntDef(sl.Values['ATHENA_LVUP'], 1);
         GM_ATHENA_JOBLVLUP := StrToIntDef(sl.Values['ATHENA_JOBLVLUP'], 1);
+        GM_ATHENA_JOBLVUP := StrToIntDef(sl.Values['ATHENA_JOBLVUP'], 1);
 
         sl.Free;
         ini.Free;
@@ -378,6 +381,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_BASELVLUP', IntToStr(GM_ATHENA_BASELVLUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_LVUP', IntToStr(GM_ATHENA_LVUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVLUP', IntToStr(GM_ATHENA_JOBLVLUP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVUP', IntToStr(GM_ATHENA_JOBLVUP);
 
         ini.Free;
 
@@ -461,6 +465,7 @@ Called when we're shutting down the server *only*
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
             else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
             else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
+            else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2562,6 +2567,77 @@ Called when we're shutting down the server *only*
             SendCStat1(tc, 1, $0002, tc.JobEXP);
 
             Result := 'GM_ATHENA_JOBLVLUP Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
+        end else begin
+            Result := Result + ' Incomplete information or level out of range.';
+        end;
+    end;
+
+    function command_athena_joblvup(tc : TChara; str : String) : String;
+    var
+        i, k, w3 : Integer;
+        oldlevel : Integer;
+    begin
+        Result := 'GM_ATHENA_JOBLVUP Failure.';
+
+        oldlevel := tc.JobLV;
+        Val(Copy(str, 10, 256), i, k);
+
+        if (k = 0) and (i >= -70) and (i <= 70) then begin
+            if i < 0 then begin
+                if (tc.JobLV + i >= 1) then tc.JobLV := tc.JobLV + i
+                else if (tc.JobLV + i < 1) and (tc.JobLV > 1) then begin
+                    tc.JobLV := 1;
+                end else begin
+                    Result := Result + ' Minimum level is 1.';
+                    Exit;
+                end;
+            end else begin
+                if (tc.JID = 0) and (tc.JobLV + i > 10) and (tc.JobLV < 10) then tc.JobLV := 10
+                else if (tc.JID = 0) and (tc.JobLV = 10) then begin
+                    Result := Result + ' Maximum level is 10.';
+                    Exit;
+                end
+                else if (tc.JID > 0) and (tc.JID < 23) and (tc.JobLV + i > 50) and (tc.JobLV < 50) then tc.JobLV := 50
+                else if (tc.JID > 0) and (tc.JID < 23) and (tc.JobLV = 50) then begin
+                    Result := Result + ' Maximum level is 50.';
+                    Exit;
+                end
+                else if (tc.JobLV + i <= 70) then tc.JobLV := tc.JobLV + i
+                else if (tc.JobLV + i > 70) and (tc.JobLV < 70) then begin
+                    tc.JobLV := 70;
+                end else begin
+                    Result := Result + ' Maximum level is 70.';
+                    Exit;
+                end;
+            end;
+
+            for i := 1 to MAX_SKILL_NUMBER do begin
+                if not tc.Skill[i].Card then tc.Skill[i].Lv := 0;
+            end;
+
+            if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
+            else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
+            else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
+
+            SendCSkillList(tc);
+
+            tc.JobEXP := tc.JobNextEXP - 1;
+
+            if tc.JID < 13 then begin
+                w3 := (tc.JID + 5) div 6 + 1;
+            end else begin
+                w3 := 3;
+            end;
+
+            tc.JobNextEXP := ExpTable[w3][tc.JobLV];
+
+            CalcStat(tc);
+            SendCStat(tc);
+            SendCStat1(tc, 0, $0037, tc.JobLV);
+            SendCStat1(tc, 0, $000c, tc.SkillPoint);
+            SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+            Result := 'GM_ATHENA_JOBLVUP Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
         end else begin
             Result := Result + ' Incomplete information or level out of range.';
         end;
