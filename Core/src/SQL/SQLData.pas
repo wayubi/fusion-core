@@ -252,7 +252,7 @@ begin
 	Application.ProcessMessages;}
 
   {读取工会资料}
-	DebugOut.Lines.Add('Guild data loading from SQL...');
+	{DebugOut.Lines.Add('Guild data loading from SQL...');
 	Application.ProcessMessages;
 
   if ExecuteSqlCmd('SELECT * FROM guild_info') then
@@ -316,13 +316,13 @@ begin
 	Application.ProcessMessages;
 
   {循环所有工会，读取工会成员等资料}
-  for i := 0 to GuildList.Count - 1 do
+  {for i := 0 to GuildList.Count - 1 do
 	begin
 		tg := GuildList.Objects[i] as TGuild;
 		with tg do
 		begin
 		  {读取工会成员资料}
-		  if ExecuteSqlCmd(Format('SELECT * FROM guild_members WHERE GDID=''%d'' LIMIT 36', [ID])) then
+		  {if ExecuteSqlCmd(Format('SELECT * FROM guild_members WHERE GDID=''%d'' LIMIT 36', [ID])) then
 			begin
 			  j := 0;
 			  while not SQLDataSet.Eof do
@@ -340,7 +340,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会称号资料}
-			if ExecuteSqlCmd(Format('SELECT * FROM guild_positions WHERE GDID=''%d'' LIMIT 20', [ID])) then
+			{if ExecuteSqlCmd(Format('SELECT * FROM guild_positions WHERE GDID=''%d'' LIMIT 20', [ID])) then
 			begin
 			  j := 0;
 				while not SQLDataSet.Eof do
@@ -357,7 +357,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会开除成员记录}
-			if ExecuteSqlCmd(Format('SELECT * FROM guild_banish WHERE GDID=''%d''', [ID])) then
+			{if ExecuteSqlCmd(Format('SELECT * FROM guild_banish WHERE GDID=''%d''', [ID])) then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -373,7 +373,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取同盟、敌对工会}
-			if ExecuteSqlCmd(Format('SELECT * FROM guild_allies WHERE GDID=''%d''', [ID])) then
+			{if ExecuteSqlCmd(Format('SELECT * FROM guild_allies WHERE GDID=''%d''', [ID])) then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -397,7 +397,7 @@ begin
 	end;
 
 	DebugOut.Lines.Add(Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
-	Application.ProcessMessages;
+	Application.ProcessMessages;}
 
 	sl.Free;
 end;

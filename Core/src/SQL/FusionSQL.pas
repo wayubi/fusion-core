@@ -12,6 +12,7 @@ uses
         function Load_Characters(GID: cardinal) : Boolean;
         function Load_Parties(GID: cardinal) : Boolean;
         function Load_Pets(AID: cardinal) : Boolean;
+        function Load_Guilds(GID: cardinal) : Boolean;
 
 implementation
 
@@ -553,6 +554,148 @@ begin
                 DebugOut.Lines.Add('Pet data loading error...');
                 Exit;
         end;
+
+        Result := True;
+end;
+
+function Load_Guilds(GID: cardinal) : Boolean;
+var
+        query : string;
+        tc : TChara;
+        tg : TGuild;
+	tgb : TGBan;
+	tgl : TGRel;
+        i, j : integer;
+        sl : TStringList;
+begin
+	sl := TStringList.Create;
+	sl.QuoteChar := '"';
+	sl.Delimiter := ',';
+        
+        Result := False;
+
+        query := 'SELECT G.*, M.* FROM guild_info AS G LEFT JOIN guild_members AS M ON (G.GDID=M.GDID) WHERE M.GID = '''+inttostr(GID)+''' LIMIT 1';
+        debugout.lines.add(query);
+        if (MySQL_Query(query)) then begin
+                while not SQLDataSet.Eof do begin
+                        tg := TGuild.Create;
+                        with tg do begin
+                                ID := StrToInt(SQLDataSet.FieldValues['GDID']);
+                                if assigned (GuildList) then begin
+                                        if (GuildList.IndexOf(tg.ID) <> -1) then begin
+                                                tg := GuildList.Objects[GuildList.IndexOf(tg.ID)] as TGuild;
+                                        end;
+                                end;
+                                if (ID > NowGuildID) then NowGuildID := ID;
+                                Name := (SQLDataSet.FieldValues['Name']);
+                                LV := StrToInt(SQLDataSet.FieldValues['LV']);
+                                EXP := StrToInt(SQLDataSet.FieldValues['EXP']);
+                                GSkillPoint := StrToInt(SQLDataSet.FieldValues['GSkillPoint']);
+                                Notice[0] := (SQLDataSet.FieldValues['Subject']);
+                                Notice[1] := (SQLDataSet.FieldValues['Notice']);
+                                Agit := (SQLDataSet.FieldValues['Agit']);
+                                Emblem := StrToInt(SQLDataSet.FieldValues['Emblem']);
+                                Present := StrToInt(SQLDataSet.FieldValues['Present']);
+                                DisposFV := StrToInt(SQLDataSet.FieldValues['DisposFV']);
+                                DisposRW := StrToInt(SQLDataSet.FieldValues['DisposRW']);
+
+                                for i := 10000 to 10004 do begin
+                                        if (GSkillDB.IndexOf(i) <> -1) then begin
+                                                GSkill[i].Data := GSkillDB.IndexOfObject(i) as TSkillDB;
+                                        end;
+                                end;
+
+                                sl.Clear;
+                                sl.DelimitedText := SQLDataSet.FieldValues['skill'];
+
+                                for i := 0 to ((sl.Count div 2) - 1) do begin
+                                        if (GSkillDB.IndexOf(strtoint(sl.Strings[0+i*2])) <> -1) then begin
+                                                GSkill[strtoint(sl.Strings[0+i*2])].Lv := strtoint(sl.Strings[1+i*2]);
+                                                GSkill[strtoint(sl.Strings[0+i*2])].Card := false;
+                                        end;
+                                end;
+                        end;
+                        GuildList.AddObject(tg.ID, tg);
+                        SQLDataSet.Next;
+                end;
+        end;
+
+        with tg do begin
+                query := 'SELECT * FROM guild_members WHERE GDID = '''+inttostr(tg.ID)+'''';
+                debugout.lines.add(query);
+                if (MySQL_Query(query)) then begin
+                        i := 0;
+                        while not SQLDataSet.Eof do begin
+                                if i > 35 then break;
+                                MemberID[i] := StrToInt(SQLDataSet.FieldValues['GID']);
+                                MemberPos[i] := StrToInt(SQLDataSet.FieldValues['PositionID']);
+                                MemberEXP[i] := StrToInt(SQLDataSet.FieldValues['MemberExp']);
+                                if (MemberID[i] <> 0) then Inc(RegUsers, 1);
+                                inc(i);
+                                SQLDataSet.Next;
+                        end;
+                end;
+
+                query := 'SELECT * FROM guild_positions WHERE GDID = '''+inttostr(tg.ID)+''' LIMIT 20';
+                debugout.lines.add(query);
+                if (MySQL_Query(query)) then begin
+                        i := 0;
+                        while not SQLDataSet.Eof do begin
+                                PosName[i] := (SQLDataSet.FieldValues['PosName']);
+                                PosInvite[i] := StrToBool(SQLDataSet.FieldValues['PosInvite']);
+                                PosPunish[i] := StrToBool(SQLDataSet.FieldValues['PosPunish']);
+                                PosEXP[i] := StrToInt(SQLDataSet.FieldValues['PosEXP']);
+                                inc(i);
+                                SQLDataSet.Next;
+                        end;
+                end;
+
+                query := 'SELECT * FROM guild_banish WHERE GDID = '''+inttostr(tg.ID)+'''';
+                debugout.lines.add(query);
+                if (MySQL_Query(query)) then begin
+                        i := 0;
+                        while not SQLDataSet.Eof do begin
+                                tgb := TGBan.Create;
+                                tgb.Name := (SQLDataSet.FieldValues['MemberName']);
+                                tgb.AccName := (SQLDataSet.FieldValues['MemberAccount']);
+                                tgb.Reason := (SQLDataSet.FieldValues['Reason']);
+                                GuildBanList.AddObject(tgb.Name, tgb);
+                                SQLDataSet.Next;
+                        end;
+                end;
+
+                query := 'SELECT * FROM guild_allies WHERE GDID = '''+inttostr(tg.ID)+'''';
+                debugout.lines.add(query);
+                if (MySQL_Query(query)) then begin
+                        i := 0;
+                        while not SQLDataSet.Eof do begin
+                                tgl := TGRel.Create;
+                                tgl.ID := StrToInt(SQLDataSet.FieldValues['GDID']);
+                                tgl.GuildName := (SQLDataSet.FieldValues['GuildName']);
+                                if (SQLDataSet.FieldValues['Relation'] = 1) then RelAlliance.AddObject(tgl.GuildName, tgl)
+                                else RelHostility.AddObject(tgl.GuildName, tgl);
+                                SQLDataSet.Next;
+                        end;
+                end;
+
+                tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
+                debugout.lines.add('ASSIGN GUILD');
+                for j := 0 to 35 do begin
+                        if MemberID[j] = tc.CID then begin
+                                tc.GuildName := Name;
+                                tc.GuildID := tg.ID;
+                                tc.ClassName := PosName[MemberPos[j]];
+                                tc.GuildPos := j;
+                                Member[j] := tc;
+                                if (j = 0) then MasterName := tc.Name;
+                                SLV := SLV + tc.BaseLV;
+                                break;
+                        end;
+                end;
+        end;
+
+        Result := True;
+        sl.Free;
 end;
 
 end.

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-05-04: FusionSQL -> Created Load_Guilds. [AlexKreuz]
 - 03-05-04: FusionSQL -> Optimized Pets Loading Algorithm. [AlexKreuz]
 - 03-05-04: FusionSQL -> Created Load_Pets. [AlexKreuz]
 - 03-05-04: FusionSQL -> Optimized Party Loading Algorithm. [AlexKreuz]

@@ -177,12 +177,13 @@ begin
 				if b > 4 then exit;
 
 
-			  if UseSQL then GetCharaPartyGuild(tp.CID[b]);
+			  //if UseSQL then GetCharaPartyGuild(tp.CID[b]);
 				if tp.CData[b] <> nil then begin
 					tc := tp.CData[b];
 
                                         if UseSQL then Load_Parties(tc.CID);
                                         if UseSQL then Load_Pets(tc.ID);
+                                        if UseSQL then Load_Guilds(tc.CID);
 {NPCƒCƒxƒ“ƒg’Ç‰Á}
 					i := MapInfo.IndexOf(tc.Map);
 					j := -1;
