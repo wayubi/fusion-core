@@ -1,4 +1,7 @@
-- 01-08-04: Fixed a pathfinding shit. Monsters should be able to snipe over cliffs only now. [AlexKreuz]
+- 01-08-04: Fixed Player spells can not be cast over walls anymore. [AlexKreuz]
+- 01-08-04: Fixed Archer-Type monsters can attack over cliffs now. [AlexKreuz]
+- 01-08-04: Fixed Archer-Type monsters can not attack over walls anymore. [AlexKreuz]
+- 01-08-04: Serious Rewrite of Pathfinding. [AlexKreuz]
 - 01-08-04: Fixed Unable to snipe over cliffs bug. [AlexKreuz]
 - 01-08-04: Added Athena GM Commands - @heal. [AlexKreuz]
 - 01-08-04: Added Athena GM Commands - @kami, @kamib. [AlexKreuz]

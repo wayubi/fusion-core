@@ -15301,9 +15301,12 @@ begin
 							if Boolean(MMode and $02) then begin
 								CreateField(tc,Tick);
 							end else if Boolean(MMode and $01) then begin
-								pcnt := 0;
+                                                                ts := tc.adata;
+                                                                if (Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, ts.Point.X, ts.Point.Y, 2) <> 0) then begin
 								SkillEffect(tc,Tick);
+                                                                end;
 								MTarget := 0;
+                                                                pcnt := 0;
 							end;
             if Boolean(MMode xor $04) then
               if (tc.ItemSkill = false) then begin
