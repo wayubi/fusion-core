@@ -1377,9 +1377,10 @@ end;
 												WFIFOB(12, 0);
 												SendBCmd(tc.MData, tc.Point, 13);
 											end;
-											SendCStat(tc);
+                      // Colus, 20040203: Don't need two of these, do we?
+											//SendCStat(tc);
 											CalcStat(tc);
-                      SendCStat(tc);
+                      SendCStat(tc, true); // Add the true to recalc sprites
 											SendCSkillList(tc);
 											WFIFOW(0, $00c3);
 											WFIFOL(2, tc.ID);
@@ -4301,16 +4302,16 @@ end;
 		//--------------------------------------------------------------------------
 		$0113: //ターゲット指定or瞬時発動スキル
 			begin
+        // OK, you have to know what you're trying to cast first.  Is it
+        // Cast Cancel?
 
-        {
-				if (((tc.MMode <> 0) and (tc.MSkill <> 277)) or
-            ((tc.MMode = 0) and (tc.MTick > timeGetTime())) ) then continue;}
-        // Colus, 20040203: You can't comment this out.  Otherwise people can
-        // recast self-targeted spells indefinitely.  Figure out an if check
-        // that incorporates both cases and use that.  I started above, but
-        // that isn't correct yet.
-        if tc.MMode <> 0 then continue;   // <- Leave that in!
-        if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
+        RFIFOW(4, w);
+
+        //if ((tc.MMode <> 0) and (tc.MSkill <> 275)) then continue;   // <- Leave that in!
+        //if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
+
+				if (((tc.MMode <> 0) and (w <> 275)) or
+            ((tc.MMode = 0) and ((tc.MTick > timeGetTime()) or (w = 275))) ) then continue;
 {チャットルーム機能追加}
 				//入室中のスキル使用無効
 				if (tc.ChatRoomID <> 0) then continue;
@@ -4320,8 +4321,16 @@ end;
 				if (tc.VenderID <> 0) then continue;
 {露店スキル追加ココまで}
 
+
+        // Now we need to save the previous spell off somewhere to pick it up
+        // when we actually perform the Cast Cancel effect.
+        if (w = 275) then begin
+          tc.Skill[275].Effect1 := tc.MSkill;
+          tc.Skill[275].EffectLV := tc.MUseLV;
+        end;
+
 				RFIFOW(2, tc.MUseLV);
-				RFIFOW(4, tc.MSkill);
+				tc.MSkill := w; // We already read this above... RFIFOW(4, tc.MSkill);
 				RFIFOL(6, tc.MTarget);
 				tc.MPoint.X := 0;
 				tc.MPoint.Y := 0;

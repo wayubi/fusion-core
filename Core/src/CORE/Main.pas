@@ -7437,6 +7437,10 @@ begin
                                 275:    {Cast Cancel}
                                         begin
                                                 //tc.SP := tc.SP - tc.Skill
+                                                // Colus, 20040203:
+                                                // Reduce SP of last casted spell (saved in Effect1 and EffectLV) by factor based on CC's level
+                                                tc.SP := tc.SP - (Skill[Skill[275].Effect1].Data.SP[Skill[275].EffectLV] * Skill[275].Data.Data2[tc.MUseLV] div 100);
+                                                if tc.SP < 0 then tc.SP := 0;
                                                 tc.MMode := 0;
 				                tc.MTick := Tick;
 				                tc.MTarget := 0;
