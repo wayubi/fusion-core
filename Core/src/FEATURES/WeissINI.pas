@@ -65,7 +65,6 @@ uses
         ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
         ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
         ini.WriteString('Server', 'MapGMsg', MapGMsg);
-        ini.WriteString('Server', 'MapUnloadTime', IntToStr(MapUnloadTime));
 
         ini.WriteString('Option', 'Left', IntToStr(FormLeft));
         ini.WriteString('Option', 'Top', IntToStr(FormTop));
@@ -105,13 +104,15 @@ uses
         ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
         ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
         // MySQL Server Lines
-        
+
         {ChrstphrR 2004/05/09 - Debug section added to INI file
         Controls options that allow/supress when errors occur - these features
         will be useful to Devs in Core/DB/Scripts, and people modifying both
         Database and Script files for testing.}
         ini.WriteString('Debug', 'ShowDebugErrors', BoolToStr(ShowDebugErrors));
-        
+
+        ini.WriteString('Toys', 'MapUnloadTime', IntToStr(MapUnloadTime));
+
         ini.Free;
     end;
 

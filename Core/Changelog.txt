@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-25-04: Corrected a mistake on INI. [Tsusai]
 - 09-25-04: Uncommented Darkhelemet's MapUnload. [Tsusai]
 - 09-25-04: Added MapUnload to the INI. [Tsusai]
 - 09-25-04: Fixed problem with Areawarp. [Tsusai
