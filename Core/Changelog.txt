@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-21-03: Fixed Minor Bug With Finger Offensive [Darkhelmet]
 - 12-21-03: Fixed Map Point System. Major bug that causes many problems. [AlexKreuz]
             - Archers can not shoot through walls anymore.
             - Monsters/Players can not jump cliffs/walls anymore.

@@ -5315,7 +5315,7 @@ begin
                                 end;
                                 267:    {Finger Offensive}
                                 begin
-                                        if spiritSpheres >= tc.Skill[267].Lv then begin
+                                        if spiritSpheres >= tc.MUseLV then begin
 					//ƒ_ƒ[ƒWZ
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						if dmg[0] < 1 then begin
@@ -5329,7 +5329,7 @@ begin
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 						DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                 tc.MTick := Tick + 1000;
-                                                spiritSpheres := 0;
+                                                spiritSpheres := spiritSpheres - tc.MUseLV;
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                         end;
                                 end;
@@ -7764,7 +7764,7 @@ begin
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                                 end;
                                 267:  //Finger Offensive
-                                                if spiritSpheres >= tc.Skill[267].Lv then begin
+                                                if spiritSpheres >= tc.MUseLV then begin
 						        //ƒ_ƒ[ƒWZ
 						        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						        if dmg[0] < 1 then begin
@@ -7778,7 +7778,7 @@ begin
 						                SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
 						                DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                                 tc.MTick := Tick + 1000;
-                                                spiritSpheres := 0;
+                                                spiritSpheres := spiritSpheres - tc.MUseLV;
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                                 end;
                                 273:  //Combo Finish
