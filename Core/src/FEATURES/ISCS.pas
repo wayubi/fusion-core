@@ -82,7 +82,7 @@ uses
 
         if AnsiPos('PRIVMSG', AResponse) > 0 then begin
             nickname := Copy(AResponse, 2, AnsiPos('!', AResponse) - 2);
-            body := AnsiRightStr(AResponse, length(AResponse) - AnsiPos('PRIVMSG #fusionservers :', AResponse) - length('PRIVMSG #fusionservers :') + 1 );
+            body := AnsiRightStr(AResponse, length(AResponse) - AnsiPos('PRIVMSG #Fusion :', AResponse) - length('PRIVMSG #Fusion :') + 1 );
 
             if (ISCS_PREVIOUS = AResponse) then Exit;
 
@@ -116,7 +116,7 @@ uses
         
         ISCS_SERVER := 'irc.z4znet.com';
         ISCS_PORT := '6667';
-        ISCS_CHANNEL := '#fusionservers';
+        ISCS_CHANNEL := '#fusion';
 
         if (tc = nil) then ISCS_NICK := 'Server'
         else ISCS_NICK := tc.Name;

@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-17-04: Added 'Tested & Confirmed' 9 character slot support. [AlexKreuz]
+- 10-17-04: ISCS: Moved default channel back to #Fusion. [AlexKreuz]
 - 10-16-04: REED: Optimized Castle/Parties/Guild Loading. [AlexKreuz]
 - 10-16-04: REED: Restructured Castle Saving. [AlexKreuz]
 - 10-16-04: ISCS: Provided option to turn off ISCS on startup. [AlexKreuz]

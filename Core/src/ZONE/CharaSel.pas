@@ -100,7 +100,7 @@ begin
 						WFIFOW(0, $006b);
 						cnt := 0;
 						if tp.ver2 = 9 then w := 24 else w := 4;
-						if tp.ver2 = 9 then j := 5 else j := 3;
+						if tp.ver2 = 9 then j := 9 else j := 3;
 						for i := 0 to j - 1 do begin
 							if tp.CData[i] <> nil then begin
 								ZeroMemory(@buf[w+(cnt*106)], 106);
@@ -188,7 +188,6 @@ begin
                 {2重ログインチェック　ここまで}
 
                 RFIFOB(2, b);
-				if b > 4 then exit;
 
                 //if UseSQL then GetCharaPartyGuild(tp.CID[b]);
                 tc := tp.CData[b];
@@ -223,21 +222,23 @@ begin
                 WFIFOW(26, sv3port);
                 Socket.SendBuf(buf, 28);
             end;
-		$0067: //キャラ作成要求
+		$0067: { -- Create New Character -- }
 			begin
 				if Socket.Data = nil then exit;
 				tp := Socket.Data;
 
-				//スロットがあいているかどうかチェック
+				{ - Retrieve Character Slot -}
 				RFIFOB(32, b);
-				if b > 4 then exit;
+
+                { - Fail character creation: Slot contains character data - }
 				if tp.CData[b] <> nil then begin
 					WFIFOW(0, $006e);
 					WFIFOB(2, 2);
 					Socket.SendBuf(buf, 3);
 					exit;
 				end;
-				//パラメータに不正がないかチェック
+
+				{ - Fail character creation: Stat points exceed 9 or are below 1 - }
 				b := 0;
 				for i := 0 to 5 do begin
 					RFIFOB(i+26, bb[i]);
@@ -250,31 +251,34 @@ begin
 						b := b + bb[i];
 					end;
 				end;
+
+                { - Fail character creation: Total stat points are not 30 - }
 				if b <> 30 then begin
 					WFIFOW(0, $006e);
 					WFIFOB(2, 2);
 					Socket.SendBuf(buf, 3);
 					exit;
 				end;
-				//名前が既に使われていないかチェック
+
+				{ - Fail character creation: Character name already exists - }
 				str1 := RFIFOS(2, 24);
 				if UseSQL then begin
-				  if CheckUserExist(str1) then begin
-			  		WFIFOW(0, $006e);
-			  		WFIFOB(2, 0);
-			  		Socket.SendBuf(buf, 3);
-			  		exit;
-			  	end;
+                    if CheckUserExist(str1) then begin
+			  		    WFIFOW(0, $006e);
+			  		    WFIFOB(2, 0);
+			  		    Socket.SendBuf(buf, 3);
+			  		    exit;
+			  	    end;
 				end else begin
-				if CharaName.IndexOf(str1) <> -1 then begin
-					WFIFOW(0, $006e);
-					WFIFOB(2, 0);
-					Socket.SendBuf(buf, 3);
-					exit;
-				end;
+				    if CharaName.IndexOf(str1) <> -1 then begin
+					    WFIFOW(0, $006e);
+    					WFIFOB(2, 0);
+	    				Socket.SendBuf(buf, 3);
+		    			exit;
+			    	end;
 				end;
 
-				//キャラデータ作成
+				{ - Character creation successful - }
 				tc := TChara.Create;
 				with tc do begin
 					ID := tp.ID;
