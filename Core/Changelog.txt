@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+
+- 01-27-04: Corrected Deviace Card effect [Colus]
+- 01-27-04: Some comment cleanups [Colus]
+- 01-27-04: Updated damage process for stone/freeze conditions [Colus]
 - 01-26-04: Base & Job Exp capped at 999x to stop MVP Fatal Crashes. [AlexKreuz]
 - 01-26-04: Fixed Characters disappear after double-login Bug. [AlexKreuz]
 - 01-26-04: Fixed Rogue's Discount Skill No Effect Bug. [AlexKreuz]
