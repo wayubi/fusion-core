@@ -1580,16 +1580,16 @@ object frmMain: TfrmMain
           object Label84: TLabel
             Left = 256
             Top = 320
-            Width = 13
+            Width = 17
             Height = 18
-            Caption = 'SP'
+            Caption = 'SP:'
           end
           object Label83: TLabel
             Left = 200
             Top = 320
-            Width = 15
+            Width = 19
             Height = 18
-            Caption = 'HP'
+            Caption = 'HP:'
           end
           object Label82: TLabel
             Left = 144
