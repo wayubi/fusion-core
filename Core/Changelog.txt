@@ -2,7 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
-- 12-30-03: Fixed Invate join party message were showing on target. [Michen]
+- 12-30-03: Fixed Invate join party fail message were showing on target. [Michen]
 - 12-29-03: Updated Sanctuary heal time, heal conditions, damage, shape [Colus]
 - 12-29-03: Fixed Non-Aggro Tanking Bug. Tanking is now possible. [AlexKreuz]
 - 12-29-03: Added Console Command "-save" for saving DBs. [AlexKreuz]
