@@ -1967,7 +1967,7 @@ end;
 										        xy.X := Random(tm.Size.X - 2) + 1;
 										        xy.Y := Random(tm.Size.Y - 2) + 1;
 										        Inc(j);
-									        until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 1)) or (j = 100) );
+									        until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
 
 									        if j <> 100 then begin
 										        UseUsableItem(tc, w);
@@ -2038,7 +2038,7 @@ end;
 											ts.Point.X := tc.Point.X + Random(11) - 5;
 											ts.Point.Y := tc.Point.Y + Random(11) - 5;
 											Inc(j);
-										until ( ((tm.gat[ts.Point.X, ts.Point.Y] <> 0) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5))  or (j = 10) );
+										until ( ((tm.gat[ts.Point.X, ts.Point.Y] <> 1) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5))  or (j = 10) );
 										if (j = 10) then begin
 											ts.Point.X := tc.Point.X;
 											ts.Point.Y := tc.Point.Y;

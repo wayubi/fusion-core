@@ -2914,7 +2914,7 @@ begin
 			//DebugOut.Lines.Add('		BlockMove OK');
 	end;
 
-	if (tm.gat[Point.X][Point.Y] <> 0) and (tm.gat[Point.X][Point.Y] <> 5) then begin
+	if (tm.gat[Point.X][Point.Y] <> 1) and (tm.gat[Point.X][Point.Y] <> 5) then begin
 			//ワープポイントに入った
 			for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
 				for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
