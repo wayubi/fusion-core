@@ -51,6 +51,7 @@ uses
     procedure create_upnp(port : Integer; name : String);
     procedure destroy_upnp(port : Integer);
     procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);
+    function JIDFixer(ID:integer) : integer;
 
 implementation
 
@@ -932,6 +933,13 @@ uses
         WFIFOW(2, w);
         WFIFOS(4, str, w - 4);
         tc1.Socket.SendBuf(buf, w);
+    end;
+
+    function JIDFixer(ID:integer) : integer;
+    begin
+        if (ID > UPPER_JOB_BEGIN) then
+            Result :=  ID - UPPER_JOB_BEGIN + LOWER_JOB_END // (RN 4001 - 4000 + 23 = 24
+        else Result := ID;
     end;
 
 end.

@@ -1641,7 +1641,7 @@ var
 
 
 	//exp_db
-	ExpTable        :array[0..3] of array[0..255] of cardinal;
+	ExpTable        :array[0..8] of array[0..255] of cardinal;
 	//job_db1
 	WeightTable     :array[0..MAX_JOB_NUMBER] of word;
 	HPTable         :array[0..MAX_JOB_NUMBER] of word;
@@ -2509,8 +2509,7 @@ begin
 		end;
 
 
-		JIDFix := tc.JID;
-		if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+		JIDFix := JIDFixer(tc.JID);
 		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
 		{g := int (Tick / 3600000);
 		 // Darkhelmet Auto Day/Night
@@ -2646,7 +2645,7 @@ begin
         except
         	i := 65536
         end;
-        
+
         if (i > 65535) then begin
 				MAXHP := 65535;
 		//end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
@@ -3022,10 +3021,21 @@ begin
 			if SPDelay[i] < 150 then SPDelay[i] := 150;
 		end;
 
-		BaseNextEXP := ExpTable[0][BaseLV];
-		if      JIDFix = 0 then i := 1
-		else if JIDFix < 7 then i := 2
-		else                 i := 3;
+
+        case JIDFix of
+        0: i := 1;
+        1..6: i := 2;
+        7..22: i := 3;
+        23: i := 4;
+        24: i := 6;
+        25..30: i := 7;
+        31..45: i := 8;
+        else i := 8;
+        end;
+
+        if i < 5 then BaseNextEXP := ExpTable[0][BaseLV]
+        else BaseNextEXP := ExpTable[5][BaseLV];
+
 		JobNextEXP := ExpTable[i][JobLV];
 
 
@@ -6025,15 +6035,33 @@ end;
 //個人のレベルアップ用
 procedure CalcLvUP(tc1:TChara; EXP:cardinal; JEXP:cardinal);
 var
-	j:Integer;
+    JIDFix : word;
+    j,job,base: byte;
 	tm:TMap;
 begin
 	tm := tc1.MData;
 
+    JIDFix := JIDFixer(tc1.JID);
+
+    case JIDFix of
+        (*  j is the appropritate job column for the exptable
+            job is the job type identifyer.  max job 10 is 1, max job 50 is 2, max job 70 is 3
+            base is the appropriate base column to use. - Tsusai 12/13/04*)
+
+        0: begin j:= 1; job := 1; base := 0; end;
+        1..6: begin j:= 2; job := 2; base := 0; end;
+        7..22: begin j:= 3; job := 2; base := 0; end;
+        23: begin j:= 4; job := 3; base := 0; end;
+        24: begin j:= 6; job := 1; base := 5; end;
+        25..30: begin j:= 7; job := 2; base := 5; end;
+        31..45: begin j:= 8; job := 3; base := 5; end;
+        else begin j:= 9; job := 2; base := 5; end;
+    end;
+
 	if DisableLevelLimit or (tc1.BaseLV < 99) then
 		tc1.BaseEXP := tc1.BaseEXP + EXP;
 
-	if DisableLevelLimit or (((tc1.JID = 0) or (tc1.JID = 4001))  and (tc1.JobLV < 10)) or ((tc1.JID <> 0) and (tc1.JobLV < 50)) then
+	if DisableLevelLimit or ((job = 1) and (tc1.JobLV < 10)) or ((job = 2) and (tc1.JobLV < 50)) or ((job = 3) and (tc1.JobLV < 70)) then
 		tc1.JobEXP := tc1.JobEXP + JEXP;
 
 	if tc1.BaseEXP >= tc1.BaseNextEXP then begin
@@ -6056,8 +6084,8 @@ begin
 				tc1.BaseEXP := 0;
 			end;
 
-            if (ExpTable[0][tc1.BaseLV] = 0) then tc1.BaseNextEXP := 999999999
-            else tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
+            if (ExpTable[base][tc1.BaseLV] = 0) then tc1.BaseNextEXP := 999999999
+            else tc1.BaseNextEXP := ExpTable[base][tc1.BaseLV];
 
 		end;
 		SendCStat1(tc1, 0, $000b, tc1.BaseLV);
@@ -6080,7 +6108,7 @@ begin
 			//ジョブレベルアップ
 			Inc(tc1.SkillPoint);
 			Inc(tc1.JobLV);
-			if DisableLevelLimit or ((tc1.JID = 0) and (tc1.JobLV < 10)) or ((tc1.JID <> 0) and (tc1.JobLV < 50)) then begin
+			if DisableLevelLimit or ((job = 1) and (tc1.JobLV < 10)) or ((job = 2) and (tc1.JobLV < 50)) or ((job = 3) and (tc1.JobLV < 70)) then begin
 				tc1.JobEXP := tc1.JobEXP - tc1.JobNextEXP;
 				if (tc1.JobEXP >= tc1.JobNextEXP) and (not DisableLevelLimit) then begin
 					tc1.JobEXP := tc1.JobNextEXP - 1;
@@ -6089,11 +6117,6 @@ begin
 				tc1.JobEXP := 0;
 			end;
 
-			if tc1.JID < 13 then begin
-				j := (tc1.JID + 5) div 6 + 1;
-			end else begin
-				j := 3; //暫定
-			end;
 			tc1.JobNextEXP := ExpTable[j][tc1.JobLV];
 
 		until tc1.JobEXP < tc1.JobNextEXP;

@@ -1519,9 +1519,9 @@ begin
 
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'EXP database loading...');
 	Application.ProcessMessages;
-	for j := 0 to 3 do ExpTable[j][0] := 1;
+	for j := 0 to 8 do ExpTable[j][0] := 1;
 	for i := 1 to 255 do begin
-		for j := 0 to 3 do ExpTable[j][i] := 999999999;
+		for j := 0 to 8 do ExpTable[j][i] := 999999999;
 	end;
 	AssignFile(txt, AppPath + 'database\exp_db.txt');
 	Reset(txt);
@@ -1530,8 +1530,8 @@ begin
 		sl.Clear;
 		Readln(txt, str);
 		sl.DelimitedText := str;
-		if sl.Count = 4 then begin
-			for j := 0 to 3 do begin
+		if sl.Count = 9 then begin
+			for j := 0 to 8 do begin
                 try
                     ExpTable[j][i] := StrToInt(sl.Strings[j]);
                 except

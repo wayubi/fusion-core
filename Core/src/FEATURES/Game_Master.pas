@@ -1494,7 +1494,9 @@ Called when we're shutting down the server *only*
 
                         if (tc.BaseNextEXP = 0) then tc.BaseNextEXP := 999999999;
                         tc.BaseEXP := tc.BaseNextEXP - 1;
-                        tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+                        if tc.JID > 23 then
+                            tc.BaseNextEXP := ExpTable[5][tc.BaseLV]
+                        else tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
 
                         CalcStat(tc);
 
@@ -1530,6 +1532,7 @@ Called when we're shutting down the server *only*
     var
         newlevel, i, j, k : Integer;
         oldlevel : Integer;
+        JIDFix : Integer;
         s : String;
     begin
         Result := 'GM_JLEVEL Failure.';
@@ -1559,12 +1562,15 @@ Called when we're shutting down the server *only*
                         if (tc.JobNextEXP = 0) then tc.JobNextEXP := 999999999;
                         tc.JobEXP := tc.JobNextEXP - 1;
 
-                        if tc.JID < 13 then begin
-                            j := (tc.JID + 5) div 6 + 1;
-                        end
-
-                        else begin
-                            j := 3;
+                        JIDFix := JIDFixer(tc.JID);
+                        case JIDFix of
+                            1..6: j := 2;
+                            7..22: j := 3;
+                            23: j := 4;
+                            24: j := 6;
+                            25..30: j := 7;
+                            31..45: j := 8;
+                            else j := 8;
                         end;
 
                         tc.JobNextEXP := ExpTable[j][tc.JobLV];
@@ -2760,7 +2766,8 @@ Called when we're shutting down the server *only*
 
                     if (tc1.BaseNextEXP = 0) then tc1.BaseNextEXP := 999999999;
                     tc1.BaseEXP := tc1.BaseNextEXP - 1;
-                    tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
+                    if tc1.JID > 23 then tc1.BaseNextEXP := ExpTable[5][tc1.BaseLV]
+                    else tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
 
                     CalcStat(tc1);
                     SendCStat(tc1);
@@ -2788,6 +2795,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         oldlevel : Integer;
         i, k, w3 : Integer;
+        JIDFix : word;
     begin
         Result := 'GM_CHARJLEVEL Failure.';
 
@@ -2821,12 +2829,17 @@ Called when we're shutting down the server *only*
                     if (tc1.JobNextEXP = 0) then tc1.JobNextEXP := 999999999;
                     tc1.JobEXP := tc1.JobNextEXP - 1;
 
-                    if tc1.JID < 13 then begin
-                        w3 := (tc1.JID + 5) div 6 + 1;
-                    end else begin
-                        w3 := 3;
+                    JIDFix := JIDFixer(tc1.JID);
+                    case JIDFix of
+                        0: w3 := 1;
+                        1..6: w3 := 2;
+                        7..22: w3 := 3;
+                        23: w3 := 4;
+                        24: w3 := 6;
+                        25..30: w3 := 7;
+                        31..45: w3 := 8;
+                        else w3 := 8;
                     end;
-
                     tc1.JobNextEXP := ExpTable[w3][tc1.JobLV];
 
                     CalcStat(tc1);
@@ -4787,7 +4800,10 @@ Called when we're shutting down the server *only*
             end;
 
             tc.BaseEXP := tc.BaseNextEXP - 1;
-            tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+            if tc.JID > 23 then
+                tc.BaseNextEXP := ExpTable[5][tc.BaseLV]
+            else tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+
 
             CalcStat(tc);
             SendCStat(tc);
@@ -4848,7 +4864,8 @@ Called when we're shutting down the server *only*
             end;
 
             tc.BaseEXP := tc.BaseNextEXP - 1;
-            tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+            if tc.JID > 23 then tc.BaseNextEXP := ExpTable[5][tc.BaseLV]
+            else tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
 
             CalcStat(tc);
             SendCStat(tc);
@@ -4866,6 +4883,7 @@ Called when we're shutting down the server *only*
     var
         i, k, w3 : Integer;
         oldlevel : Integer;
+        JIDFix : word;
     begin
         Result := 'GM_ATHENA_JOBLVLUP Failure.';
 
@@ -4913,10 +4931,16 @@ Called when we're shutting down the server *only*
 
             tc.JobEXP := tc.JobNextEXP - 1;
 
-            if tc.JID < 13 then begin
-                w3 := (tc.JID + 5) div 6 + 1;
-            end else begin
-                w3 := 3;
+            JIDFix := JIDFixer(tc.JID);
+            case JIDFix of
+                0: w3 := 1;
+                1..6: w3 := 2;
+                7..22: w3 := 3;
+                23: w3 := 4;
+                24: w3 := 6;
+                25..30: w3 := 7;
+                31..45: w3 := 8;
+                else w3 := 8;
             end;
 
             tc.JobNextEXP := ExpTable[w3][tc.JobLV];
@@ -4937,6 +4961,7 @@ Called when we're shutting down the server *only*
     var
         i, k, w3 : Integer;
         oldlevel : Integer;
+        JIDFix : word;
     begin
         Result := 'GM_ATHENA_JOBLVUP Failure.';
 
@@ -4984,10 +5009,16 @@ Called when we're shutting down the server *only*
 
             tc.JobEXP := tc.JobNextEXP - 1;
 
-            if tc.JID < 13 then begin
-                w3 := (tc.JID + 5) div 6 + 1;
-            end else begin
-                w3 := 3;
+            JIDFix := JIDFixer(tc.JID);
+            case JIDFix of
+                0: w3 := 1;
+                1..6: w3 := 2;
+                7..22: w3 := 3;
+                23: w3 := 4;
+                24: w3 := 6;
+                25..30: w3 := 7;
+                31..45: w3 := 8;
+                else w3 := 8;
             end;
 
             tc.JobNextEXP := ExpTable[w3][tc.JobLV];
