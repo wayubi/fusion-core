@@ -7037,15 +7037,17 @@ begin
 							end;
 						end;
 
-            DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
+            //DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+            DamageCalc1(tm, tc, ts, Tick, 0, 150 + (tc.Cart.Weight div 800), tl.Element, 0);
+						//dmg[0] := dmg[0] + ((100 + (tc.Cart.Weight div 800)) div 100);
             if dmg[0] < 0 then dmg[0] := 0;
 
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
 
             if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
+							SetLength(bb, 2);
+							bb[0] := 0; // Just push in the direction you're casting
+              bb[1] := 0; // for 2 tiles.
 							xy := ts.Point;
 							DirMove(tm, ts.Point, b, bb);
 							//ブロック移動
@@ -7094,15 +7096,17 @@ begin
 							end;
 						end;
 
-								DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
+								DamageCalc1(tm, tc, ts1, Tick, 0, 150 + (tc.Cart.Weight div 800), tl.Element, 0);
+								//dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
                 if dmg[0] < 0 then dmg[0] := 0;
 
 								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
 
               if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
+							SetLength(bb, 2);
+							bb[0] := 0; // Just push in the direction you're casting
+              bb[1] := 0; // for 2 tiles.
+							//bb[0] := 6;
 							xy := ts1.Point;
 							DirMove(tm, ts1.Point, b, bb);
 							//ブロック移動
@@ -9634,15 +9638,18 @@ begin
 							end;
 						end;
 
-            DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
+            //DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+            DamageCalc3(tm, tc, tc1, Tick, 0, 150 + (tc.Cart.Weight div 800), tl.Element, 0);
+						//dmg[0] := dmg[0] + (tc.Cart.Weight div 800);
             if dmg[0] < 0 then dmg[0] := 0;
 
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
 
             if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
+							SetLength(bb, 2);
+							bb[0] := 0; // Just push in the direction you're casting
+              bb[1] := 0; // for 2 tiles.
+							//bb[0] := 6;
 							xy := tc1.Point;
 							DirMove(tm, tc1.Point, b, bb);
 							//ブロック移動
@@ -9691,15 +9698,17 @@ begin
 							end;
 						end;
 
-								DamageCalc3(tm, tc, tc2, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
+								DamageCalc3(tm, tc, tc2, Tick, 0, 150 + (tc.Cart.Weight div 800), tl.Element, 0);
+								//dmg[0] := dmg[0] + (tc.Cart.MaxWeight div 8000);
                 if dmg[0] < 0 then dmg[0] := 0;
 
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], 1, 5);
 
               if (dmg[0] > 0) then begin
-							SetLength(bb, 6);
-							bb[0] := 6;
+							SetLength(bb, 2);
+							bb[0] := 0; // Just push in the direction you're casting
+              bb[1] := 0; // for 2 tiles.
+							//bb[0] := 6;
 							xy := tc2.Point;
 							DirMove(tm, tc2.Point, b, bb);
 							//ブロック移動

@@ -3685,6 +3685,7 @@ var
 	ts:TMob;
 	tl:TSkillDB;
 	i:Integer;
+  w,w2:word;
 begin
 	Result := 0;
 	tm := tc.MData;
@@ -3757,9 +3758,12 @@ begin
 		tc.pcnt := 0;
 		if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
 
-                 if (tc.MSkill =  153) then begin  {Cart Revolution}
-                        if (tc.Option <> 8) and (tc.Option <> 9) then exit;
-                 end;
+    if (tc.MSkill =  153) then begin  {Cart Revolution}
+      // Colus, 20040125: Fixing Option for Cart Rev
+      w := tc.Option and $0788;  // Got a cart?
+      w2 := tc.Option and 6; // Not hidden or cloaked?
+      if ((w = 0) or (w2 <> 0)) then exit;
+    end;
                  
 		if tc.MSkill =	26 then begin //テレポート
 			//選択
