@@ -33,7 +33,7 @@ implementation
 
             tp := Player.Objects[i] as TPlayer;
 
-            if (tp.Login = 0) and (not forced) then Continue;
+            if (not tp.Login) and (not forced) then Continue;
 
             pfile := 'Account.txt';
             PD_Save_Accounts_Basic(tp, datafile);

@@ -152,7 +152,7 @@ uses
         if Copy(str, 1, 4) <> 'join' then begin
             if array_length = 0 then begin
                 if (tc = nil) then frmMain.txtDebug.Lines.Add('[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+': '+str)
-                else if tc.PData.Login > 0 then message_green(tc, '[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+' : '+str);
+                else if tc.PData.Login then message_green(tc, '[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+' : '+str);
             end;
             str := 'PRIVMSG ' + ISCS_CHANNEL + ' :' + str;
         end;

@@ -37,7 +37,7 @@ implementation
             tp := tc.PData;
 
             if not assigned(tp) then Continue;
-            if (tp.Login = 0) and (not forced) then Continue;
+            if (not tp.Login) and (not forced) then Continue;
 
             path := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters';
 

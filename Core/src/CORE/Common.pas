@@ -1048,7 +1048,8 @@ end;
 {ChrstphrR 2004/04/20 - no type before, in the same "type" block as the forward
 declaration and TChara which points back to ... TPlayer here}
 TPlayer = class
-	Login         :byte; //0=オフライン 1=ログイン中
+//	Login         :byte; //0=オフライン 1=ログイン中
+    Login         :boolean;
 	ID	          :cardinal;
 	IP            :string;
 	Name          :string;

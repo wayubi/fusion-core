@@ -75,14 +75,14 @@ begin
                                         // Character Loads should be in Character Select Area
                                         // Speeds up login time, needed especially for SQL
                                         if UseSQL then Call_Characters(tp.ID);
-                                        if tp.Login = 1 then begin
+                                        if tp.Login then begin
                                                 count := 0;
                                                 while count < 8 do begin
                                                         if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
                                                         WFIFOW(0, $0081);
                                                         WFIFOB(2, 08);
                                                         Socket.SendBuf(buf, 3);
-                                                        tp.Login := 0;
+                                                        tp.Login := false;
                                                         tp.CData[count].Login := 0;
                                                         end;
                                                         inc(count);
@@ -210,7 +210,7 @@ begin
                 end;
                 {NPCイベント追加ココまで}
 
-                tp.Login := 1;
+                tp.Login := true;
 
                 WFIFOW(0, $0071);
                 WFIFOL(2, tc.CID);
@@ -379,9 +379,9 @@ begin
                 tc.PData := tp;
 
                 // Enable / Disable to save.
-                tp.Login := 1;
+                tp.Login := true;
                 DataSave();
-                tp.Login := 0;
+                tp.Login := false;
                 // TP should be disconnected at this point.
 
 				//キャラデータ送信

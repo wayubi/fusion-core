@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-13-04: Upgraded the double login procedure. [Tsusai]
+- 12-13-04: Booleanized TPlayer.Login  [Tsusai]
 - 12-12-04: Massive optimization of REED Loading structure. [AlexKreuz]
 - 12-12-04: Tweaked the kick/ban of online characters. [Tsusai]
 - 12-12-04: Nuked JCon Characters page. Needed to optimize loading speeds. [AlexKreuz]

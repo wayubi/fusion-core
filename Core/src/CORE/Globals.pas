@@ -780,7 +780,7 @@ uses
         else tp.Gender := StrToInt(sex);
 
         tp.Mail := email;
-        tp.Login := 0;
+        tp.Login := false;
         PlayerName.AddObject(tp.Name, tp);
         Player.AddObject(tp.ID, tp);
 

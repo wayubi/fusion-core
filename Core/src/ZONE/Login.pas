@@ -91,7 +91,7 @@ begin
 			WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
 			Socket.SendBuf(buf, 23);
 		end
-        else if (APlayer.Login = 1) then begin  //Check if player is logged in already
+        else if (APlayer.Login) then begin  //Check if player is logged in already
             loggedIn := false;
             {This way we check that a character of the player is also logged in}
             for i := 0 to 8 do begin
@@ -99,14 +99,27 @@ begin
                 if CharaName.IndexOf(APlayer.CName[i]) = -1 then Continue;
                 tc := CharaName.Objects[CharaName.IndexOf(APlayer.CName[i])] as TChara;
                 if tc.Login = 2 then loggedIn := true;
+                if tc.Login = 2 then break; //keep this tc active and not change it.  used for double login kick
+
             end;
             //DebugOut.Lines.Add('Player already Logged in');
             if loggedIn then begin
                 ZeroMemory(@buf[0],23);
-			    WFIFOW( 0, $006a);
-			    WFIFOB( 2, 3);//It will say rejected from server, but I'm not sure if this is the right message
+			    WFIFOW( 0, $0081);
+			    WFIFOB( 2, 2);//This says someone is logged on the same ID
 			    Socket.SendBuf(buf, 23);
-            end else APlayer.Login := 0;
+                if assigned(tc) then begin //kicking the online user if it's online
+                    if assigned(tc.Socket) then begin
+                        if tc.Login <> 0 then begin
+                            WFIFOW( 0, $0081);
+			                WFIFOB( 2, 2);//This says someone is logged on the same ID
+                            tc.Socket.SendBuf(buf, 23);
+                            tc.Socket.Close;
+                            tc.Socket := nil;
+                        end;
+                    end;
+                end;
+            end else APlayer.Login := false;
         end
 		else if APlayer.Pass = userpass then begin
 

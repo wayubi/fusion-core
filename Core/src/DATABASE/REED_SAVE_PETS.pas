@@ -36,7 +36,7 @@ implementation
         for i := 0 to Player.Count - 1 do begin
             tp := Player.Objects[i] as TPlayer;
 
-            if (tp.Login = 0) and (not forced) then Continue;
+            if (not tp.Login) and (not forced) then Continue;
 
             for j := 1 to 100 do begin
                 for k := 0 to PetList.Count - 1 do begin
