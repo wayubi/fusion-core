@@ -263,11 +263,12 @@ begin
 	DataLoad proc in the Database.pas module }
 	//SummonMobList := TIntList32.Create;
 	SummonMobListMVP := TIntList32.Create;
-	SummonIOBList := TIntList32.Create;
-	SummonIOVList := TIntList32.Create;
-	SummonICAList := TIntList32.Create;
-	SummonIGBList := TIntList32.Create;
-	SummonIOWBList := TIntList32.Create;
+
+	SummonIOBList  := TStringList.Create;//Changed for lower memory/ease of use
+	SummonIOVList  := TStringList.Create;//Ditto
+	SummonICAList  := TStringList.Create;//
+	SummonIGBList  := TStringList.Create;//
+	SummonIOWBList := TStringList.Create;//
 
 	ServerFlag := TStringList.Create;
 	MapInfo    := TStringList.Create;
@@ -294,41 +295,41 @@ begin
 		ServerIP := cardinal(inet_addr('127.0.0.1'));
 		//ServerIP := $0100007f;
 	end;
-	if sl.IndexOfName('Name') <> -1 then begin
+	if sl.IndexOfName('Name') > -1 then begin
 		ServerName := sl.Values['Name'];
 	end else begin
 		ServerName := 'weiss';
 	end;
-	if sl.IndexOfName('NPCID') <> -1 then begin
+	if sl.IndexOfName('NPCID') > -1 then begin
 		DefaultNPCID := StrToInt(sl.Values['NPCID']);
 	end else begin
 		DefaultNPCID := 50000;
 	end;
 	NowNPCID := DefaultNPCID;
-	if sl.IndexOfName('sv1port') <> -1 then begin
+	if sl.IndexOfName('sv1port') > -1 then begin
 		sv1port := StrToInt(sl.Values['sv1port']);
 	end else begin
 		sv1port := 6900;
 	end;
 	sv1.Port := sv1port;
-	if sl.IndexOfName('sv2port') <> -1 then begin
+	if sl.IndexOfName('sv2port') > -1 then begin
 		sv2port := StrToInt(sl.Values['sv2port']);
 	end else begin
 		sv2port := 6121;
 	end;
 	sv2.Port := sv2port;
-	if sl.IndexOfName('sv3port') <> -1 then begin
+	if sl.IndexOfName('sv3port') > -1 then begin
 		sv3port := StrToInt(sl.Values['sv3port']);
 	end else begin
 		sv3port := 5121;
 	end;
 	sv3.Port := sv3port;
-	if sl.IndexOfName('WarpDebug') <> -1 then begin
+	if sl.IndexOfName('WarpDebug') > -1 then begin
 		WarpDebugFlag := StrToBool(sl.Values['WarpDebug']);
 	end else begin
 		WarpDebugFlag := false;
 	end;
-	if sl.IndexOfName('BaseExpMultiplier') <> -1 then begin
+	if sl.IndexOfName('BaseExpMultiplier') > -1 then begin
 		BaseExpMultiplier := StrToInt(sl.Values['BaseExpMultiplier']);
         	if (BaseExpMultiplier > 999) then begin
             		BaseExpMultiplier := 999;
@@ -336,7 +337,7 @@ begin
 	end else begin
 		BaseExpMultiplier := 1;
 	end;
-	if sl.IndexOfName('JobExpMultiplier') <> -1 then begin
+	if sl.IndexOfName('JobExpMultiplier') > -1 then begin
 		JobExpMultiplier := StrToInt(sl.Values['JobExpMultiplier']);
         	if (JobExpMultiplier > 999) then begin
             		JobExpMultiplier := 999;
@@ -344,42 +345,42 @@ begin
 	end else begin
 		JobExpMultiplier := 1;
 	end;
-	if sl.IndexOfName('DisableMonsterActive') <> -1 then begin
+	if sl.IndexOfName('DisableMonsterActive') > -1 then begin
 		DisableMonsterActive := StrToBool(sl.Values['DisableMonsterActive']);
 	end else begin
 		DisableMonsterActive := false;
 	end;
-	if sl.IndexOfName('AutoStart') <> -1 then begin
+	if sl.IndexOfName('AutoStart') > -1 then begin
 		AutoStart := StrToBool(sl.Values['AutoStart']);
 	end else begin
 		AutoStart := true;
 	end;
-	if sl.IndexOfName('DisableLevelLimit') <> -1 then begin
+	if sl.IndexOfName('DisableLevelLimit') > -1 then begin
 		DisableLevelLimit := StrToBool(sl.Values['DisableLevelLimit']);
 	end else begin
 		DisableLevelLimit := false;
 	end;
-	if sl.IndexOfName('EnableMonsterKnockBack') <> -1 then begin
+	if sl.IndexOfName('EnableMonsterKnockBack') > -1 then begin
 		EnableMonsterKnockBack := StrToBool(sl.Values['EnableMonsterKnockBack']);
 	end else begin
 		EnableMonsterKnockBack := false;
 	end;
-	if sl.IndexOfName('DisableEquipLimit') <> -1 then begin
+	if sl.IndexOfName('DisableEquipLimit') > -1 then begin
 		DisableEquipLimit := StrToBool(sl.Values['DisableEquipLimit']);
 	end else begin
 		DisableEquipLimit := false;
 	end;
-	if sl.IndexOfName('ItemDropType') <> -1 then begin
+	if sl.IndexOfName('ItemDropType') > -1 then begin
 		ItemDropType := StrToBool(sl.Values['ItemDropType']);
 	end else begin
 		ItemDropType := false;
 	end;
-	if sl.IndexOfName('ItemDropDenominator') <> -1 then begin
+	if sl.IndexOfName('ItemDropDenominator') > -1 then begin
 		ItemDropDenominator := StrToInt(sl.Values['ItemDropDenominator']);
 	end else begin
 		ItemDropDenominator := 10000;
 	end;
-	if sl.IndexOfName('ItemDropPer') <> -1 then begin
+	if sl.IndexOfName('ItemDropPer') > -1 then begin
 		ItemDropPer := StrToInt(sl.Values['ItemDropPer']);
 	end else begin
 		ItemDropPer := 10000;
@@ -395,7 +396,7 @@ begin
       thing...I would rather see people use one or the other, but it's their
       call.
 }
- 	if sl.IndexOfName('ItemDropMultiplier') <> -1 then begin
+	if sl.IndexOfName('ItemDropMultiplier') > -1 then begin
 		ItemDropMultiplier := StrToInt(sl.Values['ItemDropMultiplier']);
     if ItemDropMultiplier <= 1 then begin
       ItemDropMultiplier := 1;
@@ -405,113 +406,113 @@ begin
 	end else begin
 		ItemDropMultiplier := 1;
 	end;
- 	if sl.IndexOfName('StealMultiplier') <> -1 then begin
+	if sl.IndexOfName('StealMultiplier') > -1 then begin
 		StealMultiplier := StrToInt(sl.Values['StealMultiplier']);
-    if StealMultiplier <= 0 then begin
-      StealMultiplier := 0;
-    end else if StealMultiplier > 10000 then begin
-      StealMultiplier := 10000;
-    end;
+		if StealMultiplier <= 0 then begin
+			StealMultiplier := 0;
+		end else if StealMultiplier > 10000 then begin
+			StealMultiplier := 10000;
+		end;
 	end else begin
 		StealMultiplier := 100;
 	end;
-	if sl.IndexOfName('EnablePetSkills') <> -1 then begin
+	if sl.IndexOfName('EnablePetSkills') > -1 then begin
 		EnablePetSkills := StrToBool(sl.Values['EnablePetSkills']);
 	end else begin
 		EnablePetSkills := true;
 	end;
-  if sl.IndexOfName('EnableMonsterSkills') <> -1 then begin
+	if sl.IndexOfName('EnableMonsterSkills') > -1 then begin
 		EnableMonsterSkills := StrToBool(sl.Values['EnableMonsterSkills']);
 	end else begin
 		EnableMonsterSkills := true;
 	end;
-	if sl.IndexOfName('EnableLowerClassDyes') <> -1 then begin
+	if sl.IndexOfName('EnableLowerClassDyes') > -1 then begin
 		EnableLowerClassDyes := StrToBool(sl.Values['EnableLowerClassDyes']);
 	end else begin
 		EnableLowerClassDyes := false;
 	end;
-	if sl.IndexOfName('DisableFleeDown') <> -1 then begin
+	if sl.IndexOfName('DisableFleeDown') > -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
 		DisableFleeDown := false;
 	end;
-	if sl.IndexOfName('DisableSkillLimit') <> -1 then begin
+	if sl.IndexOfName('DisableSkillLimit') > -1 then begin
 		DisableSkillLimit := StrToBool(sl.Values['DisableSkillLimit']);
 	end else begin
 		DisableSkillLimit := false;
 	end;
 {U0x008a_fix}
-	if sl.IndexOfName('DefaultZeny') <> -1 then begin
+	if sl.IndexOfName('DefaultZeny') > -1 then begin
 		DefaultZeny := StrToInt(sl.Values['DefaultZeny']);
 	end else begin
 		DefaultZeny := 300;
 	end;
-	if sl.IndexOfName('DefaultMap') <> -1 then begin
+	if sl.IndexOfName('DefaultMap') > -1 then begin
 		DefaultMap := sl.Values['DefaultMap'];
 	end else begin
 		DefaultMap := 'new_zone01';
 	end;
-	if sl.IndexOfName('DefaultPoint_X') <> -1 then begin
+	if sl.IndexOfName('DefaultPoint_X') > -1 then begin
 		DefaultPoint_X := StrToInt(sl.Values['DefaultPoint_X']);
 	end else begin
 		DefaultPoint_X := 50;
 	end;
-	if sl.IndexOfName('DefaultPoint_Y') <> -1 then begin
+	if sl.IndexOfName('DefaultPoint_Y') > -1 then begin
 		DefaultPoint_Y := StrToInt(sl.Values['DefaultPoint_Y']);
 	end else begin
 		DefaultPoint_Y := 100;
 	end;
-	if sl.IndexOfName('DefaultItem1') <> -1 then begin
+	if sl.IndexOfName('DefaultItem1') > -1 then begin
 		DefaultItem1 := StrToInt(sl.Values['DefaultItem1']);
 	end else begin
 		DefaultItem1 := 1201;
 	end;
-        if sl.IndexOfName('DefaultItem2') <> -1 then begin
+	if sl.IndexOfName('DefaultItem2') > -1 then begin
 		DefaultItem2 := StrToInt(sl.Values['DefaultItem2']);
 	end else begin
 		DefaultItem2 := 2301;
 	end;
-	if sl.IndexOfName('GMCheck') <> -1 then begin
+	if sl.IndexOfName('GMCheck') > -1 then begin
 		GMCheck := StrToIntDef(sl.Values['GMCheck'],0);
 	end else begin
 		GMCheck := $FF;
 	end;
-	if sl.IndexOfName('DebugCMD') <> -1 then begin
+	if sl.IndexOfName('DebugCMD') > -1 then begin
 		DebugCMD := StrToIntDef(sl.Values['DebugCMD'],0);
 	end else begin
 		DebugCMD := $FFFF;
 	end;
-  if sl.IndexOfName('DeathBaseLoss') <> -1 then begin
+	if sl.IndexOfName('DeathBaseLoss') > -1 then begin
 		DeathBaseLoss := StrToInt(sl.Values['DeathBaseLoss']);
 	end else begin
 		DeathBaseLoss := 1;
 	end;
-  if sl.IndexOfName('DeathJobLoss') <> -1 then begin
+	if sl.IndexOfName('DeathJobLoss') > -1 then begin
 		DeathJobLoss := StrToInt(sl.Values['DeathJobLoss']);
 	end else begin
 		DeathJobLoss := 1;
 	end;
-	if sl.IndexOfName('MonsterMob') <> -1 then begin
+	if sl.IndexOfName('MonsterMob') > -1 then begin
 		MonsterMob := StrToBool(sl.Values['MonsterMob']);
 	end else begin
 		MonsterMob := true;
 	end;
-	if sl.IndexOfName('SummonMonsterExp') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterExp') > -1 then begin
 		SummonMonsterExp := StrToBool(sl.Values['SummonMonsterExp']);
 	end else begin
 		SummonMonsterExp := true;
 	end;
-	if sl.IndexOfName('SummonMonsterAgo') <> -1 then begin
+		if sl.IndexOfName('SummonMonsterAgo') > -1 then begin
 		SummonMonsterAgo := StrToBool(sl.Values['SummonMonsterAgo']);
 	end else begin
 		SummonMonsterAgo := false;
 	end;
-	if sl.IndexOfName('SummonMonsterName') <> -1 then begin
+		if sl.IndexOfName('SummonMonsterName') > -1 then begin
 		SummonMonsterName := StrToBool(sl.Values['SummonMonsterName']);
 	end else begin
 		SummonMonsterName := true;
 	end;
-	if sl.IndexOfName('SummonMonsterMob') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterMob') > -1 then begin
 		SummonMonsterMob := StrToBool(sl.Values['SummonMonsterMob']);
 	end else begin
 		SummonMonsterMob := true;
@@ -535,69 +536,69 @@ begin
 {U0x008a_fix_end}
 	sl.Clear;
 
-        ini.ReadSectionValues('Fusion', sl);
-                if sl.IndexOfName('Option_PVP') <> -1 then begin
+	ini.ReadSectionValues('Fusion', sl);
+	if sl.IndexOfName('Option_PVP') > -1 then begin
                         Option_PVP := StrToBool(sl.Values['Option_PVP']);
                 end else begin
                         Option_PVP := false;
                 end;
-                if sl.IndexOfName('Option_MaxUsers') <> -1 then begin
+	if sl.IndexOfName('Option_MaxUsers') > -1 then begin
                         Option_MaxUsers := StrToInt(sl.Values['Option_MaxUsers']);
                 end else begin
                         Option_MaxUsers := 100;
                 end;
-                if sl.IndexOfName('Option_AutoSave') <> -1 then begin
+	if sl.IndexOfName('Option_AutoSave') > -1 then begin
                         Option_AutoSave := StrToInt(sl.Values['Option_AutoSave']);
                 end else begin
                         Option_AutoSave := 600;
                 end;
-                if sl.IndexOfName('Option_AutoBackup') <> -1 then begin
+	if sl.IndexOfName('Option_AutoBackup') > -1 then begin
                         Option_AutoBackup := StrToInt(sl.Values['Option_AutoBackup']);
                 end else begin
                         Option_AutoBackup := 0;
                 end;
-                if sl.IndexOfName('Option_WelcomeMsg') <> -1 then begin
+	if sl.IndexOfName('Option_WelcomeMsg') > -1 then begin
                         Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
                 end else begin
                         Option_WelcomeMsg := True;
                 end;
-                if sl.IndexOfName('Option_GraceTime') <> -1 then begin
+	if sl.IndexOfName('Option_GraceTime') > -1 then begin
                         Option_GraceTime := StrToInt(sl.Values['Option_GraceTime']);
                 end else begin
                         Option_GraceTime := 5000;
                 end;
-                if sl.IndexOfName('Option_GraceTime_PvPG') <> -1 then begin
+	if sl.IndexOfName('Option_GraceTime_PvPG') > -1 then begin
                         Option_GraceTime_PvPG := StrToInt(sl.Values['Option_GraceTime_PvPG']);
                 end else begin
                         Option_GraceTime_PvPG := 15000;
                 end;
-                if sl.IndexOfName('Option_Username_MF') <> -1 then begin
+	if sl.IndexOfName('Option_Username_MF') > -1 then begin
                         Option_Username_MF := StrToBool(sl.Values['Option_Username_MF']);
                 end else begin
                         Option_Username_MF := False;
                 end;
 
-                if sl.IndexOfName('Option_Back_Color') <> -1 then begin
+	if sl.IndexOfName('Option_Back_Color') > -1 then begin
                         Option_Back_Color := sl.Values['Option_Back_Color'];
                 end else begin
                         Option_Back_Color := 'FFFFFF';
                 end;
-                if sl.IndexOfName('Option_Font_Color') <> -1 then begin
+	if sl.IndexOfName('Option_Font_Color') > -1 then begin
                         Option_Font_Color := sl.Values['Option_Font_Color'];
                 end else begin
                         Option_Font_Color := '797979';
                 end;
-                if sl.IndexOfName('Option_Font_Size') <> -1 then begin
+	if sl.IndexOfName('Option_Font_Size') > -1 then begin
                         Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
                 end else begin
                         Option_Font_Size := 9;
                 end;
-                if sl.IndexOfName('Option_Font_Face') <> -1 then begin
+	if sl.IndexOfName('Option_Font_Face') > -1 then begin
                         Option_Font_Face := sl.Values['Option_Font_Face'];
                 end else begin
                         Option_Font_Face := 'Century Gothic';
                 end;
-                if sl.IndexOfName('Option_Font_Style') <> -1 then begin
+	if sl.IndexOfName('Option_Font_Style') > -1 then begin
                         Option_Font_Style := sl.Values['Option_Font_Style'];
                 end else begin
                         Option_Font_Style := 'B';
@@ -885,8 +886,10 @@ begin
         
 	ini.Free;
 
-	if UseSQL then SQLDataSave()
-	else DataSave();
+	if UseSQL then begin
+		SQLDataSave;
+	end
+	else DataSave;
 
   { Mitch: Doesnt hurt to make sure the tray icon was deleted }
   Shell_notifyIcon(NIM_DELETE, @TrayIcon);
@@ -1016,14 +1019,21 @@ begin
 	SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
 	SummonMobListMVP.Free; {CR - empty list 2004/04/23 - leaving be}
 
-	{ChrstphrR 2004/04/23 -- if these are like SummonMobList Then they are going
-	to be NASTY to free up - they're small, and the quick fix won't work with
-	these, so they're being set aside for the Proper Fix}
-	SummonIOBList.Free;
-	SummonIOVList.Free;
-	SummonICAList.Free;
-	SummonIGBList.Free;
-	SummonIOWBList.Free;
+	{ChrstphrR 2004/04/26 -- Summon???Lists cleaned up here by converting them to
+	TStringLists -- now instead of using a TIntList32 that was:
+	- storing an integer the same number as the index of the nodes in Integers[]
+	- storing a string in a TObject (think, tossing a dime into a fridge)
+	- failing to free the strings AND the Objects when cleaning up...
+	Now we have a semi-inefficient StringLists that are used for random item
+	generation when someone uses a Old Blue Box, etc.  This is a compromise data
+	structure until I make them equivalent to the TRandList derived objects that
+	TSummonMobList is.
+	}
+	SummonIOBList.Free; //Changed to TStringList
+	SummonIOVList.Free; //" " "
+	SummonICAList.Free; //" " "
+	SummonIGBList.Free; //" " "
+	SummonIOWBList.Free;//" " "
 {氏{箱追加ココまで}
 {NPCイベント追加}
 	ServerFlag.Free;//Strings Only List - safe as is.
@@ -1361,15 +1371,15 @@ var
 
 begin
 
-if (MonsterMob = true) then begin
-    k := SlaveDBName.IndexOf(ts.Data.Name);
-    if (k <> -1) then begin
-     ts.isLeader := true;
-     tss := SlaveDBName.Objects[k] as TSlaveDB;
-     if ts.Data.Name = tss.Name then begin
+	if (MonsterMob = true) then begin
+		k := SlaveDBName.IndexOf(ts.Data.Name);
+		if (k <> -1) then begin
+      ts.isLeader := true;
+      tss := SlaveDBName.Objects[k] as TSlaveDB;
+      if ts.Data.Name = tss.Name then begin
 
-     h := tss.TotalSlaves;
-     ts.SlaveCount := h;
+      h := tss.TotalSlaves;
+      ts.SlaveCount := h;
 
      repeat
       for i := 0 to 4 do begin
@@ -1461,7 +1471,6 @@ var
 	DropFlag:boolean;
         delcnt:integer;
 
-
         //Class Usage
 	tc1:TChara;     {Player}
         ts1:TMob;       {Monster}
@@ -1469,15 +1478,15 @@ var
 	td:TItemDB;     {Reads the Item Database}
 	tpaDB:TStringList;
 	tpa:TParty;     {Party Class}
-	tg  :TGuild;    {Guild Glass}
-        tgc :TCastle;
-  tt  :TTerritoryDB;
-        tn1 :TNPC;
-	ge  :cardinal;
+	tg   : TGuild;    {Guild Glass}
+	tgc  : TCastle;
+	tt   : TTerritoryDB;
+	tn1  : TNPC;
+	ge   : Cardinal;
 
-        //String Declarations
-        str :string;
-        str2:string;
+	//String Declarations
+	str  : string;
+	str2 : string;
 
 begin
         UpdateMonsterDead(tm, ts, 1);
@@ -1514,7 +1523,7 @@ begin
 	ts.SpawnTick := Tick;
 
 	n := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
-        if n = -1 then exit;
+	if n = -1 then Exit;//safe 2004/04/26
 
         if ts.isSlave then begin
                 ts1 := tm.Mob.IndexOfObject(ts.LeaderID) as TMob;

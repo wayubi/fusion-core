@@ -1337,7 +1337,7 @@ type TGuild = class
 
 	constructor Create;
 	destructor  Destroy; override;
-end;
+end;//TGuild
 //------------------------------------------------------------------------------
 type TGBan = class
 // ギルド追放者データ
@@ -1478,13 +1478,14 @@ var
 {氏{箱追加}
 	{ChrstphrR 2004/04/19 - Changing SummonMobList for size/algorithm
 	improvements}
-	SummonMobList :TSummonMobList;
+	SummonMobList : TSummonMobList;
 	SummonMobListMVP:TIntList32;
-	SummonIOBList :TIntList32;
-	SummonIOVList :TIntList32;
-	SummonICAList :TIntList32;
-	SummonIGBList :TIntList32;
-  SummonIOWBList:TIntList32;
+
+	SummonIOBList : TStringList; //Changed for ease of use/cleanup.
+	SummonIOVList : TStringList; //Changed " " " "/"
+	SummonICAList : TStringList; //Changed " " " "/"
+	SummonIGBList : TStringList; //Changed " " " "/"
+	SummonIOWBList: TStringList; //Changed " " " "/"
 {氏{箱追加ココまで}
 {NPCイベント追加}
 	ServerFlag :TStringList;
@@ -9529,10 +9530,6 @@ end;
 
 
 
-
-
-
-
 {===========================}
 {== Start of TItemDB Code ==}
 {===========================}
@@ -9972,12 +9969,24 @@ end;
 
 destructor TGuild.Destroy;
 var
-	i :integer;
+	Idx : Integer;
 begin
-	for i := 10000 to 10004 do
-		GSkill[i].Free;
+	for Idx := 10000 to 10004 do
+		GSkill[Idx].Free;
+
+	{ChrstphrR 2004/04/26 - these lists contain objects}
+	for Idx := GuildBanList.Count-1 downto 0 do
+		if Assigned(GuildBanList.Objects[Idx]) then
+			(GuildBanList.Objects[Idx] AS TGBan).Free;
 	GuildBanList.Free;
+
+	for Idx := RelAlliance.Count-1 downto 0 do
+		if Assigned(RelAlliance.Objects[Idx]) then
+			(RelAlliance.Objects[Idx] AS TGRel).Free;
 	RelAlliance.Free;
+	for Idx := RelHostility.Count-1 downto 0 do
+		if Assigned(RelHostility.Objects[Idx]) then
+			(RelHostility.Objects[Idx] AS TGRel).Free;
 	RelHostility.Free;
 
 	inherited;

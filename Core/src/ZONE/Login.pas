@@ -225,11 +225,11 @@ begin
             //Chara.Clear;
             //PartyNameList.Clear;
 {氏{箱追加}
-		//SummonMobList.Clear;//ChrstphrR - only safe Clear!
-						//SummonIOBList.Clear;
-						//SummonIOVList.Clear;
-						//SummonICAList.Clear;
-						//SummonIGBList.Clear;
+		//SummonMobList.Clear;//ChrstphrR - safe 2004/04/26
+		//SummonIOBList.Clear;//Safe 2004/04/26
+		//SummonIOVList.Clear;//Safe 2004/04/26
+		//SummonICAList.Clear;//Safe 2004/04/26
+		//SummonIGBList.Clear;//Safe 2004/04/26
 {氏{箱追加ココまで}
 {NPCイベント追加}
 						//ServerFlag.Clear;

@@ -912,32 +912,27 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 	while not eof(txt) do begin
 		Readln(txt, str);
 		sl.DelimitedText := str;
-		k := StrToInt(sl.Strings[2]);
+		if SL.Count < 3 then Continue; //safety check against bad line.
+		k := StrToIntDef(sl.Strings[2],1);
 		if (ItemDBName.IndexOf(sl.Strings[0]) = -1) or
 			(ItemDBName.IndexOf(sl.Strings[1]) = -1) or (k = 0) then continue;
-		tsmn := TSummon.Create;
-		tsmn.Name := sl.Strings[1];
+		//tsmn := TSummon.Create;
+		//tsmn.Name := SL[1];
 		for i := 1 to k do begin
-			if (sl.Strings[0] = 'Old_Blue_Box') then begin
-				j := SummonIOBList.Count;
-				SummonIOBList.AddObject(j, tsmn);
-			end else if (sl.Strings[0] = 'Old_Violet_Box') then begin
-				j := SummonIOVList.Count;
-				SummonIOVList.AddObject(j, tsmn);
-			end else if (sl.Strings[0] = 'Old_Card_Album') then begin
-				j := SummonICAList.Count;
-				SummonICAList.AddObject(j, tsmn);
-			end else if (sl.Strings[0] = 'Gift_Box') then begin
-				j := SummonIGBList.Count;
-				SummonIGBList.AddObject(j, tsmn);
-			end else if (sl.Strings[0] = 'Old_Weapon_Box') then begin
-				j := SummonIOWBList.Count;
-				SummonIOWBList.AddObject(j, tsmn);
-			end;;
+			if (SL[0] = 'Old_Blue_Box') then
+				SummonIOBList.Add(SL[1])
+			else if (SL[0] = 'Old_Violet_Box') then
+				SummonIOVList.Add(SL[1])
+			else if (SL[0] = 'Old_Card_Album') then
+				SummonICAList.Add(SL[1])
+			else if (SL[0] = 'Gift_Box') then
+				SummonIGBList.Add(SL[1])
+			else if (SL[0] = 'Old_Weapon_Box') then
+				SummonIOWBList.Add(SL[1]);
 		end;
 	end;
 	CloseFile(txt);
-	j := SummonIOBList.Count + SummonIOVList.Count + SummonICAList.Count + SummonIGBList.Count;
+	j := SummonIOBList.Count + SummonIOVList.Count + SummonICAList.Count + SummonIGBList.Count + SummonIOWBList.Count;
 	DebugOut.Lines.Add(Format('-> Total %d Summon Item List loaded.', [j]));
 	Application.ProcessMessages;
 {氏{箱追加ココまで}
@@ -1526,7 +1521,10 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 	end;
 
 	sl.Free;
-end;
+	sl1.Free;
+	{ChrstphrR 2004/04/26 - This 2nd TSL was created, used ... not free'd proper.
+	}
+end;//proc DatabaseLoad()
 //------------------------------------------------------------------------------
 // データ読み込み
 procedure PlayerDataLoad();
