@@ -1,4 +1,6 @@
-- 06-02-04: Skils - Started a massive reorganizing project. [Darkhelmet]
+- 06-02-04: Skills - FindTargetsInAttackRange added to help with Skills overhaul [ChrstphrR]
+- 06-02-04: Skill_Constants - Added new file to project [ChrstphrR]
+- 06-02-04: Skills - Started a massive reorganizing project. [Darkhelmet]
 - 06-02-04: Main - Fixed Elapsed Time calculations to use integer math only. [ChrstphrR]
 - 06-02-04: Main - Changed StatusBar resize code - will try to show Elapsed Time uncut. [ChrstphrR]
 - 06-02-04: Main - Removed unused middle panel in the StatusBar [ChrstphrR]
