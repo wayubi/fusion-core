@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 415
-  Top = 182
+  Left = 194
+  Top = 53
   Width = 608
   Height = 365
   Caption = 's'
@@ -1520,10 +1520,6 @@ object frmMain: TfrmMain
       object Save1: TMenuItem
         Caption = '&Online Save'
         OnClick = Save1Click
-      end
-      object S1: TMenuItem
-        Caption = '&Comprehensive Save'
-        OnClick = S1Click
       end
       object Backup1: TMenuItem
         Caption = '&Backup'

@@ -70,23 +70,6 @@ implementation
         end;
 
         datafile.Clear;
-        GuildList.Sort;
-
-        for i := 0 to GuildList.Count - 1 do begin
-            tg := GuildList.Objects[i] as TGuild;
-
-            for j := 0 to tg.RegUsers - 1 do begin
-                if tg.MemberID[j] = 0 then Continue;
-                if not assigned(tg.Member[j]) then Continue;
-                if tg.Member[j].GuildID <> tg.ID then Continue;
-
-                datafile.Add(IntToStr(tg.ID)+','+IntToStr(tg.MemberID[j]));
-            end;
-        end;
-
-        CreateDir(AppPath + 'gamedata\Indeces');
-        datafile.SaveToFile(AppPath + 'gamedata\Indeces\GuildMemberIDX.txt');
-
         FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }

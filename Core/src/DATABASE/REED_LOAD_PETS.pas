@@ -66,10 +66,9 @@ implementation
             datafile.Clear;
             datafile.LoadFromFile(path);
 
-            if (UID = '*') then begin
+            if PetList.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
                 tpe := TPet.Create;
             end else begin
-                if PetList.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
                 tpe := PetList.Objects[PetList.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPet;
             end;
 
@@ -92,7 +91,7 @@ implementation
 
             PD_Load_Pets_Finalize(tpe);
 
-            if (UID = '*') then begin
+            if PetList.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
                 PetList.AddObject(tpe.PetID, tpe);
             end;
         end;

@@ -23,11 +23,12 @@ uses
     function party_is_current(partyid : Integer) : Boolean;
     function guild_is_current(guildid : Integer) : Boolean;
     function get_pet_index(inventory_item : array of TItem; pet_id : Integer) : Integer;
+    procedure load_guild_members();
 
 implementation
 
 uses
-    Main;
+    Main, REED_LOAD_CHARACTERS;
 
     { ------------------------------------------------------------------------------------- }
     { R.E.E.D - retrieve_data                                                               }
@@ -280,24 +281,22 @@ uses
         tp : TPlayer;
     begin
 
-        if (UID <> '*') then begin
+        if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
+        tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
-            if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
+        for i := 0 to 8 do begin
+            if tp.CName[i] = '' then Continue;
+            if tp.CData[i] = nil then Continue;
 
-            for i := 0 to 8 do begin
-                if tp.CName[i] = '' then Continue;
-                if tp.CData[i] = nil then Continue;
-
-                if (tp.CData[i].GuildID = guildid) then begin
-                    if GuildList.IndexOf(guildid) = -1 then Continue;
+            if (tp.CData[i].GuildID = guildid) then begin
+                if GuildList.IndexOf(guildid) = -1 then begin
+                    tg := TGuild.Create;
+                    Break;
+                end else begin
                     tg := GuildList.Objects[GuildList.IndexOf(guildid)] as TGuild;
                     Break;
                 end;
             end;
-
-        end else begin
-            tg := TGuild.Create;
         end;
 
         Result := tg;
@@ -580,6 +579,171 @@ uses
                 end;
             end;
         end;
+    end;
+
+
+    procedure load_guild_members();
+    var
+        datafile, resultlist, cdirlist, clist, plist : TStringList;
+        basepath, pfile, path : String;
+        i, j, k, l : Integer;
+        member_id : Integer;
+        tc : TChara;
+        breakloop : Boolean;
+    begin
+
+        debugout.Lines.Add('­ Pre-Loading Member Linkages ­');
+
+        datafile := TStringList.Create;
+        clist := TStringList.Create;
+        plist := TStringList.Create;
+
+
+        // Preparing Guild List //
+        basepath := AppPath + 'gamedata\Guilds\';
+        pfile := 'Members.txt';
+
+        resultlist := get_list(basepath, pfile);
+
+        for i := 0 to resultlist.Count - 1 do begin
+            path := basepath + resultlist[i] + '\' + pfile;
+            datafile.LoadFromFile(path);
+
+            for j := 0 to retrieve_length(datafile, path) do begin
+                clist.Add(retrieve_value(datafile, path, j, 0));
+            end;
+        end;
+
+        clist.Sort;
+        datafile.Clear;
+
+
+        // Preparing Party List //
+        basepath := AppPath + 'gamedata\Parties\';
+        pfile := 'Members.txt';
+
+        resultlist := get_list(basepath, pfile);
+
+        for i := 0 to resultlist.Count - 1 do begin
+          path := basepath + resultlist[i] + '\' + pfile;
+          datafile.LoadFromFile(path);
+
+          for j := 0 to retrieve_length(datafile, path) do begin
+            plist.Add(retrieve_value(datafile, path, j, 0));
+          end;
+        end;
+
+        plist.Sort;
+        datafile.Clear;
+
+
+
+
+
+
+
+
+        resultlist.Free;
+
+
+        basepath := AppPath + 'gamedata\Accounts\';
+        pfile := 'Account.txt';
+
+        resultlist := get_list(basepath, pfile);
+
+        for i := 0 to resultlist.Count - 1 do begin
+
+            cdirlist := get_list(basepath + resultlist[i] + '\Characters\', 'Character.txt');
+            cdirlist.Sort;
+
+            for j := 0 to cdirlist.Count - 1 do begin
+                for k := 0 to clist.Count - 1 do begin
+                    breakloop := False;
+
+                    if (cdirlist[j] = clist[k]) then begin
+                        path := basepath + resultlist[i] + '\Characters\' + cdirlist[j] + '\Character.txt';
+                        datafile.LoadFromFile(path);
+
+                        //debugout.Lines.Add('GUILD: ' + cdirlist[j] + ',' + clist[k]);
+
+                        if Chara.IndexOf(StrToInt(clist[k])) = -1 then tc := TChara.Create
+                        else tc := Chara.Objects[Chara.IndexOf(StrToInt(clist[k]))] as TChara;
+
+                        tc.Name := retrieve_data(0, datafile, path);
+                        tc.ID := retrieve_data(1, datafile, path, 1);
+                        tc.CID := retrieve_data(2, datafile, path, 1);
+
+                        tc.JID := retrieve_data(3, datafile, path, 1);
+                        if (tc.JID > LOWER_JOB_END) then tc.JID := tc.JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
+    
+                        tc.BaseLV := retrieve_data(4, datafile, path, 1);
+
+                        tc.Head1 := retrieve_data(24, datafile, path, 1);
+                        tc.Head2 := retrieve_data(25, datafile, path, 1);
+                        tc.Head3 := retrieve_data(26, datafile, path, 1);
+                        tc.HairColor := retrieve_data(27, datafile, path, 1);
+
+                        tc.GuildID := retrieve_data(44, datafile, path, 1);
+
+                        { -- End - Retrieve and assign values to character. -- }
+
+                        if Chara.IndexOf(StrToInt(clist[k])) = -1 then begin
+                            CharaName.AddObject(tc.Name, tc);
+                            Chara.AddObject(tc.CID, tc);
+                        end;
+
+                        if tc.CID < 100001 then tc.CID := tc.CID + 100001;
+                        if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
+
+                        clist.Delete(k);
+
+                        breakloop := True;
+
+                    end;
+
+                    if (cdirlist[j] = plist[k]) then begin
+                        path := basepath + resultlist[i] + '\Characters\' + cdirlist[j] + '\Character.txt';
+                        datafile.LoadFromFile(path);
+
+                        //debugout.Lines.Add('PARTY: ' + cdirlist[j] + ',' + clist[k]);
+
+                        if Chara.IndexOf(StrToInt(plist[k])) = -1 then tc := TChara.Create
+                        else tc := Chara.Objects[Chara.IndexOf(StrToInt(plist[k]))] as TChara;
+
+
+                        tc.Name := retrieve_data(0, datafile, path);
+                        tc.ID := retrieve_data(1, datafile, path, 1);
+                        tc.CID := retrieve_data(2, datafile, path, 1);
+                        tc.PartyID := retrieve_data(45, datafile, path, 1);
+                        
+
+                        if Chara.IndexOf(StrToInt(plist[k])) = -1 then begin
+                            CharaName.AddObject(tc.Name, tc);
+                            Chara.AddObject(tc.CID, tc);
+                        end;
+
+                        if tc.CID < 100001 then tc.CID := tc.CID + 100001;
+                        if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
+
+                        plist.Delete(k);
+
+                        breakloop := True;
+                    end;
+
+                    if (breakloop) then Break;
+
+                end;
+
+            end;
+
+        end;
+
+        cdirlist.Free;
+
+        resultlist.Free;
+        clist.Free;
+        plist.Free;
+        datafile.Free;
     end;
 
 end.

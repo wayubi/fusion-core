@@ -77,7 +77,7 @@ implementation
 
             NowGuildID := (tg.ID + 1);
 
-            if (UID = '*') then begin
+            if GuildList.IndexOf(tg.ID) = -1 then begin
                 GuildList.AddObject(tg.ID, tg);
             end;
 

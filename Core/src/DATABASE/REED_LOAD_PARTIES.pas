@@ -49,7 +49,7 @@ implementation
 
             if (UID <> '*') then
                 if party_is_online(tpa) then Continue;
-            
+
             pfile := 'Settings.txt';
             path := basepath + resultlist[i] + '\' + pfile;
             PD_Load_Parties_Settings(tpa, path);
@@ -60,7 +60,7 @@ implementation
 
             NowPartyID := (tpa.ID + 1);
 
-            if (UID = '*') then begin
+            if (PartyList.IndexOf(tpa.ID) = -1) then begin
                 PartyNameList.AddObject(tpa.Name, tpa);
                 PartyList.AddObject(tpa.ID, tpa);
             end;
@@ -152,23 +152,21 @@ implementation
         tp : TPlayer;
     begin
 
-        if (UID <> '*') then begin
+        if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
+        tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
-            if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
+        for i := 0 to 8 do begin
+            if tp.CName[i] = '' then Continue;
 
-            for i := 0 to 8 do begin
-                if tp.CName[i] = '' then Continue;
-
-                if assigned(tp.CData[i]) and (tp.CData[i].PartyID = partyid) then begin
-                    if PartyList.IndexOf(partyid) = -1 then Continue;
+            if assigned(tp.CData[i]) and (tp.CData[i].PartyID = partyid) then begin
+                if PartyList.IndexOf(partyid) = -1 then begin
+                    tpa := TParty.Create;
+                    Break;
+                end else begin
                     tpa := PartyList.Objects[PartyList.IndexOf(partyid)] as TParty;
                     Break;
                 end;
             end;
-
-        end else begin
-            tpa := TParty.Create;
         end;
 
         Result := tpa;

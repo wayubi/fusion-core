@@ -121,6 +121,7 @@ uses
         frmMain.Button13.Caption := '';
         frmMain.Button14.Caption := '';
         frmMain.Button15.Caption := '';
+        frmMain.Edit53.Clear;
     end;
 
 
@@ -192,11 +193,21 @@ uses
         tp : TPlayer;
         i : Integer;
     begin
-        if (Charaname.IndexOf(str) = -1) then Exit;
-    	tc := charaname.objects[charaname.indexof(str)] as TChara;
+        {if (Charaname.IndexOf(str) = -1) then begin
 
-        tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
-        if (not assigned(tp)) then Exit;
+        end else begin
+            tc := charaname.objects[charaname.indexof(str)] as TChara;
+            tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+            if (not assigned(tp)) then Exit;
+
+            if assigned(tc.Socket) then begin
+                if tc.Login <> 0 then begin
+                	tc.Socket.Close;
+                	tc.Socket := nil;
+                end;
+            end;
+            
+        end;
 
         case tc.CharaNumber of
             0: frmMain.Button7.Caption := '';
@@ -210,18 +221,12 @@ uses
             8: frmMain.Button15.Caption := '';
         end;
 
-        if assigned(tc.Socket) then begin
-            if tc.Login <> 0 then begin
-            	tc.Socket.Close;
-            	tc.Socket := nil;
-            end;
-        end;
 
         PD_Delete_Character(tc.CID);
         tp.CName[tc.CharaNumber] := '';
         tp.CData[tc.CharaNumber] := nil;
 
-        DataSave(True);
+        DataSave(True); }
     end;
 
 
@@ -472,7 +477,9 @@ uses
         end;
         if Ban then begin
             tc.PData.Banned := True;
-            DataSave(true);
+            //DataSave(true);
+            {Alex: we just need to save the account. Also DataSave(true) is unsafe now.}
+            PD_Save_Accounts_Parse(True);
         end;
         JCon_Characters_Online();
     end;

@@ -188,7 +188,6 @@ type
     Button13: TButton;
     Button14: TButton;
     Button15: TButton;
-    S1: TMenuItem;
     ConnecttoISCS1: TMenuItem;
     EnableWebAccountCreator1: TMenuItem;
     Label60: TLabel;
@@ -312,7 +311,6 @@ type
     procedure Button13Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
-    procedure S1Click(Sender: TObject);
     procedure ConnecttoISCS1Click(Sender: TObject);
     procedure EnableWebAccountCreator1Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
@@ -10788,11 +10786,6 @@ procedure TfrmMain.Save1Click(Sender: TObject);
 begin
     DataSave(false);
     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
-end;
-
-procedure TfrmMain.S1Click(Sender: TObject);
-begin
-    DataSave(true);
 end;
 
 procedure TfrmMain.Backup1Click(Sender: TObject);
