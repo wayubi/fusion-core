@@ -11582,6 +11582,7 @@ begin
 					tn := sl.Objects[j] as TNPC;
 					j := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
 					if (j <> 0) then begin
+					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
 						ATarget := tn.ID;
 						ATick := Tick;
@@ -11590,7 +11591,7 @@ begin
 						ppos := 0;
 						MoveTick := Tick;
 						tgtPoint := tn.Point;
-						
+					    end;
 					end;
 					Exit;
 				end;
