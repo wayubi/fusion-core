@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-14-04: Fixed 80% lag increase due to increase in bandwidth usage. [AlexKreuz]
 - 06-14-04: Fixed dye patch. Other players can now see custom dyes again. [AlexKreuz]
 - 06-12-04: PSS structural changes regarding find_area_targets. [AlexKreuz]
 - 06-12-04: Switched skill [MG_SIGHT] to PSS system. [AlexKreuz]

@@ -9295,8 +9295,6 @@ begin
 					tm := MData;
 					if tm = nil then continue;
 
-                    UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
-
 					mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
 					if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin

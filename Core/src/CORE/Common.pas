@@ -3916,10 +3916,19 @@ var
 {ギルド機能追加ココまで}
 begin
 	ZeroMemory(@buf[0], 54);
+
+
+
+
+    // Alex: switched 01d9/01d8 to 0079/0078 to reenabled lower dyes. Wonder why
+    // it was changed.
+
 	if Use0079 then begin
-		WFIFOW(0, $01d9); //0079->01d9
+        WFIFOW(0, $0079);
+		//WFIFOW(0, $01d9); //0079->01d9
 	end else begin
-		WFIFOW(0, $01d8); //0078->01d8
+    	WFIFOW(0, $0078);
+		//WFIFOW(0, $01d8); //0078->01d8
 	end;
 	WFIFOL( 2, tc.ID);
 	WFIFOW( 6, tc.Speed);
@@ -4022,7 +4031,13 @@ var
 begin
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
 	ZeroMemory(@buf[0], 60);
-	WFIFOW( 0, $01da);  // 007b -> 01da
+
+    // Alex: switched 01da to 007b to reenabled lower dyes. Wonder why
+    // it was changed.
+
+	WFIFOW( 0, $007b);  // 007b -> 01da
+	//WFIFOW( 0, $01da);
+	
 	WFIFOL( 2, tc.ID);
 	WFIFOW( 6, tc.Speed);
 {追加}
