@@ -7,7 +7,7 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-	Windows, MMSystem, ScktComp, Forms, {Replace with QForms soon, and place in common}
+	Windows, MMSystem, ScktComp, Forms,
     {$ENDIF}
     {Kylix/Delphi CLX}
     {$IFDEF LINUX}

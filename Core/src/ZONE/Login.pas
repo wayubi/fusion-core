@@ -12,7 +12,7 @@ uses
     {$ENDIF}
     {Kylix/Delphi CLX}
     {$IFDEF LINUX}
-    Qt, Types
+    Qt, Types,
     {$ENDIF}
     {Shared}
     Classes, SysUtils,

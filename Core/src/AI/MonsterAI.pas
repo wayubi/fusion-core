@@ -5,12 +5,12 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-    ScktComp, MMSystem, StdCtrls,
+    ScktComp, MMSystem, //StdCtrls,
     {$ENDIF}
     {Kylix/Delphi}
-    {$IFDEF LINUX}
-    QStdCtrls,  {Tsusai: Are the StdCtrls even being used to begin with?}
-    {$ENDIF}
+//    {$IFDEF LINUX}
+//    QStdCtrls,  {Tsusai: Are the StdCtrls even being used to begin with?}
+//    {$ENDIF}
     {Shared}
     Classes, SysUtils, Types,
     {Fusion}

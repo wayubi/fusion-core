@@ -4,14 +4,14 @@ interface
 uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
-    ScktComp, Windows, MMSystem, StdCtrls,  //Tsusai: are Windows, MMSystem, and StdCtrls even used here?
+    ScktComp, //Windows, MMSystem, StdCtrls,  //Tsusai: are Windows, MMSystem, and StdCtrls even used here?
     {$ENDIF}
-    {Kylix/Delphi CLX}
-    {$IFDEF LINUX}
-    Types, QStdCtrls,
-    {$ENDIF}
+//    {Kylix/Delphi CLX}
+//    {$IFDEF LINUX}
+//    Types, QStdCtrls,
+//    {$ENDIF}
     {Shared}
-    Classes, SysUtils,
+    Classes, SysUtils, Types,
     {Fusion}
 	GlobalLists, Common, List32;
 
