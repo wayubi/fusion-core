@@ -9629,7 +9629,7 @@ begin
         except
             on ESocketError do begin
                 cmdStart.Enabled := True;
-                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                debugout.Lines.add('The Login port (' + IntToStr(sv1port) + ') is in use. You can not run Fusion on this port.');
                 Exit;
             end;
         end;
@@ -9639,7 +9639,7 @@ begin
         except
             on ESocketError do begin
                 cmdStart.Enabled := True;
-                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                debugout.Lines.add('The Character port '+ IntToStr(sv2port) +' is in use. You can not run Fusion on this port.');
                 Exit;
             end;
         end;
@@ -9649,7 +9649,7 @@ begin
         except
             on ESocketError do begin
                 cmdStart.Enabled := True;
-                debugout.Lines.add('That port is in use already. You can not run Fusion on this port.');
+                debugout.Lines.add('The Zone port '+ IntToStr(sv3port) +' is in use. You can not run Fusion on this port.');
                 Exit;
             end;
         end;

@@ -93,7 +93,7 @@ uses
             try
                 BRSHttpSrv1.Start;
             except
-                debugout.Lines.add('WAC was unable to use that port.');
+                debugout.Lines.add('WAC was unable to use the port ' + IntToStr(wacport));
                 destroy_wac(true);
             end;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-18-04: Made the port-in-use errors more informative/novice friendly. [Tsusai]
 - 12-14-04: Updated the packet table. [Tsusai]
 - 12-14-04: Fixed login packet lengths. [Tsusai]
 - 12-13-04: Preparing indeces. Midway release for conversion. [AlexKreuz]
