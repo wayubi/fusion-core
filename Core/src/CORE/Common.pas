@@ -1267,6 +1267,10 @@ TMap = class
 	TimerAct  :TIntList32; //動作中タイマー
 	TimerDef  :TIntList32; //定義済タイマー
 {NPCイベント追加ココまで}
+    {Unloading System}
+    NeedToUnload :  boolean;
+    UnloadTime  :   cardinal;
+    LastAction  :   cardinal;
 
 	constructor Create;
 	destructor Destroy; override;
@@ -1601,6 +1605,7 @@ var
   StartDeathDropItem  :cardinal;
   EndDeathDropItem    :cardinal;
   TokenDrop       :boolean;
+    MapUnloadTime   :cardinal; // Time to unload in seconds   
 	GMCheck         :cardinal; // Can the GM commands be used by non-GM's?
 	DebugCMD        :cardinal; // Can use Debug Commands?
 	DeathBaseLoss     :integer;
@@ -4222,6 +4227,7 @@ begin
 	tc.AMode := 0;
 	tc.MMode := 0;
 	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+    //tm.LastAction := TimeGetTime();  //Update on charcter leaving
 	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 {キューペット}
 	if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
@@ -7831,6 +7837,8 @@ Begin
 
 	tm := TMap.Create;
 	tm.Name := MapName;
+
+    DebugOut.Lines.Add('Map ' + tm.Name + ' Has been loaded');
 	Map.AddObject(MapName, tm);
 	tm.Mode := 1;
 
@@ -7967,6 +7975,7 @@ Begin
 	//Script Load
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Loading script...');
 	Tick := timeGetTime;
+    tm.LastAction := Tick;
 	for Idx := 0 to ScriptList.Count - 1 do begin
 		if NOT ScriptValidated(MapName, ScriptList[Idx], Tick) AND
 		   ShowDebugErrors then begin
@@ -10649,7 +10658,10 @@ end;
 constructor TMap.Create;
 begin
 	inherited;
-
+    NeedToUnload := false;
+    LastAction := timeGetTime();
+    //Minutes * 60 = seconds * 1000 = milliseconds
+    UnloadTime := MapUnloadTime * 60 * 1000;  //How long until map gets unloaded in milliseconds
 	NPC := TIntList32.Create;
 	NPCLabel := TStringList.Create;
 	CList := TIntList32.Create;

@@ -197,9 +197,12 @@ type
 		procedure CharaSplash2(tc:TChara;Tick:cardinal);
 		procedure CharaAttack(tc:TChara;Tick:cardinal);
 		procedure CharaAttack2(tc:TChara;Tick:cardinal);
+
+        {Maybe a place to put all the passive processes besides main?}
 		procedure CharaPassive(tc:TChara;Tick:cardinal);
 		procedure SkillPassive(tc:TChara;Tick:Cardinal);
 		procedure PetPassive(tc:TChara; _Tick:Cardinal);
+        function  MapPassive(tm:TMap; Tick:Cardinal) : boolean;
 
 		function  NPCAction(tm:TMap;tn:TNPC;Tick:cardinal;tc:TChara) : Integer;
 
@@ -931,6 +934,11 @@ begin
     TokenDrop := StrToBool(sl.Values['DropToken']);
   end else begin
     TokenDrop := false;
+  end;
+  if sl.IndexOfName('MapUnloadTime') <> -1 then begin   //Time To Unload a map in minutes
+    MapUnloadTime := StrToInt(sl.Values['MapUnloadTime']);
+  end else begin
+    MapUnloadTime := 0;
   end;
 
 	{ChrstphrR 2004/05/09 - Debug section added to INI file
@@ -6593,6 +6601,50 @@ end;
 
 
 //------------------------------------------------------------------------------
+function TfrmMain.MapPassive(tm:TMap; Tick:Cardinal) : boolean;
+var
+    i,j   :   cardinal;
+    tn    :   TNPC;
+    itemCount : integer; //The Number of items on the map
+
+begin
+    Result := false;  //We are going to assume it fails
+    if NOT tm.NeedToUnload then begin
+
+        //if tm.LastAction < tm.UnloadTime then tm.LastAction := tm.UnloadTime + 1000;
+
+        //try
+        //    j := Tick - tm.LastAction;
+        //except
+        //    j := tm.UnloadTime + 50000;
+        //end;
+
+        if tm.CList.Count > 0 then exit; //Map has characters on the map
+        itemCount := 0;
+        for i := 0 to tm.NPC.Count - 1 do begin
+            tn := tm.NPC.Objects[i] as TNPC;
+            if tn.CType = 3 then Inc(itemCount);
+        end;
+        if itemCount > 0 then exit; //Map has items currently on it
+
+        //It passed all of our tests, lets check it's tick
+        Result := true;
+
+        if Tick > tm.lastAction then j := Tick - tm.LastAction
+        else j := 0;
+
+        if j < tm.UnloadTime then exit;  //Map has had actions and will not be unloaded
+
+        //DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + 'Map ' + tm.Name + ' Has ' + IntToStr(tm.NPC.Count) + ' NPCs');
+        //DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + IntToStr(itemCount) + ' items are on the map of those NPCs');
+        //DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + 'Map ' + tm.Name + ' Has been idle for ' + IntToStr(j) + ' ms and needs to be unloaded');
+
+        tm.NeedToUnload := true;
+
+    end;
+
+end;
+
 function TfrmMain.NPCAction(tm:TMap;tn:TNPC;Tick:cardinal;tc:TChara) : Integer;
 var
 	k,m,c,c1: Integer;
@@ -10101,6 +10153,22 @@ begin
 				end;
 				ExitWarpSearch:
 			end;
+
+            {Check to unload maps}
+            for k := 0 to Map.Count - 1 do begin
+                tm := Map.Objects[k] as TMap;
+                if NOT MapPassive(tm, Tick) then tm.LastAction := Tick;
+                if tm.NeedToUnload then begin
+                    //DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + 'Map ' + tm.Name + 'Has been destroyed');
+                    i := Map.IndexOf(tm.Name);
+                    if i <> -1 then begin
+                        Map.Delete(i);
+                        tm.Destroy;
+                    //    DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + 'Current Map Count ' + IntToStr(Map.Count))
+                    end else DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + 'Map ' + tm.Name + 'Not Found');
+                    Break;
+                end;
+            end;
 
 	{NPCƒCƒxƒ“ƒg’Ç‰Á}
 			for k := 0 to Map.Count - 1 do begin

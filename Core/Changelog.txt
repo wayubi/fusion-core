@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-26-04: Added optional map unloading beta.  [Darkhelmet]
+- 07-26-04: Added .ini Option in [Toys] MapUnloadTime=<time in minutes>.  [Darkhelmet]
 - 07-26-04: PVP ranking works now. [Trihan]
 - 07-23-04: R.E.E.D: Conversion refined. Will not convert empty guilds. [AlexKreuz]
 - 07-23-04: R.E.E.D: Guilds being deleted on new user connect. [AlexKreuz]

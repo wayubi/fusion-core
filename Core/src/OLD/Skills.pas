@@ -4858,9 +4858,10 @@ Begin
 					end;
 
 
-			365:   //Magic Crusher PVP by Eliot
-				begin
-					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100; // Calculate Attack Power - Eliot
+			//365:   //Magic Crusher PVP by Eliot
+			//	begin
+                // CRASH July 26, 2004 - Darkhelmet, integer overflow on line 2
+					{dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100; // Calculate Attack Power - Eliot
 					dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100 - tc1.MDEF2; // Calculate Magic Defense - Eliot & added INT defence - KyuubiKitsune
 					dmg[0] := dmg[0] - tc1.Param[3];
 					if dmg[0] < 1 then          // Check for negative damage
@@ -4871,8 +4872,8 @@ Begin
 						dmg[0] := 0;
 					SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
 					frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick);
-					tc.MTick := Tick + 1000;
-				end;
+					tc.MTick := Tick + 1000;}
+			//	end;
 			47:
 				begin
 					if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
