@@ -845,7 +845,7 @@ uses
     Broadcast handler. -Tsusai
     This is the all-in-one form of broadcast designed to work with calls from
     NPC's as well as anything else.
-    tc & tc1 -> tc is the sender, tc1 is the reciever(s)
+    tc & tc1 -> tc is the sender, tc1 is the receiver(s)
     str -> Broadcast string
     NPCReferal -> If using a npc to make the call, converts MessageMod to compatable BroadcastType
     MessageMod -> changes the type of modification like blue color, Charaname pre-addon, etc
@@ -909,8 +909,6 @@ uses
                 BroadcastType := 1
             else BroadcastType := MessageMod;
         end;
-
-        if BroadcastType > 5 then BroadcastType := 1;
 
         // BroadcastType = 1 is just the string sent
         if BroadcastType = 2 then str := tc.Name + ' : ' + str; // displays characters name with it
