@@ -656,6 +656,7 @@ begin
 {アイテム製造追加ココまで}
 	MobDB.Free;
         MArrowDB.Free;
+        MobAIDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
 	SkillDB.Free;
@@ -12645,6 +12646,7 @@ begin
                     SkillDB.Clear;
                     GSkillDB.Clear;
                     SlaveDBName.Clear;
+                    MobAIDB.Clear;
                     MArrowDB.Clear;
                     IDTableDB.Clear;
                     Playername.Clear;
