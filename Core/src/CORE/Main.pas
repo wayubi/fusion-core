@@ -9445,6 +9445,12 @@ begin
 	end else if (tn.CType = 4) then begin //スキル効能地
 		if tn.Tick <= Tick then begin
 			case tn.JID of
+                                141:
+                                        begin
+						DelSkillUnit(tm, tn);
+						Dec(k);
+                        			tm.gat[tn.Point.X][tn.Point.Y] := 1;
+                    			end;
 				$81://ポータル発動前->発動後
 					begin
 						tn.JID := $80;
@@ -9470,7 +9476,6 @@ begin
 						//スキル効能地撤去
 						DelSkillUnit(tm, tn);
 						Dec(k);
-                                                tm.gat[tn.Point.X][tn.Point.Y] := 1;
 					end;
 			end;
 		end else begin
