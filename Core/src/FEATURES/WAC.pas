@@ -58,6 +58,9 @@ uses
             else if (length(username) < 4) or (length(password1) < 4) then result_type := 4
 
             else begin
+                (* Tsusai: Added conversion of %40 to @ to fix test%40test.org
+                bogus email submissions for other browsers like Firefox. *)
+                email := AnsiReplaceStr(email, '%40', '@');
                 create_account(username, password1, email, sex);
                 result_type := 5;
             end;
