@@ -14,6 +14,7 @@ uses
         function Load_Pets(AID: cardinal) : Boolean;
         function Load_Guilds(GID: cardinal) : Boolean;
         function Preload_GuildMembers() : Boolean;
+        function Create_Account(username: String; userpass: String; sex: integer) : Boolean;
 
 implementation
 
@@ -777,6 +778,19 @@ begin
         end;
         debugout.Lines.add('-- Completed.');
 
+end;
+
+function Create_Account(username: String; userpass: String; sex: integer) : Boolean;
+var
+    query : string;
+begin
+    query := 'select * from accounts where ID = '''+username+'''';
+    if MySQL_Query(query) then begin
+        if sqldataset.RecordCount = 0 then begin
+            query := 'insert into accounts values ('''', '''+username+''', '''+userpass+''', '''+inttostr(sex)+''', ''-@-'', '''', '''')';
+            MySQL_Query(query);
+        end;
+    end;
 end;
 
 end.

@@ -1,3 +1,4 @@
+- 05-21-04: Added Username_M/_F support to SQL. [AlexKreuz]
 - 05-18-04: Fixed potential memory leak, and potential crash when Shop created [ChrstphrR]
 - 05-16-04: Fixed a list index error on disconnect. [Darkhelmet]
 - 05-16-04: Added a few things by Krietor's request, some commented out. [Darkhelmet]

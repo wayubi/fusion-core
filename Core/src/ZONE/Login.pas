@@ -175,13 +175,25 @@ begin
 			option_mf := copy(userid, length(userid) - 1, 2);
 			userid := copy(userid, 0, length(userid) - 2);
 
+            if (UseSQL) then begin
+                if (option_mf = '_M') then begin
+                    Create_Account (userid, userpass, 1);
+                    option_mf := 'S';
+                end else if (option_mf = '_F') then begin
+                    Create_Account (userid, userpass, 0);
+                    option_mf := 'S';
+                end;
+            end
+
+            else begin
 			if (option_mf = '_M') then begin
 				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',1,-@-,0,,,,,,,,,');
 			end else if (option_mf = '_F') then begin
 				Writeln(txt, inttostr(100100+PlayerName.Count+count)+','+userid+','+userpass+',0,-@-,0,,,,,,,,,');
 			end;
+                Writeln(txt, '0');
+            end;
 
-			Writeln(txt, '0');
 			inc(count);
 		end
 
@@ -217,8 +229,6 @@ begin
 		Player.Clear;
 		PlayerName.Clear;
 
-		PlayerDataLoad;
-
 		//CharaName.Clear;
 		//Chara.Clear;
 		//PartyNameList.Clear;
@@ -239,8 +249,15 @@ begin
 		//PetList.Clear;
 		//DataLoad();
 
+
+		if (option_mf = 'S') then begin
+            Load_Accounts(userid);
+            sv1PacketProcessSub(Socket,w,userid,userpass);
+        end else begin
+            PlayerDataLoad;
 		if PlayerName.IndexOf(userid) = -1 then Exit;
 		sv1PacketProcessSub(Socket,w,userid,userpass);
+        end;
 			Result := True;
 	end;
 end;
@@ -281,16 +298,7 @@ begin
 
 			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
-			if UseSQL then begin
-				if Load_Accounts(userid) then begin
-					sv1PacketProcessSub(Socket,w,userid,userpass);
-				end else begin
-					ZeroMemory(@buf[0],23);
-					WFIFOW( 0, $006a);
-					WFIFOB( 2, 0);//Unregistered ID
-					Socket.SendBuf(buf, 23);
-				end;
-			end else begin
+			if UseSQL then Load_Accounts(userid);
 				if PlayerName.IndexOf(userid) > -1 then begin
 					//DebugOut.Lines.Add ('User Exists');
 					//DebugOut.Lines.Add ('ID: '+inttostr(id));
@@ -304,7 +312,6 @@ begin
 						Socket.SendBuf(buf, 23);
 					end;
 				end;
-			end;
 		end;//if buf[0]&buf[1]
 	end;//if SRL>=55...
 end;//sv1PacketProcess()
