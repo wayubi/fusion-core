@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
-
+- 01-29-04: Updated scripts to use a scriptlabel's OnInit. [Colus]
+- 01-29-04: Enabled guild flags. [Colus]
+- 01-29-04: Added support for guild territories. [Colus]
 - 01-29-04: Added garment card effects. [Colus]
 - 01-29-04: Fixed #117 - Turning off "Act Dead" doesn't display on other people's screens. [AlexKreuz]
 - 01-29-04: Fixed #113 - Archer Type Monsters can not attack through walls anymore. [AlexKreuz]
