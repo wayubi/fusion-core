@@ -676,6 +676,7 @@ uses
     begin
         SKILL_TYPE := 2;
         Result := -1;
+        tc.SkillTickID := 10; //provisory, to work the sightrasher
 
         sl := TStringList.Create;
         sl.Clear;
