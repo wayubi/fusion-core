@@ -8235,22 +8235,62 @@ begin
                                                 xy.Y := tc.Point.Y;
 
                                                 k := 0;
+				if (tc.Option and 4 <> 0) then begin
+                          // Cloaked, so uncloak
+                          tc.isCloaked := false;
+                          tc.Hidden := false;
+                          tc.Skill[MSkill].Tick := Tick;
+                          tc.SkillTick := Tick;
+                          tc.SkillTickID := 135;
+                          tc.Option := tc.Option and $FFF9;
+                          CalcStat(tc, Tick);
 
-                                                for j := - 1 to 1 do begin
-                                                        if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
-                                                                tc.isCloaked := true;
-                                                                //tc.Optionkeep := tc.Option;
-                                                                // Colus, 20040204: Trying option 4 instead of 6 for cloak
-                                                                tc.Option := tc.Option or 4;
-                                                                k := 1;
-                                                        end;
-                                                end;
+                          WFIFOW(0, $0119);
+                          WFIFOL(2, tc.ID);
+                          WFIFOW(6, tc.Stat1);
+                          WFIFOW(8, tc.Stat2);
+                          WFIFOW(10, tc.Option);
+                          WFIFOB(12, 0);
+                          SendBCmd(tm, tc.Point, 13);
+                          tc.MMode := 4;
+                          exit;
+                        end else begin
+                        for j1 := - 1 to 1 do begin
+                          for i1 := -1 to 1 do begin
+                            if ((j1 = 0) and (i1 = 0)) then continue;
+                            j := tm.gat[xy.X + i1, xy.Y + j1];
+                                if (j = 1) or (j = 5) then begin
+                                  // Colus, 20040205: Moved this from SkillPassive.
+                                  // We don't need to run the cloak every tick, only
+                                  // the status change.
+                                  tc.isCloaked := true;
+                                  tc.Hidden := true;
+                                  tc.CloakTick := Tick;
+                                  //tc.Optionkeep := tc.Option;
+                                  // Colus, 20040204: Trying option 4 instead of 6 for cloak
+                                  tc.Option := tc.Option or 4;
+                                  k := 1;
+                                  CalcStat(tc, Tick);
+
+                                  WFIFOW(0, $0119);
+                                  WFIFOL(2, tc.ID);
+                                  WFIFOW(6, tc.Stat1);
+                                  WFIFOW(8, tc.Stat2);
+                                  WFIFOW(10, tc.Option);
+                                  WFIFOB(12, 0);
+                                  SendBCmd(tm, tc.Point, 13);
+                                  tc1 := tc;
+                                  ProcessType := 1;
+                                end;
+                          end;
+                        end;
 
                                                 if k = 0 then begin
-                                                        tc.MMode := 4;
-                                                        Exit;
+                                                  SendSkillError(tc, 0);
+                                                        //tc.MMode := 4;
+                                                        //Exit;
                                                 end;
-
+                        end;
                                                 {repeat
                                                         xy.X := (tm.Size.X - 2) + 1;
                                                         xy.Y := Random(tm.Size.Y - 2) + 1;
