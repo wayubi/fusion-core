@@ -1323,7 +1323,7 @@ begin
 			end;
 		end;
 		SkillDB.AddObject(tl.ID, tl);
-    SkillDBName.AddObject(tl.IDC, tl);
+        SkillDBName.AddObject(tl.IDC, tl);
 	end;
 	CloseFile(txt);
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d skill(s) database loaded.', [SkillDB.Count]));

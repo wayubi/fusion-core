@@ -540,7 +540,11 @@ uses
         tc.JobLV := StrToInt(frmMain.Edit12.Text);
         tc.JobEXP := StrToInt(frmMain.Edit13.Text);
         tc.SkillPoint := StrToInt(frmMain.Edit16.Text);
-        tc.Zeny := StrToInt(frmMain.Edit36.Text);
+
+        if StrToInt64(frmMain.Edit36.Text) < 0 then tc.Zeny := 0
+        else if StrToInt64(frmMain.Edit36.Text) > MAXINTEGER then tc.Zeny := MAXINTEGER
+        else tc.Zeny := StrToInt(frmMain.Edit36.Text);
+
         tc.Stat1 := StrToInt(frmMain.Edit55.Text);
         tc.Stat2 := StrToInt(frmMain.Edit56.Text);
         tc.Option := StrToInt(frmMain.Edit54.Text);

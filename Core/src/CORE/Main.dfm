@@ -1887,6 +1887,7 @@ object frmMain: TfrmMain
             Top = 96
             Width = 49
             Height = 26
+            MaxLength = 10
             TabOrder = 6
           end
           object Edit41: TEdit
