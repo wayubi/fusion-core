@@ -2478,7 +2478,7 @@ begin
 		end;
 	end;
 	if (ts.HP > 0) then begin
-                if (ts.AnkleSnareTick < Tick) then Exit;
+                if (ts.AnkleSnareTick > Tick) then Exit;
 		//ターゲット設定
 		if (EnableMonsterKnockBack) then begin
 			ts.pcnt := 0;
