@@ -1112,6 +1112,12 @@ Begin(* Proc sv3PacketProcess() *)
 
                                                                         UseUsableItem(tc, w);
 
+                                                                        { Worn out scroll }
+                                                                        if (td.ID = 618) then begin
+                                                                        	tc.BaseEXP := tc.BaseEXP + Round(tc.BaseNextEXP div 100);
+                                                                            SendCStat1(tc, 1, $0001, tc.BaseEXP);
+                                                                        end;
+
                                                                         {Yggasdril Leaf}
                                                                         if (td.ID = 610) then begin
                                                                                 SendItemSkill(tc, 54, 1);
