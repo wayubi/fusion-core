@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 364
-  Top = 445
+  Left = 252
+  Top = 220
   Width = 680
   Height = 344
   Caption = 'c'
@@ -38,7 +38,7 @@ object frmMain: TfrmMain
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'Century Gothic'
+    Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
     TabOrder = 0
@@ -54,7 +54,7 @@ object frmMain: TfrmMain
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'Century Gothic'
+    Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
     TabOrder = 1
@@ -69,7 +69,7 @@ object frmMain: TfrmMain
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'Century Gothic'
+    Font.Name = 'Trebuchet MS'
     Font.Style = []
     MaxLength = 83
     ParentFont = False
@@ -86,7 +86,7 @@ object frmMain: TfrmMain
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'Century Gothic'
+    Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
     TabOrder = 4
@@ -117,11 +117,11 @@ object frmMain: TfrmMain
     Height = 259
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = clMoneyGreen
+    Color = 14071432
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
     Font.Height = -12
-    Font.Name = 'Century Gothic'
+    Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
     ReadOnly = True
