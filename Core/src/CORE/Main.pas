@@ -3577,14 +3577,14 @@ begin
 						xy.Y := MPoint.Y;
 						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
 						tn.CData := tc;
-			                        tn.MSkill := MSkill;
+            tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 						SetLength(bb, 1);
 						bb[0] := 2;
 						DirMove(tm, xy, b, bb);
 						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
 						tn.CData := tc;
-			                        tn.MSkill := MSkill;
+			      tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
 						xy.X := MPoint.X;
 						xy.Y := MPoint.Y;
@@ -3592,8 +3592,9 @@ begin
 						DirMove(tm, xy, b, bb);
 						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
 						tn.CData := tc;
-			                        tn.MSkill := MSkill;
+			      tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
+            { Colus, 20031219: Removed the stair-step pattern for diagonal FWs
 						if (b mod 2) <> 0 then begin
 
 							xy.X := MPoint.X;
@@ -3613,6 +3614,7 @@ begin
 				                        tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
 						end;
+              Colus, 20031219: FW update end}
 					end;
 				25:     {Pneuma}
 					begin
@@ -3765,35 +3767,66 @@ begin
 							end;
 						end;
 						//DebugOut.Lines.Add(Format('IceWall: (%d,%d) %d', [xy.X, xy.Y, b]));
+            {Colus, 20031219: Extended IW to 5 tiles,
+                              Removed stair-step pattern on diagonal IWs,
+                              Made duration dependent on skill level.
+                              TODO:
+                              1) Why does center tile last 1s longer on level 1 IW?
+                                 - Tested, it's all on same tick--may be client prob?
+                              2) Make IWs damageable (change mode?)
+                                 Durability based on level (floor(500, 200+(level*200)))
+                                 Durability based on time (decay over time, rate = ?)
+                              3) Find push-back and remove it (related to 2?)
+            }
+
+						SetLength(bb, 1);
 
 						xy.X := MPoint.X;
 						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], 30000);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
 						tn.CData := tc;
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
-						SetLength(bb, 1);
+
+//						SetLength(bb, 1);
+
 						bb[0] := 2;
+
 						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], 30000);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
 						tn.CData := tc;
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
+
+    				DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+
 						xy.X := MPoint.X;
 						xy.Y := MPoint.Y;
 						bb[0] := 6;
+
 						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], 30000);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
 						tn.CData := tc;
 						tn.MSkill := MSkill;
 						tn.MUseLV := MUseLV;
+
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+{           Colus, 20031219: Removed stair-step pattern for diagonal IWs
 						if (b mod 2) <> 0 then begin
 							//ŽÎ‚ßŒü‚«
 							xy.X := MPoint.X;
 							xy.Y := MPoint.Y;
 							bb[0] := 3;
 							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], 30000);
+							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
 							tn.CData := tc;
 							tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
@@ -3801,12 +3834,15 @@ begin
 							xy.Y := MPoint.Y;
 							bb[0] := 5;
 							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], 30000);
+							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
 							tn.CData := tc;
 							tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
 						end;
+            Colus, 20031219: End IW modifications}
 					end;
+
+
                                 89:     {Storm Gust}
                                         begin
 					        xy.X := MPoint.X;
