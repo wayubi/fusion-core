@@ -22,11 +22,12 @@ const
 	MAX_PARTY_SIZE = 12;
 
 	//NPC CType Constants
-	NPC_TYPE_WARP   = 0;
-	NPC_TYPE_SHOP   = 1;
-	NPC_TYPE_SCRIPT = 2;
-	NPC_TYPE_ITEM   = 3;
-	NPC_TYPE_SKILL  = 4;
+	//Byte-sized ... Mmmmm-mmm!
+	NPC_TYPE_WARP   = $00;
+	NPC_TYPE_SHOP   = $01;
+	NPC_TYPE_SCRIPT = $02;
+	NPC_TYPE_ITEM   = $03;
+	NPC_TYPE_SKILL  = $04;
 
   // Colus, 20040503: This is the default JID for invisible (non-displayed) NPCs.
   // callmob and SendNData will look for this.
@@ -1059,22 +1060,20 @@ TPlayer = class
 	destructor  Destroy; override;
 end;//TPlayer
 //------------------------------------------------------------------------------
-{パーティー機能追加}
-// パーティーデータ
+// Party Data
 TParty = class
-	Name      :string;//パーティーの名前
-	MinLV     :word;//パーティー内最低レベル
-	MaxLV     :word;//パーティー内最大レベル
-	EXPShare  :word;//パーティー経験値設定(0がバラバラで1が公平)
-	ITEMShare :word;//パーティーアイテム設定(0がバラバラで1が共有？未実装要素)
-	MemberID  :array[0..MAX_PARTY_SIZE-1] of cardinal;//メンバーのID
-	Member    :array[0..MAX_PARTY_SIZE-1] of TChara;//メンバー
-	EXP       :Cardinal; //経験値分配用
-	JEXP      :Cardinal; //経験値分配用
-	PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
-	PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
-end;
-{パーティー機能追加ココまで}
+	Name        : string; //Party Name - must be unique
+	MinLV       : Word;//Lowest level in party
+	MaxLV       : Word;//Highest level in party
+	EXPShare    : Word;//Experience sharing (0 = Not shared, 1 = Shared)
+	ITEMShare   : Word;//Item sharing       (0 = Not Shared, 1 = Shared)
+	MemberID    : array[0..MAX_PARTY_SIZE-1] of Cardinal;//Character IDs
+	Member      : array[0..MAX_PARTY_SIZE-1] of TChara;  //References
+	EXP         : Cardinal; //Used for EXP distribution to members
+	JEXP        : Cardinal; //" " " " " "
+	PartyBard   : array[0..2] of TChara; {Tracks Who the Party's Bard is}
+	PartyDancer : array[0..2] of TChara; {Tracks Who the Party's Dancer is}
+end;//TParty
 //------------------------------------------------------------------------------
 TCastle = class
 	Name        :string;
@@ -7053,44 +7052,63 @@ End;(* Func GetGuildEDegree()
 *-----------------------------------------------------------------------------*)
 
 
-//------------------------------------------------------------------------------
-function GetGuildETrigger(tn:TNPC) : word;
-var
+(*-----------------------------------------------------------------------------*
+GetGuildETrigger
+
+Pre:
+	tn is a valid, non-nil NPC
+Post:
+	if the NPC is part of a guild, the ETrigger property value is returned,
+	else 0
+*-----------------------------------------------------------------------------*)
+Function  GetGuildETrigger(
+		tn : TNPC
+	) : Word;
+Var
+	Idx : Integer;
+Begin
+	//Check Preconditions
+	Assert(tn <> NIL, 'GetGuildETrigger() -- NPC passed is invalid');
+	//--
+
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
+
+	if (Idx > -1) then
+		Result := (CastleList.Objects[Idx] AS TCastle).ETrigger;
+End;(* Func GetGuildETrigger()
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+GetGuildDDegree
+
+Pre:
+	tn is a valid, non-nil NPC
+Post:
+	if the NPC is part of a guild, the DDegree property value is returned,
+	else 0
+*-----------------------------------------------------------------------------*)
+Function  GetGuildDDegree(
+		tn : TNPC
+	) : Cardinal;
+Var
   tgc:TCastle;
-  i  :integer;
-	w  :word;
-begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
+	Idx : Integer;
+Begin
+	//Check Preconditions
+	Assert(tn <> NIL, 'GetGuildETrigger() -- NPC passed is invalid');
+	//--
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-	w := tgc.ETrigger;
-  end else begin
-  w := 0;
-  end;
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
 
-	Result := w;
-end;
-//------------------------------------------------------------------------------
-function GetGuildDDegree(tn:TNPC) : cardinal;
-var
-  tgc:TCastle;
-  i  :integer;
-	w  :cardinal;
-begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
+	if (Idx > -1) then
+		Result := (CastleList.Objects[Idx] AS TCastle).DDegree;
+End;(* Func GetGuildDDegree()
+*-----------------------------------------------------------------------------*)
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  w := tgc.DDegree;
-  end else begin
-  w := 0;
-  end;
 
-	Result := w;
-end;
 //------------------------------------------------------------------------------
 function GetGuildDTrigger(tn:TNPC) : word;
 var
@@ -7331,7 +7349,7 @@ Changes made:
 - Added local procs to do the cleanup work, and reduce code bloat.
 - Added local Constants for one of the routines.
 - Added one or two local vars for naming clarity.
-
+- Lowercase of MapName used internally, to maintain data consistancy.
 *-----------------------------------------------------------------------------*)
 Procedure MapLoad(
 		MapName : string
@@ -7683,6 +7701,7 @@ Var
 		SL.Free;
 		SL1.Free;
 		SL2.Free;
+		if Assigned(tn) then tn.Free;
 		Result := False;
 	end;
 
@@ -7739,7 +7758,7 @@ Begin
 					tn.Dir     := StrToInt(SL1[3]);
 
 					SL1.DelimitedText := SL[3];
-					tn.CType       := 0;
+					tn.CType       := NPC_TYPE_WARP;
 					tn.WarpSize.X  := StrToInt(SL1[0]);
 					tn.WarpSize.Y  := StrToInt(SL1[1]);
 					tn.WarpMap     := ChangeFileExt(SL1[2], '');
@@ -7771,7 +7790,7 @@ Begin
 					tn.Dir     := StrToInt(SL1[3]);
 
 					SL1.DelimitedText := SL[3];
-					tn.CType := 1;
+					tn.CType := NPC_TYPE_SHOP;
 					tn.JID := StrToInt(SL1[0]);
 					SetLength(tn.ShopItem, SL1.Count - 1);
 					for Idx2 := 0 to sl1.Count - 2 do begin
@@ -7798,6 +7817,22 @@ Begin
 {d$0100fix5}
 	// Script --------------------------------------------------------------------
 				end else if SL[1] = 'script' then begin
+					(* ChrstphrR 2004/05/11
+					Script Line:
+					<MapToken> 'script' <NPCName> <IDToken>
+
+					<MapToken> ::= <MapName>,<X>,<Y>,<Direction>
+						<Direction> ::= {0|1|2|3|4|5|6|7}
+						107  Direction ranges from 0 to 7, Zero being North,
+						2 6  the other compass points continuing counter-clockwise.
+						345
+
+					<NPCName>  ::= <OneWordName> | "<OneOrMoreWordName>"
+					<IDToken>  ::= <SpriteID>,'{'
+
+					Valid SpriteIDs can be found in the tables on
+					http://www.geocities.co.jp/SiliconValley-Bay/1174/npce.html
+					*)
 					tn := TNPC.Create;
 					tn.ID := NowNPCID;
 					Inc(NowNPCID);
@@ -7809,13 +7844,17 @@ Begin
 					tn.Point.Y := StrToIntDef(SL1[2],0);
 					if (tn.Point.Y < 0) or (tn.Point.Y >= tm.Size.Y) then tn.Point.Y := 0;
 					tn.Dir := StrToInt(SL1[3]);
-					tn.CType := 2;
+					tn.CType := NPC_TYPE_SCRIPT;
 
-					ScriptPath := ExtractRelativePath(AppPath, ScriptList[Idx]);
+					//ChrstphrR - 2004/05/15 corrected ScriptPath so it is valid
+					ScriptPath := ExtractRelativePath(AppPath, FileName);
 
 					SL1.DelimitedText := SL[3];
-
-					TempInt := StrToInt(SL1[0]);
+					//SL1 is now the IDToken - 2 comma separated params - check count
+					if (SL1.Count <> 2) AND (SL1[2] <> '{') then begin
+						ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
+						Exit; // Safe - 2004/04/21
+					end;
 
 					// Colus, 20040503: Making it work in a 'proper' fashion.  We DO need it,
 					// but we'll handle negative values in a better manner.
