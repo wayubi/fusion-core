@@ -12,7 +12,7 @@ uses
         procedure MobSkills(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
 
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
-
+        procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
 var
 
 dmg           :array[0..7] of integer;
@@ -331,31 +331,24 @@ begin
                         WFIFOB(14, 1);
                         SendBCmd(tm, ts.Point, 15);
                 end;
+                46:     {Double Strafe}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 2;
+                        tc.HP := tc.HP - dmg[0];
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
+                end;
                 57:     {Brandish Spear}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[tsAI.SkillLV[0]] div 100;
+                        dmg[0] := dmg[0] * tc.Skill[57].Data.Data1[tsAI.SkillLV[i]] div 100;
                         tc.HP := tc.HP - dmg[0];
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
         end;
-        WFIFOW( 0, $01de);
-	WFIFOW( 2, tsAI.Skill[i]);
-	WFIFOL( 4, ts.ID);
-	WFIFOL( 8, tc.ID);
-	WFIFOL(12, Tick);
-	//WFIFOL(16, tc.aMotion);
-	//WFIFOL(20, ts.Data.dMotion);
-        WFIFOL(16, ts.Data.dMotion);
-	WFIFOL(20, tc.aMotion);
-	WFIFOL(24, dmg[0]);
-	WFIFOW(28, tsAI.SkillLV[i]);
-	WFIFOW(30, 1);
 
-        WFIFOB(32, 6);
-	//else               WFIFOB(32, 8);
-	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
-	SendBCmd(tm, tc.Point, 33);
         end;
 
 end;
@@ -636,6 +629,29 @@ begin
 	end;
 	//DebugOut.Lines.Add(Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;
+
+//------------------------------------------------------------------------------
+procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
+
+begin
+        WFIFOW( 0, $01de);
+	WFIFOW( 2, tsAI.Skill[i]);
+	WFIFOL( 4, ts.ID);
+	WFIFOL( 8, tc.ID);
+	WFIFOL(12, Tick);
+	//WFIFOL(16, tc.aMotion);
+	//WFIFOL(20, ts.Data.dMotion);
+        WFIFOL(16, ts.Data.dMotion);
+	WFIFOL(20, tc.aMotion);
+	WFIFOL(24, dmg[0]);
+	WFIFOW(28, tsAI.SkillLV[i]);
+	WFIFOW(30, k);
+        WFIFOB(32, 6);
+	//else               WFIFOB(32, 8);
+	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+	SendBCmd(tm, tc.Point, 33);
+end;
+//------------------------------------------------------------------------------
 
 
 end.

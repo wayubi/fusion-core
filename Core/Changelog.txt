@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-30-03: Added Monster Skill Double Strafing [Darkhelmet]
 - 12-30-03: Added Monster Skill Brandish Spear [Darkhelmet]
 - 12-30-03: Added Monster Skill Heal [Darkhelmet]
 - 12-30-03: Added Support For Monster Skills on Attack [Darkhelmet]
