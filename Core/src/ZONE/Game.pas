@@ -1923,10 +1923,18 @@ end;
 								for i := 0 to Length(tn.ShopItem) - 1 do begin
 									WFIFOL( 4 +i*11, tn.ShopItem[i].Price);
 									if tc.Skill[37].Lv <> 0 then begin
-										l := tn.ShopItem[i].Price * cardinal(tc.Skill[37].Data.Data1[tc.Skill[37].Lv]) div 100;
+                                        if (tn.ShopItem[i].Price) < 100 then begin
+                                            l := ( ( tn.ShopItem[i].Price * cardinal(tc.Skill[37].Data.Data1[tc.Skill[37].Lv]) ) div 100 );
+                                        end else begin
+                                            l := ( ( tn.ShopItem[i].Price div 100 ) * cardinal(tc.Skill[37].Data.Data1[tc.Skill[37].Lv]) );
+                                        end;
 										if l = 0 then	l := 1;
                                                                         end else if tc.Skill[224].Lv <> 0 then begin
-                                                                                l := tn.ShopItem[i].Price * cardinal(tc.Skill[224].Data.Data1[tc.Skill[224].Lv]) div 100;
+                                        if (tn.ShopItem[i].Price) < 100 then begin
+                                            l := ( ( tn.ShopItem[i].Price * cardinal(tc.Skill[224].Data.Data1[tc.Skill[224].Lv]) ) div 100 );
+                                        end else begin
+                                            l := ( ( tn.ShopItem[i].Price div 100 ) * cardinal(tc.Skill[224].Data.Data1[tc.Skill[224].Lv]) );
+                                        end;
 										if l = 0 then	l := 1;
 									end else begin
 										l := tn.ShopItem[i].Price;
