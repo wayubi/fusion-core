@@ -430,7 +430,10 @@ begin
 				Socket.SendBuf(buf, 4);
 
 				//カートデータ送信
-{追加}	SendCart(tc);
+
+				if (tc.Option = 8) then begin
+				    SendCart(tc);
+				end;
 
 				tc.HPTick := timeGetTime();
 				tc.SPTick := timeGetTime();

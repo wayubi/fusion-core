@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-25-03: Fixed Cart Items duplicate bug. [AlexKreuz]
 - 12-25-03: Fixed Frost Nova does 35000 (0) damage. [AlexKreuz]
 - 12-25-03: Fixed Card with skills in clip gives extra skill points. [AlexKreuz]
 - 12-25-03: Fixed Some skills (Inc AGI) Icons were showing on caster, not target. [Michen]
