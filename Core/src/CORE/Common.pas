@@ -1662,7 +1662,7 @@ Option_Font_Style : string;
 //------------------------------------------------------------------------------
 		procedure PickUpItem(tc:TChara; l:Cardinal);
 
-		procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
+		procedure CalcAbility(tc:TChara; idx:Integer; o:Integer = 0);
 		procedure CalcEquip(tc:TChara);
 		procedure CalcSkill(tc:TChara; Tick:cardinal);
 		procedure CalcStat(tc:TChara; Tick:cardinal = 0);
@@ -1956,13 +1956,17 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
+procedure CalcAbility(tc:TChara; idx:Integer; o:Integer = 0);
 var
 	j :Integer;
   i :byte;
   JIDFix :word; // JID correction
+  td : TItemDB;
+  td2 : TItemDB;
 begin
+	td := ItemDB.IndexOfObject(tc.Item[idx].Data.ID) as TItemDB;
 	with tc do begin
+
     JIDFix := tc.JID;
     if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
 
@@ -2062,19 +2066,37 @@ begin
                 if td.LVL4WeaponASPD then LVL4WeaponASPD := true;
                 if td.PerfectDamage then PerfectDamage := true;
 
-		for j :=1 to MAX_SKILL_NUMBER do begin // Add card skills
+
+        for i := 0 to tc.Item[idx].Data.Slot - 1 do begin
+        	td2 := ItemDB.IndexOfObject(tc.Item[idx].Card[i]) as TItemDB;
+            if assigned(td2) then begin
+				for j := 1 to MAX_SKILL_NUMBER do begin
+					if td2.AddSkill[j] <> 0 then begin
+						//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
+        		        if (not DisableSkillLimit) then begin
+		                	if (td.IEquip) and (tc.Skill[j].Lv = 0) then begin
+								tc.Skill[j].Lv := td2.AddSkill[j];
+								tc.Skill[j].Card := True;
+		                    end;
+						end;
+					end;
+				end; //for j :=1 to 336 do begin
+            end;
+        end;
+
+ 		for j := 1 to MAX_SKILL_NUMBER do begin
 			if td.AddSkill[j] <> 0 then begin
 				//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
                 if (not DisableSkillLimit) then begin
-                	if (td.IEquip) and (Skill[j].Lv = 0) then begin
-						Skill[j].Lv := td.AddSkill[j];
-						Skill[j].Card := True;
+                	if (td.IEquip) and (tc.Skill[j].Lv = 0) then begin
+						tc.Skill[j].Lv := td.AddSkill[j];
+						tc.Skill[j].Card := True;
                     end;
 				end;
 			end;
 		end; //for j :=1 to 336 do begin
 
-		if td.Cast <> 0 then MCastTimeFix := MCastTimeFix * td.Cast div 100; // Cast time corrections
+		if td.Cast <> 0 then tc.MCastTimeFix := tc.MCastTimeFix * td.Cast div 100; // Cast time corrections
 		if td.HP1 <> 0 then begin //MAXHP%(1001以上で+)
 			if td.HP1 > 1000 then begin
 				MAXHP := MAXHP + (td.HP1 - 1000);
@@ -2157,14 +2179,8 @@ begin
 						WElement[1] := Item[i].Data.Element;
 						ATK[1][2] := Item[i].Data.ATK;
 					end;
-					CalcAbility(tc, Item[i].Data, o);
-{アイテム製造修正}
-					for k := 0 to Item[i].Data.Slot - 1 do begin //カード補正1
-						//製造武器の関係でカードスロットにDBにない数字が入るため(4001-4149)の時だけカード処理するように修正
-						if (Item[i].Card[k] <> 0) and (Item[i].Card[k] > 4000) and (Item[i].Card[k] < 4211) then begin
-							CalcAbility(tc, (ItemDB.IndexOfObject(Item[i].Card[k]) as TItemDB), o);
-						end;
-					end;
+					CalcAbility(tc, i, o);
+
 					//製造武器の属性、星のかけらの判定
 					if (Item[i].Card[0] = $00FF) and (Item[i].Card[1] <> 0) then begin
 						//カードスロット1に入れられた数字を$0500で割った余りがその武器の属性となる
