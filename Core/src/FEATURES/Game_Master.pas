@@ -634,7 +634,7 @@ Called when we're shutting down the server *only*
     var
         tm : TMap;
     begin
-        Result := 'GM_ALIVE Activated';
+        Result := 'GM_ALIVE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tc.HP := tc.MAXHP;
@@ -654,7 +654,7 @@ Called when we're shutting down the server *only*
         td : TItemDB;
         i, j, k : Integer;
     begin
-        Result := 'GM_ITEM Activated';
+        Result := 'GM_ITEM Success.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 6, 256);
@@ -710,7 +710,7 @@ Called when we're shutting down the server *only*
 
     function command_save(tc : TChara) : String;
     begin
-        Result := 'GM_SAVE Activated';
+        Result := 'GM_SAVE Success.';
 
         tc.SaveMap := tc.Map;
         tc.SavePoint.X := tc.Point.X;
@@ -721,7 +721,7 @@ Called when we're shutting down the server *only*
 
     function command_return(tc : TChara) : String;
     begin
-        Result := 'GM_RETURN Activated';
+        Result := 'GM_RETURN Success.';
 
         SendCLeave(tc.Socket.Data, 2);
         tc.Map := tc.SaveMap;
@@ -733,7 +733,7 @@ Called when we're shutting down the server *only*
     var
         tm : TMap;
     begin
-        Result := 'GM_DIE Activated';
+        Result := 'GM_DIE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         CharaDie(tm, tc, 1);
@@ -744,7 +744,7 @@ Called when we're shutting down the server *only*
         sl : TStringList;
         j, k : Integer;
     begin
-        Result := 'GM_AUTO Activated';
+        Result := 'GM_AUTO Success.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 5, 256);
@@ -767,7 +767,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         i, k : Integer;
     begin
-        Result := 'GM_HCOLOR Activated';
+        Result := 'GM_HCOLOR Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
@@ -782,7 +782,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         i, k : Integer;
     begin
-        Result := 'GM_CCOLOR Activated';
+        Result := 'GM_CCOLOR Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
@@ -797,7 +797,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         i, k : Integer;
     begin
-        Result := 'GM_HSTYLE Activated';
+        Result := 'GM_HSTYLE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
@@ -813,7 +813,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         tm : TMap;
     begin
-        Result := 'GM_KILL Activated';
+        Result := 'GM_KILL Success.';
 
         s := Copy(str, 6, 256);
         if (CharaName.Indexof(s) <> -1) then begin
@@ -844,7 +844,7 @@ Called when we're shutting down the server *only*
         s : String;
         tc1 : TChara;
     begin
-        Result := 'GM_GOTO Activated';
+        Result := 'GM_GOTO Success.';
 
         s := Copy(str, 6, 256);
         if CharaName.Indexof(s) <> -1 then begin
@@ -865,7 +865,7 @@ Called when we're shutting down the server *only*
         s : String;
         tc1 : TChara;
     begin
-        Result := 'GM_SUMMON Activated';
+        Result := 'GM_SUMMON Success.';
 
         s := Copy(str, 8, 256);
         if CharaName.Indexof(s) <> -1 then begin
@@ -2257,7 +2257,7 @@ Called when we're shutting down the server *only*
                     SendCStat1(tc1, 0, $0009, tc1.StatusPoint);
                     SendCStat1(tc1, 1, $0001, tc1.BaseEXP);
 
-                    Result := 'GM_CHARBLEVEL Success, level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.BaseLV) + '.';
+                    Result := 'GM_CHARBLEVEL Success. Level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.BaseLV) + '.';
                 end else begin
                     Result := Result + ' Incomplete information or level out of range.';
                 end;
@@ -2324,7 +2324,7 @@ Called when we're shutting down the server *only*
                     SendCStat1(tc1, 0, $000c, tc1.SkillPoint);
                     SendCStat1(tc1, 1, $0002, tc1.JobEXP);
 
-                    Result := 'GM_CHARJLEVEL Success, level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.JobLV) + '.';
+                    Result := 'GM_CHARJLEVEL Success. Level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.JobLV) + '.';
                 end else begin
                     Result := Result + ' Incomplete information or level out of range.';
                 end;
@@ -2366,7 +2366,7 @@ Called when we're shutting down the server *only*
 
                     SendCStat1(tc1, 0, $0009, tc1.StatusPoint);
 
-                    Result := 'GM_CHARSTATPOINT Success, status points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.StatusPoint) + '.';
+                    Result := 'GM_CHARSTATPOINT Success. Status points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.StatusPoint) + '.';
                 end else begin
                     Result := Result + ' Incomplete information or value out of range.';
                 end;
@@ -2408,7 +2408,7 @@ Called when we're shutting down the server *only*
 
                     SendCStat1(tc1, 0, $000c, tc1.SkillPoint);
 
-                    Result := 'GM_CHARSKILLPOINT Success, skill points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.SkillPoint) + '.';
+                    Result := 'GM_CHARSKILLPOINT Success. Skill points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.SkillPoint) + '.';
                 end else begin
                     Result := Result + ' Incomplete information or value out of range.';
                 end;
@@ -2419,93 +2419,6 @@ Called when we're shutting down the server *only*
             Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
         end;
     sl.Free;
-    end;
-
-    function command_athena_heal(tc : TChara; str : String) : String;
-    var
-        sl : TStringList;
-        tm : TMap;
-        i, j, ii : Integer;
-    begin
-        Result := 'GM_ATHENA_HEAL failure.';
-
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-
-        sl := TStringList.Create;
-        sl.DelimitedText := Copy(str, 6, 256);
-
-        if (sl.Count < 2) or (sl.Count > 3) then Exit;
-
-        i := 0;
-        j := 0;
-
-        if (sl.Count = 2) then begin
-            val(sl.Strings[0], i, ii);
-            if ii <> 0 then Exit;
-            val(sl.Strings[1], j, ii);
-            if ii <> 0 then Exit;
-        end;
-
-        if (i <= 0) then i := tc.MAXHP;
-        if (j <= 0) then j := tc.MAXSP;
-
-        if (tc.HP + i > tc.MAXHP) then i := tc.MAXHP - tc.HP;
-        if (tc.SP + j > tc.MAXSP) then j := tc.MAXSP - tc.SP;
-
-        i := i + tc.HP;
-        j := j + tc.SP;
-
-        tc.HP := i;
-        tc.SP := j;
-        tc.Sit := 3;
-        SendCStat1(tc, 0, 5, tc.HP);
-        SendCStat1(tc, 0, 7, tc.SP);
-        WFIFOW( 0, $0148);
-        WFIFOL( 2, tc.ID);
-        WFIFOW( 6, 100);
-        SendBCmd(tm, tc.Point, 8);
-
-        Result := 'GM_ATHENA_HEAL success. HP/SP healed!';
-        sl.Free;
-    end;
-
-    function command_athena_kami(tc : TChara; str : String) : String;
-    var
-        sl : TStringList;
-        i, w : Integer;
-        str2 : String;
-    begin
-        Result := 'GM_ATHENA_KAMI failed.';
-
-        sl := tstringlist.Create;
-        sl.DelimitedText := str;
-
-        if (sl.Count < 2) or (sl.Count > 3) then Exit;
-
-        str2 := '';
-        for i := 1 to (sl.Count - 1) do begin
-            str2 := str2 + ' ' + sl.Strings[i];
-        end;
-        str2 := Trim(str2);
-
-        if (length(sl.Strings[0])) = 5 then begin
-            str2 := 'blue' + str2;
-        end;
-
-        w := Length(str2) + 4;
-        WFIFOW (0, $009a);
-        WFIFOW (2, w);
-        WFIFOS (4, str2, w - 4);
-
-        for i := 0 to charaname.count - 1 do begin
-            tc := charaname.objects[i] as tchara;
-            if (tc.login = 2) then begin
-                tc.socket.sendbuf(buf, w);
-            end;
-        end;
-
-        Result := 'GM_ATHENA_KAMI success.';
-        sl.free;
     end;
 
     function command_changes(tc : TChara; str : String) : String;
@@ -2639,7 +2552,7 @@ Called when we're shutting down the server *only*
                 tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
                 SendCStat1(tc, 0, $0018, tc.Weight);
                 SendCGetItem(tc, k, j);
-                Result := 'GM_AEGIS_ITEM Success.';
+                Result := 'GM_AEGIS_ITEM Success. ' + inttostr(j) + ' ' + str + ' spawned.' ;
             end;
         end else begin
             WFIFOW( 0, $00a0);
@@ -2666,17 +2579,12 @@ Called when we're shutting down the server *only*
         ts.JID := ts.Data.ID;
         ts.Map := tc.Map;
         ts.Data.isLink :=false;
-        //ts.Data.isLoot :=false;
-        //プレイヤーの周囲9マスのどこかに召還
         ts.Point.X := tc.Point.X + Random(2) - 1;
         ts.Point.Y := tc.Point.Y + Random(2) - 1;
 
         ts.Dir := Random(8);
         ts.HP := ts.Data.HP;
         ts.Speed := ts.Data.Speed;
-
-        //沸き間隔を極大に設定
-        //ここはちょっと処理が適当かな？
 
         ts.SpawnDelay1 := $7FFFFFFF;
         ts.SpawnDelay2 := 0;
@@ -2723,7 +2631,7 @@ Called when we're shutting down the server *only*
                 ts.MVPDist[j].CData := nil;
                 ts.MVPDist[j].Dmg := 0;
             end;
-            ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+            ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100;
         end;
         ts.isSummon := True;
         ts.EmperiumID := 0;
@@ -2732,10 +2640,9 @@ Called when we're shutting down the server *only*
         tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 
         SendMData(tc.Socket, ts);
-        //周囲に送信
         SendBCmd(tm,ts.Point,41,tc,False);
 
-        Result := 'GM_AEGIS_MONSTER Success.';
+        Result := 'GM_AEGIS_MONSTER Success. ' + str + ' summoned.';
 
         if (SummonMonsterMob = true) then begin
             k := SlaveDBName.IndexOf(str);
@@ -2791,7 +2698,7 @@ Called when we're shutting down the server *only*
                                         ts1.MVPDist[j].CData := nil;
                                         ts1.MVPDist[j].Dmg := 0;
                                     end;
-                                        ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100; //FAに30%加算
+                                        ts1.MVPDist[0].Dmg := ts1.Data.HP * 30 div 100;
                                 end;
                                 tm.Mob.AddObject(ts1.ID, ts1);
                                 tm.Block[ts1.Point.X div 8][ts1.Point.Y div 8].Mob.AddObject(ts1.ID, ts1);
@@ -2800,7 +2707,6 @@ Called when we're shutting down the server *only*
                                 ts1.EmperiumID := 0;
 
                                 SendMData(tc.Socket, ts1);
-                                //周囲に送信
                                 SendBCmd(tm,ts1.Point,41,tc,False);
 
                                 h := h - 1;
@@ -2816,7 +2722,7 @@ Called when we're shutting down the server *only*
     var
         i : Integer;
     begin
-        Result := 'GM_AEGIS_RESETSTATE Activated.';
+        Result := 'GM_AEGIS_RESETSTATE Success.';
         for i := 0 to 5 do begin
             tc.ParamBase[i] := 1;
         end;
@@ -2832,7 +2738,7 @@ Called when we're shutting down the server *only*
     var
         i, j : Integer;
     begin
-        Result := 'GM_AEGIS_RESETSKILL Activated.';
+        Result := 'GM_AEGIS_RESETSKILL Success.';
         j := 0;
         for i := 2 to MAX_SKILL_NUMBER do begin
             j := j + tc.Skill[i].Lv;
@@ -2859,18 +2765,18 @@ Called when we're shutting down the server *only*
     var
         tm : TMap;
     begin
+    	Result := 'GM_AEGIS_HIDE Success.';
         tm := tc.MData;
 
         if (tc.Option and 64 = 0) then begin
             tc.Option := tc.Option or 64;
             tc.Hidden := true;
-            Result := 'GM_AEGIS_HIDE Activated.';
+            Result := Result + ' Hide Activated.';
         end else begin
             tc.Option := tc.Option and $FFBF;
             tc.Hidden := false;
-            Result := 'GM_AEGIS_HIDE Deactivated.';
+            Result := Result + ' Hide Deactivated.';
         end;
-
 
         WFIFOW(0, $0119);
         WFIFOL(2, tc.ID);
@@ -2881,11 +2787,100 @@ Called when we're shutting down the server *only*
         SendBCmd(tm, tc.Point, 13);
     end;
 
+
+    function command_athena_heal(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tm : TMap;
+        i, j, ii : Integer;
+    begin
+        Result := 'GM_ATHENA_HEAL Failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if (sl.Count < 2) or (sl.Count > 3) then Exit;
+
+        i := 0;
+        j := 0;
+
+        if (sl.Count = 2) then begin
+            val(sl.Strings[0], i, ii);
+            if ii <> 0 then Exit;
+            val(sl.Strings[1], j, ii);
+            if ii <> 0 then Exit;
+        end;
+
+        if (i <= 0) then i := tc.MAXHP;
+        if (j <= 0) then j := tc.MAXSP;
+
+        if (tc.HP + i > tc.MAXHP) then i := tc.MAXHP - tc.HP;
+        if (tc.SP + j > tc.MAXSP) then j := tc.MAXSP - tc.SP;
+
+		Result := 'GM_ATHENA_HEAL Success. ' + inttostr(i) + ' HP & ' + inttostr(j) + ' SP healed.';        
+
+        i := i + tc.HP;
+        j := j + tc.SP;
+
+        tc.HP := i;
+        tc.SP := j;
+        tc.Sit := 3;
+        SendCStat1(tc, 0, 5, tc.HP);
+        SendCStat1(tc, 0, 7, tc.SP);
+        WFIFOW( 0, $0148);
+        WFIFOL( 2, tc.ID);
+        WFIFOW( 6, 100);
+        SendBCmd(tm, tc.Point, 8);
+
+        sl.Free;
+    end;
+
+    function command_athena_kami(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, w : Integer;
+        str2 : String;
+    begin
+        Result := 'GM_ATHENA_KAMI Failed.';
+
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if (sl.Count < 2) or (sl.Count > 3) then Exit;
+
+        str2 := '';
+        for i := 1 to (sl.Count - 1) do begin
+            str2 := str2 + ' ' + sl.Strings[i];
+        end;
+        str2 := Trim(str2);
+
+        if (length(sl.Strings[0])) = 5 then begin
+            str2 := 'blue' + str2;
+        end;
+
+        w := Length(str2) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str2, w - 4);
+
+        for i := 0 to charaname.count - 1 do begin
+            tc := charaname.objects[i] as tchara;
+            if (tc.login = 2) then begin
+                tc.socket.sendbuf(buf, w);
+            end;
+        end;
+
+        Result := 'GM_ATHENA_KAMI Success.';
+        sl.free;
+    end;
+
     function command_athena_alive(tc : TChara) : String;
     var
         tm : TMap;
     begin
-        Result := 'GM_ATHENA_ALIVE Activated';
+        Result := 'GM_ATHENA_ALIVE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tc.HP := tc.MAXHP;
@@ -2905,7 +2900,7 @@ Called when we're shutting down the server *only*
         i : Integer;
         tm : TMap;
     begin
-        Result := 'GM_ATHENA_KILL failure.';
+        Result := 'GM_ATHENA_KILL Failure.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         sl := TStringList.Create;
@@ -2931,7 +2926,7 @@ Called when we're shutting down the server *only*
                 WFIFOB( 6, 1);
                 SendBCmd(tm, tc.Point, 7);
 
-                Result := 'GM_ATHENA_KILL success. ' + tc.name + ' has killed ' + tc.name + '.';
+                Result := 'GM_ATHENA_KILL Success. ' + tc.name + ' has killed ' + tc.name + '.';
             end else begin
                 Result := Result + tc.Name + ' is not online.';
             end;
@@ -2957,7 +2952,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         i, j, ii : Integer;
     begin
-        Result := 'GM_ATHENA_JOBCHANGE failure.';
+        Result := 'GM_ATHENA_JOBCHANGE Failure.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
@@ -3027,7 +3022,7 @@ Called when we're shutting down the server *only*
             // Colus, 20040303: Using newer packet to allow upper job changes
             UpdateLook(tm, tc, 0, i);
 
-            Result := 'GM_ATHENA_JOBCHANGE success.';
+            Result := 'GM_ATHENA_JOBCHANGE Success.';
 
         end;
 
@@ -3039,7 +3034,7 @@ Called when we're shutting down the server *only*
         tm : TMap;
         i : Integer;
     begin
-        Result := 'GM_ATHENA_HIDE activated.';
+        Result := 'GM_ATHENA_HIDE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
@@ -3063,7 +3058,7 @@ Called when we're shutting down the server *only*
         sl : TStringList;
         i, ii, j, k, w : Integer;
     begin
-        Result := 'GM_ATHENA_OPTION failure.';
+        Result := 'GM_ATHENA_OPTION Failure.';
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         sl := tstringlist.Create;
         sl.DelimitedText := str;
@@ -3088,7 +3083,7 @@ Called when we're shutting down the server *only*
         tc.Stat2 := j;
         tc.Option := k;
 
-        Result := 'GM_ATHENA_OPTION success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
+        Result := 'GM_ATHENA_OPTION Success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
 
         w := Length(str) + 4;
         WFIFOW (0, $009a);
@@ -3101,7 +3096,7 @@ Called when we're shutting down the server *only*
 
     function command_athena_storage(tc : TChara) : String;
     begin
-        Result := 'GM_ATHENA_STORAGE activated.';
+        Result := 'GM_ATHENA_STORAGE Success.';
         SendCStoreList(tc);
     end;
 
@@ -3110,14 +3105,14 @@ Called when we're shutting down the server *only*
         sl : TStringList;
         w : Integer;
     begin
-        Result := 'GM_ATHENA_SPEED failure.';
+        Result := 'GM_ATHENA_SPEED Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
         if sl.count <> 2 then Exit;
 
         if (strtoint(sl.Strings[1]) >= 25) and (strtoint(sl.Strings[1]) <= 1000) then begin
-            Result := 'GM_ATHENA_SPEED success. Walking speed is now ' + sl.Strings[1];
+            Result := 'GM_ATHENA_SPEED Success. Walking speed is now ' + sl.Strings[1];
             tc.DefaultSpeed := strtoint(sl.strings[1]);
             CalcStat(tc);
             SendCStat1(tc, 0, 0, tc.Speed);
@@ -3139,7 +3134,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         i, w : Integer;
     begin
-        Result := 'GM_ATHENA_WHO3 activated.';
+        Result := 'GM_ATHENA_WHO3 Success.';
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
@@ -3158,7 +3153,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         i, w : Integer;
     begin
-        Result := 'GM_ATHENA_WHO2 activated.';
+        Result := 'GM_ATHENA_WHO2 Success.';
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
@@ -3204,7 +3199,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         i, w : Integer;
     begin
-        Result := 'GM_ATHENA_WHO activated.';
+        Result := 'GM_ATHENA_WHO Success.';
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
@@ -3224,7 +3219,7 @@ Called when we're shutting down the server *only*
         ta : TMapList;
         i, j, ii : Integer;
     begin
-        Result := 'GM_ATHENA_JUMP failure.';
+        Result := 'GM_ATHENA_JUMP Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3244,7 +3239,7 @@ Called when we're shutting down the server *only*
             tc.Point := point(i, j);
             mapmove(tc.Socket, tc.tmpMap, tc.Point);
 
-            Result := 'GM_ATHENA_JUMP success. Jumped to ' + IntToStr(i) + ',' + IntToStr(j);
+            Result := 'GM_ATHENA_JUMP Success. Jumped to ' + IntToStr(i) + ',' + IntToStr(j);
         end;
 
     sl.Free;
@@ -3257,7 +3252,7 @@ Called when we're shutting down the server *only*
         str2 : String;
         i : Integer;
     begin
-        Result := 'GM_ATHENA_JUMPTO failure.';
+        Result := 'GM_ATHENA_JUMPTO Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3275,7 +3270,7 @@ Called when we're shutting down the server *only*
             tc.point := tc1.point;
             mapmove (tc1.socket, tc1.map, tc1.point);
 
-            Result := 'GM_ATHENA_JUMPTO success. Jumped to ' + tc1.Name;
+            Result := 'GM_ATHENA_JUMPTO Success. Jumped to ' + tc1.Name;
         end;
 
         sl.Free;
@@ -3288,7 +3283,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         i, w : Integer;
     begin
-        Result := 'GM_ATHENA_WHERE failure.';
+        Result := 'GM_ATHENA_WHERE Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3310,7 +3305,7 @@ Called when we're shutting down the server *only*
             WFIFOS (4, str, w - 4);
             tc.socket.sendbuf(buf, w);
 
-            Result := 'GM_ATHENA_WHERE success.';
+            Result := 'GM_ATHENA_WHERE Success.';
         end;
 
         sl.Free;
@@ -3386,7 +3381,7 @@ Called when we're shutting down the server *only*
         ta : TMapList;
         tc1 : TChara;
     begin
-        Result := 'GM_ATHENA_WARP+ failure.';
+        Result := 'GM_ATHENA_WARP+ Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3421,7 +3416,7 @@ Called when we're shutting down the server *only*
                     tc1.tmpMap := sl.Strings[1];
                     tc1.Point := point(i, j);
                     mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                    Result := 'GM_ATHENA_WARP+ success.';
+                    Result := 'GM_ATHENA_WARP+ Success.';
                 end
 
                 else begin
@@ -3441,7 +3436,7 @@ Called when we're shutting down the server *only*
         ta : TMapList;
         tc1 : TChara;
     begin
-        Result := 'GM_ATHENA_SEND failure.';
+        Result := 'GM_ATHENA_SEND Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3476,7 +3471,7 @@ Called when we're shutting down the server *only*
                     tc1.tmpMap := sl.Strings[1];
                     tc1.Point := point(i, j);
                     mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                    Result := 'GM_ATHENA_SEND success.';
+                    Result := 'GM_ATHENA_SEND Success.';
                 end
 
                 else begin
@@ -3496,7 +3491,7 @@ Called when we're shutting down the server *only*
         ta : TMapList;
         tc1 : TChara;
     begin
-        Result := 'GM_ATHENA_RURA+ failure.';
+        Result := 'GM_ATHENA_RURA+ Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3531,7 +3526,7 @@ Called when we're shutting down the server *only*
                     tc1.tmpMap := sl.Strings[1];
                     tc1.Point := point(i, j);
                     mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                    Result := 'GM_ATHENA_RURA+ success.';
+                    Result := 'GM_ATHENA_RURA+ Success.';
                 end
 
                 else begin
@@ -3551,7 +3546,7 @@ Called when we're shutting down the server *only*
         ta : TMapList;
         tc1 : TChara;
     begin
-        Result := 'GM_ATHENA_CHARWARP failure.';
+        Result := 'GM_ATHENA_CHARWARP Failure.';
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
@@ -3586,7 +3581,7 @@ Called when we're shutting down the server *only*
                     tc1.tmpMap := sl.Strings[1];
                     tc1.Point := point(i, j);
                     mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                    Result := 'GM_ATHENA_CHARWARP success.';
+                    Result := 'GM_ATHENA_CHARWARP Success.';
                 end
 
                 else begin
