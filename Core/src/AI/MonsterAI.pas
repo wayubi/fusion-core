@@ -344,7 +344,13 @@ begin
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
-                13:     {Soul Strike}
+                11,13,14,19,20:
+                                { 11  : Napalm Beat
+                                  13  : Soul Strike
+                                  14  : Cold Bolt
+                                  19  : Fire Bolt
+                                  20  : Lightning Bolt
+                                }
                         begin
                                 //dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
                                 //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
@@ -353,12 +359,34 @@ begin
                                 MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
 
                                 if dmg[0] < 1 then dmg[0] := 1;
-                                dmg[0] := dmg[0] * ElementTable[tc.Skill[13].Data.Element][0] div 100;
-                                dmg[0] := dmg[0] * tc.Skill[13].Data.Data2[tsAI.SkillLV[i]];
+                                dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][0] div 100;
+                                dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data2[tsAI.SkillLV[i]];
 
                                 if dmg[0] < 0 then dmg[0] := 0;
-                                SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                                SendMSkillAttack(tm, tc, ts, tsAI, Tick, tc.Skill[tsAI.Skill[i]].Data.Data2[tsAI.SkillLV[i]], i);
                         end;
+                15:     {Frost Driver}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+
+                        //dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * ( MUseLV + 100 ) div 100;
+                        //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+                        //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+                        if dmg[0] < 1 then dmg[0] := 1;
+                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][0] div 100;
+                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                        //Send Packets
+			SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                                        {if (ts.Data.race <> 1) and (ts.Data.MEXP = 0) and (dmg[0] <> 0)then begin
+                                                if Random(1000) < tl.Data1[MUseLV] * 10 then begin
+                                                        ts.nStat := 2;
+                                                        ts.BodyTick := Tick + tc.aMotion;
+                                                end;
+                                        end;}
+					//DamageProcess1(tm, tc, ts, dmg[0], Tick, False);
+					//tc.MTick := Tick + 1500;
+                end;
 
                 28:     {Heal}
                 begin
@@ -383,6 +411,13 @@ begin
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
                 end;
 
+                56:     {Pierce}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[56].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 2, i);
+                end;
                 57:     {Brandish Spear}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);

@@ -2,6 +2,12 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-01-04: Added Monster Skill Frost Driver [Darkhelmet]
+- 01-01-04: Added Monster Skill Pierce [Darkhelmet]
+- 01-01-04: Added Monster Skill Lightning Bolt [Darkhelmet]
+- 01-01-04: Added Monster Skill Fire Bolt [Darkhelmet]
+- 01-01-04: Added Monster Skill Cold Bolt [Darkhelmet]
+- 01-01-04: Added Monster Skill Napalm Beat  [Darkhelmet]
 - 01-01-04: Extended so monsters can use up to 8 Skills [Darkhelmet + Oatmeal12345]
 - 01-01-04: Added Monster Skill Soul Strike [Darkhelmet]
 - 01-01-04: Added Monster Skill Charged Arrow [Darkhelmet]
