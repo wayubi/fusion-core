@@ -5232,24 +5232,6 @@ end;
 					//ïœçXí ím
 					WFIFOW( 0, $0174);
 					SendGuildMCmd(tc, w, false);
-
-          {  Mitch: Fix bug 0000365 (first guild rank doesnt change) }
-          for i := 0 to 36 do begin
-            if tg.MemberID[i] <> 0 then begin
-              j := Chara.IndexOf(tg.MemberID[i]);
-              if j <> -1 then begin
-                tc1 := Chara.Objects[j] as TChara;
-						    tc1.GuildName := tg.Name;
-						    tc1.GuildID := tg.ID;
-						    tc1.ClassName := tg.PosName[tg.MemberPos[i]];
-						    tc1.GuildPos := i;
-						    tg.Member[i] := tc1;
-						    if (i = 0) then tg.MasterName := tc1.Name;
-					    	tg.SLV := tg.SLV + tc1.BaseLV;
-              end;
-            end;
-          end;
-
 				end;
 			end;
 		//--------------------------------------------------------------------------
