@@ -3141,10 +3141,10 @@ begin
 				if sl.Count <> 0 then begin
 					for k1 := 0 to sl.Count - 1 do begin
 						ts1 := sl.Objects[k1] as TMob;
-						dmg[0] := dmg[0] * ElementTable[0][ts1.Element] div 100; //属性相性補正
+						dmg[0] := dmg[1] * ElementTable[0][ts1.Element] div 100; //属性相性補正
 						if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 						//パケ送信
-						SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+						SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 5);
 						//ダメージ処理
 						if ts = ts1 then
 							dmg[7] := dmg[0]
