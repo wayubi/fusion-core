@@ -5083,7 +5083,7 @@ end;
 			end;
 
 		//--------------------------------------------------------------------------
-		$01a1: // ペットメニュー
+		$01a1: // Actions from the pet menu
 			begin
 				RFIFOB( 2, b );
 				tm := tc.MData;
@@ -5093,7 +5093,7 @@ end;
 					tn := tc.PetNPC;
 
 					case b of
-					0: // ペットステータス表示
+					0: // Display pet's condition
 						begin
 							WFIFOW( 0, $01a2 );
 							WFIFOS( 2, tpe.Name, 24 );
@@ -5104,7 +5104,7 @@ end;
 							WFIFOW( 33, tpe.Accessory );
 							Socket.SendBuf( buf, 35 );
 						end;
-					1: // エサをあげる
+					1: // Feed Pet
 						begin
 							w := 0;
 							j := 0;
@@ -5118,12 +5118,12 @@ end;
 
 							if w > 0 then begin
 
-								// アイテム減少
+								// If you have the item
 								Dec(tc.Item[w].Amount);
 								if tc.Item[w].Amount = 0 then tc.Item[w].ID := 0;
 								tc.Weight := tc.Weight - tc.Item[w].Data.Weight;
 
-								//アイテム数減少
+								//Send that the item was used
 								WFIFOW( 0, $00af);
 								WFIFOW( 2, w);
 								WFIFOW( 4, 1);
@@ -5142,136 +5142,142 @@ end;
 								tpe.Fullness := tpe.Fullness + tpe.Data.Fullness;
 								if tpe.Fullness > 100 then tpe.Fullness := 100;
 
-                                                                WFIFOW( 0, $01a4 );
-                                                                WFIFOB( 2, 1 );
-                                                                WFIFOL( 3, tn.ID );
-                                                                WFIFOL( 7, tpe.Relation );
-                                                                Socket.SendBuf( buf, 11 );
+                                {Send Packet For Updating Hunger}
+                                WFIFOW( 0, $01a4 );
+                                WFIFOB( 2, 1 );
+                                WFIFOL( 3, tn.ID );
+                                WFIFOL( 7, tpe.Fullness );
+                                Socket.SendBuf( buf, 11 );
 
-                                                                WFIFOW( 0, $01a4 );
-                                                                WFIFOB( 2, 2 );
-                                                                WFIFOL( 3, tn.ID );
-                                                                WFIFOL( 7, tpe.Fullness );
-                                                                Socket.SendBuf( buf, 11 );
+                                {Send Packet for updating relationship}
+                                WFIFOW( 0, $01a4 );
+                                WFIFOB( 2, 2 );
+                                WFIFOL( 3, tn.ID );
+                                WFIFOL( 7, tpe.Relation );
+                                Socket.SendBuf( buf, 11 );
 
-                                                                j := 1;
-                                                        end;
 
-                                                        WFIFOW( 0, $01a3 );
-                                                        WFIFOB( 2, j );
-                                                        WFIFOW( 3, tpe.Data.FoodID );
-                                                        Socket.SendBuf( buf, 5 );
-                                                end;
-												2: // パフォーマンス
-                                                begin
-                                                        // 親密度が高いほど、多くのアクションを見せるようにしてみる
-                                                        if tpe.Relation <= 100 then i := 0
-                                                        else if tpe.Relation <= 250 then i := 1
-                                                        else if tpe.Relation <= 750 then i := 2
-                                                        else i := 3;
 
-                                                        WFIFOW( 0, $01a4 );
-                                                        WFIFOB( 2, 4 );
-                                                        WFIFOL( 3, tn.ID );
-                                                        WFIFOL( 7, Random(i) );
-                                                        SendBCmd( tm, tn.Point, 11 );
-                                                end;
-                                                3: // 卵に戻す
-                                                begin
-                                                        for i := 1 to 100 do begin
-                                                                if( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
-                                                                ( tc.Item[i].Card[0] = $FF00 ) and ( tc.Item[i].Attr <> 0 ) then begin
+                                j := 1;
+                            end;
 
-                                                                        tc.Item[i].Attr := 0;
-
-                                                                        WFIFOW( 0, $0080 );
-                                                                        WFIFOL( 2, tn.ID );
-                                                                        WFIFOB( 6, 0 );
-                                                                        SendBCmd( tm, tn.Point, 7 );
-
-                                                                        tpe.Incubated := 0;
-
-                                                                        if UseSQL then begin
-                                                                          SavePetData(tpe, i, 1);
-                                                                        end;
-                                                                        //ペット削除
-																		j := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
-                                                                        if j <> -1 then begin
-                                                                                tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(j);
-                                                                        end;
-
-                                                                        j := tm.NPC.IndexOf( tn.ID );
-                                                                        if j <> -1 then begin
-                                                                                tm.NPC.Delete(j);
-                                                                        end;
-
-                                                                        tn.Free;
-                                                                        tc.PetData := nil;
-                                                                        tc.PetNPC := nil;
-
-                                                                        break;
-                                                                end;
-                                                        end;
-
-                                                end;
-                                                4: // アクセサリ解除
-                                                begin
-                                                        if tpe.Accessory <> 0 then begin
-
-                                                                if ItemDB.IndexOf( tpe.Accessory ) <> -1 then begin
-                                                                        td := ItemDB.IndexOfObject( tpe.Accessory ) as TItemDB;
-
-                                                                        // 重量判定
-                                                                        if tc.MaxWeight >= tc.Weight + td.Weight then begin
-																																								j := SearchCInventory(tc, td.ID, td.IEquip );
-                                                                                if j <> 0 then begin
-                                                                                        //アイテム追加
-                                                                                        tc.Item[j].ID := td.ID;
-                                                                                        tc.Item[j].Amount := tc.Item[j].Amount + 1;
-                                                                                        tc.Item[j].Equip := 0;
-                                                                                        tc.Item[j].Identify := 1;
-                                                                                        tc.Item[j].Refine := 0;
-                                                                                        tc.Item[j].Attr := 0;
-                                                                                        tc.Item[j].Card[0] := 0;
-                                                                                        tc.Item[j].Card[1] := 0;
-                                                                                        tc.Item[j].Card[2] := 0;
-                                                                                        tc.Item[j].Card[3] := 0;
-
-                                                                                        tc.Item[j].Data := td;
-
-                                                                                        //アイテムゲット通知
-                                                                                        SendCGetItem(tc, j, 1);
-
-                                                                                        // Update weight
-                                                                                        tc.Weight := tc.Weight + td.Weight;
-                                                                                        SendCStat1(tc, 0, $0018, tc.Weight);
-                                                                                end else begin
-                                                                                        //これ以上もてない
-                                                                                        WFIFOW( 0, $00a0);
-																																												WFIFOB(22, 1);
-                                                                                        Socket.SendBuf(buf, 23);
-                                                                                end;
-                                                                        end else begin
-                                                                                //重量オーバー
-                                                                                WFIFOW( 0, $00a0);
-                                                                                WFIFOB(22, 2);
-                                                                                Socket.SendBuf(buf, 23);
-                                                                        end;
-                                                                end;
-                                                                
-                                                                tpe.Accessory := 0;
-
-                                                                WFIFOW( 0, $01a4 );
-                                                                WFIFOB( 2, 3 );
-                                                                WFIFOL( 3, tn.ID );
-                                                                WFIFOL( 7, tpe.Accessory );
-                                                                SendBCmd( tm, tn.Point, 11 );
-
-                                                        end;
-                                                end;
-                                        end;
-                                end;
+                            WFIFOW( 0, $01a3 );
+                            WFIFOB( 2, j );
+                            WFIFOW( 3, tpe.Data.FoodID );
+                            Socket.SendBuf( buf, 5 );
                         end;
+
+                        2: // Performance
+                            begin
+                                // Pet will do an action if their relation is high enough
+                                if tpe.Relation <= 100 then i := 0
+                                else if tpe.Relation <= 250 then i := 1
+                                else if tpe.Relation <= 750 then i := 2
+                                else i := 3;
+
+                                WFIFOW( 0, $01a4 );
+                                WFIFOB( 2, 4 );
+                                WFIFOL( 3, tn.ID );
+                                WFIFOL( 7, Random(i) );
+                                SendBCmd( tm, tn.Point, 11 );
+                            end;
+                        3: // Return to egg status
+                        begin
+                            for i := 1 to 100 do begin
+                                if( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
+                                ( tc.Item[i].Card[0] = $FF00 ) and ( tc.Item[i].Attr <> 0 ) then begin
+
+                                    tc.Item[i].Attr := 0;
+
+                                    WFIFOW( 0, $0080 );
+                                    WFIFOL( 2, tn.ID );
+                                    WFIFOB( 6, 0 );
+                                    SendBCmd( tm, tn.Point, 7 );
+
+                                    tpe.Incubated := 0;
+
+                                    if UseSQL then begin
+                                        SavePetData(tpe, i, 1);
+                                    end;
+                                    //Remove the pet from the map
+                                    j := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
+                                    if j <> -1 then begin
+                                        tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(j);
+                                    end;
+
+                                    j := tm.NPC.IndexOf( tn.ID );
+                                    if j <> -1 then begin
+                                        tm.NPC.Delete(j);
+                                    end;
+
+                                    //Clear the Pet Data
+                                    tn.Free;
+                                    tc.PetData := nil;
+                                    tc.PetNPC := nil;
+
+                                    break;
+                                end;
+                            end;
+
+                        end;
+                        4: // Unequip accessory解除
+                        begin
+                            if tpe.Accessory <> 0 then begin
+                                //Check if accessory is equipped
+                                if ItemDB.IndexOf( tpe.Accessory ) <> -1 then begin
+                                    td := ItemDB.IndexOfObject( tpe.Accessory ) as TItemDB;
+
+                                    // Check user's weight to see if they have room for the accessory
+                                    if tc.MaxWeight >= tc.Weight + td.Weight then begin
+																																								j := SearchCInventory(tc, td.ID, td.IEquip );
+                                    if j <> 0 then begin
+                                        //Add the item to the player
+                                        tc.Item[j].ID := td.ID;
+                                        tc.Item[j].Amount := tc.Item[j].Amount + 1;
+                                        tc.Item[j].Equip := 0;
+                                        tc.Item[j].Identify := 1;
+                                        tc.Item[j].Refine := 0;
+                                        tc.Item[j].Attr := 0;
+                                        tc.Item[j].Card[0] := 0;
+                                        tc.Item[j].Card[1] := 0;
+                                        tc.Item[j].Card[2] := 0;
+                                        tc.Item[j].Card[3] := 0;
+
+                                        tc.Item[j].Data := td;
+
+                                        //Send that the character received an item
+                                        SendCGetItem(tc, j, 1);
+
+                                        // Update weight
+                                        tc.Weight := tc.Weight + td.Weight;
+                                        SendCStat1(tc, 0, $0018, tc.Weight);
+                                    end else begin
+                                        //これ以上もてない
+                                        WFIFOW( 0, $00a0);
+																																												WFIFOB(22, 1);
+                                        Socket.SendBuf(buf, 23);
+                                    end;
+                                end else begin
+                                    //重量オーバー
+                                    WFIFOW( 0, $00a0);
+                                    WFIFOB(22, 2);
+                                    Socket.SendBuf(buf, 23);
+                                end;
+                            end;
+                                                                
+                            tpe.Accessory := 0;
+
+                            WFIFOW( 0, $01a4 );
+                            WFIFOB( 2, 3 );
+                            WFIFOL( 3, tn.ID );
+                            WFIFOL( 7, tpe.Accessory );
+                            SendBCmd( tm, tn.Point, 11 );
+
+                            end;
+                        end;
+                    end;
+                end;
+            end;
                 //--------------------------------------------------------------------------
                 $01a5: // ペットの名前変更
                         begin
