@@ -92,20 +92,29 @@ implementation
     { - R.E.E.D - Load Guilds Settings ---------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
+    var
+        datafile : TStringList;
     begin
-        tg.Name := retrieve_data(0, path);
-        tg.ID := retrieve_data(1, path, 1);
-        tg.LV := retrieve_data(2, path, 1);
-        tg.EXP := retrieve_data(3, path, 1);
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
+
+        tg.Name := retrieve_data(0, datafile, path);
+        tg.ID := retrieve_data(1, datafile, path, 1);
+        tg.LV := retrieve_data(2, datafile, path, 1);
+        tg.EXP := retrieve_data(3, datafile, path, 1);
         tg.NextEXP := GExpTable[tg.LV];
-        tg.GSkillPoint := retrieve_data(4, path, 1);
-        tg.Notice[0] := retrieve_data(5, path);
-        tg.Notice[1] := retrieve_data(6, path);
-        tg.Agit := retrieve_data(7, path);
-        tg.Emblem := retrieve_data(8, path, 1);
-        tg.Present := retrieve_data(9, path, 1);
-        tg.DisposFV := retrieve_data(10, path, 1);
-        tg.DisposRW := retrieve_data(11, path, 1);
+        tg.GSkillPoint := retrieve_data(4, datafile, path, 1);
+        tg.Notice[0] := retrieve_data(5, datafile, path);
+        tg.Notice[1] := retrieve_data(6, datafile, path);
+        tg.Agit := retrieve_data(7, datafile, path);
+        tg.Emblem := retrieve_data(8, datafile, path, 1);
+        tg.Present := retrieve_data(9, datafile, path, 1);
+        tg.DisposFV := retrieve_data(10, datafile, path, 1);
+        tg.DisposRW := retrieve_data(11, datafile, path, 1);
+
+        FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -117,7 +126,12 @@ implementation
     var
         i : Integer;
         tc : TChara;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         { -- Clear Member List -- }
         for i := 0 to tg.RegUsers - 1 do begin
@@ -137,10 +151,10 @@ implementation
         { -- Clear Member List -- }
 
         { -- Assign Members -- }
-        for i := 0 to retrieve_length(path) do begin
-            tg.MemberID[i] := retrieve_value(path, i, 0);
-            tg.MemberPos[i] := retrieve_value(path, i, 1);
-            tg.MemberEXP[i] := retrieve_value(path, i, 2);
+        for i := 0 to retrieve_length(datafile, path) do begin
+            tg.MemberID[i] := retrieve_value(datafile, path, i, 0);
+            tg.MemberPos[i] := retrieve_value(datafile, path, i, 1);
+            tg.MemberEXP[i] := retrieve_value(datafile, path, i, 2);
 
             if Chara.IndexOf(tg.MemberID[i]) = -1 then begin
                 tg.MemberID[i] := 0;
@@ -161,6 +175,8 @@ implementation
         end;
         { -- Assign Members -- }
 
+        FreeAndNil(datafile);
+
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -171,19 +187,26 @@ implementation
     procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
     var
         i : Integer;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         for i := 0 to 19 do begin
-            tg.PosName[i] := retrieve_value(path, i, 4);
+            tg.PosName[i] := retrieve_value(datafile,path, i, 4);
 
-            if (retrieve_value(path, i, 1) = 'Y') then tg.PosInvite[i] := True
+            if (retrieve_value(datafile, path, i, 1) = 'Y') then tg.PosInvite[i] := True
             else tg.PosInvite[i] := False;
 
-            if (retrieve_value(path, i, 2) = 'Y') then tg.PosPunish[i] := True
+            if (retrieve_value(datafile, path, i, 2) = 'Y') then tg.PosPunish[i] := True
             else tg.PosPunish[i] := False;
 
-            tg.PosEXP[i] := retrieve_value(path, i, 3);
+            tg.PosEXP[i] := retrieve_value(datafile, path, i, 3);
         end;
+
+        FreeAndNil(datafile);
 
     end;
     { ------------------------------------------------------------------------------------- }
@@ -195,24 +218,31 @@ implementation
     procedure PD_Load_Guilds_Skills(tg : TGuild; path : String);
     var
         i, skillindex : Integer;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         for i := 10000 to 10004 do begin
             if GSkillDB.IndexOf(i) = -1 then Continue;
             tg.GSkill[i].Data := GSkillDB.IndexOfObject(i) as TSkillDB;
         end;
 
-        for i := 0 to retrieve_length(path) do begin
-            skillindex := retrieve_value(path, i, 0);
+        for i := 0 to retrieve_length(datafile, path) do begin
+            skillindex := retrieve_value(datafile, path, i, 0);
             if GSkillDB.IndexOf(skillindex) = -1 then Continue;
-            tg.GSkill[skillindex].Lv := retrieve_value(path, i, 1);
+            tg.GSkill[skillindex].Lv := retrieve_value(datafile, path, i, 1);
             tg.GSkill[skillindex].Card := False;
         end;
 
         tg.MaxUsers := 16;
         if (tg.GSkill[10004].Lv > 0) then
             tg.MaxUsers := tg.MaxUsers + tg.GSkill[10004].Data.Data1[tg.GSkill[10004].Lv];
-            
+
+        FreeAndNil(datafile);
+
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -224,7 +254,12 @@ implementation
     var
         i : Integer;
         tgb : TGBan;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         { -- Clear existing BanList -- }
         if (tg.GuildBanList.Count > 0) then begin
@@ -236,15 +271,17 @@ implementation
         end;
         { -- Clear existing BanList -- }
 
-        for i := 0 to retrieve_length(path) do begin
+        for i := 0 to retrieve_length(datafile, path) do begin
             tgb := TGBan.Create;
 
-            tgb.Name := retrieve_value(path, i, 0);
-            tgb.AccName := retrieve_value(path, i, 1);
-            tgb.Reason := retrieve_value(path, i, 2);
+            tgb.Name := retrieve_value(datafile, path, i, 0);
+            tgb.AccName := retrieve_value(datafile, path, i, 1);
+            tgb.Reason := retrieve_value(datafile, path, i, 2);
 
             tg.GuildBanList.AddObject(tgb.Name, tgb);
         end;
+
+        FreeAndNil(datafile);
 
     end;
     { ------------------------------------------------------------------------------------- }
@@ -257,7 +294,13 @@ implementation
     var
         i : Integer;
         tgl : TGRel;
+        datafile : TStringList;
     begin
+
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         { -- Clear existing Diplomacy List -- }
         if (tg.RelAlliance.Count > 0) then begin
@@ -277,19 +320,21 @@ implementation
         end;
         { -- Clear existing Diplomacy List -- }
 
-        for i := 0 to retrieve_length(path) do begin
+        for i := 0 to retrieve_length(datafile, path) do begin
             tgl := TGRel.Create;
 
-            tgl.ID := retrieve_value(path, i, 0);
-            tgl.GuildName := retrieve_value(path, i, 2);
+            tgl.ID := retrieve_value(datafile, path, i, 0);
+            tgl.GuildName := retrieve_value(datafile, path, i, 2);
 
-            if (retrieve_value(path, i, 1) = 'A') then
+            if (retrieve_value(datafile, path, i, 1) = 'A') then
                 tg.RelAlliance.AddObject(tgl.GuildName, tgl)
-            else if (retrieve_value(path, i, 1) = 'H') then
+            else if (retrieve_value(datafile, path, i, 1) = 'H') then
                 tg.RelHostility.AddObject(tgl.GuildName, tgl)
             else
                 Continue;
         end;
+
+        FreeAndNil(datafile);
 
     end;
     { ------------------------------------------------------------------------------------- }

@@ -6,11 +6,11 @@ uses
     Common,
     Classes, SysUtils, Dialogs;
 
-    function retrieve_data(idx : Integer; path : String; rtype : Integer = 0) : Variant;
+    function retrieve_data(idx : Integer; datafile : TStringList; path : String; rtype : Integer = 0) : Variant;
     function get_list(path : String; pfile : String; UID : String = '*') : TStringList;
     procedure retrieve_inventories(path : String; inventory_item : array of TItem);
-    function retrieve_length(path : String) : Integer;
-    function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
+    function retrieve_length(datafile : TStringList; path : String) : Integer;
+    function retrieve_value(datafile : TStringList; path : String; row : Integer; column : Integer) : Variant;
     procedure reed_shutdown_server(error_message : String);
     function reed_convert_type(in_value : Variant; ctype : Integer; line : Integer; path : String = '') : Variant;
     function stringlist_load(path : String) : TStringList;
@@ -40,16 +40,12 @@ uses
     {     - Type 0 = String.                                                                }
     {     - Type 1 = Integer.                                                               }
     { ------------------------------------------------------------------------------------- }
-    function retrieve_data(idx : Integer; path : String; rtype : Integer = 0) : Variant;
+    function retrieve_data(idx : Integer; datafile : TStringList; path : String; rtype : Integer = 0) : Variant;
     var
         str : String;
-        datafile : TStringList;
     begin
         if not FileExists(path) then Exit;
 
-        datafile := TStringList.Create;
-        datafile.LoadFromFile(path);
-        
         try
             str := Copy(datafile[idx], Pos(' : ', datafile[idx]) + 3, length(datafile[idx]) - Pos(' : ', datafile[idx]) + 3);
         except
@@ -63,7 +59,6 @@ uses
         else if (rtype = 1) then
             Result := reed_convert_type(str, 0, idx+1, path);
 
-        FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -155,16 +150,9 @@ uses
     { Parameters:                                                                           }
     {  - path : String, Represents file to load up.                                         }
     { ------------------------------------------------------------------------------------- }
-    function retrieve_length(path : String) : Integer;
-    var
-        datafile : TStringList;
+    function retrieve_length(datafile : TStringList; path : String) : Integer;
     begin
-        datafile := TStringList.Create;
-        datafile.LoadFromFile(path);
-
         Result := datafile.Count - 3;
-
-        FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -178,21 +166,17 @@ uses
     {  - row : Integer, The row index to look for.                                          }
     {  - column : Integer, The column index to look for.                                    }
     { ------------------------------------------------------------------------------------- }
-    function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
+    function retrieve_value(datafile : TStringList; path : String; row : Integer; column : Integer) : Variant;
     var
-        datafile : TStringList;
         columns : TStringList;
         strbuf : String;
     begin
-        datafile := TStringList.Create;
         columns := TStringList.Create;
         columns.Delimiter := ':';
 
         if not FileExists(path) then begin
             reed_shutdown_server(path + ' is missing.');
         end;
-
-        datafile.LoadFromFile(path);
 
         strbuf := StringReplace(datafile[row + 2], ' ', '[FSRCALL]', [rfReplaceAll, rfIgnoreCase]);
         columns.DelimitedText := strbuf;
@@ -203,7 +187,6 @@ uses
             Result := '';
         end;
 
-        FreeAndNil(datafile);
         FreeAndNil(columns);
     end;
     { ------------------------------------------------------------------------------------- }

@@ -76,9 +76,18 @@ implementation
     { - R.E.E.D - Load Parties Settings --------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Parties_Settings(tpa : TParty; path : String);
+    var
+        datafile : TStringList;
     begin
-        tpa.Name := retrieve_data(0, path);
-        tpa.ID := retrieve_data(1, path, 1);
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
+
+        tpa.Name := retrieve_data(0, datafile, path);
+        tpa.ID := retrieve_data(1, datafile, path, 1);
+
+        FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -90,14 +99,19 @@ implementation
     var
         i, j : Integer;
         tc : TChara;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
+        datafile.Clear;
+        datafile.LoadFromFile(path);
 
         for i := 0 to 11 do begin
             tpa.MemberID[i] := 0;
         end;
 
-        for i := 0 to retrieve_length(path) do begin
-            j := retrieve_value(path, i, 0);
+        for i := 0 to retrieve_length(datafile, path) do begin
+            j := retrieve_value(datafile,path, i, 0);
 
             if Chara.IndexOf(j) = -1 then Continue;
             tc := Chara.Objects[Chara.IndexOf(j)] as TChara;
@@ -107,6 +121,8 @@ implementation
             tc.PartyName := tpa.Name;
             tc.PartyID := tpa.ID;
         end;
+
+        FreeAndNil(datafile);
 
     end;
     { ------------------------------------------------------------------------------------- }

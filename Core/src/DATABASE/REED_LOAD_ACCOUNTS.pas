@@ -23,31 +23,37 @@ implementation
         resultlist : TStringList;
         i : Integer;
         tp : TPlayer;
+        datafile : TStringList;
     begin
         basepath := AppPath+'gamedata\Accounts\';
         pfile := 'Account.txt';
         resultlist := get_list(basepath, pfile);
 
+        datafile := TStringList.Create;
+
         for i := 0 to resultlist.Count - 1 do begin
             if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
             else path := basepath + UID + '\' + pfile;
 
+            datafile.Clear;
+            datafile.LoadFromFile(path);
+
             if (UID = '*') then tp := TPlayer.Create
             else tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
-            tp.ID := retrieve_data(0, path, 1);
-            tp.Name := retrieve_data(1, path);
-            tp.Pass := retrieve_data(2, path);
+            tp.ID := retrieve_data(0, datafile, path, 1);
+            tp.Name := retrieve_data(1, datafile, path);
+            tp.Pass := retrieve_data(2, datafile, path);
 
-            if retrieve_data(3, path) = 'MALE' then tp.Gender := 1
-            else if retrieve_data(3, path) = 'FEMALE' then tp.Gender := 0;
+            if retrieve_data(3, datafile, path) = 'MALE' then tp.Gender := 1
+            else if retrieve_data(3, datafile, path) = 'FEMALE' then tp.Gender := 0;
 
-            tp.Mail := retrieve_data(4, path);
+            tp.Mail := retrieve_data(4, datafile, path);
 
-            if retrieve_data(5, path) = 'YES' then tp.Banned := True
-            else if retrieve_data(5, path) = 'NO' then tp.Banned := False;
+            if retrieve_data(5, datafile, path) = 'YES' then tp.Banned := True
+            else if retrieve_data(5, datafile, path) = 'NO' then tp.Banned := False;
 
-            tp.AccessLevel := retrieve_data(6, path, 1);
+            tp.AccessLevel := retrieve_data(6, datafile, path, 1);
 
             if (UID = '*') then begin
                 PlayerName.AddObject(tp.Name, tp);
@@ -57,6 +63,7 @@ implementation
             if (UID <> '*') then Break;
         end;
 
+        FreeAndNil(datafile);
         FreeAndNil(resultlist);
     end;
     { ------------------------------------------------------------------------------------- }
@@ -73,10 +80,13 @@ implementation
         resultlist : TStringList;
         i, j : Integer;
         tp : TPlayer;
+        datafile : TStringList;
     begin
         basepath := AppPath+'gamedata\Accounts\';
         pfile := 'ActiveChars.txt';
         resultlist := get_list(basepath, pfile);
+
+        datafile := TStringList.Create;
 
         for i := 0 to resultlist.Count - 1 do begin
             if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
@@ -85,16 +95,20 @@ implementation
                 resultlist[i] := UID;
             end;
 
+            datafile.Clear;
+            datafile.LoadFromFile(path);
+
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
             for j := 0 to 8 do begin
-                tp.CName[j] := retrieve_data(j, path);
+                tp.CName[j] := retrieve_data(j, datafile, path);
             end;
 
             if (UID <> '*') then Break;
         end;
 
+        FreeAndNil(datafile);
         FreeAndNil(resultlist);
     end;
     { ------------------------------------------------------------------------------------- }

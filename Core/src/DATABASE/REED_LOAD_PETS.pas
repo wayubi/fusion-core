@@ -56,9 +56,15 @@ implementation
         i : Integer;
         path : String;
         tpe : TPet;
+        datafile : TStringList;
     begin
+        datafile := TStringList.Create;
+
         for i := 0 to resultlist.Count - 1 do begin
             path := basepath + resultlist[i] + '\' + pfile;
+
+            datafile.Clear;
+            datafile.LoadFromFile(path);
 
             if (UID = '*') then begin
                 tpe := TPet.Create;
@@ -67,19 +73,19 @@ implementation
                 tpe := PetList.Objects[PetList.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPet;
             end;
 
-            tpe.PlayerID := retrieve_data(0, path, 1);
-            tpe.CharaID := retrieve_data(1, path, 1);
-            tpe.Cart := retrieve_data(2, path, 1);
+            tpe.PlayerID := retrieve_data(0, datafile, path, 1);
+            tpe.CharaID := retrieve_data(1, datafile, path, 1);
+            tpe.Cart := retrieve_data(2, datafile, path, 1);
             //tpe.Index := get_pet_index(retrieve_data(3, path, 1), tpe.PetID);
-            tpe.Incubated := retrieve_data(3, path, 1);
-            tpe.PetID := retrieve_data(4, path, 1);
-            tpe.JID := retrieve_data(5, path, 1);
-            tpe.Name := retrieve_data(6, path);
-            tpe.Renamed := retrieve_data(7, path, 1);
-            tpe.LV := retrieve_data(8, path, 1);
-            tpe.Relation := retrieve_data(9, path, 1);
-            tpe.Fullness := retrieve_data(10, path, 1);
-            tpe.Accessory := retrieve_data(11, path, 1);
+            tpe.Incubated := retrieve_data(3, datafile, path, 1);
+            tpe.PetID := retrieve_data(4, datafile, path, 1);
+            tpe.JID := retrieve_data(5, datafile, path, 1);
+            tpe.Name := retrieve_data(6, datafile, path);
+            tpe.Renamed := retrieve_data(7, datafile, path, 1);
+            tpe.LV := retrieve_data(8, datafile, path, 1);
+            tpe.Relation := retrieve_data(9, datafile, path, 1);
+            tpe.Fullness := retrieve_data(10, datafile, path, 1);
+            tpe.Accessory := retrieve_data(11, datafile, path, 1);
 
             //if (tpe.Index < 1) or (tpe.Index > 100) then Continue;
             if (tpe.PlayerID = 0) then Continue;
@@ -91,6 +97,7 @@ implementation
             end;
         end;
 
+        FreeAndNil(datafile);
         FreeAndNil(resultlist);
     end;
     { ------------------------------------------------------------------------------------- }
