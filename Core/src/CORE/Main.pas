@@ -1027,6 +1027,16 @@ begin
                         Option_PVP_XPLoss := True;
                 end;
 
+    if sl.IndexOfName('Option_Packet_Out') > -1 then begin
+        try
+            Option_Packet_Out := StrToBool(sl.Values['Option_Packet_Out']);
+        except
+            on EConvertError do Option_Packet_Out := True;
+        end;
+    end else begin
+        Option_Packet_Out := False;
+    end;
+
                 sl.Clear;
                 sl1.Clear;
 

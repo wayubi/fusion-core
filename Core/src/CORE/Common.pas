@@ -1722,6 +1722,8 @@ Option_Font_Color : string;
 Option_Font_Size : integer;
 Option_Font_Face : string;
 Option_Font_Style : string;
+
+Option_Packet_Out : Boolean;
 // Fusion INI Declarations
 
 

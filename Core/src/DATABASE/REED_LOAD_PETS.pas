@@ -24,7 +24,7 @@ implementation
     begin
         path := path + 'Pets\';
         pfile := 'Pet.txt';
-        if not FileExists(path) then Exit;
+        //if not FileExists(path) then Exit;
         PD_Load_Pets(UID, get_list(path, pfile), path, pfile);
     end;
     { ------------------------------------------------------------------------------------- }

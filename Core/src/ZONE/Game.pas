@@ -159,14 +159,16 @@ Begin(* Proc sv3PacketProcess() *)
   tcr := nil;
 	while Socket.ReceiveLength >= 2 do
   begin
-		//len := Socket.ReceiveLength;
+		if (Option_Packet_Out) then len := Socket.ReceiveLength;
 		Socket.ReceiveBuf(buf[0], 2);
 		RFIFOW(0, cmd);
-		//if cmd = $00c8 then
-		//	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
+		if (Option_Packet_Out) then begin
+            if cmd = $00c8 then
+            debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
+        end;
 		tc := Socket.Data;
 		if (cmd > MAX_PACKET_NUMBER) then begin
-			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
+			if (Option_Packet_Out) then debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
 			SetLength(tmpbuf, Socket.ReceiveLength);
 			Socket.ReceiveBuf(tmpbuf[0], Socket.ReceiveLength);
 			Continue;
@@ -176,12 +178,14 @@ Begin(* Proc sv3PacketProcess() *)
 			Socket.ReceiveBuf(buf[2], 2);
 			RFIFOW(2, w);
 			Socket.ReceiveBuf(buf[4], w - 4);
-			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
+			if (Option_Packet_Out) then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
 		end else begin
 			Socket.ReceiveBuf(buf[2], PacketLength[cmd] - 2);
-			//if cmd <> $0072 then begin
-			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
-			//end;
+			if (Option_Packet_Out) then begin
+                if cmd <> $0072 then begin
+			    debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
+			    end;
+            end;
 		end;
     //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Command:' + IntToStr(cmd));
 

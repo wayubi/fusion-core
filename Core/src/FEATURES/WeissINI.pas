@@ -100,6 +100,7 @@ uses
         ini.WriteString('Fusion', 'Option_Enable_WAC', BoolToStr(Option_Enable_WAC));
         ini.WriteString('Fusion', 'Option_Enable_ISCS', BoolToStr(Option_Enable_ISCS));
         ini.WriteString('Fusion', 'Option_Use_UPnP', BoolToStr(Option_Use_UPnP));
+        ini.WriteString('Fusion', 'Option_Packet_Out', BoolToStr(Option_Packet_Out));
         // Fusion INI Lines
 
         // MySQL Server Lines
