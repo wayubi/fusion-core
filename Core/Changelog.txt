@@ -9,8 +9,6 @@
 - 10-14-04: Retabbed script.pas & added NPC command 'gstore' (guild storage). [Tsusai]
 - 10-13-04: Fixed index out of bounds errors with @kickall, @raise, @raisemap, @doom. [Trihan]
 - 10-13-04: Fixed an error in #autoloot that made it activate #auto instead. [Trihan]
-- 10-13-04: Added @save, @load, @kick, @kickall, @raise, @raisemap. [Trihan]
-- 10-13-04: Fixed a problem with Tiko's @doom. (GM_ATHENA_ITEM instead of GM_ATHENA_DOOM). [Trihan]
 - 10-13-04: REED: Restructured Party saving. [AlexKreuz]
 - 10-13-04: REED: Restructured Pet saving. [AlexKreuz]
 - 10-13-04: Added @save, @load, @kick, @kickall, @raise, @raisemap. [Trihan]
