@@ -1051,7 +1051,11 @@ end;
 procedure TfrmMain.sv2ClientRead(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
+  try
 	sv2PacketProcess(Socket);
+  except
+    exit;
+  end;
 end;
 //==============================================================================
 

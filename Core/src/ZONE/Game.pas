@@ -267,14 +267,14 @@ Begin(* Proc sv3PacketProcess() *)
 					tc.Map := tc.tmpMap;
 					tc.tmpMap := '';
 				end;
-
+        if Map.IndexOf(tc.Map) <> - 1 then begin
 				tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 				while tm.Mode < 2 do
 					Application.ProcessMessages;
 
 				tc.MData := tm;
 				if CharaPID.IndexOf(tc.ID) = -1 then CharaPID.AddObject(tc.ID, tc);
-
+        if MapInfo.IndexOf(tm.Name) <> -1 then begin
         mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
 				// Add this character to the charlist for this map
@@ -539,6 +539,8 @@ Begin(* Proc sv3PacketProcess() *)
         // Colus, 20040409: Gave the option to enable lower class dyes.
         // This should be removed when Gravity reenables them.
         UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+        end;
+        end;
 
 			end;//$007d
 		//--------------------------------------------------------------------------
@@ -2830,6 +2832,7 @@ Begin(* Proc sv3PacketProcess() *)
 					td := tc.Item[w].Data;
 					b := 0;
                                         if tc.item[w].Amount <= 0 then exit;
+          if tc.BaseLV < td.eLV then exit;
                                     case td.IType of
 					0: //Recovery item
 						begin
