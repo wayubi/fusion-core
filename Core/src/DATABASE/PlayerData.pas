@@ -20,7 +20,8 @@ uses
     REED_LOAD_PETS,
     REED_LOAD_PARTIES,
     REED_LOAD_GUILDS,
-    REED_LOAD_CASTLES;
+    REED_LOAD_CASTLES,
+    REED_SAVE_ACCOUNTS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -31,14 +32,7 @@ uses
     procedure PD_Create_Structure();
 
     { Account Data - Basic Data }
-    procedure PD_Save_Accounts(forced : Boolean = False);
     procedure PD_Delete_Accounts(tp : TPlayer);
-
-    { Account Data - Active Characters }
-    procedure PD_Save_Accounts_ActiveCharacters(forced : Boolean = False);
-
-    { Account Data - Storage }
-    procedure PD_Save_Accounts_Storage(forced : Boolean = False);
 
 
     { Character Data - Basic Data }
@@ -142,9 +136,8 @@ uses
 
         if (forced) then debugout.lines.add('Initiating Comprehensive Save .. Please Wait.');
 
-    	PD_Save_Accounts(forced);
-        PD_Save_Accounts_ActiveCharacters(forced);
-        PD_Save_Accounts_Storage(forced);
+        PD_Save_Accounts_Parse(forced);
+
 
         PD_Save_Characters(forced);
         PD_Save_Characters_Memos(forced);
@@ -197,50 +190,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Account Data - Basic Data --------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Accounts(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        i : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-        	datafile.Clear;
-
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            datafile.Add('USERID : ' + IntToStr(tp.ID));
-            datafile.Add('USERNAME : ' + tp.Name);
-            datafile.Add('PASSWORD : ' + tp.Pass);
-
-            if (tp.Gender = 0) then datafile.Add('SEX : FEMALE')
-            else if (tp.Gender = 1) then datafile.Add('SEX : MALE');
-
-            datafile.Add('EMAIL : ' + tp.Mail);
-
-            if (tp.Banned = False) then datafile.Add('BANNED : NO')
-            else if (tp.Banned = True) then datafile.Add('BANNED : YES');
-
-            datafile.Add('ACCESSLEVEL : ' + IntToStr(tp.AccessLevel));
-
-            CreateDir(AppPath + 'gamedata\Accounts');
-            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-
-            try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Account.txt');
-                //debugout.Lines.Add(tp.Name + ' account data saved.');
-            except
-                DebugOut.Lines.Add('Account data could not be saved.');
-        	end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Delete_Accounts(tp : TPlayer);
     var
         deldir : String;
@@ -312,156 +261,6 @@ uses
     end;
 
 
-    { -------------------------------------------------------------------------------- }
-    { -- Account Data - Active Characters -------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Accounts_ActiveCharacters(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        i : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-        	datafile.Clear;
-
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            datafile.Add('SLOT1 : ' + tp.CName[0]);
-            datafile.Add('SLOT2 : ' + tp.CName[1]);
-            datafile.Add('SLOT3 : ' + tp.CName[2]);
-            datafile.Add('SLOT4 : ' + tp.CName[3]);
-            datafile.Add('SLOT5 : ' + tp.CName[4]);
-            datafile.Add('SLOT6 : ' + tp.CName[5]);
-            datafile.Add('SLOT7 : ' + tp.CName[6]);
-            datafile.Add('SLOT8 : ' + tp.CName[7]);
-            datafile.Add('SLOT9 : ' + tp.CName[8]);
-
-            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-
-            try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\ActiveChars.txt');
-                //debugout.Lines.Add(tp.Name + ' account active character data saved.');
-        	except
-                DebugOut.Lines.Add('Account active character data could not be saved.');
-        	end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Account Data - Storage ------------------------------------------------------ }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Accounts_Storage(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-    	i, j, k : Integer;
-        str : String;
-        len : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-        	datafile.Clear;
-
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
-            datafile.Add('---------------------------------------------------------------------------------------------------------');
-
-            for j := 1 to 100 do begin
-    	        if tp.Kafra.Item[j].ID <> 0 then begin
-	            	str := ' ';
-
-					len := length(IntToStr(tp.Kafra.Item[j].ID));
-	                for k := 0 to (5 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-    	            str := str + IntToStr(tp.Kafra.Item[j].ID);
-	                str := str + ' : ';
-
-	                len := length(IntToStr(tp.Kafra.Item[j].Amount));
-                	for k := 0 to (5 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-    	            str := str + IntToStr(tp.Kafra.Item[j].Amount);
-	                str := str + ' : ';
-
-	                len := length(IntToStr(tp.Kafra.Item[j].Equip));
-                	for k := 0 to (3 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-            	    str := str + IntToStr(tp.Kafra.Item[j].Equip);
-        	        str := str + ' : ';
-
-    	            str := str + IntToStr(tp.Kafra.Item[j].Identify);
-	                str := str + ' : ';
-
-            	    len := length(IntToStr(tp.Kafra.Item[j].Refine));
-        	        for k := 0 to (2 - len) - 1 do begin
-    	            	str := str + ' ';
-	                end;
-            	    str := str + IntToStr(tp.Kafra.Item[j].Refine);
-        	        str := str + ' : ';
-    	            str := str + IntToStr(tp.Kafra.Item[j].Attr);
-	                str := str + ' : ';
-
-    	            len := length(IntToStr(tp.Kafra.Item[j].Card[0]));
-	                for k := 0 to (5 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-    	            str := str + IntToStr(tp.Kafra.Item[j].Card[0]);
-	                str := str + ' : ';
-
-    	            len := length(IntToStr(tp.Kafra.Item[j].Card[1]));
-	                for k := 0 to (5 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-    	            str := str + IntToStr(tp.Kafra.Item[j].Card[1]);
-	                str := str + ' : ';
-
-    	            len := length(IntToStr(tp.Kafra.Item[j].Card[2]));
-	                for k := 0 to (5 - len) - 1 do begin
-            	    	str := str + ' ';
-        	        end;
-    	            str := str + IntToStr(tp.Kafra.Item[j].Card[2]);
-	                str := str + ' : ';
-
-        	        len := length(IntToStr(tp.Kafra.Item[j].Card[3]));
-    	            for k := 0 to (5 - len) - 1 do begin
-	                	str := str + ' ';
-                	end;
-            	    str := str + IntToStr(tp.Kafra.Item[j].Card[3]);
-        	        str := str + ' : ';
-
-                    str := str + tp.Kafra.Item[j].Data.Name;
-
-    	            datafile.Add(str);
-	            end;
-            end;
-
-            CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-
-            try
-	            datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Storage.txt');
-                //debugout.Lines.Add(tp.Name + ' account storage data saved.');
-            except
-            	DebugOut.Lines.Add('Account storage data could not be saved.');
-            end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
 
 
     { -------------------------------------------------------------------------------- }

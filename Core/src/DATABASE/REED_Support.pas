@@ -16,6 +16,8 @@ uses
     function stringlist_load(path : String) : TStringList;
     function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
+    procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
+    procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
 
 implementation
 
@@ -175,7 +177,6 @@ uses
     var
         datafile : TStringList;
         columns : TStringList;
-        i : Integer;
     begin
         datafile := TStringList.Create;
         columns := TStringList.Create;
@@ -331,6 +332,121 @@ uses
 
     end;
     { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - reed_savefile                                                               }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To ensure reed files are properly saved and directories properly created.    }
+    { Parameters:                                                                           }
+    {  - folderid : Integer, Represents the id value of the data.                           }
+    {  - datafile : TStringList, Represents the actual data being saved.                    }
+    {  - path : String; Represents the location to save the data.                           }
+    {  - pfile : String; Represents the filename of the data.                               }
+    { ------------------------------------------------------------------------------------- }
+    procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
+    begin
+        CreateDir(path);
+        CreateDir(path + '\' + reed_convert_type(folderid, 1, -1));
+        datafile.SaveToFile(path + '\' + reed_convert_type(folderid, 1, -1) + '\' + pfile);
+        datafile.Clear;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - compile_inventories                                                         }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To ensure that inventory data is properly compiled for reed storage.         }
+    { Parameters:                                                                           }
+    {  - datafile : TStringList, Represents the actual data being saved.                    }
+    {  - inventory_item : array of TItem, Represents the array of items being stored.       }
+    { ------------------------------------------------------------------------------------- }
+    procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
+    var
+        j, k : Integer;
+        len : Integer;
+        str : String;
+    begin
+        datafile.Clear;
+        datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
+        datafile.Add('---------------------------------------------------------------------------------------------------------');
+
+        for j := 0 to 99 do begin
+            if inventory_item[j].ID <> 0 then begin
+
+                str := ' ';
+
+                len := length(IntToStr(inventory_item[j].ID));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].ID);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Amount));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Amount);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Equip));
+                for k := 0 to (3 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Equip);
+                str := str + ' : ';
+
+                str := str + IntToStr(inventory_item[j].Identify);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Refine));
+                for k := 0 to (2 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Refine);
+                str := str + ' : ';
+                str := str + IntToStr(inventory_item[j].Attr);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Card[0]));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Card[0]);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Card[1]));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Card[1]);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Card[2]));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Card[2]);
+                str := str + ' : ';
+
+                len := length(IntToStr(inventory_item[j].Card[3]));
+                for k := 0 to (5 - len) - 1 do begin
+                    str := str + ' ';
+                end;
+                str := str + IntToStr(inventory_item[j].Card[3]);
+                str := str + ' : ';
+
+                str := str + inventory_item[j].Data.Name;
+
+                datafile.Add(str);
+                
+            end;
+        end;
+        { ------------------------------------------------------------------------------------- }
+        
+    end;
         
 end.
 

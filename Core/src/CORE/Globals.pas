@@ -12,7 +12,7 @@ uses
     {Shared}
     Classes, SysUtils,
     {Fusion}
-    Common, SQLData, Zip, List32, PlayerData;
+    Common, SQLData, Zip, List32, PlayerData, REED_SAVE_ACCOUNTS;
 
 
 
@@ -785,7 +785,7 @@ uses
         PlayerName.AddObject(tp.Name, tp);
         Player.AddObject(tp.ID, tp);
 
-        PD_Save_Accounts(True);
+        PD_Save_Accounts_Parse(True);
     end;
 
 end.
