@@ -1,3 +1,4 @@
+- 04-07-04: Tidying up routine in Game unit, translating original Japanese comments in code (No functional code changes) [ChrstphrR]
 - 04-07-04: Added #greaper GM command. (Grim Reaper - For scaring the kiddies). [AlexKreuz]
 - 04-07-04: Fixed Stats and Options reset upon walk request, bug. [AlexKreuz]
 - 04-07-04: Added Athena-Style Username_MF Registration Method Option. [AlexKreuz]
