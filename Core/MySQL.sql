@@ -1,5 +1,5 @@
-CREATE DATABASE nlogin;
-use nlogin;
+CREATE DATABASE FusionSQL;
+use FusionSQL;
 
 CREATE TABLE login (
   AID bigint(10) unsigned NOT NULL auto_increment,
