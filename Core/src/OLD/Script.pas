@@ -1925,6 +1925,18 @@ begin
 					Inc(tc.ScriptStep);
 				end;
 
+        74: //checkpoint
+                begin
+                    i := MapInfo.IndexOf(tm.Name);
+					if (i <> -1) then begin
+						mi := MapInfo.Objects[i] as MapTbl;
+						if (mi.noSave <> true) then begin
+							tc.CheckpointMap := tn.Script[tc.ScriptStep].Data1[0];
+							tc.Checkpoint := Point(tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
+						end;
+					end;
+					Inc(tc.ScriptStep);
+				end;
 
 			end;
     Inc(cnt);

@@ -750,6 +750,8 @@ TChara = class(TLiving)
 	SavePoint     :TPoint;
 	MemoMap       :array[0..2] of string;
 	MemoPoint     :array[0..2] of TPoint;
+    CheckpointMap :string;
+    Checkpoint    :TPoint;
 
 	// Line 2: Skills
 	Skill         :array[0..MAX_SKILL_NUMBER] of TSkill;
@@ -991,6 +993,9 @@ TChara = class(TLiving)
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
         StatRecalc    :boolean; {Used for the Sage skill free cast}
         //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
+        PvPPoints     :integer;
+        PvPRank       :integer;
+        tmpPvPRank    :integer;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1682,6 +1687,9 @@ Option_Font_Style : string;
 
 		procedure CalcLvUP(tc1:TChara; EXP:cardinal; JEXP:cardinal);
 
+        {PvP rank calculation}
+        procedure CalcPvPRank(tm:TMap);
+
 		procedure SendCGetItem(tc:TChara; Index:word; Amount:word);
 		procedure SendCStat(tc:TChara; View:boolean = false);
 		procedure SendCStat1(tc:TChara; Mode:word; DType:word; Value:cardinal);
@@ -1706,7 +1714,7 @@ Option_Font_Style : string;
 
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
-    procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
+    procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; tc1:TChara=nil);
     procedure ItemDrop(tm:TMap; tc:TChara; j:integer; amount:integer);
     procedure CreateGroundItem(tm:TMap; itemID:cardinal; XPoint:cardinal; YPoint:cardinal);
                 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
@@ -1829,6 +1837,7 @@ Option_Font_Style : string;
     function  CheckGuildMaster(tn:TNPC; tc:TChara) : word;
     function  GetGuildName(tn:TNPC) : string;
     function  GetGuildMName(tn:TNPC) : string;
+    procedure SortPvPScores(Scores:TStringList);
 		function  GetGuildRelation(tg:TGuild; tc:TChara) : integer;
 		procedure KillGuildRelation(tg:TGuild; tg1:TGuild; tc:TChara; tc1:TChara; RelType:byte);
 		function  LoadEmblem(tg:TGuild) : word;
@@ -3265,13 +3274,13 @@ begin
         end;
 end;}
 //------------------------------------------------------------------------------
-procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
+procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; tc1:TChara=nil);
 // Killed by player triggers for a token to be dropped... one of Krietor's Ideas
 var
   i : integer;
-{  j : integer;
+//  j : integer;
 	mi : MapTbl;
-	item : cardinal;
+	{item : cardinal;
 	StartI  : cardinal;
   EndI    : cardinal;}
 begin
@@ -3285,9 +3294,8 @@ begin
   // Sit = 1 lets monsters know the char is dead and the player cannot move
   tc.Sit := 1;
 
-  if (KilledByP <> 1) or ( (KilledByP = 1) and (Option_PVP_XPLoss) ) then begin
+  if (tc1 = nil) or ( (tc1 <> nil) and (Option_PVP_XPLoss) ) then begin
       // Subtract the Experience loss from the .ini
-
 
       { Wow, major mistake on my behalf. Fatal N version. }
 
@@ -3375,6 +3383,19 @@ begin
       CreateGroundItem(tm, 11008, tc.Point.X + Random(3), tc.Point.Y + Random(3));
     end;
   end; }
+
+  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+  if (mi.PvP = true) and (tc1 <> nil) then begin
+    tc1.PvPPoints := tc1.PvPPoints + 1;
+    tc.PvPPoints := tc.PvPPoints - 5;
+    if tc.PvPPoints < 0 then begin
+        SendCLeave(tc.Socket.Data, 2);
+        tc.Map := tc.SaveMap;
+        tc.Point := tc.SavePoint;
+        MapMove(tc.Socket, tc.Map, tc.Point);
+    end;
+    CalcPvPRank(tm);
+  end;
 
 end;
 
@@ -4211,7 +4232,6 @@ begin
 		WFIFOB( 6, 0 );
 		SendBCmd( tm, tn.Point, 7 ,tc);
 
-
 		//ペット削除
 		i := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
 		if i <> -1 then begin
@@ -4298,6 +4318,7 @@ begin
 			if Clist.IndexOf(tc.ID) <> -1 then
 				CList.Delete(Clist.IndexOf(tc.ID));
 		end;
+        if mi.PvP then CalcPvPRank(tm);
 		if CharaPID.IndexOf(tc.ID) <> -1 then
 			CharaPID.Delete(CharaPID.IndexOf(tc.ID));
 	end;
@@ -5187,6 +5208,17 @@ begin
         end;
 end;
 
+procedure SortPvPScores(Scores:TStringList);
+var
+    i : integer;
+    j : integer;
+begin
+  for i := 1 to Scores.Count - 1 do
+    for j := Scores.Count - 1 downto i do
+      if StrToInt(Scores[j]) > StrToInt(Scores[j - 1]) then begin
+        Scores.Exchange(j, j - 1);
+      end;
+end;
 //------------------------------------------------------------------------------
 function SearchCInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
 var
@@ -6078,6 +6110,55 @@ begin
 		SendCStat1(tc1, 1, $0002, tc1.JobEXP);
 	end;
 end;
+
+procedure CalcPvPRank(tm:Tmap);
+var
+    tc1 : TChara;
+    Scores : TStringList;
+    Rank, RankOne, LastScore : Integer;
+    i : Integer;
+begin
+    RankOne := 0;
+    if tm.CList.Count > 0 then begin
+        tc1 := tm.CList.Objects[0] as TChara;
+        tc1.PvPRank := 1;
+        for i := 0 + 1 to tm.CList.Count - 1 do begin
+            tc1 := tm.CList.Objects[i] as TChara;
+            tc1.PvPRank := 2;
+        end;
+        Scores := TStringList.Create;
+        for i := 0 to tm.CList.Count - 1 do begin
+            tc1 := tm.CList.Objects[i] as TChara;
+            Scores.AddObject(IntToStr(tc1.PvPPoints), tc1);
+        end;
+        SortPvPScores(Scores);
+        LastScore := StrToInt(Scores[0]);
+
+        Rank := 0;
+        for i := 0 to Scores.Count - 1 do begin
+            tc1 := TChara(Scores.Objects[i]);
+            if (Rank = 0) and (RankOne = 0) then begin
+                Rank := Rank + 1;
+                RankOne := 1;
+            end
+            else if (StrToInt(Scores[i]) <> LastScore) or (Rank = 1) then Rank := Rank + 1;
+            tc1.PvPRank := Rank;
+            LastScore := StrToInt(Scores[i]);
+        end;
+    end;
+    for i := 0 to tm.CList.Count - 1 do begin
+        tc1 := tm.CList.Objects[i] as TChara;
+        WFIFOW( 0, $0199);
+        WFIFOW( 2, 1);
+        tc1.Socket.SendBuf(buf, 4);
+        WFIFOW( 0, $019a);
+        WFIFOL( 2, tc1.ID);
+        WFIFOL( 6, tc1.PvPRank);
+        WFIFOL( 10, tm.CList.Count);
+        tc1.Socket.SendBuf(buf, 14);
+    end;
+end;
+
 //------------------------------------------------------------------------------
 //経験値分配用
 procedure PartyDistribution(Map:string; tpa:TParty; EXP:Cardinal = 0; JEXP:Cardinal = 0);

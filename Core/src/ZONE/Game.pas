@@ -510,19 +510,8 @@ Begin(* Proc sv3PacketProcess() *)
 
         // Is this map PvP?  Then set that mode and ladder status.
         if (mi.Pvp = true) then begin
-          for j := 0 to tm.CList.Count - 1 do begin
-            tc1 := tm.CList.Objects[j] as TChara;
-            WFIFOW( 0, $0199);
-            WFIFOW( 2, 1);
-            tc1.Socket.SendBuf(buf, 4);
-            k := j + 1;
-            i := tm.CList.Count;
-            WFIFOW( 0, $019a);
-            WFIFOL( 2, tc1.ID);
-            WFIFOL( 6, k);
-            WFIFOL( 10, i);
-            tc1.Socket.SendBuf(buf, 14);
-          end;
+        if tc.CheckpointMap <> tc.Map then tc.PvPPoints := 5;
+        CalcPvPRank(tm);
         end;
 
         // Is this map GvG?  Then set that mode.

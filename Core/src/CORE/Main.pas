@@ -632,7 +632,7 @@ begin
 	if sl.IndexOfName('DefaultMap') > -1 then begin
 		DefaultMap := sl.Values['DefaultMap'];
 	end else begin
-		DefaultMap := 'new_1-1';
+		DefaultMap := 'new_zone01';
 	end;
 	if sl.IndexOfName('DefaultPoint_X') > -1 then begin
 		DefaultPoint_X := StrToInt(sl.Values['DefaultPoint_X']);
@@ -1410,6 +1410,7 @@ procedure TfrmMain.sv3ClientDisconnect(Sender: TObject;
 var
 	tc  :TChara;
 	tp  :TPlayer;
+    tm  :TMap;
 
 	i,j :integer;
 	mi  :MapTbl;
@@ -1418,10 +1419,10 @@ begin
 
     DataSave();
 
-
         // AlexKreuz: Random 10053 Bug Fix
         if Assigned(Socket.Data) then begin
 					tc := Socket.Data;
+                    tm := tc.MData;
         	SendCLeave(tc, 2);
                 {NPCƒCƒxƒ“ƒg’Ç‰Á}
          if MapInfo.IndexOf(tc.Map) <> -1 then begin
@@ -1449,6 +1450,9 @@ begin
         NowUsers := sv3.Socket.ActiveConnections;
         if NowUsers > 0 then Dec(NowUsers);
         statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers); // AlexKreuz (Status Bar)
+
+        //Recalculate PVP ranking
+        CalcPvPRank(tm);
 
 end;
 //------------------------------------------------------------------------------
@@ -3466,7 +3470,7 @@ begin
 		Result := False;
 	end else begin
     // Character has died
-    CharaDie(tm, tc1, Tick, 1);
+    CharaDie(tm, tc1, Tick, tc);
                 {tc1.Sit := 1;
                 tc1.HP := 0;
                 SendCStat1(tc1, 0, 5, tc1.HP);
@@ -10024,7 +10028,7 @@ begin
 								WFIFOL( 2, tn.ID );
 								WFIFOB( 6, 0 );
 								SendBCmd( tm, tn.Point, 7 ,tc);
-
+                                
 								//Delete block
 								l := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
 								if l <> -1 then begin
