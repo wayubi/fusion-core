@@ -1532,7 +1532,7 @@ begin
         statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers); // AlexKreuz (Status Bar)
 
         //Recalculate PVP ranking
-        CalcPvPRank(tm);
+        if mi.PvP then CalcPvPRank(tm);
 
 end;
 //------------------------------------------------------------------------------
