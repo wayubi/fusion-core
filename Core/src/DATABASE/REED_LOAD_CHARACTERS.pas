@@ -21,21 +21,22 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Characters_Parse(UID : String = '*');
     var
+        basepath : String;
         path : String;
         pfile : String;
         resultlist : TStringList;
         i : Integer;
         tp : TPlayer;
     begin
-        path := AppPath+'gamedata\Accounts\';
+        basepath := AppPath+'gamedata\Accounts\';
         pfile := 'Account.txt';
-        resultlist := get_list(path, pfile);
+        resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
             if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
 
-            path := path + resultlist[i] + '\Characters\';
+            path := basepath + resultlist[i] + '\Characters\';
 
             pfile := 'Character.txt';
             PD_Load_Characters(UID, tp, get_list(path, pfile), path, pfile);
@@ -51,6 +52,8 @@ implementation
 
             pfile := 'Cart.txt';
             PD_Load_Characters_Cart(UID, tp, get_list(path, pfile), path, pfile);
+
+            if (UID <> '*') then Break;
         end;
 
         FreeAndNil(resultlist);

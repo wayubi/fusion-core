@@ -110,7 +110,7 @@ uses
         if (sex = 'M') then tp.Gender := 1
         else if (sex = 'F') then tp.Gender := 0;
 
-        tp.Mail := '-@-';
+        tp.Mail := email;
         tp.Login := 0;
         PlayerName.AddObject(tp.Name, tp);
         Player.AddObject(tp.ID, tp);

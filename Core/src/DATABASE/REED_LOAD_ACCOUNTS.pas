@@ -17,18 +17,19 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Accounts(UID : String = '*');
     var
+        basepath : String;
         path : String;
         pfile : String;
         resultlist : TStringList;
         i : Integer;
         tp : TPlayer;
     begin
-        path := AppPath+'gamedata\Accounts\';
+        basepath := AppPath+'gamedata\Accounts\';
         pfile := 'Account.txt';
-        resultlist := get_list(path, pfile);
+        resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             if (UID = '*') then tp := TPlayer.Create
             else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
@@ -51,6 +52,8 @@ implementation
                 PlayerName.AddObject(tp.Name, tp);
                 Player.AddObject(tp.ID, tp);
             end;
+
+            if (UID <> '*') then Break;
         end;
 
         FreeAndNil(resultlist);
@@ -63,18 +66,19 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Accounts_ActiveCharacters(UID : String = '*');
     var
+        basepath : String;
         path : String;
         pfile : String;
         resultlist : TStringList;
         i, j : Integer;
         tp : TPlayer;
     begin
-        path := AppPath+'gamedata\Accounts\';
+        basepath := AppPath+'gamedata\Accounts\';
         pfile := 'ActiveChars.txt';
-        resultlist := get_list(path, pfile);
+        resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
@@ -82,6 +86,8 @@ implementation
             for j := 0 to 8 do begin
                 tp.CName[j] := retrieve_data(j, path);
             end;
+
+            if (UID <> '*') then Break;
         end;
 
         FreeAndNil(resultlist);
@@ -94,23 +100,26 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Accounts_Storage(UID : String = '*');
 	var
+        basepath : String;
         path : String;
         pfile : String;
         resultlist : TStringList;
         i, j : Integer;
         tp : TPlayer;
     begin
-        path := AppPath+'gamedata\Accounts\';
+        basepath := AppPath+'gamedata\Accounts\';
         pfile := 'Storage.txt';
-        resultlist := get_list(path, pfile);
+        resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            path := path + resultlist[i] + '\' + pfile;
+            path := basepath + resultlist[i] + '\' + pfile;
 
             if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
 
             retrieve_inventories(path, tp.Kafra.Item);
+
+            if (UID <> '*') then Break;
         end;
 
         FreeAndNil(resultlist);

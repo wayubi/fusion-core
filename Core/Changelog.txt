@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-27-04: REED multi-player errors prevented startup. [AlexKreuz]
+- 08-27-04: #58 - WAC Did Not Add Emails. [AlexKreuz]
 - 08-27-04: #55 - Discounting very expensive items caused integer overflow crash. [AlexKreuz]
 - 08-27-04: Some more partitions in REED character procedures. [AlexKreuz]
 - 08-27-04: Undefined pet in pet_db.txt caused crash. [AlexKreuz]
