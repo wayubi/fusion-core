@@ -2347,7 +2347,25 @@ var
 	i,j :integer;
         w :Cardinal;
         xy:TPoint;
+        tg    :TGuild;
 begin
+
+  // AlexKreuz: Needed to stop damage to Emperium
+  // From Splash Attacks.
+  if (ts.isEmperium) then begin
+    j := GuildList.IndexOf(tc.GuildID);
+    if (j <> -1) then begin
+	  tg := GuildList.Objects[j] as TGuild;
+      if (tg.GSkill[10000].Lv < 1) then begin
+        dmg := 0;
+        Exit;
+      end;
+    end else begin
+        dmg := 0;
+        Exit;
+    end;
+  end;
+
 	if ts.HP < Dmg then Dmg := ts.HP;
 	if Dmg = 0 then begin
 		Result := False;

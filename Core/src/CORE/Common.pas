@@ -3380,7 +3380,27 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure SendCSkillAtk1(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
+var
+  j: integer;
+  tg: TGuild;
 begin
+
+  // AlexKreuz: Needed to stop damage to Emperium
+  // From Splash Attacks.
+  if (ts.isEmperium) then begin
+    j := GuildList.IndexOf(tc.GuildID);
+    if (j <> -1) then begin
+	    tg := GuildList.Objects[j] as TGuild;
+      if (tg.GSkill[10000].Lv < 1) then begin
+        dmg := 0;
+        Exit;
+      end;
+    end else begin
+        dmg := 0;
+        Exit;
+    end;
+  end;
+  
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
