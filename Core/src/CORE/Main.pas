@@ -6493,6 +6493,8 @@ begin
 	if tpe.Accessory <> 0 then begin
 		with tn1 do begin
 
+            if not assigned(tpe.Data) then Continue;
+
 			if tpe.Data.SkillTime > 0 then begin
 				//Tick System needs to be redone
 				{if tpe.SkillTick < _Tick - 60000 + (tpe.Data.SkillTime * 1000) then begin
