@@ -1209,7 +1209,7 @@ begin
                         tn1.Enable := false;
                         l := tm.TimerAct.IndexOf(tn1.ID);
                         if (l <> -1) then begin
-                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
+                            if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
                             tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
                         end;
                         for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
@@ -1992,8 +1992,8 @@ begin
                 for i := 0 to tm.CList.Count - 1 do begin
                     tc1 := tm.CList.Objects[i] as TChara;
                     if (tc1.Point.X >= tn.Script[tc.ScriptStep].Data3[0]) and
-                        (tc1.Point.X <= tn.Script[tc.ScriptStep].Data3[1]) and
-                        (tc1.Point.Y >= tn.Script[tc.ScriptStep].Data3[2]) and
+                        (tc1.Point.X <= tn.Script[tc.ScriptStep].Data3[2]) and
+                        (tc1.Point.Y >= tn.Script[tc.ScriptStep].Data3[1]) and
                         (tc1.Point.Y <= tn.Script[tc.ScriptStep].Data3[3]) then begin
                             if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
                     end;
