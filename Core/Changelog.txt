@@ -1,6 +1,14 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+
+- 01-10-04: Added monster skill NPC_Posion, waiting on procedure from Dark-[Oatmeal12345[
+- 01-10-04: Added monster skill Npc_Energydrain-[Oatmeal12345]
+- 01-10-04: Added monster skill NPC_Blodddrain -[Oatmeal12345]
+- 01-10-04: Added monster skill Npc_Darkbreath- [Oatmeal12345]
+- 01-10-04: Added monster skill NPC_Magicalattack-[Oatmeal12345]
+- 01-10-04: Added monster skill NPC_Telekineis -[Oatmeal12345]
+- 01-10-04: Added monster skill NPC_COMBO-[Oatmeal12345]
 - 01-10-04: Fixed Monk Triple Attack Damage Calculations. [AlexKreuz]
 - 01-08-04: Updated Intimidate, wait to warp after the attack. [Darkhelmet]
 - 01-08-04: Added Raid, commented out the old Raid. [Oatmeal12345]
