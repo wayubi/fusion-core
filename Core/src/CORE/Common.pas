@@ -6181,6 +6181,7 @@ begin
         end;
     end;
     for i := 0 to tm.CList.Count - 1 do begin
+        if not assigned(tm.CList.Objects[i]) then Continue;
         tc1 := tm.CList.Objects[i] as TChara;
         WFIFOW( 0, $0199);
         WFIFOW( 2, 1);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-13-04: Undefined map/maplist in PVP rank calculations caused crash. [AlexKreuz]
 - 08-13-04: Magic Crusher skill with too high exp caused crash. [AlexKreuz]
 - 08-13-04: Several skills (NB/SS/BOLT/ETC) with too high exp caused crash. [AlexKreuz]
 - 08-13-04: Undefined map in PVP rank calculations caused crash. [AlexKreuz]
