@@ -1,7 +1,7 @@
-Fusion 1.2.0.8 - December ????, 2003
-
-- 12-19-03: Added Wedding and Super novice data to job db 1-[Oatmeal12345]
-- 12-19-03: Fixed Extremity Fist Calculation, max sp helps do more damage- [Oatmeal12345]
+--------------------------------------------------------------------------------
+Fusion 1.2.0.8 - December 25th, 2003
+--------------------------------------------------------------------------------
+- 12-19-03: Fixed Extremity Fist Calculation, max sp helps do more damage. [Oatmeal12345]
 - 12-19-03: Guild Wars Emperium took splash damage without Approval. (#79) [AlexKreuz]
 - 12-19-03: Fixed Guild Positions. Correct Members change titles now. [AlexKreuz]
 - 12-19-03: Fixed Skill Timer doesn't reset upon second use bug (#60). [AlexKreuz]
@@ -15,16 +15,93 @@ Fusion 1.2.0.8 - December ????, 2003
 - 12-17-03: Added Phen Card [Colus]
 - 12-16-03: Fixed Monk's Falling Pearl Petals (bug #94) [Colus]
 - 12-16-03: Fixed ItemDropDenominator variable type -> integer (bug #69) [Colus]
+--------------------------------------------------------------------------------
+-Added: Whistle. [Unknown]
+-Added: Apple of Idun-Bard. [Unknown]
+-Added: Deluge, Valcano, Viloentgale. [Darkhelmet]
+-Added: Icons 50 % and 90 % weight,Peko, Falcon. [Darkhelmet]
+-Added: Extremity fist graphics. [Unknown]
+-Added: Musical Strike. [Oatmeal12345]
+-Added: Throw Arrow Dancer. [Oatmeal12345]
+-Added: BladeStop. [Darkhelmet]
+-Fixed: Acid Terror Graphics. [Oatmeal12345]
+-Added: Wedding Skills to Skill db (note none of them work). [Oatmeal12345]
+-Added: Venom Dust. [Oatmeal12345]
+-Fixed: Demonstration Graphics. [Oatmeal12345]
+-Added: Spirit Spheres graphics. [Darkhelmet, Oatmeal12345, Apple Girl]
+-Added: New npc script command resetbonusstat (2x stat points). [Oatmeal12345] 
+-Added: Super Novice Class. [Oatmeal12345, Darkhelmet] 
+-Fixed: Cpu usage problem. [DarkHelmet]
+-Fixed: Angelus it now adds to the right type. [Darkhelmet] 
+-Fixed: Hiding. [Darkhelmet] 
+-Fixed: Icewall and Firepillar in pvp. [Darkhelmet] 
+-Fixed: Gm zeny bug. [Darkhelmet] 
+-Fixed: Two hand quicken taking off weapon and effect still stays bug. [Darkhelmet] 
+-Fixed: Spear Quicken taking off weapon and effect still stays bug. [Darkhelmet] 
+-Fixed: Adrenaline Rush taking off weapon an effect still stays bug. [Darkhelmet] 
+-Fixed: Thief Backslide now moves 5 tiles backwards instead of warping. [Darkhelmet] 
+-Fixed: Assassin Grimtooh requires Katar now. [Darkhelmet] 
+-Fixed: Double Strafe. [Darkhelmet] 
+-Fixed: Drake Card adds perfect damage. [Oatmeal12345] 
 
------------------------------------------------------------------
-OLD FORMAT
------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Fusion 1.2.0.7 - November 27th, 2003
+--------------------------------------------------------------------------------
+- Fixed: Bug -> Storm Gust > Caused Crash. [DarkHelmet] 
+- Fixed: Bug -> Area Effect Harmed Caster. [DarkHelmet] 
+- Fixed: Bug -> Fire Wall > Caused Range Chek Error. [DarkHelmet] 
+- Fixed: Bug -> Fire Pillar > Access Violation. [DarkHelmet] 
+- Fixed: Bug -> Being able to kill yourself when attacking a monster. [DarkHelmet]
+- Updated: Magnus Exorcism -> Time. [DarkHelmet] 
+- Updated: Crusader -> Auto Guard > Lowered Rate. [DarkHelmet] 
+- Updated: Monk -> Triple Attack > Suports Fists. [DarkHelmet] 
+- Updated: Priest -> Sanctuary. [DarkHelmet] 
+- Updated: Hunter -> Blitz Beat. [DarkHelmet]
+- Updated: Rouge -> Intimidation. [DarkHelmet]
+- Updated: Alchemist -> Demonstration. [DarkHelmet]
+- Updated: Monk -> Call Spirits. [DarkHelmet]
+- Added PVP defence.  Defence now reduces Damage--[Darkhelmet]
+- Added Pekopeco Riding Speed -[Darkhelmet]
+- Added: Assassin -> Poison React. [DarkHelmet] 
+- Added: Alchemist -> Acid Terror. [DarkHelmet]
+- Added: Crusader -> Shield Reflect. [DarkHelmet] 
+- Added: Crusader -> Devotion. [DarkHelmet] 
+- Added: Crusader -> Defender. [DarkHelmet] 
+- Added: Crusader -> Providence. [DarkHelmet] 
+- Added: Sage -> Abracadabra. [DarkHelmet]
+- Added: Sage -> Frost Weapon. [DarkHelmet]
+- Added: Sage -> Flame Launcher. [DarkHelmet]
+- Added: Sage -> Lightning Loader. [DarkHelmet]
+- Added: Sage -> Dragonology. [DarkHelmet]
+- Added: Sage -> Autocast. [DarkHelmet]
+- Added: Attack Speed Potions. [Unknown]
+- Weapon: Berserk ASPD Unlimited (using doppel effect)- [Oatmeal12345]
+- Weapon: Mjonir ASPD Unlimited (using doppel effect)-[Oatmeal12345]
+- Weapon: Blood Axe Walking speed increased ( wont stack with moonlight card)-[Oatmeal12345]
+- Weapon: Muramasa ASPD unlimited Added -[Oatmeal12345]
+- Weapon: Schweizersabel auto cast level 3 thunderbolt-[Darkhelmet]
+- Weapon: Grand Cross auto cast turn undead level 3-[Darkhelmet]
+- Weapon: Zephyrus Autocasts Thunderstorm-[Darkhelmet]
+- Weapon: Brionic cast level 3 soul strike-[Darkhelmet]
+- Weapon: FireBrand now auto casts Firebolt level 3-[Darkhelmet]
+- Weapon: IceFalcion now auto casts Cold Bolt levle 3-[Darkhelmet]
+- Weapon: Hellfire now auto casts Fireball level 3 – [Darkhelmet]
+- Card: Doppelganger-Adds 33 percent aspd-[Darkhelmet] 
+- Card: Mistress Card-No gemstone effect -[Darkhelmet]
+- Card: Eddga Card-Unlimited Endure (it doesnt' show icon on side but it works) -[Darkhelmet]
+- Card: Moonlight Card-Makes you walk faster (No icon once again) -[Darkhelmet]
+- Card: Gold Thief Bug Card-Magic spells cant' target you in pvp -[Darkhelmet]
+- Card: Osiris Card-when you respawn after you die your hp and sp are recovered fully  -[Darkhelmet]
+- Card: Pharoh Card-reduces sp consumption by 30 percent  -[Darkhelmet]
+- Card: Anolian Card-Reflects 10 percent damage back at enemy PVP -[Darkhelmet]
+- Card: Orc Lord Card-Reflects 30 percent damage back at enemy pvp -[Darkhelmet]
+- Card: Maya-Reflects 30 percent magic attack back at enemy pvp -[Darkhelmet]
+- Card: Ghostring Card-all non elemental attacks miss, only elemental attacks can damage -[Darkhelmet]
+- Card: Drake-perfect damge  -[Oatmeal12345]
 
-RESERVED FOR 1.2.0.7
-
------------------------------------------------------------------
-
+--------------------------------------------------------------------------------
 Fusion 1.2.0.6 - November 12th, 2003
+--------------------------------------------------------------------------------
 - Fixed: Cart -> User Overweight Bug. [AlexKreuz]
 - Fixed: Merchant Shop -> Fatal Crash. [AlexKreuz]
 - Fixed: Monster -> Location Undefined Fatal. [AlexKreuz]
@@ -100,10 +177,14 @@ Fusion 1.2.0.6 - November 12th, 2003
 - Created: Custom File Format For Maps (DWM). [Harbinger]
 - Created: New Map (MAP) based on DWM. [AlexKreuz]
 
+--------------------------------------------------------------------------------
 Fusion 1.2.0.5 - November 1st, 2003
+--------------------------------------------------------------------------------
 - Fixed: Healing Items now work again. [AlexKreuz]
 
-Fusion 1.2.0.4 - November 1st, 2003 
+--------------------------------------------------------------------------------
+Fusion 1.2.0.4 - November 1st, 2003
+--------------------------------------------------------------------------------
 - Fixed: Console Command: -kick caused crash. [AlexKreuz] 
 - Fixed: 10053: Random Client Reset caused Fatal Crash. [AlexKreuz] 
 - Fixed: 10054: Double Login caused Fatal Crash. [AlexKreuz] 
@@ -136,7 +217,9 @@ Fusion 1.2.0.4 - November 1st, 2003
 - Updated: Monk: Explosion Spirits. [DarkHelmet] 
 - Updated: Monk: Finger Offensive. [DarkHelmet]
 
-Fusion 1.2.0.3 - October 22nd, 2003 
+--------------------------------------------------------------------------------
+Fusion 1.2.0.3 - October 22nd, 2003
+--------------------------------------------------------------------------------
 - Added: Console Command: -sql update player set gender [AlexKreuz] 
 - Added: Console Command: -sql update chara set zeny [AlexKreuz] 
 - Fixed: -kick now disconnects user to char screen. [AlexKreuz] 
@@ -155,7 +238,9 @@ Fusion 1.2.0.3 - October 22nd, 2003
 - Updated: Monk: Finger Offensive. [DarkHelmet] 
 - Removed: Monk: Extremity Fists. [DarkHelmet]
 
-Fusion 1.2.0.2 - October 20th, 2003 
+--------------------------------------------------------------------------------
+Fusion 1.2.0.2 - October 20th, 2003
+--------------------------------------------------------------------------------
 - Fixed: 50% Guild Tax Bug caused Integer Overflow. [AlexKreuz] 
 - Fixed: The url to DarkWeiss home was incorrect. [AlexKreuz] 
 - Fixed: Monk: Extremity Fist. [DarkHelmet] 
@@ -163,11 +248,15 @@ Fusion 1.2.0.2 - October 20th, 2003
 - Fixed: Monk: Explosion Spirits Calculations. [DarkHelmet] 
 - Fixed: Monk: Investigate. [DarkHelmet]
 
+--------------------------------------------------------------------------------
 Fusion 1.2.0.1 - October 19th, 2003
+--------------------------------------------------------------------------------
 - Fixed: /monster command fixed. [AlexKreuz] 
 - Fixed: Monk Crash w/ Claws. [DarkHelmet] 
 
+--------------------------------------------------------------------------------
 Fusion 1.2.0.0 - October 19th, 2003
+--------------------------------------------------------------------------------
 - Fixed: Guild Bugs removed. [GTO] 
 - Fixed: Login Fix. [GTO] 
 - Fixed: Working Flee. [Marius] 
@@ -198,11 +287,15 @@ Fusion 1.2.0.0 - October 19th, 2003
 - Added: Status Bar: Online Users. [AlexKreuz] 
 - Added: Status Bar: UpTime. [AlexKreuz] 
 
+--------------------------------------------------------------------------------
 Fusion 1.1.0.0 - October 15th, 2003
+--------------------------------------------------------------------------------
 - Added: Server-Side Control Panel. [AlexKreuz] 
 - Added: Server-Side Command @users. [AlexKreuz] 
 
+--------------------------------------------------------------------------------
 Fusion 1.0.0.0 - October 14th, 2003
+--------------------------------------------------------------------------------
 - Changed: GM IDs extend from 100000 - 100100. [AlexKreuz] 
 - Fixed: ccolor NPC command. [AlexKreuz] 
 - Added: Weapon Sprites. [Tumy] 
@@ -213,4 +306,5 @@ Fusion 1.0.0.0 - October 14th, 2003
 - #Gives Permissions For GM Commands To Accounts 
 - Merged all Changes from DarkWeiss 1.0.0.0 - 2.2.0.0 [Merged: by AlexKreuz] 
 
+--------------------------------------------------------------------------------
 Based on Open Source Weiss (http://eweiss.sourceforge.net/forums)
