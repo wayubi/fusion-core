@@ -10333,59 +10333,66 @@ begin
     if not (tc.MTargetType = 0) then begin
     //if assigned(tc1) then begin
         for i := 1 to 100 do begin
-            if tc1.Item[i].ID <> 0 then begin
-                if tc1.Item[i].Equip <> 0 then begin
-                    modfix := modfix - tc1.param[0];
-                end;
-                weight := tc1.Item[i].Data.Weight;
-                success := muldiv(modfix, 100, weight);
-                rand := Random(20000) mod 10000;
-                if rand <= success then begin
-                    WFIFOW( 0, $011a);
-                    WFIFOW( 2, 50);
-                    WFIFOW( 4, 0);
-                    WFIFOL( 6, tc1.ID);
-                    WFIFOL(10, tc.ID);
-                    WFIFOB(14, 1);
-                    SendBCmd(tm,tc1.Point,15);
+            try
+                if tc1.Item[i].ID <> 0 then begin
+                    if tc1.Item[i].Equip <> 0 then begin
+                        modfix := modfix - tc1.param[0];
+                    end;
+                    weight := tc1.Item[i].Data.Weight;
+                    success := muldiv(modfix, 100, weight);
+                    rand := Random(20000) mod 10000;
+                    if rand <= success then begin
+                        WFIFOW( 0, $011a);
+                        WFIFOW( 2, 50);
+                        WFIFOW( 4, 0);
+                        WFIFOL( 6, tc1.ID);
+                        WFIFOL(10, tc.ID);
+                        WFIFOB(14, 1);
+                        SendBCmd(tm,tc1.Point,15);
 
-                    k := tc1.item[i].ID;
-                    td := ItemDB.IndexOfObject(k) as TItemDB;
-                    if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
-                        k := SearchCInventory(tc, td.ID, td.IEquip);
-                        if k <> 0 then begin
-                            if tc.Item[k].Amount < 30000 then begin
-                                UpdateWeight(tc, k, td);
-                                SendCGetItem(tc, k, 1);
+                        k := tc1.item[i].ID;
+                        td := ItemDB.IndexOfObject(k) as TItemDB;
+                        if tc.MaxWeight >= tc.Weight + cardinal(td.Weight) then begin
+                            k := SearchCInventory(tc, td.ID, td.IEquip);
+                            if k <> 0 then begin
+                                if tc.Item[k].Amount < 30000 then begin
+                                    UpdateWeight(tc, k, td);
+                                    SendCGetItem(tc, k, 1);
 
-                                WFIFOW( 0, $00af);
-                                WFIFOW( 2, i);
-                                WFIFOW( 4, 1);
-                                tc1.Socket.SendBuf(buf, 6);
-                                
-                                tc1.Item[i].Amount := tc1.Item[i].Amount - 1;
-                                if tc1.Item[i].Amount = 0 then tc1.Item[i].ID := 0;
-                                tc1.Weight := tc1.Weight - tc1.Item[i].Data.Weight;
-                                tc1.Socket.SendBuf(buf, 6);
-                                SendCStat1(tc, 0, $0018, tc1.Weight);
+                                    WFIFOW( 0, $00af);
+                                    WFIFOW( 2, i);
+                                    WFIFOW( 4, 1);
+                                    tc1.Socket.SendBuf(buf, 6);
 
-                                str := tc.Name + ' stole one ' + tc1.item[i].Data.Name + ' from you.';
-                                w := length(STR) + 4;
-                                WFIFOW(0, $009a);
-                                WFIFOW(2, w);
-                                WFIFOS(4, str, w - 4);
-                                tc1.Socket.SendBuf(buf, w);
+                                    tc1.Item[i].Amount := tc1.Item[i].Amount - 1;
+                                    if tc1.Item[i].Amount = 0 then tc1.Item[i].ID := 0;
+                                    tc1.Weight := tc1.Weight - tc1.Item[i].Data.Weight;
+                                    tc1.Socket.SendBuf(buf, 6);
+                                    SendCStat1(tc, 0, $0018, tc1.Weight);
 
-                                Result := true;
-                                Exit;
+                                    str := tc.Name + ' stole one ' + tc1.item[i].Data.Name + ' from you.';
+                                    w := length(STR) + 4;
+                                    WFIFOW(0, $009a);
+                                    WFIFOW(2, w);
+                                    WFIFOS(4, str, w - 4);
+                                    tc1.Socket.SendBuf(buf, w);
+
+                                    Result := true;
+                                    Exit;
+                                end;
                             end;
-                        end;
-                    end else begin
-                        // Overweight, failed to get item.
-                        WFIFOW( 0, $00a0);
-                        WFIFOB(22, 2);
-                        tc.Socket.SendBuf(buf, 23);
-                    end; {end item added}
+                        end else begin
+                            // Overweight, failed to get item.
+                            WFIFOW( 0, $00a0);
+                            WFIFOB(22, 2);
+                            tc.Socket.SendBuf(buf, 23);
+                        end; {end item added}
+                    end;
+                end;
+            except
+                on EAccessViolation do begin
+                    Result := False;
+                    Exit;
                 end;
             end;
         end;
