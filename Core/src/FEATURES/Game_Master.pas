@@ -111,6 +111,7 @@ var
     GM_ATHENA_VIT : Byte;
     GM_ATHENA_INT : Byte;
     GM_ATHENA_DEX : Byte;
+    GM_ATHENA_LUK : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -223,6 +224,7 @@ var
     function command_athena_vit(tc : TChara; str : String) : String;
     function command_athena_int(tc : TChara; str : String) : String;
     function command_athena_dex(tc : TChara; str : String) : String;
+    function command_athena_luk(tc : TChara; str : String) : String;
 
 implementation
 
@@ -340,6 +342,7 @@ implementation
         GM_ATHENA_VIT := StrToIntDef(sl.Values['ATHENA_VIT'], 1);
         GM_ATHENA_INT := StrToIntDef(sl.Values['ATHENA_INT'], 1);
         GM_ATHENA_DEX := StrToIntDef(sl.Values['ATHENA_DEX'], 1);
+        GM_ATHENA_LUK := StrToIntDef(sl.Values['ATHENA_LUK'], 1);
 
         sl.Free;
         ini.Free;
@@ -462,6 +465,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_VIT', IntToStr(GM_ATHENA_VIT));
         ini.WriteString('Athena GM Commands', 'ATHENA_INT', IntToStr(GM_ATHENA_INT));
         ini.WriteString('Athena GM Commands', 'ATHENA_DEX', IntToStr(GM_ATHENA_DEX));
+        ini.WriteString('Athena GM Commands', 'ATHENA_LUK', IntToStr(GM_ATHENA_LUK));
 
         ini.Free;
 
@@ -588,6 +592,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('vit')) = 'vit') and (check_level(tc.ID, GM_ATHENA_VIT)) ) then error_msg := command_athena_vit(tc, str)
             else if ( (copy(str, 1, length('int')) = 'int') and (check_level(tc.ID, GM_ATHENA_INT)) ) then error_msg := command_athena_int(tc, str)
             else if ( (copy(str, 1, length('dex')) = 'dex') and (check_level(tc.ID, GM_ATHENA_DEX)) ) then error_msg := command_athena_dex(tc, str)
+            else if ( (copy(str, 1, length('lukx')) = 'luk') and (check_level(tc.ID, GM_ATHENA_LUK)) ) then error_msg := command_athena_luk(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -4266,6 +4271,46 @@ Called when we're shutting down the server *only*
 
             if (i > 0) then Result := 'GM_ATHENA_DEX Success. ' + IntToStr(tc.ParamBase[4] - oldpoints) + ' points added.'
             else Result := 'GM_ATHENA_DEX Success. ' + IntToStr(oldpoints - tc.ParamBase[4]) + ' points subtracted.'
+        end else begin
+            Result := Result + 'Point amount out of range [-32767-32767].';
+        end;
+    end;
+
+    function command_athena_luk(tc : TChara; str : String) : String;
+    var
+        i, k, oldpoints : Integer;
+    begin
+        Result := 'GM_ATHENA_LUK Failure.';
+
+        oldpoints := tc.ParamBase[5];
+
+        Val(Copy(str, 5, 256), i, k);
+        if (k = 0) and (i >= -32767) and (i <= 32767) then begin
+            if i < 0 then begin
+                if (tc.ParamBase[5] + i >= 1) then tc.ParamBase[5] := tc.ParamBase[5] + i
+                else if (tc.ParamBase[5] + i < 1) and (tc.ParamBase[5] > 1) then begin
+                    tc.ParamBase[5] := 1;
+                end else begin
+                    Result := Result + 'Minimum number of points is 1.';
+                    Exit;
+                end;
+            end
+
+            else begin
+                if (tc.ParamBase[5] + i <= 32767) then tc.ParamBase[5] := tc.ParamBase[5] + i
+                else if (tc.ParamBase[5] + i > 32767) and (tc.ParamBase[5] < 32767) then begin
+                    tc.ParamBase[5] := 32767;
+                end else begin
+                    Result := Result + 'Maximum number of points is 32767.';
+                    Exit;
+                end;
+            end;
+
+            CalcStat(tc);
+            SendCStat(tc);
+
+            if (i > 0) then Result := 'GM_ATHENA_LUK Success. ' + IntToStr(tc.ParamBase[5] - oldpoints) + ' points added.'
+            else Result := 'GM_ATHENA_LUK Success. ' + IntToStr(oldpoints - tc.ParamBase[5]) + ' points subtracted.'
         end else begin
             Result := Result + 'Point amount out of range [-32767-32767].';
         end;
