@@ -1529,6 +1529,10 @@ Option_WelcomeMsg :boolean;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
 Option_Username_MF : boolean;
+Option_Back_Color : string;
+Option_Font_Color : string;
+Option_Font_Size : integer;
+Option_Font_Face : string;
 // Fusion INI Declarations
 
 

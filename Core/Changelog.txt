@@ -1,3 +1,4 @@
+- 04-07-04: Added Weiss.ini options to edit Colors and Fonts. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @who3. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @who2. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @who. [AlexKreuz]

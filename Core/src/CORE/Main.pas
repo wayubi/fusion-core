@@ -155,6 +155,9 @@ var
 	sl1 :TStringList;
 	ini :TIniFile;
   PriorityClass :cardinal;
+  a : integer;
+  b : integer;
+  c : integer;
   
 begin
 
@@ -559,6 +562,27 @@ begin
                         Option_Username_MF := False;
                 end;
 
+                if sl.IndexOfName('Option_Back_Color') <> -1 then begin
+                        Option_Back_Color := sl.Values['Option_Back_Color'];
+                end else begin
+                        Option_Back_Color := '88B6D6';
+                end;
+                if sl.IndexOfName('Option_Font_Color') <> -1 then begin
+                        Option_Font_Color := sl.Values['Option_Font_Color'];
+                end else begin
+                        Option_Font_Color := '000080';
+                end;
+                if sl.IndexOfName('Option_Font_Size') <> -1 then begin
+                        Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
+                end else begin
+                        Option_Font_Size := 9;
+                end;
+                if sl.IndexOfName('Option_Font_Face') <> -1 then begin
+                        Option_Font_Face := sl.Values['Option_Font_Face'];
+                end else begin
+                        Option_Font_Face := 'Trebuchet MS';
+                end;
+
                 sl.Clear;
                 sl1.Clear;
 
@@ -668,6 +692,19 @@ begin
 	SetPriorityClass(GetCurrentProcess(), PriorityClass);
 
 
+
+        a := strtoint(floattostr(hextoint(copy(Option_Back_Color, 1, 2))));
+        b := strtoint(floattostr(hextoint(copy(Option_Back_Color, 3, 2))));
+        c := strtoint(floattostr(hextoint(copy(Option_Back_Color, 5, 2))));
+        txtDebug.Color := RGB(a, b, c);
+
+        a := strtoint(floattostr(hextoint(copy(Option_Font_Color, 1, 2))));
+        b := strtoint(floattostr(hextoint(copy(Option_Font_Color, 3, 2))));
+        c := strtoint(floattostr(hextoint(copy(Option_Font_Color, 5, 2))));
+        txtDebug.Font.Color := RGB(a, b, c);
+
+        txtDebug.Font.Name := Option_Font_Face;
+        txtDebug.Font.Size := Option_Font_Size;
 
 	ini.Free;
 	sl.Free;
@@ -793,6 +830,10 @@ begin
         ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
         ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
+        ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
+        ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
+        ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
+        ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
         // Fusion INI Lines
         
         // MySQL Server Lines
