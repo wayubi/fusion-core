@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-29-04: Updated message sending for -server and -users to send the correct message length instead of just 256 or 200. [Mitch]
 - 01-29-04: Added messages for -pword command for errors and successfully password change. [Mitch]
 - 01-29-04: Updated message sending for #whois, #ban, and #kick to send the correct message length instead of just 256 or 200. [Mitch]
 - 01-29-04: Added messages to #save command notifying the user that the map and coords have been saved. [Mitch]

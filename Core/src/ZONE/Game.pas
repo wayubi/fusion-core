@@ -1649,7 +1649,9 @@ end;
                                                 end;
                                             end;
                                             DebugOut.Lines.Add(str2);
-                                            w := 200;
+
+                                            { Mitch 01-29-2004: Get correct str length and packet length }
+                                            w := Length(str2) + 4;
                                             WFIFOW(0, $009a);
                                             WFIFOW(2, w);
                                             WFIFOS(4, str2, w - 4);
@@ -1662,7 +1664,8 @@ end;
                                                 if (Copy(str, 1, 6) = 'server') then begin
                                                         str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
                                                         DebugOut.Lines.Add(str2);
-                                                        w := 200;
+                                                        { Mitch 01-29-2004: Get correct str length and packet length }
+                                                        w := Length(str2);
                                                         WFIFOW(0, $009a);
                                                         WFIFOW(2, w);
                                                         WFIFOS(4, str2, w - 4);
