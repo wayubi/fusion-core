@@ -1907,42 +1907,53 @@ begin
 				              ts.isLooting := False;
 				              ts.ATick := Tick + aMotion;
                     end;
-                                        tc.MSkill := tc.Skill[279].Effect1;
 
-                                        tc.MUseLV := tc.Skill[MSkill].Lv;
-
-                                        //tc.MSkill := tc.Skill[279].Effect1;
-                                        {Basing On Level to determine able spells}
-                                        {if Skill[279].Lv = 1 then i := 1;
-                                        if Skill[279].Lv <= 4 then i := 2;
-                                        if Skill[279].Lv <= 7 then i := 3;
-                                        if Skill[279].Lv <= 9 then i := 4;
-                                        if Skill[279].Lv = 10 then i := 5;
-
-                                        i := Random(i);
-                                        i := i + 1;
-
-                                        if i = 3 then i := 5;
-                                        if i = 4 then i := 6;
-                                        if i = 5 then i := 7;
-                                        if i = 2 then i := Random(2) + 2;
-
-                                        case i of
-                                                1:  tc.MSkill := 11;       {Napalm Beat
-                                                2:  tc.MSkill := 14;       {Coldbolt
-                                                3:  tc.MSkill := 19;       {Firebolt
-                                                4:  tc.MSkill := 20;       {Lightning Bolt
-                                                5:  tc.MSkill := 13;       {Soul Strike
-                                                6:  tc.MSkill := 17;       {Fire Ball
-                                                7:  tc.MSkill := 15;       {Frost Driver
-                                        end;}
-
-                                        //tc.MUseLV := tc.Skill[MSkill].Lv;
-                                        DecSP(tc, MSkill, MUseLV);
-                                        SkillEffect(tc, Tick);
-                                        //DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
-                                end;
+                    i := tc.Skill[279].Effect1;
+                    if (i > 0) then j := tc.Skill[i].Lv;
+                    // What level can you use?
+                    case i of
+                      11:
+                        begin
+                          m := 3;
                         end;
+                      14,19,20,13:
+                        begin
+                          m := 3;
+                        end;
+                      17:
+                        begin
+                          m := 2;
+                        end;
+                      15:
+                        begin
+                          m := 1;
+                        end;
+                    end;
+
+                    if (j > m) then j := m;
+                    tc.MSkill := i;
+
+                    // What level will you be casting at?
+                    // We reuse i and m now...
+
+                    m := Random(100);
+                    if (m < 50) then
+                      i := 1
+                    else if (m < 85) then
+                      i := 2
+                    else
+                      i := 3;
+
+                    if (j < i) then i := j;
+
+                    // Set the final skill level.
+                    tc.MUseLV := i;
+
+                    DecSP(tc, MSkill, MUseLV);
+                    SkillEffect(tc, Tick);
+                    //DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
+                  end;
+                end;
 
 
                         if (tc.GungnirEquipped) and (25 >= Random(100)) then begin
@@ -3531,35 +3542,51 @@ begin
                                         if tc1.HP = 0 then Exit;
                                         tc.MTargetType := 0;
                                         tc.AData := tc1;
-                                        tc.MSkill := tc.Skill[279].Effect1;
-                                        {Basing On Level to determine able spells}
-                                        {if Skill[279].Lv = 1 then i := 1;
-                                        if Skill[279].Lv <= 4 then i := 2;
-                                        if Skill[279].Lv <= 7 then i := 3;
-                                        if Skill[279].Lv <= 9 then i := 4;
-                                        if Skill[279].Lv = 10 then i := 5;
+                    i1 := tc.Skill[279].Effect1;
+                    if (i1 > 0) then j1 := tc.Skill[i1].Lv;
+                    // What level can you use?
+                    case i1 of
+                      11:
+                        begin
+                          k := 3;
+                        end;
+                      14,19,20,13:
+                        begin
+                          k := 3;
+                        end;
+                      17:
+                        begin
+                          k := 2;
+                        end;
+                      15:
+                        begin
+                          k := 1;
+                        end;
+                    end;
 
-                                        i := Random(i);
-                                        i := i + 1;
+                    if (j1 > k) then j1 := k;
+                    tc.MSkill := i1;
 
-                                        if i = 3 then i := 5;
-                                        if i = 4 then i := 6;
-                                        if i = 5 then i := 7;
-                                        if i = 2 then i := Random(2) + 2;
+                    // What level will you be casting at?
+                    // We reuse i1 and k now...
 
-                                        case i of
-                                                1:  tc.MSkill := 11;       {Napalm Beat
-                                                2:  tc.MSkill := 14;       {Coldbolt
-                                                3:  tc.MSkill := 19;       {Firebolt
-                                                4:  tc.MSkill := 20;       {Lightning Bolt
-                                                5:  tc.MSkill := 13;       {Soul Strike
-                                                6:  tc.MSkill := 17;       {Fire Ball
-                                                7:  tc.MSkill := 15;       {Frost Driver
-                                        end;}
+                    k := Random(100);
+                    if (k < 50) then
+                      i1 := 1
+                    else if (k < 85) then
+                      i1 := 2
+                    else
+                      i1 := 3;
 
-                                        tc.MUseLV := tc.Skill[MSkill].Lv;
-                                        DecSP(tc, MSkill, MUseLV);
-                                        SkillEffect(tc, Tick);
+                    if (j1 < i1) then i1 := j1;
+
+                    // Set the final skill level.
+                    tc.MUseLV := i1;
+
+                    DecSP(tc, MSkill, MUseLV);
+                    SkillEffect(tc, Tick);
+                    //DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
+
                                 end;
                                 except
                                         exit;
@@ -7482,12 +7509,17 @@ begin
                                         begin
                                           ZeroMemory(@buf[0], 30);
                                           WFIFOW(0, $01cd);
+                                          // Napalm Beat at L1
                                           if tc.Skill[11].Lv > 0 then WFIFOL(2, 11);
+                                          // CB/FB/LB at L2-L4
                                           if (tc.Skill[14].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(6, 14);
                                           if (tc.Skill[19].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(10, 19);
                                           if (tc.Skill[20].Lv > 0) and (tc.Skill[279].Lv > 1) then WFIFOL(14, 20);
+                                          // SS at L5-L7
                                           if (tc.Skill[13].Lv > 0) and (tc.Skill[279].Lv > 4) then WFIFOL(18, 13);
+                                          // FBall at L8-L9
                                           if (tc.Skill[17].Lv > 0) and (tc.Skill[279].Lv > 7) then WFIFOL(22, 17);
+                                          // FD at L10
                                           if (tc.Skill[15].Lv > 0) and (tc.Skill[279].Lv > 9) then WFIFOL(26, 15);
                                           tc.Socket.SendBuf(buf, 30);
                                                 tc1 := tc;

@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-05-04: Updated Autocast to behave 'properly' based on skills/level. [Colus]
 - 02-06-04: Updated Autospell PvP. [Darkhelmet]
 - 02-06-04: Updated Autospell. [Colus]
 - 02-05-04: Fixed Negative damage on monster skills. [Darkhelmet]
