@@ -111,6 +111,10 @@ uses
         tm : TMap;
         tl : TSkillDB;
     begin
+
+        { Placed here to prevent attacking self }
+        if tc.AData = tc then Exit;
+
     	if dmg[0] < 0 then dmg[0] := 0;
 		if tc.MTargetType = 0 then begin
 			ts := tc.AData;
@@ -121,6 +125,8 @@ uses
 			SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
 			if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then frmMain.StatCalc2(tc, tc1, Tick);
 		end;
+
+        tc.AData := nil;
     end;
 
 

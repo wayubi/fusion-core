@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-09-04: Fixed using attack type skills too fast will target self. [AlexKreuz]
 - 06-07-04: Switched skill [SM_RECOVERY] to PSS system. [AlexKreuz]
 - 06-07-04: Minor PVP pathfinding fixes. [AlexKreuz]
 - 06-07-04: Skill SM_PROVOKE now provokes PVP targets into attacking player. [AlexKreuz]

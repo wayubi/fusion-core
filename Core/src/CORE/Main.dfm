@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 281
-  Top = 255
+  Left = 546
+  Top = 477
   Width = 607
   Height = 382
   Caption = '#33'
@@ -33,12 +33,12 @@ object frmMain: TfrmMain
     Color = clCream
     Panels = <
       item
-        Alignment = taRightJustify
         Width = 300
       end
       item
         Width = 300
       end>
+    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0
