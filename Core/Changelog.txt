@@ -1,4 +1,5 @@
 
+- 03-25-04: Fixed Spear Quicken on PVP maps [Eliot]
 - 03-24-04: Added damage and equipment check for Shield Charge PVP [Eliot]
 - 03-21-04: Added range check for negative stat bonuses (they become 0). [Colus]
 - 03-21-04: Now supporting items/cards with negative stat modifiers. [Colus]

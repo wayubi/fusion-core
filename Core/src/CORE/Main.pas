@@ -9118,6 +9118,7 @@ begin
         258:
           begin
             // AlexKreuz: Fixed Spear Quicken - Set type to Spear [4 & 5]
+            // Eliot: Fixed usage in PVP maps. It wasnt usable at all.
             if (tc.Weapon = 4) or (tc.Weapon = 5) then begin
 						tc1 := tc;
 						ProcessType := 3;
@@ -9128,7 +9129,7 @@ begin
           end;
 				else
 					begin
-            if ((tm.CList.IndexOf(tc.MTarget) <> -1) and (mi.PvP = false)) or (tc1 = nil) then begin
+            if ((tm.CList.IndexOf(tc.MTarget) <> -1) or (tc1 = nil)) then begin
 								MMode := 4;
 								MTarget := 0;
                 Exit;
