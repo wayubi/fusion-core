@@ -7535,7 +7535,7 @@ end;
 
                                                 if tc.Item[w].Card[0] = $FF00 then begin
                                                         i := PetList.IndexOf( tc.Item[w].Card[2] + tc.Item[w].Card[3] * $10000 );
-                                                        if i <> -1 then begin
+                                                        if (i <> -1) then begin
                                                                 tpe := PetList.Objects[i] as TPet;
                                                         end;
                                                 end;
@@ -7583,7 +7583,7 @@ end;
 
 																								tpe.Data := tpd;
                                                 tpe.Incubated := 1;
-                                                
+
                                                 tm.NPC.AddObject(tn.ID, tn);
                                                 tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
@@ -7618,6 +7618,7 @@ end;
 																								WFIFOW( 31, tpe.Relation );
                                                 WFIFOW( 33, tpe.Accessory );
                                                 Socket.SendBuf( buf, 35 );
+
                                         end;
                                 end;
                         end;

@@ -3263,7 +3263,7 @@ var
   tn:TNPC;
 begin
   tpe := PetList.Objects[i] as TPet;
-
+  if tpe.CharaID = tc.CID then begin
   tn := TNPC.Create;
   tn.ID := NowNPCID;
 
@@ -3316,6 +3316,7 @@ begin
   WFIFOW( 31, tpe.Relation );
   WFIFOW( 33, tpe.Accessory );
   tc.Socket.SendBuf( buf, 35 );
+  end;
 end;
 //------------------------------------------------------------------------------
 procedure SendMonsterRelocation(tm:TMap; ts:tMob; tc:TChara);

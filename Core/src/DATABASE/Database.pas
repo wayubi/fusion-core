@@ -2555,7 +2555,7 @@ end;
 // ÉfÅ[É^ï€ë∂
 procedure DataSave();
 var
-	i,j,z :integer;
+	i,j,m,z :integer;
 	cnt :integer;
 	txt :TextFile;
 	sl  :TStringList;
@@ -2957,7 +2957,7 @@ begin
                                         Fullness    := StrToInt( sl.Strings[ 9] );
                                         Accessory   := StrToInt( sl.Strings[10] );
         }
-        for i := 0 to PetList.Count - 1 do begin
+        {for i := 0 to PetList.Count - 1 do begin
           tpe := PetList.Objects[i] as TPet;
           sl.Clear;
           sl.Add( IntToStr( tpe.PlayerID ) );
@@ -2975,18 +2975,21 @@ begin
           sl.Add( IntToStr( tpe.Accessory ) );
           writeln(txt, sl.DelimitedText);
           tpe.Saved := 1;
-        end;
+        end;}
 
-        {for i := 0 to Player.Count - 1 do begin
+        for i := 0 to Player.Count - 1 do begin
                 tp := Player.Objects[i] as TPlayer;
+
                 for j := 1 to 100 do begin
                         with tp.Kafra.Item[j] do begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-                                        k := Card[2] + Card[3] * $10000;
-                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
+                                        for k := 0 to PetList.Count - 1 do begin
+                                        //k := Card[2] + Card[3] * $10000;
+                                        if (PetList.IndexOf( k ) <> -1)  then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
+                                          if tpe.Saved = 0 then begin
                                                 sl.Clear;
-                                                sl.Add( IntToStr( tpe.PlayerID ) );
+                                                {sl.Add( IntToStr( tpe.PlayerID ) );
                                                 sl.Add( IntToStr( tpe.CharaID ) );
                                                 sl.Add( '0' ); // Cart
                                                 sl.Add( IntToStr( j ) ); // Index
@@ -2998,26 +3001,45 @@ begin
                                                 sl.Add( IntToStr( tpe.LV ) );
                                                 sl.Add( IntToStr( tpe.Relation  ) );
                                                 sl.Add( IntToStr( tpe.Fullness  ) );
-                                                sl.Add( IntToStr( tpe.Accessory ) );
+                                                sl.Add( IntToStr( tpe.Accessory ) ); }
+                                                sl.Add( IntToStr( tpe.PlayerID ) );
+          sl.Add( IntToStr( tpe.CharaID ) );
+          sl.Add( IntToStr( tpe.Cart ) ); // Cart
+          sl.Add( IntToStr( tpe.Index ) ); // Index
+          sl.Add( IntToStr( tpe.Incubated ) );
+          sl.Add( IntToStr( tpe.PetID ) ); // PetID
+          sl.Add( IntToStr( tpe.JID ) );
+          sl.Add( tpe.Name );
+          sl.Add( IntToStr( tpe.Renamed ) );
+          sl.Add( IntToStr( tpe.LV ) );
+          sl.Add( IntToStr( tpe.Relation  ) );
+          sl.Add( IntToStr( tpe.Fullness  ) );
+          sl.Add( IntToStr( tpe.Accessory ) );
                                                 tpe.Saved := 1;
                                                 z := j;
                                                 Writeln( txt, sl.DelimitedText );
+                                          end;
 		                                    end;
+                                        end;
                                 end;
                         end;
                 end;
-        end;
-        for i := 0 to Chara.Count - 1 do begin
-                tc := Chara.Objects[i] as TChara;
+
+        for m := 0 to 8 do begin;
+         if tp.CData[m] <> nil then begin
+        //for i := 0 to Chara.Count - 1 do begin
+                //tc := Chara.Objects[i] as TChara;
+            tc := tp.CData[m];
                 for j := 1 to 100 do begin
                         with tc.Item[j] do begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-                                        k := Card[2] + Card[3] * $10000;
-
-                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
+                                        //k := Card[2] + Card[3] * $10000;
+                                    for k := 0 to PetList.Count - 1 do begin
+                                        if (PetList.IndexOf( k ) <> -1) then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
+                                                if tpe.Saved = 0 then begin
                                                 sl.Clear;
-                                                sl.Add( IntToStr( tpe.PlayerID ) );
+                                                {sl.Add( IntToStr( tpe.PlayerID ) );
                                                 sl.Add( IntToStr( 0 ) );
                                                 sl.Add( '0' ); // Cart
                                                 sl.Add( IntToStr( j ) ); // Index
@@ -3030,21 +3052,40 @@ begin
                                                 sl.Add( IntToStr( tpe.Relation  ) );
                                                 sl.Add( IntToStr( tpe.Fullness  ) );
                                                 sl.Add( IntToStr( tpe.Accessory ) );
-		                                            writeln(txt, sl.DelimitedText);
+		                                            writeln(txt, sl.DelimitedText); }
+                                                sl.Add( IntToStr( tpe.PlayerID ) );
+                                                sl.Add( IntToStr( tpe.CharaID ) );
+                                                sl.Add( IntToStr( tpe.Cart ) ); // Cart
+                                                sl.Add( IntToStr( tpe.Index ) ); // Index
+                                                sl.Add( IntToStr( tpe.Incubated ) );
+                                                sl.Add( IntToStr( tpe.PetID ) ); // PetID
+                                                sl.Add( IntToStr( tpe.JID ) );
+                                                sl.Add( tpe.Name );
+                                                sl.Add( IntToStr( tpe.Renamed ) );
+                                                sl.Add( IntToStr( tpe.LV ) );
+                                                sl.Add( IntToStr( tpe.Relation  ) );
+                                                sl.Add( IntToStr( tpe.Fullness  ) );
+                                                sl.Add( IntToStr( tpe.Accessory ) );
+                                                Writeln(txt, sl.DelimitedText);
                                                 tpe.Saved := 1;
                                                 z := j;
+                                                end;
 	                                      end;
+                                    end;
                                 end;
                         end;
-                end;
-                for j := 1 to 100 do begin
+
+
+                //for j := 1 to 100 do begin
                         with tc.Cart.Item[j] do begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
-                                        k := Card[2] + Card[3] * $10000;
-                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
+                                        //k := Card[2] + Card[3] * $10000;
+                                        for k := 0 to PetList.Count - 1 do begin
+                                        if (PetList.IndexOf( k ) <> -1) then begin
+                                          if tpe.Saved = 0 then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
                                                 sl.Clear;
-                                                sl.Add( IntToStr( tpe.PlayerID ) );
+                                                {sl.Add( IntToStr( tpe.PlayerID ) );
                                                 sl.Add( IntToStr( tpe.CharaID ) );
                                                 sl.Add( '1' ); // Cart
                                                 sl.Add( IntToStr( j ) ); // Index
@@ -3057,14 +3098,32 @@ begin
                                                 sl.Add( IntToStr( tpe.Relation  ) );
                                                 sl.Add( IntToStr( tpe.Fullness  ) );
                                                 sl.Add( IntToStr( tpe.Accessory ) );
+                                                }
+                                                sl.Add( IntToStr( tpe.PlayerID ) );
+          sl.Add( IntToStr( tpe.CharaID ) );
+          sl.Add( IntToStr( tpe.Cart ) ); // Cart
+          sl.Add( IntToStr( tpe.Index ) ); // Index
+          sl.Add( IntToStr( tpe.Incubated ) );
+          sl.Add( IntToStr( tpe.PetID ) ); // PetID
+          sl.Add( IntToStr( tpe.JID ) );
+          sl.Add( tpe.Name );
+          sl.Add( IntToStr( tpe.Renamed ) );
+          sl.Add( IntToStr( tpe.LV ) );
+          sl.Add( IntToStr( tpe.Relation  ) );
+          sl.Add( IntToStr( tpe.Fullness  ) );
+          sl.Add( IntToStr( tpe.Accessory ) );
                                                 tpe.Saved := 1;
                                                 z := j;
                                                 Writeln( txt, sl.DelimitedText );
+                                                end;
+                                        end;
                                         end;
                                 end;
                         end;
                 end;
-        end;       }
+          end;
+        end;
+        end;
 	CloseFile(txt);
 
   //DebugOut.Lines.add('Pet Saved');

@@ -15603,7 +15603,7 @@ begin
                                                 tn.pcnt := k;
                                                 tn.ppos := 0;
 
-                                                PetMoveTick := Tick + 1000;
+                                                PetMoveTick := Tick + 1500;
                                                 if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
 
                                                 if tn.MoveTick + spd <= Tick then begin
