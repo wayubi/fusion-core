@@ -1136,7 +1136,7 @@ object frmMain: TfrmMain
         Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 5
       end
       object Button3: TButton
         Left = 8
@@ -1144,7 +1144,7 @@ object frmMain: TfrmMain
         Width = 75
         Height = 25
         Caption = '&Clear'
-        TabOrder = 5
+        TabOrder = 16
         OnClick = Button3Click
       end
       object Button4: TButton
@@ -1153,7 +1153,7 @@ object frmMain: TfrmMain
         Width = 75
         Height = 25
         Caption = '&Save'
-        TabOrder = 6
+        TabOrder = 18
         OnClick = Button4Click
       end
       object Button6: TButton
@@ -1162,7 +1162,7 @@ object frmMain: TfrmMain
         Width = 75
         Height = 25
         Caption = '&Delete'
-        TabOrder = 7
+        TabOrder = 17
         OnClick = Button6Click
       end
       object ComboBox15: TComboBox
@@ -1171,7 +1171,7 @@ object frmMain: TfrmMain
         Width = 121
         Height = 26
         ItemHeight = 18
-        TabOrder = 8
+        TabOrder = 4
         Items.Strings = (
           'Female'
           'Male')
@@ -1182,7 +1182,7 @@ object frmMain: TfrmMain
         Width = 121
         Height = 26
         ItemHeight = 18
-        TabOrder = 9
+        TabOrder = 6
         Items.Strings = (
           'No'
           'Yes')
@@ -1192,7 +1192,7 @@ object frmMain: TfrmMain
         Top = 264
         Width = 121
         Height = 25
-        TabOrder = 10
+        TabOrder = 7
         OnClick = Button7Clic
       end
       object Button8: TButton
@@ -1200,7 +1200,7 @@ object frmMain: TfrmMain
         Top = 264
         Width = 121
         Height = 25
-        TabOrder = 11
+        TabOrder = 8
         OnClick = Button8Click
       end
       object Button9: TButton
@@ -1208,7 +1208,7 @@ object frmMain: TfrmMain
         Top = 264
         Width = 121
         Height = 25
-        TabOrder = 12
+        TabOrder = 9
         OnClick = Button9Click
       end
       object Button10: TButton
@@ -1216,7 +1216,7 @@ object frmMain: TfrmMain
         Top = 304
         Width = 121
         Height = 25
-        TabOrder = 13
+        TabOrder = 10
         OnClick = Button10Click
       end
       object Button11: TButton
@@ -1224,7 +1224,7 @@ object frmMain: TfrmMain
         Top = 304
         Width = 121
         Height = 25
-        TabOrder = 14
+        TabOrder = 11
         OnClick = Button11Click
       end
       object Button12: TButton
@@ -1232,7 +1232,7 @@ object frmMain: TfrmMain
         Top = 304
         Width = 121
         Height = 25
-        TabOrder = 15
+        TabOrder = 12
         OnClick = Button12Click
       end
       object Button13: TButton
@@ -1240,7 +1240,7 @@ object frmMain: TfrmMain
         Top = 344
         Width = 121
         Height = 25
-        TabOrder = 16
+        TabOrder = 13
         OnClick = Button13Click
       end
       object Button14: TButton
@@ -1248,7 +1248,7 @@ object frmMain: TfrmMain
         Top = 344
         Width = 121
         Height = 25
-        TabOrder = 17
+        TabOrder = 14
         OnClick = Button14Click
       end
       object Button15: TButton
@@ -1256,7 +1256,7 @@ object frmMain: TfrmMain
         Top = 344
         Width = 121
         Height = 25
-        TabOrder = 18
+        TabOrder = 15
         OnClick = Button15Click
       end
     end
