@@ -1157,20 +1157,21 @@ begin
   // then you need to have a check here so that you don't run into negative HP.
   // Likewise you need to send the correct packets for updates, etc., right?
 
-  tc.HP := tc.HP - dmg[0];  //Subtract Damage
-  WFIFOW( 0, $01de);
+        if tc.HP - dmg[0] > 0 then tc.HP := tc.HP - dmg[0];  //Subtract Damage.
+        if tc.HP < 0 then tc.HP := 0;
+        WFIFOW( 0, $01de);
 	WFIFOW( 2, tsAI.Skill[i]);
 	WFIFOL( 4, ts.ID);
 	WFIFOL( 8, tc.ID);
 	WFIFOL(12, Tick);
 	//WFIFOL(16, tc.aMotion);
 	//WFIFOL(20, ts.Data.dMotion);
-  WFIFOL(16, ts.Data.dMotion);
+        WFIFOL(16, ts.Data.dMotion);
 	WFIFOL(20, tc.aMotion);
 	WFIFOL(24, dmg[0]);
 	WFIFOW(28, tsAI.SkillLV[i]);
 	WFIFOW(30, k);
-  WFIFOB(32, 8);
+        WFIFOB(32, 8);
 	//else               WFIFOB(32, 8);
 	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
 	SendBCmd(tm, tc.Point, 33);
