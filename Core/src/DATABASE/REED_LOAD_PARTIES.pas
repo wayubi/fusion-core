@@ -144,7 +144,7 @@ implementation
             for i := 0 to 8 do begin
                 if tp.CName[i] = '' then Continue;
 
-                if (tp.CData[i].PartyID = partyid) then begin
+                if assigned(tp.CData[i]) and (tp.CData[i].PartyID = partyid) then begin
                     if PartyList.IndexOf(partyid) = -1 then Continue;
                     tpa := PartyList.Objects[PartyList.IndexOf(partyid)] as TParty;
                     Break;
