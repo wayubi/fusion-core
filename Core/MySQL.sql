@@ -1,10 +1,9 @@
-Database cobax_mako running on localhost 
 # phpMyAdmin SQL Dump
-# version 2.5.2
+# version 2.5.6-rc1
 # http://www.phpmyadmin.net
 #
 # Host: localhost
-# Generation Time: Feb 28, 2004 at 02:13 AM
+# Generation Time: Mar 06, 2004 at 11:59 AM
 # Server version: 4.0.15
 # PHP Version: 4.2.3
 # 
@@ -15,9 +14,6 @@ Database cobax_mako running on localhost
 
 #
 # Table structure for table `account_flags`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `account_flags`;
@@ -32,10 +28,6 @@ CREATE TABLE `account_flags` (
 #
 # Table structure for table `accounts`
 #
-# Creation: Feb 26, 2004 at 05:38 AM
-# Last update: Feb 28, 2004 at 02:05 AM
-# Last check: Feb 27, 2004 at 06:42 PM
-#
 
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
@@ -48,15 +40,12 @@ CREATE TABLE `accounts` (
   `regDate` datetime default NULL,
   PRIMARY KEY  (`AID`),
   KEY `ID` (`ID`)
-) TYPE=MyISAM AUTO_INCREMENT=100002 ;
+) TYPE=MyISAM AUTO_INCREMENT=100492 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `cart`
-#
-# Creation: Feb 28, 2004 at 12:53 AM
-# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `cart`;
@@ -71,9 +60,6 @@ CREATE TABLE `cart` (
 #
 # Table structure for table `character_flags`
 #
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 02:05 AM
-#
 
 DROP TABLE IF EXISTS `character_flags`;
 CREATE TABLE `character_flags` (
@@ -86,9 +72,6 @@ CREATE TABLE `character_flags` (
 
 #
 # Table structure for table `characters`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `characters`;
@@ -138,17 +121,13 @@ CREATE TABLE `characters` (
   `PLv` smallint(2) default NULL,
   `AID` bigint(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`GID`),
-  UNIQUE KEY `Name` (`Name`),
   KEY `AID` (`AID`)
-) TYPE=MyISAM AUTO_INCREMENT=100002 ;
+) TYPE=MyISAM AUTO_INCREMENT=101242 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `guild_allies`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `guild_allies`;
@@ -165,9 +144,6 @@ CREATE TABLE `guild_allies` (
 #
 # Table structure for table `guild_banish`
 #
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
-#
 
 DROP TABLE IF EXISTS `guild_banish`;
 CREATE TABLE `guild_banish` (
@@ -181,9 +157,6 @@ CREATE TABLE `guild_banish` (
 
 #
 # Table structure for table `guild_castle`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `guild_castle`;
@@ -213,9 +186,6 @@ CREATE TABLE `guild_castle` (
 #
 # Table structure for table `guild_info`
 #
-# Creation: Feb 28, 2004 at 01:53 AM
-# Last update: Feb 28, 2004 at 02:05 AM
-#
 
 DROP TABLE IF EXISTS `guild_info`;
 CREATE TABLE `guild_info` (
@@ -233,23 +203,20 @@ CREATE TABLE `guild_info` (
   `DisposRW` int(4) default NULL,
   `skill` longtext,
   PRIMARY KEY  (`GDID`)
-) TYPE=MyISAM AUTO_INCREMENT=2 ;
+) TYPE=MyISAM AUTO_INCREMENT=5 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `guild_members`
 #
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 02:05 AM
-#
 
 DROP TABLE IF EXISTS `guild_members`;
 CREATE TABLE `guild_members` (
   `GDID` bigint(10) unsigned NOT NULL default '0',
   `GID` bigint(10) unsigned default NULL,
-  `MemberExp` bigint(10) unsigned default NULL,
   `PositionID` int(4) unsigned default NULL,
+  `MemberExp` bigint(10) unsigned default NULL,
   UNIQUE KEY `GID` (`GID`)
 ) TYPE=MyISAM;
 
@@ -257,9 +224,6 @@ CREATE TABLE `guild_members` (
 
 #
 # Table structure for table `guild_positions`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 01:59 AM
 #
 
 DROP TABLE IF EXISTS `guild_positions`;
@@ -279,10 +243,6 @@ CREATE TABLE `guild_positions` (
 #
 # Table structure for table `inventory`
 #
-# Creation: Feb 28, 2004 at 01:28 AM
-# Last update: Feb 28, 2004 at 02:06 AM
-# Last check: Feb 28, 2004 at 02:06 AM
-#
 
 DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE `inventory` (
@@ -295,9 +255,6 @@ CREATE TABLE `inventory` (
 
 #
 # Table structure for table `party`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `party`;
@@ -318,17 +275,14 @@ CREATE TABLE `party` (
   `MemberID9` bigint(10) unsigned default NULL,
   `MemberID10` bigint(10) unsigned default NULL,
   `MemberID11` bigint(10) unsigned default NULL,
-  PRIMARY KEY  (`GRID`),
-  KEY `Name` (`Name`)
-) TYPE=MyISAM AUTO_INCREMENT=1 ;
+  UNIQUE KEY `Name` (`Name`),
+  KEY `GRID` (`GRID`)
+) TYPE=MyISAM AUTO_INCREMENT=53 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `pet`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `pet`;
@@ -347,15 +301,12 @@ CREATE TABLE `pet` (
   `Fullness` int(4) default NULL,
   `Accessory` int(4) unsigned default NULL,
   PRIMARY KEY  (`PID`)
-) TYPE=MyISAM AUTO_INCREMENT=1 ;
+) TYPE=MyISAM AUTO_INCREMENT=11 ;
 
 # --------------------------------------------------------
 
 #
 # Table structure for table `server_flags`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 12:50 AM
 #
 
 DROP TABLE IF EXISTS `server_flags`;
@@ -370,10 +321,6 @@ CREATE TABLE `server_flags` (
 #
 # Table structure for table `skills`
 #
-# Creation: Feb 28, 2004 at 01:40 AM
-# Last update: Feb 28, 2004 at 02:08 AM
-# Last check: Feb 28, 2004 at 02:08 AM
-#
 
 DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
@@ -387,9 +334,6 @@ CREATE TABLE `skills` (
 #
 # Table structure for table `storage`
 #
-# Creation: Feb 28, 2004 at 01:28 AM
-# Last update: Feb 28, 2004 at 02:05 AM
-#
 
 DROP TABLE IF EXISTS `storage`;
 CREATE TABLE `storage` (
@@ -402,37 +346,19 @@ CREATE TABLE `storage` (
 # --------------------------------------------------------
 
 #
-# Table structure for table `temptable`
-#
-# Creation: Feb 28, 2004 at 01:54 AM
-# Last update: Feb 28, 2004 at 01:54 AM
-#
-
-DROP TABLE IF EXISTS `temptable`;
-CREATE TABLE `temptable` (
-  `AID` int(11) NOT NULL default '0',
-  `CNAME` text NOT NULL
-) TYPE=MyISAM;
-
-# --------------------------------------------------------
-
-#
 # Table structure for table `warpmemo`
-#
-# Creation: Feb 28, 2004 at 12:50 AM
-# Last update: Feb 28, 2004 at 02:05 AM
 #
 
 DROP TABLE IF EXISTS `warpmemo`;
 CREATE TABLE `warpmemo` (
   `GID` bigint(10) unsigned NOT NULL default '0',
-  `mapName0` varchar(24) NOT NULL default '',
+  `mapName0` varchar(24) default NULL,
   `xPos0` smallint(2) default NULL,
   `yPos0` smallint(2) default NULL,
-  `mapName1` varchar(24) NOT NULL default '',
+  `mapName1` varchar(24) default NULL,
   `xPos1` smallint(2) default NULL,
   `yPos1` smallint(2) default NULL,
-  `mapName2` varchar(24) NOT NULL default '',
+  `mapName2` varchar(24) default NULL,
   `xPos2` smallint(2) default NULL,
   `yPos2` smallint(2) default NULL,
   UNIQUE KEY `GID` (`GID`)
