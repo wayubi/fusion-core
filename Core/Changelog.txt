@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-24-04: Fixed PVP cast timer did not cancel on hit. [AlexKreuz]
 - 01-23-04: Fixed cart lockup/dupe bug (#230). [Colus]
 - 01-23-04: Fixed Adrenaline Rush Effect doesn't wear off with weapon change. [AlexKreuz]
 - 01-23-04: Fixed Spear Quicken Effect doesn't wear off with weapon change. [AlexKreuz]

@@ -3394,6 +3394,16 @@ begin
 			WFIFOW(27, dmg[1]);
 			SendBCmd(tm, tc1.Point, 29);
 
+            {Colus, 20031216: Cancel casting timer on hit. Also, phen card handling.}
+            if (tc1.NoCastInterrupt = False) and (dmg[0] > 0) then begin
+              tc1.MMode := 0;
+              tc1.MTick := 0;
+              WFIFOW(0, $01b9);
+              WFIFOL(2, tc1.ID);
+              SendBCmd(tm, tc1.Point, 6);
+            end;
+            {Colus, 20031216: end cast-timer cancel}
+
 			if SplashAttack then CharaSplash2(tc,Tick);  //Splash Attack Enabled
 
                         if tc.Skill[279].Tick > Tick then begin     {Auto Cast}
