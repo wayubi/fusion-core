@@ -12512,7 +12512,7 @@ begin
 					until (j = 100);
 						
 					if j <> 100 then begin
-						pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+						pcnt := SearchAttack(path, tm, Point.X, Point.Y, xy.X, xy.Y);
 						ts.DeadWait := Tick;
 					end;
 						
