@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-28-04: Undid Mitch's change b/c it prevented any attacks from happening [Colus]
 - 01-28-04: Just fixed some grammatical errors in some hardcoded text. [Mitch]
 - 01-28-04: Removed some useless code loops that just affect server performance. [Mitch]
 - 01-28-04: Fixed attacking monsters on same square as players [Mitch]

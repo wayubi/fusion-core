@@ -94,8 +94,14 @@ begin
   if you're stuck on it was right here. Since it breaks out of the
   while when the aa[1].x = x2 and aa[1].y = y2 (where the monster was at!)
 	OLD CODE: while (n <> 0) and ((aa[1].x <> x2) or (aa[1].y <> y2)) do begin
-  I removed the last 2 conditions so hopefully its fixed? }
-  while (n <> 0) do begin
+  I removed the last 2 conditions so hopefully its fixed?
+
+  Colus, 20040129: No, it is not fixed.  You can't attack _anything_ if the
+  code is like this!  The result will still be 0, you will walk up to the
+  monster and not do anything.}
+
+  //while (n <> 0) do begin
+  while (n <> 0) and ((aa[1].x <> x2) or (aa[1].y <> y2)) do begin
 		rh := aa[1];
 		PopHeap(aa, n);
 
