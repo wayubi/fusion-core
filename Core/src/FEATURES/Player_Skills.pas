@@ -19,6 +19,7 @@ var
     { Calculation Procedures }
     procedure use_sp(tc : TChara; SkillID : word; LV : byte);
     function find_targets(tc : TChara; sl : TStringList; rangefield : Integer) : TStringList;
+    function check_allow_pvp(tc : TChara) : Boolean;
 
     { Skill Procedures - Swordsman }
     function skill_sword_mastery(tc : TChara) : Integer;
@@ -47,6 +48,9 @@ uses
         targets : TStringList;
     begin
         SKILL_TYPE := 0;
+
+        if not check_allow_pvp(tc) then Exit;
+
         targets := TStringList.Create;
         targets.Clear;
 
@@ -306,6 +310,16 @@ uses
         end;
 
         Result := sl;
+    end;
+
+    function check_allow_pvp(tc : TChara) : Boolean;
+    var
+    	mi : MapTbl;
+    begin
+    	mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+
+        if (not mi.PvP) and (tc.MTargetType <> 0) then Result := False
+        else Result := True;
     end;
 
 
