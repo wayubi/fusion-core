@@ -1955,8 +1955,17 @@ begin
 		if n <> 1 then Inc(l);
         if n <> 1 then Inc(w);
 
-		l := l * BaseExpMultiplier;
-        w := w * JobExpMultiplier;
+		try
+        	l := l * BaseExpMultiplier;
+        except
+        	l := 2147483647;
+        end;
+
+		try
+        	w := w * JobExpMultiplier;
+        except
+    		w := 2147483647;
+        end;
 
 		if (i = mvpid) and (not mvpitem) then l := l + bonus;
 
