@@ -610,13 +610,13 @@ type TChara = class
   //
   // 01: Sight        02: Hide          04: Cloak         08: Cart 1
   // 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
-  // 256: Cart 3      512: Cart 4       1024: Cart 5
-  // 8192: Ruwach
+  // 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
+  // 4096: ?          8192: Ruwach      16384: Footsteps  32768: ?
 
   //  0000 | 0000 | 0000 | 0000
-  //    R     CCC   CPPF   CCHS
-  //    w     543   2Hel   1lig
-  //    c            dcc    kdt
+  //    R    OCCC   CPPF   CCHS
+  //    w    r543   2Hel   1lig
+  //    c    c       dcc    kdt
   //    h            eon     e
   //
   // OptionKeep is not necessary.  All options should be set up

@@ -1,4 +1,4 @@
-
+- 03-16-04: Added some documentation on new options. [Colus]
 
 --------------------------------------------------------------------------------
 Fusion 1.210 - March 13th, 2004
