@@ -5564,25 +5564,41 @@ begin
 
       368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
         begin
-        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-
-        //Send Skill Packets
-        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-         end;
+        if tc.Weapon = 2 then begin
+           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+           if dmg[0] < 0 then dmg[0] := 0;
+           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+           if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+           DamageProcess1(tm, tc, ts, dmg[0], Tick);
+           tc.MTick := Tick + 500;
+           end else begin
+           SendSkillError(tc, 6);
+           MMode := 4;
+           Exit;
+           end;
+           end;
 
 
 
           379:   // ASC_Soulbreaker
           // Damage Calc needs to redone
         begin
-        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
-        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+     if tc.Weapon = 16 then begin
+           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+           if dmg[0] < 0 then dmg[0] := 0;
+           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+           if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then StatCalc1(tc, ts, Tick);
+           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+           DamageProcess1(tm, tc, ts, dmg[0], Tick);
+           tc.MTick := Tick + 500;
+           end else begin
+           SendSkillError(tc, 6);
+           MMode := 4;
+           Exit;
+           end;
+           end;
 
-        //Send Skill Packets
-        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-
-        end;
         
           394:     {Arrow Shower}
                   begin
