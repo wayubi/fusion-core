@@ -9,6 +9,9 @@ uses
     procedure PD_PlayerData_Load(UID : String = '*');
     procedure PD_PlayerData_Save(forced : Boolean = False);
 
+    { Create Basic Structure }
+    procedure PD_Create_Structure();
+
     { Account Data - Basic Data }
     procedure PD_Load_Accounts(UID : String = '*');
     procedure PD_Save_Accounts(forced : Boolean = False);
@@ -97,6 +100,8 @@ uses
     { -------------------------------------------------------------------------------- }
     procedure PD_PlayerData_Load(UID : String = '*');
     begin
+        PD_Create_Structure();
+
         if UID = '*' then debugout.Lines.add('­ Accounts ­');
     	PD_Load_Accounts(UID);
         PD_Load_Accounts_ActiveCharacters(UID);
@@ -130,10 +135,9 @@ uses
 
     procedure PD_PlayerData_Save(forced : Boolean = False);
     begin
-        CreateDir(AppPath + 'gamedata');
+        PD_Create_Structure();
 
         if (forced) then debugout.lines.add('Initiating Comprehensive Save .. Please Wait.');
-        //if not (forced) then debugout.lines.add('Intiating Partial User Save .. Please Wait.');
 
     	PD_Save_Accounts(forced);
         PD_Save_Accounts_ActiveCharacters(forced);
@@ -159,7 +163,19 @@ uses
         PD_Save_Castles(forced);
 
         if (forced) then debugout.lines.add('Comprehensive Save Completed.');
-        //if not (forced) then debugout.lines.add('Partial User Save Completed.');
+    end;
+
+
+    { -------------------------------------------------------------------------------- }
+    { -- Create Structure ------------------------------------------------------------ }
+    { -------------------------------------------------------------------------------- }
+    procedure PD_Create_Structure();
+    begin
+        CreateDir(AppPath + 'gamedata');
+        CreateDir(AppPath + 'gamedata\Accounts');
+        CreateDir(AppPath + 'gamedata\Parties');
+        CreateDir(AppPath + 'gamedata\Guilds');
+        CreateDir(AppPath + 'gamedata\Castles');
     end;
 
 
@@ -2110,6 +2126,7 @@ uses
 
                     tg.LV := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
                     tg.EXP := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
+                    tg.NextEXP := GExpTable[tg.LV];
                     tg.GSkillPoint := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
                     tg.Notice[0] := ( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
                     tg.Notice[1] := ( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
@@ -2206,7 +2223,7 @@ uses
         i, j : Integer;
         saveflag : Boolean;
     begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
+    	SetCurrentDir(AppPath+'gamedata\Guilds\');
         datafile := TStringList.Create;
         sl := TStringList.Create;
 
@@ -2328,7 +2345,6 @@ uses
             	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Members.txt');
             	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Positions.txt');
             	DeleteFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Skills.txt');
-                if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name) then
                 	RmDir(AppPath + 'gamedata\Guilds\' + searchResult.Name);
             end;
 
@@ -2665,6 +2681,11 @@ uses
                             tg.GSkill[j].Lv := StrToInt(sl.Strings[1]);
                             tg.GSkill[j].Card := False;
                         end;
+                    end;
+
+                    tg.MaxUsers := 16;
+                    if (tg.GSkill[10004].Lv > 0) then begin
+                        tg.MaxUsers := tg.MaxUsers + tg.GSkill[10004].Data.Data1[tg.GSkill[10004].Lv];
                     end;
 
                     //debugout.Lines.Add(tg.Name + ' guild skill data loaded.');

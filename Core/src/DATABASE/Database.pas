@@ -11,7 +11,6 @@ uses
 // 関数定義
 		procedure DatabaseLoad(Handle:HWND);
 		procedure DataLoad();
-		procedure PlayerDataLoad();
 		procedure DataSave(forced : Boolean = False);
 //==============================================================================
 
@@ -1663,25 +1662,7 @@ begin
 	}
 end;//proc DatabaseLoad()
 //------------------------------------------------------------------------------
-// データ読み込み
-procedure PlayerDataLoad();
-var
-	i   : Integer;
-	j   : Integer;
-	k   : Integer;
-	i1  : Integer;
-	ver : Integer;
-	str : string;
-	txt : TextFile;
-	sl  : TStringList;
-	tp  : TPlayer;
-begin
 
-PD_PlayerData_Load();
-
-end;
-
-//------------------------------------------------------------------------------
 procedure DataLoad();
 var
 	i, j : integer;
@@ -2291,6 +2272,7 @@ begin
             for i := 0 to CharaName.Count - 1 do begin
                 if AnsiLowerCase(tc.Name) = AnsiLowerCase(CharaName[i]) then begin
                     tc.Name := tc.Name + '_';
+                    tp.CName[tc.CharaNumber] := tc.Name;
                     redo := True;
                 end;
             end;

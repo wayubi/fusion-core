@@ -166,15 +166,18 @@ begin
             if (option_mf = '_M') or (option_mf = '_F') then begin
 				userid := copy(userid, 0, length(userid) - 2);
 
-                for i := 0 to PlayerName.Count - 1 do begin
-                	tp2 := PlayerName.Objects[i] as TPlayer;
+                Idx := 100101;
+                i := 0;
+                
+                for i := 0 to Player.Count - 1 do begin
+                	tp2 := Player.Objects[i] as TPlayer;
                 	if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
                     	Idx := i + 100101;
                         Break;
                     end;
                 end;
 
-                if (i = playername.count) then Idx := 100101 + PlayerName.Count;
+                if (i = player.count) then Idx := 100101 + Player.Count;
 
 	            if (option_mf = '_M') then begin
     	        	tp := TPlayer.Create;
@@ -183,7 +186,7 @@ begin
 	            	tp.Pass := userpass;
 	            	tp.Gender := 1;
     	    	    tp.Mail := '-@-';
-    		        PlayerName.InsertObject(i, tp.Name, tp);
+                    PlayerName.AddObject(tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
 	            end else if (option_mf = '_F') then begin
     	        	tp := TPlayer.Create;
@@ -192,9 +195,10 @@ begin
 	            	tp.Pass := userpass;
 	            	tp.Gender := 0;
     	    	    tp.Mail := '-@-';
-    		        PlayerName.InsertObject(i, tp.Name, tp);
+                    PlayerName.AddObject(tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
                 end;
+                PD_Save_Accounts(True);
             end;
 
         end;
@@ -215,15 +219,18 @@ begin
         	Readln(addtxt,userdata);
             sl.DelimitedText := userdata;
 
-            for i := 0 to PlayerName.Count - 1 do begin
-            	tp2 := PlayerName.Objects[i] as TPlayer;
+            i := 0;
+            Idx := 100101;
+
+            for i := 0 to Player.Count - 1 do begin
+            	tp2 := Player.Objects[i] as TPlayer;
                 if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
                 	Idx := i + 100101;
                     Break;
                 end;
             end;
 
-            if (i = playername.count) then Idx := 100101 + PlayerName.Count;
+            if (i = player.count) then Idx := 100101 + Player.Count;
 
             tp := TPlayer.Create;
             tp.ID := Idx;
@@ -231,8 +238,9 @@ begin
             tp.Pass := sl.Strings[1];
             tp.Gender := StrToInt(sl.Strings[2]);
             tp.Mail := sl.Strings[3];
-            PlayerName.InsertObject(i, tp.Name, tp);
+            PlayerName.AddObject(tp.Name, tp);
             Player.AddObject(tp.ID, tp);
+            PD_Save_Accounts(True);
 
             inc(count);
             sl.Clear;
@@ -242,8 +250,6 @@ begin
 		Rewrite(addtxt);
 		Flush(addtxt);  { Verifies that text REALLY was written to the file }
 		CloseFile(addtxt);
-
-
 
         if UseSQL then
         	SQLDataSave
@@ -259,41 +265,23 @@ begin
 		- Make a safe routine to write the new accounts, or, if not,
 		the whole list to txtfile or SQL, as the case may be.}
 
+        {
 		for Idx := Player.Count-1 downto 0 do
 			if Assigned(Player.Objects[Idx]) then
 				(Player.Objects[Idx] AS TPlayer).Free;
 		Player.Clear;
 		PlayerName.Clear;
 
-		//CharaName.Clear;
-		//Chara.Clear;
-		//PartyNameList.Clear;
-{氏{箱追加}
-		//SummonMobList.Clear;//ChrstphrR - safe 2004/04/26
-		//SummonIOBList.Clear;//Safe 2004/04/26
-		//SummonIOVList.Clear;//Safe 2004/04/26
-		//SummonICAList.Clear;//Safe 2004/04/26
-		//SummonIGBList.Clear;//Safe 2004/04/26
-{氏{箱追加ココまで}
-{NPCイベント追加}
-		//ServerFlag.Clear;
-		//MapInfo.Clear;
-{NPCイベント追加ココまで}
-{ギルド機能追加}
-		//GuildList.Clear;
-{ギルド機能追加ココまで}
-		//PetList.Clear;
-		//DataLoad();
-
-
 		if (option_mf = 'S') then begin
             Load_Accounts(userid);
             sv1PacketProcessSub(Socket,w,userid,userpass);
         end else begin
             PlayerDataLoad;
+        }
+
 		if PlayerName.IndexOf(userid) = -1 then Exit;
 		sv1PacketProcessSub(Socket,w,userid,userpass);
-        end;
+
 			Result := True;
 	end;
 end;

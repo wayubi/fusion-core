@@ -4,7 +4,7 @@ interface
 
 uses
 	SysUtils, WinSock,
-	Common, Database, WeissINI, Globals, Game_Master;
+	Common, Database, WeissINI, Globals, Game_Master, PlayerData;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate();
@@ -127,15 +127,18 @@ uses
 		    DataSave(True);
         end else begin
 
-        	for i := 0 to PlayerName.Count - 1 do begin
-            	tp2 := PlayerName.Objects[i] as TPlayer;
+            Idx := 100101;
+            i := 0;
+
+        	for i := 0 to Player.Count - 1 do begin
+            	tp2 := Player.Objects[i] as TPlayer;
                 if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
                 	Idx := i + 100101;
                     Break;
                 end;
             end;
 
-            if (i = PlayerName.Count) then Idx := 100101 + PlayerName.Count;
+            if (i = Player.Count) then Idx := 100101 + Player.Count;
 
     		AccountItem := TPlayer.Create;
 	    	AccountItem.ID := Idx;
@@ -143,9 +146,10 @@ uses
     	    AccountItem.Pass := frmMain.Edit4.Text;
         	AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
 	        AccountItem.Mail := frmMain.Edit6.Text;
-    		PlayerName.InsertObject(i, AccountItem.Name, AccountItem);
+    		PlayerName.AddObject(AccountItem.Name, AccountItem);
     		Player.AddObject(AccountItem.ID, AccountItem);
-	        DataSave(True);
+            PD_Save_Accounts(True);
+
     	    frmMain.Button3.Click;
         end;
 
@@ -155,8 +159,7 @@ uses
     procedure JCon_Accounts_Delete();
     var
     	tp : TPlayer;
-        tpe : TPet;
-        i, j, k : Integer;
+        i, k : Integer;
     begin
 
     	for k := 0 to frmMain.ListBox1.Count - 1 do begin

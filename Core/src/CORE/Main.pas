@@ -413,10 +413,14 @@ begin
 	SkillDBName := TStringList.Create;
 	PlayerName := TStringList.Create;
 	PlayerName.CaseSensitive := True;
+    PlayerName.Sorted := True;
 	Player := TIntList32.Create;
+    Player.Sorted := True;
 	CharaName := TStringList.Create;
 	CharaName.CaseSensitive := True;
+    CharaName.Sorted := True;
 	Chara := TIntList32.Create;
+    Chara.Sorted := True;
 	CharaPID := TIntList32.Create;
 
 	PartyNameList := TStringList.Create;

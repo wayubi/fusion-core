@@ -1,6 +1,16 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-23-04: PlayerDataLoad() not made obsolete by R.E.E.D. [AlexKreuz]
+- 07-23-04: R.E.E.D case insensitive duplicate characters not converted. [AlexKreuz]
+- 07-23-04: ALBGM_NEWPLAYER fixed after R.E.E.D conflict occured. [AlexKreuz]
+- 07-23-04: JCon Account Creator fixed after R.E.E.D conflict occured. [AlexKreuz]
+- 07-23-04: addplayer.txt fixed after R.E.E.D conflict occured. [AlexKreuz]
+- 07-23-04: _M/_F fixed after R.E.E.D conflict occured. [AlexKreuz]
+- 07-23-04: Sorting of Player/Chara lists. [AlexKreuz]
+- 07-23-04: R.E.E.D auto-creation of structure. [AlexKreuz]
+- 07-23-04: Fixed guild exp calculation. Broke with R.E.E.D. [AlexKreuz]
+- 07-23-04: Fixed guild Maxusers calculation. Broke with R.E.E.D. [AlexKreuz]
 - 07-23-04: R.E.E.D: Multiple membership in parties fixed. [AlexKreuz]
 - 07-23-04: R.E.E.D: Multiple membership in guilds fixed. [AlexKreuz]
 - 07-23-04: R.E.E.D: Castles with invalid guilds cleared. [AlexKreuz]

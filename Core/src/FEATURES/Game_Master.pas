@@ -3,7 +3,7 @@ unit Game_Master;
 interface
 
 uses
-    IniFiles, Classes, SysUtils, Common, List32, MMSystem, Globals;
+    IniFiles, Classes, SysUtils, Common, List32, MMSystem, Globals, PlayerData;
 
 var
     GM_ALIVE : Byte;
@@ -2166,15 +2166,18 @@ Called when we're shutting down the server *only*
                 Result := Result + ' Gender can only be 1 (Male) or 2 (Female).';
             end else begin
 
-    	    	for i := 0 to PlayerName.Count - 1 do begin
-	            	tp2 := PlayerName.Objects[i] as TPlayer;
+                i := 0;
+                Idx := 100101;
+
+    	    	for i := 0 to Player.Count - 1 do begin
+	            	tp2 := Player.Objects[i] as TPlayer;
                 	if (tp2.ID <> i + 100101) and (tp2.ID > 100100) then begin
             	    	Idx := i + 100101;
         	            Break;
     	            end;
 	            end;
 
-            	if (i = PlayerName.Count) then Idx := 100101 + PlayerName.Count;
+            	if (i = Player.Count) then Idx := 100101 + Player.Count;
 
                 tp1 := TPlayer.Create;
                 tp1.ID := Idx;
@@ -2185,8 +2188,10 @@ Called when we're shutting down the server *only*
                 tp1.Banned := 0;
                 tp1.ver2 := 9;
 
-                PlayerName.InsertObject(i, tp1.Name, tp1);
+                PlayerName.AddObject(tp1.Name, tp1);
                 Player.AddObject(tp1.ID, tp1);
+
+                PD_Save_Accounts(True);
 
                 Result := 'GM_NEWPLAYER Success. ' + tp1.Name + ' has been added successfully.';
             end;
