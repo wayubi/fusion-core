@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-07-04: Updated weiss.dpr for linux directory structure. [Tsusai]
 - 08-07-04: Took out 10053/10054 error messages. Confusing the server admins. [AlexKreuz]
 - 08-07-04: Modified default font style. [AlexKreuz]
 - 08-07-04: Cleaned up source code file structure. [AlexKreuz]
