@@ -1,6 +1,12 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-16-04: Update to Battle Command procedure fix [Colus]
+- 01-16-04: Corrections in recovery item use packet [Colus]
+- 01-16-04: Correction in recovery item formula for Learning Potion bonus [Colus]
+- 01-16-04: Correction in recovery item formula for HP Recovery Skill bonus [Colus]
+- 01-16-04: Updated Potion Pitcher [Colus]
+ - NOTE: If you cannot select levels for this skill that is a client-side issue.
 - 01-16-04: Fixed major crash bug in Battle Command procedure. [AlexKreuz]
 - 01-15-04: Updated SendCMove, aura display [Colus]
 - 01-15-04: Updated Snatcher and Steal again [Colus]
