@@ -1126,41 +1126,46 @@ end;
 
 						end;
 
-            end else if (Copy(str, 1, 7) = 'banish ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
-            sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 8, 256);
-						try
-							Val(sl.Strings[sl.Count - 2], i, k);
-              if k <> 0 then continue;
-
-							Val(sl.Strings[sl.Count - 1], j, k);
-              if k <> 0 then continue;
-
-              if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
-							ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
-							if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
-
-              for k := 0 to sl.Count - 4 do begin
-					    s := s + ' ' + sl.Strings[k];
-              s := Trim(s);
-				      end;
-
-              if CharaName.Indexof(s) <> -1 then begin
-              tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-              if tc1.Login = 2 then begin
-							SendCLeave(tc1, 2);
-							tc1.tmpMap := sl.Strings[sl.Count - 3];
-              xy.X := i;
-              xy.Y := j;
-							tc1.Point := xy;
-							MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-              end;
-              end;
-              
-              end;
-						finally
-							sl.Free();
-						end;
+end else if (Copy(str, 1, 7) = 'banish ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
+  sl := TStringList.Create;
+  sl.DelimitedText := Copy(str, 8, 256);
+  try
+    Val(sl.Strings[sl.Count - 2], i, k);
+    if k <> 0 then continue;
+  
+    Val(sl.Strings[sl.Count - 1], j, k);
+    if k <> 0 then continue;
+  
+    if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
+      ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
+      if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
+  
+      for k := 0 to sl.Count - 4 do begin
+        s := s + ' ' + sl.Strings[k];
+        s := Trim(s);
+      end;
+  
+      if CharaName.Indexof(s) <> -1 then begin
+        tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+        if tc1.Login = 2 then begin
+          SendCLeave(tc1, 2);
+          tc1.tmpMap := sl.Strings[sl.Count - 3];
+          xy.X := i;
+          xy.Y := j;
+          tc1.Point := xy;
+          MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
+        end
+        else begin
+          tc1.Map := sl.Strings[sl.Count - 3];
+          tc1.Point.X := i;
+          tc1.Point.Y := j;
+        end;
+      end;
+  
+    end;
+  finally
+  sl.Free();
+end;
 
 					end else if (Copy(str, 1, 4) = 'job ') and ((DebugCMD and $0010) <> 0) and (tid.ChangeJob = 1) then begin
 {èCê≥}                                          if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ÉmÅ[ÉrÉXÇ©ÇÁÇÕèoóàÇ»Ç¢
