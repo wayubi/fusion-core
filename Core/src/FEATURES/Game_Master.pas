@@ -179,6 +179,9 @@ var
     function command_athena_option(tc : TChara; str : String) : String;
     function command_athena_storage(tc : TChara) : String;
     function command_athena_speed(tc : TChara; str : String) : String;
+    function command_athena_who3(tc : TChara; str : String) : String;
+    function command_athena_who2(tc : TChara; str : String) : String;
+    function command_athena_who(tc : Tchara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -496,6 +499,9 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
             else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc.ID, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
             else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_ATHENA_SPEED)) ) then error_msg := command_athena_speed(tc, str)
+            else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc.ID, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
+            else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc.ID, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
+            else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc.ID, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2752,6 +2758,89 @@ Called when we're shutting down the server *only*
         tc.socket.sendbuf(buf, w);
 
         sl.Free;
+    end;
+
+    function command_athena_who3(tc : Tchara; str : String) : String;
+    var
+        tc1 : TChara;
+        i, w : Integer;
+    begin
+        Result := 'GM_ATHENA_WHO3 activated.';
+        for i := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                str := 'Name: ' + tc1.Name + ' -- Party: ' + tc1.PartyName + ' -- Guild: ' + tc1.GuildName;
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+            end;
+        end;
+    end;
+
+    function command_athena_who2(tc : TChara; str : String) : String;
+    var
+        tc1 : TChara;
+        i, w : Integer;
+    begin
+        Result := 'GM_ATHENA_WHO2 activated.';
+        for i := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+
+                if tc1.JID = 0 then str :='Novice' else
+                if tc1.JID = 1 then str :='Swordsman' else
+                if tc1.JID = 2 then str :='Mage' else
+                if tc1.JID = 3 then str :='Archer' else
+                if tc1.JID = 4 then str :='Acolyte' else
+                if tc1.JID = 5 then str :='Merchant' else
+                if tc1.JID = 6 then str :='Thief' else
+                if tc1.JID = 7 then str :='Knight' else
+                if tc1.JID = 8 then str :='Priest' else
+                if tc1.JID = 9 then str :='Wizard' else
+                if tc1.JID = 10 then str :='Blacksmith' else
+                if tc1.JID = 11 then str :='Hunter' else
+                if tc1.JID = 12 then str :='Assassin' else
+                if tc1.JID = 13 then str :='Knight 2' else
+                if tc1.JID = 14 then str :='Crusader' else
+                if tc1.JID = 15 then str :='Monk' else
+                if tc1.JID = 16 then str :='Sage' else
+                if tc1.JID = 17 then str :='Rogue' else
+                if tc1.JID = 18 then str :='Alchemist' else
+                if tc1.JID = 19 then str :='Bard' else
+                if tc1.JID = 20 then str :='Dancer' else
+                if tc1.JID = 21 then str :='Crusader 2' else
+                if tc1.JID = 22 then str :='Wedding' else
+                if tc1.JID = 23 then str :='Super Novice' else
+                str := 'Unknown Class';
+
+                str := 'Name: ' + tc1.Name + ' -- Job: ' + str + ' -- Base Level:  ' + inttostr(tc1.baselv) + ' -- Job Level: ' + inttostr(tc1.joblv);
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+            end;
+        end;
+    end;
+
+    function command_athena_who(tc : Tchara; str : String) : String;
+    var
+        tc1 : TChara;
+        i, w : Integer;
+    begin
+        for i := 0 to CharaName.Count - 1 do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                str := 'Name: ' + tc1.Name + ' -- Location: ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+            end;
+        end;
     end;
       
     function command_athena_help(tc : TChara) : String;

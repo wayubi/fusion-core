@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-30-04: Added Athena @who command to ALBGM. [Trihan]
+- 06-30-04: Added Athena @who2 command to ALBGM. [Trihan]
+- 06-30-04: Added Athena @who3 command to ALBGM. [Trihan]
 - 06-30-04: Fixed the bug where Aegis and Athena access levels weren't being saved. [Trihan]
 - 06-30-04: Added Athena @speed command to ALBGM. [Trihan]
 - 06-30-04: Added Athena @storage command to ALBGM. [Trihan]
