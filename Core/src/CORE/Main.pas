@@ -4993,8 +4993,8 @@ begin
 
 				                                end else begin
 
-					                                tc.HP := 0;
-					                                WFIFOW( 0, $0080);
+					                                tc.HP := 1;
+					                                {WFIFOW( 0, $0080);
 					                                WFIFOL( 2, tc.ID);
 					                                WFIFOB( 6, 1);
 					                                SendBCmd(tm, tc.Point, 7);
@@ -5011,7 +5011,7 @@ begin
 					                                tc.pcnt := 0;
 					                                if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
 						                        ATarget := 0;
-                                                                        ts.ARangeFlag := false;
+                                                                        ts.ARangeFlag := false;}
 					                        end;
 
 					                        WFIFOW( 0, $00b0);
