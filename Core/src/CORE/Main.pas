@@ -51,6 +51,7 @@ type
                 procedure CharaAttack2(tc:TChara;Tick:cardinal);
 		procedure CharaPassive(tc:TChara;Tick:cardinal);
                 procedure SkillPassive(tc:TChara;Tick:Cardinal);
+		procedure PetPassive(tc:TChara; Tick:cardinal);
 
 		function  NPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
 
@@ -2895,6 +2896,69 @@ end;
 
 //==============================================================================
 
+{Pet Picks Up an Item}
+procedure PetPickUp(tm:TMap; tpe:TPet; tc: TChara; Tick:Cardinal);
+var
+	tn:TNPC;
+  tn1:TNPC;
+	i,j:Integer;
+begin
+	with tpe do begin
+    tn1 := tc.PetNPC;
+		if tm.NPC.IndexOf(tpe.ATarget) <> -1 then begin
+			tn := tm.NPC.IndexOfObject(tpe.ATarget) as TNPC;
+			if (abs(tn1.Point.X - tn.Point.X) <= 1) and (abs(tn1.Point.Y - tn.Point.Y) <= 1) then begin
+				j := 0;
+				{for i := 1 to 25 do begin
+					//Add the Item
+					if tpe.Item[i].ID = 0 then begin
+						tpe.Item[i].Amount := 0;
+						j := i;
+						break;
+					end;
+				end;}
+				if j <> 0 then begin
+					//アイテム追加
+					tpe.Item[j].ID := tn.Item.ID;
+					tpe.Item[j].Amount := tpe.Item[j].Amount + tn.Item.Amount;
+					tpe.Item[j].Equip := 0;
+					tpe.Item[j].Identify := tn.Item.Identify;
+					tpe.Item[j].Refine := tn.Item.Refine;
+					tpe.Item[j].Attr := tn.Item.Attr;
+					tpe.Item[j].Card[0] := tn.Item.Card[0];
+					tpe.Item[j].Card[1] := tn.Item.Card[1];
+					tpe.Item[j].Card[2] := tn.Item.Card[2];
+					tpe.Item[j].Card[3] := tn.Item.Card[3];
+					tpe.Item[j].Data := tn.Item.Data;
+				end;
+				//Remove the item from screen
+				WFIFOW(0, $00a1);
+				WFIFOL(2, tn.ID);
+				SendBCmd(tm, tn1.Point, 6);
+				//Remove item from block
+				tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
+				with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
+					Delete(IndexOf(tn.ID));
+				tn.Free;
+
+			end else begin
+				//Update Monster Location
+        UpdatePetLocation(tm, tn1);
+				Exit;
+			end;
+		end;
+
+    UpdatePetLocation(tm, tn1);
+
+		tn1.pcnt := 0;
+		tn1.MoveTick := Tick + 1000;
+		tpe.ATarget := 0;
+		//tpe.ATick := Tick + ts.Data.ADelay;
+		tpe.isLooting := False;
+	end;
+end;
+
+//------------------------------------------------------------------------------
 
 {Pet Moving Function}
 procedure TfrmMain.PetMoving( tc:TChara; _Tick:cardinal );
@@ -5402,15 +5466,14 @@ begin
                                         end;
                                 end;
 
-
-                                       253:    {Holy Cross}
+                                253:    {Holy Cross}
                                         begin
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                                                 //Send Skill Packets
-                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
-                                                //Byte 16 isn't Blind 32 is Chance to blind on undead
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+												//Byte 16 isn't Blind 32 is Chance to blind on undead
                                         if Random(100) < Skill[253].Data.Data2[MUseLV] then begin
                                                         if (ts.Stat2 <> 32) and (ts.Data.Race = 1)  then begin
 								ts.nStat := 32;
@@ -11039,6 +11102,78 @@ begin
                         tc.HP := 1;
                 end;}
 //------------------------------------------------------------------------------
+procedure TfrmMain.PetPassive(tc:TChara; Tick:cardinal);
+var
+  j,k,m,n :Integer;
+  spd:cardinal;
+	xy:TPoint;
+	dx,dy:integer;
+	tm:TMap;
+	tn1:TNPC;
+  tn:TNPC;
+  tpe:TPet;
+  tc1:TChara;
+  i1,j1,k1:integer;
+	MobData:TMobDB;
+	sl:TStringList;
+begin
+  sl := TStringList.Create;
+  tm := tc.MData;
+  tn1 := tc.PetNPC;
+  tpe := tc.PetData;
+  MobData := tpe.MobData;
+  with tn1 do begin
+    //if tpe.MobData
+    if MobData.isLoot = true then begin
+    //if tpe.Data.MobID = 1002 then begin
+    //if (not isLooting) and Data.isLoot then begin
+      if (not tpe.isLooting) then begin
+				//ルートモンス
+				sl.Clear;
+
+				//アイテム探し
+				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
+							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
+							if tn.CType <> 3 then Continue;
+							if (abs(tn.Point.X - Point.X) <= 1) and (abs(tn.Point.Y - Point.Y) <= 1) then begin
+								//候補に追加
+								sl.AddObject(IntToStr(tn.ID), tn);
+							end;
+						end;
+					end;
+				end;
+				if sl.Count <> 0 then begin
+					j := Random(sl.Count);
+					tn := sl.Objects[j] as TNPC;
+					j := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
+					if (j <> 0) then begin
+					    //if ts.Item[10].ID = 0 then begin
+						tpe.isLooting := True;
+						tpe.ATarget := tn.ID;
+						//ATick := Tick;
+
+						pcnt := j;
+						ppos := 0;
+						MoveTick := Tick;
+
+						NextPoint := tn.Point;
+            SendPetMove(tc.Socket, tc, xy );
+            SendBCmd( tm, tn.Point, 58, tc, True );
+					    //end;
+					end;
+					Exit;
+				end;
+      end;
+			//end;
+    //DebugOut.Lines.Add('Poring is your pet.');
+    end;
+  end;
+end;
+
+
+//------------------------------------------------------------------------------
 function TfrmMain.NPCAction(tm:TMap;tn:TNPC;Tick:cardinal) : Integer;
 var
 	k,m,c,c1: Integer;
@@ -13892,6 +14027,7 @@ begin
 
 				CharaPassive(tc,Tick);
                                 SkillPassive(tc,Tick);
+				if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetPassive(tc, Tick);
 
 				//時間制限スキルが切れたかどうかチェック
 				if SkillTick <= Tick then begin
@@ -14130,47 +14266,53 @@ begin
 					end;
 				end;
 {キューペット}
-                                        if ( PetData <> nil ) and ( PetNPC <> nil ) then begin
+                                        if ( PetData <> nil ) and ( PetNPC <> nil ) and (PetMoveTick < Tick) then begin
                                                 tpe := PetData;
-                                                tn := PetNPC;
+                                          tn := PetNPC;
+                                          if tpe.isLooting = false then begin
+                                            // 移動
+                                            j := 0;
+                                            k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y );
+                                            if k > 2 then begin
 
-                                                // 移動
-                                                j := 0;
-                                                k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y );
-                                                if k > 2 then begin
+                                              if Sit = 0 then begin
+                                                xy := Point;
+                                              end else begin
+                                                repeat
+                                                  if j >= 100 then begin
+                                                    xy := Point;
+                                                    break;
+                                                  end;
 
-                                                        if Sit = 0 then begin
-                                                                xy := Point;
-                                                        end else begin
-                                                                repeat
-                                                                        if j >= 100 then begin
-                                                                                xy := Point;
-                                                                                break;
-                                                                        end;
+                                                  xy.X := Point.X + Random(5) - 2;
+                                                  xy.Y := Point.Y + Random(5) - 2;
+                                                  Inc(j);
+                                                until ( xy.X <> Point.X ) or ( xy.Y <> Point.Y );
 
-                                                                        xy.X := Point.X + Random(5) - 2;
-                                                                        xy.Y := Point.Y + Random(5) - 2;
-                                                                        Inc(j);
-                                                                until ( xy.X <> Point.X ) or ( xy.Y <> Point.Y );
+                                                k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y );
+                                              end;
 
-                                                                k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y );
-                                                        end;
+                                              if k <> 0 then begin
+                                                tn.NextPoint := xy;
+                                                SendPetMove( Socket, tc, xy );
+                                                SendBCmd( tm, tn.Point, 58, tc, True );
 
-                                                        if k <> 0 then begin
-                                                                tn.NextPoint := xy;
-                                                                SendPetMove( Socket, tc, xy );
-                                                                SendBCmd( tm, tn.Point, 58, tc, True );
+                                                if tn.pcnt = 0 then MoveTick := Tick;
+                                                tn.pcnt := k;
+                                                tn.ppos := 0;
 
-                                                                if tn.pcnt = 0 then MoveTick := Tick;
-                                                                tn.pcnt := k;
-                                                                tn.ppos := 0;
+                                                PetMoveTick := Tick + 1000;
+                                                if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
 
-                                                                if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
-                                                                if tn.MoveTick + spd <= Tick then begin
-                                                                        PetMoving( tc, Tick );
-                                                                end;
-                                                        end;
+                                                if tn.MoveTick + spd <= Tick then begin
+                                                  PetMoving( tc, Tick );
                                                 end;
+
+                                              end;
+                                            end;
+                                          end else if tpe.isLooting then begin
+                                            PetPickup(tm, tpe, tc, Tick);
+                                          end;
 
                                                 // 自動腹減りシステム
                                                 if tpe.Fullness > 0 then begin

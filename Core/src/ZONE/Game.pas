@@ -6992,6 +6992,7 @@ end;
                                                         tpe.Relation := 250;
                                                         tpe.Fullness := 25;
                                                         tpe.Accessory := 0;
+                                                        tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
 
                                                         PetList.AddObject( tpe.PetID, tpe );
 

@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-16-04: Added Pet looting system, items cannot be recovered though. [Darkhelmet]
 - 02-16-04: Added Chance to Blind for Holy cross to undead [Oatmeal]
 - 02-14-04: Added Graphic support for Land protector: no effect though [Oatmeal]
 - 02-14-04: Fixed Beat bane not giving bonus damage [Oatmeal]

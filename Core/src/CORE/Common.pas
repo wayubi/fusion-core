@@ -390,6 +390,10 @@ type TPet = class
         Fullness        :integer;
         Accessory       :word;
         Data            :TPetDB;
+		    isLooting       :boolean;  //Tracks if the pet is looting
+        ATarget         :cardinal;  //Pets attacking target as well as looting
+        Item            :array[1..25] of TItem;  //Items a pet is holding
+        MobData         :Pointer;
 end;
 {キューペットここまで}
 //------------------------------------------------------------------------------
@@ -838,6 +842,7 @@ type TChara = class
 {キューペット}
         PetData       :Pointer;
         PetNPC        :Pointer;
+		PetMoveTick   :cardinal;
         Crusader      :Pointer;
         Autocastactive :Boolean;
         noday         :Boolean;
@@ -1506,6 +1511,7 @@ Option_GraceTime_PvPG :cardinal;
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);   //Kills a monster
+				procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
@@ -2925,6 +2931,16 @@ begin
 	WFIFOL( 2, ts.ID);
 	WFIFOB( 6, k);
 	SendBCmd(tm, ts.Point, 7);
+end;
+//------------------------------------------------------------------------------
+procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
+
+begin
+        WFIFOW(0, $0088);
+        WFIFOL(2, tn.ID);
+        WFIFOW(6, tn.Point.X);
+        WFIFOW(8, tn.Point.Y);
+        SendBCmd(tm, tn.Point, 10);
 end;
 //------------------------------------------------------------------------------
 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
