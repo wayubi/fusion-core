@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
-	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32;
+	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32, Zip;
 
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -5690,6 +5690,7 @@ var
 	ta	:TMapList;
 {NPCイベント追加ココまで}
 
+        afm_compressed :TZip;
         afm :textfile;
         letter :char;
 begin
@@ -5710,7 +5711,13 @@ begin
         ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
 
         if ta.Ext = 'afm' then begin
-          assignfile(afm,AppPath + 'map/' + MapName + '.afm');
+
+          afm_compressed := tzip.create(afm_compressed);
+          afm_compressed.Filename := AppPath+'map\'+MapName+'.afm';
+          afm_compressed.Extract;
+          afm_compressed.Free;
+
+          assignfile(afm,AppPath + 'map/' + MapName + '.out');
           Reset(afm);
 
           ReadLn(afm,str);
@@ -5739,6 +5746,7 @@ begin
             ReadLn(afm,str);
           end;
           CloseFile(afm);
+          deletefile(AppPath+'map\'+MapName+'.out');
         end
 
         else begin

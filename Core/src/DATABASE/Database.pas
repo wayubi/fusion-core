@@ -5,7 +5,7 @@ unit Database;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common;
+	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, Zip;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -61,7 +61,10 @@ var
 	sr	:TSearchRec;
 	dat :TFileStream;
 	jf	:array[0..23] of boolean;
+
+        afm_compressed :TZip;
         afm :textfile;
+
 begin
 	sl := TStringList.Create;
 	sl1 := TStringList.Create;
@@ -100,6 +103,14 @@ begin
 
         if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
 		repeat
+
+                        afm_compressed := tzip.create(afm_compressed);
+                        afm_compressed.Filename := AppPath+'map\'+sr.Name;
+                        afm_compressed.Extract;
+
+                        sr.Name := StringReplace(sr.Name, '.afm', '.out',
+                          [rfReplaceAll, rfIgnoreCase]);
+
 			assignfile(afm,AppPath + 'map\' + sr.Name);
 			Reset(afm);
 			
@@ -127,8 +138,12 @@ begin
 			ta.Size := xy;
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
+
+                        deletefile(AppPath+'map\'+sr.Name);
+
 		until FindNext(sr) <> 0;
 		FindClose(sr);
+                afm_compressed.Free;
         end;
 
         if FindFirst(AppPath + 'map\*.map', $27, sr) = 0 then begin
