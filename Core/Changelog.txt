@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-12-04: Buffs are now removed on job change. [Darkhelmet]
 - 02-12-04: Merged Colus's Cloaking Fix, my bad before. [Darkhelmet]
 - 02-12-04: Fixed Passive weapon skills, now display amount of ATK increased. [Darkhelmet]
 - 02-11-04: Fixed SQL-Crash when viewing Guild information. [AlexKreuz]

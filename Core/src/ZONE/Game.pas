@@ -1363,6 +1363,22 @@ end;
                   end;
                 end;
 
+                // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+                for j := 1 to 336 do begin
+                  if tc.Skill[j].Data.Icon <> 0 then begin
+                    if tc.Skill[j].Tick >= timeGetTime() then begin
+  						        //DebugOut.Lines.Add('(Icon Removed');
+	  					        WFIFOW(0, $0196);
+		  				        WFIFOW(2, tc.Skill[j].Data.Icon);
+			  			        WFIFOL(4, tc.ID);
+				  		        WFIFOB(8, 0);
+                      SendBCmd(tm, tc.Point, 9);
+                    end;
+                  end;
+                  tc.Skill[j].Tick := timeGetTime();
+                  tc.Skill[j].Effect1 := 0;
+					      end;
+
             					//tc.SkillPoint := 0;
 
 						        	tc.JID := i;
