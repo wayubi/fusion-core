@@ -1177,14 +1177,14 @@ end;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc.socket.sendbuf(buf, w);
+                tc1.socket.sendbuf(buf, w);
               end else begin
                 str := tc1.Name + ' located at: ' + tc1.Map + ' (' + IntToStr(tc1.Point.X) + ',' + IntToStr(tc1.Point.Y) + ')';
                 w := Length(str) + 4;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc.socket.sendbuf(buf, w);
+                tc1.socket.sendbuf(buf, w);
               end;
             end else begin
               str := 'Couldnt find player: ' + s;
@@ -1666,9 +1666,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tc1.Map);
+							tc1.tmpMap := LowerCase(tm.Name);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been enabled!';
               w := Length(str) + 4;
@@ -1688,9 +1688,9 @@ end;
 							tc1.Socket.SendBuf(buf, 4);   }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tc1.Map);
+							tc1.tmpMap := LowerCase(tm.Name);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been disabled!';
               w := Length(str) + 4;
@@ -1718,9 +1718,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tc1.Map);
+							tc1.tmpMap := LowerCase(tm.Name);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'Guild PVP has been enabled!';
               w := Length(str) + 4;
@@ -4225,8 +4225,8 @@ end;
 		$0113: //ターゲット指定or瞬時発動スキル
 			begin
 
-				if tc.MMode <> 0 then continue;
-        if (tc.MMode = 0) and (tc.MTick > timeGetTime()) then Continue;
+				//if tc.MMode <> 0 then continue;
+                                if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
 {チャットルーム機能追加}
 				//入室中のスキル使用無効
 				if (tc.ChatRoomID <> 0) then continue;

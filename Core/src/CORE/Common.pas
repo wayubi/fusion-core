@@ -788,6 +788,7 @@ type TChara = class
 	MTargetType   :byte; // Category of AData. 0 = mob, 1 = player.
 	MPoint        :rPoint;
 	MTick         :cardinal;
+        SPAmount      :integer;         {Total amount of SP used by a skill}
 
   spiritSpheres :word;  // Spirit spheres per character.  Moved from global scope.
 
@@ -833,6 +834,8 @@ type TChara = class
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 
         SPRedAmount   :integer;   {Amount SP Usage is Reduced by}
+
+        SpellBroken   :boolean;   {Used For Spellbreaker}
 
         LastSong      :integer;   {Last Song a Bard Cast}
         LastSongLV    :integer;   {Level of last song a Bard Cast}
@@ -3914,10 +3917,12 @@ begin
 end;
 //------------------------------------------------------------------------------
 function DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
-var
-        SPAmount        :integer;
+//var
+        //SPAmount        :integer;
 
 begin
+   with tc do begin
+        SPAmount := 0;
 	Result := false;
         if SkillID = 0 then
          exit;
@@ -3948,6 +3953,7 @@ begin
 	WFIFOW( 2, $0007);
 	WFIFOL( 4, tc.SP);
 	tc.Socket.SendBuf(buf, 8);
+   end;
 	Result := true;
 end;
 

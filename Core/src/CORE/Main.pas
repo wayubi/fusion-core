@@ -7360,12 +7360,6 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
-                                                tc.spiritSpheres := tc.spiritSpheres + 1;
-                                                if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
-                                                if tc.spiritSpheres > Skill[261].Data.Data2[Skill[261].Lv] then tc.spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
-                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-                                               { tc1 := tc;
-                                                ProcessType := 2;
                                                 tc.spiritSpheres := tc.spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
                                                 if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
@@ -7428,6 +7422,27 @@ begin
                                 //End Monk Skills
 
                                 //Sage
+                                275:    {Cast Cancel}
+                                        begin
+                                                //tc.SP := tc.SP - tc.Skill
+                                                tc.MMode := 0;
+				                tc.MTick := Tick;
+				                tc.MTarget := 0;
+				                tc.MPoint.X := 0;
+				                tc.MPoint.Y := 0;
+                                                
+                                                //Update SP
+                                                WFIFOW( 0, $00b0);
+	                                        WFIFOW( 2, $0007);
+	                                        WFIFOL( 4, tc.SP);
+	                                        tc.Socket.SendBuf(buf, 8);
+
+                                                //Cancel Cast Timer
+                                                WFIFOW(0, $01b9);
+                                                WFIFOL(2, tc.ID);
+                                                SendBCmd(tm, tc.Point, 6);
+                                                //ProcessType := 4;
+                                        end;
                                 279:    {Autocast}
                                         begin
                                                 tc1 := tc;
@@ -7892,15 +7907,6 @@ begin
 						end;
                   214: //Raid
                   begin
-                  if (tc.Option = 6) then begin
-                  tc.Hidden := false;
-                  WFIFOW(0, $0119);
-                  WFIFOL(2, tc.ID);
-                  WFIFOW(6, 0);
-                  WFIFOW(8, 0);
-                  WFIFOW(10, 0);
-                  WFIFOB(12, 0);
-                  SendBCmd(tm, tc.Point, 13);
                   xy := tc.Point;
                   sl.Clear;
                   j := tl.Range2;
@@ -7924,14 +7930,7 @@ begin
                   DamageProcess1(tm, tc, ts1, dmg[0], Tick);
                   end;
                   end;
-            end else begin
-            SendSkillError(tc, 0);
-            tc.MMode := 4;
-            tc.MPoint.X := 0;
-            tc.MPoint.Y := 0;
-            Exit;
-            end;
-            end;
+                  end;
 
 				111: //アドレナリン_ラッシ
 					begin
@@ -9953,6 +9952,17 @@ begin
 
                 end;
            end;
+                                277:    {Spellbreaker}
+                                        begin
+                                                tc.SP := tc.SP + (tc1.SPAmount * tc.Skill[277].Data.Data1[MUseLv]);
+                                                if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+                                                tc1.MMode := 0;
+                                                tc1.MPoint.X := 0;
+                                                tc1.MPoint.Y := 0;
+                                                WFIFOW(0, $01b9);
+                                                WFIFOL(2, tc1.ID);
+                                                SendBCmd(tm, tc1.Point, 6);
+                                        end;
 
            end;
            if tc1.MagicReflect then begin
@@ -13226,7 +13236,7 @@ begin
 								MPoint.X := 0;
 								MPoint.Y := 0;
 						 end;
-            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
+            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) then begin
               if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
