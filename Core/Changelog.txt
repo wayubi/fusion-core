@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-25-04: Added Athena @joblvlup command to ALBGM system, made commands that raise base level support up to level 255. [Trihan]
 - 06-25-04: Fixed #991 - Weapon skills became permanent on reconnect. [AlexKreuz]
 - 06-24-04: Added Athena @lvup command to ALBGM system. [Trihan]
 - 06-24-04: Added Athena @baselvlup command to ALBGM system. [Trihan]
