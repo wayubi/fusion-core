@@ -358,20 +358,20 @@ begin
 				case ID of
 				        4115:
                                                 begin
-					                DrainFix[0] := 3; //バグ仕様
+					                DrainFix[0] := 3; // Hunter Fly Card
 					                DrainPer[0] := 15;
                                                 end;
 
-				        4082:	DamageFixS[0] := 15; //親デザ
-				        4092:	DamageFixS[1] := 15; //スケワカ
-				        4126:	DamageFixS[2] := 15; //ミノタウロス
+				        4082:	DamageFixS[0] := 15; // Desert Wolf Card
+				        4092:	DamageFixS[1] := 15; // Skel Worker Card
+				        4126:	DamageFixS[2] := 15; // Minorous Card
 
-				        4122: //デビアス
+				        4125: // Deviace Card (changed from Deviruchi, 5->7% bonus
 					begin
-						DamageFixR[2] := 5;
-						DamageFixR[3] := 5;
-						DamageFixR[4] := 5;
-						DamageFixR[7] := 5;
+						DamageFixR[2] := 7;
+						DamageFixR[3] := 7;
+						DamageFixR[4] := 7;
+						DamageFixR[7] := 7;
 					end;
                                 1131:   {Ice Falchion}
                                         begin

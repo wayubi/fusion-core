@@ -1672,7 +1672,7 @@ begin
                 if td.LVL4WeaponASPD then LVL4WeaponASPD := true;
                 if td.PerfectDamage then PerfectDamage := true;
 
-		for j :=1 to 336 do begin //スキル追加
+		for j :=1 to 336 do begin // Add card skills
 			if td.AddSkill[j] <> 0 then begin
 				if (not Skill[j].Data.Job1[JID]) and (not Skill[j].Data.Job2[JID]) and (not DisableSkillLimit) then begin
 					Skill[j].Lv := td.AddSkill[j];
@@ -1681,7 +1681,7 @@ begin
 			end;
 		end; //for j :=1 to 336 do begin
 
-		if td.Cast <> 0 then MCastTimeFix := MCastTimeFix * td.Cast div 100; //詠唱時間%
+		if td.Cast <> 0 then MCastTimeFix := MCastTimeFix * td.Cast div 100; // Cast time corrections
 		if td.HP1 <> 0 then begin //MAXHP%(1001以上で+)
 			if td.HP1 > 1000 then begin
 				MAXHP := MAXHP + (td.HP1 - 1000);
@@ -3833,7 +3833,7 @@ begin
   end;
   
   // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
-	if (ts.EffectTick[0] > Tick) then dmg := dmg * 2; //レックス_エーテルナ
+	if (ts.EffectTick[0] > Tick) then dmg := dmg * 2; // Lex Aeterna effect
 
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);

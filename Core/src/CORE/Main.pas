@@ -1784,17 +1784,18 @@ begin
 				end;
 			end;
 
-			dmg[0] := dmg[0] + ATK[Arms][3]; //精錬補正
+			dmg[0] := dmg[0] + ATK[Arms][3]; // 'Refining correction'
 			if dmg[0] < 1 then dmg[0] := 1;
-			dmg[0] := dmg[0] + ATK[0][4]; //修練補正
+			dmg[0] := dmg[0] + ATK[0][4]; //修練補正    ' Practice correction'?  (skill bonus?)
 
-			//カード補正
-			if Arms = 0then begin //左手にはカード補正なし
+			// Japn. comment: 'Card correction'
+			if Arms = 0then begin // Japn. comment: 'When there are no card corrections for the left hand'
 				dmg[0] := dmg[0] * DamageFixS[ts.Data.scale] div 100;
 				dmg[0] := dmg[0] * DamageFixR[0][ts.Data.Race] div 100;
 				dmg[0] := dmg[0] * DamageFixE[0][ts.Element mod 20] div 100;
 			end;
-			//属性設定
+
+			// Japn. comment: 'Establish element'
 			if AElement = 0 then begin
 				if Weapon = 11 then begin
 					AElement := WElement[1];
@@ -1802,22 +1803,24 @@ begin
 					AElement := WElement[Arms];
 				end;
 			end;
-			if ts.Stat1 = 2 then i := 21 //凍結処理
-			else i := ts.Element;
-			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; //属性相性補正
-			if ts.Stat1 = 5 then dmg[0] := dmg[0] * 2; //レックス_エーテルナ
+			if ts.Stat1 = 2 then i := 21 // Frozen?  Water 1
+			else if ts.Stat1 = 1 then i := 22 // Stone?  Earth 1
+      else i := ts.Element;
+
+			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; // Elemental damage multiplier
+			if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 		end else begin
 			//攻撃ミス
 			dmg[0] := 0;
 		end;
 
-			//HP吸収
+			//HP leech effect
 			if (dmg[0] > 0) and (random(100) < DrainPer[0]) then begin
 				HP := HP + (dmg[0] * DrainFix[0] div 100);
 				if HP > MAXHP then HP := MAXHP;
 				SendCStat1(tc, 0, 5, HP);
 			end;
-			//SP吸収
+			//SP leech effect
 			if (dmg[0] > 0) and (random(100) < DrainPer[1]) then begin
 				SP := SP + (dmg[0] * DrainFix[1] div 100);
 				if SP > MAXSP then SP := MAXSP;
@@ -2121,7 +2124,7 @@ begin
 			Inc(i1);
 		end;
 
-		if crit then dmg[5] := 10 else dmg[5] := 0; //クリティカルチェック
+		if crit then dmg[5] := 10 else dmg[5] := 0; // Set critical attack status
 		//VITボーナスとか計算
 		j := ((tc.Param[2] div 2) + (tc.Param[2] * 3 div 10));
 		k := ((tc.Param[2] div 2) + (tc.Param[2] * tc.Param[2] div 150 - 1));
@@ -2418,10 +2421,11 @@ begin
 					AElement := WElement[Arms];
 				end;
 			end;
-			if tc1.Stat1 = 2 then i := 21 //凍結処理
+			if tc1.Stat1 = 2 then i := 21 // Frozen?  Water 1
+      else if tc1.Stat1 = 1 then i := 22 // Stone?  Earth 1
 			else i := 1;
 			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; //属性相性補正
-			if tc1.Stat1 = 5 then dmg[0] := dmg[0] * 2; //レックス_エーテルナ
+			if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; //レックス_エーテルナ
 		end else begin
 			//攻撃ミス
 			dmg[0] := 0;
@@ -2500,9 +2504,9 @@ begin
     end;
   end;
 
-  // Lex Aeterna:
+  // Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
-    Dmg := Dmg * 2;
+    // Dmg := Dmg * 2;  // Done in the DamageCalc functions
     ts.EffectTick[0] := 0;
   end;
 
@@ -2582,9 +2586,9 @@ var
         w :Cardinal;
 begin
 
-  // Lex Aeterna:
+  // Reset Lex Aeterna
 	if (tc1.Skill[78].Tick > Tick) then begin
-    Dmg := Dmg * 2;
+    // Dmg := Dmg * 2;  // Done in the DamageCalc functions
     tc.Skill[78].Tick := 0;
   end;
 
@@ -9278,7 +9282,7 @@ begin
 {追加}				StatCalc2(tc, tc1, Tick);
 					end;
 {:119}
-				76: //レックスデビーナ
+				76: // Lex Divina vs. Player
 					begin
 						//パケ送信
 						WFIFOW( 0, $011a);
@@ -9288,7 +9292,7 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
-						//対アンデッド
+						// Set Silence effect
 						if Boolean((1 shl 2) and tc1.Stat2) then begin
 							tc1.HealthTick[2] := tc1.HealthTick[2] + 30000; //延長
 						end else begin
@@ -9296,9 +9300,10 @@ begin
 						end;
 					end;
 {:119}
-				77: //ターンアンデット
+				77: // Turn Undead vs. Player
 					begin
-						if (ts.Data.Race = 1) or (ts.Element mod 20 = 9) then begin
+            // Colus, 20040127: Fixed check to be for players
+						if (1 = 1) then begin
 							m := MUseLV * 20 + Param[3] + Param[5] + BaseLV + (200 - 200 * Cardinal(tc1.HP) div tc1.HP) div 200;
 							if (Random(1000) < m) then begin
 								dmg[0] := tc1.HP;
@@ -9306,7 +9311,7 @@ begin
 {変更}					dmg[0] := (BaseLV + Param[3] + (MUseLV * 10)) * ElementTable[6][0] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 							end;
-							//対アンデッド
+							// Damage cap (removed)
 							//if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //保険
 							SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 							DamageProcess2(tm, tc, tc1, dmg[0], Tick);
@@ -9328,7 +9333,7 @@ begin
 						SendBCmd(tm, tc1.Point, 15);
 
             // Colus, 20040126: Can't use Lex Aeterna on Stat1.
-            // Set the tick on the skill instead, for 10 minutes (should be enough?)
+            // Set the tick on the skill instead.
 
             if ((tc1.Stat1 < 1) or (tc1.Stat1 > 2)) then
               tc1.Skill[78].Tick := $FFFFFFFF;
