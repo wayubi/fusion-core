@@ -7838,7 +7838,7 @@ Begin
 	tm := TMap.Create;
 	tm.Name := MapName;
 
-    DebugOut.Lines.Add('Map ' + tm.Name + ' Has been loaded');
+    //DebugOut.Lines.Add('Map ' + tm.Name + ' Has been loaded');
 	Map.AddObject(MapName, tm);
 	tm.Mode := 1;
 

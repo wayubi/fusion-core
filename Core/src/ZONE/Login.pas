@@ -64,6 +64,13 @@ begin
 			WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
 			Socket.SendBuf(buf, 23);
 		end
+        else if APlayer.Login = 1 then begin  //Check if player is logged in already
+            //DebugOut.Lines.Add('Player already Logged in');
+            ZeroMemory(@buf[0],23);
+			WFIFOW( 0, $006a);
+			WFIFOB( 2, 3);//It will say rejected from server, but I'm not sure if this is the right message
+			Socket.SendBuf(buf, 23);
+        end
 		else if APlayer.Pass = userpass then begin
 
 			APlayer.IP := Socket.RemoteAddress;
