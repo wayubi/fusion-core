@@ -774,8 +774,8 @@ begin
                                 ts.IsCasting := true;
                                 tn := SetSkillUnit(tm, ts.ID, xy, Tick, $88, 0, 3000, nil, ts);
 
-                                tn.MSkill := ts.MSKill;
-                                tn.MUseLV := ts.MSKill;
+                                tn.MSkill := ts.MSkill;
+                                tn.MUseLV := ts.MLevel;
 
                                 for j := 1 to AttackData.Skill[83].Data.Data2[ts.MLevel] do begin;
                                         WFIFOW( 0, $0117);
