@@ -2217,7 +2217,11 @@ begin
 		end;
 		ASpeed := ADelay div 2;
 
-                if (Skill[60].Tick > Tick) and (tc.Weapon <> 3) then Skill[60].Tick := Tick;
+                if (Skill[60].Tick > Tick) and (tc.Weapon <> 3) then begin
+                    Skill[60].Tick := Tick;
+                    SkillTick := Tick;
+                end;
+
                 if (Skill[111].Tick > Tick) and (tc.Weapon <> (6 or 7)) then Skill[111].Tick := Tick;
                 if (Skill[258].Tick > Tick) and (tc.Weapon <> (4 or 5)) then Skill[258].Tick := Tick;
 
