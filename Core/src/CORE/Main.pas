@@ -141,7 +141,6 @@ var
 
 
 
-
 implementation
 
 {$R *.dfm}
@@ -183,7 +182,7 @@ begin
 
 	DebugOut := txtDebug;
 
-	Caption := ' Fusion 1.210'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
+	Caption := ' Fusion 1.2.1.0 CVS Release'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
 
 	ScriptList := TStringList.Create;
 
@@ -2596,7 +2595,9 @@ begin
 		Exit;
 	end;
 	if (ts.Stat1 <> 0) and isBreak then begin
+    if ts.Stat1 <> 5 then begin   //code for ankle snar, not to break
 		ts.BodyTick := Tick + tc.aMotion;
+    end;
 	end;
 
   UpdateMonsterLocation(tm, ts);
@@ -3199,7 +3200,6 @@ begin
 	with tc do begin
 		ts := AData;
 		tm := MData;
-
                 if ts.Hidden = True then exit;  //Monster is hidden so you can't hit it.
 
 		if ts.HP <= 0 then begin
@@ -3751,7 +3751,7 @@ begin
 			end;
 		end;
 	end;
-end;
+end;                                       
 //------------------------------------------------------------------------------
 {追加}
 procedure TfrmMain.CreateField(tc:TChara; Tick:Cardinal);
@@ -3965,7 +3965,8 @@ begin
 								        xy.X := (MPoint.X) -4 + i1;
 								        xy.Y := (MPoint.Y) -4 + j1;
 								        if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
-								        tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], tl.Data1[MUseLV] * 1000);
+								        tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], tl.Data1[MUseLV]);
+                        tn.Tick := Tick + tl.Data1[MUseLV];
 								        tn.CData := tc;
 					                                tn.MSkill := MSkill;
 								        tn.MUseLV := MUseLV;
@@ -4204,72 +4205,75 @@ begin
 							Exit;
 						end;
          end;
-                                92:     {Quagmire}
-                                        begin
-					        xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-                                                for i := 0 to 8 do begin;
-                                                        MPoint.Y := - 4 + MPoint.Y + i;
-                                                        MPoint.X := - 4 + MPoint.X + i;
-                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $89, 0, 3000, tc);
-                                                end;
-			                        tn.MSkill := MSkill;
-			                        tn.MUseLV := MUseLV;
+            92:     {Quagmire}
+            begin
+					    xy.X := MPoint.X;
+						  xy.Y := MPoint.Y;
+                for i := 0 to 8 do begin;
+                  MPoint.Y := - 4 + MPoint.Y + i;
+                  MPoint.X := - 4 + MPoint.X + i;
+                  tn := SetSkillUnit(tm, ID, xy, Tick, $89, 0, MUseLv*5000,tc);
+                end;
 
-                                                for i := 0 to 4 do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (-2 + MPoint.X + i));
-			                                WFIFOW(12, (MPoint.Y));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
+			          tn.MSkill := MSkill;
+			          tn.MUseLV := MUseLV;
 
-                                                for i := 0 to 4 do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (-2 + MPoint.X + i));
-			                                WFIFOW(12, (MPoint.Y - 2));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
+                for i := 0 to 4 do begin;
+                  WFIFOW( 0, $0117);
+			            WFIFOW( 2, MSkill);
+			            WFIFOL( 4, ID);
+			            WFIFOW( 8, MUseLV);
+			            WFIFOW(10, (-2 + MPoint.X + i));
+			            WFIFOW(12, (MPoint.Y));
+			            WFIFOL(14, 1);
+			            SendBCmd(tm, xy, 18);
+                end;
 
-                                                for i := 0 to 4 do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (-2 + MPoint.X + i));
-			                                WFIFOW(12, (MPoint.Y - 1));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
+                for i := 0 to 4 do begin;
+                  WFIFOW( 0, $0117);
+			            WFIFOW( 2, MSkill);
+			            WFIFOL( 4, ID);
+			            WFIFOW( 8, MUseLV);
+			            WFIFOW(10, (-2 + MPoint.X + i));
+			            WFIFOW(12, (MPoint.Y - 2));
+			            WFIFOL(14, 1);
+			            SendBCmd(tm, xy, 18);
+                end;
 
-                                                for i := 0 to 4 do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (-2 + MPoint.X + i));
-			                                WFIFOW(12, (MPoint.Y + 1));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
+                for i := 0 to 4 do begin;
+                  WFIFOW( 0, $0117);
+			            WFIFOW( 2, MSkill);
+			            WFIFOL( 4, ID);
+			            WFIFOW( 8, MUseLV);
+			            WFIFOW(10, (-2 + MPoint.X + i));
+			            WFIFOW(12, (MPoint.Y - 1));
+			            WFIFOL(14, 1);
+			            SendBCmd(tm, xy, 18);
+                 end;
 
-                                                for i := 0 to 4 do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (-2 + MPoint.X + i));
-			                                WFIFOW(12, (MPoint.Y + 2));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
+                 for i := 0 to 4 do begin;
+                  WFIFOW( 0, $0117);
+			            WFIFOW( 2, MSkill);
+			            WFIFOL( 4, ID);
+			            WFIFOW( 8, MUseLV);
+			            WFIFOW(10, (-2 + MPoint.X + i));
+			            WFIFOW(12, (MPoint.Y + 1));
+			            WFIFOL(14, 1);
+			            SendBCmd(tm, xy, 18);
+                 end;
+
+                 for i := 0 to 4 do begin;
+                   WFIFOW( 0, $0117);
+			             WFIFOW( 2, MSkill);
+			             WFIFOL( 4, ID);
+			             WFIFOW( 8, MUseLV);
+			             WFIFOW(10, (-2 + MPoint.X + i));
+			             WFIFOW(12, (MPoint.Y + 2));
+			             WFIFOL(14, 1);
+			             SendBCmd(tm, xy, 18);
+                  end;
+                                                
+
 					end;
 
                                 110:    {Hammer Fall}
@@ -11098,10 +11102,9 @@ begin
                                         tc2 := sl2.Objects[c1] as TChara;
                                     if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
 
-                                        {Alex: I have no clue why this is here, but it caused serious problems}
-                                        {if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
+                                        if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
                                                 if (tc2.PartyName = tn.CData.Partyname) then break;
-                                        end;}
+                                        end;
                                         
                                         case tn.JID of
                                                 $74://ブラストマイン発動
@@ -11348,23 +11351,20 @@ begin
 
 							$91:    {Ankle Snare Trapping PVP}
 							begin
+
 								if (tn.Count <> 0) and (tc2 <> tn.CData) then begin
-                                                                        if not flag then Break; //踏んでない
-
-                                                                        tc2.AnkleSnareTick := tn.Tick;
-
-									tn.Tick := Tick + tn.Count * 10000;
+                 if not flag then Break; //踏んでない
+                 tc2.AnkleSnareTick := tn.Tick;
+                 tn.Tick := Tick + tn.Count * 10000;
 									//ts1.DmgTick := Tick + tn.Count * 10000;
 									tc2.Point.X := tn.Point.X;
 									tc2.Point.Y := tn.Point.Y;
 									tc2.pcnt := 0;
-
-                                                                        UpdatePlayerLocation(tm, tc2);
-                                                                        tn.Count := 0;
+                  UpdatePlayerLocation(tm, tc2);
+                  tn.Count := 0;
 									if c = (sl2.Count -1) then tn.Count := 0;
 								end;
-							end;
-
+                end;
 						$93: {Land Mine}
 							begin
 								if not flag then Break; //踏んでない
@@ -11642,7 +11642,7 @@ begin
 {追加:119}
 						$84: // Damage of Magnus Exorcism
 							begin
-								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) then begin
+								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) and (tn.Tick >= Tick) then begin
 									//ダメージ算出
 									dmg[0] := tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1) * tn.CData.MATKFix div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
@@ -11651,7 +11651,7 @@ begin
 									dmg[0] := dmg[0] * tn.Count;
 									dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[79].Data.Element][ts1.Element] div 100;
 									if dmg[0] < 0 then dmg[0] := 0;
-									tn.Tick := Tick;       // TODO: Stop expiring ME tiles on 1 hit
+									//tn.Tick := Tick;       // TODO: Stop expiring ME tiles on 1 hit
 									//ダメージパケ送信
 									WFIFOW( 0, $01de);
 									WFIFOW( 2, 79);
@@ -11758,20 +11758,17 @@ begin
                                                                         end;
 								end;
 							end;
-                                                $89: //Quagmire
-                                                begin
-								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-                                                                        if (ts1.Speed * 2 >= 65535) then begin
-                                                                                ts1.Speed := 65535;
-                                                                        end else begin
-						                                ts1.Speed := ts1.Speed * 2;
-                                                                        end;
-									if c = (sl.Count -1) then begin
-										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 3 then tn.Tick := Tick
-									end;
-								end;
-							end;
+                $89: //Quagmire
+                     //ts.EffectTick[1] set to be the tick value of monster under
+                     //Quagmire effect. effect will resume after EffectTick[1]
+                     //is less than Tick, done in procedure StatEffect
+            begin
+              if (ts1.EffectTick[1] < Tick ) then begin
+                 ts1.Speed := ts1.Speed * 2;
+                 ts1.Data.Param[4] := ts1.Data.Param[4] div 2;
+              end;
+                 ts1.EffectTick [1]:= Tick + 5000*tc1.Skill[92].Lv;
+              end;
 
 						$8d:    {Ice Wall}
 							begin
@@ -11817,27 +11814,26 @@ begin
 								
 							end;
 
-                                                $91:    {Ankle Snare Trapping Code}
+                $91:    {Ankle Snare Trapping Code}
 							begin
 								if tn.Count <> 0 then begin
-                                                                        if not flag then Break; //踏んでない
+                if not flag then Break; //踏んでない
 								//if Random(1000) < tn.CData.Skill[117].Data.Data2[tn.Count] * 10 then begin
-									if (ts1.Stat1 <> 5) then begin
-                                                                                ts1.Data.Mode:= 0;
-										ts1.nStat := 5;
-										ts1.BodyTick := Tick + tc1.aMotion;
+								if (ts1.Stat1 <> 5) then begin
+                  ts1.Data.Mode:= 0;
+									ts1.nStat := 5;
+									ts1.BodyTick := Tick + tc1.aMotion;
 									end;
 								//end;
-                                                                        ts1.AnkleSnareTick := tn.Tick;
+                  ts1.AnkleSnareTick := tn.Tick;
 									tn.Tick := Tick + tn.Count * 10000;
-                                                                        tn.Count := 0;
+                  tn.Count := 0;
 									//ts1.DmgTick := Tick + tn.Count * 10000;
 									ts1.Point.X := tn.Point.X;
 									ts1.Point.Y := tn.Point.Y;
 									ts1.pcnt := 0;
-                                                                        UpdateMonsterLocation(tm, ts1);
-									
-									if c = (sl.Count -1) then tn.Count := 0;
+                  UpdateMonsterLocation(tm, ts1);
+                  if c = (sl.Count -1) then tn.Count := 0;
 								end;
 							end;
                                                 $92:    {Venom Dust}
@@ -12779,6 +12775,7 @@ var
 	sflag:Boolean;
 	j,m,n:Word;
 begin
+
 	sflag := False;
 	if (ts.Stat1 = 0) or (ts.Stat1 <> ts.nStat) then begin
 		if (ts.BodyTick <> 0) and (ts.BodyTick < Tick) then begin
@@ -12834,6 +12831,25 @@ begin
 			SendBCmd(tm,ts.Point,60,nil,True);    // Length 58->60
 		end;
 	end;
+       //wiz skill quagmire duration over, monster resume
+      if (ts.EffectTick[1] <= Tick) and (ts.EffectTick[1]<>0) then begin
+        ts.EffectTick[1]:=0;
+        ts.Speed := ts.Speed div 2;
+        ts.Data.Param[4] := ts.Data.Param[4] * 2;
+			  ZeroMemory(@buf[0], 60);
+			  WFIFOW( 0, $007b);
+			  WFIFOL( 2, ts.ID);
+			  WFIFOW( 6, ts.Speed);
+			  WFIFOW( 8, ts.Stat1);
+			  WFIFOW(10, ts.Stat2);
+			  WFIFOW(14, ts.JID);
+			  WFIFOL(22, timeGetTime());
+			  WFIFOW(36, ts.Dir);
+			  WFIFOM2(50, ts.Point, ts.Point);
+			  WFIFOB(56, 5);
+			  WFIFOB(57, 5);
+			  SendBCmd(tm,ts.Point,60,nil,True);    // Length 58->60
+      end;
 	//状態変化2
 	m := 0;
 	for n:= 0 to 4 do begin

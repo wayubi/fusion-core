@@ -283,12 +283,12 @@ type TMob = class
 	Point1      :TPoint;
 	Point2      :TPoint;
 	Speed       :word;
-	Stat1       :Byte; // 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep
+	Stat1       :Byte; // 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep, 5 = ankle snar
 	Stat2       :Byte; // 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
-  nStat       :Cardinal;
+  nStat       :Cardinal; 
 	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
 	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
-	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, currently)
+	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire currently)
 	isLooting   :boolean;
 	Item        :array[1..10] of TItem;
 	HP          :integer;
@@ -984,7 +984,7 @@ type TNPC = class
 	ScriptInitS  :integer; //OnInitステップ
 	ScriptInitD  :Boolean; //OnInit実行済フラグ
   ScriptInitMS :integer;
-  
+
 	ChatRoomID  :cardinal; //チャットルームID
 	Enable      :Boolean; //有効スイッチ
 {アジト機能追加}
@@ -999,7 +999,7 @@ type TNPC = class
 	//skill
 	Count       :word;
 	CData       :TChara;
-        MData       :TMob;    
+        MData       :TMob;
 {追加}
 	MSkill      :Word;
 {追加ココまで}
@@ -4473,6 +4473,7 @@ begin
  	        SendBCmd(tm, tn.Point, 24);
         end;
 
+
         // Graffiti/Talkie Box
         if (((tn.JID = $B0) or (tn.JID = $99)) and (SText <> '')) then begin
           tn.Name := SText;
@@ -4501,6 +4502,7 @@ begin
 	        WFIFOB(14, $83);
 	        WFIFOB(15, 1);
 	        SendBCmd(tm, tn.Point, 16);
+
         end else begin
 	//周りに通知
 	        WFIFOW( 0, $011f);
