@@ -2898,9 +2898,9 @@ Begin(* Proc sv3PacketProcess() *)
 
    // {Alex: Reduce Number of Items}
    WFIFOW( 0, $00af); 
-   WFIFOW( 2, w); 
-   WFIFOW( 4, 1); 
-                     Socket.SendBuf(buf, 6); 
+   WFIFOW( 2, w);
+   WFIFOW( 4, 1);
+                     Socket.SendBuf(buf, 6);
 
    // {Alex: Update Weight Display}
    SendCStat1(tc, 0, $0018, tc.Weight);
@@ -3003,43 +3003,52 @@ Begin(* Proc sv3PacketProcess() *)
 {NPCイベント追加ココまで}
 								end;
 {氏{箱追加}
-							10, 201: //古木の枝
+							10, 201: //Dead Branch
 								begin
-{アジト機能追加}
 									if not mi.noBranch then begin
-{アジト機能追加ココまで}
-									UseUsableItem(tc, w);
+										UseUsableItem(tc, w);
 
-									if (SummonMobList.Count > 0) then begin
-										tm := tc.MData;
-										ts := TMob.Create;
-                    if td.Effect = 10 then begin
-										  l := Random(SummonMobList.Count);
-										  tsmn := SummonMobList.Objects[l] as TSummon;
-                    end else begin
-                      l := Random(SummonMobListMVP.Count);
-										  tsmn := SummonMobListMVP.Objects[l] as TSummon;
-                    end;
+										//Use MobList or MobListMVP
+										if (SummonMobList.Count > 0) then begin
+											tm := tc.MData;
+											ts := TMob.Create;
+											if td.Effect = 10 then begin
+												{ChrstphrR - 2004/04/20 - design change}
+												// L = ID of
+												L := SummonMobList.RandomChoice;
+												str := (MobDB.Objects[MobDB.IndexOf(L)] AS TMobDB).Name;
+												//Fill Mob Data.
+												ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
+												ts.ID := NowMobID;
+												Inc(NowMobID);
+											end else begin //MVP list
+												{ChrstphrR - I'm not sure this code is called - its list is empty
+												and the bigger problem is it doesn't CHECK to see if it's empty...
+												I'm leaving it as is, and will fix it after SummonMobList is confirmed}
 
-										str := tsmn.Name;
-										ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
-										ts.ID := NowMobID;
-										Inc(NowMobID);
+												l := Random(SummonMobListMVP.Count);
+												tsmn := SummonMobListMVP.Objects[l] as TSummon;
 
-										if (SummonMonsterName = true) then begin
-                    ts.Name := ts.Data.JName;
-                    end else begin
-					          ts.Name := 'Summon Monster';
-                    end;
+												str := tsmn.Name;
+												ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
+												ts.ID := NowMobID;
+												Inc(NowMobID);
+											end;
 
-                    if (SummonMonsterAgo = true) then begin
-					          ts.isActive := true;
-                    end else begin
-                    ts.isActive := ts.Data.isActive;
-                    end;
+											if (SummonMonsterName = true) then begin
+												ts.Name := ts.Data.JName;
+											end else begin
+												ts.Name := 'Summon Monster';
+											end;
 
-										ts.JID := ts.Data.ID;
-										ts.Map := tc.Map;
+											if (SummonMonsterAgo = true) then begin
+												ts.isActive := true;
+											end else begin
+												ts.isActive := ts.Data.isActive;
+											end;
+
+											ts.JID := ts.Data.ID;
+											ts.Map := tc.Map;
 
 										j := 0;
 										repeat
@@ -3066,7 +3075,7 @@ Begin(* Proc sv3PacketProcess() *)
 										ts.ATKPer := 100;
 										ts.DEFPer := 100;
 										ts.DmgTick := 0;
-											ts.isActive := true;
+										ts.isActive := true;
 
 										ts.Element := ts.Data.Element;
 
@@ -3086,7 +3095,7 @@ Begin(* Proc sv3PacketProcess() *)
 										tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 
 										ts.isSummon := True;
-                    ts.EmperiumID := 0;
+										ts.EmperiumID := 0;
 
 										SendMData(tc.Socket, ts);
 										//周囲に送信
