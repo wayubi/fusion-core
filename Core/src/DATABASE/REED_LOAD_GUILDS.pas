@@ -12,6 +12,7 @@ uses
     procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Positions(tg : TGuild; path : String);
+    procedure PD_Load_Guilds_Skills(tg : TGuild; path : String);
 
     function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
@@ -79,6 +80,9 @@ implementation
 
             pfile := 'Positions.txt';
             PD_Load_Guilds_Positions(tg, path + pfile);
+
+            pfile := 'Skills.txt';
+            PD_Load_Guilds_Skills(tg, path + pfile);
 
 
             NowGuildID := (tg.ID + 1);
@@ -190,6 +194,34 @@ implementation
     end;
     { ------------------------------------------------------------------------------------- }
     
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Members ----------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Guilds_Skills(tg : TGuild; path : String);
+    var
+        i, skillindex : Integer;
+    begin
+
+        for i := 10000 to 10004 do begin
+            if GSkillDB.IndexOf(i) = -1 then Continue;
+            tg.GSkill[i].Data := GSkillDB.IndexOfObject(i) as TSkillDB;
+        end;
+
+        for i := 0 to retrieve_length(path) do begin
+            skillindex := retrieve_value(path, i, 0);
+            if GSkillDB.IndexOf(skillindex) = -1 then Continue;
+            tg.GSkill[skillindex].Lv := retrieve_value(path, i, 1);
+            tg.GSkill[skillindex].Card := False;
+        end;
+
+        tg.MaxUsers := 16;
+        if (tg.GSkill[10004].Lv > 0) then
+            tg.MaxUsers := tg.MaxUsers + tg.GSkill[10004].Data.Data1[tg.GSkill[10004].Lv];
+            
+    end;
+    { ------------------------------------------------------------------------------------- }
+
 
     { ------------------------------------------------------------------------------------- }
     { R.E.E.D - Guild Supplemental Functions                                                }

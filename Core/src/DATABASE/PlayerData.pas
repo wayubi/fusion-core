@@ -78,7 +78,6 @@ uses
     procedure PD_Save_Guilds_Positions(forced : Boolean = False);
 
     { Guild Data - Skills Data }
-    procedure PD_Load_Guilds_Skills(UID : String = '*');
     procedure PD_Save_Guilds_Skills(forced : Boolean = False);
 
     { Guild Data - Ban List Data }
@@ -133,7 +132,6 @@ uses
         if UID = '*' then debugout.Lines.add('­ Guilds ­');
         PD_Load_Guilds_Pre_Parse(UID);
 
-        PD_Load_Guilds_Skills(UID);
         PD_Load_Guilds_BanList(UID);
         PD_Load_Guilds_Diplomacy(UID);
 
@@ -1367,97 +1365,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Position Data -------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_Positions(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        i : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Positions.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Positions.txt');
-
-                    sl.delimiter := ':';
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-                            if tp.CData[i] = nil then Continue;
-
-                            if tp.CData[i].GuildName <> searchResult.Name then Continue
-                            else tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-
-                            if assigned(tg) then Break;
-                        end;
-
-                        if tg = nil then Continue;
-
-                    end else begin
-                        for i := 0 to GuildList.Count - 1 do begin
-                            tg := GuildList.Objects[i] as TGuild;
-                            if tg.ID = StrToInt(searchResult.Name) then Break;
-                        end;
-                    end;
-
-                    if not assigned(tg) then Continue;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                    	if tg.MemberID[i] <> 0 then begin
-                            if not assigned(tg.Member[i]) then Break;
-                         	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 0 to 19 do begin
-                    	sl.delimiter := ':';
-                        sl.delimitedtext  := space_in(datafile[i+2]);
-
-                    	tg.PosName[i] := trim(space_out(sl.Strings[4]));
-
-                        if (trim(space_out(sl.Strings[1])) = 'Y') then tg.PosInvite[i] := True
-                        else if (trim(space_out(sl.Strings[1])) = 'Y') then tg.PosInvite[i] := False;
-
-                        if (trim(space_out(sl.Strings[1])) = 'Y') then tg.PosPunish[i] := True
-                        else if (trim(space_out(sl.Strings[1])) = 'Y') then tg.PosPunish[i] := False;
-
-                        tg.PosEXP[i] := StrToInt(trim(space_out(sl.Strings[3])));
-                    end;
-
-                    //debugout.Lines.Add(tg.Name + ' guild position data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild position data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Guilds_Positions(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -1536,103 +1443,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Skills Data ---------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_Skills(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        i, j : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Skills.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Skills.txt');
-                    sl.delimiter := ':';
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-                            if tp.CData[i] = nil then Continue;
-
-                            if tp.CData[i].GuildName <> searchResult.Name then Continue
-                            else tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-
-                            if assigned(tg) then Break;
-                        end;
-
-                        if tg = nil then Continue;
-
-                    end else begin
-                        for i := 0 to GuildList.Count - 1 do begin
-                            tg := GuildList.Objects[i] as TGuild;
-                            if tg.ID = StrToInt(searchResult.Name) then Break;
-                        end;
-                    end;
-
-                    if not assigned(tg) then Continue;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                        if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
-                    	if tg.MemberID[i] <> 0 then begin
-                        	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    for i := 10000 to 10004 do begin
-                        if GSkillDB.IndexOf(i) <> -1 then begin
-                        	tg.GSkill[i].Data := GSkillDB.IndexOfObject(i) as TSkillDB;
-                        end;
-                    end;
-
-                    for i := 0 to datafile.Count - 3 do begin
-                    	sl.delimiter := ':';
-                        sl.delimitedtext := datafile[i+2];
-
-                    	if GSkillDB.IndexOf(StrToInt(sl.Strings[0])) <> -1 then begin
-                        	j := StrToInt(sl.Strings[0]);
-                            tg.GSkill[j].Lv := StrToInt(sl.Strings[1]);
-                            tg.GSkill[j].Card := False;
-                        end;
-                    end;
-
-                    tg.MaxUsers := 16;
-                    if (tg.GSkill[10004].Lv > 0) then begin
-                        tg.MaxUsers := tg.MaxUsers + tg.GSkill[10004].Data.Data1[tg.GSkill[10004].Lv];
-                    end;
-
-                    //debugout.Lines.Add(tg.Name + ' guild skill data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild skill data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Guilds_Skills(forced : Boolean = False);
     var
     	datafile : TStringList;
