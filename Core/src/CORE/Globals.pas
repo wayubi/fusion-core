@@ -465,17 +465,18 @@ uses
             // fileslist.Add(AppPath + 'pet.txt');
             // fileslist.Add(AppPath + 'player.txt');
             //fileslist.Add(AppPath + 'status.txt');
-            fileslist.Add(AppPath + 'servervars.txt');
+            fileslist.Add(AppPath + 'Global_Vars.txt');
+            fileslist.Add(AppPath + 'servervariables.txt');
             fileslist.Add(AppPath + 'BannedIPs.txt');
 
             zfile.FileSpecList := fileslist;
             zfile.Add;
 
             //R.E.E.D
-            gamefolder := AppPath + 'gamedata';
+            gamefolder := AppPath;
             zfile.AddPath := gamefolder;
             gamedatalist := tstringlist.Create;
-            gamedatalist.Add('*.txt');
+            gamedatalist.Add('gamedata\*.txt');
             zfile.AddOptions := [aoRecursive, aoFolderEntries, aoUpdate]; //include all subfolders too.
 
             zfile.FileSpecList := gamedatalist;

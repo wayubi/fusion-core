@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-05-05: Updated backup function to include correct files and correct paths. [AlexKreuz]
 - 01-05-05: Added Bugtracker & Forum links to Fusion Menu. [AlexKreuz]
 - 01-05-05: OnTouch triggering more stable. [Tsusai]
 - 01-02-05: Reindented game.pas; Added Clown/Gypsy support to party handling. [Tsusai]
