@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-28-04: Experimental New Way of saving the DB, feedback please. [Darkhelmet]
 - 02-27-04: Optimizing SQL Format; Part 1/2 - Startup & Connection Bugs. [AlexKreuz]
 - 02-27-04: Fixed pets getting stuck in walls on warps. [Darkhelmet]
 - 02-27-04: Fixed duplicating of pet.txt, please verify. [Darkhelmet]

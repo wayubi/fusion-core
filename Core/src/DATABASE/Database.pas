@@ -2732,13 +2732,46 @@ begin
           tpe.Saved := 0;
         end;
 
-        for i := 0 to Player.Count - 1 do begin
+        {
+        PlayerID    := StrToInt( sl.Strings[ 0] );
+                                        CharaID     := StrToInt( sl.Strings[ 1] );
+                                        Cart        := StrToInt( sl.Strings[ 2] );
+                                        Index       := StrToInt( sl.Strings[ 3] );
+                                        Incubated   := StrToInt( sl.Strings[ 4] );
+                                        PetID       := StrToInt( sl.Strings[ 5] );
+                                        Name        :=           sl.Strings[ 6];
+                                        Renamed     := StrToInt( sl.Strings[ 7] );
+																				Relation    := StrToInt( sl.Strings[ 8] );
+                                        Fullness    := StrToInt( sl.Strings[ 9] );
+                                        Accessory   := StrToInt( sl.Strings[10] );
+        }
+        for i := 0 to PetList.Count - 1 do begin
+          tpe := PetList.Objects[i] as TPet;
+          sl.Clear;
+          sl.Add( IntToStr( tpe.PlayerID ) );
+          sl.Add( IntToStr( tpe.CharaID ) );
+          sl.Add( IntToStr( tpe.Cart ) ); // Cart
+          sl.Add( IntToStr( tpe.Index ) ); // Index
+          sl.Add( IntToStr( tpe.Incubated ) );
+          sl.Add( IntToStr( tpe.PetID ) ); // PetID
+          sl.Add( IntToStr( tpe.JID ) );
+          sl.Add( tpe.Name );
+          sl.Add( IntToStr( tpe.Renamed ) );
+          sl.Add( IntToStr( tpe.LV ) );
+          sl.Add( IntToStr( tpe.Relation  ) );
+          sl.Add( IntToStr( tpe.Fullness  ) );
+          sl.Add( IntToStr( tpe.Accessory ) );
+          writeln(txt, sl.DelimitedText);
+          tpe.Saved := 1;
+        end;
+
+        {for i := 0 to Player.Count - 1 do begin
                 tp := Player.Objects[i] as TPlayer;
                 for j := 1 to 100 do begin
                         with tp.Kafra.Item[j] do begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
                                         k := Card[2] + Card[3] * $10000;
-                                        if (PetList.IndexOf( k ) <> -1) and (j > z) and (tpe.Saved = 0) then begin
+                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
                                                 sl.Clear;
                                                 sl.Add( IntToStr( tpe.PlayerID ) );
@@ -2769,7 +2802,7 @@ begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
                                         k := Card[2] + Card[3] * $10000;
 
-                                        if (PetList.IndexOf( k ) <> -1) and (j > z) and (tpe.Saved = 0) then begin
+                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
                                                 sl.Clear;
                                                 sl.Add( IntToStr( tpe.PlayerID ) );
@@ -2796,7 +2829,7 @@ begin
                         with tc.Cart.Item[j] do begin
                                 if ( ID <> 0 ) and ( Amount > 0 ) and ( Card[0] = $FF00 ) then begin
                                         k := Card[2] + Card[3] * $10000;
-                                        if (PetList.IndexOf( k ) <> -1) and (j > z) and (tpe.Saved = 0) then begin
+                                        if (PetList.IndexOf( k ) <> -1) and (tpe.Saved = 0) then begin
                                                 tpe := PetList.IndexOfObject( k ) as TPet;
                                                 sl.Clear;
                                                 sl.Add( IntToStr( tpe.PlayerID ) );
@@ -2819,7 +2852,7 @@ begin
                                 end;
                         end;
                 end;
-        end;
+        end;       }
 	CloseFile(txt);
 
   //DebugOut.Lines.add('Pet Saved');

@@ -1252,7 +1252,7 @@ begin
     if tpe.JID = 1026 then begin
       if Random(10000) < (tpe.Relation) then begin
         dmg[0] := 444;
-        dmg[0] := dmg[0] * (ElementTable[7][ts.Element] div 100);
+        //dmg[0] := dmg[0] * (ElementTable[7][ts.Element] div 100);
         if dmg[0] < 0 then dmg[0] := 0;
         PetDamageProcess(tm, ts, tc, dmg[0], Tick);
         SendPetSkillAttack(tm, tc, ts, Tick, 190);
@@ -1262,7 +1262,7 @@ begin
     if tpe.JID = 1035 then begin
       if Random(10000) < (tpe.Relation) then begin
         dmg[0] := 444;
-        dmg[0] := dmg[0] * (ElementTable[4][ts.Element] div 100);
+        //dmg[0] := dmg[0] * (ElementTable[4][ts.Element] div 100);
         if dmg[0] < 0 then dmg[0] := 0;
         PetDamageProcess(tm, ts, tc, dmg[0], Tick);
         SendPetSkillAttack(tm, tc, ts, Tick, 187);
@@ -1272,7 +1272,7 @@ begin
     if tpe.JID = 1077 then begin
       if Random(10000) < (tpe.Relation) then begin
         dmg[0] := 444;
-        dmg[0] := dmg[0] * (4 * (ElementTable[7][ts.Element] div 100));
+        //dmg[0] := dmg[0] * (4 * (ElementTable[7][ts.Element] div 100));
         if dmg[0] < 0 then dmg[0] := 0;
         PetDamageProcess(tm, ts, tc, dmg[0], Tick);
         SendPetSkillAttack(tm, tc, ts, Tick, 187);
