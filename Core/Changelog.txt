@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-10-04: Miscellaneous cleanup of variable declarations. [AlexKreuz]
+- 09-10-04: #92: Logging in with different account overwrote each other. [AlexKreuz]
 - 09-10-04: REED: Major overhaul to Pet Database. [AlexKreuz]
 - 09-06-04: Added Character Tab to JCon (Incomplete and disabled). [Tsusai]
 - 09-06-04: Not sure if i commited autoloot error, but fixed just in case. [Tsusai]

@@ -80,7 +80,10 @@ implementation
 
         for i := 0 to resultlist.Count - 1 do begin
             if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
-            else path := basepath + UID + '\' + pfile;
+            else begin
+                path := basepath + UID + '\' + pfile;
+                resultlist[i] := UID;
+            end;
 
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
@@ -106,7 +109,7 @@ implementation
         path : String;
         pfile : String;
         resultlist : TStringList;
-        i, j : Integer;
+        i : Integer;
         tp : TPlayer;
     begin
         basepath := AppPath+'gamedata\Accounts\';
@@ -115,7 +118,10 @@ implementation
 
         for i := 0 to resultlist.Count - 1 do begin
             if (UID = '*') then path := basepath + resultlist[i] + '\' + pfile
-            else path := basepath + UID + '\' + pfile;
+            else begin
+                path := basepath + UID + '\' + pfile;
+                resultlist[i] := UID;
+            end;
 
             if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;

@@ -179,7 +179,6 @@ uses
     procedure PD_PlayerData_Delete(UID : String);
     var
         tp : TPlayer;
-        tc : TChara;
     begin
         if PlayerName.IndexOf(UID) = -1 then Exit;
         tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
@@ -1011,8 +1010,6 @@ uses
     procedure PD_Save_Characters_Pets(forced : Boolean = False);
     var
     	datafile : TStringList;
-        petdelete : Boolean;
-        searchResult : TSearchRec;
         tp : TPlayer;
         tpe : TPet;
         tc : TChara;
@@ -1721,7 +1718,7 @@ uses
         sl : TStringList;
         tp : TPlayer;
         tg : TGuild;
-        i, j : Integer;
+        i : Integer;
         saveflag : Boolean;
     begin
     	SetCurrentDir(AppPath+'gamedata\Guilds');
@@ -2057,7 +2054,7 @@ uses
         tp : TPlayer;
         tg : TGuild;
         tgb : TGBan;
-        i, j : Integer;
+        i : Integer;
         saveflag : Boolean;
     begin
     	SetCurrentDir(AppPath+'gamedata\Guilds');
@@ -2230,7 +2227,7 @@ uses
         tp : TPlayer;
         tg : TGuild;
         tgl : TGRel;
-        i, j : Integer;
+        i : Integer;
         saveflag : Boolean;
     begin
     	SetCurrentDir(AppPath+'gamedata\Guilds');

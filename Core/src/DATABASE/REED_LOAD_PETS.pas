@@ -22,24 +22,21 @@ implementation
         path : String;
         pfile : String;
         resultlist : TStringList;
-        resultlist2 : TStringList;
-        i, j : Integer;
-        tp : TPlayer;
-        tc : TChara;
+        i : Integer;
     begin
         basepath := AppPath + 'gamedata\Accounts\';
         pfile := 'Account.txt';
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
-
             if (UID = '*') then path := basepath + resultlist[i] + '\Pets\'
-            else path := basepath + UID + '\Pets\';
+            else begin
+                path := basepath + UID + '\Pets\';
+                resultlist[i] := UID;
+            end;
 
             pfile := 'Pet.txt';
-            PD_Load_Pets(UID, get_list(path, pfile), path, pfile);
+            PD_Load_Pets(resultlist[i], get_list(path, pfile), path, pfile);
 
             if (UID <> '*') then Break;
         end;
@@ -102,7 +99,6 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Load_Pets_Finalize(tpe : TPet);
     var
-        i : Integer;
         tp : TPlayer;
         tc : TChara;
     begin
