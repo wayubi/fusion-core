@@ -2166,12 +2166,12 @@ begin
 		end;
     if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JID] div 100) * (100 + Param[2]) div 100) > 65535) then begin
         MAXHP := 65535;
-    end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
-        MAXHP := 65535;
+    //end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
+      //  MAXHP := 65535;
     end else begin
 
 		tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * HPTable[JID] div 100) * (100 + tc.Param[2]) div 100;
-                if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
+           //     if tc.JID = 23 then tc.MAXHP := tc.MAXHP + (35 + tc.BaseLV * 5 + ((1 + tc.BaseLV) * tc.BaseLV div 2) * 40 div 100) * (100 + tc.Param[2]) div 100;
 
     end;
     if (Skill[248].Lv <> 0) then begin
@@ -2184,7 +2184,7 @@ begin
     end;
 
 		MAXSP := MAXSP + BaseLV * SPTable[JID] * (100 + Param[3]) div 100;
-                if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
+               // if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
 		MATK1 := Param[3] + (Param[3] div 7) * (Param[3] div 7);
 		MATK2 := Param[3] + (Param[3] div 5) * (Param[3] div 5);
 		MATKFix := MATKFix + 100; //èÒÇ»Ç«Ç…ÇÊÇÈMATKï‚ê≥
@@ -2253,13 +2253,13 @@ begin
 
 		if WeaponType[1] = 0 then begin
 			ADelay := 20*WeaponASPDTable[JID][Weapon];
-                        if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
+                 //       if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else if WeaponType[0] = 0 then begin
 			ADelay := 20*WeaponASPDTable[JID][WeaponType[1]];
-                        if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
+                   //     if (JID = 23) then ADelay := 20*WeaponASPDTable[0][WeaponType[1]];
 		end else begin //ìÒìÅó¨
 			ADelay := 14*(WeaponASPDTable[JID][WeaponType[0]] + WeaponASPDTable[JID][WeaponType[1]]);
-                        if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
+                     //   if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
 		end;
 		i := ( ( ADelay * Param[1] div 500 ) * 2 + ADelay * Param[4] div 1000 );
 		if ADelay < i then ADelay := 200
@@ -2423,7 +2423,7 @@ begin
 		//030316-2 unknown-user
 {èCê≥}
 		//030316-2 Cardinal
-		if Param[3] > 123 then begin
+		{if Param[3] > 123 then begin
 			SPDelay[0] := 150;
 		end else begin
 			SPDelay[0] := 7560 - (60 * Param[3]);
@@ -2432,7 +2432,11 @@ begin
 			HPDelay[0] := 150;
 		end else begin
 			HPDelay[0] := 3000 - (14 * (BaseLV + Param[2])); //ébíË
-		end;
+		end;}
+                //The old SP regen was only used in Comodo, after 6.0 the sp regen become 8 secs to regen and 6 for hp you also get more
+                HPDelay[0] := 6000;
+                SPDelay[0] := 8000;
+
 		//---
 {:code}
 		if Skill[74].Tick > Tick then begin //É}ÉOÉj

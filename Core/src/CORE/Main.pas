@@ -3282,9 +3282,9 @@ begin
 				end;
 				dmg[1] := dmg[1] + (Param[4] div 10 + Param[3] div 2) * 2 + 80;
 				dmg[1] := dmg[1] * dmg[4];
-				MMode := 0;
+				MMode := 4;
 				MSkill := 129;
-				MUseLV := $FFFF;
+				MUseLV := $F000;
 
 				xy := ts.Point;
 				//ダメージ算出
@@ -10342,12 +10342,62 @@ var
   sl:TStringList;
   tl:TSkillDB;
   i1,j1,k1:integer;
+  bonusregen:Integer;
   tm:TMap;
 begin
 	with tc do begin
 		//HPSP回復処理
 		if Weight * 2 < MaxWeight then begin
+                
+
+if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
+if HP <> MAXHP then begin
+bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
+if bonusregen = 0 then begin ;
+Inc(HP);
+end else begin
+HP := HP + bonusregen;
+end;
+HPTick := HPTick + HPDelay[3 - Sit];
+
+
+if HP > MAXHP then HP := MAXHP;
+WFIFOW( 0, $00b0);
+WFIFOW( 2, $0005);
+WFIFOL( 4, HP);
+Socket.SendBuf(buf, 8);
+end else begin
+HPTick := Tick;
+end;
+end;
+
+if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick)  then begin
+if SP <> MAXSP then begin
+
+
+bonusregen := 1+(MAXSP div 100) + (Param[3] div 6) ;
+if Param[3] >= 120 then begin
+bonusregen := bonusregen + (((Param[3]-120) div 2)+ 4) ;
+end;
+SP := SP + bonusregen ;
+
+SPTick := SPTick + SPDelay[3 - Sit];
+
+if SP > MAXSP then SP := MAXSP;
+WFIFOW( 0, $00b0);
+WFIFOW( 2, $0007);
+WFIFOL( 4, SP);
+Socket.SendBuf(buf, 8);
+end else begin
+SPTick := Tick;
+end;
+end;
       if Weight * 2 <> MaxWeight then begin
+
+
+if Weight * 2 < MaxWeight then begin
+
+
 
 			//HP自動回復
 
@@ -10458,6 +10508,7 @@ begin
 
     end;
   end;
+end;
 end;
 //------------------------------------------------------------------------------
    procedure TfrmMain.SkillPassive(tc:TChara;Tick:cardinal);
@@ -10630,7 +10681,7 @@ begin
 
 
       {Colus, 20031223: Added check for Ashura recovery period.}
-			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
+			{if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
 				if (HP <> MAXHP) then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
                                                 if tc.isPoisoned = True then Dec(HP)
@@ -10643,7 +10694,7 @@ begin
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, HP);
 					Socket.SendBuf(buf, 8);
-                                {end else if (tc.isPoisoned = True) then begin
+                                end else if (tc.isPoisoned = True) then begin
                                         for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
 						Dec(HP);
 						HPTick := HPTick + HPDelay[3 - Sit];
@@ -10652,13 +10703,13 @@ begin
 					WFIFOW( 0, $00b0);
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, HP);
-					Socket.SendBuf(buf, 8);}
+					Socket.SendBuf(buf, 8);
 				end else begin
 					HPTick := Tick;
 				end;
 			end;
 			//SP自動回復
-      {Colus, 20031223: Added check for Ashura recovery period.}
+      {Colus, 20031223: Added check for Ashura recovery period.
 			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (Skill[271].Tick < Tick) then begin
 				if SP <> MAXSP then begin
 					for j := 1 to (Tick - SPTick) div SPDelay[3 - Sit] do begin
@@ -10673,7 +10724,7 @@ begin
 					end else begin
 						SPTick := Tick;
 				end;
-			end;
+			end;  }
 
 			if (Sit >= 2) then begin
 
