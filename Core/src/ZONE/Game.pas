@@ -1216,6 +1216,42 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.free;
                                         end
 
+                                        else if (copy(str, 1, 4) = 'heal') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if (sl.Count > 3) or (sl.Count = 2) then continue;
+
+                                                i := 0;
+                                                j := 0;
+
+                                                if (sl.count = 3) then begin
+                                                        val(sl.Strings[1], i, ii);
+                                                        if ii <> 0 then continue;
+                                                        val(sl.Strings[2], j, ii);
+                                                        if ii <> 0 then continue;
+                                                end;
+
+                                                if (i <= 0) then i := tc.MAXHP;
+                                                if (j <= 0) then j := tc.MAXSP;
+
+                                                if (tc.HP + i > tc.MAXHP) then i := tc.MAXHP - tc.HP;
+                                                if (tc.SP + j > tc.MAXSP) then j := tc.MAXSP - tc.SP;
+
+                                                i := i + tc.HP;
+                                                j := j + tc.SP;
+
+                                                tc.HP := i;
+                                                tc.SP := j;
+                                                tc.Sit := 3;
+                                                SendCStat1(tc, 0, 5, tc.HP);
+                                                SendCStat1(tc, 0, 7, tc.SP);
+                                                WFIFOW( 0, $0148);
+                                                WFIFOL( 2, tc.ID);
+                                                WFIFOW( 6, 100);
+                                                SendBCmd(tm, tc.Point, 8);
+                                        end
+
                                         else begin
                                         end;
                                 end else
