@@ -134,6 +134,8 @@ var
     GM_ATHENA_DOOM : Byte;
     GM_ATHENA_KICK : Byte;
     GM_ATHENA_KICKALL : Byte;
+    GM_ATHENA_RAISE : Byte;
+    GM_ATHENA_RAISEMAP : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -262,8 +264,10 @@ var
     function command_athena_item2(tc : TChara; str : String) : String;
     function command_athena_item(tc : TChara; str : String) : String;
     function command_athena_doom(tc : TChara) : String;
-    function command_athena_kick(tc : Tchara; str : String) : String;
+    function command_athena_kick(tc : TChara; str : String) : String;
     function command_athena_kickall(tc : TChara) : String;
+    function command_athena_raise(tc : TChara) : String;
+    function command_athena_raisemap(tc : TChara) : String;
 
 implementation
 
@@ -400,6 +404,8 @@ implementation
         GM_ATHENA_DOOM := StrToIntDef(sl.Values['ATHENA_DOOM'], 1);
         GM_ATHENA_KICK := StrToIntDef(sl.Values['ATHENA_KICK'], 1);
         GM_ATHENA_KICKALL := StrToIntDef(sl.Values['ATHENA_KICKALL'], 1);
+        GM_ATHENA_RAISE := StrToIntDef(sl.Values['ATHENA_RAISE'], 1);
+        GM_ATHENA_RAISEMAP := StrToIntDef(sl.Values['ATHENA_RAISEMAP'], 1);
 
         sl.Free;
         ini.Free;
@@ -541,6 +547,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_DOOM', IntToStr(GM_ATHENA_DOOM));
         ini.WriteString('Athena GM Commands', 'ATHENA_KICK', IntToStr(GM_ATHENA_KICK));
         ini.WriteString('Athena GM Commands', 'ATHENA_KICKALL', IntToStr(GM_ATHENA_KICKALL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_RAISE', IntToStr(GM_ATHENA_RAISE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_RAISEMAP', IntToStr(GM_ATHENA_RAISEMAP));
 
         ini.Free;
 
@@ -676,9 +684,11 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('model')) = 'model') and (check_level(tc, GM_ATHENA_MODEL)) ) then error_msg := command_athena_model(tc, str)
             else if ( (copy(str, 1, length('item2')) = 'item2') and (check_level(tc, GM_ATHENA_ITEM2)) ) then error_msg := command_athena_item2(tc, str)
             else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
-            else if ( (copy(str, 1, length('doom')) = 'doom') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_doom(tc)
+            else if ( (copy(str, 1, length('doom')) = 'doom') and (check_level(tc, GM_ATHENA_DOOM)) ) then error_msg := command_athena_doom(tc)
             else if ( (copy(str, 1, length('kickall')) = 'kickall') and (check_level(tc, GM_ATHENA_KICKALL)) ) then error_msg := command_athena_kickall(tc)
             else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc, GM_ATHENA_KICK)) ) then error_msg := command_athena_kick(tc, str)
+            else if ( (copy(str, 1, length('raisemap')) = 'raisemap') and (check_level(tc, GM_ATHENA_RAISEMAP)) ) then error_msg := command_athena_raisemap(tc)
+            else if ( (copy(str, 1, length('raise')) = 'raise') and (check_level(tc, GM_ATHENA_RAISE)) ) then error_msg := command_athena_raise(tc)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -2090,7 +2100,7 @@ Called when we're shutting down the server *only*
     begin
         Result := 'GM_PVPON Failure.';
 
-        if MapInfo.IndexOf(tc.Map) <> -1 then begin;
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin
             mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             if (mi.PvP = true) then begin
                 Result := Result + ' PVP already enabled on map ' + tc.Map + '.';
@@ -4981,8 +4991,54 @@ Called when we're shutting down the server *only*
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
                 tc1.Socket.Close;
-                Result := 'Character ' + tc1.Name + ' has been kicked.';
             end;
+        end;
+    end;
+
+    function command_athena_raise(tc : TChara) : String;
+    var
+        tc1 : TChara;
+        tm : TMap;
+        i : Integer;
+    begin
+        Result := 'GM_ATHENA_RAISE Success.';
+        for i := 0 to CharaName.Count do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                tc1.HP := tc1.MAXHP;
+                tc1.SP := tc1.MAXSP;
+                tc1.Sit := 3;
+                SendCStat1(tc1, 0, 5, tc1.HP);
+                SendCStat1(tc1, 0, 7, tc1.SP);
+                WFIFOW(0, $0148);
+                WFIFOL(2, tc1.ID);
+                WFIFOW(6, 100);
+                SendBCmd(tm, tc1.Point, 8);
+            end;
+        end;
+    end;
+
+
+    function command_athena_raisemap(tc : TChara) : String;
+    var
+        tc1 : TChara;
+        i : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_ATHENA_RAISEMAP Success.';
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        for i := 0 to tm.CList.Count do begin
+            tc1 := tm.CList.objects[i] as TChara;
+            tc1.HP := tc1.MAXHP;
+            tc1.SP := tc1.MAXSP;
+            tc1.Sit := 3;
+            SendCStat1(tc1, 0, 5, tc1.HP);
+            SendCStat1(tc1, 0, 7, tc1.SP);
+            WFIFOW(0, $0148);
+            WFIFOL(2, tc1.ID);
+            WFIFOW(6, 100);
+            SendBCmd(tm, tc1.Point, 8);
         end;
     end;
     
