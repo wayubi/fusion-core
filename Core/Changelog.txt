@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-18-04: Commented out non working, unused pre variables. [Tsusai]
 - 10-17-04: Cleaned up the structure of #warp. [Trihan]
 - 10-17-04: Cleaned up the structure of #goto and #summon. [Trihan]
 - 10-17-04: Cleaned up the structure of #hstyle and #kill, and other minor fixes. [Trihan]
