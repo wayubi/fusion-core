@@ -4688,6 +4688,7 @@ var
 	sl              :TStringList;
         ma              :TMArrowDB;
 	ProcessType     :Byte;
+        DamageProcessed :boolean;
 begin
 	sl := TStringList.Create;
 	ProcessType := 0;
@@ -4936,6 +4937,7 @@ begin
                                 end;
                                 254:    {Grand Cross}
                                 begin
+                                        DamageProcessed := false;
                                         NoCastInterrupt := true;
                                         tc.MPoint.X := tc.Point.X;
                                         tc.MPoint.Y := tc.Point.Y;
@@ -4970,51 +4972,54 @@ begin
 							ts1 := sl.Objects[k1] as TMob;
 							DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
                                                         j := 3;
-                                                        SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j);
-							if tc.HP > dmg[0] then begin
-					                        tc.HP := tc.HP - (dmg[0] * 100 div 200);
-					                        if dmg[0] <> 0 then begin
-						                        tc.DmgTick := Tick + tc.dMotion div 2;
-                                                                        {Colus, 20031216: Cancel casting timer on hit.
-                                                                                Also, phen card handling.}
-                                                                        if tc.NoCastInterrupt = False then begin
-                                                                                tc.MMode := 0;
-                                                                                tc.MTick := 0;
-                                                                                WFIFOW(0, $01b9);
-                                                                                WFIFOL(2, tc.ID);
-                                                                                SendBCmd(tm, tc.Point, 6);
-                                                                        end;
-                                                                        {Colus, 20031216: end cast-timer cancel}
+                                                        if DamageProcessed = false then begin
+                                                                DamageProcessed := true;
+                                                                SendCSkillAtk2(tm, tc, tc, Tick, (dmg[0] * 100 div 200), j);
+							        if tc.HP > dmg[0] then begin
+					                                tc.HP := tc.HP - (dmg[0] * 100 div 200);
+					                                if dmg[0] <> 0 then begin
+						                                tc.DmgTick := Tick + tc.dMotion div 2;
+                                                                                {Colus, 20031216: Cancel casting timer on hit.
+                                                                                        Also, phen card handling.}
+                                                                                if tc.NoCastInterrupt = False then begin
+                                                                                        tc.MMode := 0;
+                                                                                        tc.MTick := 0;
+                                                                                        WFIFOW(0, $01b9);
+                                                                                        WFIFOL(2, tc.ID);
+                                                                                        SendBCmd(tm, tc.Point, 6);
+                                                                                end;
+                                                                                {Colus, 20031216: end cast-timer cancel}
+					                                end;
+
+				                                end else begin
+
+					                                tc.HP := 0;
+					                                WFIFOW( 0, $0080);
+					                                WFIFOL( 2, tc.ID);
+					                                WFIFOB( 6, 1);
+					                                SendBCmd(tm, tc.Point, 7);
+					                                tc.Sit := 1;
+
+                                                                        i := (100 - DeathBaseLoss);
+                                                                        tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
+                                                                        i := (100 - DeathJobLoss);
+                                                                        tc.JobEXP := Round(tc.JobEXP * (i / 100));
+
+                                                                        SendCStat1(tc, 1, $0001, tc.BaseEXP);
+                                                                        SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+					                                tc.pcnt := 0;
+					                                if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
+						                        ATarget := 0;
+                                                                        ts.ARangeFlag := false;
 					                        end;
 
-				                        end else begin
-
-					                        tc.HP := 0;
-					                        WFIFOW( 0, $0080);
-					                        WFIFOL( 2, tc.ID);
-					                        WFIFOB( 6, 1);
-					                        SendBCmd(tm, tc.Point, 7);
-					                        tc.Sit := 1;
-
-                                                                i := (100 - DeathBaseLoss);
-                                                                tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
-                                                                i := (100 - DeathJobLoss);
-                                                                tc.JobEXP := Round(tc.JobEXP * (i / 100));
-
-                                                                SendCStat1(tc, 1, $0001, tc.BaseEXP);
-                                                                SendCStat1(tc, 1, $0002, tc.JobEXP);
-
-					                        tc.pcnt := 0;
-					                        if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
-						                ATarget := 0;
-                                                                ts.ARangeFlag := false;
-					                end;
-
-					                WFIFOW( 0, $00b0);
-					                WFIFOW( 2, $0005);
-					                WFIFOL( 4, tc.HP);
-					                tc.Socket.SendBuf(buf, 8);
-					                ATick := ATick + ts.Data.ADelay;
+					                        WFIFOW( 0, $00b0);
+					                        WFIFOW( 2, $0005);
+					                        WFIFOL( 4, tc.HP);
+					                        tc.Socket.SendBuf(buf, 8);
+					                        ATick := ATick + ts.Data.ADelay;
+                                                        end;
 
                                                         //SendCStat1(tc, 0, 5, tc.HP);
                                                         //SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 3, 6);
