@@ -1,4 +1,6 @@
-- 04-08-04: Had to re-fix some set-math logic in Game - mea culpa :o [ChrstphrR]
+- 04-07-04: Added Athena GM Commands - @rura+, @send, @warp+, @charwarp. [AlexKreuz]
+- 04-07-04: Renamed #greaper to #ironical. [AlexKreuz]
+- 04-07-04: Had to re-fix some set-math logic in Game - mea culpa :o [ChrstphrR]
 - 04-07-04: Tidying up routine in Game unit, translating original Japanese comments in code (No functional code changes) (3rd time) [ChrstphrR]
 - 04-07-04: Added 'RUN' Skill, fixed a few checks up and started tracking monster status.  [Darkhelmet]
 - 04-07-04: Added #greaper GM command. (Grim Reaper - For scaring the kiddies). [AlexKreuz]

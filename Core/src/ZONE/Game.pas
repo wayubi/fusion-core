@@ -755,7 +755,59 @@ Begin(* Proc sv3PacketProcess() *)
 
 				RFIFOW(2, w);
 				str := RFIFOS(4, w - 4);
-{Edit - Miyuki}
+
+                                // Athena GM Commands Port - To Shut Them Up. Courtesy of AlexKreuz.
+                                if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '@') then begin
+                                        str := Copy(str, Pos(' : ', str) + 4, 256);
+
+                                        if (copy(str, 1, 5) = 'rura+') or (copy(str, 1, 4) = 'send') or (copy(str, 1, 4) = 'warp') or (copy(str, 1, 8) = 'charwarp') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                i := strtoint(sl.strings[2]);
+                                                j := strtoint(sl.strings[3]);
+
+                                                if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+                                                        ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
+                                                        if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then continue;
+
+                                                        for k := 4 to sl.Count - 1 do begin
+                                                                s := s + ' ' + sl.Strings[k];
+                                                                s := Trim(s);
+                                                        end;
+
+                                                        if charaname.IndexOf(s) <> -1 then begin
+                                                                tc1 := charaname.objects[charaname.indexof(s)] as tchara;
+                                                                str := tc.Name + ' warped ' + tc1.Name + ' to ' + sl.strings[1] + ' ' + inttostr(i) + ' ' + inttostr(j);
+
+                                                                w := Length(str) + 4;
+                                                                WFIFOW (0, $009a);
+                                                                WFIFOW (2, w);
+                                                                WFIFOS (4, str, w - 4);
+                                                                tc.socket.sendbuf(buf, w);
+
+                                                                if tc1.Login = 2 then begin
+                                                                        sendcleave(tc1, 2);
+                                                                        tc1.tmpMap := sl.Strings[1];
+                                                                        tc1.Point := point(i, j);
+                                                                        mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                                                                end
+
+                                                                else begin
+                                                                        tc1.Map := sl.Strings[1];
+                                                                        tc1.Point := point(i, j);
+                                                                end;
+                                                        end;
+                                                end;
+                                                sl.Free;
+                                        end
+
+                                        else begin
+                                        end;
+                                                                                
+                                end else
+                                // Athena GM Commands Port - To Shut Them Up. Courtesy of AlexKreuz.
+
 				if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
 					str := Copy(str, Pos(' : ', str) + 4, 256);
 					//#で始まるコマンド(主にでばぐ用)
@@ -763,7 +815,7 @@ Begin(* Proc sv3PacketProcess() *)
 
 
 					// NEW GM COMMANDS
-					if (Copy(str, 1, 8) = 'greaper') then begin
+					if (Copy(str, 1, 8) = 'ironical') then begin
 						WFIFOW(0, $0119);
 						WFIFOL(2, tc.ID);
 						WFIFOW(6, 0);
