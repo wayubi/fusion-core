@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-27-04: REED: Corruption of guild storage caused load error. [AlexKreuz]
 - 09-27-04: #146: Can not exit chat room if multple users in it. [AlexKreuz]
 - 09-27-04: Optimized memory clearing procedures. [AlexKreuz]
 - 09-25-04: Corrected a mistake on INI. [Tsusai]

@@ -1708,7 +1708,7 @@ uses
 
             if not saveflag then Continue;
 
-
+            datafile.Clear;
             datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
             datafile.Add('---------------------------------------------------------------------------------------------------------');
 
