@@ -3760,7 +3760,7 @@ Begin
 					end;
 				143: //Ž€‚ñ‚¾ƒtƒŠ
 					begin
-	    tc1 := tc;
+                        tc1 := tc;
 						ProcessType := 1;
 					end;
 	147:
@@ -6000,7 +6000,7 @@ Begin
 
 					// Play Dead
 					if (tc1.MSkill = 143) then begin
-						if tc1.Sit = 1 then begin
+						{if tc1.Sit = 1 then begin
 							//set SkillOnBool for icon update //beita 20040206
 							//tc1.setSkillOnBool(False);
 							tc1.Sit := 3;
@@ -6013,9 +6013,9 @@ Begin
 							CalcStat(tc1, Tick);
 						end else begin
 							//set SkillOnBool for icon update //beita 20040206
-							//tc1.setSkillOnBool(True);
+							//tc1.setSkillOnBool(True);}
 							tc1.Sit := 1;
-						end;
+						//end;
 					end;
 
 					if (tl.Icon <> 0) then begin

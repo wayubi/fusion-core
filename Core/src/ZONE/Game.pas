@@ -3125,6 +3125,12 @@ end;
                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mode:' + IntToStr(tc.MMode));
                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Item:' + IntToStr(tc.UseItemID));
 
+              if (tc.Sit = 1) and (tc.MSkill = 143) then begin
+				tc.SkillTick := tc.Skill[143].Tick;
+				tc.SkillTickID := 143;
+                tc.Sit := 3;
+                exit;
+              end else begin
                 if (tc.Sit <> 1) or (tc.MSkill = 143) then begin
                 	if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
                     {NPCイベント追加}
@@ -3167,6 +3173,7 @@ end;
                         if k <> 0 then SendSkillError(tc,k);
                     end;
                 end;
+            end;
             end;
 		//--------------------------------------------------------------------------
 		$0116: //場所指定スキル
