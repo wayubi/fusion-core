@@ -183,6 +183,7 @@ var
     function command_athena_who2(tc : TChara; str : String) : String;
     function command_athena_who(tc : TChara; str : String) : String;
     function command_athena_jump(tc : TChara; str : String) : String;
+    function command_athena_jumpto(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -503,6 +504,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc.ID, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
             else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc.ID, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
             else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc.ID, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
+            else if ( (copy(str, 1, length('jumpto')) = 'jumpto') and (check_level(tc.ID, GM_ATHENA_JUMPTO)) ) then error_msg := command_athena_jumpto(tc, str)
             else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
@@ -2832,6 +2834,7 @@ Called when we're shutting down the server *only*
         tc1 : TChara;
         i, w : Integer;
     begin
+        Result := 'GM_ATHENA_WHO activated.';
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
@@ -2876,7 +2879,38 @@ Called when we're shutting down the server *only*
 
     sl.Free;
     end;
-      
+
+    function command_athena_jumpto(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tc1 : TChara;
+        str2 : String;
+        i : Integer;
+    begin
+        Result := 'GM_ATHENA_JUMPTO failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 2 then Exit;
+
+        str2 := '';
+        for i := 1 to (sl.Count - 1) do begin
+            str2 := str2 + ' ' + sl.Strings[i];
+        end;
+        str2 := Trim(str2);
+
+        if (CharaName.Indexof(str2) <> -1) then begin
+            tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
+            tc.tmpmap := tc1.map;
+            tc.point := tc1.point;
+            mapmove (tc1.socket, tc1.map, tc1.point);
+
+            Result := 'GM_ATHENA_JUMPTO success. Jumped to ' + tc1.Name;
+        end;
+
+        sl.Free;
+    end;
+
     function command_athena_help(tc : TChara) : String;
     var
 	    Help : TStringList;
