@@ -6334,6 +6334,7 @@ var
 	i	:integer;
 	j	:integer;
 	l	:cardinal;
+    m   :cardinal;
 	w	:word;
 	str	:string;
 	tcr	:TChatRoom;
@@ -6366,6 +6367,7 @@ begin
 		//抜けるメンバーをリストの後ろに配置
 		if (tcr.Users > 1) then begin
 			l := tcr.MemberID[j];
+            m := tcr.MemberCID[j];
 			str := tcr.MemberName[j];
 			if (j <= 18) and (j <> tcr.Users - 1) then begin
 				for i := j to tcr.Users - 2 do begin
@@ -6374,7 +6376,7 @@ begin
 					tcr.MemberName[i] := tcr.MemberName[i+1];
 				end;
 				tcr.MemberID[tcr.Users - 1] := l;
-				tcr.MemberCID[tcr.Users - 1] := l;
+				tcr.MemberCID[tcr.Users - 1] := m;
 				tcr.MemberName[tcr.Users - 1] := str;
 			end;
 		end;
