@@ -5527,8 +5527,7 @@ begin
                                                 if spiritSpheres = 5 then begin
                                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
-                                                        tc.SP := 0;
-                                                        dmg[0] := dmg[0] *(8 + SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
                                                         dmg[0] := dmg[0] + j;
                                                         if dmg[0] < 0 then begin
                                                                 dmg[0] := 0;
@@ -5563,6 +5562,7 @@ begin
                                                         tc.Skill[270].Tick := Tick;
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
+                                                        tc.SP := 0;
                                                         SendCStat(tc);
                                                 end;
                                         end;
@@ -8308,8 +8308,7 @@ begin
                                                         if spiritSpheres = 5 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
-                                                        tc.SP := 0;
-                                                        dmg[0] := dmg[0] *(8 + SP div 100) + 250 + (tc.Skill[271].Lv * 150);
+                                                        dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
                                                         dmg[0] := dmg[0] + j;
                                                         if dmg[0] < 0 then begin
                                                                 dmg[0] := 0;
@@ -8344,6 +8343,7 @@ begin
                                                         tc.Skill[270].Tick := Tick;
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
+                                                        tc.SP := 0;
                                                         SendCStat(tc);                                                        
                                                 end;
                                         end;
