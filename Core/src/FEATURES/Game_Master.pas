@@ -75,7 +75,7 @@ var
     GM_ATHENA_SEND : Byte;
     GM_ATHENA_WARPP : Byte;
     GM_ATHENA_CHARWARP : Byte;
-    
+
 
     GM_Access_DB : TIntList32;
 
@@ -198,7 +198,7 @@ implementation
 
     procedure save_commands();
     var
-        ini : TIniFile;
+		ini : TIniFile;
     begin
         ini := TIniFile.Create(AppPath + 'gm_commands.ini');
 
@@ -332,27 +332,43 @@ implementation
         tc.Socket.SendBuf(buf, length(str) + 4);
     end;
 
-    procedure save_gm_log(tc : TChara; str : String);
-    var
-        logfile : TStringList;
-        timestamp : TDateTime;
-        filename : String;
-    begin
-        timestamp := Now;
-        filename := StringReplace(DateToStr(timestamp), '/', '_', [rfReplaceAll, rfIgnoreCase]);
-        logfile := TStringList.Create;
+	{
+	save_gm_log()
+	Orig Author: AlexKreuz
+	2004/05/28
 
-        if FileExists(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt') then begin
-            logfile.LoadFromFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+	Revisions:
+	2004/05/31 [ChrstphrR] Added exception handling to gracefully handle file
+	errors that might occur. (Notice how try-except doesn't butcher the code :D )
+	}
+	procedure save_gm_log(tc : TChara; str : String);
+	var
+		logfile : TStringList;
+		timestamp : TDateTime;
+		filename : String;
+	begin
+		timestamp := Now;
+		filename := StringReplace(DateToStr(timestamp), '/', '_', [rfReplaceAll, rfIgnoreCase]);
+		logfile := TStringList.Create;
+
+		{ChrstphrR 2004/05/30 - try-except to handle nasty situations where
+		we can't open or write to the logfiles -- they won't be showstoppers.
+		Note that the Create and Free methods are outside of this.}
+		try
+			if FileExists(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt') then begin
+				logfile.LoadFromFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+			end;
+
+			str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
+			logfile.Add(str);
+
+			CreateDir('logs');
+			logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+		except
+			on E : Exception do DebugOut.Lines.Add('*** GM Logfile Error : ' + E.Message);
 		end;
-
-        str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
-        logfile.Add(str);
-
-        CreateDir('logs');
-        logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
-        logfile.Free;
-    end;
+		logfile.Free;
+	end;
 
     function command_alive(tc : TChara) : String;
     var
