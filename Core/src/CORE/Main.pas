@@ -3471,7 +3471,7 @@ begin
       // Hammer Fall on enemy when Master is attacking
         tn := tc.PetNPC;
         tpe := tc.PetData;
-        if tpe.Accessory <> 1 then break;
+       if tpe.Accessory > 0 then begin
         if (tpe.JID = 1110) and (tc.AData <> nil) then begin
           if Random(100) < (tpe.Relation / 100.0) then begin
             xy.X := ts.Point.X;
@@ -3513,6 +3513,7 @@ begin
             SendBCmd(tm, tn.Point, 15);
           end;
         end;
+       end;
       end;
 
 
