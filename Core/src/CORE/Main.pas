@@ -9099,6 +9099,7 @@ begin
                 tc1.Optionkeep := tc1.Option;
                 tc1.Option := 6;
                 tc1.Hidden := true;
+                calcskill(tc1, tick);
               end;
 
               WFIFOW(0, $0119);

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-26-03: Fixed code for Tunnel Drive Data. Waiting on Data. [AlexKreuz]
 - 12-26-03: Modified Skill_DB Format for correct Skill Requirements. [AlexKreuz]
 - 12-26-03: Fixed LockItem / Switch Items on Refine NPC Bug. [AlexKreuz]
 - 12-26-03: Fixed DirMove function. [AlexKreuz]
