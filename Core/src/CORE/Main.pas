@@ -39,6 +39,7 @@ type
 		StatusBar1: TStatusBar;
 		Button2: TButton;
 		BackupTimer: TTimer;
+    TopPanel: TPanel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -1183,9 +1184,10 @@ begin
 	MapList.Free;
 end;//proc TfrmMain.FormCloseQuery()
 //------------------------------------------------------------------------------
+
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-        Perform(WM_NCACTIVATE, Word(Active), 0);
+	Perform(WM_NCACTIVATE, Word(Active), 0);
 	if WindowState = wsNormal then begin
 		FormLeft := Left;
 		FormTop := Top;

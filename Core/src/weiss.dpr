@@ -14,7 +14,8 @@ uses
   CharaSel in 'CharaSel.pas',
   Game in 'Game.pas',
   Database in 'Database.pas',
-  Script in 'Script.pas';
+  Script in 'Script.pas',
+  Skills in 'Skills.pas';
 
 {$R *.res}
 
