@@ -90,6 +90,17 @@ implementation
             end;            
         end;
 
+        datafile.Clear;
+
+        for i := 0 to PetList.Count - 1 do begin
+            PetList.Sort;
+            tpe := PetList.IndexOfObject(i) as TPet;
+            datafile.Add(IntToStr(tpe.PetID)+','+IntToStr(tpe.PlayerID));
+        end;
+
+        CreateDir(AppPath + 'gamedata\Indeces');
+        datafile.SaveToFile(AppPath + 'gamedata\Indeces\PetIDX.txt');
+
         FreeAndNil(datafile);
     end;
     { ------------------------------------------------------------------------------------- }

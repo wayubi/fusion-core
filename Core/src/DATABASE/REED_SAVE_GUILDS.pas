@@ -24,7 +24,7 @@ implementation
     procedure PD_Save_Guilds_Parse(forced : Boolean = False);
     var
         datafile : TStringList;
-        i : Integer;
+        i, j : Integer;
         tg : TGuild;
         path : String;
         pfile : String;
@@ -68,6 +68,24 @@ implementation
             PD_Save_Guilds_Storage(tg, datafile);
             reed_savefile(tg.ID, datafile, path, pfile);
         end;
+
+        datafile.Clear;
+        GuildList.Sort;
+
+        for i := 0 to GuildList.Count - 1 do begin
+            tg := GuildList.Objects[i] as TGuild;
+
+            for j := 0 to tg.RegUsers - 1 do begin
+                if tg.MemberID[j] = 0 then Continue;
+                if not assigned(tg.Member[j]) then Continue;
+                if tg.Member[j].GuildID <> tg.ID then Continue;
+
+                datafile.Add(IntToStr(tg.ID)+','+IntToStr(tg.MemberID[j]));
+            end;
+        end;
+
+        CreateDir(AppPath + 'gamedata\Indeces');
+        datafile.SaveToFile(AppPath + 'gamedata\Indeces\GuildMemberIDX.txt');
 
         FreeAndNil(datafile);
     end;

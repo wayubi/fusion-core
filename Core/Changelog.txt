@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-13-04: Preparing indeces. Midway release for conversion. [AlexKreuz]
 - 12-13-04: Fixed form again. [AlexKreuz]
 - 12-13-04: Supernovice and advanced classes use their own exp values now. [Tsusai]
 - 12-13-04: Cleaned up login.pas [Tsusai]
