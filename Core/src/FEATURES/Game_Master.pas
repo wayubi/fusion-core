@@ -181,7 +181,8 @@ var
     function command_athena_speed(tc : TChara; str : String) : String;
     function command_athena_who3(tc : TChara; str : String) : String;
     function command_athena_who2(tc : TChara; str : String) : String;
-    function command_athena_who(tc : Tchara; str : String) : String;
+    function command_athena_who(tc : TChara; str : String) : String;
+    function command_athena_jump(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -502,6 +503,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('who3')) = 'who3') and (check_level(tc.ID, GM_ATHENA_WHO3)) ) then error_msg := command_athena_who3(tc, str)
             else if ( (copy(str, 1, length('who2')) = 'who2') and (check_level(tc.ID, GM_ATHENA_WHO2)) ) then error_msg := command_athena_who2(tc, str)
             else if ( (copy(str, 1, length('who')) = 'who') and (check_level(tc.ID, GM_ATHENA_WHO)) ) then error_msg := command_athena_who(tc, str)
+            else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2841,6 +2843,38 @@ Called when we're shutting down the server *only*
                 tc.socket.sendbuf(buf, w);
             end;
         end;
+    end;
+
+    function command_athena_jump(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        ta : TMapList;
+        i, j, ii : Integer;
+    begin
+        Result := 'GM_ATHENA_JUMP failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 3 then Exit;
+
+        val(sl.Strings[1], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[2], j, ii);
+        if ii <> 0 then Exit;
+
+        if (maplist.IndexOf(tc.Map) <> -1) then begin
+            ta := maplist.objects[maplist.indexof(tc.map)] as tmaplist;
+            if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then Exit;
+
+            sendcleave(tc, 2);
+            tc.tmpMap := tc.map;
+            tc.Point := point(i, j);
+            mapmove(tc.Socket, tc.tmpMap, tc.Point);
+
+            Result := 'GM_ATHENA_JUMP success. Jumped to ' + IntToStr(i) + ',' + IntToStr(j);
+        end;
+
+    sl.Free;
     end;
       
     function command_athena_help(tc : TChara) : String;
