@@ -11233,7 +11233,8 @@ begin
   tpe := tc.PetData;
   MobData := tpe.MobData;
 
-  if tpe.Accessory <> 0 then with tn1 do begin
+  if tpe.Accessory <> 0 then begin
+    with tn1 do begin
 
     if tpe.Data.SkillTime > 0 then begin
       //Tick System needs to be redone
@@ -11354,7 +11355,7 @@ begin
 
 						pcnt := k;
 						ppos := 0;
-						MoveTick := _Tick;
+						MoveTick := Tick;
 
 						NextPoint := tn.Point;
             PetMoving(tc, Tick);
@@ -11368,6 +11369,7 @@ begin
 			//end;
     //DebugOut.Lines.Add('Poring is your pet.');
     end;
+  end;
   end;
 end;
 
@@ -14659,6 +14661,7 @@ procedure TfrmMain.Button1Click(Sender: TObject);
 var
         i, j, k, counter: integer;
         tc1:TChara;
+        tc2:TChara;
         tp1: TPlayer;
         ta: TMapList;
         str: string;
@@ -14681,14 +14684,16 @@ begin
 
                         k := 0;
                         for i := 0 to CharaName.Count - 1 do begin
-        		        tc1 := CharaName.Objects[i] as TChara;
-        			if tc1.Login = 2 then begin
+        		              tc1 := CharaName.Objects[i] as TChara;
+        			              if (tc1.Login = 2) and (tc1 <> tc2) then begin
                                         if k = 0 then begin
-                                                str := str + tc1.Name;
-                                                k := k + 1
+                                          tc2 := tc1;
+                                          str := str + tc1.Name;
+                                          k := k + 1
                                         end else begin
-                                                str := str + ', ' + tc1.Name;
-                                                k := k + 1;
+                                          tc2 := tc1;
+                                          str := str + ', ' + tc1.Name;
+                                          k := k + 1;
                                         end;
                                 end;
                         end;
