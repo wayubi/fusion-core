@@ -395,7 +395,8 @@ uses
                     //debugout.Lines.Add(tp.Name + ' account storage data loaded.');
                 end;
         	except
-                DebugOut.Lines.Add('Account storage data could not be loaded.');
+                DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
+                DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Storage.txt');
         	end;
         until FindNext(searchResult) <> 0;
         FindClose(searchResult);
@@ -999,7 +1000,8 @@ uses
 
                         //debugout.Lines.Add(tc.Name + ' character inventory data loaded.');
                     except
-                    	DebugOut.Lines.Add('Character inventory data could not be loaded.');
+                        DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
+                        DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Inventory.txt');
                     end;
                 end;
 
@@ -1175,7 +1177,8 @@ uses
 
                         //debugout.Lines.Add(tc.Name + ' character cart data loaded.');
                     except
-                    	DebugOut.Lines.Add('Character cart data could not be loaded.');
+                        DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
+                        DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Cart.txt');
                     end;
                 end;
 
@@ -1332,7 +1335,15 @@ uses
                         if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
                         tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
 
-                        for i := 0 to datafile.Count - 1 do tc.Flag.Add(datafile[i]);
+                        if (UID <> '*') then begin
+                            for i := 0 to datafile.Count - 1 do begin
+                                tc.Flag.Delete(0);
+                            end;
+                        end;
+
+                        for i := 0 to datafile.Count - 1 do begin
+                            tc.Flag.Add(datafile[i]);
+                        end;
 
                         //debugout.Lines.Add(tc.Name + ' character variables data loaded.');
                     except
