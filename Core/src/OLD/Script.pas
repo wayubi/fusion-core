@@ -25,6 +25,7 @@ uses
     procedure npc_timer(tm:TMap; tn:TNPC; OnOff : boolean);
     procedure npc_add_statskill(tc :TChara; stat,skill :integer);
     procedure npc_warp(tc :TChara; destination :string; x,y :integer);
+    function var_substitute(tc: TChara; tn: TNPC; str: string):string;
 
 {==============================================================================}
 
@@ -92,7 +93,8 @@ begin
         0: Inc(tc.ScriptStep); //(nop)
         1:  //mes
             begin
-                str := tn.Script[tc.ScriptStep].Data1[0];
+                str := var_substitute(tc,tn,tn.Script[tc.ScriptStep].Data1[0]);
+                {str := tn.Script[tc.ScriptStep].Data1[0];
                 i := AnsiPos('$[', str);
                 while i <> 0 do begin
                     j := AnsiPos(']', Copy(str, i + 2, 256));
@@ -117,7 +119,7 @@ begin
                 str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
                 str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
                 str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$$', '$', [rfReplaceAll]);
+                str := StringReplace(str, '$$', '$', [rfReplaceAll]);}
                 i := Length(str);
                 WFIFOW(0, $00b4);
                 WFIFOW(2, i + 8);
@@ -149,6 +151,7 @@ begin
                         if i = 0 then str := tn.Script[tc.ScriptStep].Data1[i]
                         else str := str + ':' + tn.Script[tc.ScriptStep].Data1[i];
                     end;
+                    str := var_substitute(tc,tn,str);
                     i := Length(str);
                     WFIFOW(0, $00b7);
                     WFIFOW(2, i + 8);
@@ -1084,7 +1087,7 @@ begin
             begin
                 j := tn.Script[tc.ScriptStep].Data3[0];
                 str := '';
-                //Flags
+                //checking if the right side of the equation is a var
                 if (Copy(tn.Script[tc.ScriptStep].Data1[1], 1, 1) = '\') then
                     str := ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[1]]
                 else begin
@@ -1093,7 +1096,8 @@ begin
                     if (i <> -1) then str := tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[1]]
                     else str := tn.Script[tc.ScriptStep].Data1[1];
                 end;
-                //and more flags
+                str := var_substitute(tc,tn,str);
+                //Setting the left side equal to the right
                 if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) = '\') then begin
                     //Server flags
                     if (j = 0) then ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := str
@@ -1922,6 +1926,38 @@ begin
     tc.tmpMap := destination;
     tc.Point := Point(x,y);
     MapMove(tc.Socket, tc.tmpMap, tc.Point);
+end;
+
+function var_substitute(tc: TChara; tn: TNPC; str: string):string;
+var
+  i,j,k : integer;
+begin
+    i := AnsiPos('$[', str);
+    while i <> 0 do begin
+        j := AnsiPos(']', Copy(str, i + 2, 256));
+        if j <= 1 then break;
+        //Variable Substituting
+        if (Copy(str, i + 2, 1) = '$') then
+            str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+        else if (Copy(str, i + 2, 2) = '\$') then
+            str := Copy(str, 1, i - 1) + ServerFlag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+        else begin
+            k := ConvFlagValue(tc, Copy(str, i + 2, j - 1), true);
+            if k <> -1 then str := Copy(str, 1, i - 1) + IntToStr(k) + Copy(str, i + j + 2, 256)
+            else str := Copy(str, 1, i - 1) + Copy(str, i + j + 2, 256);
+        end;
+        i := AnsiPos('$[', str);
+        end;
+    str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
+    str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+    str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
+    str := StringReplace(str, '$guildmaster', GetGuildMName(tn), [rfReplaceAll]);
+    str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(tn)), [rfReplaceAll]);
+    str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
+    str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
+    str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
+    str := StringReplace(str, '$$', '$', [rfReplaceAll]);
+    Result := str;
 end;
 
 end.
