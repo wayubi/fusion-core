@@ -2264,7 +2264,7 @@ end;
 											begin
 
 												for w2 := 0 to 2 do begin
-													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (k <> 612) then begin
+													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (tc.Item[w].ID <> 612) then begin
 														e2 := 1;
 														continue;
 													end;
@@ -2289,7 +2289,7 @@ end;
 
 												for w2 := 0 to 2 do begin
 
-													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (k = 612) or ((tma.ItemLV > 1) and (k = 613)) or ((tma.ItemLV = 3) and (k = 614)) then begin
+													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (tc.Item[w].ID = 612) or ((tma.ItemLV > 1) and (tc.Item[w].ID = 613)) or ((tma.ItemLV = 3) and (tc.Item[w].ID = 614)) then begin
 														e2 := 1;
 														continue;
 													end;
