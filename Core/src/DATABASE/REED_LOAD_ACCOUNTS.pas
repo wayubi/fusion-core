@@ -32,7 +32,7 @@ implementation
             path := basepath + resultlist[i] + '\' + pfile;
 
             if (UID = '*') then tp := TPlayer.Create
-            else tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
+            else tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
             tp.ID := retrieve_data(0, path, 1);
             tp.Name := retrieve_data(1, path);
@@ -80,8 +80,8 @@ implementation
         for i := 0 to resultlist.Count - 1 do begin
             path := basepath + resultlist[i] + '\' + pfile;
 
-            if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
+            if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
             for j := 0 to 8 do begin
                 tp.CName[j] := retrieve_data(j, path);
@@ -114,8 +114,8 @@ implementation
         for i := 0 to resultlist.Count - 1 do begin
             path := basepath + resultlist[i] + '\' + pfile;
 
-            if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
+            if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
             retrieve_inventories(path, tp.Kafra.Item);
 

@@ -4,15 +4,20 @@ interface
 
 uses
     Common,
-    Classes, SysUtils;
+    Classes, SysUtils, Dialogs;
 
     function retrieve_data(idx : Integer; path : String; rtype : Integer = 0) : Variant;
     function get_list(path : String; pfile : String; UID : String = '*') : TStringList;
     procedure retrieve_inventories(path : String; inventory_item : array of TItem);
     function retrieve_length(path : String) : Integer;
     function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
+    procedure reed_shutdown_server(error_message : String);
+    function reed_convert_type(in_value : Variant; ctype : Integer; line : Integer; path : String = '') : Variant;
 
 implementation
+
+uses
+    Main;
 
     { ------------------------------------------------------------------------------------- }
     { R.E.E.D - retrieve_data                                                               }
@@ -33,12 +38,18 @@ implementation
         datafile := TStringList.Create;
         datafile.LoadFromFile(path);
         
-        str := Copy(datafile[idx], Pos(' : ', datafile[idx]) + 3, length(datafile[idx]) - Pos(' : ', datafile[idx]) + 3);
+        try
+            str := Copy(datafile[idx], Pos(' : ', datafile[idx]) + 3, length(datafile[idx]) - Pos(' : ', datafile[idx]) + 3);
+        except
+            on EStringListError do begin
+                reed_shutdown_server('Error in ' + path + ' on line ' + inttostr(idx+1));
+            end;
+        end;
 
         if (rtype = 0) then
             Result := str
         else if (rtype = 1) then
-            Result := StrToInt(str);
+            Result := reed_convert_type(str, 0, idx+1, path);
 
         FreeAndNil(datafile);
     end;
@@ -102,16 +113,16 @@ implementation
         for i := 2 to datafile.Count - 1 do begin
             columns.DelimitedText := datafile[i];
 
-            inventory_item[i-2].ID := StrToInt(columns.Strings[0]);
-            inventory_item[i-2].Amount := StrToInt(columns.Strings[1]);
-            inventory_item[i-2].Equip := StrToInt(columns.Strings[2]);
-            inventory_item[i-2].Identify := StrToInt(columns.Strings[3]);
-            inventory_item[i-2].Refine := StrToInt(columns.Strings[4]);
-            inventory_item[i-2].Attr := StrToInt(columns.Strings[5]);
-            inventory_item[i-2].Card[0] := StrToInt(columns.Strings[6]);
-            inventory_item[i-2].Card[1] := StrToInt(columns.Strings[7]);
-            inventory_item[i-2].Card[2] := StrToInt(columns.Strings[8]);
-            inventory_item[i-2].Card[3] := StrToInt(columns.Strings[9]);
+            inventory_item[i-2].ID := reed_convert_type(columns.Strings[0], 0, i, path);
+            inventory_item[i-2].Amount := reed_convert_type(columns.Strings[1], 0, i, path);
+            inventory_item[i-2].Equip := reed_convert_type(columns.Strings[2], 0, i, path);
+            inventory_item[i-2].Identify := reed_convert_type(columns.Strings[3], 0, i, path);
+            inventory_item[i-2].Refine := reed_convert_type(columns.Strings[4], 0, i, path);
+            inventory_item[i-2].Attr := reed_convert_type(columns.Strings[5], 0, i, path);
+            inventory_item[i-2].Card[0] := reed_convert_type(columns.Strings[6], 0, i, path);
+            inventory_item[i-2].Card[1] := reed_convert_type(columns.Strings[7], 0, i, path);
+            inventory_item[i-2].Card[2] := reed_convert_type(columns.Strings[8], 0, i, path);
+            inventory_item[i-2].Card[3] := reed_convert_type(columns.Strings[9], 0, i, path);
             inventory_item[i-2].Data := ItemDB.Objects[ItemDB.IndexOf(inventory_item[i-2].ID)] as TItemDB;
         end;
 
@@ -169,6 +180,51 @@ implementation
         FreeAndNil(datafile);
         FreeAndNil(columns);
     end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - reed_shutdown_server                                                        }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To shut down the server when the user has a corrupted R.E.E.D database.      }
+    { Parameters:                                                                           }
+    {  - error_message : String, Represents the message that the user needs.                }
+    { ------------------------------------------------------------------------------------- }
+    procedure reed_shutdown_server(error_message : String);
+    begin
+        ShowMessage('R.E.E.D has detected a corrupt database. ' + error_message + '. Your server will now shut down.');
+        Halt;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - reed_convert_type                                                           }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To inteligently handle conversions of types and provide proper shutdown.     }
+    { Parameters:                                                                           }
+    {  - in_value : Variant, Represents the value that must be converted.                   }
+    {  - ctype : Integer, Represents the type of conversion.                                }
+    {  - line : Integer, Represents the error line or if no line, the correct message.      }
+    {  - path : String, Represents the error location.                                      }
+    { ------------------------------------------------------------------------------------- }
+    function reed_convert_type(in_value : Variant; ctype : Integer; line : Integer; path : String = '') : Variant;
+    begin
+        try
+            case ctype of
+                0 : Result := StrToInt(in_value);
+                1 : Result := IntToStr(in_value);
+            end;
+        except
+            on EConvertError do begin
+                if (line >= 0) then
+                    reed_shutdown_server('Error in ' + path + ' on line ' + inttostr(line))
+                else
+                    reed_shutdown_server('"' + in_value + '" is not a valid database id');
+            end;
+        end;
+    end;
+    { ------------------------------------------------------------------------------------- }
 
 end.
 

@@ -33,8 +33,8 @@ implementation
         resultlist := get_list(basepath, pfile);
 
         for i := 0 to resultlist.Count - 1 do begin
-            if Player.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(StrToInt(resultlist[i]))] as TPlayer;
+            if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
             path := basepath + resultlist[i] + '\Characters\';
 
@@ -76,8 +76,8 @@ implementation
             if (UID = '*') then begin
                 tc := TChara.Create;
             end else begin
-                if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-                tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+                if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+                tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
     
                 if (tc.Name <> tp.CName[0]) and (tc.Name <> tp.CName[1]) and (tc.Name <> tp.CName[2])
                 and (tc.Name <> tp.CName[3]) and (tc.Name <> tp.CName[4]) and (tc.Name <> tp.CName[5])
@@ -174,8 +174,8 @@ implementation
     begin
         for i := 0 to resultlist.Count - 1 do begin
 
-            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
             path := basepath + resultlist[i] + '\' + pfile;
 
@@ -205,8 +205,8 @@ implementation
     begin
         for i := 0 to resultlist.Count - 1 do begin
 
-            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
             for j := 0 to MAX_SKILL_NUMBER do begin
                 if SkillDB.IndexOf(j) <> -1 then begin
@@ -252,8 +252,8 @@ implementation
     begin
         for i := 0 to resultlist.Count - 1 do begin
 
-            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
             path := basepath + resultlist[i] + '\' + pfile;
 
@@ -277,8 +277,8 @@ implementation
     begin
         for i := 0 to resultlist.Count - 1 do begin
 
-            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
-            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
             path := basepath + resultlist[i] + '\' + pfile;
 
