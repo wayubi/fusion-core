@@ -11,7 +11,7 @@ uses
 	List32;
 
 const
-	RELEASE_VERSION = '1.211';
+	RELEASE_VERSION = '1.211 J';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;

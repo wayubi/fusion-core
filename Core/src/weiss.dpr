@@ -4,7 +4,6 @@ program Weiss;
 
 uses
   madExcept,
-  madLinkDisAsm,
   Forms,
   Main in 'Main.pas' {frmMain},
   List32 in '..\lib\List32.pas',

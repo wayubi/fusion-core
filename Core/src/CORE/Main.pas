@@ -11,7 +11,7 @@ uses
 	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
 	SQLData, FusionSQL, Math, Game_Master, Player_Skills,
 	{3rd Party Units}
-	List32, Zip;
+	List32, Zip, Menus;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;
@@ -37,9 +37,54 @@ type
 		Edit1: TEdit;
 		Button1: TButton;
 		StatusBar1: TStatusBar;
-		Button2: TButton;
 		BackupTimer: TTimer;
-    TopPanel: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+    Exit1: TMenuItem;
+    Save1: TMenuItem;
+    Server1: TMenuItem;
+    Start1: TMenuItem;
+    Stop1: TMenuItem;
+    TabSheet3: TTabSheet;
+    ListBox1: TListBox;
+    Edit2: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    Edit3: TEdit;
+    Label3: TLabel;
+    Edit4: TEdit;
+    Label4: TLabel;
+    Edit5: TEdit;
+    Label5: TLabel;
+    Edit6: TEdit;
+    Edit7: TEdit;
+    Label6: TLabel;
+    Edit8: TEdit;
+    Label7: TLabel;
+    Label8: TLabel;
+    Edit9: TEdit;
+    Label9: TLabel;
+    Edit10: TEdit;
+    Edit11: TEdit;
+    Label10: TLabel;
+    Edit12: TEdit;
+    Label11: TLabel;
+    Edit13: TEdit;
+    Label12: TLabel;
+    Edit14: TEdit;
+    Label13: TLabel;
+    Edit15: TEdit;
+    Label14: TLabel;
+    Edit16: TEdit;
+    Label15: TLabel;
+    Label16: TLabel;
+    Button3: TButton;
+    Button4: TButton;
+    MinimizetoTray1: TMenuItem;
+    Label17: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -102,11 +147,17 @@ type
 		procedure cmdStopClick(Sender: TObject);
 		procedure Button1Click(Sender: TObject);
 		procedure Edit1KeyPress(Sender: TObject; var Key: Char);
-
-		//Iconify procedures
-		procedure cmdMinTray(Sender: TObject);
 		procedure CMClickIcon(var msg: TMessage); message WM_NOTIFYICON;
 		procedure BackupTimerTimer(Sender: TObject);
+    procedure Start1Click(Sender: TObject);
+    procedure Stop1Click(Sender: TObject);
+    procedure Exit1Click(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
+    procedure ListBox1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Save1Click(Sender: TObject);
+    procedure MinimizetoTray1Click(Sender: TObject);
 
 		//procedure cbxPriorityClick(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
@@ -206,7 +257,7 @@ begin
 
 	DebugOut := txtDebug;
 
-	Caption := ' Fusion Server Software - '+RELEASE_VERSION; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
+	Caption := ' The Fusion Project: RO Server Software'; //ExtractFileName(ChangeFileExt(ParamStr(0), ''));
 
 	ScriptList := TStringList.Create;
 
@@ -348,17 +399,17 @@ begin
 	end;
 	if sl.IndexOfName('BaseExpMultiplier') > -1 then begin
 		BaseExpMultiplier := StrToInt(sl.Values['BaseExpMultiplier']);
-		if (BaseExpMultiplier > 999) then begin
+		{if (BaseExpMultiplier > 999) then begin
 			BaseExpMultiplier := 999;
-		end;
+		end;}
 	end else begin
 		BaseExpMultiplier := 1;
 	end;
 	if sl.IndexOfName('JobExpMultiplier') > -1 then begin
 		JobExpMultiplier := StrToInt(sl.Values['JobExpMultiplier']);
-		if (JobExpMultiplier > 999) then begin
+		{if (JobExpMultiplier > 999) then begin
 			JobExpMultiplier := 999;
-		end;
+		end;}
 	end else begin
 		JobExpMultiplier := 1;
 	end;
@@ -852,7 +903,8 @@ begin
         //DebugOut.Lines.LoadFromFile('Fusion.notice');
 
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '--- Fusion Command Output Begin ---');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '--- Fusion '+ RELEASE_VERSION +' ---');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '--- Command Output Begin ---');
         debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
 
 	cmdStart.Enabled := true;
@@ -9232,8 +9284,6 @@ var
 label ExitWarpSearch;
 begin
 
-	edit1.SetFocus;
-
 	sl := TStringList.Create;
 	try
 		cmdStart.Enabled := false;
@@ -10665,27 +10715,6 @@ begin
 
 end;
 
-procedure TfrmMain.cmdMinTray(Sender: TObject);
-  begin
-    //Add Icon to System Tray
-                TrayIcon.cbSize := SizeOf(TrayIcon);
-                TrayIcon.Wnd := Self.Handle;
-                TrayIcon.uID := 0;
-                TrayIcon.uFlags := NIF_ICON or NIF_TIP or NIF_MESSAGE;
-                TrayIcon.uCallbackMessage := WM_NOTIFYICON;
-                TrayIcon.hIcon := Application.Icon.Handle;
-                TrayIcon.szTip := 'Fusion';
-                Shell_notifyIcon(NIM_ADD, @TrayIcon);
-                frmMain.Visible := false;
-                Application.Minimize;
-                ShowWindow(Application.Handle, SW_HIDE);
-                SetWindowLong(Application.Handle, GWL_EXSTYLE,
-                GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
-                //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
-                // (Don't ToolWindows don't show in taskbar by default)
-
-end;
-
 procedure TfrmMain.CMClickIcon(var msg: TMessage);
 begin
   if msg.lparam = WM_LBUTTONDBLCLK then begin
@@ -10834,5 +10863,129 @@ begin
   end;
 end;//TfrmMain.KnockBackLiving
 
+
+procedure TfrmMain.Start1Click(Sender: TObject);
+begin
+	cmdStart.Click;
+end;
+
+procedure TfrmMain.Stop1Click(Sender: TObject);
+begin
+	cmdStop.Click;
+end;
+
+procedure TfrmMain.Exit1Click(Sender: TObject);
+begin
+	frmMain.Close;
+end;
+
+procedure TfrmMain.PageControl1Change(Sender: TObject);
+var
+	i : Integer;
+    AccountItem : TPlayer;
+begin
+
+	ListBox1.Clear;
+
+	for i := 0 to (PlayerName.Count - 1) do begin
+		AccountItem := PlayerName.Objects[i] as TPlayer;
+        listbox1.Items.AddObject(PlayerName.Strings[i], AccountItem);
+        listbox1.Sorted := True;
+    end;
+
+end;
+
+procedure TfrmMain.ListBox1Click(Sender: TObject);
+var
+    AccountItem : TPlayer;
+begin
+	AccountItem := listbox1.Items.Objects[listbox1.ItemIndex] as TPlayer;
+    Edit2.Text := IntToStr(AccountItem.ID);
+    Edit3.Text := AccountItem.Name;
+    Edit4.Text := AccountItem.Pass;
+    Edit5.Text := IntToStr(AccountItem.Gender);
+    Edit6.Text := AccountItem.Mail;
+    Edit7.Text := IntToStr(AccountItem.Banned);
+    Edit8.Text := AccountItem.CName[0];
+    Edit9.Text := AccountItem.CName[1];
+    Edit10.Text := AccountItem.CName[2];
+    Edit11.Text := AccountItem.CName[3];
+    Edit12.Text := AccountItem.CName[4];
+    Edit13.Text := AccountItem.CName[5];
+    Edit14.Text := AccountItem.CName[6];
+    Edit15.Text := AccountItem.CName[7];
+    Edit16.Text := AccountItem.CName[8];
+end;
+
+procedure TfrmMain.Button3Click(Sender: TObject);
+begin
+    Edit2.Clear;
+    Edit3.Clear;
+    Edit4.Clear;
+    Edit5.Clear;
+    Edit6.Clear;
+    Edit7.Clear;
+    Edit8.Clear;
+    Edit9.Clear;
+    Edit10.Clear;
+    Edit11.Clear;
+    Edit12.Clear;
+    Edit13.Clear;
+    Edit14.Clear;
+    Edit15.Clear;
+    Edit16.Clear;
+end;
+
+procedure TfrmMain.Button4Click(Sender: TObject);
+var
+    AccountItem : TPlayer;
+begin
+	if PlayerName.IndexOf(Edit3.Text) <> -1 then begin
+		AccountItem := PlayerName.Objects[PlayerName.IndexOf(Edit3.Text)] as TPlayer;
+	    AccountItem.ID := StrToInt(Edit2.Text);
+        AccountItem.Name := Edit3.Text;
+        AccountItem.Pass := Edit4.Text;
+        AccountItem.Gender := StrToInt(Edit5.Text);
+        AccountItem.Mail := Edit6.Text;
+	    DataSave();
+    end else begin
+    	AccountItem := TPlayer.Create;
+	    AccountItem.ID := PlayerName.Count + 100101;
+        AccountItem.Name := Edit3.Text;
+        AccountItem.Pass := Edit4.Text;
+        AccountItem.Gender := StrToInt(Edit5.Text);
+        AccountItem.Mail := Edit6.Text;
+    	PlayerName.AddObject(AccountItem.Name, AccountItem);
+    	Player.AddObject(AccountItem.ID, AccountItem);
+        DataSave();
+        Button3.Click;
+    end;
+end;
+
+procedure TfrmMain.Save1Click(Sender: TObject);
+begin
+    DataSave();
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
+end;
+
+procedure TfrmMain.MinimizetoTray1Click(Sender: TObject);
+begin
+    //Add Icon to System Tray
+                TrayIcon.cbSize := SizeOf(TrayIcon);
+                TrayIcon.Wnd := Self.Handle;
+                TrayIcon.uID := 0;
+                TrayIcon.uFlags := NIF_ICON or NIF_TIP or NIF_MESSAGE;
+                TrayIcon.uCallbackMessage := WM_NOTIFYICON;
+                TrayIcon.hIcon := Application.Icon.Handle;
+                TrayIcon.szTip := 'Fusion';
+                Shell_notifyIcon(NIM_ADD, @TrayIcon);
+                frmMain.Visible := false;
+                Application.Minimize;
+                ShowWindow(Application.Handle, SW_HIDE);
+                SetWindowLong(Application.Handle, GWL_EXSTYLE,
+                GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
+                //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
+                // (Don't ToolWindows don't show in taskbar by default)
+end;
 
 end.

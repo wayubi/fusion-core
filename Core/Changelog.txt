@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-16-04: Base & Job experiences uncapped. [AlexKreuz]
+- 06-16-04: Built in account creator. [AlexKreuz]
+- 06-16-04: Live editing of account data. [AlexKreuz]
+- 06-16-04: New interface. (OMFG IT IS BEAUTIFUL) [AlexKreuz]
 - 06-15-04: Added basis for donpcevent. [Darkhelmet]
 - 06-15-04: Fixed procedure FindTargetsInAttackRange. [Darkhelmet]
 - 06-15-04: Fixed weapon sprites viewable by others broke with dye fix. [AlexKreuz]
