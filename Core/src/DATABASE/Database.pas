@@ -853,6 +853,17 @@ begin
 			end;//case
 
 		end;
+
+        { Bug Tracing: 01/06/05 }
+            // There is an access violation in the line below though I don't
+            // understand why that is.  Either ItemDB can not be accessed and
+            // for some reason has either been destroyed or not created, or
+            // this instance of td does not exist.  However that doesn't make
+            // sense either because it was created right above us.  I checked
+            // to make sure there were no early "Continue" statements bumping
+            // it out prematurely, but found nothing.  I'm pretty confident the
+            // ItemDB IntList32 has not properly been created.
+            // - AlexKreuz (01/06/05)
 		ItemDB.AddObject(td.ID, td);
 		ItemDBName.AddObject(td.Name, td);
 	end;
