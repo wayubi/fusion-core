@@ -1,3 +1,6 @@
+- 05-01-04: Fixed stability problem regarding NPC IDs of value -1. [AlexKreuz]
+
+
 - 04-30-04: Removed some debug statements. [Colus]
 - 04-30-04: Updated Combo Finish to monitor time to expire combo Ashura mode. [Colus]
 - 04-30-04: Updated Aqua Benedicta.  Now checks that you are on water. [Colus]

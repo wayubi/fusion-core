@@ -7698,13 +7698,20 @@ Begin
 						ScriptPath := ExtractRelativePath(AppPath, ScriptList[Idx]);
 
 						SL1.DelimitedText := SL[3];
-						//TempInt := StrToInt(SL1[0]);
-						TempInt := StrToIntDef(SL1[0],0);
+
+						TempInt := StrToInt(SL1[0]);
+
+                        // Alex: I don't know who made this change and I really don't care
+                        // but let me just say that this change led to serious stability
+                        // problems regarding NPCs. Whoever made this change did NOT test
+                        // their results effectively.
+						{TempInt := StrToIntDef(SL1[0],0);
 						if TempInt < 0 then begin
 							ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, 'script']);
 							if Assigned(tn) then tn.Free;
 							Exit;
-						end;
+						end;}
+
 						tn.JID := TempInt;
 						//ChrstphrR - ERangeError - bad input when
 						// I walk into a guild castle area off of Payon.
