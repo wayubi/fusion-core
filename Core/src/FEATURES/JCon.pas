@@ -540,21 +540,21 @@ uses
         CharacterItem.Stat2 := StrToInt(frmMain.Edit56.Text);
         CharacterItem.Option := StrToInt(frmMain.Edit54.Text);
 
-        if StrToInt(frmMain.Edit58.Text) > CharacterItem.MAXHP then begin
-            CharacterItem.HP := CharacterItem.MAXHP;
-            frmMain.Edit58.Text := IntToStr(CharacterItem.MAXHP);
-        end else begin
-            if StrToInt(frmMain.Edit58.Text) < 1 then CharacterItem.MAXHP := 1;
+//        if StrToInt(frmMain.Edit58.Text) > CharacterItem.MAXHP then begin
+//            CharacterItem.HP := CharacterItem.MAXHP;
+//            frmMain.Edit58.Text := IntToStr(CharacterItem.MAXHP);
+//        end else begin
+//            if StrToInt(frmMain.Edit58.Text) < 1 then CharacterItem.MAXHP := 1;
             CharacterItem.HP := StrToInt(frmMain.Edit58.Text);
-        end;
+//        end;
 
-        if StrToInt(frmMain.Edit53.Text) > CharacterItem.MAXSP then begin
-            CharacterItem.SP := CharacterItem.MAXSP;
-            frmMain.Edit53.Text := IntToStr(CharacterItem.MAXSP);
-        end else begin
-            if StrToInt(frmMain.Edit53.Text) <= 0 then CharacterItem.MAXSP := 1;
+//        if StrToInt(frmMain.Edit53.Text) > CharacterItem.MAXSP then begin
+//            CharacterItem.SP := CharacterItem.MAXSP;
+//            frmMain.Edit53.Text := IntToStr(CharacterItem.MAXSP);
+//        end else begin
+//            if StrToInt(frmMain.Edit53.Text) <= 0 then CharacterItem.MAXSP := 1;
             CharacterItem.SP := StrToInt(frmMain.Edit53.Text);
-        end;
+//        end;
 
         CharacterItem.Speed := StrToInt(frmMain.Edit41.Text);
         CharacterItem.Hair := StrToInt(frmMain.Edit46.Text);
