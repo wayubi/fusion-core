@@ -1513,6 +1513,7 @@ var
 	j :integer;
     sl :TStringList;
 begin
+        if (tc.ID <> 0) then begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
@@ -1656,6 +1657,7 @@ begin
 			Exit;
 		end;
 	end;
+end;
 end;
 
 //------------------------------------------------------------------------------

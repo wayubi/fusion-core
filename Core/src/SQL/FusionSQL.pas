@@ -723,23 +723,29 @@ end;
 function Preload_GuildMembers() : Boolean;
 var
         query : string;
-        j, k : integer;
-        data : array[0..65535] of integer;
+        tc : TChara;
 begin
-        query := 'SELECT GID FROM guild_members';
+        query := 'SELECT C.GID, C.Name, C.BaseLV FROM characters AS C LEFT JOIN guild_members AS G ON (C.GID=G.GID) WHERE C.GID <> 0';
         if MySQL_Query(query) then begin
-                k := (SQLDataSet.RecordCount - 1);
-                for j := 0 to k do begin
-                        data[j] := StrToInt(SQLDataSet.FieldValues['GID']);
+                debugout.Lines.add('Pre-Loading Character Data for Guilds');
+                SQLDataSet.First;
+                while not SQLDataSet.Eof do begin
+                        tc := TChara.Create;
+                        tc.CID := StrToInt(SQLDataSet.FieldValues['GID']);
+                        tc.Name := SQLDataSet.FieldValues['Name'];
+                        if assigned (CharaName) then begin
+                                if (CharaName.IndexOf(tc.Name) <> -1) then begin
+                                        tc := CharaName.Objects[CharaName.IndexOf(tc.Name)] as TChara;
+                                end;
+                        end;
+                        tc.BaseLV := StrToInt(SQLDataSet.FieldValues['BaseLV']);
+                        CharaName.AddObject(tc.Name, tc);
+                        Chara.AddObject(tc.CID, tc);
                         SQLDataSet.Next;
                 end;
         end;
-
-        debugout.Lines.add('Pre-Loading Character Data for Guilds');
-        for j := 0 to k do begin
-                Load_Characters(data[j]);
-        end;
         debugout.Lines.add('-- Completed.');
+
 end;
 
 end.
