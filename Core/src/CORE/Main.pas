@@ -3597,8 +3597,10 @@ begin
         StealItem(tc, ts);
 
       end;
+      SendCAttack1(tc, dmg[0], dmg[1], dmg[4], dmg[5], tm, ts, Tick);
 
-			WFIFOW( 0, $008a);
+      //Transformed to SendCAttack1
+			{WFIFOW( 0, $008a);
 			WFIFOL( 2, ID);
 			WFIFOL( 6, ATarget);
 			WFIFOL(10, timeGetTime());
@@ -3608,7 +3610,8 @@ begin
 			WFIFOW(24, dmg[4]); //分割数
 			WFIFOB(26, dmg[5]); //0=単攻撃 8=複数 10=クリティカル
 			WFIFOW(27, dmg[1]); //逆手
-			SendBCmd(tm, ts.Point, 29);
+			SendBCmd(tm, ts.Point, 29); }
+      
 			//スプラッシュ攻撃千葉滋賀佐賀(ﾟ∀ﾟ)
 			if SplashAttack then begin
 {追加}  CharaSplash(tc,Tick);
@@ -13732,6 +13735,8 @@ begin
 				for j := 1 to (Tick - ATick) div Data.ADelay do begin
 					if tc1.Skill[255].Tick > Tick then begin
 						DamageCalc2(tm, tc1, ts, Tick);
+            SendMAttack(tm, ts, tc2, dmg[0], dmg[4], dmg[5], Tick);
+            {
 						WFIFOW( 0, $008a);
 						WFIFOL( 2, ID);
 						WFIFOL( 6, tc2.ID);
@@ -13741,12 +13746,14 @@ begin
 						WFIFOW(22, dmg[0]);
 						WFIFOW(24, dmg[4]);
 
+
 						// 4->9 for Endure damage, allow lucky hit gfx
 						if ((tc2.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;
 
 						WFIFOB(26, dmg[5]);
 						WFIFOW(27, 0);
 						SendBCmd(tm, tc2.Point, 29);
+            }
 
 						if (dmg[0] <> 0) and (tc2.pcnt <> 0) and (tc2.dMotion <> 0) then begin
 							tc2.Sit := 3;
@@ -13830,7 +13837,8 @@ begin
 						DamageCalc2(tm, tc1, ts, Tick);
 						if dmg[0] <= 0 then dmg[0] := 0;
 
-						WFIFOW( 0, $008a);
+            SendMAttack(tm, ts, tc1, dmg[0], dmg[4], dmg[5], Tick);
+						{WFIFOW( 0, $008a);
 						WFIFOL( 2, ID);
 						WFIFOL( 6, ATarget);
 						WFIFOL(10, timeGetTime());
@@ -13844,7 +13852,7 @@ begin
 
 						WFIFOB(26, dmg[5]);
 						WFIFOW(27, 0);
-						SendBCmd(tm, tc1.Point, 29);
+						SendBCmd(tm, tc1.Point, 29);}
 						
 						if (dmg[0] <> 0) and (tc1.pcnt <> 0) and (tc1.dMotion <> 0) then begin
 							tc1.Sit := 3;

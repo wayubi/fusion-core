@@ -1520,6 +1520,9 @@ Option_GraceTime_PvPG :cardinal;
 		procedure SendCLeave(tc:TChara; mode:byte);
 		procedure SendBCmd(tm:TMap; Point:TPoint; PacketLen:word; tc:TChara = nil; tail:boolean = False);
 
+    procedure SendCAttack1(tc:TChara; dmg0:integer; dmg1:integer; dmg4:integer; dmg5:integer; tm:TMap; ts:TMob; Tick:cardinal);
+    procedure SendMAttack(tm:TMap; ts:TMob; tc:TChara; dmg0:integer; dmg4:integer; dmg5:integer; Tick:cardinal);
+
 		procedure SendItemSkill(tc:TChara; s:Cardinal; L:Cardinal = 1);
 		procedure SendSkillError(tc:TChara; EType:byte; BType:word = 0);
                 procedure SendItemError(tc:TChara; Code:Cardinal);
@@ -2008,7 +2011,7 @@ begin
 			Bonus[4] := Bonus[4] + 5;
                         Bonus[5] := Bonus[5] + 5;
 		end;
-                if Skill[383].Tick > Tick then begin
+                if (Skill[383].Tick > Tick) and (Skill[383].Lv > 0) then begin
                         tc.FLEE1 := tc.FLEE1 + Skill[383].Data.Data2[Skill[383].Lv];
                         end;
 		//所持限界量増加スキル
@@ -3730,6 +3733,45 @@ begin
   end;
 end;
 
+//------------------------------------------------------------------------------
+
+procedure SendCAttack1(tc:TChara; dmg0:integer; dmg1:integer; dmg4:integer; dmg5:integer; tm:TMap; ts:TMob; Tick:cardinal);
+begin
+  with tc do begin
+    WFIFOW( 0, $008a);
+    WFIFOL( 2, ID);
+    WFIFOL( 6, ATarget);
+    WFIFOL(10, Tick);
+    WFIFOL(14, aMotion);
+    WFIFOL(18, ts.Data.dMotion);
+    WFIFOW(22, dmg0); //ダメージ
+    WFIFOW(24, dmg4); //分割数
+    WFIFOB(26, dmg5); //0=単攻撃 8=複数 10=クリティカル
+    WFIFOW(27, dmg1); //逆手
+    SendBCmd(tm, ts.Point, 29);
+  end;
+end;
+
+procedure SendMAttack(tm:TMap; ts:TMob; tc:TChara; dmg0:integer; dmg4:integer; dmg5:integer; Tick:cardinal);
+
+begin
+  with ts do begin
+    WFIFOW( 0, $008a);
+    WFIFOL( 2, ID);
+    WFIFOL( 6, ATarget);
+    WFIFOL(10, Tick);
+    WFIFOL(14, ts.Data.aMotion);
+    WFIFOL(18, tc.dMotion);
+    WFIFOW(22, dmg0);
+    WFIFOW(24, dmg4);
+    // 4->9 for Endure damage, allow lucky hit gfx
+    if ((tc.dMotion = 0) and (dmg5 <> 11)) then dmg5 := 9;
+
+    WFIFOB(26, dmg5);
+    WFIFOW(27, 0);
+    SendBCmd(tm, tc.Point, 29);
+  end;
+end;
 //------------------------------------------------------------------------------
 procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 var

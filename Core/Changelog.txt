@@ -1,3 +1,4 @@
+- 03-20-04: Fixed a few lag issues while players attack near each other.  [Darkhelmet]
 - 03-19-04: Fixed Waterball Crash PvP. Bug #597.  [Darkhelmet]
 - 03-19-04: Cleaned up a few more commonly called code bits and comments. [Colus]
 - 03-19-04: Corrected weapon skill expiration code. [Colus]
