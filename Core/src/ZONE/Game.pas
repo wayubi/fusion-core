@@ -1593,17 +1593,18 @@ Begin(* Proc sv3PacketProcess() *)
           tc.Option := tc.Option or 8192;
         end
         //CRW 2004/04/07th - Set math increased code clarity.
-        else if (tc.JID IN [ 5, 10, 18, 23, 4006, 4011, 4019]) AND
+        else if ((tc.JID IN [ 5, 10, 18, 23 ]) OR (tc.JID = 4006) OR (tc.JID = 4011) OR (tc.JID = 4019)) AND
                 (Copy(str, 8, 4) = 'cart') then
         begin
         //else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 23) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
           tc.Option := tc.Option or 8;
 					//カートデータ送信
 {追加}		SendCart(tc);
-        end else if (tc.JID IN [ 11, 4012 ]) AND (Copy(str, 8, 6) = 'falcon')) then begin
+        end else if (((tc.JID = 11) OR (tc.JID = 4012)) AND (Copy(str, 8, 6) = 'falcon')) then begin
           tc.Option := tc.Option or $10;
         end
-        else if (tc.JID IN [ 7, 14, 4008, 4014, 4015, 4023 ]) AND
+        else if ((tc.JID IN [ 7, 14 ]) OR (tc.JID = 4008) OR
+        				(tc.JID = 4014) OR (tc.JID = 4015) OR (tc.JID = 4023 )) AND
         				((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then
         begin
           tc.Option := tc.Option or $20;
