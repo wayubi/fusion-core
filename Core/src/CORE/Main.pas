@@ -1170,8 +1170,13 @@ begin
             on EAccessViolation do Continue;
         end;
     end;
-	ItemDB.Free; //CR - Frees up 1.4Mb properly on close down that is leaked.
-	ItemDBName.Free;
+
+    try
+    	ItemDB.Free; //CR - Frees up 1.4Mb properly on close down that is leaked.
+	    ItemDBName.Free;
+    except
+        on EAccessViolation do ;
+    end;
 
 {ÉAÉCÉeÉÄêªë¢í«â¡}
 	for Idx := MaterialDB.Count-1 downto 0 do
