@@ -5304,9 +5304,15 @@ begin
                                 //New skills ---- Rouge
                                 211:    {Steal Coin}
                                 begin
-                                        SendCSkillAtk1(tm, tc, ts, Tick, 0, 1, 6);
                                         j := Random(7);
                                         if (Random(100) < tl.Data1[MUseLV]) then begin
+                                                WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, MTarget);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, ts.Point, 15);
                                         //DebugOut.Lines.Add('Steal zeny success');
                                                 k := ts.Data.LV * 5;
                                                 Inc(Zeny, k);
@@ -6402,7 +6408,7 @@ begin
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
           end else begin
-            SendSkillError(tc, 6);          
+            SendSkillError(tc, 6);
             MMode := 4;
             Exit;
           end;
@@ -6555,6 +6561,28 @@ begin
 							ts.BodyTick := Tick + tc.aMotion;
 						end else if (ts.Stat1 = 5) then ts.BodyTick := ts.BodyTick + 30000;
 						end;
+                                              141:  //venom splasher 
+                                                begin
+                                                WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, MTarget);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+						SendBCmd(tm, ts.Point, 15);
+                                                if ts.Stat2 = 1 then begin
+                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then dmg[0] := 0;
+
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                StatCalc1(tc, ts, Tick);
+                                                end else begin
+            SendSkillError(tc, 6);
+            MMode := 4;
+            Exit;
+            end;
+            end;
 				84: //JT
 					begin
                                                 if tc.ID = ts.ID then Exit;
