@@ -11469,7 +11469,7 @@ begin
                         end;
 
                         if k <> 1 then begin
-                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Skill[135].Tick := Tick;
                                 tc.SkillTick := Tick;
                                 tc.SkillTickID := 135;
                                 tc.Option := tc.Option and $FFF9;
@@ -11501,7 +11501,7 @@ begin
                           tm := tc.MData;
                           tc.SP := 0;
                           SendCStat1(tc, 0, 7, SP);
-                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Skill[135].Tick := Tick;
                                 tc.Option := tc.Option and $FFF9;
                                 SkillTick := tc.Skill[MSkill].Tick;
                                 SkillTickID := 135;
@@ -11536,9 +11536,9 @@ begin
                           tm := tc.MData;
                           tc.SP := 0;
                           SendCStat1(tc, 0, 7, SP);
-                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Skill[51].Tick := Tick;
                                 tc.Option := tc.Option and $FFF9;
-                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTick := tc.Skill[51].Tick;
                                 SkillTickID := 51;
                                 tc.Hidden := false;
                                 tc.isCloaked := false;
@@ -11570,7 +11570,7 @@ begin
                           tc.Skill[114].Tick := Tick;
                           tc.Skill[114].EffectLV := 0;
                           SkillTick := tc.Skill[114].Tick;
-                          SkillTickID := 114; DebugOut.Lines.Add(Format('STID %d', [SkillTickID]));
+                          SkillTickID := 114; //DebugOut.Lines.Add(Format('STID %d', [SkillTickID]));
                         end;
                 end;
                 if (tc.isPoisoned = true) then begin
