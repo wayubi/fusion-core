@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-20-04: Added error message for Defender skill [BieL®]
 - 08-20-04: Added error message for Shield Boomerang skill [BieL®]
 - 08-20-04: Fixed the Second Stage of Act Dead skill [BieL®]
 - 08-20-04: Added error message for Shield Charge skill [BieL®]

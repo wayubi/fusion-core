@@ -1963,9 +1963,15 @@ Begin
 			// therefore it has no use being against a monster
 			257:    {Defender}
 				begin
-					tc1 := tc;
-					ProcessType := 3;
-				end;
+                    if (tc.Shield = 0) then begin
+                        SendSkillError(tc,6);
+                        tc.MMode := 4;
+                        exit;
+                    end else begin
+					    tc1 := tc;
+					    ProcessType := 3;
+				    end;
+                end;
 
 			{Crusader Skills Player vs Monster end}
       {Sage Skills Player vs Monster begin}
@@ -2748,8 +2754,14 @@ Begin
 					end;
 				257: //Defender
 					begin
-						tc1 := tc;
-						ProcessType := 3;
+                        if (tc.Shield = 0) then begin
+                           SendSkillError(tc,6);
+                           tc.MMode := 4;
+                           exit;
+                        end else begin
+					       tc1 := tc;
+					       ProcessType := 3;
+				        end;
 					end;
 
 				//Monk Skills
@@ -4122,8 +4134,14 @@ Begin
 				end;
 			257: //Defender
 				begin
-					tc1 := tc;
-					ProcessType := 3;
+                    if (tc.Shield = 0) then begin
+                        SendSkillError(tc,6);
+                        tc.MMode := 4;
+                        exit;
+                    end else begin
+					    tc1 := tc;
+					    ProcessType := 3;
+				    end;
 				end;
 			{258: //Spear Quicken
 				begin
