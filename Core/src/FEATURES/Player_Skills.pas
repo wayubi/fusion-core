@@ -195,6 +195,7 @@ uses
         tm : TMap;
         tl : TSkillDB;
     begin
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
         { Placed here to prevent attacking self }
         if tc.AData = tc then Exit;
