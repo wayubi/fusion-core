@@ -6,7 +6,11 @@ December 23, 2003
 [Suggestions by Darkhelmet]
 
 - Monster Skills
-- Tweak New Map Format <-- (what do you mean, tweak?) (Alex)  <---alex monsters are spawning in walls, and going through them many reports on it today(Oatmeal)
+- Tweak New Map Format <-- (what do you mean, tweak?) (Alex)
+     <---alex monsters are spawning in walls, and going through them many reports on it today(Oatmeal)
+     <---oat, this is not a bug with the maps.. this is a bug with the source.. just like icewall and flywing...
+         its basically 2 bugs in one. 1 bug was fixed with new maps, but for full fix, the source must be fixed.
+         (Alex)
 - Guild Wars  (Low priority)
 - Update Triple blow (low priority)
 - Update Item Db (high Priortity)-i'm working on it-(oatmeal)
