@@ -235,14 +235,14 @@ begin
                 p := nil;
                 len := 0;
                 if str = 'zeny'             then begin p := @tc.Zeny;       len := 4; end
-                //Job is obsolete with jobchange and (base/job)level & option
+                //Job is obsolete with jobchange and (base/job)level
                 //won't work without relogin
                 //else if str = 'job'         then begin p := @tc.JID;        len := 2; end
                 //else if str = 'baselevel'   then begin p := @tc.BaseLV;     len := 2; end
                 //else if str = 'joblevel'    then begin p := @tc.JobLV;      len := 2; end
                 else if str = 'statuspoint' then begin p := @tc.StatusPoint;len := 2; end
                 else if str = 'skillpoint'  then begin p := @tc.SkillPoint; len := 2; end
-                //else if str = 'option'      then begin p := @tc.Option;     len := 4; end
+                else if str = 'option'      then begin p := @tc.Option;     len := 4; end
                 else if str = 'speed'       then begin p := @tc.Speed;      len := 2; end;
 				if len <> 0 then begin
                     j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
@@ -280,6 +280,9 @@ begin
                 //Variable check
                 if (Copy(str, 1, 1) <> '\') then tc.Flag.Values[str] := IntToStr(i)
                 else ServerFlag.Values[str] := IntToStr(i);
+
+                if str = 'option' then UpdateOption(tm, tc); //update character's options after setting
+
 
                 Inc(tc.ScriptStep);
             end;
