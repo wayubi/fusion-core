@@ -457,7 +457,7 @@ uses
     { Parameters:                                                                           }
     {  - tpa : TParty, Represents the party data to check.                                  }
     { Results:                                                                              }
-    {  - Result : Boolean, Represents the return value of whether or not onnline.           }
+    {  - Result : Boolean, Represents the return value of whether or not online.           }
     { ------------------------------------------------------------------------------------- }
     function party_is_online(tpa : TParty) : Boolean;
     var
@@ -479,6 +479,17 @@ uses
     { ------------------------------------------------------------------------------------- }
 
 
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - reed_column_align                                                           }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To provide a centralized location for formatting REED format data.           }
+    { Parameters:                                                                           }
+    {  - str : String, Represents the data to format.                                       }
+    {  - count : Integer, Represents number of spaces to put ahead of string.               }
+    {  - last : Boolean, Represents switch that determines if its the last column.          }
+    { Results:                                                                              }
+    {  - Result : String, Represents the fully formatted line to return.                    }
+    { ------------------------------------------------------------------------------------- }    
     function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
     var
         len : Integer;
@@ -496,6 +507,7 @@ uses
 
         Result := result_string;
     end;
+    { ------------------------------------------------------------------------------------- }
         
 end.
 

@@ -49,6 +49,22 @@ implementation
             pfile := 'Positions.txt';
             PD_Save_Guilds_Positions(tg, datafile);
             reed_savefile(tg.ID, datafile, path, pfile);
+
+            pfile := 'Skills.txt';
+            PD_Save_Guilds_Skills(tg, datafile);
+            reed_savefile(tg.ID, datafile, path, pfile);
+
+            pfile := 'BanList.txt';
+            PD_Save_Guilds_BanList(tg, datafile);
+            reed_savefile(tg.ID, datafile, path, pfile);
+
+            pfile := 'Diplomacy.txt';
+            PD_Save_Guilds_Diplomacy(tg, datafile);
+            reed_savefile(tg.ID, datafile, path, pfile);
+
+            pfile := 'Storage.txt';
+            PD_Save_Guilds_Storage(tg, datafile);
+            reed_savefile(tg.ID, datafile, path, pfile);
         end;
 
         FreeAndNil(datafile);
@@ -153,7 +169,23 @@ implementation
     { - R.E.E.D - Save Guilds Skills ------------------------------------------------------ }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Guilds_Skills(tg : TGuild; datafile : TStringList);
+    var
+        i : Integer;
+        str : String;
     begin
+        datafile.Add(' SK ID : LV : SKILL NAME');
+        datafile.Add('-------------------------------');
+
+        for i := 10000 to 10004 do begin
+            if tg.GSkill[i].LV = 0 then Continue;
+            str := ' ';
+
+            str := str + reed_column_align(IntToStr(i), 0);
+            str := str + reed_column_align(IntToStr(tg.GSkill[i].LV), 2);
+            str := str + reed_column_align(tg.GSkill[i].Data.IDC, 0, False);
+
+            datafile.Add(str);
+        end;
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -162,7 +194,26 @@ implementation
     { - R.E.E.D - Save Guilds BanList ----------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Guilds_BanList(tg : TGuild; datafile : TStringList);
+    var
+        i : Integer;
+        str : String;
+        tgb : TGBan;
     begin
+        datafile.Add(' CHARACTER NAME          : ACCOUNT NAME            : BAN REASON');
+        datafile.Add('------------------------------------------------------------------------------------------------------');
+
+        for i := 0 to tg.GuildBanList.Count - 1 do begin
+            tgb := tg.GuildBanList.Objects[i] as TGBan;
+            if (tgb = nil) then Continue;
+
+            str := ' ';
+
+            str := str + reed_column_align(tgb.Name, 23);
+            str := str + reed_column_align(tgb.AccName, 23);
+            str := str + reed_column_align(tgb.Reason, 0, False);
+
+            datafile.Add(str);
+        end;
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -171,7 +222,37 @@ implementation
     { - R.E.E.D - Save Guilds Diplomacy --------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Guilds_Diplomacy(tg : TGuild; datafile : TStringList);
+    var
+        i : Integer;
+        str : String;
+        tgl : TGRel;
     begin
+        datafile.Add(' GID    : T : GUILD NAME');
+        datafile.Add('-----------------------------------------------------');
+
+        for i := 0 to tg.RelAlliance.Count - 1 do begin
+            tgl := tg.RelAlliance.Objects[i] as TGRel;
+            if (tgl = nil) then Continue;
+
+            str := ' ';
+
+            str := str + reed_column_align(IntToStr(tgl.ID), 6);
+            str := str + reed_column_align('A', 0, False);
+
+            datafile.Add(str);
+        end;
+
+        for i := 0 to tg.RelHostility.Count - 1 do begin
+            tgl := tg.RelAlliance.Objects[i] as TGRel;
+            if (tgl = nil) then Continue;
+
+            str := ' ';
+
+            str := str + reed_column_align(IntToStr(tgl.ID), 6);
+            str := str + reed_column_align('H', 0, False);
+
+            datafile.Add(str);
+        end;
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -181,6 +262,7 @@ implementation
     { ------------------------------------------------------------------------------------- }
     procedure PD_Save_Guilds_Storage(tg : TGuild; datafile : TStringList);
     begin
+        compile_inventories(datafile, tg.Storage.Item);
     end;
     { ------------------------------------------------------------------------------------- }
 
