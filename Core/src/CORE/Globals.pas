@@ -50,7 +50,6 @@ uses
 
     procedure create_upnp(port : Integer; name : String);
     procedure destroy_upnp(port : Integer);
-    procedure warp_handle(tc : TChara; destination : string; x,y : integer);
     procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);
 
 implementation
@@ -839,14 +838,6 @@ uses
                 ShowMessage('An Error occured while trying to remove the UPnP Ports. If you have a router with UPnP enabled, please check the Internet Gateway to make sure the Fusion ports are closed. Make sure to disable UPnP if your router does not support it.');
             end;
         end;
-    end;
-
-    procedure warp_handle(tc : TChara; destination : string; x,y : integer);
-    begin
-        SendCLeave(tc, 2);
-        tc.tmpMap := destination;
-        tc.Point := Point(x,y);
-        MapMove(tc.Socket, tc.tmpMap, tc.Point);
     end;
 
     procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);

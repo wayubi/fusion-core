@@ -18,6 +18,14 @@ uses
 {   Listed Procedures}
     {Function  ScriptValidated(MapName : string; FileName : string; Tick : Cardinal) : Boolean;}
     procedure NPCScript(tc:TChara; value:cardinal = 0; mode:byte = 0; MsgStr:string = '');
+    {Procedures for npc commands that share the same code}
+    procedure npc_heal(tn:TNPC; tc:TChara; HP,SP,HPdis : integer);
+    procedure npc_die(tc :TChara);
+    procedure npc_jobchange(tm:TMap; tc :TChara; job:integer);
+    procedure npc_timer(tm:TMap; tn:TNPC; OnOff : boolean);
+    procedure npc_add_statskill(tc :TChara; stat,skill :integer);
+    procedure npc_warp(tc :TChara; destination :string; x,y :integer);
+
 {==============================================================================}
 
 
@@ -81,11 +89,8 @@ begin
     cnt := 0;
     while (tc.ScriptStep < tn.ScriptCnt) and (cnt < 100) do begin
         case tn.Script[tc.ScriptStep].ID of
-        0: //(nop)
-            begin
-                Inc(tc.ScriptStep);
-            end;
-        1: //mes
+        0: Inc(tc.ScriptStep); //(nop)
+        1:  //mes
             begin
                 str := tn.Script[tc.ScriptStep].Data1[0];
                 i := AnsiPos('$[', str);
@@ -187,10 +192,7 @@ begin
             end;
         8: //warp
             begin
-                SendCLeave(tc, 2);
-                tc.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
-                tc.Point := Point(tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
-                MapMove(tc.Socket, tc.tmpMap, tc.Point);
+                npc_warp(tc,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
                 exit;
             end;
         9: //save
@@ -206,27 +208,8 @@ begin
 				Inc(tc.ScriptStep);
 			end;
         10: //heal
-            begin
-                Inc(tc.HP, tn.Script[tc.ScriptStep].Data3[0]);
-                if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
-                Inc(tc.SP, tn.Script[tc.ScriptStep].Data3[1]);
-                if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-                WFIFOW( 0, $011a);
-                WFIFOW( 2, 28);
-                WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[0]);
-                WFIFOL( 6, tc.ID);
-                WFIFOL(10, tn.ID);
-                WFIFOB(14, 1);
-                SendBCmd(tc.MData, tn.Point, 15);
-					{ commented out SP heal packets?
-					WFIFOW( 0, $013d);
-					WFIFOW( 2, $0007);
-					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
-					tc.Socket.SendBuf(buf, 6);
-					}
-                SendCStat1(tc, 0, 5, tc.HP);
-                SendCStat1(tc, 0, 7, tc.SP);
-
+            begin;
+                npc_heal(tn,tc,tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1],tn.Script[tc.ScriptStep].Data3[0]);
                 Inc(tc.ScriptStep);
             end;
         11: //set
@@ -431,64 +414,7 @@ begin
             end;
         17: //jobchange
             begin
-                //Unequipping items for jobchange
-                for i := 1 to 100 do begin
-                    if tc.Item[i].Equip = 32768 then begin
-                        tc.Item[i].Equip := 0;
-                        WFIFOW(0, $013c);
-                        WFIFOW(2, 0);
-                        tc.Socket.SendBuf(buf, 4);
-                    end else if tc.Item[i].Equip <> 0 then begin
-                        reset_skill_effects(tc);
-                        WFIFOW(0, $00ac);
-                        WFIFOW(2, i);
-                        WFIFOW(4, tc.Item[i].Equip);
-                        tc.Item[i].Equip := 0;
-                        WFIFOB(6, 1);
-                        tc.Socket.SendBuf(buf, 7);
-                        remove_equipcard_skills(tc, i);
-                    end;
-                end;
-                //Taking off options
-                if (tc.Option <> 0) then begin
-                    tc.Option := 0;
-                    {UpdateOption(tm, tc);}
-                    WFIFOW(0, $0119);
-                    WFIFOL(2, tc.ID);
-                    WFIFOW(6, 0);
-                    WFIFOW(8, 0);
-                    WFIFOW(10, tc.Option);
-                    WFIFOB(12, 0);
-                    SendBCmd(tc.MData, tc.Point, 13);
-                end;
-
-                // Colus, 20040304: Adding job offset for upper classes
-                j := tn.Script[tc.ScriptStep].Data3[0];
-                {if (j > LOWER_JOB_END) then begin
-                    j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-                    tc.ClothesColor := 1; // Use 'default' upper job clothes color
-                end else tc.ClothesColor := 0; // Default color for regular jobs}
-
-                if (j > LOWER_JOB_END) then begin
-                    j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-                    if (DisableAdv2ndDye) and (j > 4007) then
-                        tc.ClothesColor := 0
-                    else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
-                end else tc.ClothesColor := 0;
-
-
-                tc.JID := j;
-                tc.JobEXP := 0;
-                tc.JobLV := 1;
-                SendCStat1(tc, 0, $0037, tc.JobLV);
-                CalcStat(tc);
-                tc.SkillPoint := 0;
-                CalcStat(tc);
-                SendCStat(tc, true);
-                SendCSkillList(tc);
-                // Colus, 20040304: New view packet for jobchange
-                UpdateLook(tc.MData, tc, 0, tc.JID);
-                UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+                npc_jobchange(tm,tc,tn.Script[tc.ScriptStep].Data3[0]);
                 Inc(tc.ScriptStep);
             end;
         18: //viewpoint
@@ -522,7 +448,6 @@ begin
                 if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then
                     tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := IntToStr(Random(tn.Script[tc.ScriptStep].Data3[0]))
                 else ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := IntToStr(Random(tn.Script[tc.ScriptStep].Data3[0]));
-
 				Inc(tc.ScriptStep);
 			end;
         21: //option
@@ -576,14 +501,7 @@ begin
             end;
         23: //die
             begin
-                CalcStat(tc);
-                tc.HP := 0;
-                tc.Sit := 1;
-                SendCStat1(tc, 0, 5, tc.HP);
-                WFIFOW(0, $0080);
-                WFIFOL(2, tc.ID);
-                WFIFOB(6, 1);
-                tc.Socket.SendBuf(buf, 7);
+                npc_die(tc);
                 Inc(tc.ScriptStep);
             end;
         24: //ccolor
@@ -596,33 +514,8 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
-        25: //refine		refine[itemID][fail][+val]
+        25:
             begin
-                j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
-                k := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
-                l := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[2]);
-                if (j >= 0) and (j <= 10) then begin
-                    for i := 1 to 100 do begin
-                        if (tc.Item[i].ID <> 0) and
-                        (tc.Item[i].Amount <> 0) and
-                        tc.Item[i].Data.IEquip and
-                        (tc.Item[i].Equip <> 0) and
-                        (tc.Item[i].Card[0] <> $00ff) then begin
-                            tc.Item[i].Refine := byte(l);
-                            WFIFOW(0, $0188);
-                            WFIFOW(2, k);
-                            WFIFOW(4, i);
-                            WFIFOW(6, word(l));
-                            tc.Socket.SendBuf(buf, 8);
-                        end;
-                    end;
-                    CalcStat(tc);
-                    WFIFOW(0, $019b);
-                    WFIFOL(2, tc.ID);
-                    WFIFOL(6, 3);
-                    SendBCmd(tc.MData, tc.Point, 10, tc);
-                    SendCStat(tc);
-                end;
                 Inc(tc.ScriptStep);
             end;
         26: //getitemamount
@@ -873,6 +766,7 @@ begin
             begin
                 ts := TMob.Create;
                 with ts do begin
+                    j := -1;
                     Map := tn.Script[tc.ScriptStep].Data1[0];
                     Point.X := tn.Script[tc.ScriptStep].Data3[0];
                     Point.Y := tn.Script[tc.ScriptStep].Data3[1];
@@ -955,44 +849,6 @@ begin
             begin
                 l := tn.Script[tc.ScriptStep].Data3[0];
                 str := tn.Script[tc.ScriptStep].Data1[0] + chr(0);
-                i := AnsiPos('$[', str);
-                while i <> 0 do begin
-                    j := AnsiPos(']', Copy(str, i + 2, 256));
-                    if j <= 1 then break;
-                    //grabbing variables
-                    if (Copy(str, i + 2, 1) = '$') then
-                        str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
-                    else if (Copy(str, i + 2, 2) = '\$') then
-                        str := Copy(str, 1, i - 1) + ServerFlag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
-                    else begin
-                        k := ConvFlagValue(tc, Copy(str, i + 2, j - 1), true);
-                        if k <> -1 then str := Copy(str, 1, i - 1) + IntToStr(k) + Copy(str, i + j + 2, 256)
-                        else str := Copy(str, 1, i - 1) + Copy(str, i + j + 2, 256);
-                    end;
-                    i := AnsiPos('$[', str);
-                end;
-                //predetermined variable string replacement
-                str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
-                str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
-                str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
-                str := StringReplace(str, '$guildmaster', GetGuildMName(tn), [rfReplaceAll]);
-                str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$$', '$', [rfReplaceAll]);
-                str := StringReplace(str, '\\', '\', [rfReplaceAll]);
-                //optional tags (first set is for map only, second set for global)
-                if ((l = 0) or (l = 200)) then str := tn.Name + ' : ' + str; // Null (0): displays npc name with it
-                //10 isn't here and isn't needed since it'll make str show itself anyways
-                if ((l = 100) or (l = 300)) then str := 'blue' + str;        //  Blue String Broadcast
-                if ((l = 20) or (l = 220)) then str := tc.Name + ' : ' + str; // displays characters name with it
-                if ((l = 30) or (l = 230)) then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
-                if ((l = 40) or (l = 240)) then str := 'blue' + tn.Name + ' : ' +str; //displays npc name and in blue
-                w := Length(str) + 4;
-                WFIFOW(0, $009a);
-                WFIFOW(2, w);
-                WFIFOS(4, str, w - 4);
                 if ((l < 101) or (l > 300)) then begin
                     //MAP broadcasting
                     tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
@@ -1007,39 +863,13 @@ begin
                         if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
                     end;
                 end;
+
+                broadcast_handle(tc,tc1,str,true,l,tn);
                 Inc(tc.ScriptStep);
             end;
         35: //npctimer
             begin
-                i := tn.Script[tc.ScriptStep].Data3[0];
-                j := tm.TimerAct.IndexOf(tn.ID);
-                if (i = 0) then begin
-                    //OFF
-                    if (j <> -1) then begin
-                        if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
-                        tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn.ID));
-                    end;
-                end else if (i = 1) then begin
-                    //ON
-                    if (j = -1) then begin
-                        j := tm.TimerDef.IndexOf(tn.ID);
-                        if (j <> -1) then begin
-                            tr := tm.TimerDef.Objects[j] as NTimer;
-                            tr.Tick := timeGetTime();
-                            for k := 0 to tr.Cnt - 1 do begin
-                                tr.Done[k] := 0;
-                            end;
-                            tm.TimerAct.AddObject(tn.ID, tr);
-                            if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
-                        end;
-                    end else begin
-                        //Restart
-                        tr := tm.TimerAct.Objects[j] as NTimer;
-                        tr.Tick := timeGetTime();
-                        for k := 0 to tr.Cnt - 1 do tr.Done[k] := 0;
-                        if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
-                    end;
-                end;
+                npc_timer(tm,tn,StrToBool(IntToStr(tn.Script[tc.ScriptStep].Data3[0])));
                 Inc(tc.ScriptStep);
             end;
         36: //addnpctimer
@@ -1086,23 +916,15 @@ begin
                     tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
                     while (tm.CList.Count > 0) do begin
                         tc1 := tm.CList.Objects[0] as TChara;
-                        if tc1.Login = 2 then begin
-                            SendCLeave(tc1, 2);
-                            tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
-                            tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
-                            MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                        end;
+                        if tc1.Login = 2 then
+                            npc_warp(tc1,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
                     end;
                 end else if (tn.Script[tc.ScriptStep].Data3[2] = 1) then begin
                     //Warp all characters on the server
                     for j := 0 to CharaName.Count - 1 do begin
                         tc1 := CharaName.Objects[j] as TChara;
-                        if tc1.Login = 2 then begin
-                            SendCLeave(tc1, 2);
-                            tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
-                            tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
-                            MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                        end;
+                        if tc1.Login = 2 then
+                            npc_warp(tc1,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
                     end;
                 end else begin
                     //Warp all in NPC chatroom
@@ -1112,12 +934,8 @@ begin
                         if (tcr.Users < 2) then continue;
                         while (tcr.Users > 1) do begin
                             tc1 := CharaPID.IndexOfObject(tcr.MemberID[1]) as TChara;
-                            if tc1.Login = 2 then begin
-                                SendCLeave(tc1, 2);
-                                tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[0];
-                                tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
-                                MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                            end;
+                            if tc1.Login = 2 then
+                                npc_warp(tc1,tn.Script[tc.ScriptStep].Data1[0],tn.Script[tc.ScriptStep].Data3[0],tn.Script[tc.ScriptStep].Data3[1]);
                         end;
                     end;
                 end;
@@ -1432,15 +1250,15 @@ begin
                 Inc(tc.ScriptStep);
             end;
         {Colus, 20040110: Added (empty so far) guild territory commands}
-        58: begin end;//getagit
-        59: begin end;//getguild
+        58: Inc(tc.ScriptStep); //getagit
+        59: Inc(tc.ScriptStep); //getguild
         60: //agitregist
             begin
                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Agit now %s', [tn.Script[tc.ScriptStep].Data1[0]]));
                 tn.Agit := tn.Script[tc.ScriptStep].Data1[0];
                 Inc(tc.ScriptStep);
             end;
-        61: begin end;//Movenpc
+        61: Inc(tc.ScriptStep); //Movenpc
         63: //Remove Equipment
             begin
                 for  j := 1 to 100 do begin
@@ -1598,15 +1416,13 @@ begin
         68: // addskillpoints
             begin
                 i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
-                tc.SkillPoint := tc.SkillPoint + i;
-                SendCSkillList(tc);
+                npc_add_statskill(tc,0,1);
                 Inc(tc.ScriptStep);
             end;
         69: // addstatpoints
             begin
                 i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
-                tc.StatusPoint := tc.StatusPoint + i;
-                SendCStat(tc);
+                npc_add_statskill(tc,i,0);
                 Inc(tc.ScriptStep);
             end;
         70: // emotion <emotion #>;
@@ -1645,31 +1461,11 @@ begin
             end;
         72: //percentheal <percentheal HPpercent,SPpercent;>
             begin
-                Inc(tc.HP, tn.Script[tc.ScriptStep].Data3[0]);
                 //Healing
                 j := tc.MAXHP * tn.Script[tc.ScriptStep].Data3[0] div 100;
-                tc.HP := tc.HP + j;
-                if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
                 //SP Increasing
-                Inc(tc.SP, tn.Script[tc.ScriptStep].Data3[1]);
                 i := tc.MAXSP * tn.Script[tc.ScriptStep].Data3[1] div 100;
-                tc.SP := tc.SP + i;
-                if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-                WFIFOW( 0, $011a);
-                WFIFOW( 2, 28);
-                WFIFOW( 4, j);
-                WFIFOL( 6, tc.ID);
-                WFIFOL(10, tn.ID);
-                WFIFOB(14, 1);
-                SendBCmd(tc.MData, tn.Point, 15);
-					{old sp packets
-					WFIFOW( 0, $013d);
-					WFIFOW( 2, $0007);
-					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
-					tc.Socket.SendBuf(buf, 6);
-					}
-                SendCStat1(tc, 0, 5, tc.HP);
-                SendCStat1(tc, 0, 7, tc.SP);
+                npc_heal(tn,tc,j,i,j);
                 Inc(tc.ScriptStep);
             end;
         73: //percentdamage <percentdamage hp,sp;>
@@ -1680,13 +1476,7 @@ begin
                 else tc.HP := 0; //Safe
                 //Check if it will kill the character
                 if (tc.HP = 0) then begin
-                    tc.HP := 0;
-                    tc.Sit := 1;
-                    SendCStat1(tc, 0, 5, tc.HP);
-                    WFIFOW(0, $0080);
-                    WFIFOL(2, tc.ID);
-                    WFIFOB(6, 1);
-                    tc.Socket.SendBuf(buf, 7);
+                    npc_die(tc);
                 end else begin
                     //Damage Packet Process
                     WFIFOW( 0, $008a);
@@ -1722,7 +1512,7 @@ begin
                 end;
                 Inc(tc.ScriptStep);
             end;
-        75: //inputstr (not working)
+        75: //inputstr
 				begin
 					if MsgStr = '' then begin
 						WFIFOW( 0, $01d4);
@@ -1735,7 +1525,6 @@ begin
 						end else begin
 							ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := MsgStr;
 						end;
-
 						Inc(tc.ScriptStep);
 					end;
 				end;
@@ -1753,12 +1542,8 @@ begin
                         if (tc1.Point.X >= i) and
                         (tc1.Point.X <= k) and
                         (tc1.Point.Y >= j) and
-                        (tc1.Point.Y <= l) then begin
-                            SendCLeave(tc1, 2);
-                            tc1.tmpMap := tn.Script[tc.ScriptStep].Data1[1];
-                            tc1.Point := Point(tn.Script[tc.ScriptStep].Data3[4],tn.Script[tc.ScriptStep].Data3[5]);
-                            MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-                        end;
+                        (tc1.Point.Y <= l) then
+                            npc_warp(tc1,tn.Script[tc.ScriptStep].Data1[1],tn.Script[tc.ScriptStep].Data3[4],tn.Script[tc.ScriptStep].Data3[5]);
                     end;
                 end;
                 Inc(tc.ScriptStep);
@@ -1915,8 +1700,6 @@ begin
             end;
         81: //remotenpctimer
             begin
-                i := tn.Script[tc.ScriptStep].Data3[0];
-                j := -1;
                 for k := 0 to tm.NPC.Count - 1 do begin
                     tn1 := tm.NPC.Objects[k] as TNPC;
                     if (tn1.Name = tn.Script[tc.ScriptStep].Data1[0]) then begin
@@ -1924,78 +1707,14 @@ begin
                         break;
                     end;
                 end;
-                j := tm.TimerAct.IndexOf(tn1.ID);
-                if (i = 0) then begin
-                    //OFF
-                    if (j <> -1) then begin
-                        if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Remote NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
-                        tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
-                    end;
-                end else if (i = 1) then begin
-                    //ON
-                    if (j = -1) then begin
-                        j := tm.TimerDef.IndexOf(tn1.ID);
-                        if (j <> -1) then begin
-                            tr := tm.TimerDef.Objects[j] as NTimer;
-                            tr.Tick := timeGetTime();
-                            for k := 0 to tr.Cnt - 1 do begin
-                                tr.Done[k] := 0;
-                            end;
-                            tm.TimerAct.AddObject(tn1.ID, tr);
-                            if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Remote NPC Timer(%d) was started / Starting Timer(%d)', [tn1.ID,tm.TimerAct.Count]));
-                        end;
-                    end else begin
-                        //Restart
-                        tr := tm.TimerAct.Objects[j] as NTimer;
-                        tr.Tick := timeGetTime();
-                        for k := 0 to tr.Cnt - 1 do tr.Done[k] := 0;
-                        if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Remote NPC Timer(%d) was re-started / Starting Timer(%d)', [tn1.ID,tm.TimerAct.Count]));
-                    end;
-                end;
+                if j = 0 then
+                    npc_timer(tm,tn1,StrToBool(IntToStr(tn.Script[tc.ScriptStep].Data3[0])));
                 Inc(tc.ScriptStep);
             end;
         82: //areabroadcast
             begin
                 l := tn.Script[tc.ScriptStep].Data3[4];
                 str := tn.Script[tc.ScriptStep].Data1[1] + chr(0);
-                i := AnsiPos('$[', str);
-                while i <> 0 do begin
-                    j := AnsiPos(']', Copy(str, i + 2, 256));
-                    if j <= 1 then break;
-                    //grabbing variables
-                    if (Copy(str, i + 2, 1) = '$') then
-                        str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
-                    else if (Copy(str, i + 2, 2) = '\$') then
-                        str := Copy(str, 1, i - 1) + ServerFlag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
-                    else begin
-                        k := ConvFlagValue(tc, Copy(str, i + 2, j - 1), true);
-                        if k <> -1 then str := Copy(str, 1, i - 1) + IntToStr(k) + Copy(str, i + j + 2, 256)
-                        else str := Copy(str, 1, i - 1) + Copy(str, i + j + 2, 256);
-                    end;
-                    i := AnsiPos('$[', str);
-                end;
-                //predetermined variable string replacement
-                str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
-                str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
-                str := StringReplace(str, '$guildname', GetGuildName(tn), [rfReplaceAll]);
-                str := StringReplace(str, '$guildmaster', GetGuildMName(tn), [rfReplaceAll]);
-                str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
-                str := StringReplace(str, '$$', '$', [rfReplaceAll]);
-                str := StringReplace(str, '\\', '\', [rfReplaceAll]);
-                //option tags
-                if l = 0 then str := tn.Name + ' : ' + str; // Null (0): displays npc name with it
-                if l = 100 then str := 'blue' + str;        //  Blue String Broadcast
-                if l = 20 then str := tc.Name + ' : ' + str; // displays characters name with it
-                if l = 30 then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
-                if l = 40 then str := 'blue' + tn.Name + ' : ' +str; //displays npc name and in blue
-                w := Length(str) + 4;
-                WFIFOW(0, $009a);
-                WFIFOW(2, w);
-                WFIFOS(4, str, w - 4);
-                //Broadcast on map
                 tm := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
                 for i := 0 to tm.CList.Count - 1 do begin
                     tc1 := tm.CList.Objects[i] as TChara;
@@ -2006,6 +1725,7 @@ begin
                             if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
                     end;
                 end;
+                broadcast_handle(tc,tc1,str,true,l,tn);
                 Inc(tc.ScriptStep);
             end;
         83: //waitingroomcount
@@ -2059,5 +1779,149 @@ end;
 {==============================================================================}
 {End of NPC Script Commands}
 {==============================================================================}
+
+procedure npc_heal(tn:TNPC; tc:TChara; HP,SP,HPdis : integer);
+begin
+    if (tc.HP + HP) > tc.MAXHP then tc.HP := tc.MAXHP
+    else tc.HP := tc.HP + HP;
+    if (tc.SP + SP) > tc.MAXSP then tc.SP := tc.MAXSP
+    else tc.SP := tc.SP + SP;
+    WFIFOW( 0, $011a);
+    WFIFOW( 2, 28);
+    WFIFOW( 4, HPDis);
+    WFIFOL( 6, tc.ID);
+    WFIFOL(10, tn.ID);
+    WFIFOB(14, 1);
+    SendBCmd(tc.MData, tn.Point, 15);
+    { commented out SP heal packets?
+    WFIFOW( 0, $013d);
+    WFIFOW( 2, $0007);
+    WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
+    tc.Socket.SendBuf(buf, 6);
+    }
+    SendCStat1(tc, 0, 5, tc.HP);
+    SendCStat1(tc, 0, 7, tc.SP);
+end;
+
+procedure npc_die(tc :TChara);
+begin
+    CalcStat(tc);
+    tc.HP := 0;
+    tc.Sit := 1;
+    SendCStat1(tc, 0, 5, tc.HP);
+    WFIFOW(0, $0080);
+    WFIFOL(2, tc.ID);
+    WFIFOB(6, 1);
+    tc.Socket.SendBuf(buf, 7);
+end;
+
+procedure npc_jobchange(tm:TMap; tc :TChara; job:integer);
+var
+    i :integer;
+begin
+    //Unequipping items for jobchange
+    for i := 1 to 100 do begin
+        if tc.Item[i].Equip = 32768 then begin
+            tc.Item[i].Equip := 0;
+            WFIFOW(0, $013c);
+            WFIFOW(2, 0);
+            tc.Socket.SendBuf(buf, 4);
+        end else if tc.Item[i].Equip <> 0 then begin
+            reset_skill_effects(tc);
+            WFIFOW(0, $00ac);
+            WFIFOW(2, i);
+            WFIFOW(4, tc.Item[i].Equip);
+            tc.Item[i].Equip := 0;
+            WFIFOB(6, 1);
+            tc.Socket.SendBuf(buf, 7);
+            remove_equipcard_skills(tc, i);
+        end;
+    end;
+    //Taking off options
+    if (tc.Option <> 0) then begin
+        tc.Option := 0;
+        {UpdateOption(tm, tc);}
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, 0);
+        WFIFOW(8, 0);
+        WFIFOW(10, tc.Option);
+        WFIFOB(12, 0);
+        SendBCmd(tc.MData, tc.Point, 13);
+    end;
+    // Colus, 20040304: Adding job offset for upper classes
+    {if (j > LOWER_JOB_END) then begin
+    j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+    tc.ClothesColor := 1; // Use 'default' upper job clothes color
+    end else tc.ClothesColor := 0; // Default color for regular jobs}
+
+    if (job > LOWER_JOB_END) then begin
+        job := job - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+        if (DisableAdv2ndDye) and (job > 4007) then tc.ClothesColor := 0
+        else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+    end else tc.ClothesColor := 0;
+
+    tc.JID := job;
+    tc.JobEXP := 0;
+    tc.JobLV := 1;
+    SendCStat1(tc, 0, $0037, tc.JobLV);
+    CalcStat(tc);
+    tc.SkillPoint := 0;
+    CalcStat(tc);
+    SendCStat(tc, true);
+    SendCSkillList(tc);
+    // Colus, 20040304: New view packet for jobchange
+    UpdateLook(tc.MData, tc, 0, tc.JID);
+    UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+end;
+
+procedure npc_timer(tm:TMap; tn:TNPC; OnOff : boolean);
+var
+    j,k : integer;
+    Timer : NTimer;
+begin
+    j := tm.TimerAct.IndexOf(tn.ID);
+    if not OnOff then begin
+    //OFF
+        if (j <> -1) then begin
+            if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
+            tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn.ID));
+        end;
+    end else if OnOff then begin
+        //ON
+        if (j = -1) then begin
+            j := tm.TimerDef.IndexOf(tn.ID);
+            if (j <> -1) then begin
+                Timer := tm.TimerDef.Objects[j] as NTimer;
+                Timer.Tick := timeGetTime();
+                for k := 0 to Timer.Cnt - 1 do Timer.Done[k] := 0;
+                tm.TimerAct.AddObject(tn.ID, Timer);
+                if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
+            end;
+        end else begin
+            //Restart
+            Timer := tm.TimerAct.Objects[j] as NTimer;
+            Timer.Tick := timeGetTime();
+            for k := 0 to Timer.Cnt - 1 do Timer.Done[k] := 0;
+            if ShowDebugErrors then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
+        end;
+    end;
+end;
+
+procedure npc_add_statskill(tc :TChara; stat,skill :integer);
+begin
+    tc.SkillPoint := tc.SkillPoint + skill;
+    tc.StatusPoint := tc.StatusPoint + stat;
+    SendCSkillList(tc);
+    SendCStat(tc);
+end;
+
+procedure npc_warp(tc :TChara; destination :string; x,y :integer);
+begin
+    SendCLeave(tc, 2);
+    tc.tmpMap := destination;
+    tc.Point := Point(x,y);
+    MapMove(tc.Socket, tc.tmpMap, tc.Point);
+end;
 
 end.
