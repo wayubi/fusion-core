@@ -335,77 +335,101 @@ begin
 		rh := aa[1];
 		PopHeap(aa, n);
 
-    // AlexKreuz new searchpath logic -> Less Calculations = Better performance.
-    if (x2 > x1) then begin
-      if (y2 > y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  0, 6, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  1, 7, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0,  1, 0, 10);
-      end else if (y2 < y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10);
-        if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1, -1, 5, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  0, 6, 10);
-      end else if (y2 = y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1, -1, 5, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  0, 6, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  1, 7, 14);
-      end;
-    end else if (x2 < x1) then begin
-      if (y2 > y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0,  1, 0, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  1, 1, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  0, 2, 10);
-      end else if (y2 < y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  0, 2, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10);
-      end else if (y2 = y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  1, 1, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y  ) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  0, 2, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
-      end;
-    end else if (x2 = x1) then begin
-      if (y2 > y1) then begin
-    		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  1, 7, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0,  1, 0, 10);
-    		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y+1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1,  1, 1, 14);
-      end else if (y2 < y1) then begin
-        if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y-1) then
-          AddPath2(aa, n, rh, x1, y1, x2, y2,  1, -1, 5, 14);
-        if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
-    		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y-1) then
-    			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10);
-      end;
-    end;
-    // AlexKreuz new searchpath logic -> Less Calculations = Better performance.
+        // AlexKreuz SearchPath v.2.0
+        if (x2 > rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x, rh.y-1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end;
+            end else if (y2 = rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x+1, rh.y-1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end;
+            end;
+        end else if (x2 < rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x-1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y) or CanMove (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end;
+            end else if (y2 = rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x-1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end;
+            end;
+        end else if (x2 = rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanMove (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end else if CanMove (tm, rh.x, rh.y, rh.x-1, rh.y) or CanMove (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end;
+            end;
+        end;
+        // AlexKreuz SearchPath v.2.0
 
-    // Old Search Path calculations.
-		{if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y-1) then
-			AddPath2(aa, n, rh, x1, y1, x2, y2,  1, -1, 5, 14);
-		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
+        // Old Search Path calculations.
+		{if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
 			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  0, 6, 10);
+		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y-1) then
+			AddPath2(aa, n, rh, x1, y1, x2, y2,  1, -1, 5, 14);
 		if CanMove(tm, rh.x, rh.y, rh.x+1, rh.y+1) then
 			AddPath2(aa, n, rh, x1, y1, x2, y2,  1,  1, 7, 14);
 		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y+1) then
@@ -417,7 +441,8 @@ begin
 		if CanMove(tm, rh.x, rh.y, rh.x-1, rh.y-1) then
 			AddPath2(aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
 		if CanMove(tm, rh.x, rh.y, rh.x  , rh.y-1) then
-			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10);}
+			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10); }
+        // Old Search Path calculations.
 
 	end;
 	if n = 0 then begin

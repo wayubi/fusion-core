@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-17-04: SearchPath Algorithm v2.0 - 37%-87% performance increase over original. [AlexKreuz]
 - 01-16-04: Fixed weapon requirements/error displays for some skills [Colus]
 - 01-16-04: Updated error return values [Colus]
 - 01-16-04: New SendSkillError function (supercedes SendItemError) [Colus]
