@@ -1686,7 +1686,7 @@ begin
 		end;
 		MATKFix := MATKFix + td.MATK; //杖用
 		DEF1 := DEF1 + td.DEF;
-		MDEF1 := td.MDEF;
+		MDEF1 := MDEF1 + td.MDEF;
 		HIT := HIT + td.HIT; //命中
 		FLEE1 := FLEE1 + td.FLEE; //回避
 		Critical := Critical + td.Crit; //クリティカル
