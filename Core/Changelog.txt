@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-14-04: Modified @who, @who2 and @who3 to accept matchtext and show GM levels. [Trihan]
 - 10-14-04: Retabbed script.pas & added NPC command 'gstore' (guild storage). [Tsusai]
 - 10-13-04: Fixed index out of bounds errors with @kickall, @raise, @raisemap, @doom. [Trihan]
 - 10-13-04: Fixed an error in #autoloot that made it activate #auto instead. [Trihan]

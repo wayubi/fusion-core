@@ -10,7 +10,7 @@ uses
     {Kylix/Delphi CLX}
         {Need to finx CLX equiv of MMSystem (timeGetTime)}
     {Shared}
-    IniFiles, Classes, SysUtils,
+    IniFiles, Classes, SysUtils, StrUtils,
     {Fusion}
     Common, List32, Globals, PlayerData, WeissINI, ISCS;
 
@@ -3432,84 +3432,157 @@ Called when we're shutting down the server *only*
     function command_athena_who3(tc : Tchara; str : String) : String;
     var
         tc1 : TChara;
-        i, w : Integer;
+        tp : TPlayer;
+        i, w, matches : Integer;
+        s, party, guild : String;
     begin
-        Result := 'GM_ATHENA_WHO3 Success.';
+        Result := 'GM_ATHENA_WHO3 Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 6, 256);
+        s := Trim(s);
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
-            if tc1.Login = 2 then begin
-                str := 'Name: ' + tc1.Name + ' -- Party: ' + tc1.PartyName + ' -- Guild: ' + tc1.GuildName;
-                w := Length(str) + 4;
-                WFIFOW (0, $009a);
-                WFIFOW (2, w);
-                WFIFOS (4, str, w - 4);
-                tc.socket.sendbuf(buf, w);
+            if LeftStr(Uppercase(tc1.name),Length(s)) = Uppercase(s) then begin
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tc1.PartyName = '' then party := chr(39) + 'None' + chr(39) else party := tc1.PartyName;
+                    if tc1.GuildName = '' then guild := chr(39) + 'None' + chr(39) else guild := tc1.GuildName;
+                    if tp.AccessLevel > 0 then begin
+                        str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | Party: ' + party + ' | Guild: ' + guild;
+                    end else begin
+                        str := 'Name: ' + tc1.Name + ' | Party: ' + party + ' | Guild: ' + guild;
+                    end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
             end;
+        end;
+        if matches = 0 then str := 'No player found.' else if matches > 1 then str := IntToStr(matches) + ' players found.' else str := IntToStr(matches) + ' player found.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHO3 Success.';
         end;
     end;
 
     function command_athena_who2(tc : TChara; str : String) : String;
     var
         tc1 : TChara;
-        i, w : Integer;
+        tp : TPlayer;
+        i, w, matches : Integer;
+        s, job : String;
     begin
-        Result := 'GM_ATHENA_WHO2 Success.';
+        Result := 'GM_ATHENA_WHO2 Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 6, 256);
+        s := Trim(s);
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
-            if tc1.Login = 2 then begin
+            if LeftStr(Uppercase(tc1.name),Length(s)) = Uppercase(s) then begin
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tc1.JID = 0 then job :='Novice' else
+                    if tc1.JID = 1 then job :='Swordsman' else
+                    if tc1.JID = 2 then job :='Mage' else
+                    if tc1.JID = 3 then job :='Archer' else
+                    if tc1.JID = 4 then job :='Acolyte' else
+                    if tc1.JID = 5 then job :='Merchant' else
+                    if tc1.JID = 6 then job :='Thief' else
+                    if tc1.JID = 7 then job :='Knight' else
+                    if tc1.JID = 8 then job :='Priest' else
+                    if tc1.JID = 9 then job :='Wizard' else
+                    if tc1.JID = 10 then job :='Blacksmith' else
+                    if tc1.JID = 11 then job :='Hunter' else
+                    if tc1.JID = 12 then job :='Assassin' else
+                    if tc1.JID = 13 then job :='Knight 2' else
+                    if tc1.JID = 14 then job :='Crusader' else
+                    if tc1.JID = 15 then job :='Monk' else
+                    if tc1.JID = 16 then job :='Sage' else
+                    if tc1.JID = 17 then job :='Rogue' else
+                    if tc1.JID = 18 then job :='Alchemist' else
+                    if tc1.JID = 19 then job :='Bard' else
+                    if tc1.JID = 20 then job :='Dancer' else
+                    if tc1.JID = 21 then job :='Crusader 2' else
+                    if tc1.JID = 22 then job :='Wedding' else
+                    if tc1.JID = 23 then job :='Super Novice' else
+                    job := 'Unknown Class';
 
-                if tc1.JID = 0 then str :='Novice' else
-                if tc1.JID = 1 then str :='Swordsman' else
-                if tc1.JID = 2 then str :='Mage' else
-                if tc1.JID = 3 then str :='Archer' else
-                if tc1.JID = 4 then str :='Acolyte' else
-                if tc1.JID = 5 then str :='Merchant' else
-                if tc1.JID = 6 then str :='Thief' else
-                if tc1.JID = 7 then str :='Knight' else
-                if tc1.JID = 8 then str :='Priest' else
-                if tc1.JID = 9 then str :='Wizard' else
-                if tc1.JID = 10 then str :='Blacksmith' else
-                if tc1.JID = 11 then str :='Hunter' else
-                if tc1.JID = 12 then str :='Assassin' else
-                if tc1.JID = 13 then str :='Knight 2' else
-                if tc1.JID = 14 then str :='Crusader' else
-                if tc1.JID = 15 then str :='Monk' else
-                if tc1.JID = 16 then str :='Sage' else
-                if tc1.JID = 17 then str :='Rogue' else
-                if tc1.JID = 18 then str :='Alchemist' else
-                if tc1.JID = 19 then str :='Bard' else
-                if tc1.JID = 20 then str :='Dancer' else
-                if tc1.JID = 21 then str :='Crusader 2' else
-                if tc1.JID = 22 then str :='Wedding' else
-                if tc1.JID = 23 then str :='Super Novice' else
-                str := 'Unknown Class';
-
-                str := 'Name: ' + tc1.Name + ' -- Job: ' + str + ' -- Base Level:  ' + inttostr(tc1.baselv) + ' -- Job Level: ' + inttostr(tc1.joblv);
-                w := Length(str) + 4;
-                WFIFOW (0, $009a);
-                WFIFOW (2, w);
-                WFIFOS (4, str, w - 4);
-                tc.socket.sendbuf(buf, w);
+                    if tp.AccessLevel > 0 then begin
+                            str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                        end else begin
+                            str := 'Name: ' + tc1.Name + ') | BLvl: ' + IntToStr(tc.BaseLV) + ' | Job: ' + job + ' (Lvl: ' + IntToStr(tc.JobLV) + ')';
+                        end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
             end;
+        end;
+        if matches = 0 then str := 'No player found.' else if matches > 1 then str := IntToStr(matches) + ' players found.' else str := IntToStr(matches) + ' player found.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHO2 Success.';
         end;
     end;
 
     function command_athena_who(tc : Tchara; str : String) : String;
     var
         tc1 : TChara;
-        i, w : Integer;
+        tp : TPlayer;
+        i, w, matches : Integer;
+        s : String;
     begin
-        Result := 'GM_ATHENA_WHO Success.';
+        Result := 'GM_ATHENA_WHO Failure.';
+
+        matches := 0;
+
+        s := Copy(str, 5, 256);
+        s := Trim(s);
         for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
-            if tc1.Login = 2 then begin
-                str := 'Name: ' + tc1.Name + ' -- Location: ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
-                w := Length(str) + 4;
-                WFIFOW (0, $009a);
-                WFIFOW (2, w);
-                WFIFOS (4, str, w - 4);
-                tc.socket.sendbuf(buf, w);
+            if LeftStr(Uppercase(tc1.name),Length(s)) = Uppercase(s) then begin
+                if tc1.Login = 2 then begin
+                    matches := matches + 1;
+                    tp := tc1.PData;
+                    if tp.AccessLevel > 0 then begin
+                        str := 'Name: ' + tc1.Name + ' (GM: ' + IntToStr(tp.AccessLevel) + ') | Location: ' + tc1.map + '.gat ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                    end else begin
+                        str := 'Name: ' + tc1.Name + ' | Location: ' + tc1.map + '.gat ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                    end;
+                    w := Length(str) + 4;
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, str, w - 4);
+                    tc.socket.sendbuf(buf, w);
+                end;
             end;
+        end;
+        if matches = 0 then str := 'No player found.' else if matches > 1 then str := IntToStr(matches) + ' players found.' else str := IntToStr(matches) + ' player found.';
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+        if matches > 0 then begin
+            Result := 'GM_ATHENA_WHO Success.';
         end;
     end;
 
