@@ -122,6 +122,9 @@ uses
         for i := 2 to datafile.Count - 1 do begin
             columns.DelimitedText := datafile[i];
 
+            datafile[i] := StringReplace(datafile[i], ' ', '', [rfReplaceAll, rfIgnoreCase]);
+            if datafile[i] = '' then Continue;
+
             if ItemDB.IndexOf(reed_convert_type(columns.Strings[0], 0, i, path)) = -1 then Continue;
 
             inventory_item[i-2].ID := reed_convert_type(columns.Strings[0], 0, i, path);
