@@ -1851,9 +1851,6 @@ end;
                                                         if (td.ID = 656) then SendItemSkill(tc, 291, 2);
                                                         if (td.ID = 657) then SendItemSkill(tc, 291, 3);
 
-
-
-
 							if tc.Item[w].Amount > 0 then begin
                                                                 if td.ID = 607 then begin  {Yggasberry}
                                                                         tc.HP := tc.MAXHP;
@@ -1868,6 +1865,13 @@ end;
                                                                         SendCStat1(tc, 0, 5, tc.HP);
                                                                         SendCStat1(tc, 0, 7, tc.SP);
                                                                 end;
+
+                                                                if td.Effect = 1 then begin
+                                                                        tc.isPoisoned := False;
+                                                                        tc.PoisonTick := timeGetTime();
+                                                                        PoisonCharacter(tm, tc, timeGetTime);
+                                                                end;
+
 								if td.HP2 <> 0 then begin
                                                                         if tc.Skill[227].Lv <> 0 then begin
                                                                                 tc.HP := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[227].Data.Data1[tc.Skill[228].Lv] div 100;  //Learning Potion

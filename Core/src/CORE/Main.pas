@@ -7389,10 +7389,13 @@ begin
 					begin
 						ProcessType := 3;
 					end;
-				35: //ÉLÉÖÉAÅ|
+				35:     {Cure}
 					begin
-						tc1.Stat2 := tc1.Stat2 and (not $1C);
-						ProcessType := 0;
+						//tc1.Stat2 := tc1.Stat2 and (not $1C);
+                                                tc1.isPoisoned := False;
+                                                tc1.PoisonTick := Tick;
+                                                PoisonCharacter(tm, tc1, Tick);
+						//ProcessType := 0;
 					end;
         40:
           begin
@@ -9915,6 +9918,7 @@ begin
                 if (tc.isPoisoned = true) then begin
                         if tc.PoisonTick < Tick then begin
                                 tc.isPoisoned := False;
+                                tc.PoisonTick := Tick;
                                 PoisonCharacter(tm, tc, Tick);
                         end;
                 end;
@@ -9923,9 +9927,10 @@ begin
 
       {Colus, 20031223: Added check for Ashura recovery period.}
 			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
-				if (HP <> MAXHP)  and (tc.isPoisoned = False) then begin
+				if (HP <> MAXHP) then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
-						Inc(HP);
+                                                if tc.isPoisoned = True then Dec(HP)
+                                                else Inc(HP);
 						HPTick := HPTick + HPDelay[3 - Sit];
 					end;
 					if HP > MAXHP then HP := MAXHP;
@@ -9933,7 +9938,7 @@ begin
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, HP);
 					Socket.SendBuf(buf, 8);
-                                end else if (tc.isPoisoned = True) then begin
+                                {end else if (tc.isPoisoned = True) then begin
                                         for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
 						Dec(HP);
 						HPTick := HPTick + HPDelay[3 - Sit];
@@ -9942,7 +9947,7 @@ begin
 					WFIFOW( 0, $00b0);
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, HP);
-					Socket.SendBuf(buf, 8);
+					Socket.SendBuf(buf, 8);}
 				end else begin
 					HPTick := Tick;
 				end;

@@ -2610,6 +2610,7 @@ end;}
 //------------------------------------------------------------------------------
 procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);
 begin
+        tm := tc.MData;
         if tc.PoisonTick > Tick then begin
                 WFIFOW(0, $0119);
                 WFIFOL(2, tc.ID);
