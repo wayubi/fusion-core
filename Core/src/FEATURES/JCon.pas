@@ -319,7 +319,7 @@ uses
     var
 		i : Integer;
 	begin
-        WAN_IP := PChar(frmMain.Edit17.Text);
+        WAN_IP := frmMain.Edit17.Text;
 		WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
 		ServerName := frmMain.Edit18.Text;
     	DefaultNPCID := StrToInt(frmMain.Edit19.Text);
