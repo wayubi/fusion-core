@@ -11,7 +11,7 @@ uses
 //==============================================================================
 // 过程&函数
     function  HexToInt(Hex : string) : Cardinal; 
-    function  ExecuteSqlCmd(sqlcmd: String) : Boolean;
+    function  ExecuteSqlCmd(SQLDataSet: TSQLDataSet; sqlcmd: String) : TSQLDataSet;
 		procedure SQLDataLoad();
 		procedure SQLDataSave();
 		function  GetPlayerData(userid: String) : Boolean; {取得帐号资料}
@@ -35,7 +35,6 @@ uses
 implementation
 
 var
-  SQLDataSet    :TSQLDataSet;
   SQLConnection :TSQLConnection;
 
 //------------------------------------------------------------------------------
@@ -60,9 +59,9 @@ end;
 //------------------------------------------------------------------------------
 // 执行数据库查询
 //------------------------------------------------------------------------------
-function  ExecuteSqlCmd(sqlcmd: String) : Boolean;
+function  ExecuteSqlCmd(SQLDataSet: TSQLDataSet; sqlcmd: String) : TSQLDataSet;
 begin
-  Result := False;
+  Result := nil;
 
   {初始化数据库}
 	if not assigned(SQLConnection) then
@@ -92,11 +91,11 @@ begin
 		end;
 	end;
 
-  if not assigned(SQLDataSet) then
-	begin
+//  if not assigned(SQLDataSet) then
+//	begin
 	  SQLDataSet := TSQLDataSet.Create(nil);
     SQLDataSet.SQLConnection := SQLConnection;
-	end;
+//	end;
 
   if SQLDataSet.Active then
     SQLConnection.Close;
@@ -110,7 +109,7 @@ begin
 		  DebugOut.Lines.Add( Format( '*** Execute SQL Error: %s', [sqlcmd] ) );
 			exit;
 		end;
-		Result := True;
+		Result := SQLDataSet;
 		Exit;
   end;
 	try
@@ -119,8 +118,8 @@ begin
 		DebugOut.Lines.Add( Format( '*** Open SQL Data Error: %s', [sqlcmd] ) );
 		exit;
 	end;
-	DebugOut.Lines.Add(sqlcmd);
-	Result := True;
+//	DebugOut.Lines.Add(sqlcmd);
+	Result := SQLDataSet;
 end;
 
 //------------------------------------------------------------------------------
@@ -138,10 +137,12 @@ var
 	tgl :TGRel;
 	txt :TextFile;
 	str :string;
+	SQLDataSet : TSQLDataSet;
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
+	SQLDataSet := nil;
 
 	if not FileExists(AppPath + 'status.txt') then begin
 		AssignFile(txt, AppPath + 'status.txt');
@@ -169,7 +170,8 @@ begin
 	DebugOut.Lines.Add('Castle data loading from SQL...');
 	Application.ProcessMessages;
 
-	if ExecuteSqlCmd('SELECT * FROM gcastle') then
+  SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT * FROM gcastle');
+	if (SQLDataSet <> nil) then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -208,7 +210,8 @@ begin
 	DebugOut.Lines.Add('Party data loading from SQL...');
 	Application.ProcessMessages;
 
-	if ExecuteSqlCmd('SELECT * FROM party') then
+  SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT * FROM party');
+	if SQLDataSet <> nil then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -247,7 +250,8 @@ begin
 	DebugOut.Lines.Add('Guild data loading from SQL...');
 	Application.ProcessMessages;
 
-  if ExecuteSqlCmd('SELECT * FROM guildinfo') then
+  SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT * FROM guildinfo');
+	if (SQLDataSet <> nil) then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -306,7 +310,8 @@ begin
 		with tg do
 		begin
 		  {读取工会成员资料}
-		  if ExecuteSqlCmd(Format('SELECT * FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [ID])) then
+		  SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT * FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [ID]));
+			if SQLDataSet <> nil then
 			begin
 			  j := 0;
 			  while not SQLDataSet.Eof do
@@ -324,7 +329,8 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会称号资料}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [ID])) then
+			SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format( 'SELECT * FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [ID]));
+			if SQLDataSet <> nil then
 			begin
 			  j := 0;
 				while not SQLDataSet.Eof do
@@ -341,7 +347,8 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会开除成员记录}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildBanishInfo WHERE GDID=''%d''', [ID])) then
+			SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT * FROM guildBanishInfo WHERE GDID=''%d''', [ID]));
+			if SQLDataSet <> nil then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -357,7 +364,8 @@ begin
 			Application.ProcessMessages;
 
 			{读取同盟、敌对工会}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildAllyInfo WHERE GDID=''%d''', [ID])) then
+			SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT * FROM guildAllyInfo WHERE GDID=''%d''', [ID]));
+			if SQLDataSet <> nil then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -405,10 +413,21 @@ var
 	sl  :TStringList;
 	txt :TextFile;
 	cnt :integer;
+	SQLDataSet : TSQLDataSet;
+//  sr	:TSearchRec;
 begin
+{  if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
+    repeat
+      DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
+    until FindNext(sr) <> 0;
+    FindClose(sr);
+  end;
+}
+  //rmDir(AppPath+'map\tmpFiles');
 	sl := TStringList.Create;
 	sl.QuoteChar := '''';
 	sl.Delimiter := ',';
+	SQLDataSet := nil;
   {保存帐号和仓库资料}
   if PlayerName.Count <> 0 then
   begin
@@ -418,7 +437,7 @@ begin
       tp := PlayerName.Objects[i] as TPlayer;
       with tp do
       begin
-			  if not ExecuteSqlCmd(Format('REPLACE INTO login (AID,ID,passwd,Gender,Mail,GMMode) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, Name, Pass, Gender, Mail, GMMode])) then begin
+			  if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO login (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, Name, Pass, Gender, Mail, Banned])) = nil then begin
           DebugOut.Lines.Add('*** Save Player Account data error.');
 				end;
 
@@ -436,7 +455,7 @@ begin
 					  bindata := bindata + IntToHex(Kafra.Item[j].Card[3],4);
 					end;
 				end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO storeitem (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) then begin
+		    if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO storeitem (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Player Kafra data error.');
 				end;
       end;
@@ -499,7 +518,7 @@ begin
 				bindata := 'GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
 				bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID';
 
-		    if not ExecuteSqlCmd(Format('REPLACE INTO Characters (%s) VALUES (%s)', [bindata, sl.DelimitedText])) then begin
+		    if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO Characters (%s) VALUES (%s)', [bindata, sl.DelimitedText])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Character data error.');
 				end;
 
@@ -511,7 +530,7 @@ begin
 					  bindata := bindata + IntToHex(Skill[j].Lv, 4);
 				  end;
 			  end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO skills (GID,skillInfo) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		    if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO skills (GID,skillInfo) VALUES (''%d'',''%s'')', [CID, bindata])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Character Skill data error.');
 				end;
 
@@ -531,7 +550,7 @@ begin
 					  bindata := bindata + IntToHex(Item[j].Card[3], 4);
 				  end;
 			  end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO item (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		    if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO item (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Character Item data error.');
 				end;
 
@@ -551,12 +570,12 @@ begin
 					  bindata := bindata + IntToHex(Cart.Item[j].Card[3], 4);
 		  		end;
 		  	end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO cartItem (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+		    if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO cartItem (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Character CartItem data error.');
 				end;
 
 				{保存人物MEMO记录点资料}
-				if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, MemoMap[0], MemoPoint[0].X, MemoPoint[0].Y, MemoMap[1], MemoPoint[1].X, MemoPoint[1].Y, MemoMap[2], MemoPoint[2].X, MemoPoint[2].Y])) then begin
+				if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, MemoMap[0], MemoPoint[0].X, MemoPoint[0].Y, MemoMap[1], MemoPoint[1].X, MemoPoint[1].Y, MemoMap[2], MemoPoint[2].X, MemoPoint[2].Y])) = nil then begin
 				  DebugOut.Lines.Add('*** Save Character CartItem data error.');
 				end;
 			end;
@@ -608,7 +627,7 @@ begin
         for j := 0 to 7 do begin
           sl.Add(IntToStr(GuardStatus[j]));
         end;
-				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [sl.DelimitedText])) then
+				if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [sl.DelimitedText])) = nil then
 				begin
 				  DebugOut.Lines.Add('*** Save Castle data error.');
 				end;
@@ -634,7 +653,7 @@ begin
 			  for j := 0 to 11 do begin
 				  sl.Add(IntToStr(MemberID[j]));
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [sl.DelimitedText])) then
+			  if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [sl.DelimitedText])) = nil then
 				begin
 				  DebugOut.Lines.Add('*** Save Party data error.');
 				end;
@@ -662,7 +681,7 @@ begin
 					  bindata := bindata + IntToHex(GSkill[j].Lv, 4);
 				  end;
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO guildinfo (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, Name, LV, EXP, GSkillPoint, Notice[0], Notice[1], Agit, Emblem, present, DisposFV, DisposRW, bindata])) then
+			  if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO guildinfo (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, Name, LV, EXP, GSkillPoint, Notice[0], Notice[1], Agit, Emblem, present, DisposFV, DisposRW, bindata])) = nil then
 				begin
 				  DebugOut.Lines.Add('*** Save Guild data error.');
 				end;
@@ -671,7 +690,7 @@ begin
 			  for j := 0 to 35 do begin
 				  if MemberID[j] <> 0 then
 					begin
-					  if not ExecuteSqlCmd(Format('REPLACE INTO guildMinfo (GDID,GID,MemberExp,PositionID) VALUES (''%d'',''%d'',''%d'',''%d'')', [ID, MemberID[j], MemberEXP[j], MemberPos[j]])) then
+					  if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO guildMinfo (GDID,GID,MemberExp,PositionID) VALUES (''%d'',''%d'',''%d'',''%d'')', [ID, MemberID[j], MemberEXP[j], MemberPos[j]])) = nil then
 				    begin
 				      DebugOut.Lines.Add('*** Save Guild Member data error.');
 				    end;
@@ -740,8 +759,10 @@ function GetPlayerData(userid : String) : Boolean;
 var
   tp  :TPlayer;
 	i,j,k : Integer;
+	SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
 	if assigned(PlayerName) then
 	begin
@@ -754,7 +775,8 @@ begin
 
   DebugOut.Lines.Add(format('Load User Data From MySQL: %s', [userid]));
 
-  if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.GMMode,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE ID=''%s'' LIMIT 1', [userid])) then begin
+  SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE ID=''%s'' LIMIT 1', [userid]));
+	if SQLDataSet = nil then begin
     DebugOut.Lines.Add(format('Load User Data From MySQL Error: %s', [userid]));
 		Exit;
 	end;
@@ -770,7 +792,7 @@ begin
     Pass := SQLDataSet.FieldValues['passwd'];
     Gender := SQLDataSet.FieldValues['Gender'];
     Mail := SQLDataSet.FieldValues['Mail'];
-    GMMode := SQLDataSet.FieldValues['GMMode'];
+    Banned := SQLDataSet.FieldValues['Banned'];
 		ver2 := 9;
 
 		if SQLDataSet.FieldValues['storeitem'] <> '' then
@@ -822,12 +844,15 @@ var
 	ta : TMapList;
 	tp  :TPlayer;
 	tpa :TParty;
+	SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
 	DebugOut.Lines.Add(format('Load Character Data From MySQL: AccountID = %d', [AID]));
 
-	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM Characters AS C ' + format('LEFT JOIN warpInfo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN item AS I ON (I.GID=C.GID) LEFT JOIN cartItem AS T ON (T.GID=C.GID) WHERE C.AID=''%d''', [AID])) then
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM Characters AS C ' + format('LEFT JOIN warpInfo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN item AS I ON (I.GID=C.GID) LEFT JOIN cartItem AS T ON (T.GID=C.GID) WHERE C.AID=''%d''', [AID]));
+	if SQLDataSet <> nil then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -1016,7 +1041,6 @@ begin
 					end;
 				end;
 			end;
-
 			tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
 			tp.CName[tc.CharaNumber] := tc.Name;
 			tp.CData[tc.CharaNumber] := tc;
@@ -1052,38 +1076,41 @@ end;
 // 从数据库删除人物
 //------------------------------------------------------------------------------
 function DeleteChar(GID: cardinal) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
 	DebugOut.Lines.Add(format('Delete Character data from MySQL: %d', [GID]));
 
   {删除人物资料}
-	if not ExecuteSqlCmd(format('DELETE FROM Characters WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM Characters WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Character data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物技能资料}
-	if not ExecuteSqlCmd(format('DELETE FROM skills WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM skills WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Character skill data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物物品资料}
-	if not ExecuteSqlCmd(format('DELETE FROM item WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM item WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Character item data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物手推车资料}
-	if not ExecuteSqlCmd(format('DELETE FROM cartItem WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM cartItem WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Character cartItem data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物所在工会成员资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet,format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete guildMinfo data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物MEMO记录点资料}
-	if not ExecuteSqlCmd(format('DELETE FROM warpInfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM warpInfo WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete warpInfo data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
@@ -1095,10 +1122,14 @@ end;
 // 检查人物是否存在
 //------------------------------------------------------------------------------
 function  CheckUserExist(userid: String) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
-  if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [userid])) then begin
+  SQLDataSet := ExecuteSqlCmd(SQLDataSet, format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [userid]));
+	if SQLDataSet = nil then begin
     DebugOut.Lines.Add(format('Get character data from MySQL Error: %s', [userid]));
 		Exit;
 	end;
@@ -1117,12 +1148,15 @@ var
   tpe : TPet;
 	tp  : TPlayer;
 	tc  : TChara;
+	SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
 	DebugOut.Lines.Add(format('Load Character''s Pet Data From MySQL: PlayerID = %d', [AID]));
 
-	if ExecuteSqlCmd(Format('SELECT * FROM pet WHERE PlayerID=''%d''', [AID])) then begin
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT * FROM pet WHERE PlayerID=''%d''', [AID]));
+	if SQLDataSet <> nil then begin
 	  while not SQLDataSet.Eof do
     begin
       i := PetDB.IndexOf( StrToInt( SQLDataSet.FieldValues['JID'] ) );
@@ -1190,9 +1224,13 @@ end;
 // 取得当前的帐号ID编号
 //------------------------------------------------------------------------------
 function  GetNowLoginID() : cardinal;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := 100101;
-	if not ExecuteSqlCmd('SELECT AID FROM login ORDER BY AID DESC LIMIT 1') then begin
+	SQLDataSet := nil;
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT AID FROM login ORDER BY AID DESC LIMIT 1');
+	if SQLDataSet = nil then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1205,9 +1243,13 @@ end;
 // 取得当前的人物ID编号
 //------------------------------------------------------------------------------
 function  GetNowCharaID() : cardinal;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := 100001;
-	if not ExecuteSqlCmd('SELECT GID FROM Characters ORDER BY GID DESC LIMIT 1') then begin
+	SQLDataSet := nil;
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT GID FROM Characters ORDER BY GID DESC LIMIT 1');
+	if SQLDataSet = nil then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1220,9 +1262,13 @@ end;
 // 取得当前的宠物ID编号
 //------------------------------------------------------------------------------
 function  GetNowPetID() : cardinal;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := 1;
-	if not ExecuteSqlCmd('SELECT PID FROM pet ORDER BY PID DESC LIMIT 1') then begin
+	SQLDataSet := nil;
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, 'SELECT PID FROM pet ORDER BY PID DESC LIMIT 1');
+	if SQLDataSet = nil then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1240,8 +1286,10 @@ var
   CharaID   : cardinal;
 	Cart      : byte;
 	Incubated : byte;
+	SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
   case place of
 	  1: begin
@@ -1264,7 +1312,7 @@ begin
 	  end;
 	end;
 
-  if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [tpe.PetID, tpe.PlayerID, CharaID, Cart, PIndex, Incubated, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
+  if ExecuteSqlCmd(SQLDataSet, Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [tpe.PetID, tpe.PlayerID, CharaID, Cart, PIndex, Incubated, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) = nil then
   begin
     DebugOut.Lines.Add('*** Save Pet data error.');
 		Exit;
@@ -1277,12 +1325,15 @@ end;
 // 保存工会头衔资料
 //------------------------------------------------------------------------------
 function  SaveGuildMPosition(GDID: cardinal; PosName: string; PosInvite: boolean; PosPunish: boolean; PosEXP: byte; Grade: Integer) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
   {删除旧资料}
-	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
-  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, PosName, BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
+	ExecuteSqlCmd(SQLDataSet, Format('DELETE FROM guildMPosition WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
+  if ExecuteSqlCmd(SQLDataSet, Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, PosName, BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) = nil then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild Position data error.');
 	  Exit;
@@ -1299,10 +1350,13 @@ var
   j  : Integer;
   tc : TChara;
 	tg : TGuild;
+	SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 	
-	if not ExecuteSqlCmd(Format('SELECT GDID FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	SQLDataSet := ExecuteSqlCmd(SQLDataSet, Format('SELECT GDID FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID]));
+	if SQLDataSet = nil then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1338,17 +1392,20 @@ end;
 // 从数据库删除工会成员(mtype=1为退会，mtype=2为开除)
 //------------------------------------------------------------------------------
 function  DeleteGuildMember(GID: cardinal; mtype: Integer; tgb: TGBan; GDID: cardinal) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 	
 	if mtype = 2 then begin
-	  if not ExecuteSqlCmd(format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, tgb.Name, tgb.AccName, tgb.Reason])) then begin
+	  if ExecuteSqlCmd(SQLDataSet, format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, tgb.Name, tgb.AccName, tgb.Reason])) = nil then begin
       DebugOut.Lines.Add(format('INSERT guildBanishInfo data to MySQL Error: %d', [GID]));
 //		  Exit;
 	  end;
 	end;
 
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) = nil then begin
     DebugOut.Lines.Add(format('Delete guildMinfo data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
@@ -1360,10 +1417,13 @@ end;
 // 从数据库删除组队
 //------------------------------------------------------------------------------
 function  DeleteParty(Name: string) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 	
-	if not ExecuteSqlCmd(format('DELETE FROM party WHERE Name=''%s'' LIMIT 1', [Name])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM party WHERE Name=''%s'' LIMIT 1', [Name])) = nil then begin
     DebugOut.Lines.Add(format('Delete party data from MySQL Error: %s', [Name]));
 		Exit;
 	end;
@@ -1375,10 +1435,13 @@ end;
 // 保存同盟、敌对工会资料(mtype=1同盟，mtype=2敌对)
 //------------------------------------------------------------------------------
 function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
-  if not ExecuteSqlCmd(Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, GuildName, mtype])) then
+  if ExecuteSqlCmd(SQLDataSet, Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, GuildName, mtype])) = nil then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
 		exit;
@@ -1391,10 +1454,13 @@ end;
 // 删除同盟、敌对工会资料(mtype=1同盟，mtype=2敌对)
 //------------------------------------------------------------------------------
 function  DeleteGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 	
-	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, GuildName, mtype])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, GuildName, mtype])) = nil then begin
     DebugOut.Lines.Add(format('Delete guildAllyInfo data from MySQL Error: %s', [GuildName]));
 		Exit;
 	end;
@@ -1406,33 +1472,36 @@ end;
 // 删除工会资料
 //------------------------------------------------------------------------------
 function  DeleteGuildInfo(GDID: cardinal) : Boolean;
+var
+  SQLDataSet : TSQLDataSet;
 begin
   Result := False;
+	SQLDataSet := nil;
 
 	DebugOut.Lines.Add(format('Delete Guild data from MySQL: %d', [GDID]));
 
   {删除工会资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildinfo WHERE GDID=''%d'' LIMIT 1', [GDID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildinfo WHERE GDID=''%d'' LIMIT 1', [GDID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Guild data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会成员资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [GDID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [GDID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Guild Member data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会头衔资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [GDID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [GDID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Guild Position data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会开除成员记录资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildBanishInfo WHERE GDID=''%d''', [GDID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildBanishInfo WHERE GDID=''%d''', [GDID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Guild BanishInfo data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会同盟、敌对资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d''', [GDID])) then begin
+	if ExecuteSqlCmd(SQLDataSet, format('DELETE FROM guildAllyInfo WHERE GDID=''%d''', [GDID])) = nil then begin
     DebugOut.Lines.Add(format('Delete Guild AllyInfo data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
