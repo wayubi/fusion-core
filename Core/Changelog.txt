@@ -1,3 +1,7 @@
+- 05-04-04: Database unit - local unit proc LoadSummonLists [ChrstphrR]
+- 05-04-04: Bug fix #827 - thorough fix for bad data in summon_item.txt [ChrstphrR]
+- 05-04-04: Database unit - local unit function DataBaseFilesExist [ChrstphrR]
+- 05-04-04: DataBaseFilesExist - updated to check for required DB files. [ChrstphrR]
 - 05-03-04: Fixed (hopefully) the issue with invisible NPC IDs permanently.  Use -1 again. [Colus]
 - 05-01-04: Fixed stability problem regarding NPC IDs of value -1. [AlexKreuz]
 

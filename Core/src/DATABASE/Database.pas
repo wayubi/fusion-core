@@ -11,23 +11,234 @@ uses
 // 関数定義
 		procedure DatabaseLoad(Handle:HWND);
 		procedure DataLoad();
-        procedure PlayerDataLoad();
+		procedure PlayerDataLoad();
 		procedure DataSave();
 //==============================================================================
 
 
-
-
-
-
-
-
-
+	//Files partitioned out of DatabaseLoad
+	Function  DataBaseFilesExist : Boolean;
+	Procedure LoadSummonLists;
 
 implementation
 
 uses
 	Common, GlobalLists, Zip;
+
+
+(*-----------------------------------------------------------------------------*
+DataBaseFilesExist
+
+Returns a True value if ALL files needed in the Database folder exist,
+else returns false.
+(Optional DB files are checked for individually)
+
+Called by:
+	DatabaseLoad
+
+Pre:
+	None.
+Post:
+	Returns a True or False value
+
+Revisions:
+--
+2004/05/04 - ChrstphrR - Initial breakout from DatabaseLoad - 11 required files
+2004/05/04 - " - Checked again, and Required Files checked now 21
+
+Question:
+The following files were not checked for here - are they really just optional?
+	special_db.txt
+	mapinfo_db.txt
+
+*-----------------------------------------------------------------------------*)
+Function  DataBaseFilesExist : Boolean;
+Begin
+	Result := True; // Assume True.
+
+	if NOT (
+		FileExists(AppPath + 'database\item_db.txt') AND
+		FileExists(AppPath + 'database\summon_item.txt') AND
+		FileExists(AppPath + 'database\summon_mob.txt') AND
+		FileExists(AppPath + 'database\summon_mobID.txt') AND
+		FileExists(AppPath + 'database\metalprocess_db.txt') AND
+
+		FileExists(AppPath + 'database\pet_db.txt' ) AND
+		FileExists(AppPath + 'database\mob_db.txt') AND
+		FileExists(AppPath + 'database\skill_db.txt') AND
+		FileExists(AppPath + 'database\skill_guild_db.txt') AND
+		FileExists(AppPath + 'database\exp_guild_db.txt') AND
+
+		FileExists(AppPath + 'database\exp_db.txt') AND
+		FileExists(AppPath + 'database\Monster_AI.txt') AND
+		FileExists(AppPath + 'database\territory_db.txt') AND
+		FileExists(AppPath + 'database\summon_slave.txt') AND
+		FileExists(AppPath + 'database\make_arrow.txt') AND
+
+		FileExists(AppPath + 'database\id_table.txt') AND
+		FileExists(AppPath + 'database\job_db1.txt') AND
+		FileExists(AppPath + 'database\job_db2.txt') AND
+		FileExists(AppPath + 'database\wp_db.txt') AND
+		FileExists(AppPath + 'database\warp_db.txt') AND
+
+		FileExists(AppPath + 'database\ele_db.txt')
+	) then begin
+		Result := FALSE;
+	end;
+End;(* Func DataBaseFilesExist (LocalUnitProc)
+*-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+LoadSummonLists
+
+This is a Local Procedure to Database unit. Must be declared ahead of the
+DatabaseLoad procedure.
+
+Loads all Summon* Lists from the proper database files. Broken out to make the
+original routine more readable -- each group of files loaded in it's own logical
+section.
+
+Called by:
+	DatabaseLoad
+
+Pre:
+	DataBaseFilesExist returns True (summmon_*.txt files exist)
+Post:
+	The following lists will have Zero or more entries:
+	SummonMobList    (summon_mobID.txt)
+	SummonMobListMVP (summon_mob.txt -- currently empty for this list)
+	SummonIOBList    (summon_item.txt)
+	SummonIOVList    (summon_item.txt)
+	SummonICAList    (summon_item.txt)
+	SummonIGBList    (summon_item.txt)
+	SummonIOWBList   (summon_item.txt)
+
+Revisions:
+--
+2004/05/04 - ChrstphrR - Initial breakout from DatabaseLoad
+2004/05/04 - ChrstphrR - Bug fix #827 - fixed for that, and ALL box summon lists
+*-----------------------------------------------------------------------------*)
+Procedure LoadSummonLists;
+Var
+	Idx     : Integer;
+	Counter : Integer; //Tallies entries into a list for display when done
+	Weight  : Integer; //Weighting number or "chance" item has to be chosen.
+
+	Txt     : TextFile;
+	Str     : string;      //Holds each line read
+	SL      : TStringList; //Parses Str into text tokens.
+
+	Summon  : TSummon; //Inefficient object used with SummonMobListMVP
+Begin
+	DebugOut.Lines.Add('Summon Monster List loading...');
+	{ChrstphrR 2004/04/19 - New SummonMobList code... created and loaded here}
+
+	//Creates and loads data from the file all in one step
+	SummonMobList := TSummonMobList.Create(AppPath + 'database\summon_mobID.txt');
+	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [SummonMobList.Count]));
+	{ChrstphrR 2004/04/19 - yes, that's all to see here - the rest is in the
+	TSummonMobList code}
+
+	{ChrstphrR 2004/04/19 - editing some of the code here, so it properly loads
+	the old style SummonMobListMVP, and comments out the old SummonMobList calls
+	P.S. -- SummonMobListMVP is always empty, no data is defined... I'm just
+	Covering My Tracks and keeping the code as it was, for now.
+	P.P.S. -- *Every* one of these StrToInt calls are unsafe, if a DB dev or,
+	more likely, a user corrupts the files, a non numeric input into StrToInt
+	will stop the server dead in it's tracks.
+	}
+	Application.ProcessMessages;
+	AssignFile(Txt, AppPath + 'database\summon_mob.txt');
+	Reset(Txt);
+	Counter := 0;
+	SL := TStringList.Create;
+	while not eof(Txt) do begin
+		Readln(txt, str);
+		SL.Delimiter     := ',';
+		SL.DelimitedText := Str;
+		if (SL[0] = 'MVP') AND (SL.Count >= 3) then begin
+			Weight := StrToInt(SL[2]);
+			Summon      := TSummon.Create;
+			Summon.Name := SL[1];
+			for Idx := 1 to Weight do begin
+				SummonMobListMVP.AddObject(Counter, Summon);
+				Inc(Counter);
+			end;
+		end;
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(
+		Format('-> Total %d Summon MVP Monster List loaded.', [Counter])
+	);
+	//-- End of SummonMobList / SummonMobListMVP Load
+
+
+	//Summon Box Lists
+	DebugOut.Lines.Add('Summon Item List loading...');
+	Application.ProcessMessages;
+	AssignFile(Txt, AppPath + 'database\summon_item.txt');
+	Reset(Txt);
+	SL.Clear;
+	while not eof(Txt) do begin
+		Readln(txt, str);
+		SL.DelimitedText := Str;
+		if SL.Count < 3 then Continue; //safety check against bad line.
+
+		{ChrstphrR 2004/05/04 - code-side fix for bug #827 -- Checking entries
+		in summon_item.txt against ItemDB before adding to list.
+		We know that ItemDB is populated about 400 lines ahead, so checking is safe,
+		so we're checking the ItemDBName list to make sure the Box items ARE there.}
+
+		{ChrstphrR 2004/05/04 - StrToIntDef ensures that at least, the
+		weighting of this choice will be 1, if not defined, or 0 or less.}
+		Weight := StrToIntDef(SL[2],1);
+
+		if (ItemDBName.IndexOf(SL[0]) = -1) then begin
+			{Warn of invalid container in the line, handle gracefully}
+			DebugOut.Lines.Add(
+				'*** summon_item.txt Error handled (1). Please report this Item: ' + str
+			);
+			Continue;
+		end;
+		if (ItemDBName.IndexOf(SL[1]) = -1) then begin
+			{ChrstphrR - well, the item in the summon_item.txt doesn't exist if we
+			branch here, output a message to let the user know, so they can post a
+			bug report to get the DB file corrected.}
+			DebugOut.Lines.Add(
+				'*** summon_item.txt Error handled (2). Please report this Item: ' + Str
+			);
+			Continue;
+		end;//if ItemDBName Check
+
+		//ChrstphrR -- Poor algorithm choice, will convert "later" to
+		//algorithm TSummonMobList uses.
+		for Idx := 1 to Weight do begin
+			if (SL[0] = 'Old_Blue_Box') then
+				SummonIOBList.Add(SL[1])
+			else if (SL[0] = 'Old_Violet_Box') then
+				SummonIOVList.Add(SL[1])
+			else if (SL[0] = 'Old_Card_Album') then
+				SummonICAList.Add(SL[1])
+			else if (SL[0] = 'Gift_Box') then
+				SummonIGBList.Add(SL[1])
+			else if (SL[0] = 'Old_Weapon_Box') then
+				SummonIOWBList.Add(SL[1]);
+		end;
+
+	end;//while
+	CloseFile(Txt);
+	SL.Free;
+
+	Counter := SummonIOBList.Count + SummonIOVList.Count + SummonICAList.Count +
+		SummonIGBList.Count + SummonIOWBList.Count;
+
+	DebugOut.Lines.Add(Format('-> Total %d Summon Item List loaded.', [Counter]));
+	Application.ProcessMessages;
+End;(* Proc LoadSummonLists (LocalUnitProc)
+*-----------------------------------------------------------------------------*)
+
+
 //==============================================================================
 // データベース読み込み
 procedure DatabaseLoad(Handle:HWND);
@@ -77,8 +288,8 @@ var
 	dat :TFileStream;
 	jf	:array[0..MAX_JOB_NUMBER] of boolean;
 
-        afm_compressed :TZip;
-        afm :textfile;
+	afm_compressed :TZip;
+	afm :textfile;
 
 begin
 	sl := TStringList.Create;
@@ -86,58 +297,43 @@ begin
 	//sl.QuoteChar := '"';
 	//sl.Delimiter := ',';
 
-	//各種データファイルの存在をチェック
-	if not (FileExists(AppPath + 'database\item_db.txt') and
-{氏{箱追加ココまで}
-					FileExists(AppPath + 'database\summon_item.txt') and
-          //FileExists(AppPath + 'database\summon_slave.txt') and
-					FileExists(AppPath + 'database\summon_mob.txt') and
-          //FileExists(AppPath + 'database\make_arrow.txt') and
-{氏{箱追加ココまで}
-{アイテム製造追加}
-					FileExists(AppPath + 'database\metalprocess_db.txt') and
-{アイテム製造追加ココまで}
-{キューペット}
-          FileExists( AppPath + 'database\pet_db.txt' ) and
-{キューペットここまで}
-					FileExists(AppPath + 'database\mob_db.txt') and
-					FileExists(AppPath + 'database\skill_db.txt') and
-{ギルド機能追加}
-					FileExists(AppPath + 'database\skill_guild_db.txt') and
-					FileExists(AppPath + 'database\exp_guild_db.txt') and
-{ギルド機能追加ココまで}
-					FileExists(AppPath + 'database\exp_db.txt')) then begin
-		MessageBox(Handle, 'You have missing files. Go to the Fusion Download Center to get them.', 'Fusion', MB_OK or MB_ICONSTOP);
+	if NOT DataBaseFilesExist then begin
+		MessageBox(
+			Handle,
+			'You have missing files. Go to the Fusion Download Center to get them.',
+			'Fusion',
+			MB_OK or MB_ICONSTOP
+		);
 		Application.Terminate;
-		exit;
+		Exit;
 	end;
 
 	//gatファイルの存在をチェック
 	DebugOut.Lines.Add('Map data loading...');
 	Application.ProcessMessages;
 
-        if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
+	if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
 		repeat
 
-                        CreateDir('map\tmpFiles');
-                        afm_compressed := tzip.create(afm_compressed);
-                        afm_compressed.Filename := AppPath+'map\'+sr.Name;
-                        afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
-                        afm_compressed.Extract;
+			CreateDir('map\tmpFiles');
+			afm_compressed := tzip.create(afm_compressed);
+			afm_compressed.Filename := AppPath+'map\'+sr.Name;
+			afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
+			afm_compressed.Extract;
 
-                        sr.Name := StringReplace(sr.Name, '.af2', '.out',
-                          [rfReplaceAll, rfIgnoreCase]);
+			sr.Name := StringReplace(sr.Name, '.af2', '.out',
+				[rfReplaceAll, rfIgnoreCase]);
 
 			assignfile(afm,AppPath + 'map\tmpFiles\' + sr.Name);
 			Reset(afm);
-			
+
 			ReadLn(afm,str);
 			if (str <> 'ADVANCED FUSION MAP') then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
-                                Application.Terminate;
-                                exit;
-                        end;
-                        
+				MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
+				Application.Terminate;
+				exit;
+			end;
+
 			ReadLn(afm,str);
 			ReadLn(afm,xy.X,xy.Y);
 			CloseFile(afm);
@@ -151,29 +347,29 @@ begin
 			//Application.ProcessMessages;
 			ta := TMapList.Create;
 			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-                        ta.Ext := 'af2';
+			ta.Ext := 'af2';
 			ta.Size := xy;
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
 
 		until FindNext(sr) <> 0;
 		FindClose(sr);
-                afm_compressed.Free;
-        end;
+		afm_compressed.Free;
+	end;
 
-        if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
+	if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
 		repeat
 
-                        assignfile(afm,AppPath + 'map\' + sr.Name);
+			assignfile(afm,AppPath + 'map\' + sr.Name);
 			Reset(afm);
-			
+
 			ReadLn(afm,str);
 			if (str <> 'ADVANCED FUSION MAP') then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
-                                Application.Terminate;
-                                exit;
-                        end;
-                        
+				MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
+				Application.Terminate;
+				exit;
+			end;
+
 			ReadLn(afm,str);
 			ReadLn(afm,xy.X,xy.Y);
 			CloseFile(afm);
@@ -187,25 +383,25 @@ begin
 			//Application.ProcessMessages;
 			ta := TMapList.Create;
 			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-                        ta.Ext := 'afm';
+			ta.Ext := 'afm';
 			ta.Size := xy;
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
 
 		until FindNext(sr) <> 0;
 		FindClose(sr);
-        end;
+	end;
 
-        if FindFirst(AppPath + 'map\*.gat', $27, sr) = 0 then begin
+	if FindFirst(AppPath + 'map\*.gat', $27, sr) = 0 then begin
 		repeat
 			dat := TFileStream.Create(AppPath + 'map\' + sr.Name, fmOpenRead, fmShareDenyWrite);
 
 			SetLength(str, 4);
-                        dat.Read(str[1], 4);
-                        if str <> 'GRAT' then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
-                                Application.Terminate;
-                                exit;
+			dat.Read(str[1], 4);
+			if str <> 'GRAT' then begin
+				MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
+				Application.Terminate;
+				exit;
 			end;
 
 			dat.Read(w, 2);
@@ -221,14 +417,14 @@ begin
 			//Application.ProcessMessages;
 			ta := TMapList.Create;
 			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-                        ta.Ext := 'gat';
+												ta.Ext := 'gat';
 			ta.Size := xy;
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
 		until FindNext(sr) <> 0;
 		FindClose(sr);
 	end;
-        
+
 	if MapList.IndexOf('prontera') = -1 then begin
 		//最低限、prontera.gatがないと起動しない
 		MessageBox(Handle, 'prontera map file missing', 'Fusion', MB_OK or MB_ICONSTOP);
@@ -495,7 +691,7 @@ begin
                                 4146:   MagicReflect := true;   {Maya Card}
                                 4137:   PerfectDamage := true;  {Drake Card}
 
-			end;
+			end;//case
 
 		end;
 		ItemDB.AddObject(td.ID, td);
@@ -855,87 +1051,16 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 
       GlobalVars.AddObject(tGlobal.Variable, tGlobal);
       end;
-    end;
+		end;
 	end;
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [GlobalVars.Count]));
 	Application.ProcessMessages;
 
-	{Summon Monster List}
-	DebugOut.Lines.Add('Summon Monster List loading...');
-	{ChrstphrR 2004/04/19 - New SummonMobList code... created and loaded here}
 
-	//Creates and loads data from the file all in one step
-	SummonMobList := TSummonMobList.Create(AppPath + 'database\summon_mobID.txt');
-	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [SummonMobList.Count]));
-	{ChrstphrR 2004/04/19 - yes, that's all to see here - the rest is in the
-	TSummonMobList code}
-
-	{ChrstphrR 2004/04/19 - editing some of the code here, so it properly loads
-	the old style SummonMobListMVP, and comments out the old SummonMobList calls
-	P.S. -- SummonMobListMVP is always empty, no data is defined... I'm just
-	Covering My Tracks and keeping the code as it was, for now.
-	P.P.S. -- *Every* one of these StrToInt calls are unsafe, if a DB dev or,
-	more likely, a user corrupts the files, a non numeric input into StrToInt
-	will stop the server dead in it's tracks.
-	}
-	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\summon_mob.txt');
-	Reset(txt);
-	j := 0;
-	SL.Clear;
-	while not eof(txt) do begin
-		Readln(txt, str);
-		SL.Delimiter := ',';
-		SL.DelimitedText := str;
-		if (SL[0] = 'MVP') AND (SL.Count >= 3) then begin
-			k := StrToInt(SL[2]);
-			tsmn := TSummon.Create;
-			tsmn.Name := sl.Strings[1];
-			for i := 1 to k do begin
-				SummonMobListMVP.AddObject(j, tsmn);
-				j := j + 1;
-			end;
-		end;
-	end;
-	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Summon MVP Monster List loaded.', [j]));
-	Application.ProcessMessages;
-	//-- End of SummonMobList / SummonMobListMVP Load
-
-	//箱データベース読み込み
-	DebugOut.Lines.Add('Summon Item List loading...');
-	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\summon_item.txt');
-	Reset(txt);
-	sl.Clear;
-	while not eof(txt) do begin
-		Readln(txt, str);
-		sl.DelimitedText := str;
-		if SL.Count < 3 then Continue; //safety check against bad line.
-		k := StrToIntDef(sl.Strings[2],1);
-		if (ItemDBName.IndexOf(sl.Strings[0]) = -1) or
-			(ItemDBName.IndexOf(sl.Strings[1]) = -1) or (k = 0) then continue;
-		//tsmn := TSummon.Create;
-		//tsmn.Name := SL[1];
-		for i := 1 to k do begin
-			if (SL[0] = 'Old_Blue_Box') then
-				SummonIOBList.Add(SL[1])
-			else if (SL[0] = 'Old_Violet_Box') then
-				SummonIOVList.Add(SL[1])
-			else if (SL[0] = 'Old_Card_Album') then
-				SummonICAList.Add(SL[1])
-			else if (SL[0] = 'Gift_Box') then
-				SummonIGBList.Add(SL[1])
-			else if (SL[0] = 'Old_Weapon_Box') then
-				SummonIOWBList.Add(SL[1]);
-		end;
-	end;
-	CloseFile(txt);
-	j := SummonIOBList.Count + SummonIOVList.Count + SummonICAList.Count + SummonIGBList.Count + SummonIOWBList.Count;
-	DebugOut.Lines.Add(Format('-> Total %d Summon Item List loaded.', [j]));
-	Application.ProcessMessages;
+	LoadSummonLists;
 {氏{箱追加ココまで}
+
 {キューペット}
         DebugOut.Lines.Add( 'Pet database loading...' );
         Application.ProcessMessages;
@@ -948,7 +1073,6 @@ DebugOut.Lines.Add('Pharmacy database loading...');
                 sl.DelimitedText := str;
 
                 tp := TPetDB.Create;
-
                 with tp do begin
                         MobID := StrToInt( sl.Strings[0] );
                         ItemID := StrToInt( sl.Strings[1] );
@@ -962,7 +1086,7 @@ DebugOut.Lines.Add('Pharmacy database loading...');
                         Reserved := StrToInt( sl.Strings[9] );
                         Die := StrToInt( sl.Strings[10] );
                         Capture := StrToInt( sl.Strings[11] );
-                        tp.SkillTime := StrToInt( sl.Strings[13] );
+			SkillTime   := StrToInt( sl.Strings[13] );
                 end;
                 PetDB.AddObject( tp.MobID, tp );
         end;
@@ -3078,7 +3202,7 @@ begin
                                                 tpe.Saved := 1;
                                                 z := j;
                                                 end;
-	                                      end;
+																				end;
                                     end;
                                 end;
                         end;
@@ -3109,7 +3233,7 @@ begin
                                                 }
                                                 sl.Add( IntToStr( tpe.PlayerID ) );
           sl.Add( IntToStr( tpe.CharaID ) );
-          sl.Add( IntToStr( tpe.Cart ) ); // Cart
+					sl.Add( IntToStr( tpe.Cart ) ); // Cart
           sl.Add( IntToStr( tpe.Index ) ); // Index
           sl.Add( IntToStr( tpe.Incubated ) );
           sl.Add( IntToStr( tpe.PetID ) ); // PetID
@@ -3140,7 +3264,7 @@ begin
   { Ugh I'll fix this ... hmm
   Mitch 01-31-2004 : mapinfo_db.txt save! 
   AssignFile(txt, AppPath + '\database\mapinfo_db.txt');
-  Rewrite(txt);
+	Rewrite(txt);
   WriteLn(txt, 'MapName,Memo,Save,Teleport,PVP,GuildPVP');
   for i := 0 to MapInfo.Count - 1 do begin
     mi := MapInfo.Objects[i] as MapTbl;
@@ -3168,5 +3292,11 @@ begin
 	sl.Free;
 end;
 //------------------------------------------------------------------------------
+
+
+
+
+
+
 
 end.
