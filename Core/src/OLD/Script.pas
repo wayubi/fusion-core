@@ -1852,6 +1852,31 @@ begin
                 tc.guild_storage := True;
                 Inc(tc.ScriptStep);
             end;
+        79: //getareausers
+            begin
+                i := tn.Script[tc.ScriptStep].Data3[0]; //x1
+                j := tn.Script[tc.ScriptStep].Data3[1]; //y1
+                k := tn.Script[tc.ScriptStep].Data3[2]; //x2
+                l := tn.Script[tc.ScriptStep].Data3[3]; //y2
+                cnt := 0;
+                if Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0]) <> -1 then begin
+                    tm1 := Map.Objects[Map.IndexOf(tn.Script[tc.ScriptStep].Data1[0])] as TMap;
+                    for m := 0 to tm1.CList.Count - 1 do begin
+                        tc1 := tm1.CList.Objects[m] as TChara;
+                        if tc1.Login = 2 then begin
+                            if (tc1.Point.X >= i) and
+                            (tc1.Point.X <= k) and
+                            (tc1.Point.Y >= j) and
+                            (tc1.Point.Y <= l) then
+                                cnt := cnt + 1;
+                        end;
+                    end;
+                    if (Copy(tn.Script[tc.ScriptStep].Data1[1], 1, 1) <> '\') then
+                        tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[1]] := IntToStr(cnt)
+                    else ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[1]] := IntToStr(cnt);
+                end;
+                Inc(tc.ScriptStep);
+            end;
         //add commands before this
 
 
