@@ -3683,18 +3683,18 @@ begin
 						Exit;
 					end;
 
-                                70:     {Sanctuary}
+        70:     {Sanctuary}
 					begin
-                                                j := SearchCInventory(tc, 717, false);
+            j := SearchCInventory(tc, 717, false);
 						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
 
-                                                        if NoJamstone = False then UseItem(tc, j);
-
-                                                        for j1 := 1 to 7 do begin
-							        for i1 := 1 to 7 do begin
-								        if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
-								        xy.X := (MPoint.X) -4 + i1;
-								        xy.Y := (MPoint.Y) -4 + j1;
+              if NoJamstone = False then UseItem(tc, j);
+              // Colus, 20031229: Corrected size/shape of Sanctuary field
+              for j1 := 1 to 5 do begin
+							      for i1 := 1 to 5 do begin
+								        if ((i1 < 2) or (i1 > 4)) and ((j1 < 2) or (j1 > 4)) then Continue;
+								        xy.X := (MPoint.X) -2 + i1;
+								        xy.Y := (MPoint.Y) -2 + j1;
 
 								        if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
 								        tn := SetSkillUnit(tm, ID, xy, Tick, $46, 10, tl.Data1[MUseLV] * 1000);
@@ -9388,7 +9388,8 @@ begin
          if Weight * 2 <> MaxWeight then begin
 
             {Sanctuary}
-                if (tc.Skill[70].Tick > Tick) and (tc.HPRTick + 5000 <= Tick) and (tc.InField = true) then begin
+                // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
+                if ((tc.Skill[70].Tick > Tick) and (tc.HPRTick + 1000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP)) then begin
 
                         j := Skill[70].Effect1;
 
@@ -10186,48 +10187,49 @@ begin
 				for c := 0 to sl.Count - 1 do begin
 					ts1 := sl.Objects[c] as TMob;
 
-                                        case tn.JID of
-                                                $46: //Sanctuary
-                                                     begin
-                                                        if ts1.Data.Race <> 1 then begin
-                                                                //ダメージ算出
-                                                                dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
-                                                                        
-                                                                tn.Tick := Tick;
-                                                                //ダメージパケ送信
-                                                                ts1.HP := ts1.HP + dmg[0];
+          case tn.JID of
+            $46: //Sanctuary
+              begin
+                // Colus, 20031229: Check is same as ME (no undead prop, demon race)
+                if ((ts1.Element mod 20 <> 9) and (ts1.Data.Race <> 6)) then begin
+                  //ダメージ算出
+                  dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
 
-                                                                if ts1.HP > ts1.Data.HP then ts1.HP := ts1.Data.HP;
+                  tn.Tick := Tick;
+                  //ダメージパケ送信
+                  ts1.HP := ts1.HP + dmg[0];
+                  if ts1.HP > ts1.Data.HP then ts1.HP := ts1.Data.HP;
 
-                                                                WFIFOW( 0, $011a);
-                                                                WFIFOW( 2, tn.MSkill);
-                                                                WFIFOW( 4, dmg[0]);
-                                                                WFIFOL( 6, ts1.ID);
-                                                                WFIFOL(10, tn.ID);
-                                                                WFIFOB(14, 1);
-                                                                SendBCmd(tm, ts1.Point, 15);
+                  WFIFOW( 0, $011a);
+                  WFIFOW( 2, tn.MSkill);
+                  WFIFOW( 4, dmg[0]);
+                  WFIFOL( 6, ts1.ID);
+                  WFIFOL(10, tn.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, ts1.Point, 15);
 
-                                                        end else begin
-                                                                dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
+                end else begin
+                  dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
 
-								if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+                  if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+                  dmg[0] := dmg[0] div 2; // Half-heal damage for undead/demon
 
-								tn.Tick := Tick;
-								WFIFOW( 0, $01de);
-								WFIFOW( 2, $46);
-								WFIFOL( 4, tn.ID);
-								WFIFOL( 8, ts1.ID);
-								WFIFOL(12, Tick);
-								WFIFOL(16, tc1.aMotion);
-								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOL(24, dmg[0]);
-								WFIFOW(28, tn.Count);
-								WFIFOW(30, 1);
-								WFIFOB(32, 5);
-								SendBCmd(tm, tn.Point, 33);
-								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
-                                                        end;
-                                                     end;
+                  tn.Tick := Tick;
+                  WFIFOW( 0, $01de);
+                  WFIFOW( 2, $46);
+                  WFIFOL( 4, tn.ID);
+                  WFIFOL( 8, ts1.ID);
+                  WFIFOL(12, Tick);
+                  WFIFOL(16, tc1.aMotion);
+                  WFIFOL(20, ts1.Data.dMotion);
+                  WFIFOL(24, dmg[0]);
+                  WFIFOW(28, tn.MUseLV); // Changed from tn.Count to 1 (1-hit)
+                  WFIFOW(30, 1);
+                  WFIFOB(32, 6);  // Changed from 5 (bolt spell) to 6 (1-hit)
+                  SendBCmd(tm, tn.Point, 33);
+                  DamageProcess1(tm, tc1, ts1, dmg[0], tick);
+                end;
+              end;
 {:119}
 						$74://ブラストマイン発動
 							begin
