@@ -2668,6 +2668,64 @@ Called when we're shutting down the server *only*
         weiss_ini_save();
     end;
 
+    function command_jail(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_JAIL Success.';
+
+        s := Copy(str, 6, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            Result := 'GM_JAIL Success. ' + s + ' jailed.';
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+
+            if (tc1.Login = 2) then begin
+                SendCLeave(tc1, 2);
+                tc1.Map := 'sec_pri';
+                tc1.Point := Point(20,80);
+                MapMove(tc1.Socket, tc.Map, tc.Point);
+            end else begin
+                tc1.Map := 'sec_pri';
+                tc1.Point := Point(20,80);
+
+                Result := Result + ' But ' + s + ' is offline.';
+            end;
+
+        end else begin
+            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
+    function command_unjail(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_UNJAIL Success.';
+
+        s := Copy(str, 8, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            Result := 'GM_JAIL Success. ' + s + ' unjailed.';
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+
+            if (tc1.Login = 2) then begin
+                SendCLeave(tc1, 2);
+                tc1.Map := 'prontera';
+                tc1.Point := Point(150,170);
+                MapMove(tc1.Socket, tc.Map, tc.Point);
+            end else begin
+                tc1.Map := 'prontera';
+                tc1.Point := Point(150,170);
+
+                Result := Result + ' But ' + s + ' is offline.';
+            end;
+
+        end else begin
+            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
 
     function command_aegis_b(str : String) : String;
     var
@@ -4823,86 +4881,29 @@ Called when we're shutting down the server *only*
         end;
     end;
 
-function command_athena_doom(tc : Tchara) : String;
+    function command_athena_doom(tc : Tchara) : String;
     var
         tc1 : TChara;
         tm : TMap;
         i, w : Integer;
         debug : String;
-       begin
+    begin
         Result := 'GM_ATHENA_DOOM Success.';
         for i := 0 to CharaName.Count do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
-            if tc1.PData.Accesslevel = 0 then begin
-                debug := 'The user ' + tc1.Name + ' has been killed.';
-                w := Length(debug) + 4;
-               tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
-                CharaDie(tm, tc1, 1);
-                WFIFOW (0, $009a);
-                WFIFOW (2, w);
-                WFIFOS (4, debug, w - 4);
-                tc.socket.sendbuf(buf, w);
+                if tc1.PData.Accesslevel = 0 then begin
+                    debug := 'The user ' + tc1.Name + ' has been killed.';
+                    w := Length(debug) + 4;
+                    tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+                    CharaDie(tm, tc1, 1);
+                    WFIFOW (0, $009a);
+                    WFIFOW (2, w);
+                    WFIFOS (4, debug, w - 4);
+                    tc.socket.sendbuf(buf, w);
                 end;
             end;
         end;
     end;
 
-function command_jail(tc : TChara; str : String) : String;
-    var
-        s : String;
-        tc1 : TChara;
-    begin
-        Result := 'GM_JAIL Success.';
-
-        s := Copy(str, 6, 256);
-        if CharaName.Indexof(s) <> -1 then begin
-            Result := 'GM_JAIL Success. ' + s + ' jailed.';
-            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-
-            if (tc1.Login = 2) then begin
-                SendCLeave(tc1, 2);
-                tc1.Map := 'sec_pri';
-                tc1.Point := Point(20,80);
-                MapMove(tc1.Socket, tc.Map, tc.Point);
-            end else begin
-                tc1.Map := 'sec_pri';
-                tc1.Point := Point(20,80);
-
-                Result := Result + ' But ' + s + ' is offline.';
-            end;
-
-        end else begin
-            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
-        end;
-    end;
-
-function command_unjail(tc : TChara; str : String) : String;
-    var
-        s : String;
-        tc1 : TChara;
-    begin
-        Result := 'GM_UNJAIL Success.';
-
-        s := Copy(str, 8, 256);
-        if CharaName.Indexof(s) <> -1 then begin
-            Result := 'GM_JAIL Success. ' + s + ' unjailed.';
-            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-
-            if (tc1.Login = 2) then begin
-                SendCLeave(tc1, 2);
-                tc1.Map := 'prontera';
-                tc1.Point := Point(150,170);
-                MapMove(tc1.Socket, tc.Map, tc.Point);
-            end else begin
-                tc1.Map := 'prontera';
-                tc1.Point := Point(150,170);
-
-                Result := Result + ' But ' + s + ' is offline.';
-            end;
-
-        end else begin
-            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
-        end;
-    end;
 end.
