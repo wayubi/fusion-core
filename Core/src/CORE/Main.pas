@@ -356,6 +356,9 @@ type
     ComboBox21: TComboBox;
     Label139: TLabel;
     ComboBox22: TComboBox;
+    Help1: TMenuItem;
+    Bugtracker1: TMenuItem;
+    FusionHomepage1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -475,6 +478,8 @@ type
     procedure Console1Click(Sender: TObject);
     procedure Accounts1Click(Sender: TObject);
     procedure Characters1Click(Sender: TObject);
+    procedure Bugtracker1Click(Sender: TObject);
+    procedure FusionHomepage1Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11271,6 +11276,16 @@ procedure TfrmMain.Characters1Click(Sender: TObject);
 begin
     JCon_Characters_Online();
     TabSheet7.Show;
+end;
+
+procedure TfrmMain.Bugtracker1Click(Sender: TObject);
+begin
+    ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net/bugtracker',nil,nil, SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.FusionHomepage1Click(Sender: TObject);
+begin
+    ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net',nil,nil, SW_SHOWNORMAL);
 end;
 
 end.
