@@ -768,6 +768,7 @@ type TChara = class
         Autocastactive :Boolean;
         noday         :Boolean;
 
+        noHPRecovery  :Boolean;   {Player Cannot Recover HP}
         noSPRecovery  :Boolean;   {Player Cannot Recover SP}
 
         LastSong      :integer;   {Last Song a Bard Cast}
@@ -1841,8 +1842,9 @@ begin
                 end;
 
                 if Skill[268].Tick > Tick then begin //Steel Body
-                        tc.DEF1 := tc.DEF1 + 90;
-                        tc.MDEF1 := tc.MDEF1 +90;
+                        // Colus 20031223: Not +90, = 90.
+                        tc.DEF1 := 90; //tc.DEF1 + 90;
+                        tc.MDEF1 := 90; //tc.MDEF1 +90;
                 end;
                 if Skill[269].Tick > Tick then begin
                         tc.Option := 6;
