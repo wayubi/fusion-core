@@ -340,6 +340,10 @@ type
     Label116: TLabel;
     Label131: TLabel;
     Button25: TButton;
+    Edit79: TEdit;
+    Edit80: TEdit;
+    Label132: TLabel;
+    Label133: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -452,6 +456,8 @@ type
     procedure ListBox7Click(Sender: TObject);
     procedure Button23Click(Sender: TObject);
     procedure Button25Click(Sender: TObject);
+    procedure Button24Click(Sender: TObject);
+    procedure ListBox8Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11620,6 +11626,16 @@ end;
 procedure TfrmMain.Button25Click(Sender: TObject);
 begin
     JCon_Chara_Flag_Delete();
+end;
+
+procedure TfrmMain.Button24Click(Sender: TObject);
+begin
+    JCon_Chara_Flag_Save();
+end;
+
+procedure TfrmMain.ListBox8Click(Sender: TObject);
+begin
+    JCon_Chara_Flag_Populate();
 end;
 
 end.

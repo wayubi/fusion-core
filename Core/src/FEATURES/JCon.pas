@@ -8,7 +8,7 @@ uses
     WSocket,
     {$ENDIF}
     {Shared}
-    SysUtils,
+    SysUtils, StrUtils,
     {Fusion}
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC;
 
@@ -37,7 +37,8 @@ uses
     procedure JCon_Chara_Skill_Save();
     procedure JCon_Chara_Flag_Load();
     procedure JCon_Chara_Flag_Delete();
-
+    procedure JCon_Chara_Flag_Populate();
+    procedure JCon_Chara_Flag_Save();
 
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
@@ -890,10 +891,7 @@ uses
         DataSave(true);
         if frmMain.CheckBox2.Checked = false then JCon_Chara_Skill_Load(false)
         else JCon_Chara_Skill_Load(true);
-
-
     end;
-
 
     procedure JCon_Chara_Flag_Load();
     var
@@ -901,6 +899,8 @@ uses
 
 	begin
         frmMain.ListBox8.Clear;
+        frmMain.Edit79.Clear;
+        frmMain.Edit80.Clear;
 
         if (frmMain.listbox2.ItemIndex = -1) then Exit;
         tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
@@ -920,7 +920,46 @@ uses
 
         DataSave(true);
         JCon_Chara_Flag_Load();
+    end;
 
+    procedure JCon_Chara_Flag_Populate();
+    var
+        tc : TChara;
+        sl : string;
+        delimiter : integer;
+    begin
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        if (frmMain.listbox8.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        sl := frmMain.ListBox8.Items.Strings[frmMain.ListBox8.ItemIndex];
+        delimiter := AnsiPos('=', sl);
+        frmMain.Edit79.Text := AnsiLeftStr(sl, delimiter - 1);
+        frmMain.Edit80.Text := AnsiRightStr(sl, (length(sl) - delimiter));
+    end;
+
+    procedure JCon_Chara_Flag_Save();
+    var
+        tc : TChara;
+        sl, str : string;
+        varname, varval : string; // variable name and variable value
+        delimiter : integer;  // position of "=" for delimitting
+    begin
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        if (frmMain.listbox8.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        sl := frmMain.ListBox8.Items.Strings[frmMain.ListBox8.ItemIndex];
+        delimiter := AnsiPos('=', sl);
+        varname := AnsiLeftStr(sl, delimiter - 1);
+        varval := AnsiRightStr(sl, (length(sl) - delimiter));
+        str := frmMain.Edit79.Text + '=' + frmMain.Edit80.Text;
+
+        if frmMain.Edit79.Text <> varname then //adding a new var
+            tc.Flag.Add(str)
+        else //updating
+            tc.Flag.Strings[frmMain.ListBox8.ItemIndex] := str;
+
+        DataSave(true);
+        JCon_Chara_Flag_Load();
     end;
 
 end.

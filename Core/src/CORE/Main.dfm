@@ -2255,6 +2255,20 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'Skill ID:'
           end
+          object Label132: TLabel
+            Left = 192
+            Top = 200
+            Width = 78
+            Height = 18
+            Caption = 'Variable Name'
+          end
+          object Label133: TLabel
+            Left = 192
+            Top = 240
+            Width = 30
+            Height = 18
+            Caption = 'Value'
+          end
           object ListBox7: TListBox
             Left = 8
             Top = 16
@@ -2271,10 +2285,10 @@ object frmMain: TfrmMain
             Height = 169
             ItemHeight = 18
             TabOrder = 1
-            OnClick = ListBox4Click
+            OnClick = ListBox8Click
           end
           object Button23: TButton
-            Left = 288
+            Left = 296
             Top = 160
             Width = 75
             Height = 25
@@ -2289,6 +2303,7 @@ object frmMain: TfrmMain
             Height = 25
             Caption = 'Save'
             TabOrder = 3
+            OnClick = Button24Click
           end
           object ComboBox20: TComboBox
             Left = 192
@@ -2315,6 +2330,20 @@ object frmMain: TfrmMain
             Caption = 'Delete'
             TabOrder = 6
             OnClick = Button25Click
+          end
+          object Edit79: TEdit
+            Left = 192
+            Top = 216
+            Width = 121
+            Height = 26
+            TabOrder = 7
+          end
+          object Edit80: TEdit
+            Left = 192
+            Top = 256
+            Width = 121
+            Height = 26
+            TabOrder = 8
           end
         end
       end
@@ -2388,7 +2417,7 @@ object frmMain: TfrmMain
       end
     end
     object Database1: TMenuItem
-      Caption = 'Database'
+      Caption = '&Database'
       object Save1: TMenuItem
         Caption = 'Online Save'
         OnClick = Save1Click
@@ -2403,7 +2432,7 @@ object frmMain: TfrmMain
       end
     end
     object Control1: TMenuItem
-      Caption = 'Control'
+      Caption = '&Control'
       object MinimizetoTray2: TMenuItem
         Caption = 'Minimize to Tray'
         OnClick = MinimizetoTray2Click
