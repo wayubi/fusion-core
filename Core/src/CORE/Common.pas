@@ -4762,6 +4762,11 @@ begin
 		if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin
 			tl := tc.Skill[tc.MSkill].Data;
 
+            if (tc.MSkill = 18) and (FireWallCount = 9) then begin
+                SendSkillError(tc, 0);
+                Exit;
+            end;
+
 			if tc.SP < tl.SP[tc.MUseLV] then begin
 				//SP•s‘«
 				Result := 1;
@@ -5595,10 +5600,10 @@ begin
     SendBCmd(tm, tn.Point, 24);
   end;
 
-//  if (tn.JID = $7f) and (tn.CData <> nil) then begin
-//    tc := tn.CData;
-//    tc.FireWallCount := tc.FireWallCount - 1 ;
-//  end;
+  if (tn.JID = $7f) and (tn.CData <> nil) then begin
+    tc := tn.CData;
+    tc.FireWallCount := tc.FireWallCount - 1 ;
+  end;
   
 	tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
 	with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
@@ -10516,8 +10521,8 @@ begin
 if Value > 128 then
     fFireWallCount := 0;
 
-    if Value >= 3 then
-        fFireWallCount := 3
+    if Value >= 9 then
+        fFireWallCount := 9
     else
         fFireWallCount := Value;
 end;

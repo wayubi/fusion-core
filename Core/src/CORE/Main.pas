@@ -4631,7 +4631,6 @@ begin
 			end;
 		18:     {Fire Wall}
 			begin
-                //if FireWallCount < 3 then begin
 				xy.X := MPoint.X - Point.X;
 				xy.Y := MPoint.Y - Point.Y;
 				if abs(xy.X) > abs(xy.Y) * 3 then begin
@@ -4652,6 +4651,7 @@ begin
 				xy.X := MPoint.X;
 				xy.Y := MPoint.Y;
 				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+                FireWallCount := FireWallCount + 1;
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
@@ -4659,6 +4659,7 @@ begin
 				bb[0] := 2;
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+                FireWallCount := FireWallCount + 1;
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
@@ -4667,6 +4668,7 @@ begin
 				bb[0] := 6;
 				DirMove(tm, xy, b, bb);
 				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+                FireWallCount := FireWallCount + 1;
 				tn.CData := tc;
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
@@ -4691,12 +4693,6 @@ begin
 					tn.MUseLV := MUseLV;
 				end;
 				Colus, 20031219: FW update end}
-                //FireWallCount := FireWallCount + 1;
-                //end
-                //else begin
-                //SendSkillError(tc,0);
-                //Exit;
-                //end;
 			end;
 		25:     {Pneuma}
 			begin
