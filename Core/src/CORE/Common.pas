@@ -4346,8 +4346,10 @@ begin
 		//マップから自分のデータを消去
 		tm.CList.Delete(tm.Clist.IndexOf(tc.ID));
 		with tm.Block[tc.Point.X div 8][tc.Point.Y div 8] do begin
-			if Clist.IndexOf(tc.ID) <> -1 then
-				CList.Delete(Clist.IndexOf(tc.ID));
+            try
+	    		if Clist.IndexOf(tc.ID) <> -1 then CList.Delete(Clist.IndexOf(tc.ID));
+            except
+            end;
 		end;
         if mi.PvP then CalcPvPRank(tm);
 		if CharaPID.IndexOf(tc.ID) <> -1 then
