@@ -8,15 +8,24 @@ uses
     {Windows VCL}
     {$IFDEF MSWINDOWS}
 	Windows, MMSystem, ScktComp, Forms,
+	
+	{Replace with QForms soon, and place in common}
+	{
+	Alex: NO! We are not using any Q Components in VCL windows
+	because that will require us to distribute the 4 MB dll file
+	please dont make such drastic decisions without thinking ahead.
+	We are sticking with Forms and not QForms
+	}
+    
     {$ENDIF}
     {Kylix/Delphi CLX}
     {$IFDEF LINUX}
     Qt, Types, QForms,
     {$ENDIF}
     {Shared}
-    Classes, Math, SysUtils,
+    Classes, Math, SysUtils, StrUtils,
     {Fusion}
-    Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData;
+    Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData, ISCS;
 
 //==============================================================================
 // ŠÖ”’è‹`
@@ -755,7 +764,11 @@ Begin(* Proc sv3PacketProcess() *)
                 end;
                 // ALBGM - Accesss Level Based GM System. Finally, nice and clean.
 
-                if (length(str) > 0) then begin
+                if (tc.ISCS) then begin
+                    iscs_console_send(AnsiRightStr(str, length(str) - AnsiPos(' : ', str) - length(' : ') + 1 ), tc );                    
+                end
+
+                else if (length(str) > 0) then begin
                 	tm := tc.MData;
 
 					WFIFOW(0, $008e);

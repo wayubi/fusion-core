@@ -28,6 +28,7 @@ uses
   JCon in 'FEATURES\JCon.pas',
   Player_Skills in 'FEATURES\Player_Skills.pas',
   WeissINI in 'FEATURES\WeissINI.pas',
+  ISCS in 'FEATURES\ISCS.pas',
 
   GlobalLists in 'OLD\GlobalLists.pas',
   Manifest in 'OLD\Manifest.pas',
@@ -39,7 +40,11 @@ uses
 
   Zip in '3RDPARTY\Zip.pas',
   ZipDlls in '3RDPARTY\ZipDlls.pas',
-  List32 in '3RDPARTY\List32.pas';
+  List32 in '3RDPARTY\List32.pas',
+  SlyIrc in '3RDPARTY\SlyIrc.pas',
+  Response in '3RDPARTY\Response.pas',
+  WSocket in '3RDPARTY\WSocket.pas',
+  WSockBuf in '3RDPARTY\WSockBuf.pas';
   {$ENDIF}
 
   {$IFDEF LINUX}
@@ -66,6 +71,7 @@ uses
   JCon in 'FEATURES/JCon.pas',
   Player_Skills in 'FEATURES/Player_Skills.pas',
   WeissINI in 'FEATURES/WeissINI.pas',
+  ISCS in 'FEATURES/ISCS.pas',
 
   GlobalLists in 'OLD/GlobalLists.pas',
   Manifest in 'OLD/Manifest.pas',
@@ -78,6 +84,10 @@ uses
   Zip in '3RDPARTY/Zip.pas',
   ZipDlls in '3RDPARTY/ZipDlls.pas',
   List32 in '3RDPARTY/List32.pas';
+  SlyIrc in '3RDPARTY/SlyIrc.pas',
+  Response in '3RDPARTY/Response.pas',
+  WSocket in '3RDPARTY/WSocket.pas',
+  WSockBuf in '3RDPARTY/WSockBuf.pas';
   {$ENDIF}
 
 {$R *.res}

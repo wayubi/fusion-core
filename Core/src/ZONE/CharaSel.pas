@@ -119,6 +119,10 @@ begin
                                 end;
                                 tc.Stat1 := 0;
                                 tc.Stat2 := 0;
+
+                                // Inter-Server Communcation System
+                                tc.ISCS := False;
+
 								with tc do begin
 									WFIFOL(w+(cnt*106)+  0, CID);
 									WFIFOL(w+(cnt*106)+  4, BaseEXP);

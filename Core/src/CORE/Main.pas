@@ -17,7 +17,7 @@ uses
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
-        PacketProcesses,
+        PacketProcesses, ISCS,
     {3rd Party Units}
     	List32, Zip;
 
@@ -10291,6 +10291,15 @@ var
 label ExitParse;
 begin
 
+        if ISCS_ON then begin
+            if (Edit1.Text = '-ISCSOFF') then begin
+                iscs_console_disconnect();
+            end else begin
+                iscs_console_send(Edit1.Text);
+            end;
+        end else
+
+
         if Copy(Edit1.Text, 1, 1) = '-' then begin
 
                 sl := TStringList.Create;
@@ -10298,7 +10307,11 @@ begin
 
                 if sl.Count = 0 then goto ExitParse;
 
-                if sl.Strings[0] = 'users' then begin
+                if sl.Strings[0] = 'ISCSON' then begin
+                    iscs_console_connect();
+                end
+
+                else if sl.Strings[0] = 'users' then begin
                 // Displays List of Online Users
                 // Syntax: -users [global]
 
@@ -10879,13 +10892,10 @@ ExitParse:
 end;
 
 procedure TfrmMain.Edit1KeyPress(Sender: TObject; var Key: Char);
-
 begin
-
-        if Key = #13 then begin
-                button1.Click;
-        end;
-
+    if Key = #13 then begin
+        button1.Click;
+    end;
 end;
 
 procedure TfrmMain.CMClickIcon(var msg: TMessage);

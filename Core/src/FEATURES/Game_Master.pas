@@ -12,7 +12,7 @@ uses
     {Shared}
     IniFiles, Classes, SysUtils,
     {Fusion}
-    Common, List32, Globals, PlayerData;
+    Common, List32, Globals, PlayerData, ISCS;
 
 var
     GM_ALIVE : Byte;
@@ -69,6 +69,8 @@ var
     GM_CHARSTATPOINT : Byte;
     GM_CHARSKILLPOINT : Byte;
     GM_CHANGES : Byte;
+    GM_ISCSON : Byte;
+    GM_ISCSOFF : Byte;
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
@@ -187,6 +189,8 @@ var
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
     function command_changes(tc : TChara; str : String) : String;
+    function command_iscson(tc : TChara) : String;
+    function command_iscsoff(tc : TChara) : String;
 
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
@@ -307,6 +311,8 @@ implementation
         GM_CHARSTATPOINT := StrToIntDef(sl.Values['CHARSTATPOINT'], 1);
         GM_CHARSKILLPOINT := StrToIntDef(sl.Values['CHARSKILLPOINT'], 1);
         GM_CHANGES := StrToIntDef(sl.Values['CHANGES'], 0);
+        GM_ISCSON := StrToIntDef(sl.Values['ISCSON'], 0);
+        GM_ISCSOFF := StrToIntDef(sl.Values['ISCSOFF'], 0);
 
         ini.ReadSectionValues('Aegis GM Commands', sl);
 
@@ -440,6 +446,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'CHARSTATPOINT', IntToStr(GM_CHARSTATPOINT));
         ini.WriteString('Fusion GM Commands', 'CHARSKILLPOINT', IntToStr(GM_CHARSKILLPOINT));
         ini.WriteString('Fusion GM Commands', 'CHANGES', IntToStr(GM_CHANGES));
+        ini.WriteString('Fusion GM Commands', 'ISCSON', IntToStr(GM_ISCSON));
+        ini.WriteString('Fusion GM Commands', 'ISCSOFF', IntToStr(GM_ISCSOFF));
 
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
         ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -575,6 +583,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
+            else if ( (copy(str, 1, length('iscson')) = 'iscson') and (check_level(tc, GM_ISCSON)) ) then error_msg := command_iscson(tc)
+            else if ( (copy(str, 1, length('iscsoff')) = 'iscsoff') and (check_level(tc, GM_ISCSOFF)) ) then error_msg := command_iscsoff(tc)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
@@ -2542,6 +2552,21 @@ Called when we're shutting down the server *only*
         changefile.Free;
         Result := 'GM_CHANGES Success.';
     end;
+
+    function command_iscson(tc : TChara) : String;
+    begin
+        tc.ISCS := True;
+        iscs_console_connect(tc);
+        Result := 'GM_ISCSON Success.';
+    end;
+
+    function command_iscsoff(tc : TChara) : String;
+    begin
+        tc.ISCS := False;
+        iscs_console_disconnect(tc);
+        Result := 'GM_ISCSOFF Success.';
+    end;
+
 
     function command_aegis_b(str : String) : String;
     var

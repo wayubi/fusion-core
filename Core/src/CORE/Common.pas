@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = '1.212 E -- R.E.E.D Alpha 5 Release';
+	RELEASE_VERSION = '1.212 F -- I.S.C.S Alpha 1 Release';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
@@ -675,6 +675,9 @@ TChara = class(TLiving)
 	PData         :TPlayer; // Reference back to owning TPlayer
 	IP            :string;
 	Login         :byte; // 0 = offline; 1 = loading; 2 = online
+
+    // Inter-Server Communication System
+    ISCS : Boolean;
 
 	// Data saved and loaded to/from chara.txt
 	// Line 1:
