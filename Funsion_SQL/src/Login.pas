@@ -51,7 +51,7 @@ begin
         tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
 	if tp.Pass = userpass then begin
     if UseSQL then
-		  GetCharaData(tp.ID); // 取得帐号的人物资料
+		  GetAccCharaData(tp.ID); // 取得帐号的人物资料
         {2廳儘僌僀儞僠僃僢僋}
         //DebugOut.Lines.Add('TP Login: '+inttostr(tp.Login));
         if tp.Login = 1 then begin
