@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-28-04: One area of mapunload is causeing server to restart like mad. Commented out. [Tsusai]
 - 07-28-04: Addition to map unloading [Darkhelmet]
 - 07-28-04: Added System of reduced lag for bard [Darkhelmet]
 - 07-28-04: Updated the default starting map location (new_1-1) again... [Tsusai]
