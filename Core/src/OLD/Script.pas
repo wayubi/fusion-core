@@ -1953,6 +1953,7 @@ begin
     str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(tn)), [rfReplaceAll]);
     str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(tn)), [rfReplaceAll]);
     str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(tn)), [rfReplaceAll]);
+    str := StringReplace(str, '$joblevel', IntToStr(tc.JobLV), [rfReplaceAll]);
     str := StringReplace(str, '$$', '$', [rfReplaceAll]);
     Result := str;
 end;

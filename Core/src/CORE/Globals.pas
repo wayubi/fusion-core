@@ -896,8 +896,7 @@ uses
         //predetermined variable string replacement
         str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
         str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
-        str := StringReplace(str, '$$', '$', [rfReplaceAll]);
-        str := StringReplace(str, '\\', '\', [rfReplaceAll]);
+        str := StringReplace(str, '$joblevel', IntToStr(tc.JobLV), [rfReplaceAll]);
         if ((NPCReferal) and (Assigned(NPC))) then begin
             str := StringReplace(str, '$guildname', GetGuildName(NPC), [rfReplaceAll]);
             str := StringReplace(str, '$guildmaster', GetGuildMName(NPC), [rfReplaceAll]);
@@ -906,6 +905,8 @@ uses
             str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(NPC)), [rfReplaceAll]);
             str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(NPC)), [rfReplaceAll]);
         end;
+        str := StringReplace(str, '$$', '$', [rfReplaceAll]);
+        str := StringReplace(str, '\\', '\', [rfReplaceAll]);
 
 
         if NPCReferal then begin
