@@ -221,8 +221,8 @@ uses
 
             datafile.Add('EMAIL : ' + tp.Mail);
 
-            if (tp.Banned = 0) then datafile.Add('BANNED : NO')
-            else if (tp.Banned = 1) then datafile.Add('BANNED : YES');
+            if (tp.Banned = False) then datafile.Add('BANNED : NO')
+            else if (tp.Banned = True) then datafile.Add('BANNED : YES');
 
             datafile.Add('ACCESSLEVEL : ' + IntToStr(tp.AccessLevel));
 

@@ -1967,12 +1967,12 @@ Called when we're shutting down the server *only*
             tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
             tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
 
-            if tp1.Banned = 0 then begin
+            if tp1.Banned = False then begin
                 Result := Result + ' ' + tc1.Name + ' has been banned.';
-                tp1.Banned := 1;
+                tp1.Banned := True;
             end else begin
                 Result := Result + ' ' + tc1.Name + ' has been un-banned.';
-                tp1.Banned := 0;
+                tp1.Banned := False;
             end;
         end else begin
             Result := 'GM_BAN Failure. Character ' + s + ' not found.';

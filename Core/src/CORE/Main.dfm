@@ -52,7 +52,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 400
     Height = 462
-    ActivePage = TabSheet7
+    ActivePage = TabSheet1
     Align = alClient
     Constraints.MinHeight = 445
     Constraints.MinWidth = 400
@@ -1874,6 +1874,14 @@ object frmMain: TfrmMain
         object TabSheet10: TTabSheet
           Caption = 'Inventory'
           ImageIndex = 1
+          object ListBox4: TListBox
+            Left = 8
+            Top = 16
+            Width = 193
+            Height = 153
+            ItemHeight = 18
+            TabOrder = 0
+          end
         end
         object TabSheet13: TTabSheet
           Caption = 'Cart'

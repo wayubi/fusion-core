@@ -142,7 +142,7 @@ begin
                         tp.Pass := SQLDataSet.FieldValues['passwd'];
                         tp.Gender := SQLDataSet.FieldValues['Gender'];
                         tp.Mail := SQLDataSet.FieldValues['Mail'];
-                        tp.Banned := StrToInt(SQLDataSet.FieldValues['Banned']);
+                        tp.Banned := StrToBool(SQLDataSet.FieldValues['Banned']);
                         tp.ver2 := 9;
                         if (SQLDataSet.FieldValues['storeitem'] <> '') then begin
                                 with SQLDataSet do begin

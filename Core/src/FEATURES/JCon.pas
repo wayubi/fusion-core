@@ -66,7 +66,8 @@ uses
         frmMain.ComboBox15.ItemIndex := AccountItem.Gender;
 	    frmMain.Edit6.Text := AccountItem.Mail;
         frmMain.ComboBox18.ItemIndex := -1;
-        frmMain.ComboBox18.ItemIndex := AccountItem.Banned;
+        //frmMain.ComboBox18.ItemIndex := AccountItem.Banned;
+        frmMain.ComboBox18.ItemIndex := abs(StrToInt(BoolToStr(AccountItem.Banned)));
 
         if AccountItem.CName[0] <> '' then frmMain.Button7.Caption := AccountItem.CName[0]
         else frmMain.Button7.Caption := '';
@@ -135,7 +136,7 @@ uses
 	        AccountItem.Pass := frmMain.Edit4.Text;
     	    AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
         	AccountItem.Mail := frmMain.Edit6.Text;
-	        AccountItem.Banned := frmMain.ComboBox18.ItemIndex;
+	        AccountItem.Banned := StrToBool(IntToStr(abs(frmMain.ComboBox18.ItemIndex)));
 		    DataSave(True);
         end else begin
             create_account(frmMain.Edit3.Text, frmMain.Edit4.Text, frmMain.Edit6.Text, IntToStr(frmMain.ComboBox15.ItemIndex));

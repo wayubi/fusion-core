@@ -284,6 +284,7 @@ type
     Button20: TButton;
     Label101: TLabel;
     Label102: TLabel;
+    ListBox4: TListBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -11516,7 +11517,7 @@ begin
         end;
     end;
 
-    CharacterItem.PData.Banned := 1;
+    CharacterItem.PData.Banned := True;
     JCon_Characters_Online();
     DataSave(true);
 

@@ -44,8 +44,8 @@ implementation
 
             tp.Mail := retrieve_data(4, path);
 
-            if retrieve_data(5, path) = 'YES' then tp.Banned := 1
-            else if retrieve_data(5, path) = 'NO' then tp.Banned := 0;
+            if retrieve_data(5, path) = 'YES' then tp.Banned := True
+            else if retrieve_data(5, path) = 'NO' then tp.Banned := False;
 
             tp.AccessLevel := retrieve_data(6, path, 1);
 

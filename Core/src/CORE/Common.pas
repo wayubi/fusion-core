@@ -1034,7 +1034,7 @@ TPlayer = class
 	Pass          :string;
 	Gender        :byte;
 	Mail          :string;
-	Banned        :byte;
+	Banned        :boolean;
 	CID           :array[0..8] of cardinal;
 	CName         :array[0..8] of string;
 	CData         :array[0..8] of TChara; //Reference pointers

@@ -731,7 +731,7 @@ begin
     Pass := unaddslashes(SQLDataSet.FieldValues['passwd']);
     Gender := StrToInt(SQLDataSet.FieldValues['Gender']);
     Mail := unaddslashes(SQLDataSet.FieldValues['Mail']);
-    Banned := StrToInt(SQLDataSet.FieldValues['Banned']);
+    Banned := StrToBool(SQLDataSet.FieldValues['Banned']);
 		ver2 := 9;
 
 		if SQLDataSet.FieldValues['storeitem'] <> '' then begin
