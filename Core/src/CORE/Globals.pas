@@ -960,7 +960,7 @@ uses
         resultlist := get_list(basepath, pfile);
         resultlist.Sort;
         if (resultlist.Count = 0) then Result := 1
-        else Result := StrToInt(resultlist[resultlist.Count-1])+1;
+        else Result := reed_convert_type(resultlist[resultlist.Count-1], 0, 0, basepath+resultlist[resultlist.Count-1])+1;
         resultlist.Free;
     end;
 
