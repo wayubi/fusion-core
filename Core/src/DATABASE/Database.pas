@@ -1185,11 +1185,13 @@ begin
 				else if (sl[i] = 'pvp') then mi.PvP := true
 				else if (sl[i] = 'pvpg') then mi.PvPG := true
 				else if (sl[i] = 'noday') then mi.noday := true
-				else if (sl[i] = 'ctf') then mi.ctf := true;
+				else if (sl[i] = 'ctf') then mi.ctf := true
+                else if (sl[i] = 'pvpn') then mi.PvPN := true;
 
 				if (Option_PVP = false) then begin
 					mi.PvP  := false;
 					mi.PvPG := false;
+                    mi.PvPN := false;
 				end;
 
 				{アジト機能追加ココまで}
