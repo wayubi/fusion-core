@@ -64,13 +64,13 @@ uses
     begin
         SKILL_TYPE := 0;
 
-        {if not check_allow_pvp(tc) then begin //this string need more work or to disactivate forever
+        if not check_allow_pvp(tc) then begin
             if (tc.MSkill = 8) then begin
                 tc.SkillTickID := 8;
             end else begin
                 exit;
             end;
-        end;}
+        end;
 
         targets := TStringList.Create;
         targets.Clear;
@@ -348,7 +348,6 @@ uses
         tc.MUseLv := 0;
     end;
 
-    //Pvp will tell you if you should find monster targets or player targets.
     function find_targets(tc : TChara; sl : TStringList; rangefield : Integer; playersOnly : Boolean = false) : TStringList;
     var
         j1, i1, k1 : Integer;
@@ -676,7 +675,7 @@ uses
     begin
         SKILL_TYPE := 2;
         Result := -1;
-        tc.SkillTickID := 10; //provisory, to work the sightrasher
+        tc.SkillTickID := 10;
 
         sl := TStringList.Create;
         sl.Clear;

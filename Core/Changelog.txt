@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-12-04: Undid non-pvp skill fix. Fix allowed characters to attack each other in NoPVP mode. [AlexKreuz]
 - 09-12-04: Fixed the Sight link to Sight Rasher. [BieL®]
 - 09-12-04: Added the error message to Sight Rasher. [BieL®]
 - 09-12-04: Added the error message to Two-hand Quicken. [BieL®]
