@@ -7540,6 +7540,9 @@ Begin
 	for Idx := 0 to ScriptList.Count - 1 do begin
 		AssignFile(txt, ScriptList.Strings[Idx]);
 		Reset(txt);
+
+		{ChrstphrR - 2004/04/22 - reset Lines for each script, when parsing.}
+		lines := 0;
 		while not eof(txt) do begin
 			Readln(txt, str);
 			Inc(lines);
@@ -7609,7 +7612,7 @@ Begin
 						SetLength(tn.ShopItem, SL1.Count - 1);
 						for Idx2 := 0 to sl1.Count - 2 do begin
 							tn.ShopItem[Idx2] := TShopItem.Create;
-							j := Pos(':', SL1[Idx+1]);
+							j := Pos(':', SL1[Idx2+1]);
 							tn.ShopItem[Idx2].ID    := StrToInt(Copy(SL1[Idx2+1], 1, j - 1));
 							tn.ShopItem[Idx2].Price := StrToInt(Copy(SL1[Idx2+1], j + 1, 8));
 							tn.ShopItem[Idx2].Data  := ItemDB.IndexOfObject(tn.ShopItem[Idx2].ID) as TItemDB;
