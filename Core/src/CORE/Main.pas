@@ -1623,7 +1623,7 @@ begin
 
             tc.Login := 0;
             tp := tc.PData;
-            tp.Login := 0;
+            tp.Login := false;
 
             if UseSQL then SQLDataSave();
         end;
