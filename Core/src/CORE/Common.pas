@@ -28,6 +28,10 @@ const
 	NPC_TYPE_ITEM   = 3;
 	NPC_TYPE_SKILL  = 4;
 
+  // Colus, 20040503: This is the default JID for invisible (non-displayed) NPCs.
+  // callmob and SendNData will look for this.
+  NPC_INVISIBLE = 32767;
+
 
 
 type TLiving = class
@@ -4976,6 +4980,8 @@ procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolea
 begin
 {NPCイベント追加}
 	//if (tn.JID = -1) then exit;//CR 2004/04/26 - JID is Cardinal.
+  // Colus, 20040503: Checking against the constant value now.
+  if (tn.JID = NPC_INVISIBLE) then exit;
 {NPCイベント追加ココまで}
 	if (tn.CType = 3) then begin
 		WFIFOW( 0, $009d);
@@ -7705,12 +7711,17 @@ Begin
                         // but let me just say that this change led to serious stability
                         // problems regarding NPCs. Whoever made this change did NOT test
                         // their results effectively.
-						{TempInt := StrToIntDef(SL1[0],0);
+
+            // Colus, 20040503: Making it work in a 'proper' fashion.  We DO need it,
+            // but we'll handle negative values in a better manner.
+            // All negative JIDs are set to the NPC_INVISIBLE value.
+						TempInt := StrToIntDef(SL1[0],0);
 						if TempInt < 0 then begin
-							ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, 'script']);
+              TempInt := NPC_INVISIBLE;
+							{ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, 'script']);
 							if Assigned(tn) then tn.Free;
-							Exit;
-						end;}
+							Exit;}
+						end;
 
 						tn.JID := TempInt;
 						//ChrstphrR - ERangeError - bad input when
@@ -9276,7 +9287,8 @@ Begin
 						k := 0;
 						for j := 0 to tm.NPC.Count - 1 do begin
 							tn1 := tm.NPC.Objects[j] as TNPC;
-							if (tn1.Name = tn.Script[i].Data2[0]) and (tn1.JID = -1) then begin
+              // Colus, 20040503: Uses NPC_INVISIBLE constant now.
+							if (tn1.Name = tn.Script[i].Data2[0]) and (tn1.JID = NPC_INVISIBLE) then begin
 								tn.Script[i].Data2[0] := IntToStr(tn1.ID);
 								k := 1;
 								break;
