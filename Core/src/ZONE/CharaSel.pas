@@ -182,6 +182,7 @@ begin
 					tc := tp.CData[b];
 
                                         if UseSQL then Load_Parties(tc.CID);
+                                        if UseSQL then Load_Pets(tc.ID);
 {NPCƒCƒxƒ“ƒg’Ç‰Á}
 					i := MapInfo.IndexOf(tc.Map);
 					j := -1;

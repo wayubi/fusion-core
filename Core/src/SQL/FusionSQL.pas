@@ -11,6 +11,7 @@ uses
         function Call_Characters(AID: cardinal) : Boolean;
         function Load_Characters(GID: cardinal) : Boolean;
         function Load_Parties(GID: cardinal) : Boolean;
+        function Load_Pets(AID: cardinal) : Boolean;
 
 implementation
 
@@ -466,6 +467,92 @@ begin
         end;
 
         Result := True;
+end;
+
+function Load_Pets(AID: cardinal) : Boolean;
+var
+        tpe : TPet;
+        tp : TPlayer;
+        tc : TChara;
+        query : string;
+        i : integer;
+begin
+        Result := False;
+
+        query := 'SELECT * FROM pet WHERE PlayerID = '' '+inttostr(AID)+'''';
+        if (MySQL_Query(query)) then begin
+                while not SQLDataSet.Eof do begin
+                        i := PetDB.IndexOf(strtoint(SQLDataSet.FieldValues['JID']));
+                        if (i <> -1) then begin
+                                tpe := TPet.Create;
+                                with tpe do begin
+                                        if assigned (PetList) then begin
+                                                if (PetList.IndexOf(StrToInt(SQLDataSet.FieldValues['PID'])) <> -1) then begin
+                                                        tpe := PetList.Objects[PetList.IndexOf(StrToInt(SQLDataSet.FieldValues['PID']))] as TPet;
+                                                end;
+                                        end;
+                                        PlayerID := StrToInt(SQLDataSet.FieldValues['PlayerID']);
+                                        CharaID := StrToInt(SQLDataSet.FieldValues['CharaID']);
+                                        Cart := StrToInt(SQLDataSet.FieldValues['Cart']);
+                                        Index := StrToInt(SQLDataSet.FieldValues['PIndex']);
+                                        Incubated := StrToInt(SQLDataSet.FieldValues['Incubated']);
+                                        PetID := StrToInt(SQLDataSet.FieldValues['PID']);
+                                        JID := StrToInt(SQLDataSet.FieldValues['JID']);
+                                        Name := unaddslashes(SQLDataSet.FieldValues['Name']);
+                                        Renamed := StrToInt(SQLDataSet.FieldValues['Renamed']);
+                                        LV := StrToInt(SQLDataSet.FieldValues['LV']);
+                                        Relation := StrToInt(SQLDataSet.FieldValues['Relation']);
+                                        Fullness := StrToInt(SQLDataSet.FieldValues['Fullness']);
+                                        Accessory := StrToInt(SQLDataSet.FieldValues['Accessory']);
+                                        Data := PetDB.Objects[i] as TPetDB;
+                                end;
+                                PetList.AddObject(tpe.PetID, tpe);
+
+                                if (tpe.PlayerID <> 0) then begin
+                                        if (tpe.CharaID = 0) then begin
+                                                try
+                                                        tp := Player.IndexOfObject(tpe.PlayerID) as TPlayer;
+                                                        with tp.Kafra.Item[tpe.Index] do begin
+                                                                Attr := 0;
+                                                                Card[0] := $FF00;
+                                                                Card[2] := tpe.PetID mod $10000;
+                                                                Card[3] := tpe.PetID div $10000;
+                                                        end;
+                                                except
+                                                end;
+                                        end else begin
+                                                tc := Chara.IndexOfObject(tpe.CharaID) as TChara;
+                                                if tpe.Cart = 0 then begin
+                                                        try
+                                                                with tc.Item[tpe.Index] do begin
+                                                                        Attr := tpe.Incubated;
+                                                                        Card[0] := $FF00;
+                                                                        Card[2] := tpe.PetID mod $10000;
+                                                                        Card[3] := tpe.PetID div $10000;
+                                                                end;
+                                                        except
+                                                        end;
+                                                end else begin
+                                                        try
+                                                                with tc.Cart.Item[tpe.Index] do begin
+                                                                        Attr := 0;
+                                                                        Card[0] := $FF00;
+                                                                        Card[2] := tpe.PetID mod $10000;
+                                                                        Card[3] := tpe.PetID div $10000;
+                                                                end;
+                                                        except
+                                                        end;
+                                                end;
+                                        end;
+                                end;
+
+                        end;
+                        SQLDataSet.Next;
+                end;
+        end else begin
+                DebugOut.Lines.Add('Pet data loading error...');
+                Exit;
+        end;
 end;
 
 end.

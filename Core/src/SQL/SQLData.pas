@@ -213,7 +213,7 @@ begin
 	Application.ProcessMessages;
 
   {读取组队资料}
-	DebugOut.Lines.Add('Party data loading from SQL...');
+	{DebugOut.Lines.Add('Party data loading from SQL...');
 	Application.ProcessMessages;
 
 	if ExecuteSqlCmd('SELECT * FROM party') then
@@ -249,7 +249,7 @@ begin
 	end;
 
 	DebugOut.Lines.Add(Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));
-	Application.ProcessMessages;
+	Application.ProcessMessages;}
 
   {读取工会资料}
 	DebugOut.Lines.Add('Guild data loading from SQL...');
