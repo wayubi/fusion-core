@@ -902,6 +902,7 @@ type TPlayer = class
 	Gender        :byte;
 	Mail          :string;
 	Banned        :byte;
+	CID           :array[0..8] of cardinal;
 	CName         :array[0..8] of string;
 	CData         :array[0..8] of TChara;
 	Kafra         :TItemList;
@@ -1422,6 +1423,14 @@ GlobalGMsg        :string;
 MapGMsg           :string;
 {僆僾僔儑儞娭楢偙偙傑偱}
 
+// Fusion SQL Declarations
+UseSQL            :Boolean; {是否使用数据库}
+DbHost            :String;
+DbUser            :String;
+DbPass            :String;
+DbName            :String;
+// Fusion SQL Declarations
+
 // Fusion INI Declarations
 Option_PVP        :boolean;
 Option_MaxUsers   :word;
@@ -1601,6 +1610,8 @@ Option_GraceTime_PvPG :cardinal;
 
 
 implementation
+
+uses SQLData;
 
 //==============================================================================
 {捛壛}
@@ -5455,6 +5466,7 @@ begin
 				w := 4;
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
+				  if UseSQL then GetCharaData(Member[i].ID);
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin
 						WFIFOL(w      , tc1.ID);
@@ -6212,6 +6224,7 @@ begin
 		j := tg.RelAlliance.IndexOf(tg1.Name);
 		if (j <> -1) then begin
 			tgl := tg.RelAlliance.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg.ID,tg1.Name,1);
 			tg.RelAlliance.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg1.ID);
@@ -6222,6 +6235,7 @@ begin
 		j := tg1.RelAlliance.IndexOf(tg.Name);
 		if (j <> -1) then begin
 			tgl := tg1.RelAlliance.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg1.ID,tg.Name,1);
 			tg1.RelAlliance.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg.ID);
@@ -6233,6 +6247,7 @@ begin
 		j := tg.RelHostility.IndexOf(tg1.Name);
 		if (j <> -1) then begin
 			tgl := tg.RelHostility.Objects[j] as TGRel;
+			if UseSQL then DeleteGuildAllyInfo(tg.ID,tg1.Name,2);
 			tg.RelHostility.Delete(j);
 			WFIFOW( 0, $0184);
 			WFIFOL( 2, tg1.ID);

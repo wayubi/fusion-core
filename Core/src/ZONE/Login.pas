@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows,Classes, SysUtils, ScktComp, Common, Database;
+	Windows,Classes, SysUtils, ScktComp, Common, Database, SQLData;
 
 //==============================================================================
 // 娭悢掕媊
@@ -67,7 +67,8 @@ begin
     end else
 
     if tp.Pass = userpass then begin
-
+    if UseSQL then
+		  GetAccCharaData(tp.ID); // 取得帐号的人物资料
         if tp.Login = 1 then begin
             count := 0;
 
@@ -88,9 +89,11 @@ begin
         tp.IP := Socket.RemoteAddress;
         tp.Login := 1;
         tp.LoginID1 := Random($7FFFFFFF) + 1;
+					if UseSQL then tp.LoginID2 := GetNowLoginID()
+					else begin
         tp.LoginID2 := NowLoginID;
         Inc(NowLoginID);
-
+					end;
         if NowLoginID >= 2000000000 then NowLoginID := 0;
 
         //DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
@@ -250,6 +253,16 @@ begin
 
 			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
+			if UseSQL then begin
+			  if GetPlayerData(userid) then begin
+          sv1PacketProcessSub(Socket,w,userid,userpass);
+			  end else begin
+          ZeroMemory(@buf[0],23);
+				  WFIFOW( 0, $006a);
+				  WFIFOB( 2, 0);
+				  Socket.SendBuf(buf, 23);
+			  end;
+			end else begin
 			id := PlayerName.IndexOf(userid);
 			if id <> -1 then begin
                                 //DebugOut.Lines.Add ('User Exists');
@@ -269,4 +282,6 @@ begin
 	end;
 end;
 //==============================================================================
+
+end;
 end.

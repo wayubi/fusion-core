@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows, SysUtils, ScktComp, Common;
+	Windows, SysUtils, ScktComp, Common, SQLData;
 
 //==============================================================================
 // 関数定義
@@ -157,6 +157,7 @@ begin
 
 				RFIFOB(2, b);
 				if b > 4 then exit;
+			  if UseSQL then GetCharaPartyGuild(tp.CID[b]);
 				if tp.CData[b] <> nil then begin
 					tc := tp.CData[b];
 {NPCイベント追加}
@@ -227,8 +228,11 @@ begin
 				with tc do begin
 					ID := tp.ID;
 					Gender := tp.Gender;
+					if UseSQL then CID := GetNowCharaID()
+					else begin
 					CID := NowCharaID;
 					Inc(NowCharaID);
+					end;
 					Name := str1;
 					Gender := tp.Gender;
 					JID := 0;
@@ -304,6 +308,7 @@ begin
 					HP := MAXHP;
 					SP := MAXSP;
 				end;
+				if UseSQL then SaveCharaData(tc);
 				CharaName.AddObject(tc.Name, tc);
 				Chara.AddObject(tc.CID, tc);
 				RFIFOB(32, b);
@@ -397,6 +402,8 @@ begin
                 end;
               end;
             end;
+						if UseSQL then
+						  DeleteChar(tc.CID);
 						CharaName.Delete(i);
 						Chara.Delete(i);
 						tc.Free;

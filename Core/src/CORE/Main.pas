@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;
@@ -273,7 +273,6 @@ begin
 		ServerIP := cardinal(inet_addr('127.0.0.1'));
 		//ServerIP := $0100007f;
 	end;
-	sl1.Free;
 	if sl.IndexOfName('Name') <> -1 then begin
 		ServerName := sl.Values['Name'];
 	end else begin
@@ -482,6 +481,11 @@ begin
 	end else begin
 		MapGMsg := 'Emperium Has Been Destroyed';
 	end;
+  if sl.IndexOfName('UseSQL') <> -1 then begin
+		UseSQL := StrToBool(sl.Values['UseSQL']);
+	end else begin
+		UseSQL := false;
+	end;
         if sl.IndexOfName('Timer') <> -1 then begin
 		Timer := StrToBool(sl.Values['Timer']);
 	end else begin
@@ -529,6 +533,34 @@ begin
 
 
         sl.Clear;
+        sl1.Clear;
+
+	ini.ReadSectionValues('Database', sl); // ∂¡»°DatabaseΩ⁄
+	sl1.Delimiter := '.';
+	sl1.DelimitedText := sl.Values['dbhost'];
+	if sl1.Count = 4 then begin
+		DbHost := sl.Values['dbhost'];
+	end else begin
+		DbHost := '127.0.0.1';
+  end;
+  sl1.Free;
+	if sl.IndexOfName('dbuser') <> -1 then begin
+		DbUser := sl.Values['dbuser'];
+	end else begin
+		DbUser := 'root';
+	end;
+	if sl.IndexOfName('dbpass') <> -1 then begin
+		DbPass := sl.Values['dbpass'];
+	end else begin
+		DbPass := '';
+	end;
+	if sl.IndexOfName('dbname') <> -1 then begin
+		DbName := sl.Values['dbname'];
+	end else begin
+		DbName := 'nlogin';
+	end;
+
+        sl.clear;
 
 	ini.ReadSectionValues('Option', sl);
 
@@ -592,6 +624,9 @@ begin
 	Show;
 	//ÉfÅ[É^ì«Ç›çûÇ›
 	DatabaseLoad(Handle);
+	if UseSQL then
+	  SQLDataLoad()
+	else
 	DataLoad();
 
 	//MapLoad('moc_vilg00');
@@ -690,12 +725,18 @@ begin
         ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
         ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
         ini.WriteString('Server', 'MapGMsg', MapGMsg);
+  ini.WriteString('Server', 'UseSQL', BoolToStr(UseSQL));
 	ini.WriteString('Option', 'Left', IntToStr(FormLeft));
 	ini.WriteString('Option', 'Top', IntToStr(FormTop));
 	ini.WriteString('Option', 'Width', IntToStr(FormWidth));
 	ini.WriteString('Option', 'Height', IntToStr(FormHeight));
 	ini.WriteString('Option', 'Priority', IntToStr(Priority));
         ini.WriteString('Option', 'Priority', IntToStr(Priority));
+
+	ini.WriteString('Database', 'dbhost', DbHost);
+	ini.WriteString('Database', 'dbuser', DbUser);
+	ini.WriteString('Database', 'dbpass', DbPass);
+	ini.WriteString('Database', 'dbname', DbName);
 
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
@@ -707,6 +748,9 @@ begin
         
 	ini.Free;
 
+	if UseSQL then
+	  SQLDataSave()
+	else
 	DataSave();
 
   { Mitch: Doesnt hurt to make sure the tray icon was deleted }
@@ -14093,6 +14137,9 @@ end;
 {U0x003b}
 procedure TfrmMain.DBsaveTimerTimer(Sender: TObject);
 begin
+	if UseSQL then
+	  SQLDataSave()
+	else
 	DataSave();
 	//DebugOut.Lines.Add('Data Saved');
 end;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-10-04: Added Michen's Beta MySQL Version. [AlexKreuz]
 - 02-10-04: Fixed Bug #256, Backstab now works PvP. [Darkhelmet]
 - 02-10-04: Fixed Bug #147, Monsters cannot cast while silenced. [Darkhelmet]
 - 02-09-04: Applied Pathfinding Algorithm v2.0 to Monsters' Target Finding procedures. [AlexKreuz]
