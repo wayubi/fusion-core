@@ -150,13 +150,13 @@ Begin(* Proc sv3PacketProcess() *)
 		//if cmd = $00c8 then
 		//	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
 		tc := Socket.Data;
-		if (cmd > $200) then begin
+		if (cmd > MAX_PACKET_NUMBER) then begin
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
 			SetLength(tmpbuf, Socket.ReceiveLength);
 			Socket.ReceiveBuf(tmpbuf[0], Socket.ReceiveLength);
 			Continue;
 		end;
-		Assert((cmd > 0) AND (cmd <= $200), 'Packet Type: index error ' + IntToStr(cmd));
+		Assert((cmd > 0) AND (cmd <= MAX_PACKET_NUMBER), 'Packet Type: index error ' + IntToStr(cmd));
 		if PacketLength[cmd] = -1 then begin
 			Socket.ReceiveBuf(buf[2], 2);
 			RFIFOW(2, w);
