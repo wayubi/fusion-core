@@ -1388,7 +1388,9 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
   DebugOut.Lines.Add('');
   sl.Clear;
   }
-end;
+	{ChrstphrR 2004/04/26 - have to free up what you create...}
+	sl.Free;
+end;//LoadMonsterAIData()
 
 //------------------------------------------------------------------------------
 procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
@@ -1431,42 +1433,50 @@ begin
       //end;
     end else if tsAI2.IfState = 'IF_HIDING' then begin
       if ts.Hidden = true then CheckSkill(tm, ts, tsAI2, Tick);
-    end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
-    end else if tsAI2.IfState = 'IF_ENEMYCOUNT' then begin
-      sl2 := TStringList.Create;
-      m := 9;
-      // Get Players in Area
-      for p1 := (ts.Point.Y - m) div 8 to (ts.Point.Y + m) div 8 do begin
+		end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
+		end else if tsAI2.IfState = 'IF_ENEMYCOUNT' then begin
+			sl2 := TStringList.Create;
+			m := 9;
+			// Get Players in Area
+			for p1 := (ts.Point.Y - m) div 8 to (ts.Point.Y + m) div 8 do begin
 				for i1 := (ts.Point.X - m) div 8 to (ts.Point.X + m) div 8 do begin
 					for c1 := 0 to tm.Block[i1][p1].Clist.Count -1 do begin
-            if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
-						  tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
-              if tc2 = nil then Continue;
-						  if (abs(tc2.Point.X - ts.Point.X) <= m) and (abs(tc2.Point.Y - ts.Point.Y) <= m) then
-							  sl2.AddObject(IntToStr(tc2.ID),tc2);
-            end;
+						if (tm.Block[i1][p1].Clist.Objects[c1] is TChara) then begin
+							tc2 := tm.Block[i1][p1].CList.Objects[c1] as TChara;
+							if tc2 = nil then Continue;
+							if (abs(tc2.Point.X - ts.Point.X) <= m) and (abs(tc2.Point.Y - ts.Point.Y) <= m) then
+								sl2.AddObject(IntToStr(tc2.ID),tc2);
+						end;
 					end;
 				end;
 			end;
-      EnemyCount := sl2.Count;
-      //Check if enemy count meets the if condition
-      if EnemyCount >= StrToInt(tsAI2.IfCond) then CheckSkill(tm, ts, tsAI2, Tick);
-      //DebugOut.Lines.Add('Enemy Count: ' + IntToStr(EnemyCount));
-    end else
-      CheckSkill(tm, ts, tsAI2, Tick);
+			EnemyCount := sl2.Count;
+			//Check if enemy count meets the if condition
+			if EnemyCount >= StrToInt(tsAI2.IfCond) then CheckSkill(tm, ts, tsAI2, Tick);
+			//DebugOut.Lines.Add('Enemy Count: ' + IntToStr(EnemyCount));
 
-    ts.Data.DebugFlag := true;
-  end;
-end;
+			{ChrstphrR 2004/04/26 - have to free up what you create...}
+			{Safe to just Free, since the objects stored are owned and
+			referenced by another list - tm.CList}
+			sl2.Free;
+		end else
+			CheckSkill(tm, ts, tsAI2, Tick);
+
+		ts.Data.DebugFlag := true;
+	end;
+
+	{ChrstphrR 2004/04/26 - have to free up what you create...}
+	sl.Free;
+end;//CalculateSkillIf
 
 //------------------------------------------------------------------------------
 
 procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBFusion; Tick:Cardinal);
 var
-  TempSkill:TSkillDB;
+	TempSkill:TSkillDB;
 begin
-  if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) and (ts.SkillWaitTick < Tick) then begin
-  //if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
+	if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) and (ts.SkillWaitTick < Tick) then begin
+	//if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
 	if tsAI2.SkillID = 'RUN' then begin
       ts.Status := 'RUN';
     end else begin
@@ -1684,8 +1694,11 @@ begin
 							end;
         end;
       end;
-    end;
-end;
+		end;
+
+	{ChrstphrR 2004/04/26 - have to free up what you create...}
+	sl.Free;
+end;//proc PetAttackSkill()
 
 
 
