@@ -10778,9 +10778,14 @@ begin
 
                         k := 0;
 
-                        for j := - 1 to 1 do begin
-                                if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
-                                        tc.isCloaked := true;
+                        for j1 := - 1 to 1 do begin
+                          for i1 := -1 to 1 do begin
+                            if ((j1 = 0) and (i1 = 0)) then continue;
+                            j := tm.gat[xy.X + i1, xy.Y + j1];
+                                if (j = 1) or (j = 5) then begin
+                                  // Colus, 20040205: Moved this to the actual skill.
+                                  // Too many updates.
+                                        {tc.isCloaked := true;
                                         //tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
 
                                         //if SkillTick > tc1.Skill[MSkill].Tick then begin
@@ -10800,13 +10805,16 @@ begin
                                         WFIFOW(8, tc.Stat2);
                                         WFIFOW(10, tc.Option);
                                         WFIFOB(12, 0);
-                                        SendBCmd(tm, tc.Point, 13);
+                                        SendBCmd(tm, tc.Point, 13);   }
                                         k := 1;
                                 end;
+                          end;
                         end;
 
                         if k <> 1 then begin
                                 tc.Skill[MSkill].Tick := Tick;
+								tc.SkillTick := Tick;
+                                tc.SkillTickID := 135;
                                 tc.Option := tc.Option and $FFF9;
                                 //SkillTick := tc.Skill[MSkill].Tick;
                                 //SkillTickID := MSkill;
@@ -10823,9 +10831,29 @@ begin
                         end;
                 end;
 
-                if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) > Tick) then begin
-                        if tc.SP > 1 then tc.SP := tc.SP - 1;
-                        CloakTick := Tick;
+                if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
+                        if tc.SP > 1 then begin
+                          tc.SP := tc.SP - 1;
+                          CloakTick := Tick;
+                          SendCStat1(tc, 0, 7, SP);
+                          //DebugOut.Lines.Add('Hit cloaktick');
+                        end else begin
+                          // Colus, 20040205: Added uncloak when you run out of SP.
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Option := tc.Option and $FFF9;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := 135;
+                                tc.Hidden := false;
+                                tc.isCloaked := false;
+                                CalcStat(tc, Tick);
+                                WFIFOW(0, $0119);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Stat1);
+                                WFIFOW(8, tc.Stat2);
+                                WFIFOW(10, tc.Option);
+                                WFIFOB(12, 0);
+                                SendBCmd(tm, tc.Point, 13);                          
+                        end;
                 end;
 
                 if (tc.isPoisoned = true) then begin
