@@ -18,7 +18,7 @@ var
     GM_DIE : Byte;
     GM_AUTO : Byte;
     GM_HCOLOR : Byte;
-		GM_CCOLOR : Byte;
+    GM_CCOLOR : Byte;
     GM_HSTYLE : Byte;
     GM_KILL : Byte;
     GM_GOTO : Byte;
@@ -28,7 +28,7 @@ var
     GM_JOB : Byte;
     GM_BLEVEL : Byte;
     GM_JLEVEL : Byte;
-		GM_CHANGESTAT : Byte;
+    GM_CHANGESTAT : Byte;
     GM_SKILLPOINT : Byte;
     GM_SKILLALL : Byte;
     GM_STATALL : Byte;
@@ -45,10 +45,24 @@ var
     GM_GLEVEL : Byte;
     GM_IRONICAL : Byte;
     GM_MOTHBALL : Byte;
+    GM_WHERE : Byte;
+    GM_REVIVE : Byte;
+    GM_BAN : Byte;
+    GM_KICK : Byte;
+    GM_ICON : Byte;
+    GM_UNICON : Byte;
+    GM_SERVER : Byte;
+    GM_PVPON : Byte;
+    GM_PVPOFF : Byte;
+    GM_GPVPON : Byte;
+    GM_GPVPOFF : Byte;
+    GM_NEWPLAYER : Byte;
+    GM_PWORD : Byte;
+    GM_USERS : Byte;
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
-		GM_AEGIS_BB : Byte;
+    GM_AEGIS_BB : Byte;
     GM_AEGIS_HIDE : Byte;
     GM_AEGIS_RESETSTATE : Byte;
     GM_AEGIS_RESETSKILL : Byte;
@@ -58,7 +72,7 @@ var
     GM_ATHENA_ALIVE : Byte;
     GM_ATHENA_KILL : Byte;
     GM_ATHENA_DIE : Byte;
-		GM_ATHENA_JOBCHANGE : Byte;
+    GM_ATHENA_JOBCHANGE : Byte;
     GM_ATHENA_HIDE : Byte;
     GM_ATHENA_OPTION : Byte;
     GM_ATHENA_STORAGE : Byte;
@@ -80,7 +94,7 @@ var
     GM_Access_DB : TIntList32;
 
     procedure load_commands();
-		procedure save_commands();
+    procedure save_commands();
 
     procedure parse_commands(tc : TChara; str : String);
     function check_level(id : Integer; cmd : Integer) : Boolean;
@@ -88,7 +102,7 @@ var
     procedure save_gm_log(tc : TChara; str : String);
 
     function command_alive(tc : TChara) : String;
-		function command_item(tc : TChara; str : String) : String;
+    function command_item(tc : TChara; str : String) : String;
     function command_save(tc : TChara) : String;
     function command_return(tc : TChara) : String;
     function command_die(tc : TChara) : String;
@@ -108,7 +122,7 @@ var
     function command_skillpoint(tc : TChara; str : String) : String;
     function command_skillall(tc : TChara) : String;
     function command_statall(tc : TChara) : String;
-		function command_zeny(tc : TChara; str : String) : String;
+    function command_zeny(tc : TChara; str : String) : String;
     function command_changeskill(tc : TChara; str : String) : String;
     function command_monster(tc : TChara; str : String) : String;
     function command_speed(tc : TChara; str : String) : String;
@@ -118,9 +132,17 @@ var
     function command_unit(tc : TChara; str : String) : String;
     function command_stat(tc : TChara; str : String) : String;
     function command_refine(tc : TChara; str : String) : String;
-		function command_glevel(tc : TChara; str : String) : String;
+    function command_glevel(tc : TChara; str : String) : String;
     function command_ironical(tc : TChara) : String;
     function command_mothball(tc : TChara) : String;
+    function command_where(tc : TChara; str : String) : String;
+    function command_revive(str : String) : String;
+    function command_ban(str : String) : String;
+    function command_kick(str : String) : String;
+    function command_icon(tc : TChara; str : String) : String;
+    function command_unicon(tc : TChara; str : String) : String;
+    function command_server() : String;
+
 
 implementation
 
@@ -138,7 +160,7 @@ implementation
         GM_ITEM := StrToIntDef(sl.Values['ITEM'], 1);
         GM_SAVE := StrToIntDef(sl.Values['SAVE'], 1);
         GM_RETURN := StrToIntDef(sl.Values['RETURN'], 1);
-				GM_DIE := StrToIntDef(sl.Values['DIE'], 1);
+        GM_DIE := StrToIntDef(sl.Values['DIE'], 1);
         GM_AUTO := StrToIntDef(sl.Values['AUTO'], 1);
         GM_HCOLOR := StrToIntDef(sl.Values['HCOLOR'], 1);
         GM_CCOLOR := StrToIntDef(sl.Values['CCOLOR'], 1);
@@ -148,7 +170,7 @@ implementation
         GM_SUMMON := StrToIntDef(sl.Values['SUMMON'], 1);
         GM_WARP := StrToIntDef(sl.Values['WARP'], 1);
         GM_BANISH := StrToIntDef(sl.Values['BANISH'], 1);
-				GM_JOB := StrToIntDef(sl.Values['JOB'], 1);
+        GM_JOB := StrToIntDef(sl.Values['JOB'], 1);
         GM_BLEVEL := StrToIntDef(sl.Values['BLEVEL'], 1);
         GM_JLEVEL := StrToIntDef(sl.Values['JLEVEL'], 1);
         GM_CHANGESTAT := StrToIntDef(sl.Values['CHANGESTAT'], 1);
@@ -168,6 +190,20 @@ implementation
         GM_GLEVEL := StrToIntDef(sl.Values['GLEVEL'], 1);
         GM_IRONICAL := StrToIntDef(sl.Values['IRONICAL'], 1);
         GM_MOTHBALL := StrToIntDef(sl.Values['MOTHBALL'], 1);
+        GM_WHERE := StrToIntDef(sl.Values['WHERE'], 1);
+        GM_REVIVE := StrToIntDef(sl.Values['REVIVE'], 1);
+        GM_BAN := StrToIntDef(sl.Values['BAN'], 1);
+        GM_KICK := StrToIntDef(sl.Values['KICK'], 1);
+        GM_ICON := StrToIntDef(sl.Values['ICON'], 1);
+        GM_UNICON := StrToIntDef(sl.Values['UNICON'], 1);
+        GM_SERVER := StrToIntDef(sl.Values['SERVER'], 255);
+        GM_PVPON := StrToIntDef(sl.Values['PVPON'], 1);
+        GM_PVPOFF := StrToIntDef(sl.Values['PVPOFF'], 1);
+        GM_GPVPON := StrToIntDef(sl.Values['GPVPON'], 1);
+        GM_GPVPOFF := StrToIntDef(sl.Values['GPVPOFF'], 1);
+        GM_NEWPLAYER := StrToIntDef(sl.Values['NEWPLAYER'], 1);
+        GM_PWORD := StrToIntDef(sl.Values['PWORD'], 1);
+        GM_USERS := StrToIntDef(sl.Values['USERS'], 1);
 
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
@@ -175,10 +211,10 @@ implementation
         GM_AEGIS_HIDE := StrToIntDef(sl.Values['AEGIS_HIDE'], 1);
         GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_RESETSKILL := StrToIntDef(sl.Values['AEGIS_RESETSKILL'], 1);
-        
+
         GM_ATHENA_HEAL := StrToIntDef(sl.Values['ATHENA_HEAL'], 1);
         GM_ATHENA_KAMI := StrToIntDef(sl.Values['ATHENA_KAMI'], 1);
-				GM_ATHENA_ALIVE := StrToIntDef(sl.Values['ATHENA_ALIVE'], 1);
+        GM_ATHENA_ALIVE := StrToIntDef(sl.Values['ATHENA_ALIVE'], 1);
         GM_ATHENA_KILL := StrToIntDef(sl.Values['ATHENA_KILL'], 1);
         GM_ATHENA_DIE := StrToIntDef(sl.Values['ATHENA_DIE'], 1);
         GM_ATHENA_JOBCHANGE := StrToIntDef(sl.Values['ATHENA_JOBCHANGE'], 1);
@@ -255,6 +291,21 @@ Called when we're shutting down the server *only*
 		ini.WriteString('Fusion GM Commands', 'GLEVEL', IntToStr(GM_GLEVEL));
 		ini.WriteString('Fusion GM Commands', 'IRONICAL', IntToStr(GM_IRONICAL));
 		ini.WriteString('Fusion GM Commands', 'MOTHBALL', IntToStr(GM_MOTHBALL));
+		ini.WriteString('Fusion GM Commands', 'WHERE', IntToStr(GM_WHERE));
+		ini.WriteString('Fusion GM Commands', 'REVIVE', IntToStr(GM_REVIVE));
+		ini.WriteString('Fusion GM Commands', 'BAN', IntToStr(GM_BAN));
+		ini.WriteString('Fusion GM Commands', 'KICK', IntToStr(GM_KICK));
+		ini.WriteString('Fusion GM Commands', 'ICON', IntToStr(GM_ICON));
+		ini.WriteString('Fusion GM Commands', 'UNICON', IntToStr(GM_UNICON));
+		ini.WriteString('Fusion GM Commands', 'SERVER', IntToStr(GM_SERVER));
+		ini.WriteString('Fusion GM Commands', 'PVPON', IntToStr(GM_PVPON));
+		ini.WriteString('Fusion GM Commands', 'PVPOFF', IntToStr(GM_PVPOFF));
+		ini.WriteString('Fusion GM Commands', 'GPVPON', IntToStr(GM_GPVPON));
+		ini.WriteString('Fusion GM Commands', 'GPVPOFF', IntToStr(GM_GPVPOFF));
+		ini.WriteString('Fusion GM Commands', 'NEWPLAYER', IntToStr(GM_NEWPLAYER));
+		ini.WriteString('Fusion GM Commands', 'PWORD', IntToStr(GM_PWORD));
+		ini.WriteString('Fusion GM Commands', 'USERS', IntToStr(GM_USERS));
+		ini.WriteString('Fusion GM Commands', 'SERVER', IntToStr(GM_SERVER));
 
 		ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
 		ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -340,6 +391,13 @@ Called when we're shutting down the server *only*
 		else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
 		else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
 		else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
+        else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_WHERE)) ) then error_msg := command_where(tc, str)
+		else if ( (copy(str, 1, length('revive')) = 'revive') and (check_level(tc.ID, GM_REVIVE)) ) then error_msg := command_revive(str)
+        else if ( (copy(str, 1, length('ban')) = 'ban') and (check_level(tc.ID, GM_BAN)) ) then error_msg := command_ban(str)
+        else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc.ID, GM_KICK)) ) then error_msg := command_kick(str)
+        else if ( (copy(str, 1, length('icon')) = 'icon') and (check_level(tc.ID, GM_ICON)) ) then error_msg := command_icon(tc, str)
+        else if ( (copy(str, 1, length('unicon')) = 'unicon') and (check_level(tc.ID, GM_UNICON)) ) then error_msg := command_unicon(tc, str)
+        else if ( (copy(str, 1, length('server')) = 'server') and (check_level(tc.ID, GM_SERVER)) ) then error_msg := command_server()
 		;
 
 		if (error_msg <> '') then error_message(tc, error_msg);
@@ -1572,6 +1630,151 @@ Called when we're shutting down the server *only*
         	end;
         end;
 
+    end;
+
+    function command_where(tc : TChara; str : String) : String;
+    var
+    	s : String;
+        tc1 : TChara;
+    begin
+    	Result := 'GM_WHERE Failure.';
+
+        s := Copy(str, 7, 256);
+        if s = '' then begin
+            Result := 'GM_WHERE Success. ' + tc.Name + ' located at: ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ').';
+        end else if CharaName.IndexOf(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
+            if tc1.Login <> 2 then begin
+                Result := Result + ' ' + tc1.Name + ' is not logged in.';
+            end else begin
+                Result := 'GM_WHERE Success. ' + tc1.Name + ' located at: ' + tc1.Map + ' (' + IntToStr(tc1.Point.X) + ',' + IntToStr(tc1.Point.Y) + ').';
+            end;
+        end else begin
+            Result := Result + ' Couldnt find player ' + s + '.';
+        end;
+    end;
+
+    function command_revive(str : String) : String;
+    var
+    	s : String;
+        tc1 : TChara;
+        tm : TMap;
+    begin
+    	Result := 'GM_REVIVE Failure.';
+
+        s := Copy(str, 8, 256);
+        s := Trim(s);
+        if CharaName.IndexOf(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
+            tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+
+            tc1.HP := tc1.MAXHP;
+            tc1.SP := tc1.MAXSP;
+            tc1.Sit := 3;
+            SendCStat1(tc1,0,5,tc1.HP);
+            SendCStat1(tc1,0,7,tc1.SP);
+            WFIFOW( 0, $0148);
+            WFIFOL( 2, tc1.ID);
+            WFIFOW( 6, 100);
+            SendBCmd(tm, tc1.Point, 8);
+
+            Result := 'GM_REVIVE Success. ' + tc1.Name + ' revived.'; 
+        end else begin
+        	Result := Result + ' Character ' + s + ' not found.';
+    	end;
+    end;
+
+    function command_ban(str : String) : String;
+    var
+    	s : String;
+        tc1 : TChara;
+        tp1 : TPlayer;
+    begin
+    	Result := 'GM_BAN Success.';
+
+        s := Copy(str, 5, 256);
+        s := Trim(s);
+        if CharaName.IndexOf(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
+
+            if tp1.Banned = 0 then begin
+            	Result := Result + ' ' + tc1.Name + ' has been banned.';
+    	        tp1.Banned := 1;
+            end else begin
+            	Result := Result + ' ' + tc1.Name + ' has been un-banned.';
+    	        tp1.Banned := 0;
+            end;
+        end else begin
+        	Result := 'GM_BAN Failure. Character ' + s + ' not found.';
+    	end;
+    end;
+
+    function command_kick(str : String) : String;
+    var
+    	s : String;
+        tc1 : TChara;	
+    begin
+    	Result := 'GM_KICK Failure.';
+        s := Copy(str, 6, 256);
+        s := Trim(s);
+
+        if CharaName.Indexof(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            if tc1.Login = 2 then begin
+	            tc1.Socket.Close;
+                Result := 'GM KICK Success. Character ' + tc1.Name + ' has been kicked.';
+            end else begin
+            	Result := Result + ' Character ' + s + ' is not online.';
+            end;
+        end else begin
+        	Result := Result + ' Character ' + s + ' does not exist.';
+        end;
+    end;
+
+    function command_icon(tc : TChara; str : String) : String;
+    var
+    	i, j, k : Integer;
+        tm : TMap;
+    begin
+    	Result := 'GM_ICON Failure.';
+
+        Val(Copy(str, 6, 256), i, k);
+        
+        if (k = 0) then begin
+            for j := i to i do begin
+            	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                UpdateIcon(tm, tc, j, 1);
+            end;
+            Result := 'GM_ICON Success. Icon ' + IntToStr(j-1) + ' set.';
+        end else begin
+        	Result := Result + ' Invalid input. Integer input required.';
+        end;
+    end;
+    
+    function command_unicon(tc : TChara; str : String) : String;
+    var
+    	i, j, k : Integer;
+        tm : TMap;
+    begin
+    	Result := 'GM_UNICON Failure.';
+
+        Val(Copy(str, 8, 256), i, k);
+        
+        if (k = 0) then begin
+            for j := i to i do begin
+            	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                UpdateIcon(tm, tc, j, 0);
+            end;
+            Result := 'GM_UNICON Success. Icon ' + IntToStr(j-1) + ' unset.';
+        end else begin
+        	Result := Result + ' Invalid input. Integer input required.';
+        end;
+    end;
+
+    function command_server() : String;
+    begin
+    	Result := 'Ragnarok Online Server powered by Fusion Server Software - ' + RELEASE_VERSION + '.';
     end;
 
 end.
