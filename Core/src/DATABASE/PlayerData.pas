@@ -2170,6 +2170,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
@@ -2376,6 +2377,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
@@ -2547,6 +2549,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
@@ -2721,6 +2724,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
@@ -2886,6 +2890,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
@@ -3066,6 +3071,7 @@ uses
         	tg := GuildList.Objects[i] as TGuild;
 
             if (tg = nil) then Continue;
+            if tg.RegUsers = 0 then Continue;
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
