@@ -1,3 +1,4 @@
+- 05-28-04: Added #201 - Feature Request: Added timestamps to text console. [AlexKreuz]
 - 05-28-04: Added #883 - Feature Request: Option_GM_Logs - INI option logs GM commands. [AlexKreuz]
 - 05-28-04: Switched GM Command, #kill to ALBGM system. [AlexKreuz]
 - 05-28-04: Switched GM Command, #hstyle to ALBGM system. [AlexKreuz]

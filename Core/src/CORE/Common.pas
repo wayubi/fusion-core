@@ -2367,10 +2367,10 @@ begin
 			WElement[1] := 5;
 		end;
     { Colus, 20031228: This is getting stomped in CalcStat
-    DebugOut.Lines.Add(Format('Speed: %d', [Speed]));
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Speed: %d', [Speed]));
                 if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
                         Speed := (Skill[213].Data.Data2[Skill[213].Lv] * Speed) div 100;
-    DebugOut.Lines.Add(Format('Tunnel Speed: %d', [Speed]));
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Tunnel Speed: %d', [Speed]));
                         ASpeed := Round(ASpeed * (Skill[213].Data.Data2[Skill[213].Lv] / 100));
                 end;
      }
@@ -2437,7 +2437,7 @@ begin
 
     JIDFix := tc.JID;
     if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-    //DebugOut.Lines.Add(Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
+    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
                 {g := int (Tick / 3600000);
                  // Darkhelmet Auto Day/Night
                 if (Tick / 3600000) <= 110 then begin
@@ -2945,7 +2945,7 @@ begin
 
 
 		//if Weapon = 11 then Element := ArrowElement;
-		//DebugOut.Lines.Add(Format('WElement: %d/%d', [WElement[0], WElement[1]]));
+		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('WElement: %d/%d', [WElement[0], WElement[1]]));
 		if Weapon = 16 then Critical := Critical * 2;
 		Inc(Range);
     if ((MAXHP * MAXHPPer div 100) > 65535) then begin
@@ -3155,7 +3155,7 @@ begin
   with tc do begin
         {Peco Peco}
         {if (tc.Skill[63].Lv <> 0) and (tc.Option = 32) then begin
-                //DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(ﾟ∀ﾟ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, tc.Skill[63].Data.Icon);
                 WFIFOL(4, tc.ID);
@@ -3171,7 +3171,7 @@ begin
 
         {Falcon Icon}
         {if (tc.Skill[127].Lv <> 0) and (tc.Option = 16) then begin
-                //DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(ﾟ∀ﾟ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, tc.Skill[127].Data.Icon);
                 WFIFOL(4, tc.ID);
@@ -3188,7 +3188,7 @@ begin
 
         {Overweight 50%}
         {if tc.Weight * 2 >= tc.MaxWeight then begin
-                //DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(ﾟ∀ﾟ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, 35);
                 WFIFOL(4, tc.ID);
@@ -3205,7 +3205,7 @@ begin
 
         {Overweight 90%}
         {if Weight * 100 div MaxWeight >= 90 then begin
-        //DebugOut.Lines.Add('(ﾟ∀ﾟ)?');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(ﾟ∀ﾟ)?');
                 WFIFOW(0, $0196);
                 WFIFOW(2, 36);
                 WFIFOL(4, tc.ID);
@@ -3319,7 +3319,7 @@ begin
     while (StartI <= EndI) do begin
       j := SearchCInventory(tc, StartI, false);
       if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
-        DebugOut.Lines.Add('Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
 					//UseItem(tc, j);  //Use Item Function
         ItemDrop(tm, tc, j, 1);
         break;
@@ -4057,7 +4057,7 @@ var
         //Tick :cardinal;
 {ギルド機能追加ココまで}
 begin
-	//DebugOut.Lines.Add(Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
 	ZeroMemory(@buf[0], 60);
 	WFIFOW( 0, $01da);  // 007b -> 01da
 	WFIFOL( 2, tc.ID);
@@ -4281,7 +4281,7 @@ begin
   end
 
   else begin
-     debugout.lines.add('Attempted Battle Command Crash. Temporary Bypass. -AlexKreuz');
+     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Attempted Battle Command Crash. Temporary Bypass. -AlexKreuz');
   end;
 end;
 
@@ -4443,7 +4443,7 @@ var
 begin
   JIDFix := tc.JID;
   if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-  //DebugOut.Lines.Add(Format('JID = %d',[JID]));
+  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('JID = %d',[JID]));
 	//スキル送信
 	WFIFOW( 0, $010f);
 	j := 0;
@@ -4451,7 +4451,7 @@ begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
 		if ((not (tc.Skill[i].Data.Job1[JIDFix])) and (not (tc.Skill[i].Data.Job2[JIDFix])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
-    //if (tc.Skill[i].Data.Job1[JID]) then DebugOut.Lines.Add(Format('Skill %d is true for JID %d',[i, JID]));
+    //if (tc.Skill[i].Data.Job1[JID]) then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Skill %d is true for JID %d',[i, JID]));
 		WFIFOW( 0+37*j+4, i);
 		WFIFOW( 2+37*j+4, tc.Skill[i].Data.SType);
 		WFIFOW( 4+37*j+4, 0);
@@ -5181,7 +5181,7 @@ end;
 //------------------------------------------------------------------------------
 procedure SendMMove(Socket: TCustomWinSocket; ts:TMob; before, after:TPoint; ver2:Word);
 begin
-	//DebugOut.Lines.Add(Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
 	ZeroMemory(@buf[0], 60);
 	WFIFOW( 0, $007b);
 	WFIFOL( 2, ts.ID);
@@ -6080,7 +6080,7 @@ begin
 		//パーティー情報の送信(00FBパケット)
 		j := 28;
 		for k := 0 to 11 do begin
-			//DebugOut.Lines.Add(Format('k = %d : tpa.MemberID = %d', [k,tpa.MemberID[k]]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('k = %d : tpa.MemberID = %d', [k,tpa.MemberID[k]]));
 			if (tpa.MemberID[k] = 0) then break;
 			if (tpa.Member[k].Login = 2) and (tpa.Member[k].BaseLV < tpa.MinLV) then tpa.MinLV := tpa.Member[k].BaseLV;//パーティー最高レベル
 			if (tpa.Member[k].Login = 2) and (tpa.Member[k].BaseLV > tpa.MaxLV) then tpa.MaxLV := tpa.Member[k].BaseLV;//パーティー最低レベル
@@ -6099,7 +6099,7 @@ begin
 			end else begin
 				WFIFOB(j+45, 1);//オフライン
 			end;
-			//DebugOut.Lines.Add(Format('k = %d : ID = %d : Name = %s : Map = %s ', [k, tpa.Member[k].ID, tpa.Member[k].Name, tpa.Member[k].Map]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('k = %d : ID = %d : Name = %s : Map = %s ', [k, tpa.Member[k].ID, tpa.Member[k].Name, tpa.Member[k].Map]));
 			j := j + 46;
 		end;
 		WFIFOW(0, $00fb);
@@ -6156,7 +6156,7 @@ begin
 			if (tc.Map = tc1.Map) or (InMap = false) then begin
 				if (tc.ID = tc1.ID) and (AvoidSelf = true) then continue;
 				tc1.Socket.SendBuf(buf, PacketLen);
-				//DebugOut.Lines.Add(Format('Send to ID %d : Length %d ', [tc1.ID, PacketLen]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Send to ID %d : Length %d ', [tc1.ID, PacketLen]));
 			end;
 		end;
 	end;
@@ -6234,14 +6234,14 @@ begin
 		tcr.MemberID[tcr.Users] := 0;
 		tcr.MemberCID[tcr.Users] := 0;
 		tcr.MemberName[tcr.Users] := '';
-		//DebugOut.Lines.Add(Format('%s Leaves %s', [tc.Name ,tcr.Title]));
+		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s Leaves %s', [tc.Name ,tcr.Title]));
 
 		if (tcr.Users = 0) then begin
 			//空室チャット閉じ
 			WFIFOW( 0, $00d8);
 			WFIFOL( 2, tcr.ID);
 			SendNCrCmd(tc.MData, tc.Point, 6, tc, true);
-			//DebugOut.Lines.Add(Format('ChatRoom(%s) was deleted / Remaining ChatRoom(%d)', [tcr.Title,ChatRoomList.Count-1]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('ChatRoom(%s) was deleted / Remaining ChatRoom(%d)', [tcr.Title,ChatRoomList.Count-1]));
 			ChatRoomList.Delete(ChatRoomList.IndexOf(tcr.ID));
 			tcr.Free;
 		end else begin
@@ -6398,7 +6398,7 @@ begin
 			tc.VenderID := 0;
 
 			//露店リスト削除
-			//DebugOut.Lines.Add(Format('Vender(%s) was close / Remaining Vender(%d)', [tv.Title,VenderList.Count-1]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Vender(%s) was close / Remaining Vender(%d)', [tv.Title,VenderList.Count-1]));
 			VenderList.Delete(VenderList.IndexOf(tv.ID));
 			tv.Free;
 		end;
@@ -6470,7 +6470,7 @@ begin
 				WFIFOW(0, $00ee);
 				tc.Socket.SendBuf(buf, 2);
 			end;
-			//DebugOut.Lines.Add(Format('Dealings(%d) was canceled / Remaining Dealings(%d)', [tdl.ID,DealingList.Count-1]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dealings(%d) was canceled / Remaining Dealings(%d)', [tdl.ID,DealingList.Count-1]));
 			DealingList.Delete(DealingList.IndexOf(tdl.ID));
 			tdl.Free;
 		end;
@@ -6794,7 +6794,7 @@ begin
 		end;
 		//if (tn1.ScriptInitS <> -1) then begin
 			//OnInitラベルを実行
-			//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn1.ID]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn1.ID]));
 			//tc1 := TChara.Create;
 			//tc1.TalkNPCID := tn1.ID;
 			//tc1.ScriptStep := tn1.ScriptInitS;
@@ -6832,7 +6832,7 @@ begin
 			tn1.Enable := false;
 			l := tm.TimerAct.IndexOf(tn1.ID);
 			if (l <> -1) then begin
-				//DebugOut.Lines.Add(Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
 				tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
 			end;
 			for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
@@ -6882,7 +6882,7 @@ var
 	te  :TEmp;
 	tgc :TCastle;
 begin
-          //DebugOut.Lines.Add(MobName);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + MobName);
           tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
           ts := TMob.Create;
 					ts.Data := MobDBName.Objects[MobDBName.IndexOf(MobName)] as TMobDB;
@@ -6995,7 +6995,7 @@ var
   te    :TEmp;
   tgc   :TCastle;
 begin
-          //DebugOut.Lines.Add(MobName);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + MobName);
           tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
           ts := TMob.Create;
 					ts.Data := MobDB.Objects[MobDB.IndexOf(MobID)] as TMobDB;
@@ -7655,7 +7655,7 @@ Var
 
 	procedure MapErr(const EMsg : String);
 	begin
-		DebugOut.Lines.Add(EMsg);
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + EMsg);
 		tm.Free;
 	end;
 
@@ -7754,7 +7754,7 @@ Begin
 		dat := TMemoryStream.Create; //Memory Buffer to read in Map
 		{ChrstphrR -- dat is NOT freed up proper in most early Exits}
 		if ta.Ext = 'gat' then begin
-			//DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Loading mapfile... : ' + MapName + '.gat');
 			dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
 			SetLength(str, 4);
 			dat.Read(str[1], 4);
@@ -7807,12 +7807,12 @@ Begin
 	end;
 
 	//Script Load
-	//DebugOut.Lines.Add('Loading script...');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Loading script...');
 	Tick := timeGetTime;
 	for Idx := 0 to ScriptList.Count - 1 do begin
 		if NOT ScriptValidated(MapName, ScriptList[Idx], Tick) AND
 		   ShowDebugErrors then begin
-			DebugOut.Lines.Add(Format(
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format(
 				'*** Error with script "%s" on map "%s"',
 				[ScriptList[Idx], MapName]
 			));
@@ -7857,7 +7857,7 @@ Begin
 							end;
 						end;
 						if (k = 0) then begin
-							//DebugOut.Lines.Add(Format('%s: [callmob] event not found', [tn.Script[i].Data2[0]]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s: [callmob] event not found', [tn.Script[i].Data2[0]]));
 							tn.Script[i].Data2[0] := '';
 						end;
 					end;
@@ -7971,7 +7971,7 @@ Var
 				end;//else-case
 			end;//case
 
-			DebugOut.Lines.Add(EMsg);
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + EMsg);
 		end;//if ShowDebugErrors
 		SL.Free;
 		SL1.Free;
@@ -8018,7 +8018,7 @@ Begin
 					tn.ID := NowNPCID;
 					Inc(NowNPCID);
 					tn.Name := SL[2];
-					//DebugOut.Lines.Add('-> adding warp point ' + tn.Name);
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> adding warp point ' + tn.Name);
 					if WarpDebugFlag then begin
 						tn.JID := 1002;
 					end else begin
@@ -8058,7 +8058,7 @@ Begin
 					tn.ID      := NowNPCID;
 					Inc(NowNPCID);
 					tn.Name    := SL[2];
-					//DebugOut.Lines.Add('-> adding shop ' + tn.Name);
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> adding shop ' + tn.Name);
 					tn.Map     := MapName;
 					tn.Point.X := StrToInt(SL1[1]);
 					tn.Point.Y := StrToInt(SL1[2]);
@@ -8112,7 +8112,7 @@ Begin
 					tn.ID := NowNPCID;
 					Inc(NowNPCID);
 					tn.Name := SL[2];
-					//DebugOut.Lines.Add('-> adding script ' + tn.Name);
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> adding script ' + tn.Name);
 					tn.Map := MapName;
 					tn.Point.X := StrToIntDef(SL1[1],0);
 					if (tn.Point.X < 0) or (tn.Point.X >= tm.Size.X) then tn.Point.X := 0;
@@ -9158,7 +9158,7 @@ Begin
 							end;
 							//j := CastleList.IndexOf(SL1[0]);
 							//if j = - 1 then begin
-								//DebugOut.Lines.Add(Format('%s %.4d: [guildreg] map error', [ScriptPath, lines]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s %.4d: [guildreg] map error', [ScriptPath, lines]));
 								{ChrstphrR - adding in proper cleanup even though this is
 								all commented out...}
 								//SL.Free;
@@ -9553,7 +9553,7 @@ Begin
 
 					if SL1.Count <> 5 then begin
 						if ShowDebugErrors then
-							DebugOut.Lines.Add(Format(
+							debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format(
 								'%s %.4d: Monster Definition Error: %s',
 								[ScriptPath, Lines, Str]
 							));
@@ -9566,7 +9566,7 @@ Begin
 
 					ts0 := TMob.Create;
 					ts0.Name := SL[2];
-					//DebugOut.Lines.Add('-> adding mob ' + ts0.Name);
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> adding mob ' + ts0.Name);
 					ts0.Map := MapName;
 					ts0.Point1.X := StrToInt(SL1[1]);
 					ts0.Point1.Y := StrToInt(SL1[2]);
@@ -9580,7 +9580,7 @@ Begin
 					SL1.DelimitedText := SL[3];
 					if SL1.Count <> 5 then begin
 						if ShowDebugErrors then
-							DebugOut.Lines.Add(Format(
+							debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format(
 								'%s %.4d: Monster Definition Error: %s',
 								[ScriptPath, Lines, Str]
 							));
@@ -9650,7 +9650,7 @@ Begin
 							ts.Point.Y := ts.Point1.Y + Random(ts.Point2.Y + 1) - (ts.Point2.Y div 2);
 							//030317
 							if (ts.Point.X < 0) or (ts.Point.X > tm.Size.X - 2) or (ts.Point.Y < 0) or (ts.Point.Y > tm.Size.Y - 2) then begin
-								//DebugOut.Lines.Add(Format('***RandomRoute Error!! (%d,%d) %dx%d', [xy.X,xy.Y,tm.Size.X,tm.Size.Y]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('***RandomRoute Error!! (%d,%d) %dx%d', [xy.X,xy.Y,tm.Size.X,tm.Size.Y]));
 								if ts.Point.X < 0 then ts.Point.X := 0;
 								if ts.Point.X > tm.Size.X - 2 then ts.Point.X := tm.Size.X - 2;
 								if ts.Point.Y < 0 then ts.Point.Y := 0;
@@ -9873,7 +9873,7 @@ begin
         for i := 0 to 7 do begin
             mdrop[i] := modfix * integer(ts.Data.Drop[i].Per) div 100;
             rand := Random(20000) mod 10000;
-            //DebugOut.Lines.Add(Format('Drop %d, dropid %d, modfix %d, mdrop %d, rand %d',[i,ts.Data.Drop[i].ID,modfix,mdrop[i],rand]));
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Drop %d, dropid %d, modfix %d, mdrop %d, rand %d',[i,ts.Data.Drop[i].ID,modfix,mdrop[i],rand]));
             if rand <= mdrop[i] then begin
                 // Graphic send
                 WFIFOW( 0, $011a);

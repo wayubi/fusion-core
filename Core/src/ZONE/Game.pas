@@ -148,10 +148,10 @@ Begin(* Proc sv3PacketProcess() *)
 		Socket.ReceiveBuf(buf[0], 2);
 		RFIFOW(0, cmd);
 		//if cmd = $00c8 then
-		//	//DebugOut.Lines.Add('!');
+		//	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '!');
 		tc := Socket.Data;
 		if (cmd > $200) then begin
-			//DebugOut.Lines.Add('不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '不明なパケット' + IntToStr(Socket.ReceiveLength) + 'バイトを破棄しました');
 			SetLength(tmpbuf, Socket.ReceiveLength);
 			Socket.ReceiveBuf(tmpbuf[0], Socket.ReceiveLength);
 			Continue;
@@ -161,14 +161,14 @@ Begin(* Proc sv3PacketProcess() *)
 			Socket.ReceiveBuf(buf[2], 2);
 			RFIFOW(2, w);
 			Socket.ReceiveBuf(buf[4], w - 4);
-			//DebugOut.Lines.Add(Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x len:%d plen:%d', [tc.ID, cmd, w, len]));
 		end else begin
 			Socket.ReceiveBuf(buf[2], PacketLength[cmd] - 2);
 			//if cmd <> $0072 then begin
-			//DebugOut.Lines.Add(Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, cmd]));
 			//end;
 		end;
-    //DebugOut.Lines.Add('Command:' + IntToStr(cmd));
+    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Command:' + IntToStr(cmd));
 
 		case cmd of
 		//--------------------------------------------------------------------------
@@ -176,13 +176,13 @@ Begin(* Proc sv3PacketProcess() *)
 			begin
 				RFIFOL( 2, L);
 				accountid := IntToStr(L);
-				//DebugOut.Lines.Add(Format('3:%.8d CMD %.4x', [l, cmd]));
-				//DebugOut.Lines.Add('		AccountID = ' + IntToHex(l, 4));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [l, cmd]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '		AccountID = ' + IntToHex(l, 4));
 				RFIFOL( 6, l2);
 				charaid := IntToStr(l2);
-				//DebugOut.Lines.Add('		CharaID = ' + IntToHex(l, 4));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '		CharaID = ' + IntToHex(l, 4));
 				RFIFOL(10, id1);
-				//DebugOut.Lines.Add('		LoginID1 = ' + IntToHex(id1, 4));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '		LoginID1 = ' + IntToHex(id1, 4));
 				//RFIFOL(14, id2);
 				if (Player.IndexOf(L) <> -1) and (Chara.IndexOf(L2) <> -1) then begin
 					tp := Player.IndexOfObject(L) as TPlayer;
@@ -329,7 +329,7 @@ Begin(* Proc sv3PacketProcess() *)
 									SendNData(Socket, tn,tc.ver2);
 									if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
 										//OnInit processing
-										//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
+										//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn.ID]));
 										tc1 := TChara.Create;
 										tc1.TalkNPCID := tn.ID;
 										tc1.ScriptStep := tn.ScriptInitS;
@@ -581,8 +581,8 @@ Begin(* Proc sv3PacketProcess() *)
 		//--------------------------------------------------------------------------
 		$0089: //攻撃、座り
 			begin
-        //DebugOut.Lines.Add(IntToStr(tc.ID));
-        //DebugOut.Lines.Add(IntToStr(tc.AMode));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tc.ID));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tc.AMode));
 				if tc.AMode > 2 then continue;
 				if tc.MMode <> 0 then continue;
 
@@ -590,13 +590,13 @@ Begin(* Proc sv3PacketProcess() *)
                 tc.Skill[272].Tick := 0;
 
 				RFIFOB(6, b);
-				//DebugOut.Lines.Add('Inside Attack Command');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Inside Attack Command');
 				if (b = 0) or (b = 7) then begin
-        //DebugOut.Lines.Add(IntToStr(b));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(b));
 					//攻撃
 					RFIFOL(2, l);
 					tm := tc.MData;
-          //DebugOut.Lines.Add(IntToStr(l));
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(l));
           ////////////////////////////////////
 					//モンスター型NPC（攻撃しようとすると開始）
           if tm.NPC.IndexOf(l) <> -1 then begin
@@ -1063,7 +1063,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                         for j := 1 to MAX_SKILL_NUMBER do begin
                                                                 if tc.Skill[j].Data.Icon <> 0 then begin
                                                                         if tc.Skill[j].Tick >= timeGetTime() then begin
-                                                                                //DebugOut.Lines.Add('(Icon Removed');
+                                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(Icon Removed');
                                                                                 UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
                                                                         end;
                                                                 end;
@@ -1436,7 +1436,7 @@ Begin(* Proc sv3PacketProcess() *)
 								end;//if-else
 							end;
 						end;//for i
-						DebugOut.Lines.Add(str2);
+						debugout.lines.add('[' + TimeToStr(Now) + '] ' + str2);
 
 						{Mitch 01-29-2004: Make w the correct length of the packet instead of just 200 }
 						w := Length(str2) + 4;
@@ -1855,7 +1855,7 @@ Begin(* Proc sv3PacketProcess() *)
             for j := 1 to MAX_SKILL_NUMBER do begin
               if tc.Skill[j].Data.Icon <> 0 then begin
                 if tc.Skill[j].Tick >= timeGetTime() then begin
-                  //DebugOut.Lines.Add('(Icon Removed');
+                  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(Icon Removed');
                   UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
                 end;
               end;
@@ -2022,7 +2022,7 @@ Begin(* Proc sv3PacketProcess() *)
 
                                         end else if (Copy(str, 1, 6) = 'server') then begin
                                         	str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
-                                        	DebugOut.Lines.Add(str2);
+                                        	debugout.lines.add('[' + TimeToStr(Now) + '] ' + str2);
                                         	w := 200;
                                         	WFIFOW(0, $009a);
                                         	WFIFOW(2, w);
@@ -2039,7 +2039,7 @@ Begin(* Proc sv3PacketProcess() *)
               CalcStat(tc);
               SendCStat(tc);
               SendCStat1(tc, 0, $0009, tc.StatusPoint);
-						//DebugOut.Lines.Add('DEBUG* Added all stats to ' + tc.Name);
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DEBUG* Added all stats to ' + tc.Name);
 
           end else if (Copy(str, 1, 12) = 'changeskill ') and ((DebugCMD and $4000) <> 0) and (tid.ChangeStatSkill = 1) then begin
 
@@ -2080,7 +2080,7 @@ Begin(* Proc sv3PacketProcess() *)
 						end;
 {修正ココまで}
 						tc.SkillPoint := 1000;
-						//DebugOut.Lines.Add('DEBUG* Added all skills to ' + tc.Name);
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DEBUG* Added all skills to ' + tc.Name);
 						SendCSkillList(tc);
 {追加}      CalcStat(tc);
             SendCStat(tc);
@@ -2260,7 +2260,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                 if sl.Count <> 2 then continue;
 
                                                 if length(sl.Strings[0]) < 4 then begin
-                                                        //DebugOut.Lines.Add('Password Change Failed');
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password Change Failed');
                                                         { Mitch 01-29-2004: Notify user why it failed! }
                                                         str := 'Passwords must be at least 4 characters long!';
                                                         w := Length(str) + 4;
@@ -2270,7 +2270,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                         tc.socket.sendbuf(buf, w);
                                                 end
                                                 else if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
-                                                        //DebugOut.Lines.Add('Password Change Failed');
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password Change Failed');
                                                         { Mitch 01-29-2004: Notify user why it failed! }
                                                         str := 'You have to enter a new password and your email address!';
                                                         w := Length(str) + 4;
@@ -2283,13 +2283,13 @@ Begin(* Proc sv3PacketProcess() *)
                                                         tp1 := Player.IndexOfObject(tc.ID) as TPlayer;
                                                         { Mitch: Removed the following because it isnt used yet:
                                                         if tp1.Gender = 0 then begin
-                                                                //DebugOut.Lines.Add(tc.Name + ' is changing her password.');
+                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc.Name + ' is changing her password.');
                                                         end
                                                         else begin
-                                                                //DebugOut.Lines.Add(tc.Name + ' is changing his password.');
+                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc.Name + ' is changing his password.');
                                                         end;
                                                         }
-                                                        //DebugOut.Lines.Add('Old Password: ' + tp1.Pass);
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Password: ' + tp1.Pass);
                                                         if sl.Strings[1] <> tp1.Mail then begin
                                                           { Mitch 01-29-2004: Notify user why it failed! }
                                                           str := 'Your email address didnt match the one you entered!';
@@ -2300,7 +2300,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                           tc.socket.sendbuf(buf, w);
                                                         end else begin
                                                           tp1.Pass := sl.Strings[0];
-                                                          //DebugOut.Lines.Add('New Password: ' + tp1.Pass);
+                                                          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Password: ' + tp1.Pass);
                                                           { Mitch 01-29-2004: Notify user that the password is changed! }
                                                           str := 'Password changed. New Password: ' + tp1.Pass;
                                                           w := Length(str) + 4;
@@ -2326,7 +2326,7 @@ Begin(* Proc sv3PacketProcess() *)
                                     				end;
                                                 end;
                                             end;
-                                            DebugOut.Lines.Add(str2);
+                                            debugout.lines.add('[' + TimeToStr(Now) + '] ' + str2);
 
                                             { Mitch 01-29-2004: Get correct str length and packet length }
                                             w := Length(str2) + 4;
@@ -2384,7 +2384,7 @@ Begin(* Proc sv3PacketProcess() *)
 
                                                 if (Copy(str, 1, 6) = 'server') then begin
                                                         str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
-                                                        DebugOut.Lines.Add(str2);
+                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + str2);
                                                         { Mitch 01-29-2004: Get correct str length and packet length }
                                                         w := Length(str2);
                                                         WFIFOW(0, $009a);
@@ -2498,7 +2498,7 @@ Begin(* Proc sv3PacketProcess() *)
 		$0096: //wis送信
 			begin
 				RFIFOW(2, w);
-        //DebugOut.Lines.Add(IntToStr(w));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(w));
 				str := RFIFOS(4, 24);
 				i := CharaName.IndexOf(str);
 				if i = -1 then begin
@@ -2550,7 +2550,7 @@ Begin(* Proc sv3PacketProcess() *)
         end;
         end;
 
-      //DebugOut.Lines.Add('GM:'+str);
+      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'GM:'+str);
       end;
       end;
       end;
@@ -2662,7 +2662,7 @@ Begin(* Proc sv3PacketProcess() *)
 				RFIFOW(2, w);
 				RFIFOL(4, l);
 				if (l = tc.ID) and (w >= 1) and (w <= 100) then begin
-        //DebugOut.Lines.Add('UsedItem:' + IntToStr(w));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'UsedItem:' + IntToStr(w));
 					td := tc.Item[w].Data;
 					b := 0;
                                         if tc.item[w].Amount <= 0 then exit;
@@ -3184,7 +3184,7 @@ end;
 				if tc.EqLock = true then continue;
 				RFIFOW(2, w1);
 				RFIFOW(4, w2);
-				//DebugOut.Lines.Add(Format('Index:%d EquipType:%d', [w1, w2]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Index:%d EquipType:%d', [w1, w2]));
 {修正}
         // Colus, 20040304: Upper classes able to equip things now?
         i := tc.JID;
@@ -3407,7 +3407,7 @@ end;
 				if tc.EqLock = true then continue;
 {精錬NPC機能追加ココまで}
 				RFIFOW(2, w);
-        //DebugOut.Lines.Add(IntToStr(tc.Item[w].Equip));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tc.Item[w].Equip));
 				if tc.Item[w].Equip = 32768 then begin
 					tc.Item[w].Equip := 0;
 					WFIFOW(0, $013c);
@@ -3472,7 +3472,7 @@ end;
 			begin
 				RFIFOW(2, w);
 				RFIFOB(4, b);
-				//DebugOut.Lines.Add('	amount = ' + IntToStr(b));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '	amount = ' + IntToStr(b));
 				w := w - 13;
 				if (tc.ParamBase[w] < 100) and (tc.StatusPoint >= tc.ParamUp[w]) then begin
 					Inc(tc.ParamBase[w]);
@@ -3784,7 +3784,7 @@ end;
 
 					tc.ChatRoomID := tcr.ID;
 					ChatRoomList.AddObject(tcr.ID, tcr);
-					//DebugOut.Lines.Add(Format('ChatRoomTitle = %s : OwnerID = %d : OwnerName = %s', [tcr.Title, tcr.MemberID[0], tcr.MemberName[0]]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('ChatRoomTitle = %s : OwnerID = %d : OwnerName = %s', [tcr.Title, tcr.MemberID[0], tcr.MemberName[0]]));
 					i := 0;
         end;
 
@@ -3873,7 +3873,7 @@ end;
 					WFIFOB(16, tcr.Pub);
 					WFIFOS(17, tcr.Title, w);
 					SendNCrCmd(tc.MData, tc.Point, w + 17, tc, true);
-					//DebugOut.Lines.Add(Format('Join = %s / RoomTitle = %s / Users = %d', [tc.Name, tcr.Title, tcr.Users]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Join = %s / RoomTitle = %s / Users = %d', [tc.Name, tcr.Title, tcr.Users]));
 {NPCイベント追加}
 					if (tcr.NPCowner <> 0) and (tcr.Limit = tcr.Users) then begin
 						tc1 := TChara.Create;
@@ -4088,7 +4088,7 @@ end;
 						tdl.UserID[0] := tc1.ID;
 						tdl.USerID[1] := tc.ID;
 						DealingList.AddObject(tdl.ID, tdl);
-						//DebugOut.Lines.Add(Format('StartDealing ID = %d : Char1 = %S : Char2 = %s', [tdl.ID, tc1.Name, tc.Name]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('StartDealing ID = %d : Char1 = %S : Char2 = %s', [tdl.ID, tc1.Name, tc.Name]));
 					end;
 				end;
 			end;
@@ -4305,7 +4305,7 @@ end;
 
 				tc.DealingID := 0;
 				tc1.DealingID := 0;
-				//DebugOut.Lines.Add(Format('Dealings(%d) was completed / Remaining Dealings(%d)', [tdl.ID,DealingList.Count-1]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dealings(%d) was completed / Remaining Dealings(%d)', [tdl.ID,DealingList.Count-1]));
 				DealingList.Delete(DealingList.IndexOf(tdl.ID));
 				tdl.Free;
 			end;
@@ -4475,14 +4475,14 @@ end;
 						tpa.Member[0] := tc;
                                                 if tc.JID = 19 then begin
                                                         tpa.PartyBard[0] := tc;
-                                                        //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end else if tc.JID = 20 then begin
                                                         tpa.PartyDancer[0] := tc;
-                                                        //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);
-						//DebugOut.Lines.Add(Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
 						SendPartyList(tc);
 						i := 0;
 					end;
@@ -4492,7 +4492,7 @@ end;
 					WFIFOB( 2, i);         // 1:同名～ 2:既に～
 					Socket.SendBuf(buf, 3);
 				end;
-				//DebugOut.Lines.Add(Format('PartyNameList.Count = %d', [PartyNameList.Count]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyNameList.Count = %d', [PartyNameList.Count]));
 
 			end;
 
@@ -4507,7 +4507,7 @@ end;
 					WFIFOL( 2, tc.ID);
 					WFIFOS( 6, tc.PartyName, 24);
 					tc1.Socket.SendBuf(buf, 30);
-					//DebugOut.Lines.Add(Format('Party (%s) Join Request From %s To %s', [tc.PartyName,tc.Name,tc1.Name]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Party (%s) Join Request From %s To %s', [tc.PartyName,tc.Name,tc1.Name]));
 				end else begin
 					WFIFOW( 0, $00fd);
 					WFIFOS( 2, tc1.Name, 24);
@@ -4524,10 +4524,10 @@ end;
 				RFIFOL(2, l);
 				RFIFOL(6, l2);
 				j := -1;
-				//DebugOut.Lines.Add(Format('tc.ID = %d : l = %d', [tc.CID,l]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('tc.ID = %d : l = %d', [tc.CID,l]));
 				tc1 := CharaPID.IndexOfObject(l) as TChara;
 				if tc1 = nil then Continue;
-				//DebugOut.Lines.Add(Format('tc.ID = %d / tc1.ID = %d / l = %d', [tc.CID,tc1.CID,l]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('tc.ID = %d / tc1.ID = %d / l = %d', [tc.CID,tc1.CID,l]));
 				if (l2 = 0) then begin
 					WFIFOW( 0, $00fd);
 					WFIFOS( 2, tc.Name, 24);
@@ -4541,10 +4541,10 @@ end;
 							tpa.Member[i] := tc;
                                                         if tc.JID = 19 then begin
                                                                 tpa.PartyBard[0] := tc;
-                                                                //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                         end else if tc.JID = 20 then begin
                                                                 tpa.PartyDancer[0] := tc;
-                                                                //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                         end;
 							tc.PartyName := tpa.Name;
 							if (tc.BaseLV < tpa.MinLV) then tpa.MinLV := tc.BaseLV;
@@ -4554,7 +4554,7 @@ end;
 						end;
 					end;
 					if (j <> -1) then begin
-						//DebugOut.Lines.Add(Format('PartyName = %s / tc.ID = %d / tc1.ID = %d / slot = %d', [tpa.Name,tc.ID,tc1.ID,j]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName = %s / tc.ID = %d / tc1.ID = %d / slot = %d', [tpa.Name,tc.ID,tc1.ID,j]));
 						SendPartyList(tc);
 					end;
 				end;
@@ -4565,7 +4565,7 @@ end;
 				i := PartyNameList.IndexOf(tc.PartyName);
 				if (i <> -1) then begin
 					tpa := PartyNameList.Objects[i] as TParty;
-					//DebugOut.Lines.Add(Format('party check tc.PartyName = %d tpa.Name = %d', [PartyNameList.IndexOf(tc.PartyName),PartyNameList.IndexOf(tpa.Name)]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('party check tc.PartyName = %d tpa.Name = %d', [PartyNameList.IndexOf(tc.PartyName),PartyNameList.IndexOf(tpa.Name)]));
 
 					WFIFOW( 0, $0105);
 					WFIFOL( 2, tc.CID);
@@ -4590,12 +4590,12 @@ end;
 						tpa.MemberID[11] := 0;
 						tpa.Member[11] := nil;
 
-					//DebugOut.Lines.Add(Format('%s Leaves %s', [tc.Name,tpa.Name]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s Leaves %s', [tc.Name,tpa.Name]));
 
 					if (tpa.MemberID[0] = 0) then begin
 					  if UseSQL then DeleteParty(tpa.Name);
 						PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
-						//DebugOut.Lines.Add(Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
 						tpa.Free;
 					end else begin
 						SendPartyList(tpa.Member[0]);
@@ -4665,12 +4665,12 @@ end;
 							tpa.MemberID[11] := 0;
 							tpa.Member[11] := nil;
 
-						//DebugOut.Lines.Add(Format('%s Leaves %s', [tc.Name,tpa.Name]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s Leaves %s', [tc.Name,tpa.Name]));
 
 						if (tpa.MemberID[0] = 0) then begin
 						  if UseSQL then DeleteParty(tpa.Name);
 							PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
-							//DebugOut.Lines.Add(Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
 							tpa.Free;
 						end else begin
 							SendPartyList(tpa.Member[0]);
@@ -4784,11 +4784,11 @@ end;
 				tc.MPoint.X := 0;
 				tc.MPoint.Y := 0;
 
-        //DebugOut.Lines.Add('Use Skill:' + IntToStr(tc.MSkill));
-        //DebugOut.Lines.Add('Use Level:' + IntToStr(tc.MUseLV));
-        //DebugOut.Lines.Add('Target:' + IntToStr(tc.MTarget));
-        //DebugOut.Lines.Add('Mode:' + IntToStr(tc.MMode));
-        //DebugOut.Lines.Add('Use Item:' + IntToStr(tc.UseItemID));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Skill:' + IntToStr(tc.MSkill));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Level:' + IntToStr(tc.MUseLV));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Target:' + IntToStr(tc.MTarget));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mode:' + IntToStr(tc.MMode));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Item:' + IntToStr(tc.UseItemID));
 
         if (tc.Sit <> 1) or (tc.MSkill = 143) then begin
 				if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
@@ -4874,7 +4874,7 @@ end;
 		$0118: //攻撃キャンセル
 			begin
 				if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
-				//DebugOut.Lines.Add(Format('3:%.8d AMode = %d', [tc.ID, tc.AMode]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d AMode = %d', [tc.ID, tc.AMode]));
 			end;
 		//--------------------------------------------------------------------------
 		$011b: //テレポorポータル場所選択
@@ -5043,7 +5043,7 @@ end;
 						WFIFOW(0, $011e);
 						WFIFOB(2, 0);
 						Socket.SendBuf(buf, 3);
-						//DebugOut.Lines.Add(Format('Memo %d: %s (%d,%d)', [i, tc.Map, tc.Point.X, tc.Point.Y]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Memo %d: %s (%d,%d)', [i, tc.Map, tc.Point.X, tc.Point.Y]));
 						continue;
 					end;
 					j := 0;
@@ -5065,7 +5065,7 @@ end;
 				WFIFOW(0, $011e);
 				WFIFOB(2, 0);
 				Socket.SendBuf(buf, 3);
-				//DebugOut.Lines.Add(Format('Memo %d: %s (%d,%d)', [i, tc.Map, tc.Point.X, tc.Point.Y]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Memo %d: %s (%d,%d)', [i, tc.Map, tc.Point.X, tc.Point.Y]));
 				continue;
 			end;
 		//--------------------------------------------------------------------------
@@ -5549,7 +5549,7 @@ end;
 						WFIFOL(2, tv.ID);
 						SendBCmd(tc1.MData, tc1.Point, 6, tc1);
 						//露店リスト削除
-						//DebugOut.Lines.Add(Format('Vender(%s) was close / Remaining Vender(%d)', [tv.Title,VenderList.Count-1]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Vender(%s) was close / Remaining Vender(%d)', [tv.Title,VenderList.Count-1]));
 						VenderList.Delete(VenderList.IndexOf(tv.ID));
 						tv.Free;
 					end;
@@ -6071,7 +6071,7 @@ end;
 					tc.ClassName := PosName[0];
 				end;
 				GuildList.AddObject(tg.ID, tg);
-				//DebugOut.Lines.Add(Format('GuildName %s : ID = %d : Name = %s', [tg.Name, tg.MemberID[0], tg.Member[0].Name]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('GuildName %s : ID = %d : Name = %s', [tg.Name, tg.MemberID[0], tg.Member[0].Name]));
 
 				//作成成功応答
 				WFIFOW( 0, $0167);
@@ -6124,7 +6124,7 @@ end;
 		//--------------------------------------------------------------------------
 		$016b: //ギルド勧誘応答
 			begin
-      //DebugOut.Lines.Add('Guild Invite');
+      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Invite');
 
 RFIFOL(2, l);
 RFIFOL(6, l2);
@@ -7646,7 +7646,7 @@ end;
 					WFIFOW(28+j*22, tc.Cart.Item[tv.Idx[j]].Card[3]);
 				end;
 				Socket.SendBuf(buf, w);
-				//DebugOut.Lines.Add(Format('VenderTitle = %s : OwnerID = %d : OwnerName = %s', [tv.Title, tc.CID, tc.Name]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('VenderTitle = %s : OwnerID = %d : OwnerName = %s', [tv.Title, tc.CID, tc.Name]));
 
 				//Notify other characters that this shop is open for business now
 				WFIFOW(0, $0131);
@@ -7695,14 +7695,14 @@ end;
 						tpa.Member[0] := tc;
                                                 if tc.JID = 19 then begin
                                                         tpa.PartyBard[0] := tc;
-                                                        //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end else if tc.JID = 20 then begin
                                                         tpa.PartyDancer[0] := tc;
-                                                        //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);
-						//DebugOut.Lines.Add(Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
 						SendPartyList(tc);
 						i := 0;
 					end;
@@ -7712,7 +7712,7 @@ end;
 					WFIFOB( 2, i);         // 1:同名～ 2:既に～
 					Socket.SendBuf(buf, 3);
 				end;
-				//DebugOut.Lines.Add(Format('PartyNameList.Count = %d', [PartyNameList.Count]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('PartyNameList.Count = %d', [PartyNameList.Count]));
 
 			end;
 {露店スキル追加ココまで}

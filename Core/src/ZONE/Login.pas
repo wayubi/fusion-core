@@ -76,7 +76,7 @@ begin
 			end;
 			if NowLoginID >= 2000000000 then NowLoginID := 0;
 
-			//DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'tp.ver2 = '+inttostr(w));
 			//tp.ver2 := w;
 			APlayer.ver2 := 9;
 
@@ -292,13 +292,13 @@ begin
 		Socket.ReceiveBuf(buf, len);
 		if (buf[0] = $64) and (buf[1] = $0) then begin
 			RFIFOL(2, l);
-			//DebugOut.Lines.Add('ver1 ' + IntToStr(l));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 ' + IntToStr(l));
 			RFIFOW(54, w);
 			userid := RFIFOS(6, 24);
 			userpass := RFIFOS(30, 24);
 
-			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
-			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'User: ' + userid + ' - Pass: ' + userpass);
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then Load_Accounts(userid);
 				if PlayerName.IndexOf(userid) > -1 then begin
 					//DebugOut.Lines.Add ('User Exists');

@@ -826,15 +826,15 @@ begin
 	//MapLoad('moc_vilg00');
 	//MapLoad('moc_vilg01');
 
-        DebugOut.Lines.Add('');
-	DebugOut.Lines.Add('Startup Success.');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Startup Success.');
         //DebugOut.Lines.SaveToFile('StartupLog.txt');
 
         //DebugOut.Lines.LoadFromFile('Fusion.notice');
 
-        DebugOut.Lines.Add('');
-        DebugOut.Lines.Add('--- Fusion Command Output Begin ---');
-        DebugOut.Lines.Add('');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '--- Fusion Command Output Begin ---');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
 
 	cmdStart.Enabled := true;
   
@@ -1213,20 +1213,20 @@ end;
 procedure TfrmMain.sv1ClientConnect(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-	//DebugOut.Lines.Add(Socket.RemoteAddress + ': Login Server -> Connect');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Connect');
 end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv1ClientDisconnect(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-	//DebugOut.Lines.Add(Socket.RemoteAddress + ': Login Server -> Disconnect');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Disconnect');
 end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv1ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
-        DebugOut.Lines.Add(Socket.RemoteAddress + ': Login Server -> Error: ' + inttostr(ErrorCode));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Login Server -> Error: ' + inttostr(ErrorCode));
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1258,20 +1258,20 @@ end;
 procedure TfrmMain.sv2ClientConnect(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-        //DebugOut.Lines.Add(Socket.RemoteAddress + ': Character Server -> Connect');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Connect');
 end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv2ClientDisconnect(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-        //DebugOut.Lines.Add(Socket.RemoteAddress + ': Character Server -> Disconnect');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Disconnect');
 end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv2ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
 begin
-        DebugOut.Lines.Add(Socket.RemoteAddress + ': Character Server -> Error: ' + inttostr(ErrorCode));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Character Server -> Error: ' + inttostr(ErrorCode));
 	if ErrorCode = 10053 then Socket.Close;
 	ErrorCode := 0;
 end;
@@ -1304,7 +1304,7 @@ end;
 procedure TfrmMain.sv3ClientConnect(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-	//DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Connect');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Connect');
 	NowUsers := sv3.Socket.ActiveConnections;
         statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers); // AlexKreuz (Status Bar)
 end;
@@ -1346,7 +1346,7 @@ begin
         end;
 
         // AlexKreuz: Random 10053 Bug Fix
-        //DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Disconnect');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Disconnect');
         NowUsers := sv3.Socket.ActiveConnections;
         if NowUsers > 0 then Dec(NowUsers);
         statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers); // AlexKreuz (Status Bar)
@@ -1360,7 +1360,7 @@ procedure TfrmMain.sv3ClientError(Sender: TObject;
 //	tc  :TChara;
 //	tp  :TPlayer;
 begin
-	DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
 	if UseSQL then SQLDataSave();
 	if ErrorCode = 10053 then Socket.Close;
 	if ErrorCode = 10054 then Socket.Close;
@@ -2463,7 +2463,7 @@ begin
 		ts.BodyTick := Tick + tc.aMotion;
 	end;
 
-	//DebugOut.Lines.Add(Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;//proc TFrmMain.DamageCalc1()
 //------------------------------------------------------------------------------
 
@@ -2498,7 +2498,7 @@ begin
 				end;
 			end;
 			end;
-			//DebugOut.Lines.Add('Targeted: ' + inttostr(i));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Targeted: ' + inttostr(i));
 			if i > 12 then i := 12;
 			if i < 2 then i := 2;
 			tc.TargetedFix := 12 - i;
@@ -2606,13 +2606,13 @@ begin
 							DelSkillUnit(tm, tn);
 							Dec(i1);
 						end;
-						//DebugOut.Lines.Add('Safety Wall OK >>' + IntToStr(tn.Count));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Safety Wall OK >>' + IntToStr(tn.Count));
 						dmg[6] := 0;
 					end;
 				$85: // Pneuma
 					begin
 						if ts.Data.Range1 >= 4 then miss := true;
-						//DebugOut.Lines.Add('Pneuma OK');
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pneuma OK');
 						dmg[6] := 0;
 					end;
 				end;//case
@@ -2794,7 +2794,7 @@ begin
 
 		dmg[4] := 1;
 	end;
-	//DebugOut.Lines.Add(Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;
 //------------------------------------------------------------------------------
 
@@ -2852,7 +2852,7 @@ begin
                     begin
                         if (miss = false) and (tc.Weapon = 11) then begin
                             miss := true;
-                            //DebugOut.Lines.Add('Pneuma OK');
+                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pneuma OK');
                             dmg[6] := 0;
                         end;
                     end;
@@ -3035,7 +3035,7 @@ begin
 	if tc1.Stat1 <> 0 then begin
 		tc1.BodyTick := Tick + tc.aMotion;
 	end;
-	//DebugOut.Lines.Add(Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;
 //------------------------------------------------------------------------------
 
@@ -3145,7 +3145,7 @@ begin
 			if ts.ATarget <> tc.ID then
 				ts.pcnt := 0
 			else if (ts.pcnt <> 0)  then begin
-				//DebugOut.Lines.Add('Monster Knockback!');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Knockback!');
 				SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				SendBCmd(tm, ts.Point, 58, tc,True);
 			end;
@@ -3247,7 +3247,7 @@ begin
 			if tc1.ATarget <> tc.ID then
 				tc1.pcnt := 0
 			else if tc1.pcnt <> 0 then begin
-				//DebugOut.Lines.Add('Character Knockback!');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Knockback!');
 				//SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				SendBCmd(tm, tc1.Point, 58, tc,True);
 			end;
@@ -3486,7 +3486,7 @@ begin
                                                 if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
                                                 ((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
                                                         //消滅通知
-                                                        //DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Delete', [tc1.Name]));
                                                         WFIFOW(0, $0080);
                                                         WFIFOL(2, ID);
                                                         WFIFOB(6, 0);
@@ -3495,11 +3495,11 @@ begin
                                                 if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
                                                 ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
                                                         //出現通知
-                                                        //DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
+                                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Add', [tc1.Name]));
                                                         SendNData( tc1.Socket, tn, tc1.ver2 );
                                                         //移動通知
                                                         if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
-                                                                //DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
+                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
                                                                 SendPetMove(tc1.Socket, tc, NextPoint );
                                                         end;
                                                 end;
@@ -3592,7 +3592,7 @@ with tc do begin
             begin  HeadDir := 0; dx :=  0; dy :=	0; end; //本来は起こるはずがない
         end;
         Inc(ppos);
-        //DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
     
         for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
             for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin
@@ -3601,8 +3601,8 @@ with tc do begin
 
                     if ((dx <> 0) and (abs(xy.Y - tn.Point.Y) < 16) and (xy.X = tn.Point.X + dx * 15)) or
                     ((dy <> 0) and (abs(xy.X - tn.Point.X) < 16) and (xy.Y = tn.Point.Y + dy * 15)) then begin
-                        //DebugOut.Lines.Add(IntToStr(tn.Item.Identify));
-                        //DebugOut.Lines.Add(Format('		NPC %s Delete', [tn.Name]));
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tn.Item.Identify));
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		NPC %s Delete', [tn.Name]));
 
                         if tn.CType = 3 then begin
                             WFIFOW(0, $00a1);
@@ -3622,7 +3622,7 @@ with tc do begin
                     
                     if ((dx <> 0) and (abs(Point.Y - tn.Point.Y) < 16) and (Point.X = tn.Point.X - dx * 15)) or
                     ((dy <> 0) and (abs(Point.X - tn.Point.X) < 16) and (Point.Y = tn.Point.Y - dy * 15)) then begin
-                        //DebugOut.Lines.Add(Format('		NPC %s Add', [tn.Name]));
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		NPC %s Add', [tn.Name]));
 
                         //if tn.CType = 2 then begin
                             //SendNData(Socket, tn, tc.ver2);
@@ -3631,7 +3631,7 @@ with tc do begin
                         if (tn.Enable = true) then begin
                             SendNData(Socket, tn, tc.ver2);
                             if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
-                                //DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn.ID]));
     
                                 tc1 := TChara.Create;
                                 tc1.TalkNPCID := tn.ID;
@@ -3678,7 +3678,7 @@ with tc do begin
                     if tc <> tc1 then begin
                         if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
                         ((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
-                            //DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
+                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Delete', [tc1.Name]));
                             
                             WFIFOW(0, $0080);
                             WFIFOL(2, ID);
@@ -3690,13 +3690,13 @@ with tc do begin
     
                         if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
                         ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
-                            //DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
+                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Add', [tc1.Name]));
     
                             SendCData(tc, tc1);
                             SendCData(tc1, tc);
                             
                             if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
-                                //DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
     
                                 SendCMove(tc1.Socket, tc, Point, tgtPoint);
                             end;
@@ -3710,7 +3710,7 @@ with tc do begin
 
                     if ((dx <> 0) and (abs(xy.Y - ts.Point.Y) < 16) and (xy.X = ts.Point.X + dx * 15)) or
                     ((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
-                        //DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Mob %s Delete', [ts.Name]));
                         
                         UpdateMonsterDead(tm, ts, 0);
                         {WFIFOW(0, $0080);
@@ -3721,7 +3721,7 @@ with tc do begin
 
                     if ((dx <> 0) and (abs(Point.Y - ts.Point.Y) < 16) and (Point.X = ts.Point.X - dx * 15)) or
                     ((dy <> 0) and (abs(Point.X - ts.Point.X) < 16) and (Point.Y = ts.Point.Y - dy * 15)) then begin
-                        //DebugOut.Lines.Add(Format('		Mob %s Add', [ts.Name]));
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Mob %s Add', [ts.Name]));
                         
                         SendMData(Socket, ts);
 
@@ -3734,15 +3734,15 @@ with tc do begin
         end;
 
         if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
-            //DebugOut.Lines.Add(Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
 
             with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
-                //DebugOut.Lines.Add('BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
                 Delete(IndexOf(ID));
             end;
             
             tm.Block[Point.X div 8][Point.Y div 8].CList.AddObject(ID, tc);
-            //DebugOut.Lines.Add('		BlockMove OK');
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '		BlockMove OK');
         end;
 
         if (tm.gat[Point.X][Point.Y] <> 1) and (tm.gat[Point.X][Point.Y] <> 5) then begin
@@ -3795,7 +3795,7 @@ with tc do begin
             end;
             }
             
-            //DebugOut.Lines.Add(Format('		Move OK', [ID]));
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Move OK', [ID]));
             break;
         end;
         
@@ -4451,7 +4451,7 @@ begin
 						if xy.Y > 0 then b := 1 else b := 3;
 					end;
 				end;
-				//DebugOut.Lines.Add(Format('FireWall: (%d,%d) %d', [xy.X, xy.Y, b]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('FireWall: (%d,%d) %d', [xy.X, xy.Y, b]));
 
 				xy.X := MPoint.X;
 				xy.Y := MPoint.Y;
@@ -4764,7 +4764,7 @@ begin
 						if xy.Y > 0 then b := 1 else b := 3;
 					end;
 				end;
-				//DebugOut.Lines.Add(Format('IceWall: (%d,%d) %d', [xy.X, xy.Y, b]));
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('IceWall: (%d,%d) %d', [xy.X, xy.Y, b]));
 				{Colus, 20031219: Extended IW to 5 tiles,
 				Removed stair-step pattern on diagonal IWs,
 				Made duration dependent on skill level.
@@ -6433,7 +6433,7 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, ts.Point, 15);
-                                        //DebugOut.Lines.Add('Steal zeny success');
+                                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Steal zeny success');
                                                 k := ts.Data.LV * 5;
                                                 Inc(Zeny, k);
 						// Update Zeny
@@ -10200,7 +10200,7 @@ begin
                                                 j := Random(7);
                                                 if (Random(100) < tl.Data1[MUseLV]) then begin
                                                         if tc1.Zeny > 0 then begin;
-                                                         //DebugOut.Lines.Add('PvP Steal zenny succesful');
+                                                         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PvP Steal zenny succesful');
                                                                 k := (tc.BaseLV * 5) - (tc1.BaseLV * 3);
                                                         if k < 0 then k := 0;
                                                         Dec(tc1.Zeny, k);
@@ -11117,7 +11117,7 @@ begin
                                 $85: {Pneuma}
                                 begin
                                     dmg[0] := 0;
-                                    //DebugOut.Lines.Add('Pneuma OK');
+                                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pneuma OK');
                                     dmg[6] := 0;
                                     k := 0;
                                 end;
@@ -11728,7 +11728,7 @@ begin
                                 $85: {Pneuma}
                                 begin
                                     dmg[0] := 0;
-                                    //DebugOut.Lines.Add('Pneuma OK');
+                                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pneuma OK');
                                     dmg[6] := 0;
                                     k := 0;
                                 end;
@@ -11809,7 +11809,7 @@ begin
                                       end;
 						                          //Remove Icons
 			                                if tc1.Skill[i].Data.Icon <> 0 then begin
-							                          //DebugOut.Lines.Add('(Icon Removed)!');
+							                          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(Icon Removed)!');
                                         UpdateIcon(tm, tc1, tc1.Skill[i].Data.Icon, 0);
 						                          end;
                                       CalcStat(tc1, Tick);
@@ -12031,7 +12031,7 @@ begin
 						if ProcessType = 3 then SendCStat(tc1);
 						//アイコン表示
 			if (tl.Icon <> 0) and (tl.Icon <> 107) then begin
-							//DebugOut.Lines.Add('(ﾟ∀ﾟ)!');
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(ﾟ∀ﾟ)!');
               UpdateIcon(tm, tc1, tl.Icon, 1);
 						end;
 					end;
@@ -12066,7 +12066,7 @@ begin
                 if tc.MSkill = 255 then begin
                   if tc.JID = 14 then tc1.Crusader := tc;
                 end;
-								//DebugOut.Lines.Add(Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
 								tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
 								tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;
 								tc1.Skill[tc.MSkill].Effect1 := tl.Data2[tc.MUseLV];
@@ -12388,7 +12388,7 @@ begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
-                          //DebugOut.Lines.Add('Hit cloaktick');
+                          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit cloaktick');
                         end else begin
                           // Colus, 20040205: Added uncloak when you run out of SP.
                           // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
@@ -12422,7 +12422,7 @@ begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
-                          //DebugOut.Lines.Add('Hit cloaktick');
+                          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit cloaktick');
                         end else begin
                           tm := tc.MData;
                           // Colus, 20040205: Added unhide when you run out of SP.
@@ -12455,7 +12455,7 @@ begin
                           tc.SP := tc.SP - 1;
                           tc.Skill[114].Tick := Tick + Cardinal(tc.Skill[114].Data.Data1[tc.Skill[114].Lv]);
                           SendCStat1(tc, 0, 7, SP);
-                          //DebugOut.Lines.Add('Hit maximize tick');
+                          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit maximize tick');
                         end else begin
                           // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
                           tm := tc.MData;
@@ -12464,7 +12464,7 @@ begin
                           tc.Skill[114].Tick := Tick;
                           tc.Skill[114].EffectLV := 0;
                           SkillTick := tc.Skill[114].Tick;
-                          SkillTickID := 114; //DebugOut.Lines.Add(Format('STID %d', [SkillTickID]));
+                          SkillTickID := 114; //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('STID %d', [SkillTickID]));
                         end;
                 end;
                 if (tc.isPoisoned = true) then begin
@@ -12759,7 +12759,7 @@ begin
 				end;
       end;
 			//end;
-    //DebugOut.Lines.Add('Poring is your pet.');
+    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Poring is your pet.');
     end;
   end;
   end;
@@ -12831,7 +12831,7 @@ begin
         $99: // Talkie Box Activated
           begin
 						tn.JID := $8c;
-            //DebugOut.Lines.Add('Talkie changed');
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie changed');
             UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 60000;
           end;
@@ -12880,17 +12880,17 @@ begin
 							end;
             $99: // Talkie Box fires
             begin
-             //DebugOut.Lines.Add('Talkie fire self');
+             //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie fire self');
               WFIFOW(0, $0191);
               WFIFOL(2, tc1.ID);
               WFIFOS(6, tn.Name, 80);
-              //DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
               SendBCmd(tm, tn.Point, 86);
             end;
             $8c: // Talkie Box fires
             begin
               WFIFOW(0, $0191);
-              //DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
+              //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name %s', [tn.Name]));
               WFIFOL(2, tn.ID);
               WFIFOS(6, tn.Name, 80);
               SendBCmd(tm, tn.Point, 86);
@@ -13323,7 +13323,7 @@ begin
 							end;
 						$87: //FP
 							begin
-								//DebugOut.Lines.Add('Hit') ;
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit') ;
 								{if not flag then Break;} //踏んでない
 								tn.Tick := Tick;
 								dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tc1.MATKFix div 500 + 50;
@@ -13484,7 +13484,7 @@ begin
 							end;
             $99: {Talkie Box}
               begin
-              //  DebugOut.Lines.Add('Talkie fire pvp');
+              //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Talkie fire pvp');
                 WFIFOW(0, $0191);
                 WFIFOL(2, tc2.ID);
                 WFIFOS(6, tn.Name, 80);
@@ -13643,7 +13643,7 @@ begin
                   DamageProcess1(tm, tc1, ts1, dmg[0], tick);
                 end else begin
                 //if ((ts1.Element mod 20 <> 9) and (ts1.Data.Race <> 6) and (ts1.EffectTick[3] <= Tick)) then begin
-                  //DebugOut.lines.add(format('et3 %d, tick %d',[ts1.EffectTick[3], Tick]));
+                  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + format('et3 %d, tick %d',[ts1.EffectTick[3], Tick]));
                   //ダメージ算出
                   //dmg[0] := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
                   i := tn.CData.Skill[70].Data.Data2[tn.MUseLV];
@@ -13854,7 +13854,7 @@ begin
 							end;
 						$87: //FP
 							begin
-								//DebugOut.Lines.Add('Hit') ;
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Hit') ;
 								{if not flag then Break;} //踏んでない
 								tn.Tick := Tick;
 								dmg[0] := (tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1)) * tn.CData.MATKFix div 500 + 50;
@@ -14459,7 +14459,7 @@ begin
 										xy.Y := xy.Y + Point.Y;
 										//030316-2 名無しさん/030317
 										if (xy.X < 0) or (xy.X > tm.Size.X - 2) or (xy.Y < 0) or (xy.Y > tm.Size.Y - 2) then begin
-											//DebugOut.Lines.Add(Format('***RandomRoute Error!! (%d,%d) %dx%d', [xy.X,xy.Y,tm.Size.X,tm.Size.Y]));
+											//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('***RandomRoute Error!! (%d,%d) %dx%d', [xy.X,xy.Y,tm.Size.X,tm.Size.Y]));
 											if xy.X < 0 then xy.X := 0;
 											if xy.X > tm.Size.X - 2 then xy.X := tm.Size.X - 2;
 											if xy.Y < 0 then xy.Y := 0;
@@ -14476,12 +14476,12 @@ begin
 											//	Delete(IndexOf(IntToStr(ID)));
 											//end;
 											c := tm.Block[Point.X div 8][Point.Y div 8].Mob.IndexOf(ID);
-											//DebugOut.Lines.Add('MobBlockDelete2 ' + Inttostr(c));
+											//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'MobBlockDelete2 ' + Inttostr(c));
 											if c <> -1 then begin
 												tm.Block[Point.X div 8][Point.Y div 8].Mob.Delete(c);
 												Dec(a);
 											end else begin
-												//DebugOut.Lines.Add(Format('MobBlockDelete2 %d (%d,%d)',[c,Point.X,Point.Y]));
+												//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('MobBlockDelete2 %d (%d,%d)',[c,Point.X,Point.Y]));
 										end;
 										//新しいブロックにデータ追加
 										tm.Block[xy.X div 8][xy.Y div 8].Mob.AddObject(ID, ts);
@@ -14540,7 +14540,7 @@ begin
 					begin              {HeadDir := 0;} dx :=  0; dy :=  0; end; //本来は起こるはずがない
 			end;
 			Inc(ppos);
-			//DebugOut.Lines.Add(Format('	 Mob-Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, path[ppos-1], spd, Tick]));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('	 Mob-Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, path[ppos-1], spd, Tick]));
 
 			//ブロック処理
 			for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
@@ -14581,7 +14581,7 @@ begin
 					tm.Block[xy.X div 8][xy.Y div 8].Mob.Delete(c);
 					Dec(k);
 				end else begin
-					//DebugOut.Lines.Add(Format('MobBlockDelete %d (%d,%d)',[c,xy.X,xy.Y]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('MobBlockDelete %d (%d,%d)',[c,xy.X,xy.Y]));
 				end;
 				//新しいブロックにデータ追加
 				tm.Block[Point.X div 8][Point.Y div 8].Mob.AddObject(ID, ts);
@@ -15611,7 +15611,7 @@ begin
             if (AMode = 1) or (AMode = 2) then begin
                 ts := AData;
                 if ( (ts.Point.x = tc.Point.x) and (ts.Point.y = tc.Point.Y) ) then begin
-                    //debugout.lines.add('stuck');
+                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'stuck');
                     k := 0;
                     r := 0;
                     while ( (k = 0) and (r < 100) ) do begin
@@ -15650,7 +15650,7 @@ begin
 				//追加移動処理
 				if NextFlag and (DmgTick <= Tick) then begin
 					if (tm.Size.X < NextPoint.X) or (tm.Size.Y < NextPoint.Y) then begin
-						//DebugOut.Lines.Add('Move processing error');
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
 //					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
@@ -15700,7 +15700,7 @@ begin
 					end;
 				end;
 			except
-				//DebugOut.Lines.Add('Move processing error');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
 			end;
 
                         //Auto Attacking
@@ -15743,7 +15743,7 @@ begin
 							//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
 							k := 0;
 							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
-								//DebugOut.Lines.Add('mob : ' + IntToStr(k));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
                                                                 if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
                                                                         Inc(k);
                                                                         continue;
@@ -15926,7 +15926,7 @@ begin
 					// Remove icon if the skill has one...
           if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
             if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
-  						//DebugOut.Lines.Add(Format('(Icon remove, skilltickid %d)',[SkillTickID]));
+  						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('(Icon remove, skilltickid %d)',[SkillTickID]));
               UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
             end;
 					end;
@@ -15949,7 +15949,7 @@ begin
 							//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
 							k := 0;
 							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
-								//DebugOut.Lines.Add('mob : ' + IntToStr(k));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
                                                                 if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
                                                                         Inc(k);
                                                                         continue;
@@ -16078,7 +16078,7 @@ begin
                         if ts.isSlave then begin
                         MonsterDie(tm,tc,ts,Tick);
                         end else begin
-												//DebugOut.Lines.Add(Format('* * * * SearchPath Error (%d,%d)',[Point.X,Point.Y]));
+												//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('* * * * SearchPath Error (%d,%d)',[Point.X,Point.Y]));
                         end;
 												MoveWait := Tick + 10000;
 											end;
@@ -16090,7 +16090,7 @@ begin
 							//アイテム&スキル効能地処理(付近のもののみ処理)
 							k := 0;
 							while (0 <= k) and (k < tm.Block[a][b].NPC.Count) do begin
-								//DebugOut.Lines.Add('mob : ' + IntToStr(k));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
                 if ((tm.Block[a][b].NPC.Objects[k] is TNPC) = false) then begin
                 Inc(k);
                 continue;
@@ -16243,7 +16243,7 @@ begin
 						tn := tm.NPC.IndexOfObject(tr.ID) as TNPC;
 						for a := 0 to tr.Cnt - 1 do begin
 							if (tr.Tick + cardinal(tr.Idx[a]) <= Tick) and (tr.Done[a] = 0) then begin
-								//DebugOut.Lines.Add(Format('NPC Timer Event(%d)', [tr.Idx[a]]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer Event(%d)', [tr.Idx[a]]));
 								tr.Done[a] := 1;
 								tc1 := TChara.Create;
 								tc1.TalkNPCID := tr.ID;
@@ -16330,7 +16330,7 @@ begin
 		SQLDataSave()
 	else
 		DataSave();
-	//DebugOut.Lines.Add('Data Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Data Saved');
 end;
 
 //==============================================================================
@@ -16378,7 +16378,7 @@ begin
                                 end;
                         end;
 
-                        DebugOut.Lines.Add(str);
+                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + str);
 
                         if sl.Count = 2 then begin
                                 if sl.Strings[1] = 'global' then begin
@@ -16392,7 +16392,7 @@ begin
                 else if sl.strings[0] = 'save' then begin
                 // Save data
                     DataSave();
-                    Debugout.lines.add('Player data has been saved.');
+                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data has been saved.');
                 end
 
                 else if sl.Strings[0] = 'reload' then begin
@@ -16433,16 +16433,16 @@ begin
                     PetList.Clear;
                 	DatabaseLoad(Handle);
 	                DataLoad();
-                    debugout.lines.add('');
-                    debugout.lines.add('Databases Reload Completed ...');
-                    debugout.lines.add('');
+                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Databases Reload Completed ...');
+                    debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
                 end
 
                 else if sl.Strings[0] = 'uptime' then begin
                 // Displays Uptime Stats in Console
                 // Syntax: -uptime [global]
 
-                        DebugOut.Lines.Add('Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.');
+                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Fusion Server Uptime: '+floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.');
 
                         if sl.Count = 2 then begin
                                 if sl.Strings[1] = 'global' then begin
@@ -16464,7 +16464,7 @@ begin
                                                         WFIFOW(0, $00b3);
                                                         WFIFOB(2, $0001);
                                                         tc1.Socket.SendBuf(buf, 3);
-                                                        DebugOut.Lines.Add(sl.Strings[1] + ' has been kicked.');
+                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + sl.Strings[1] + ' has been kicked.');
                                                         
                                                         if sl.Count > 2 then begin
                                                                 if sl.Strings[2] = 'global' then begin
@@ -16473,7 +16473,7 @@ begin
                                                                 end;
                                                         end;
                                                 end else begin
-                                                        DebugOut.Lines.Add(sl.Strings[1] + ' is not online.');
+                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + sl.Strings[1] + ' is not online.');
                                                 end;
                                         end;
                                 end;
@@ -16552,16 +16552,16 @@ begin
 																	        	if sl.Strings[9] = '=' then begin
 																			        if sl.Count > 10 then begin
                                                                                                                                                                         if PlayerName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                DebugOut.Lines.Add('That username does not exist.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That username does not exist.');
                                                                                                                                                                         end
                                                                                                                                                                         else begin
                                                                                                                                                                                 tp1 := PlayerName.Objects[PlayerName.IndexOf(sl.Strings[10])] as TPlayer;
 
-                                                                                                                                                                                DebugOut.Lines.Add('Username: '+sl.Strings[10]);
-                                                                                                                                                                                DebugOut.Lines.Add('Old Gender: '+inttostr(tp1.Gender));
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Gender: '+inttostr(tp1.Gender));
                                                                                                                                                                                 tp1.Gender := strtoint(sl.Strings[6]);
-                                                                                                                                                                                DebugOut.Lines.Add('New Gender: '+sl.Strings[6]);
-                                                                                                                                                                                DebugOut.Lines.Add('Gender change was successful.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Gender: '+sl.Strings[6]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Gender change was successful.');
                                                                                                                                                                         end;
                                                                                                                                			        	end;
                                                                                                                                                         end;
@@ -16587,16 +16587,16 @@ begin
 																	        	if sl.Strings[9] = '=' then begin
 																			        if sl.Count > 10 then begin
                                                                                                                                                                         if PlayerName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                DebugOut.Lines.Add('That username does not exist.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That username does not exist.');
                                                                                                                                                                         end
                                                                                                                                                                         else begin
                                                                                                                                                                                 tp1 := PlayerName.Objects[PlayerName.IndexOf(sl.Strings[10])] as TPlayer;
 
-                                                                                                                                                                                DebugOut.Lines.Add('Username: '+sl.Strings[10]);
-                                                                                                                                                                                DebugOut.Lines.Add('Old Password: '+ tp1.Pass);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Password: '+ tp1.Pass);
                                                                                                                                                                                 tp1.Pass := sl.Strings[6];
-                                                                                                                                                                                DebugOut.Lines.Add('New Password: '+sl.Strings[6]);
-                                                                                                                                                                                DebugOut.Lines.Add('Password change was successful.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Password: '+sl.Strings[6]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password change was successful.');
                                                                                                                                                                         end;
                                                                                                                                			        	end;
                                                                                                                                                         end;
@@ -16614,17 +16614,17 @@ begin
                                                                                                                                                                         end;
 
                                                                                                                                                                         if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                DebugOut.Lines.Add('That character does not exist.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
                                                                                                                                                                         end
                                                                                                                                                                         else begin
                                                                                                                                                                                 tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
                                                                                                                                                                                 tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
 
-                                                                                                                                                                                DebugOut.Lines.Add('Username: '+sl.Strings[10]);
-                                                                                                                                                                                DebugOut.Lines.Add('Old Password: '+ tp1.Pass);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Username: '+sl.Strings[10]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Old Password: '+ tp1.Pass);
                                                                                                                                                                                 tp1.Pass := sl.Strings[6];
-                                                                                                                                                                                DebugOut.Lines.Add('New Password: '+sl.Strings[6]);
-                                                                                                                                                                                DebugOut.Lines.Add('Password change was successful.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'New Password: '+sl.Strings[6]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Password change was successful.');
                                                                                                                                                                         end;
                                                                                                                                			        	end;
                                                                                                                                                         end;
@@ -16666,25 +16666,25 @@ begin
                                                                                                                                                                         end;
 
                                                                                                                                                                         if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                DebugOut.Lines.Add('That character does not exist.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
                                                                                                                                                                         end
                                                                                                                                                                         else begin
                                                                                                                                                                                 tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
-                                                                                                                                                                                DebugOut.Lines.Add('Character Name: ' + sl.Strings[10]);
-                                                                                                                                                                                DebugOut.Lines.Add('Total Zeny: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[10]);
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Zeny: ' + inttostr(tc1.Zeny));
 
                                                                                                                                                                                 if (copy(sl.Strings[6],1,1) = '+') or (copy(sl.Strings[6],1,1) = '-') then begin
                                                                                                                                                                                         if tc1.Zeny + Cardinal(strtoint(sl.Strings[6])) < 0 then begin
-                                                                                                                                                                                                DebugOut.Lines.Add('Not enough Zeny. Zeny command was un-successful.');
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Not enough Zeny. Zeny command was un-successful.');
                                                                                                                                                                                         end else begin
                                                                                                                                                                                                 tc1.Zeny := tc1.Zeny + Cardinal(strtoint(sl.Strings[6]));
-                                                                                                                                                                                                DebugOut.Lines.Add('Zeny command was successful.');
-                                                                                                                                                                                                DebugOut.Lines.Add('Updated Total: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
                                                                                                                                                                                         end;
                                                                                                                                                                                 end else begin
                                                                                                                                                                                         tc1.Zeny := strtoint(sl.Strings[6]);
-                                                                                                                                                                                        DebugOut.Lines.Add('Zeny command was successful.');
-                                                                                                                                                                                        DebugOut.Lines.Add('Updated Total: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
+                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
                                                                                                                                                                                 end;
 
                                                                                                                                                                                 if tc1.Login = 2 then begin
@@ -16723,7 +16723,7 @@ begin
                                                                                                                                                                                         end;
 
                                                                                                                                                                                         if CharaName.IndexOf(sl.Strings[12]) = -1 then begin
-                                                                                                                                                                                                DebugOut.Lines.Add('That character does not exist.');
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
                                                                                                                                                                                         end else begin
 
                                                                                                                                                                                                 tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[12])] as TChara;
@@ -16744,12 +16744,12 @@ begin
                                                                                                                                                                                                                         tc1.Point.X := strtoint(sl.Strings[7]);
                                                                                                                                                                                                                         tc1.Point.Y := strtoint(sl.Strings[8]);
                                                                                                                                                                                                                 end;
-                                                                                                                                                                                                                DebugOut.Lines.Add(tc1.Name + ' was moved successfully to ' + sl.Strings[6] + ' ' + sl.Strings[7] + ' ' + sl.Strings[8] + '.');
+                                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was moved successfully to ' + sl.Strings[6] + ' ' + sl.Strings[7] + ' ' + sl.Strings[8] + '.');
                                                                                                                                                                                                         end else begin
-                                                                                                                                                                                                                DebugOut.Lines.Add(tc1.Name + ' was not moved. Bad Map Coordinates.');
+                                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was not moved. Bad Map Coordinates.');
                                                                                                                                                                                                         end;
                                                                                                                                                                                                 end else begin
-                                                                                                                                                                                                        DebugOut.Lines.Add(tc1.Name + ' was not moved. Bad Map Name.');
+                                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + tc1.Name + ' was not moved. Bad Map Name.');
                                                                                                                                                                                                 end;
                                                                                                                                                                                         end;
                                                                                                                                                                                 end;
@@ -16784,26 +16784,26 @@ begin
                                                                                                                                                                         end;
 
                                                                                                                                                                         if CharaName.IndexOf(sl.Strings[10]) = -1 then begin
-                                                                                                                                                                                DebugOut.Lines.Add('That character does not exist.');
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
                                                                                                                                                                         end
                                                                                                                                                                         else begin
                                                                                                                                                                                 tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[10])] as TChara;
-                                                                                                                                                                                DebugOut.Lines.Add('Character Name: ' + sl.Strings[10]);
-                                                                                                                                                                                //DebugOut.Lines.Add('Total Zeny: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[10]);
+                                                                                                                                                                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Zeny: ' + inttostr(tc1.Zeny));
 
                                                                                                                                                                                 if (copy(sl.Strings[7],1,1) = '+') or (copy(sl.Strings[7],1,1) = '-') then begin
                                                                                                                                                                                         if tc1.Item[sl.Strings[6]].Amount + strtoint(sl.Strings[7]) < 0 then begin
-                                                                                                                                                                                                DebugOut.Lines.Add('Not enough quantity. Item command was un-successful.');
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Not enough quantity. Item command was un-successful.');
                                                                                                                                                                                         end else begin
                                                                                                                                                                                                 tc1.Item[sl.Strings[6]
                                                                                                                                                                                                 tc1.Zeny := tc1.Zeny + strtoint(sl.Strings[6]);
-                                                                                                                                                                                                DebugOut.Lines.Add('Zeny command was successful.');
-                                                                                                                                                                                                DebugOut.Lines.Add('Updated Total: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
+                                                                                                                                                                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
                                                                                                                                                                                         end;
                                                                                                                                                                                 end else begin
                                                                                                                                                                                         tc1.Zeny := strtoint(sl.Strings[6]);
-                                                                                                                                                                                        DebugOut.Lines.Add('Zeny command was successful.');
-                                                                                                                                                                                        DebugOut.Lines.Add('Updated Total: ' + inttostr(tc1.Zeny));
+                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Zeny command was successful.');
+                                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Updated Total: ' + inttostr(tc1.Zeny));
                                                                                                                                                                                 end;
 
                                                                                                                                                                                 if tc1.Login = 2 then begin
@@ -16856,15 +16856,15 @@ begin
                                                                                                                                                 end;
 
                                                                                                                                                 if CharaName.IndexOf(sl.Strings[8]) = -1 then begin
-                                                                                                                                                        DebugOut.Lines.Add('That character does not exist.');
+                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'That character does not exist.');
                                                                                                                                                 end
                                                                                                                                                 else begin
                                                                                                                                                         tc1 := CharaName.Objects[CharaName.IndexOf(sl.Strings[8])] as TChara;
-                                                                                                                                                        DebugOut.Lines.Add('Character Name: ' + sl.Strings[8]);
+                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Name: ' + sl.Strings[8]);
                                                                                                                                                         i := 0;
                                                                                                                                 			for j := 1 to 100 do begin
                                                                                                                                 				if tc1.Item[j].ID <> 0 then begin
-                                                                                                                                                                        DebugOut.Lines.Add('Call Number: '+inttostr(j)+', ID: '+inttostr(tc1.Item[j].ID)+', Quantity: '+inttostr(tc1.Item[j].Amount));
+                                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Call Number: '+inttostr(j)+', ID: '+inttostr(tc1.Item[j].ID)+', Quantity: '+inttostr(tc1.Item[j].Amount));
                                                                                                                                 					{sl.Add(IntToStr(tc.Item[j].ID));
                                                                                                                                 					sl.Add(IntToStr(tc.Item[j].Amount));
                                                                                                                                 					sl.Add(IntToStr(tc.Item[j].Equip));
@@ -16878,7 +16878,7 @@ begin
                                                                                                                                 					Inc(i);
                                                                                                                                 				end;
                                                                                                                                 			end;
-                                                                                                                                                        DebugOut.Lines.Add('Total Items: ' + inttostr(i));
+                                                                                                                                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Total Items: ' + inttostr(i));
 																	        end;
 															        	end;
 															        end;
@@ -16929,7 +16929,7 @@ ExitParse:
 		        if tc1.Login = 2 then tc1.Socket.SendBuf(buf, w);
                 end;
 
-                DebugOut.Lines.Add('Server: ' + str);
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server: ' + str);
         end;
 
         edit1.Clear;
@@ -17076,13 +17076,13 @@ begin
       end;
       tm.Block[tv.Point.X div 8][tv.Point.Y div 8].Clist.AddObject(tv.ID, tv);
 
-      //if (tv.pcnt <> 0) then begin DebugOut.Lines.Add('Move');
+      //if (tv.pcnt <> 0) then begin debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move');
         tv.pcnt := 0;
         //UpdateLivingLocation(tm, tv);
         //SendCMove(tc.Socket, (tv as TChara), xy, tv.Point);
         //SendBCmd(tm, tv.Point, 60, tc);
-      //end else begin DebugOut.Lines.Add('Stat');
-      //DebugOut.Lines.Add(Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
+      //end else begin debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Stat');
+      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
         SetSkillUnit(tm, tv.ID, tv.Point, timeGetTime(), $2E, 0, 3000, tc);
         UpdateLivingLocation(tm, tv);
 				//SendCData(tc, tc);

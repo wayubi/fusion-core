@@ -45,7 +45,7 @@ begin
                 try
                         SQLConnection.Connected := True;
                 except
-                        DebugOut.Lines.Add('*** Error on MySQL Connect.');
+                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '*** Error on MySQL Connect.');
                         Exit;
                 end;
         end;
@@ -63,7 +63,7 @@ begin
                 try
                         SQLDataSet.ExecSQL;
 		except
-                        DebugOut.Lines.Add( Format( '*** Execute SQL Error: %s', [sqlcmd] ) );
+                        debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Execute SQL Error: %s', [sqlcmd] ) );
                         exit;
                 end;
                 Result := True;
@@ -73,7 +73,7 @@ begin
         try
                 SQLDataSet.Open;
         except
-                DebugOut.Lines.Add( Format( '*** Open SQL Data Error: %s', [sqlcmd] ) );
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Open SQL Data Error: %s', [sqlcmd] ) );
                 exit;
         end;
         Result := True;
@@ -223,7 +223,7 @@ begin
         Result := False;
         addkey := True;
 
-        //DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
         query := 'SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem, V.flagdata FROM characters AS C LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) ';
         query2 := 'LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) LEFT JOIN character_flags AS V ON (V.GID=C.GID) WHERE C.GID='+''''+inttostr(GID)+''''+' LIMIT 1';
@@ -295,14 +295,14 @@ begin
                                 tc.MemoPoint[i].Y := StrToInt(SQLDataSet.FieldValues['yPos' + IntToStr(i)]);
 
                                 if (tc.MemoMap[i] <> '') and (MapList.IndexOf(tc.MemoMap[i]) = -1) then begin
-                                        DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d "%s"', [tc.Name, i, tc.MemoMap[i]]));
+                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d "%s"', [tc.Name, i, tc.MemoMap[i]]));
                                         tc.MemoMap[i] := '';
                                         tc.MemoPoint[i].X := 0;
                                         tc.MemoPoint[i].Y := 0;
                                 end else if (tc.MemoMap[i] <> '') then begin
                                         ta := MapList.Objects[MapList.IndexOf(tc.MemoMap[i])] as TMapList;
                                         if (tc.MemoPoint[i].X < 0) or (tc.MemoPoint[i].X >= ta.Size.X) or (tc.MemoPoint[i].Y < 0) or (tc.MemoPoint[i].Y >= ta.Size.Y) then begin
-                                                DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [tc.Name, i, tc.MemoMap[i], ta.Size.X, ta.Size.Y, tc.MemoPoint[i].X, tc.MemoPoint[i].Y]));
+                                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [tc.Name, i, tc.MemoMap[i], ta.Size.X, ta.Size.Y, tc.MemoPoint[i].X, tc.MemoPoint[i].Y]));
                                                 tc.MemoMap[i] := '';
                                                 tc.MemoPoint[i].X := 0;
                                                 tc.MemoPoint[i].Y := 0;
@@ -312,7 +312,7 @@ begin
                         if (tc.CID < 100001) then tc.CID := tc.CID + 100001;
 
                         if MapList.IndexOf(tc.Map) = -1 then begin
-                                DebugOut.Lines.Add(Format('%s : Invalid Map "%s"', [tc.Name, tc.Map]));
+                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map "%s"', [tc.Name, tc.Map]));
                                 tc.Map := 'prontera';
                                 tc.Point.X := 158;
                                 tc.Point.Y := 189;
@@ -320,14 +320,14 @@ begin
 
                         ta := MapList.Objects[MapList.IndexOf(tc.Map)] as TMapList;
                         if (tc.Point.X < 0) or (tc.Point.X >= ta.Size.X) or (tc.Point.Y < 0) or (tc.Point.Y >= ta.Size.Y) then begin
-                                DebugOut.Lines.Add(Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[tc.Name, tc.Map, ta.Size.X, ta.Size.Y, tc.Point.X, tc.Point.Y]));
+                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[tc.Name, tc.Map, ta.Size.X, ta.Size.Y, tc.Point.X, tc.Point.Y]));
                                 tc.Map := 'prontera';
                                 tc.Point.X := 158;
                                 tc.Point.Y := 189;
                         end;
 
                         if MapList.IndexOf(tc.SaveMap) = -1 then begin
-                                DebugOut.Lines.Add(Format('%s : Invalid SaveMap "%s"', [tc.Name, tc.SaveMap]));
+                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap "%s"', [tc.Name, tc.SaveMap]));
                                 tc.SaveMap := 'prontera';
                                 tc.SavePoint.X := 158;
                                 tc.SavePoint.Y := 189;
@@ -335,7 +335,7 @@ begin
 
                         ta := MapList.Objects[MapList.IndexOf(tc.SaveMap)] as TMapList;
                         if (tc.SavePoint.X < 0) or (tc.SavePoint.X >= ta.Size.X) or (tc.SavePoint.Y < 0) or (tc.SavePoint.Y >= ta.Size.Y) then begin
-                                DebugOut.Lines.Add(Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [tc.Name, tc.SaveMap, ta.Size.X, ta.Size.Y, tc.SavePoint.X, tc.SavePoint.Y]));
+                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [tc.Name, tc.SaveMap, ta.Size.X, ta.Size.Y, tc.SavePoint.X, tc.SavePoint.Y]));
                                 tc.SaveMap := 'prontera';
                                 tc.SavePoint.X := 158;
                                 tc.SavePoint.Y := 189;
@@ -464,7 +464,7 @@ begin
 
                         if (addkey) then begin
                                 PartyNameList.AddObject(tpa.Name, tpa);
-                                DebugOut.Lines.Add(Format('Add Party Name : %s.', [tpa.Name]));
+                                debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Add Party Name : %s.', [tpa.Name]));
                         end;
 
                         tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
@@ -569,7 +569,7 @@ begin
                         SQLDataSet.Next;
                 end;
         end else begin
-                DebugOut.Lines.Add('Pet data loading error...');
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet data loading error...');
                 Exit;
         end;
 
@@ -754,7 +754,7 @@ begin
 
         query := 'SELECT C.GID, C.Name, C.BaseLV FROM characters AS C LEFT JOIN guild_members AS G ON (C.GID=G.GID) WHERE C.GID <> 0';
         if MySQL_Query(query) then begin
-                debugout.Lines.add('Pre-Loading Character Data for Guilds');
+                debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pre-Loading Character Data for Guilds');
                 SQLDataSet.First;
                 while not SQLDataSet.Eof do begin
                         tc := TChara.Create;
@@ -776,7 +776,7 @@ begin
                         SQLDataSet.Next;
                 end;
         end;
-        debugout.Lines.add('-- Completed.');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-- Completed.');
 
 end;
 

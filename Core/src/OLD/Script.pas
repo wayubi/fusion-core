@@ -371,10 +371,10 @@ begin
 {NPCイベント追加ココまで}
 					k := SearchCInventory(tc, i, false);
 					if (k <> 0) and (tc.Item[k].Amount >= j) then begin
-						//DebugOut.Lines.Add(Format('s-checkitem: %d %d = 1', [i, j]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-checkitem: %d %d = 1', [i, j]));
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
 					end else begin
-						//DebugOut.Lines.Add(Format('s-checkitem: %d %d = 0', [i, j]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-checkitem: %d %d = 0', [i, j]));
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
 					end;
 				end;
@@ -417,12 +417,12 @@ begin
 					5: flag := boolean(i <  j);
 					else
 						begin
-							//DebugOut.Lines.Add(Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
 							tc.ScriptStep := $FFFF;
 							break;
 						end;
 					end;
-					//DebugOut.Lines.Add(Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
 					if flag then begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
 					end else begin
@@ -1111,7 +1111,7 @@ begin
 					if (i = 0) then begin
 						//タイマーOFF
 						if (j <> -1) then begin
-							//DebugOut.Lines.Add(Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
 							tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn.ID));
 						end;
 					end else if (i = 1) then begin
@@ -1126,7 +1126,7 @@ begin
 									tr.Done[k] := 0;
 								end;
 								tm.TimerAct.AddObject(tn.ID, tr);
-								//DebugOut.Lines.Add(Format('NPC Timer(%d) was started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
 							end;
 						end else begin
 							//再スタート
@@ -1135,7 +1135,7 @@ begin
 							for k := 0 to tr.Cnt - 1 do begin
 								tr.Done[k] := 0;
 							end;
-							//DebugOut.Lines.Add(Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn.ID,tm.TimerAct.Count]));
 						end;
 					end;
 					Inc(tc.ScriptStep);
@@ -1167,7 +1167,7 @@ begin
 									tr.Done[k] := 1;
 								end;
 							end;
-							//DebugOut.Lines.Add(Format('NPC Timer(%d) was added (%d)ms', [tn.ID,i]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was added (%d)ms', [tn.ID,i]));
 						end;
 					end;
 					Inc(tc.ScriptStep);
@@ -1239,7 +1239,7 @@ begin
 
 						tn.ChatRoomID := tcr.ID;
 						ChatRoomList.AddObject(tcr.ID, tcr);
-						//DebugOut.Lines.Add(Format('ChatRoomTitle = %s : OwnerID = %d : OwnerName = %s', [tcr.Title, tcr.MemberID[0], tcr.MemberName[0]]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('ChatRoomTitle = %s : OwnerID = %d : OwnerName = %s', [tcr.Title, tcr.MemberID[0], tcr.MemberName[0]]));
 
 						//周辺にパケ送信
 						w := Length(tcr.Title);
@@ -1272,7 +1272,7 @@ begin
 						end;
 						if (tn1.ScriptInitS <> -1) then begin
 							//OnInitラベルを実行
-							//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn1.ID]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn1.ID]));
 							tc1 := TChara.Create;
 							tc1.TalkNPCID := tn1.ID;
 							tc1.ScriptStep := tn1.ScriptInitS;
@@ -1310,7 +1310,7 @@ begin
 							tn1.Enable := false;
 							l := tm.TimerAct.IndexOf(tn1.ID);
 							if (l <> -1) then begin
-								//DebugOut.Lines.Add(Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
 								tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
 							end;
 							for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
@@ -1482,8 +1482,8 @@ begin
           tg := GuildList.Objects[j] as TGuild;
 					//i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
           i := StrToInt(tn.Script[tc.ScriptStep].Data1[0]);
-          //DebugOut.Lines.Add(tn.Script[tc.ScriptStep].Data1[0]);
-          //DebugOut.Lines.Add(tn.Script[tc.ScriptStep].Data1[1]);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tn.Script[tc.ScriptStep].Data1[0]);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tn.Script[tc.ScriptStep].Data1[1]);
 					if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then begin
 						if i = 0 then begin
 							tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := '0';
@@ -1510,9 +1510,9 @@ begin
 					i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
           //i := StrToInt(tn.Script[tc.ScriptStep].Data1[0]);
           //i := i - 1;
-          //DebugOut.Lines.Add(IntToStr(tgc.GuardStatus[i]));
-          //DebugOut.Lines.Add(tn.Script[tc.ScriptStep].Data1[0]);
-          //DebugOut.Lines.Add(tn.Script[tc.ScriptStep].Data1[1]);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tgc.GuardStatus[i]));
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tn.Script[tc.ScriptStep].Data1[0]);
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + tn.Script[tc.ScriptStep].Data1[1]);
 					if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then begin
 						if i = 0 then begin
 							tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := '0';
@@ -1598,7 +1598,7 @@ begin
         end;
       60: //agitregist
         begin
-          //DebugOut.Lines.Add(Format('Agit now %s', [tn.Script[tc.ScriptStep].Data1[0]]));
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Agit now %s', [tn.Script[tc.ScriptStep].Data1[0]]));
           tn.Agit := tn.Script[tc.ScriptStep].Data1[0];
 					Inc(tc.ScriptStep);        
         end;
@@ -1717,12 +1717,12 @@ begin
 					5: flag := boolean(i <  j);
 					else
 						begin
-							//DebugOut.Lines.Add(Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: invalid formula "%s"', [tn.Script[tc.ScriptStep].Data1[2]]));
 							tc.ScriptStep := $FFFF;
 							break;
 						end;
 					end;
-					//DebugOut.Lines.Add(Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('s-check: %s %s(%d) %s = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data3[2], tn.Script[tc.ScriptStep].Data1[1], byte(flag)]));
 					if flag then begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
 					end else begin
@@ -1772,13 +1772,13 @@ begin
 						end;
 					end else if (tc.Login = 2) then begin
 						//キャラクターフラグ
-						//DebugOut.Lines.Add(Format('str-check: %s', [tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]]]));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('str-check: %s', [tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]]]));
 						if (tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] = str) then begin
 							flag := true;
 						end;
 					end;
 
-					//DebugOut.Lines.Add(Format('str-check: %s %s %s(%s) = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data1[1], str, byte(flag)]));
+					//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('str-check: %s %s %s(%s) = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data1[1], str, byte(flag)]));
 					if ((j = 0) and (flag = true)) or ((j = 1) and (flag = false)) then begin
 						tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0];
 					end else begin
@@ -1809,7 +1809,7 @@ begin
     Inc(cnt);
 		end;
 		if cnt >= 100 then begin
-			//DebugOut.Lines.Add('script error!!! : infinity loop founded');
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'script error!!! : infinity loop founded');
 		end;
 		if (tc.ScriptStep >= tn.ScriptCnt) or (cnt >= 100) then begin
 			//スクリプト終了

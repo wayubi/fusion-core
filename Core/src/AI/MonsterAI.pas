@@ -342,7 +342,7 @@ begin
                 i := Random(8);
                 if ts.MSKill <> 0 then begin
                         if tsAI.PercentChance[i] > Random(100) then begin
-                                //DebugOut.Lines.Add('Success');
+                                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Success');
 
                                 MonsterCastTime(tm, ts, Tick);
                                 ts.NowSkill := ts.MSKill;
@@ -356,7 +356,7 @@ begin
                                 MobStatSkills(tm, ts, tsAI, Tick, i);
                                 //Break;
                         end;
-                        //end else DebugOut.Lines.Add('Fail');
+                        //end else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Fail');
                 end;
         //end;
 end; }
@@ -710,7 +710,7 @@ something in it}
                         dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
-                else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+                else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
             end;
         end;
 
@@ -821,10 +821,10 @@ begin
 					                tn := SetSkillUnit(tm, ts.ID, xy, Tick, $92, 0, AttackData.Skill[140].Data.Data1[ts.MLevel] * 1000, nil, ts);
 					                tn.MSkill := ts.MSkill;
                           tn.MUseLV := ts.MLevel;
-                          Debugout.Lines.Add('Venom Dust')
+                          debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Venom Dust')
                         end; }
 
-                        else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+                        else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
                 end;  //end case
         //end;
 end;
@@ -958,7 +958,7 @@ with ts do begin
                     WFIFOB(6, j);
                     SendBCmd(tm, ts.Point, 7);
                   end;
-          else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
+          else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
         end;
 
         case ProcessType of
@@ -1022,7 +1022,7 @@ with ts do begin
                                 end;}
 
                                 if (ts.MSKill = 114) then begin
-                                        DebugOut.Lines.Add('Monster Casts Power Maximize');
+                                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Casts Power Maximize');
                                         {if tc1.Option = 32 then begin
 						//tc1.Option := tc1.Optionkeep;
                                                 SkillTick := tc1.Skill[MSkill].Tick;
@@ -1071,7 +1071,7 @@ begin
 				end;
 			end;
 			end;
-			//DebugOut.Lines.Add('Targeted: ' + inttostr(i));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Targeted: ' + inttostr(i));
 			if i > 12 then i := 12;
 			if i < 2 then i := 2;
 			tc.TargetedFix := 12 - i;
@@ -1179,13 +1179,13 @@ begin
 							DelSkillUnit(tm, tn);
 							Dec(i1);
 						end;
-						//DebugOut.Lines.Add('Safety Wall OK >>' + IntToStr(tn.Count));
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Safety Wall OK >>' + IntToStr(tn.Count));
 						dmg[6] := 0;
 					end;
 				$85: //ƒjƒ…[ƒ}
 					begin
 						if ts.Data.Range1 >= 4 then miss := true;
-						//DebugOut.Lines.Add('Pneuma OK');
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pneuma OK');
 						dmg[6] := 0;
 					end;
 				end;
@@ -1329,7 +1329,7 @@ begin
                 if dmg[0] > 16000 then dmg[0] := 16000;
 		dmg[4] := 1;
 	end;
-	//DebugOut.Lines.Add(Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('REV %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;
 
 //------------------------------------------------------------------------------
@@ -1443,74 +1443,74 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
   //j := MobAIDBFusion.IndexOf(ts.Number);
   //k := j;
   //j := MobAIDBFusion.IndexOf(ts.Name);
-  //DebugOut.Lines.Add(ts.Name);
+  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + ts.Name);
   for m := 0 to MobAIDBFusion.Count do begin
     if MobAIDBFusion.IndexOf(m) <> -1 then begin
     //while (j > 0) do begin
       //tsAI2 := MobAIDBFusion.IndexOf(j)] as TMobAIDBFusion;
       tsAI2 := MobAIDBFusion.Objects[MobAIDBFusion.IndexOf(m)] as TMobAIDBFusion;
-      //DebugOut.Lines.Add(IntToStr(j));
+      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(j));
       if (ts.Data.ID = tsAI2.ID) then begin
 
         sl.Add(IntToStr(m));
         ts.Data.SkillLocations := sl.DelimitedText;
         ts.Data.SkillCount := ts.Data.SkillCount + 1;
 
-        //DebugOut.Lines.Add('Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
-        //DebugOut.Lines.Add('----------------------------');
-        //DebugOut.Lines.Add('Skill: ' + tsAI2.SkillID);
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '----------------------------');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill: ' + tsAI2.SkillID);
 
-        //DebugOut.Lines.Add('Requires monster is in ' + tsAI2.Status + ' status');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Requires monster is in ' + tsAI2.Status + ' status');
 
         if tsAI2.Dispel = 'NO_DISPEL' then begin
-        //  DebugOut.Lines.Add('Cannot be broken when attacked.');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Cannot be broken when attacked.');
           ts.NoDispel := true;
         end else
-        //  DebugOut.Lines.Add('Can be broken when attacked.');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Can be broken when attacked.');
           ts.NoDispel := true;
         ///////////If Conditions Begin////////////////
         if tsAI2.IfState = 'IF_COMRADECONDITION' then begin
-        //  DebugOut.Lines.Add('Skill Has Comrade Condition, ' + tsAI2.IfCond);
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill Has Comrade Condition, ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_COMRADEHP' then begin
-        //  DebugOut.Lines.Add('Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill Has Comrade HP Condition, if Comrade HP is ' + tsAI2.IfCond + '% or less');
         end;
         if tsAI2.IfState = 'IF_CONDITION' then begin
-        //  DebugOut.Lines.Add('Only active if monster is: ' + tsAI2.IfCond);
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Only active if monster is: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HIDING' then begin
-        //  DebugOut.Lines.Add('Monster Must Be Hiding');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Must Be Hiding');
         end;
         if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
-        //  DebugOut.Lines.Add('Enemy Must be Magic Locked');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Enemy Must be Magic Locked');
         end;
         if tsAI2.IfState = 'IF_RANGEATTACKED' then begin
-        //  DebugOut.Lines.Add('Enemy Must be Range Attacked');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Enemy Must be Range Attacked');
         end;
         if tsAI2.IfState = 'IF_RUDEATTACK' then begin
-        //  DebugOut.Lines.Add('Enemy Must be Rude Attacked');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Enemy Must be Rude Attacked');
         end;
         if tsAI2.IfState = 'IF_SKILLUSE' then begin
-        //  DebugOut.Lines.Add('Skill ' + tsAI2.IfCond + ' Triggers this');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + tsAI2.IfCond + ' Triggers this');
         end;
         if tsAI2.IfState = 'IF_SLAVENUM' then begin
-        //  DebugOut.Lines.Add('Slave Count Must be at least: ' + tsAI2.IfCond);
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Slave Count Must be at least: ' + tsAI2.IfCond);
         end;
         if tsAI2.IfState = 'IF_HP' then begin
-        //  DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+        //  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
         end;
 
         if tsAI2.IfState = 'IF_ENEMYCOUNT' then
           begin
-            //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
+            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
           end;
         ///////////If Conditions End////////////////
         {
-        DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
-        //DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
-        DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
-        DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
-        DebugOut.Lines.Add('----Next Skill----');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill Level: ' + IntToStr(tsAI2.SkillLV));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Percent: ' + IntToStr(tsAI2.Percent));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Cast Time: ' + IntToStr(tsAI2.Cast_Time));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Cool Time: ' + IntToStr(tsAI2.Cool_Time));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + '----Next Skill----');
         }
 
       end;
@@ -1522,12 +1522,12 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
   ts.CanFindTarget := true;
 
   {
-  DebugOut.Lines.Add('Locations of skills: ' + ts.Data.SkillLocations );
-  DebugOut.Lines.Add('Locations of skills: ' + sl.DelimitedText );
-  DebugOut.Lines.Add('Done');
-  DebugOut.Lines.Add('----------------------------');
-  DebugOut.Lines.Add('');
-  DebugOut.Lines.Add('');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Locations of skills: ' + ts.Data.SkillLocations );
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Locations of skills: ' + sl.DelimitedText );
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Done');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + '----------------------------');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + '');
   sl.Clear;
   }
 	{ChrstphrR 2004/04/26 - have to free up what you create...}
@@ -1562,14 +1562,14 @@ begin
 
     if tsAI2.IfState = 'IF_HP' then begin
       //if ts.Data.DebugFlag = false then begin
-        //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' of the ' + ts.Name + ' has an if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + tsAI2.SkillID + ' of the ' + ts.Name + ' has an if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
         HPCount := ts.HP * 1000 div (Integer(ts.Data.HP) * 10);
-        //DebugOut.Lines.Add('Monster''''s hp percent is ' + IntToStr(HPCount));
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster''''s hp percent is ' + IntToStr(HPCount));
 
         if HPCount > StrToInt(tsAI2.IfCond) then
-          //DebugOut.Lines.Add('If Statement passes as false')
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'If Statement passes as false')
         else begin
-          //DebugOut.Lines.Add('If Statement passes as true');
+          //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'If Statement passes as true');
           CheckSkill(tm, ts, tsAI2, Tick);
         end;
 
@@ -1598,7 +1598,7 @@ begin
 			EnemyCount := sl2.Count;
 			//Check if enemy count meets the if condition
 			if EnemyCount >= StrToInt(tsAI2.IfCond) then CheckSkill(tm, ts, tsAI2, Tick);
-			//DebugOut.Lines.Add('Enemy Count: ' + IntToStr(EnemyCount));
+			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Enemy Count: ' + IntToStr(EnemyCount));
 
 			{ChrstphrR 2004/04/26 - have to free up what you create...}
 			{Safe to just Free, since the objects stored are owned and
@@ -1646,7 +1646,7 @@ begin
       NewMonsterCastTime(tm, ts, Tick);
     end;
     //MobSkills(tm, ts, Tick);
-    //DebugOut.Lines.Add('Percent Passes');
+    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Percent Passes');
   end;
 end;
 //------------------------------------------------------------------------------
@@ -1952,7 +1952,7 @@ begin
 			if tc1.ATarget <> tc.ID then
 				tc1.pcnt := 0
 			else if tc1.pcnt <> 0 then begin
-				//DebugOut.Lines.Add('Character Knockback!');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Knockback!');
 				//SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				SendBCmd(tm, tc1.Point, 58, tc,True);
 			end;
@@ -2052,7 +2052,7 @@ begin
 			if tc1.ATarget <> ts.ID then
 				tc1.pcnt := 0
 			else if tc1.pcnt <> 0 then begin
-				//DebugOut.Lines.Add('Character Knockback!');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character Knockback!');
 				//SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				SendBCmd(tm, tc1.Point, 58, nil ,True);
 			end;
@@ -2172,7 +2172,7 @@ begin
 			if ts.ATarget <> tc.ID then
 				ts.pcnt := 0
 			else if (ts.pcnt <> 0)  then begin
-				//DebugOut.Lines.Add('Monster Knockback!');
+				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster Knockback!');
 				        SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
 				        SendBCmd(tm, ts.Point, 58, tc,True);
 			end;

@@ -132,12 +132,12 @@ Var
 	Str     : string;      //Holds each line read
 	SL      : TStringList; //Parses Str into text tokens.
 Begin
-	DebugOut.Lines.Add('Summon Monster List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Summon Monster List loading...');
 	{ChrstphrR 2004/04/19 - New SummonMobList code... created and loaded here}
 
 	//Creates and loads data from the file all in one step
 	SummonMobList := TSummonMobList.Create(AppPath + 'database\summon_mobID.txt');
-	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [SummonMobList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Summon Monster List loaded.', [SummonMobList.Count]));
 	{ChrstphrR 2004/04/19 - yes, that's all to see here - the rest is in the
 	TSummonMobList code}
 
@@ -154,7 +154,7 @@ Begin
 		if (SL[0] = 'MVP') AND (SL.Count >= 3) then begin
 			if (MobDBName.IndexOf(SL[1]) = -1) then begin
 				{Warn of invalid container in the line, handle gracefully}
-				DebugOut.Lines.Add(
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + 
 					'*** summon_item.txt Error handled (1). Please report this Item: ' + str
 				);
 			end else begin
@@ -166,7 +166,7 @@ Begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 
 		Format( '-> Total %d Summon MVP Monster List loaded.',
 		[SummonMobListMVP.Count] )
 	);
@@ -174,7 +174,7 @@ Begin
 
 
 	//Summon Box Lists
-	DebugOut.Lines.Add('Summon Item List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Summon Item List loading...');
 	Application.ProcessMessages;
 	AssignFile(Txt, AppPath + 'database\summon_item.txt');
 	Reset(Txt);
@@ -195,7 +195,7 @@ Begin
 
 		if (ItemDBName.IndexOf(SL[0]) = -1) then begin
 			{Warn of invalid container in the line, handle gracefully}
-			DebugOut.Lines.Add(
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + 
 				'*** summon_item.txt Error handled (1). Please report this Item: ' + str
 			);
 			Continue;
@@ -204,7 +204,7 @@ Begin
 			{ChrstphrR - well, the item in the summon_item.txt doesn't exist if we
 			branch here, output a message to let the user know, so they can post a
 			bug report to get the DB file corrected.}
-			DebugOut.Lines.Add(
+			debugout.lines.add('[' + TimeToStr(Now) + '] ' + 
 				'*** summon_item.txt Error handled (2). Please report this Item: ' + Str
 			);
 			Continue;
@@ -232,7 +232,7 @@ Begin
 	Counter := SummonIOBList.Count + SummonIOVList.Count + SummonICAList.Count +
 		SummonIGBList.Count + SummonIOWBList.Count;
 
-	DebugOut.Lines.Add(Format('-> Total %d Summon Item List loaded.', [Counter]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Summon Item List loaded.', [Counter]));
 	Application.ProcessMessages;
 End;(* Proc LoadSummonLists
 *-----------------------------------------------------------------------------*)
@@ -274,7 +274,7 @@ Var
 	PetDBrow  : TStringList;
 
 Begin
-	DebugOut.Lines.Add( 'Pet database loading...' );
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' +  'Pet database loading...' );
 
 	AssignFile(Txt, AppPath + 'database\pet_db.txt' );
 	Reset(Txt);
@@ -323,7 +323,7 @@ Begin
 			except
 				on EConvertError do begin
 					//No number where a number should be...
-					DebugOut.Lines.Add( Format(
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format(
 						'pet_db.txt Error handled : Incorrect/missing field on line %d : %s', [LineCount, Str]
 					) );
 					PetErrors := TRUE;
@@ -335,21 +335,21 @@ Begin
 			// No match for MobID in mobdb, or line wasn't up to 14 parts.
 			case ID_Idx of
 			-1 : begin
-					DebugOut.Lines.Add( Format(
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format(
 						'pet_db.txt Error handled : Invalid MobID on line %d : %s',
 						[LineCount, Str]
 					) );
 					PetErrors := TRUE;
 				end;
 			-2 : begin
-					DebugOut.Lines.Add( Format(
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format(
 						'pet_db.txt Error handled : Line %d has less than 14 fields',
 						[LineCount]
 					) );
 					PetErrors := TRUE;
 				end;
 				else begin
-					DebugOut.Lines.Add( Format(
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format(
 						'pet_db.txt Error handled : Invalid MobID on line %d : %s',
 						[LineCount, Str]
 					) );
@@ -361,13 +361,13 @@ Begin
 	CloseFile(txt);
 
 	if PetErrors then begin
-		DebugOut.Lines.Add( Format(
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format(
 			'*** Error(s) in %sdatabase\pet_db.txt found.',
 			[AppPath]
 		) );
-		DebugOut.Lines.Add( '	This may affect game play. Please repair this file.' );
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' +  '	This may affect game play. Please repair this file.' );
 	end;
-	DebugOut.Lines.Add( Format( '-> Total %d pet(s) database loaded.', [PetDB.Count] ) );
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '-> Total %d pet(s) database loaded.', [PetDB.Count] ) );
 	Application.ProcessMessages;
 
 End;(* Proc LoadPetData
@@ -446,7 +446,7 @@ begin
 	end;
 
 	//gatファイルの存在をチェック
-	DebugOut.Lines.Add('Map data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Map data loading...');
 	Application.ProcessMessages;
 
 	if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
@@ -567,7 +567,7 @@ begin
 		Application.Terminate;
 		exit;
 	end;
-	DebugOut.Lines.Add(Format('-> Total %d map(s) loaded.', [MapList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d map(s) loaded.', [MapList.Count]));
 	Application.ProcessMessages;
 
 	{ChrstphrR 2004/05/24 -- Moved so that early exits aren't memory leaks too}
@@ -575,7 +575,7 @@ begin
 	SL1 := TStringList.Create;
 
 	//アイテムデータロード
-	DebugOut.Lines.Add('Item database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Item database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\item_db.txt');
 	Reset(txt);
@@ -704,7 +704,7 @@ begin
 				DamageFixR[i] := 0;
 				DamageFixE[i] := 0;
 			end;
-			//if ID > 4000 then DebugOut.Lines.Add(Format('ID = %d', [ID]));
+			//if ID > 4000 then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('ID = %d', [ID]));
 			DamageFixR[StrToInt(sl.Strings[36])] := StrToInt(sl.Strings[37]);
 			DamageFixE[StrToInt(sl.Strings[38])] := StrToInt(sl.Strings[39]);
 			i := StrToInt(sl.Strings[40]);
@@ -838,11 +838,11 @@ begin
 		ItemDBName.AddObject(td.Name, td);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d item(s) database loaded.', [ItemDB.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d item(s) database loaded.', [ItemDB.Count]));
 	Application.ProcessMessages;
 {追加}
 	//アイテム特殊定義
-	DebugOut.Lines.Add('Special database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Special database loading...');
 	Application.ProcessMessages;
 	if FileExists(AppPath + 'database\special_db.txt') then begin
 		AssignFile(txt, AppPath + 'database\special_db.txt');
@@ -903,16 +903,16 @@ begin
 			Inc(k);
 		end;
 		CloseFile(txt);
-		DebugOut.Lines.Add(Format('-> Total %d item(s) database change.', [k]));
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d item(s) database change.', [k]));
 		Application.ProcessMessages;
 	end else begin
-		DebugOut.Lines.Add('-> Special database Not Find.');
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Special database Not Find.');
 		Application.ProcessMessages;
 	end;
 {追加ココまで}
 {アイテム製造追加}
 	//アイテム製造データベース読み込み
-	DebugOut.Lines.Add('MetalProcess database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'MetalProcess database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\metalprocess_db.txt');
 	Reset(txt);
@@ -939,12 +939,12 @@ begin
 		MaterialDB.AddObject(tma.ID, tma);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d metalprocess(s) database loaded.', [MaterialDB.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d metalprocess(s) database loaded.', [MaterialDB.Count]));
 	Application.ProcessMessages;
 {アイテム製造追加ココまで}
 
 	//モンスターデータベース読み込み
-	DebugOut.Lines.Add('Monster database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Monster database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\mob_db.txt');
 	Reset(txt);
@@ -1026,7 +1026,7 @@ begin
 		MobDBName.AddObject(tb.Name, tb);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d monster(s) database loaded.', [MobDB.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d monster(s) database loaded.', [MobDB.Count]));
 	Application.ProcessMessages;
 
 {氏{箱追加}
@@ -1038,7 +1038,7 @@ begin
 
 	{Aegis Monster Skills Load}
 
-	DebugOut.Lines.Add('Fusion Monster AI database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Fusion Monster AI database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\Monster_AI.txt');
 	Reset(txt);
@@ -1082,7 +1082,7 @@ begin
         tsAI2.IfCond := sl.Strings[9];
       end;
       j := j + 1;
-      //DebugOut.Lines.Add(Format('%d', [j]));
+      //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%d', [j]));
       //Data Converting
       {
       if MobDBName.IndexOf(tsAI2.Name) <> -1 then begin
@@ -1102,7 +1102,7 @@ begin
     end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Fusion monster(s) skills loaded.', [MobAIDBFusion.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Fusion monster(s) skills loaded.', [MobAIDBFusion.Count]));
 	Application.ProcessMessages;
 
   {Global Variables Load}
@@ -1112,7 +1112,7 @@ begin
 		Writeln(txt, '// Variable, Value');
 		CloseFile(txt);
 	end;
-  DebugOut.Lines.Add('Global Variables loading...');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Global Variables loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'Global_Vars.txt');
 	Reset(txt);
@@ -1136,7 +1136,7 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [GlobalVars.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Global Variables loaded.', [GlobalVars.Count]));
 	Application.ProcessMessages;
 
 
@@ -1149,7 +1149,7 @@ begin
 
 {NPCイベント追加}
 	//mapinfo_db読み込み
-	DebugOut.Lines.Add('Mapinfo database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mapinfo database loading...');
 	Application.ProcessMessages;
 	if FileExists(AppPath + 'database\mapinfo_db.txt') then begin
 		AssignFile(txt, AppPath + 'database\mapinfo_db.txt');
@@ -1199,15 +1199,15 @@ begin
 			Inc(k);
 		end;
 		CloseFile(txt);
-		DebugOut.Lines.Add(Format('-> Total %d MapInfo database loaded.', [k]));
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d MapInfo database loaded.', [k]));
 		Application.ProcessMessages;
 	end else begin
-		DebugOut.Lines.Add('-> Mapinfo database Not Find.');
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Mapinfo database Not Find.');
 		Application.ProcessMessages;
 	end;
 {NPCイベント追加ココまで}
 	//スキルデータベース読み込み
-	DebugOut.Lines.Add('Skill database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\skill_db.txt');
 	Reset(txt);
@@ -1250,11 +1250,11 @@ begin
         if (i < (LOWER_JOB_END - 1)) and (Job1[i]) then begin
           Job1[i + LOWER_JOB_END + 1] := true;
         end;
-        //if (Job1[i + LOWER_JOB_END + 1]) then DebugOut.Lines.Add(Format('Job1[%d] set',[i+LOWER_JOB_END+1]));
+        //if (Job1[i + LOWER_JOB_END + 1]) then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Job1[%d] set',[i+LOWER_JOB_END+1]));
 			end;
       {for i := 0 to MAX_JOB_NUMBER do begin
         if (Job1[i]) and (ID = 394) then
-          DebugOut.Lines.Add(Format('Skill %d, job %d is set',[tl.ID, i]));
+          debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Skill %d, job %d is set',[tl.ID, i]));
       end;}
 			for i := 0 to 4 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
@@ -1275,13 +1275,13 @@ begin
     SkillDBName.AddObject(tl.IDC, tl);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d skill(s) database loaded.', [SkillDB.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d skill(s) database loaded.', [SkillDB.Count]));
 	Application.ProcessMessages;
 
 	//経験値テーブル読み込み
 {ギルド機能追加}
 	//ギルドスキルデータベース読み込み
-	DebugOut.Lines.Add('Guild Skill database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Skill database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\skill_guild_db.txt');
 	Reset(txt);
@@ -1333,11 +1333,11 @@ begin
 		GSkillDB.AddObject(tl.ID, tl);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d guild skill(s) database loaded.', [GSkillDB.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d guild skill(s) database loaded.', [GSkillDB.Count]));
 	Application.ProcessMessages;
 
   // Colus, 20040130: Adding territory name DB.
-  DebugOut.Lines.Add('Guild Territory database loading...');
+  debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Territory database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\territory_db.txt');
 	Reset(txt);
@@ -1356,11 +1356,11 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d guild territories loaded.', [TerritoryList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d guild territories loaded.', [TerritoryList.Count]));
 	Application.ProcessMessages;
 
 
-	DebugOut.Lines.Add('Slave Summon Mobs List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Slave Summon Mobs List loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\summon_slave.txt');
 	Reset(txt);
@@ -1388,10 +1388,10 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Slave Summon Mobs List loaded.', [j]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Slave Summon Mobs List loaded.', [j]));
 	Application.ProcessMessages;
 
-	DebugOut.Lines.Add('Make Arrow List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Make Arrow List loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\make_arrow.txt');
 	Reset(txt);
@@ -1419,11 +1419,11 @@ begin
 		MArrowDB.AddObject(ma.ID,ma);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Make Arrow List loaded.', [j]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Make Arrow List loaded.', [j]));
 	Application.ProcessMessages;
 
 
-	DebugOut.Lines.Add('ID Table List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ID Table List loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\id_table.txt');
 	Reset(txt);
@@ -1462,11 +1462,11 @@ begin
 		IDTableDB.AddObject(tid.ID,tid);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d ID Table List loaded.', [j]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d ID Table List loaded.', [j]));
 	Application.ProcessMessages;
 
 
-	DebugOut.Lines.Add('GM Access List loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'GM Access List loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\gm_access.txt');
 	Reset(txt);
@@ -1484,12 +1484,12 @@ begin
         GM_Access_DB.AddObject(tGM.ID, tGM);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d GM Access List loaded.', [j]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d GM Access List loaded.', [j]));
 	Application.ProcessMessages;
 
 
 	//ギルド経験値テーブル読み込み
-	DebugOut.Lines.Add('Guild EXP database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild EXP database loading...');
 	Application.ProcessMessages;
 	for i := 1 to 50 do GExpTable[i] := 1999999999;
 	AssignFile(txt, AppPath + 'database\exp_guild_db.txt');
@@ -1506,7 +1506,7 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> Guild EXP database loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Guild EXP database loaded.');
 	Application.ProcessMessages;
 
 	//Check for Emblem directory...
@@ -1519,7 +1519,7 @@ begin
 	end;
 {ギルド機能追加ココまで}
 
-	DebugOut.Lines.Add('EXP database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'EXP database loading...');
 	Application.ProcessMessages;
 	for j := 0 to 3 do ExpTable[j][0] := 1;
 	for i := 1 to 255 do begin
@@ -1539,11 +1539,11 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> EXP database loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> EXP database loaded.');
 	Application.ProcessMessages;
 {修正}
 	//ジョブデータテーブル1読み込み
-	DebugOut.Lines.Add('Job database 1 loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Job database 1 loading...');
 	Application.ProcessMessages;
 	for i := 0 to MAX_JOB_NUMBER do begin
 		WeightTable[i] := 0;
@@ -1572,11 +1572,11 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> Job database 1 loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Job database 1 loaded.');
 	Application.ProcessMessages;
 
 	//ジョブデータテーブル2読み込み
-	DebugOut.Lines.Add('Job database 2 loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Job database 2 loading...');
 	Application.ProcessMessages;
 	for i := 0 to MAX_JOB_NUMBER do begin
 		for j := 1 to 255 do JobBonusTable[i][j] := 0;
@@ -1590,11 +1590,11 @@ begin
 		for j := 1 to sl.Count do JobBonusTable[i][j] := StrToInt(sl.Strings[j-1]);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> Job database 2 loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Job database 2 loaded.');
 	Application.ProcessMessages;
 {修正ココまで}
 	//武器ダメージ修正テーブル読み込み
-	DebugOut.Lines.Add('Weapon database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Weapon database loading...');
 	Application.ProcessMessages;
 	for i := 0 to 2 do begin
 		for j := 0 to 16 do WeaponTypeTable[i][j] := 100;
@@ -1608,7 +1608,7 @@ begin
 		for j := 0 to 16 do WeaponTypeTable[i][j] := StrToInt(sl.Strings[j]);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> Weapon database loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Weapon database loaded.');
 	Application.ProcessMessages;
 
 	{April 4, 2004: Warp Database - Darkhelmet
@@ -1619,7 +1619,7 @@ begin
 		a player needs item X to warp, but the item is not consumed on warp as of yet.
 	}
 	if WarpEnabled = true then begin
-	DebugOut.Lines.Add('Warping database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Warping database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\warp_db.txt');
 	Reset(txt);
@@ -1639,14 +1639,14 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Warps loaded.', [WarpDatabase.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('-> Total %d Warps loaded.', [WarpDatabase.Count]));
 	Application.ProcessMessages;
 	end;
 
 
 
 	//属性テーブル読み込み
-	DebugOut.Lines.Add('Element database loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Element database loading...');
 	Application.ProcessMessages;
 	for i := 0 to 9 do begin
 		for j := 0 to 99 do ElementTable[i][j] := 100;
@@ -1685,11 +1685,11 @@ begin
 		for j := 0 to 19 do ElementTable[i][j+80] := StrToInt(sl.Strings[j]);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add('-> Element database loaded.');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + '-> Element database loaded.');
 	Application.ProcessMessages;
 
 	//スクリプトファイルのリストを作成
-	DebugOut.Lines.Add('Making script list...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Making script list...');
 	Application.ProcessMessages;
 	sl.Clear;
 	sl1.Clear;
@@ -1754,7 +1754,7 @@ begin
 		CloseFile(txt);
 	end;
 
-	DebugOut.Lines.Add('Player data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data loading...');
 	Application.ProcessMessages;
 	ver := 0;
 	AssignFile(txt, AppPath + 'player.txt');
@@ -1843,7 +1843,7 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
 	Application.ProcessMessages;
 
 	if (PlayerName.Count <= 0) then Exit;
@@ -1961,7 +1961,7 @@ begin
 		CloseFile(txt);
 	end else begin
 		//サーバ共有フラグ読込
-		DebugOut.Lines.Add('Server Flag loading...');
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Server Flag loading...');
 		Application.ProcessMessages;
 		AssignFile(txt, AppPath + 'status.txt');
 		Reset(txt);
@@ -1972,7 +1972,7 @@ begin
 		j := StrToInt(sl.Strings[0]);
 		for i := 1 to j do ServerFlag.Add('\' + sl.Strings[i]);
 		CloseFile(txt);
-		DebugOut.Lines.Add(Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
+		debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Flag loaded.', [ServerFlag.Count]));
 		Application.ProcessMessages;
 	end;
 {NPCイベント追加ココまで}
@@ -1985,7 +1985,7 @@ begin
 	end;
 {ギルド機能追加ココまで}
 	//アカウント情報ロード
-	DebugOut.Lines.Add('Player data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player data loading...');
 	Application.ProcessMessages;
 	ver := 0;
 	AssignFile(txt, AppPath + 'player.txt');
@@ -2074,11 +2074,11 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d player(s) data loaded.', [PlayerName.Count]));
 	Application.ProcessMessages;
 
 	//キャラ情報ロード
-	DebugOut.Lines.Add('Character data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Character data loading...');
 	Application.ProcessMessages;
 	ver := 0;
 	AssignFile(txt, AppPath + 'chara.txt');
@@ -2188,7 +2188,7 @@ begin
 
 			//マップ存在チェック
 			if MapList.IndexOf(Map) = -1 then begin
-				DebugOut.Lines.Add(Format('%s : Invalid Map "%s"', [Name, Map]));
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map "%s"', [Name, Map]));
 				Map := 'prontera';
 				Point.X := 158;
 				Point.Y := 189;
@@ -2196,7 +2196,7 @@ begin
 			//座標チェック
 			ta := MapList.Objects[MapList.IndexOf(Map)] as TMapList;
 			if (Point.X < 0) or (Point.X >= ta.Size.X) or (Point.Y < 0) or (Point.Y >= ta.Size.Y) then begin
-				DebugOut.Lines.Add(Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
 				Map := 'prontera';
 				Point.X := 158;
 				Point.Y := 189;
@@ -2204,7 +2204,7 @@ begin
 
 			//マップ存在チェック
 			if MapList.IndexOf(SaveMap) = -1 then begin
-				DebugOut.Lines.Add(Format('%s : Invalid SaveMap "%s"', [Name, SaveMap]));
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap "%s"', [Name, SaveMap]));
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
@@ -2212,7 +2212,7 @@ begin
 			//座標チェック
 			ta := MapList.Objects[MapList.IndexOf(SaveMap)] as TMapList;
 			if (SavePoint.X < 0) or (SavePoint.X >= ta.Size.X) or (SavePoint.Y < 0) or (SavePoint.Y >= ta.Size.Y) then begin
-				DebugOut.Lines.Add(Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
+				debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
@@ -2221,7 +2221,7 @@ begin
 			for i := 0 to 2 do begin
 				//マップ存在チェック
 				if (MemoMap[i] <> '') and (MapList.IndexOf(MemoMap[i]) = -1) then begin
-					DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d "%s"', [Name, i, MemoMap[i]]));
+					debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d "%s"', [Name, i, MemoMap[i]]));
 					MemoMap[i] := '';
 					MemoPoint[i].X := 0;
 					MemoPoint[i].Y := 0;
@@ -2230,7 +2230,7 @@ begin
 					ta := MapList.Objects[MapList.IndexOf(MemoMap[i])] as TMapList;
 					if (MemoPoint[i].X < 0) or (MemoPoint[i].X >= ta.Size.X) or
 						 (MemoPoint[i].Y < 0) or (MemoPoint[i].Y >= ta.Size.Y) then begin
-						DebugOut.Lines.Add(Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [Name, i, MemoMap[i], ta.Size.X, ta.Size.Y, MemoPoint[i].X, MemoPoint[i].Y]));
+						debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid MemoMap%d Point "%s"[%dx%d] (%d,%d)', [Name, i, MemoMap[i], ta.Size.X, ta.Size.Y, MemoPoint[i].X, MemoPoint[i].Y]));
 						MemoMap[i] := '';
 						MemoPoint[i].X := 0;
 						MemoPoint[i].Y := 0;
@@ -2314,7 +2314,7 @@ begin
 		Chara.AddObject(tc.CID, tc);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d character(s) data loaded.', [CharaName.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d character(s) data loaded.', [CharaName.Count]));
 	Application.ProcessMessages;
 
 	//キャラ情報&プレイヤー情報のリンク
@@ -2343,7 +2343,7 @@ begin
 {修正ココまで}
 
 {パーティー機能追加}
-	DebugOut.Lines.Add('Castle data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'gcastle.txt');
 	Reset(txt);
@@ -2379,12 +2379,12 @@ begin
 		CastleList.AddObject(tgc.Name, tgc);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d Castle(s) data loaded.', [CastleList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Castle(s) data loaded.', [CastleList.Count]));
 	Application.ProcessMessages;
 
 
 	//パーティー情報ロード
-	DebugOut.Lines.Add('Party data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Party data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'party.txt');
 	Reset(txt);
@@ -2411,10 +2411,10 @@ begin
 			EXPShare := 0;
 		end;
 		PartyNameList.AddObject(tpa.Name, tpa);
-		// DebugOut.Lines.Add(Format('Name : %s.', [tpa.Name]));
+		// debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Name : %s.', [tpa.Name]));
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Party(s) data loaded.', [PartyNameList.Count]));
 	Application.ProcessMessages;
 
 	//IDとプレイヤー情報のリンク
@@ -2435,7 +2435,7 @@ begin
 
 {ギルド機能追加}
 	//ギルド情報ロード
-	DebugOut.Lines.Add('Guild data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'guild.txt');
 	Reset(txt);
@@ -2555,7 +2555,7 @@ begin
 		GuildList.AddObject(tg.ID, tg);
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
 	Application.ProcessMessages;
 
 	//IDとプレイヤー情報のリンク
@@ -2583,7 +2583,7 @@ begin
 
 {キューペット}
 
-	DebugOut.Lines.Add('Pet data loading...');
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet data loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'pet.txt');
 	Reset(txt);
@@ -2739,7 +2739,7 @@ begin
 		if NowPetID <= tpe.PetID then NowPetID := tpe.PetID + 1;
 	end;
 
-	DebugOut.Lines.Add( Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
+	debugout.lines.add('[' + TimeToStr(Now) + '] ' +  Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
 	Application.ProcessMessages;
 
 {キューペットここまで}
@@ -2833,7 +2833,7 @@ begin
 		end;
 		CloseFile(txt);
 	end;
-	//DebugOut.Lines.add('Player Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Player Saved');
 
 	if CharaName.Count <> 0 then begin
 		AssignFile(txt, AppPath + 'chara.txt');
@@ -2980,7 +2980,7 @@ begin
 		end;
 		CloseFile(txt);
 	end;
-  //DebugOut.Lines.add('Chara Saved');
+  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Chara Saved');
 
 {NPCイベント追加}
 	//サーバ共有フラグ保存
@@ -3003,7 +3003,7 @@ begin
 	sl.Strings[0] := IntToStr(cnt);
 	writeln(txt, sl.DelimitedText);
 	CloseFile(txt);
-	//DebugOut.Lines.add('Status Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Status Saved');
 {NPCイベント追加ココまで}
 
 {パーティー機能追加}
@@ -3030,7 +3030,7 @@ begin
 		writeln(txt, sl.DelimitedText);
 	end;
 	CloseFile(txt);
-	//DebugOut.Lines.add('Castle Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Castle Saved');
 
 	AssignFile(txt, AppPath + 'party.txt');
 	Rewrite(txt);
@@ -3047,7 +3047,7 @@ begin
 		writeln(txt, sl.DelimitedText);
 	end;
 	CloseFile(txt);
-	//DebugOut.Lines.add('Guild Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
 {パーティー機能追加ココまで}
 
 {ギルド機能追加}
@@ -3127,7 +3127,7 @@ begin
 		end;
 	end;
 	CloseFile(txt);
-	//DebugOut.Lines.add('Guild Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Guild Saved');
 {ギルド機能追加ココまで}
 
 //Cute Pet Load Start
@@ -3249,7 +3249,7 @@ begin
 		end;
 		CloseFile(txt);
 
-	//DebugOut.Lines.add('Pet Saved');
+	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Pet Saved');
 //Cute Pet Load End
 
 	sl.Free;
