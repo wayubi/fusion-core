@@ -6850,45 +6850,56 @@ begin
 	Result := w;
 end;
 //------------------------------------------------------------------------------
-function CheckGuildMaster(tn:TNPC; tc:TChara) : word;
-var
-  tgc:TCastle;
-  i  :integer;
-	w  :word;
-begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  if (tgc.GMName = tc.Name) then begin
-  w := 1;
-  end;
-  end else begin
-  w := 0;
-  end;
+(*-----------------------------------------------------------------------------*
+CheckGuildMaster
+Pre:
+	tc is a valid, non-nil TChara
+	tn is a valid, non-nil TNPC
+	(In other words, this function's not responsible for bad input)
+Post:
+	If the Character is the Guild Master of the same Guild the NPC owns,
+	1 is returned, else 0.
+*-----------------------------------------------------------------------------*)
+Function  CheckGuildMaster(
+          	tn : TNPC;
+          	tc : TChara
+          ) : Word;
+Var{ChrstphrR 2004/04/28 Eliminated unused variables}
+	tgc:TCastle;
+	Idx :integer;
+Begin
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
 
-	Result := w;
-end;
-//------------------------------------------------------------------------------
-function GetGuildID(tn:TNPC) : word;
-var
-  tgc:TCastle;
-  i  :integer;
-	w  :word;
-begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
+	if (Idx > - 1) AND ((CastleList.Objects[i] AS TCastle).GMName = tc.Name) then
+		Result := 1;
+End;(* Func CheckGuildMaster()
+*-----------------------------------------------------------------------------*)
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  w := tgc.GID;
-  end else begin
-  w := 0;
-  end;
 
-	Result := w;
-end;
+(*-----------------------------------------------------------------------------*
+GetGuildID
+Pre:
+	tn is a valid, non-nil TNPC
+	(In other words, this function's not responsible for bad input)
+Post:
+	If tn is associated with a guild, returns the Guild ID, else returns 0
+*-----------------------------------------------------------------------------*)
+Function  GetGuildID(
+          	tn : TNPC
+          ) : Word;
+Var{ChrstphrR 2004/04/28 Eliminated unused variables}
+	Idx : Integer;
+Begin
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
+
+	if (Idx > - 1) then
+		Result := (CastleList.Objects[i] AS TCastle).GID;
+End;(* Func GetGuildID()
+*-----------------------------------------------------------------------------*)
+
 //------------------------------------------------------------------------------
 procedure GuildDInvest(tn:TNPC);
 var

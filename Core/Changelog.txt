@@ -1,3 +1,5 @@
+- 04-28-04: GetGuildID - Defined pre/post conditions, Eliminated unused variables. [ChrstphrR]
+- 04-28-04: CheckGuildMaster - Defined pre/post conditions, Eliminated unused variables. [ChrstphrR]
 - 04-28-04: CalcStat - Eliminated unused variables. [ChrstphrR]
 - 04-28-04: EnableGuildKafra - Eliminated unused variables. [ChrstphrR]
 - 04-28-04: Get/SetGuildKafra - Eliminated unused variables. [ChrstphrR]
