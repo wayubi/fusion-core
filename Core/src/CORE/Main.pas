@@ -7830,6 +7830,8 @@ begin
             tc1.PoisonTick := Tick;
             tc1.isBlind := false;
             tc1.BlindTick := Tick;
+			tc1.FreezeTick := Tick;
+            tc1.isFrozen := false;
             tc1.Stat1 := 0;
             tc1.Stat2 := 0;
             UpdateStatus(tm, tc1, Tick);
@@ -9183,6 +9185,7 @@ begin
 						if Random(1000) < tl.Data1[MUseLV] * 10 then begin
 							//if (tc1.Stat1 <> 1) then begin
 								tc1.Stat1 := 1;
+								tc1.isStoned := true;
 								tc1.StoneTick := Tick + 15000;
                 UpdateStatus(tm, tc1, Tick);
 							//end;
@@ -9329,7 +9332,7 @@ begin
 							end;
 						end;
           end;
-				52:     {Envenom}
+				52:     {Envenom PvP}
 					begin
 						DamageCalc3(tm, tc, tc1, Tick, 0, 100, tl.Element);
 						dmg[0] := dmg[0] + 15 * MUseLV;
@@ -9343,6 +9346,8 @@ begin
 						if Random(1000) < k1 then begin
                                                         tc1.isPoisoned := true;
                                                         tc1.PoisonTick := Tick + 20000;
+							tc1.Stat2 := 1;
+             				UpdateStatus(tm, tc1, Tick);
 							//if not Boolean(tc1.Stat2 and 1) then
 								//tc1.HealthTick[0] := Tick + tc.aMotion
 							//else tc1.HealthTick[0] := tc1.HealthTick[0] + 30000;
@@ -10378,7 +10383,7 @@ begin
 		if Weight * 2 < MaxWeight then begin
                 
 
-if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
+if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) then begin
 if HP <> MAXHP then begin
 bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
 if bonusregen = 0 then begin ;
@@ -10725,7 +10730,7 @@ begin
                           tc.Stat2 := 0;
                           tc.isSilenced := false;
                           tc.SilencedTick := Tick;
-                          //SilenceCharacter(tm, tc, Tick);
+                          SilenceCharacter(tm, tc, Tick);
                         end;
                 end;
 
@@ -11467,6 +11472,15 @@ begin
 									if c = (sl2.Count -1) then tn.Count := 0;
 								end;
                 end;
+						$92:    {Venom Dust PvP effect}
+              				begin
+                				if tc2.isPoisoned = false then begin
+                  					tc2.isPoisoned := True;
+                  					tc2.PoisonTick := tick + 15000;
+                  					tc2.Stat2 := 1;
+                  					UpdateStatus(tm, tc2, Tick);
+                				end;
+              				end;
 						$93: {Land Mine}
 							begin
 								if not flag then Break; //“¥‚ñ‚Å‚È‚¢

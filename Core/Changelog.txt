@@ -2,6 +2,8 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-09-04: Updated Poison Effect PvP, just needs to reduce HP now. [Darkhelmet]
+- 02-09-04: Updated Venom Dust PvP. [Darkhelmet]
 - 02-08-04: Fixed Bug #455, MDEF can now stack from items. [Darkhelmet]
 - 02-08-04: Added Music to Bard SKills. [Darkhelmet]
 - 02-08-04: Updated Stone Curse PvP, not working fully. [Darkhelmet]

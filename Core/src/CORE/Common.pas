@@ -1935,6 +1935,10 @@ begin
                        i := 10 + (5 * tc.Skill[33].EffectLV);
                        tc.DEF2 := tc.DEF2 + (tc.Param[2] * i div 100);
                 end;
+
+				if isPoisoned = true then begin
+                  tc.DEF2 := tc.DEF2 * 75 div 100;
+                end;
 		//ƒuƒŒƒX(STR,INT,DEX+)
 		if Skill[34].Tick > Tick then begin
 			Bonus[0] := Bonus[0] + Skill[34].EffectLV;
@@ -2824,6 +2828,11 @@ end;}
 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
 begin
         tm := tc.MData;
+		
+		{Example Poison changes your stats so this is neccessary}
+        CalcStat(tc, Tick);
+        CalcSkill(tc, Tick);
+        SendCStat(tc);
         WFIFOW(0, $0119);
         WFIFOL(2, tc.ID);
         WFIFOW(6, tc.Stat1);
