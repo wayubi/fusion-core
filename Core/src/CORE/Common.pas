@@ -1225,6 +1225,7 @@ MapTbl = class
 	noTele    :Boolean;
 	PvP       :Boolean;
 	PvPG      :Boolean;
+    PvPN      :Boolean;
 	noDay     :Boolean;
   //Capture the flag w00t, heh
   CTF       :Boolean;

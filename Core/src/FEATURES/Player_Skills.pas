@@ -18,7 +18,7 @@ var
 
     { Calculation Procedures }
     procedure use_sp(tc : TChara; SkillID : word; LV : byte);
-    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer) : TStringList;
+    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer; playersOnly : Boolean = false) : TStringList;
     function check_allow_pvp(tc : TChara) : Boolean;
 
     { Skill Procedures - Swordsman }
@@ -265,8 +265,9 @@ uses
         tc.MSkill := 0;
         tc.MUseLv := 0;
     end;
-    
-    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer) : TStringList;
+
+    //Pvp will tell you if you should find monster targets or player targets.
+    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer; playersOnly : Boolean = false) : TStringList;
     var
         j1, i1, k1 : Integer;
         tm : TMap;
@@ -285,6 +286,7 @@ uses
 
         for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
             for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+              if NOT playersOnly then begin
                 for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
                     ts := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
 
@@ -294,6 +296,7 @@ uses
                         if (abs(ts.Point.X - xy.X) <= tl.Range2) and (abs(ts.Point.Y - xy.Y) <= tl.Range2) then sl.AddObject(IntToStr(ts.ID),ts);
                     end;
                 end;
+              end;
 
                 for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
                     if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then Continue;
@@ -600,10 +603,11 @@ uses
         if (tc.MSkill = 10) then tc.Option := tc.Option or 1 else tc.Option := tc.Option or $2000;
         UpdateOption(tm, tc);
 
-        sl := find_targets(tc, sl, 1);
+        sl := find_targets(tc, sl, 1, true);
 
         if sl.Count <> 0 then begin
             for k1 := 0 to sl.Count - 1 do begin
+                //tc1 := tm.CList.IndexOfObject(tc.MTarget) as TChara;
                 tc1 := sl.Objects[k1] as TChara;
                 if (tc1.Option and 6 <> 0) then begin
                     tc1.Option := tc1.Option and $FFF9;
