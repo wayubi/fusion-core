@@ -6281,9 +6281,27 @@ end;
 									i := 0;
 								end;
 							else begin//•Ší»‘¢(¬Œ÷—¦‚ÍjobLv * 0.3 + DEX * 0.1 + LUK * 0.1 + ƒXƒLƒ‹•â³ + 15 ‚Æ‰¼’è)
-                // Colus 20040118: Adding Pharamacy check here
+                // Colus, 20040224: Updated calculation for Pharmacy.  Not correct, but closer.
+                // Like Steal, the exact formula is not known to anybody yet...
+                // Some formulas given:
+                //
+                // LP×3 + Pha×2 + JobLv×0.3 + Dex×0.1 + Int×0.05 + 10
+                // LP×1 + Pha×3 + JobLv×0.2 + Dex×0.1 + Luk×0.1 + 20
+                // Pha×4 + JobLv×0.3 + Dex×0.1 + Int×0.05 + 20
+                // LP + Pha * 3 + PP + JovLV * 0.5 + LUK * 0.1 + DEX * 0.1 + 5
+                // LP + Pha×3 + PP + Job×0.2 + Dex×0.1 + Luk×0.05 + 15
+
+                // Somebody shoot me.  Anyway, I'm going to use this one for now:
+                // LP + Pha * 3 + PP + JovLV * 0.5 + LUK * 0.1 + DEX * 0.1 + 5
+                // Why?  It's got a lot of trials behind it.  It'll do for now.
+
                 if (tma.RequireSkill = 228) then begin
-                  if (Random(2000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100)) then i := 0;
+                  if (Random(1000) < ((tc.Skill[227].Lv * 10) +  // 100
+                     (tc.Skill[tma.RequireSkill].Lv * 30) +      // 300
+                      (tc.Skill[231].Lv * 10) +                  // 50
+                      tc.JobLV * 5 +                             // 250
+                      tc.Param[4] + tc.Param[5]) +               // 200
+                      5 ) then i := 0;                           // 5 = 905
                 end else begin
                   if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100) + 150 + (tc.Skill[107].Lv * 10) + anvil - (w2 + (tma.ItemLV -1) * 100)) then i := 0;
                 end;

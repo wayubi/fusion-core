@@ -8701,6 +8701,7 @@ begin
 							WFIFOW(2, j);
 							Socket.SendBuf(buf, j);
             end else begin
+              SendSkillError(tc, 0);
               tc.MMode := 4;
   						Exit;
 
