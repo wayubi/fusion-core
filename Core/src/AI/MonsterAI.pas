@@ -46,7 +46,7 @@ var
 	tn:TNPC;
 	sl:TStringList;
 begin
-  //if ts.Data.Loaded = false then TempNewAIProcedures(tm, ts, Tick);
+  if ts.Data.Loaded = false then TempNewAIProcedures(tm, ts, Tick);
 
 	sl := TStringList.Create;
 	with ts do begin

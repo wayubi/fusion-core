@@ -87,6 +87,7 @@ var
 {露店スキル追加ココまで}  
 {取引機能追加}
 	tdl :TDealings;
+  twp :TWarpDatabase;
 {取引機能追加ココまで}
 {キューペット}
         tpd             :TPetDB;
@@ -1924,7 +1925,50 @@ end;
                                             tc.Socket.SendBuf(buf, w);
                                         end else
                                         // AlexKreuz: Get list of users
+                                        // Darkhelmet Player Warp commands
+                                        if (Copy(str, 1, 4) = 'warp') then begin
+                                          if WarpItem <> 0 then k := SearchCInventory(tc, WarpItem, false);
+                                          sl := TStringList.Create;
+                                          sl.DelimitedText := Copy(str, 6, 256);
+                                          try
+                                             if WarpDatabase.IndexOf(sl.Strings[0]) <> -1 then begin
+                                              twp := WarpDatabase.Objects[WarpDatabase.IndexOf(sl.Strings[0])] as TWarpDatabase;
+                                              if (tc.Zeny >= twp.Cost) and ((k <> 0) and (tc.Item[k].Amount >= 1)) then begin
+                                                if (sl.Strings[0] = 'save') or (sl.Strings[0] = 'return') or (sl.Strings[0] = 'home') then begin
+                                                  if (tc.Hidden = false) then SendCLeave(tc, 2);
+                                                  tc.Map := tc.SaveMap ;
+						                                      tc.Point.X := tc.SavePoint.X;
+						                                      tc.Point.Y := tc.SavePoint.Y;
+                                                  twp.Map := tc.SaveMap ;
+						                                      twp.X := tc.SavePoint.X;
+						                                      twp.Y := tc.SavePoint.Y;
+                                                end else begin
+							                                  //if sl.Count <> 3 then continue;
+							                                  i := twp.X;
 
+							                                  j := twp.Y;
+
+							                                  //Find the Map
+							                                  if MapList.IndexOf(LowerCase(twp.MAP)) = -1 then continue;
+							                                  //座標チェック
+							                                  ta := MapList.Objects[MapList.IndexOf(LowerCase(twp.MAP))] as TMapList;
+							                                  if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
+                                                if (tc.Hidden = false) then SendCLeave(tc, 2);
+                                                tc.tmpMap := LowerCase(twp.MAP);
+						                                  	tc.Point :=Point(twp.X,twp.Y);
+                                                end;
+							                                  //Warp the Player
+                                                tc.Zeny := tc.Zeny - twp.Cost;
+
+							                                  MapMove(Socket, LowerCase(twp.MAP), Point(twp.X,twp.Y));
+                                              end else if ((k <> 0) and (tc.Item[k].Amount >= 1)) then SendSkillError(tc, 5)
+                                              else SendSkillError(tc, 6)
+                                             end;
+
+                                            finally
+                                              sl.Free();
+                                            end;
+                                        end;
 
 
                                                 if (Copy(str, 1, 6) = 'server') then begin

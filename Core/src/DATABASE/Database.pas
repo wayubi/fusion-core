@@ -59,6 +59,7 @@ var
 	tb  :TMobDB;
 	tsAI :TMobAIDB;
   tsAI2 :TMobAIDBAegis;
+  twp :TWarpDatabase;
 
       //  tPharm  :TPharmacyDB;  {Pharmacy's Database}
   tt  :TTerritoryDB;
@@ -1310,6 +1311,40 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	DebugOut.Lines.Add('-> Weapon database loaded.');
 	Application.ProcessMessages;
 
+  {April 4, 2004: Warp Database - Darkhelmet
+    It works like this, a Game Master can define in warp_db.txt what places any user
+    can warp to without having to get to a kafra.  I.E. -warp prontera.  This will
+    warp the user to prontera with the coordinates the Game Master Defines.  It also
+    allows you to set a cost for the warp.  Lastly, a Game Master can define that
+    a player needs item X to warp, but the item is not consumed on warp as of yet.
+  }
+  if WarpEnabled = true then begin
+  DebugOut.Lines.Add('Warping database loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\warp_db.txt');
+	Reset(txt);
+	Readln(txt, str);
+  while not eof(txt) do begin
+    if (sl.Strings[0] <> '//') then begin
+    twp := TWarpDatabase.Create;
+    sl.Clear;
+    Readln(txt, str);
+    sl.DelimitedText := str;
+    twp.NAME := sl.Strings[0];
+    twp.MAP := sl.Strings[1];
+    twp.X := StrToInt(sl.Strings[2]);
+    twp.Y := StrToInt(sl.Strings[3]);
+    twp.Cost := StrToInt(sl.Strings[4]);
+    WarpDatabase.AddObject(twp.NAME, twp);
+    end;
+  end;
+  CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d Warps loaded.', [WarpDatabase.Count]));
+	Application.ProcessMessages;
+  end;
+
+
+
 	//属性テーブル読み込み
 	DebugOut.Lines.Add('Element database loading...');
 	Application.ProcessMessages;
@@ -2416,6 +2451,7 @@ begin
 
         DebugOut.Lines.Add( Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
 	Application.ProcessMessages;
+
 {キューペットここまで}
 	sl.Free;
 end;

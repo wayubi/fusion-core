@@ -220,6 +220,8 @@ begin
         MArrowDB := TIntList32.Create;
         MArrowDB.Sorted := true;
 
+        WarpDatabase := TStringList.Create;
+
         IDTableDB := TIntList32.Create;
         IDTableDB.Sorted := true;
 
@@ -627,6 +629,20 @@ begin
 	end else begin
 		GMCheck := $FF;
 	end;
+
+  //Darkhelmet's Toys
+  ini.ReadSectionValues('Toys', sl);
+  if sl.IndexOfName('EnabledUWarp') <> -1 then begin
+    WarpEnabled := StrToBool(sl.Values['EnabledUWarp']);
+	end else begin
+		WarpEnabled := False;
+	end;
+  if sl.IndexOfName('EUWarpItem') <> -1 then begin
+    WarpItem := StrToInt(sl.Values['EUWarpItem']);
+	end else begin
+		WarpItem := 0;
+	end;
+
 	//cbxPriority.ItemIndex := Priority;
   case Priority of
 	0: 		PriorityClass := REALTIME_PRIORITY_CLASS;
@@ -795,6 +811,7 @@ begin
 {アイテム製造追加ココまで}
 	MobDB.Free;
         MArrowDB.Free;
+        WarpDatabase.Free;
         MobAIDB.Free;
         MobAIDBAegis.Free;
         PharmacyDB.Free;
@@ -13621,7 +13638,7 @@ begin
 					    if ts.Item[10].ID = 0 then begin
 						isLooting := True;
             Status := 'MOVEITEM_ST';
-            //CalculateSkillIf(tm, ts, Tick);
+            CalculateSkillIf(tm, ts, Tick);
 						ATarget := tn.ID;
 						ATick := Tick;
 
@@ -15545,6 +15562,7 @@ begin
                     MobAIDB.Clear;
                     MobAIDBAegis.Clear;
                     MArrowDB.Clear;
+                    WarpDatabase.Clear;
                     IDTableDB.Clear;
                     Playername.Clear;
                     Player.Clear;

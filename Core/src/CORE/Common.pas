@@ -314,6 +314,14 @@ type TMArrowDB = class
   CNum      :array[0..2] of integer;
 end;
 //------------------------------------------------------------------------------
+type TWarpDatabase = class
+  NAME:String;  //Name that player will type
+  MAP :String;  //Name of the Actual Map
+  X   :integer; //X Coordinate to warp to
+  Y   :integer; //Y Coordinate to warp to
+  Cost:integer; //Amount of zeny the warp takes
+end;
+//------------------------------------------------------------------------------
 // 経験値配分用カウンタ
 type rEXPDist = record
 	CData       :Pointer;
@@ -1433,6 +1441,7 @@ var
         PharmacyDB :TIntList32;
   SlaveDBName:TStringList;
   MArrowDB   :TIntList32;
+  WarpDatabase:TStringList;
   IDTableDB  :TIntList32;
 	SkillDB    :TIntList32;
   SkillDBName:TStringlist;
@@ -1485,7 +1494,8 @@ var
 	stra            :array[0..32767] of char;
 {オプション関連}
         //キャラクター初期データ関連
-
+        WarpEnabled :boolean;
+        WarpItem    :cardinal;
         GMCheck         :cardinal; // GMコマンドをGM以外も使えるか
         DebugCMD        :cardinal; // デバッグコマンドが使えるか
 DeathBaseLoss     :integer;

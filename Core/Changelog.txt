@@ -1,3 +1,4 @@
+- 04-05-04: Adding more AI updates and AI Range Check errors fixes. [Darkhelmet]
 - 04-05-04: Added Assign method to ItemDB class. [ChrstphrR]
 - 04-05-04: Documented/clarified param/var names for Item container routines [ChrstphrR]
 - 04-03-04: Adding conditional testing and proper cast time. [Darkhelmet]
