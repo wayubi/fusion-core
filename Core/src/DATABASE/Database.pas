@@ -1158,7 +1158,7 @@ begin
 		Readln(txt, str);
 		sl.DelimitedText := str;
 		for j := sl.Count to 19 do sl.Add('100');
-		for j := 0 to 19 do ElementTable[i][j+23] := StrToInt(sl.Strings[j]);
+		for j := 0 to 19 do ElementTable[i][j+20] := StrToInt(sl.Strings[j]);
 		//---
 		sl.Clear;
 		Readln(txt, str);

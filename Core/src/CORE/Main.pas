@@ -10267,14 +10267,15 @@ begin
 {追加:119}
 						$84: //マグヌス
 							begin
-								if (ts1.Element mod 20 = 9) or ((ts1.Data.Race = 6) and (ts1.Element <> 21)) then begin
+              DebugOut.Lines.Add(Format('Element %d Race %d', [ts1.Element,ts1.Data.Race]));
+								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) then begin
 									//ダメージ算出
 									dmg[0] := tn.CData.MATK1 + Random(tn.CData.MATK2 - tn.CData.MATK1 + 1) * tn.CData.MATKFix div 100;
 									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
 									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
 									dmg[0] := dmg[0] * tn.Count;
-									dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[79].Data.Element][29] div 100;
+									dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[79].Data.Element][ts1.Element] div 100;
 									if dmg[0] < 0 then dmg[0] := 0;
 									tn.Tick := Tick;
 									//ダメージパケ送信
