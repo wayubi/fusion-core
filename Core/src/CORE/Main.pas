@@ -9115,7 +9115,7 @@ begin
 							//DebugOut.Lines.Add('(ﬂÅÕﬂ)!');
 							WFIFOW(0, $0196);
 							WFIFOW(2, tl.Icon);
-							WFIFOL(4, ID);
+							WFIFOL(4, tc1.ID);
 							WFIFOB(8, 1);
 							//Socket.SendBuf(buf, 9);
                                                         SendBCmd(tm, tc1.Point, 9);

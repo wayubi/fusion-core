@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+- 12-27-03: Fixed Use Increase_Agility with other one,But show message and icon in local. [Michen]
 - 12-25-03: Fixed Decrease AGI stacking bug. [AlexKreuz]
 - 12-25-03: Added "#kick charaname" command. [AlexKreuz]
 - 12-25-03: Added "#ban charaname" command. [AlexKreuz]
