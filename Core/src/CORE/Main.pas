@@ -195,7 +195,6 @@ type
     EnableWebAccountCreator1: TMenuItem;
     Label60: TLabel;
     Edit5: TEdit;
-    TabSheet6: TTabSheet;
     ListBox2: TListBox;
     Label61: TLabel;
     Edit7: TEdit;
@@ -217,9 +216,7 @@ type
     Edit13: TEdit;
     Edit14: TEdit;
     Edit15: TEdit;
-    PageControl3: TPageControl;
     TabSheet7: TTabSheet;
-    TabSheet8: TTabSheet;
     Edit16: TEdit;
     Label72: TLabel;
     Label73: TLabel;
@@ -271,7 +268,6 @@ type
     Label95: TLabel;
     Label96: TLabel;
     Button16: TButton;
-    Button17: TButton;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -11425,7 +11421,7 @@ begin
 		JCon_Accounts_Load();
     end else if (TabSheet4.Showing) then begin
     	JCon_INI_Server_Load();
-    end else if (TabSheet6.Showing) then begin
+    end else if (TabSheet7.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
     end;
 
