@@ -5443,7 +5443,8 @@ begin
                                         MMode := 4;
                                         Exit;
                                         end;
-                                        end;
+
+                                      
                                 {214:    {Raid}
                                 {begin
                                         if (tc.Option = 6) then begin
