@@ -6,7 +6,10 @@ December 23, 2003
 [Suggestions by Darkhelmet]
 
 - Monster Skills
-- Tweak New Map Format <-- (what do you mean, tweak?) (Alex)
+- Tweak New Map Format <-- (what do you mean, tweak?) (Alex)  <---alex monsters are spawning in walls, and going through them many reports on it today(Oatmeal)
+- Guild Wars  (Low priority)
+- Update Triple blow (low priority)
+- Update Item Db (high Priortity)-i'm working on it-(oatmeal)
 - Wedding System (Low Priority)
 - GM commands #ban , #kick (very helpful) [Eliot]
 - Mercenary Monsters .. Talk to Paradox (Alex)
