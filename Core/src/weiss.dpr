@@ -3,6 +3,7 @@ program Weiss;
 {$R 'manifest.res' 'manifest.rc'}
 
 uses
+  madScreenShot,
   {$IFDEF MSWINDOWS}
   madExcept,
   Forms,
@@ -110,7 +111,7 @@ uses
 
 begin
   Application.Initialize;
-  Application.Title := 'The Fusion Project';
+  Application.Title := 'Fusion Server Software';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
 end.

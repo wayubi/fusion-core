@@ -19,7 +19,7 @@ uses
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
         PacketProcesses, ISCS, WAC,
     {3rd Party Units}
-    	List32, Zip, WSocket;
+    	List32, Zip, WSocket, jpeg;
 
 const
     {I know these are windows based, keep away from linux XD}
@@ -60,8 +60,6 @@ type
     Stop1: TMenuItem;
     TabSheet3: TTabSheet;
     ListBox1: TListBox;
-    Edit2: TEdit;
-    Label1: TLabel;
     Label2: TLabel;
     Edit3: TEdit;
     Label3: TLabel;
@@ -344,6 +342,16 @@ type
     Label133: TLabel;
     Label134: TLabel;
     Label135: TLabel;
+    Menu1: TMenuItem;
+    Console1: TMenuItem;
+    Options1: TMenuItem;
+    Administration1: TMenuItem;
+    Accounts1: TMenuItem;
+    Characters1: TMenuItem;
+    Label1: TLabel;
+    Combo_ISCS: TComboBox;
+    Label136: TLabel;
+    ListBox9: TListBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -416,6 +424,7 @@ type
     procedure Exit1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure ListBox9Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -458,6 +467,10 @@ type
     procedure Button25Click(Sender: TObject);
     procedure Button24Click(Sender: TObject);
     procedure ListBox8Click(Sender: TObject);
+    procedure Options1Click(Sender: TObject);
+    procedure Console1Click(Sender: TObject);
+    procedure Accounts1Click(Sender: TObject);
+    procedure Characters1Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -528,7 +541,9 @@ var
 begin
 
 	AppPath := ExtractFilePath(ParamStr(0));
-    Caption := ' The Fusion Project: RO Server Software';
+    Caption := ' Fusion Server Software - ' + RELEASE_VERSION;
+
+    Combo_ISCS.ItemIndex := 0;
 
 	//Alex' new GM command initialization
 	load_commands();
@@ -895,7 +910,7 @@ begin
 	if sl.IndexOfName('Option_Font_Color') > -1 then begin
                         Option_Font_Color := sl.Values['Option_Font_Color'];
                 end else begin
-                        Option_Font_Color := '666666';
+                        Option_Font_Color := '14BB85';
                 end;
 	if sl.IndexOfName('Option_Font_Size') > -1 then begin
                         Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
@@ -905,12 +920,12 @@ begin
 	if sl.IndexOfName('Option_Font_Face') > -1 then begin
                         Option_Font_Face := sl.Values['Option_Font_Face'];
                 end else begin
-                        Option_Font_Face := 'Trebuchet MS';
+                        Option_Font_Face := 'Lucida Sans Unicode';
                 end;
 	if sl.IndexOfName('Option_Font_Style') > -1 then begin
 		Option_Font_Style := sl.Values['Option_Font_Style'];
 	end else begin
-		Option_Font_Style := 'B';
+		Option_Font_Style := '';
 	end;
 
 
@@ -11413,7 +11428,12 @@ end;
 
 procedure TfrmMain.ListBox1Click(Sender: TObject);
 begin
-	JCon_Accounts_Populate();
+	JCon_Accounts_Populate(0);
+end;
+
+procedure TfrmMain.ListBox9Click(Sender: TObject);
+begin
+    JCon_Accounts_Populate(1);
 end;
 
 procedure TfrmMain.Button3Click(Sender: TObject);
@@ -11646,6 +11666,29 @@ end;
 procedure TfrmMain.ListBox8Click(Sender: TObject);
 begin
     JCon_Chara_Flag_Populate();
+end;
+
+procedure TfrmMain.Options1Click(Sender: TObject);
+begin
+    JCon_INI_Server_Load();
+    TabSheet2.Show;
+end;
+
+procedure TfrmMain.Console1Click(Sender: TObject);
+begin
+    TabSheet1.Show;
+end;
+
+procedure TfrmMain.Accounts1Click(Sender: TObject);
+begin
+    JCon_Accounts_Load();
+    TabSheet3.Show;
+end;
+
+procedure TfrmMain.Characters1Click(Sender: TObject);
+begin
+    JCon_Characters_Online();
+    TabSheet7.Show;
 end;
 
 end.

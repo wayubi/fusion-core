@@ -13,7 +13,7 @@ uses
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE;
 
 	procedure JCon_Accounts_Load();
-    procedure JCon_Accounts_Populate();
+    procedure JCon_Accounts_Populate(aType : Integer);
     procedure JCon_Accounts_Clear();
     procedure JCon_Accounts_Save();
     procedure JCon_Accounts_Delete();
@@ -59,23 +59,34 @@ uses
 	begin
 
 		frmMain.ListBox1.Clear;
+        frmMain.ListBox9.Clear;
 
 		for i := 0 to (PlayerName.Count - 1) do begin
 			AccountItem := PlayerName.Objects[i] as TPlayer;
 	        frmMain.listbox1.Items.AddObject(PlayerName.Strings[i], AccountItem);
     	    frmMain.listbox1.Sorted := True;
+            AccountItem := Player.Objects[i] as TPlayer;
+            frmMain.ListBox9.Items.AddObject(IntToStr(AccountItem.ID), AccountItem);
+            frmMain.ListBox9.Sorted := True;
 	    end;
     end;
 
 
-    procedure JCon_Accounts_Populate();
+    procedure JCon_Accounts_Populate(aType : Integer);
 	var
     	AccountItem : TPlayer;
 	begin
     	if (frmMain.listbox1.ItemIndex = -1) then Exit;
 
-		AccountItem := frmMain.listbox1.Items.Objects[frmMain.listbox1.ItemIndex] as TPlayer;
-	    frmMain.Edit2.Text := IntToStr(AccountItem.ID);
+		if aType = 0 then
+            AccountItem := frmMain.listbox1.Items.Objects[frmMain.listbox1.ItemIndex] as TPlayer
+        else
+            AccountItem := frmMain.listbox9.Items.Objects[frmMain.listbox9.ItemIndex] as TPlayer;
+
+        frmMain.ListBox9.ItemIndex := Player.IndexOf(AccountItem.ID);
+        frmMain.ListBox1.ItemIndex := PlayerName.IndexOf(AccountItem.Name);
+
+	    frmMain.Label136.Caption := IntToStr(AccountItem.ID);
     	frmMain.Edit3.Text := AccountItem.Name;
 	    frmMain.Edit4.Text := AccountItem.Pass;
         frmMain.ComboBox15.ItemIndex := -1;
@@ -110,7 +121,7 @@ uses
 
     procedure JCon_Accounts_Clear();
     begin
-	    frmMain.Edit2.Clear;
+        frmMain.Label136.Caption := '';
     	frmMain.Edit3.Clear;
 	    frmMain.Edit4.Clear;
     	frmMain.ComboBox15.Text := '';
@@ -149,7 +160,7 @@ uses
         	    end;
 	        end;
 
-		    AccountItem.ID := StrToInt(frmMain.Edit2.Text);
+		    //AccountItem.ID := StrToInt(frmMain.Edit2.Text);
         	AccountItem.Name := frmMain.Edit3.Text;
 	        AccountItem.Pass := frmMain.Edit4.Text;
     	    AccountItem.Gender := frmMain.ComboBox15.ItemIndex;
