@@ -8571,7 +8571,7 @@ begin
 		tc1 := AData;
 		if tc1.GraceTick > Tick then exit;
 
-		if tc1.Skill[255].Tick > Tick then begin
+		if (tc1.Skill[255].Tick > Tick) and (assigned(tc1.Crusader)) then begin
 			tc2 := tc1.Crusader;
 			if (tc2.Login <> 2) and (tc1 <> tc2) then begin
 				tc2 := nil;
