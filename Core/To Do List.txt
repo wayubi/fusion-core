@@ -1,3 +1,10 @@
+http://fusion.cobax.net/
+
+For all Dev discussions....
+
+
+-------------------------------------------------------------------------
+
 1-26-04: TODO for 1.2.0.9 [Colus]
 
 OK, let's make a list.  I assume we're planning a release around 2-1-2004.
