@@ -178,6 +178,7 @@ var
     function command_athena_hide(tc : TChara) : String;
     function command_athena_option(tc : TChara; str : String) : String;
     function command_athena_storage(tc : TChara) : String;
+    function command_athena_speed(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -490,6 +491,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc.ID, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
             else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
             else if ( (copy(str, 1, length('storage')) = 'storage') and (check_level(tc.ID, GM_ATHENA_STORAGE)) ) then error_msg := command_athena_storage(tc)
+            else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_ATHENA_SPEED)) ) then error_msg := command_athena_speed(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2717,6 +2719,35 @@ Called when we're shutting down the server *only*
     begin
         Result := 'GM_ATHENA_STORAGE activated.';
         SendCStoreList(tc);
+    end;
+
+    function command_athena_speed(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        w : Integer;
+    begin
+        Result := 'GM_ATHENA_SPEED failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 2 then Exit;
+
+        if (strtoint(sl.Strings[1]) >= 25) and (strtoint(sl.Strings[1]) <= 1000) then begin
+            Result := 'GM_ATHENA_SPEED success. Walking speed is now ' + sl.Strings[1];
+            tc.DefaultSpeed := strtoint(sl.strings[1]);
+            CalcStat(tc);
+            SendCStat1(tc, 0, 0, tc.Speed);
+        end else begin
+            Result := Result + 'Requested speed out of range. Must be 25-1000';
+        end;
+
+        w := Length(str) + 4;
+        WFIFOW (0, $009a);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
+
+        sl.Free;
     end;
       
     function command_athena_help(tc : TChara) : String;
