@@ -5922,7 +5922,7 @@ begin
 		//HPSPâÒïúèàóù
 		if Weight * 2 < MaxWeight then begin
 
-			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (tc.isPoisoned = false) and  (tc.Option and 6 = 0) then begin
+			if (HPTick + HPDelay[3 - Sit] <= Tick) and (tc.isPoisoned = false) and  (tc.Option and 6 = 0) then begin
 				if HP <> MAXHP then begin
 					bonusregen := (MAXHP div 200) + (Param[1] div 5) ;
 					if bonusregen = 0 then begin
@@ -5939,7 +5939,7 @@ begin
 				end;
 			end;
 
-			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and  (tc.Option and 6 = 0) then begin
+			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (Skill[270].Tick < Tick) and (tc.Option and 6 = 0) then begin
 				if SP <> MAXSP then begin
 
 					bonusregen := 1+(MAXSP div 100) + (Param[3] div 6) ;
@@ -5972,27 +5972,6 @@ begin
 						end;
 					end;
 
-					{Colus, 20031223: Why is the SP part of Spiritual Relaxation here?}
-					{Shouldn't it be in SkillPassive?  Oh, well...}
-					{ Anyway, according to kRO site, SP *can* be recovered with this
-						in Critical Explosion mode, but not in normal regen.  So I'm
-						removing the Critical Explosion check while adding the Ashura check.
-						Also, it doesn't say anything about recovering HP, so that's not
-						changed...for now.}
-					if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) and (tc.Option and 6 = 0) then begin
-						if (SP <> MAXSP) then begin
-{ãZèp229}
-							j := (3 + MAXSP * 2 div 1000) * Skill[260].Data.Data2[Skill[260].Lv];
-							if SP + j > MAXSP then j := MAXSP - SP;
-							SP := SP + j;
-							WFIFOW( 0, $013d);
-							WFIFOW( 2, $0007);
-							WFIFOW( 4, j);
-							Socket.SendBuf(buf, 6);
-							SendCStat1(tc, 0, 7, SP);
-						end;
-						SPRTick := Tick;
-					end;
 
 				{ Ç–ÇÂÇ¡Ç∆ÇµÇΩÇÁÇ±ÇÃèàóùÇ¢ÇÈÇ©Ç‡
 				end else begin
@@ -6308,7 +6287,11 @@ begin
 
 
       {Colus, 20031223: Added check for Ashura recovery period.}
-			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
+			{
+
+            Alex: Neither Asura nor Fury affect HP Recovery.
+
+            if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick > Tick) and (Option and 6 = 0) then begin
 				if (HP <> MAXHP) then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
                                                 if tc.isPoisoned = True then Dec(HP)
@@ -6328,10 +6311,10 @@ begin
 				end else begin
 					HPTick := Tick;
 				end;
-			end;
+			end;}
 			//SPé©ìÆâÒïú
       {Colus, 20031223: Added check for Ashura recovery period.}
-			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
+			{if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick > Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
 				if SP <> MAXSP then begin
 					for j := 1 to (Tick - SPTick) div SPDelay[3 - Sit] do begin
 						Inc(SP);
@@ -6342,24 +6325,44 @@ begin
 					end else begin
 						SPTick := Tick;
 				end;
-			end;
+			end;}
 
 		if (Sit >= 2) then begin
 
-			if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) and (Option and 6 = 0) then begin
-				if HP <> MAXHP then begin
-					j := (5 + MAXHP div 500) * Skill[260].Data.Data1[Skill[260].Lv];
-					if HP + j > MAXHP then j := MAXHP - HP;
-					HP := HP + j;
-					WFIFOW( 0, $013d);
-					WFIFOW( 2, $0005);
-					WFIFOW( 4, j);
-					Socket.SendBuf(buf, 6);
-					SendCStat1(tc, 0, 5, HP);
+        	if Weight * 2 < MaxWeight then begin
+
+	        	{ Alex: iro.ragnarokonline.com: "the caster cannot restore SP automatically"; No mention of HP }
+				if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Option and 6 = 0) then begin
+					if HP <> MAXHP then begin
+						j := (5 + MAXHP div 500) * Skill[260].Data.Data1[Skill[260].Lv];
+						if HP + j > MAXHP then j := MAXHP - HP;
+						HP := HP + j;
+						WFIFOW( 0, $013d);
+						WFIFOW( 2, $0005);
+						WFIFOW( 4, j);
+						Socket.SendBuf(buf, 6);
+						SendCStat1(tc, 0, 5, HP);
+					end;
+					HPRTick := Tick;
 				end;
-				HPRTick := Tick;
-			end;
-		end;
+
+		        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) and (Skill[270].Tick < Tick) and (tc.Option and 6 = 0) then begin
+    		    	if (SP <> MAXSP) then begin
+        		    	j := (3 + MAXSP * 2 div 1000) * Skill[260].Data.Data2[Skill[260].Lv];
+            		    if SP + j > MAXSP then j := MAXSP - SP;
+                		SP := SP + j;
+                		WFIFOW( 0, $013d);
+	                    WFIFOW( 2, $0007);
+    	                WFIFOW( 4, j);
+        	            Socket.SendBuf(buf, 6);
+            	        SendCStat1(tc, 0, 7, SP);
+                	end;
+	                SPRTick := Tick;
+    	        end;
+                
+            end;
+        end;
+
 	end;
 	//end;
 end;

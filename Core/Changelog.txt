@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-01-04: #897 - No recovery when weight is over 50%. [AlexKreuz]
+- 07-01-04: HP will recover if Asura Strike/Extremity Fist are active. [AlexKreuz]
+- 07-01-04: SP will not recover if Asura Strike/Extremity Fist are active. [AlexKreuz]
 - 07-01-04: Added percentheal and percentheal2 NPC commands. [Tsusai]
 - 07-01-04: Added Athena @warp+, @send and @rura+ commands to ALBGM. [Trihan]
 - 07-01-04: Fixed #1031 - All card/equip skills removed on weapon remove. [AlexKreuz]
