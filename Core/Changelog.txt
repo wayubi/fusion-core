@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
-
+- 12-30-03: Added Monster AI Class and Database Loading [Darkhelmet]
 - 12-30-03: Added Phen effect to GrandCross so when you get hit you dont cancel spell-[Oatmeal12345]
 - 12-30-03: Fixed the Max weight problem from bonus str -[Oatmeal12345]
 - 12-30-03: Fixed Grand Cross [Darkhelmet]

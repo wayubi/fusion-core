@@ -57,6 +57,7 @@ var
 	mi  :MapTbl;
 {NPCイベント追加ココまで}
 	tb  :TMobDB;
+	tsAI :TMobAIDB;
 	tl	:TSkillDB;
 	sr	:TSearchRec;
 	dat :TFileStream;
@@ -643,6 +644,38 @@ begin
 
 {氏{箱追加}
 	//枝データベース読み込み
+DebugOut.Lines.Add('Monster AI database loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\mob_ai_db.txt');
+	Reset(txt);
+	Readln(txt, str);
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+		sl.DelimitedText := str;
+
+                tsAI := TMobAIDb.Create;
+//ID   Skill1	Skill2	Skill3	Skill4	Level1	Level2	Level3	Level4	Percent1	Percent2	Percent3	Percent4
+
+
+		with tsAI do begin
+                        ID := StrToInt(sl.Strings[0]);
+                        for j := 0 to 3 do begin
+			        Skill[j] := StrToInt(sl.Strings[1 + j]);
+                                SkillLV[j] := StrToInt(sl.Strings[5 + j]);
+                                PercentChance[j] := StrToInt(sl.Strings[9 + j]);
+                                //SkillType[j] := StrToInt(sl.Strings[13 + j]);
+                        end;
+		end;
+
+                MobAIDB.AddObject(tsAI.ID, tsAI);
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d monster(s) skills loaded.', [MobAIDB.Count]));
+	Application.ProcessMessages;
+
+
+{Summon Monster List}
 	DebugOut.Lines.Add('Summon Monster List loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\summon_mob.txt');

@@ -152,6 +152,15 @@ type rDropItem = record
   Stolen:cardinal;
 end;
 //------------------------------------------------------------------------------
+type TMobAIDB = class
+// ID,SKILL1,LEVEL1,PERCENT1,TYPE1,SKILL2,LEVEL2,PERCENT2,TYPE2,SKILL3,LEVEL3,PERCENT3,TYPE3,SKILL4,LEVEL4,PERCENT4,TYPE4
+        ID              :cardinal;
+        Skill           :array[0..3] of integer;
+        SkillLv         :array[0..3] of integer;
+        PercentChance   :array[0..3] of integer;
+        //SkillType       :array[0..3] of integer;
+end;
+//------------------------------------------------------------------------------
 // モンスターデータベース
 //ID,Name,JName,LV,HP,EXP,JEXP,Range,ATK1,ATK2,DEF1,DEF2,MDEF1,MDEF2,HIT,FLEE,
 //Scale,Race,Ele,Mode,Speed,ADelay,aMotion,dMotion,Drop1id,Drop1per,Drop2id,
@@ -198,6 +207,7 @@ type TMobDB = class
 {追加}
 	isLoot      :boolean; //Mode &  2 : ルート
 	isLink      :boolean; //Mode &  8 : リンク
+	AISkill     :TMobAIDB;
 {追加ココまで}
 end;
 //------------------------------------------------------------------------------
@@ -1217,6 +1227,8 @@ var
 	DealingList :TIntList32;
 	DealMaxID  :cardinal;
 {取引機能追加ココまで}
+	{Monster Skill Database}
+    MobAIDB      :TIntList32;
 {氏{箱追加}
 	SummonMobList :TIntList32;
 	SummonIOBList :TIntList32;
