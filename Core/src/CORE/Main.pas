@@ -6868,7 +6868,8 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
-                                                spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
+                                                spiritSpheres := spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
+                                                if spiritSpheres > 5 then spiritSpheres := 5;
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                                 {WFIFOW( 0, $01d0);
                                                 WFIFOL( 2, tc.ID);
