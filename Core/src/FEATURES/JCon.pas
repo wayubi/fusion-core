@@ -272,8 +272,10 @@ uses
             end;
         end;}
 
-        CharaName.Delete(CharaName.IndexOf(tc.Name));
-        Chara.Delete(Chara.IndexOf(tc.CID));
+        if CharaName.IndexOf(tc.Name) <> -1 then
+            CharaName.Delete(CharaName.IndexOf(tc.Name));
+        if Chara.IndexOf(tc.CID) <> -1 then
+            Chara.Delete(Chara.IndexOf(tc.CID));
 
         DataSave(True);
     end;
