@@ -1,3 +1,4 @@
+- 04-28-04: Fixed error with Old Blue Box / Old Violet Box Eliotsan's users mentioned. [ChrstphrR]
 - 04-28-04: GetGuildID - Defined pre/post conditions, Eliminated unused variables. [ChrstphrR]
 - 04-28-04: CheckGuildMaster - Defined pre/post conditions, Eliminated unused variables. [ChrstphrR]
 - 04-28-04: CalcStat - Eliminated unused variables. [ChrstphrR]
