@@ -3762,7 +3762,9 @@ begin
                 end;
 		tl := tc.Skill[tc.MSkill].Data;
 
-		if (tc.SP < tl.SP[tc.MUseLV]) and (tc.ItemSkill = false) then begin
+		if (tc.SP < tl.SP[tc.MUseLV]) and (tc.ItemSkill = false) and
+     (((tc.MSkill <> 51) and (tc.MSkill <> 135)) or
+      (((tc.MSkill = 51) or (tc.MSkill = 135)) and (tc.Option and 6 = 0))) then begin
 			//SP•s‘«
 			Result := 1;
 			Exit;
