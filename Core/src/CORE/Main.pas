@@ -7560,11 +7560,11 @@ begin
 							begin
                 if (tn.MSkill = 85) then begin // LoV
                   if (tn.Tick + 1000 * tn.Count) < (Tick + 4000) then begin
-                    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100;
-  									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+                    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * (tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100);
+  									dmg[0] := (dmg[0] div 100) * (100 - ts1.Data.MDEF); //MDEF%
   									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
   									if dmg[0] < 1 then dmg[0] := 1;
-  									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+  									dmg[0] := (dmg[0] div 100) * ElementTable[tl.Element][ts1.Element];
   									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 	  								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
 
