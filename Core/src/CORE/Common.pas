@@ -3939,7 +3939,6 @@ begin
 	WFIFOW(0, $00b0 + Mode);
 	WFIFOW(2, DType);
 	WFIFOL(4, Value);
-    if (tc.Login <> 2) then Exit;
 	tc.Socket.SendBuf(buf, 8);
 {パーティー機能追加}
 	//ステータスの更新時にHPバーの情報も更新する
@@ -3954,7 +3953,7 @@ begin
   if (Mode = 0) and ((DType = $0018) or (DType = $0019)) then begin
     i := tc.Weight * 100 div tc.MaxWeight;
 
-    if (i >= 50) then begin
+    if (i >= 50) and (i < 90) then begin
       UpdateIcon(tc.MData, tc, 35, 1);
     end else begin
       UpdateIcon(tc.MData, tc, 35, 0);
