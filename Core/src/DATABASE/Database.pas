@@ -2206,7 +2206,9 @@ begin
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
+            end;
 
+            if MapList.IndexOf(SaveMap) <> -1 then begin
     			//座標チェック
 	    		ta := MapList.Objects[MapList.IndexOf(SaveMap)] as TMapList;
 		    	if (SavePoint.X < 0) or (SavePoint.X >= ta.Size.X) or (SavePoint.Y < 0) or (SavePoint.Y >= ta.Size.Y) then begin
