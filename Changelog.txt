@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion_SQL 1.0.0.0 - December 25th, 2003
 --------------------------------------------------------------------------------
+- Fixed: Fix bug MySQL only save one character. [Michen]
 - Fixed: Guild member list doesn't show member without login. [Michen]
 - Modify: SavePet. [Michen]
 - Modify: Get NowLoginID,NowCharaID,NowPetID from DB. [Michen]

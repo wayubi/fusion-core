@@ -7,7 +7,7 @@ CREATE TABLE login (
   passwd varchar(24) NOT NULL,
   Gender tinyint(2) NOT NULL DEFAULT '1',
   Mail varchar(50) NOT NULL DEFAULT '-@-',
-  GMMode tinyint(2) NOT NULL DEFAULT '0',
+  Banned tinyint(2) NOT NULL DEFAULT '0',
   regDate datetime,
   PRIMARY KEY (AID),
   KEY ID (ID)
@@ -62,7 +62,7 @@ CREATE TABLE Characters (
   AID bigint(10) unsigned NOT NULL,
   PRIMARY KEY (GID),
   UNIQUE KEY Name (Name),
-  UNIQUE KEY AID (AID)
+  KEY AID (AID)
 ) TYPE=MyISAM;
 
 CREATE TABLE warpInfo (
@@ -142,7 +142,8 @@ CREATE TABLE party (
   MemberID9 bigint(10) unsigned, 
   MemberID10 bigint(10) unsigned, 
   MemberID11 bigint(10) unsigned, 
-  PRIMARY KEY (GRID)
+  PRIMARY KEY (GRID),
+  KEY Name (Name)
 ) TYPE=MyISAM;
 
 CREATE TABLE guildinfo (
@@ -172,11 +173,13 @@ CREATE TABLE guildMinfo (
 
 CREATE TABLE guildMPosition (
   GDID bigint(10) unsigned NOT NULL,
+  Grade int(4),
   PosName varchar(24),
   PosInvite smallint(2),
   PosPunish smallint(2),
   PosEXP bigint(10) unsigned,
-  UNIQUE KEY GDID (GDID)
+  KEY GDID (GDID),
+  KEY mutidata (GDID,Grade)
 ) TYPE=MyISAM;
 
 CREATE TABLE guildBanishInfo (
@@ -191,7 +194,8 @@ CREATE TABLE guildAllyInfo (
   GDID bigint(10) unsigned NOT NULL,
   GuildName varchar(24),
   Relation smallint(2),
-  UNIQUE KEY GDID (GDID)
+  UNIQUE KEY GDID (GDID),
+  KEY mutidata (GDID,GuildName,Relation)
 ) TYPE=MyISAM;
 
 CREATE TABLE pet (
