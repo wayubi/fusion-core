@@ -1159,7 +1159,7 @@ end;
 						end;
 
 
-        end else if (Copy(str, 1, 6) = 'where ') and (tid.BroadCast = 1) then begin
+        end else if (Copy(str, 1, 6) = 'where') and (tid.BroadCast = 1) then begin
             s := Copy(str, 7, 256);
             if s = '' then begin
               //Location of self
