@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
-- 12-19-03: Updated FW, now covers only 3 tiles regardless of orientation [Colus]
-- 12-19-03: Updated IW, now extends for 5 tiles instead of 3 [Colus]
-- 12-19-03: Updated IW, now extends for only 5 tiles regardless of orientation [Colus]
-- 12-19-03: Updated IW, duration depends on skill level [Colus]
+- 12-19-03: Updated Fire Wall, now covers only 3 tiles regardless of orientation [Colus]
+- 12-19-03: Updated Icewall, now extends for 5 tiles instead of 3 [Colus]
+- 12-19-03: Updated Icewall, now covers only 5 tiles regardless of orientation [Colus]
+- 12-19-03: Updated Icewall, duration now depends on skill level [Colus]
 - 12-19-03: Fixed Extremity Fist Calculation, max sp helps do more damage. [Oatmeal12345]
 - 12-19-03: Guild Wars Emperium took splash damage without Approval. (#79) [AlexKreuz]
 - 12-19-03: Fixed Guild Positions. Correct Members change titles now. [AlexKreuz]
