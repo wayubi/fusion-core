@@ -886,7 +886,7 @@ begin
 	ini.Free;
 
 	if UseSQL then
-		SQLDataSave;
+		SQLDataSave
 	else
 		DataSave;
 
@@ -1377,16 +1377,15 @@ begin
 		end;
 	end;
 end;//proc TFrmMain.MonsterSpawn()
-
 //------------------------------------------------------------------------------
 
 {Spawn Monster}
 procedure TFrmMain.MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
 var
-	i, j, k, l, h, m, ii   :integer;
-	tc                     :TChara;
-  ts1                    :TMob;
-  tss                    :TSlaveDB;
+	i, j, k, h, m : Integer;
+	tc            : TChara;
+	ts1           : TMob;
+	tss           : TSlaveDB;
 
 begin
 
@@ -2030,38 +2029,35 @@ end;
 procedure TFrmMain.DamageCalc1(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; Arms:byte = 0; SkillPer:integer = 0; AElement:byte = 0; HITFix:integer = 0);
 var
 	i,j,m :integer;
-	k     :Cardinal;
 	miss  :boolean;
 	crit  :boolean;
 	datk  :boolean;
-        Delay :integer;
-        tatk  :boolean;
+	tatk  :boolean;
 
-        tg    :TGuild;
-        td    :TItemDB;
+	tg    :TGuild;
 begin
 	with tc do begin
-                GraceTick := Tick;
+		GraceTick := Tick;
 
-  if (ts.isEmperium) then begin
-    j := GuildList.IndexOf(GuildID);
-    if (j <> -1) then begin
-	  tg := GuildList.Objects[j] as TGuild;
-      if (tg.GSkill[10000].Lv < 1) then begin
-        dmg[0] := 0;
-        Exit;
-      end;
-    end else begin
-        dmg[0] := 0;
-        Exit;
-    end;
-    end;
+		if (ts.isEmperium) then begin
+			j := GuildList.IndexOf(GuildID);
+			if (j <> -1) then begin
+			tg := GuildList.Objects[j] as TGuild;
+				if (tg.GSkill[10000].Lv < 1) then begin
+					dmg[0] := 0;
+					Exit;
+				end;
+			end else begin
+				dmg[0] := 0;
+				Exit;//safe 2004/04/27
+			end;
+		end;
 
 		i := HIT + HITFix - ts.Data.FLEE + 80;
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
 		dmg[6] := i;
-    Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
+		Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
 		if Arms = 0 then begin
 			crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
@@ -2071,13 +2067,13 @@ begin
 		miss := boolean((Random(100) >= i) and (not crit));
 		//DAチェック
 		if (miss = false) and (Arms = 0) and (SkillPer = 0) and (Random(100) < DAPer) then begin
-                        if Skill[263].Lv <> 0 then tatk := true;
+			if Skill[263].Lv <> 0 then tatk := true;
 			if Skill[48].Lv <> 0 then datk := true;
 			crit := false;
-                        if tatk = true then datk := false;
-                         //if tatk = true then tc.ATick := timeGetTime() + Delay;
-                         //if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
-                         //if tatk = true then Monkdelay(tm, tc, Delay);
+												if tatk = true then datk := false;
+												 //if tatk = true then tc.ATick := timeGetTime() + Delay;
+												 //if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
+												 //if tatk = true then Monkdelay(tm, tc, Delay);
 
                         //if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
 
@@ -2725,13 +2721,12 @@ end;
 {Player Attacking Player}
 procedure TFrmMain.DamageCalc3(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; Arms:byte = 0; SkillPer:integer = 0; AElement:byte = 0; HITFix:integer = 0);
 var
-	i,j,m,i1 :integer;
-	k     :Cardinal;
+	i,m,i1 :integer;
 	miss  :boolean;
 	crit  :boolean;
 	datk  :boolean;
-        tatk  :boolean;
-        tn    :TNPC;
+	tatk  :boolean;
+	tn    :TNPC;
 begin
 	with tc do begin
                 //Grace Time Handling
@@ -2963,75 +2958,86 @@ begin
 end;
 //------------------------------------------------------------------------------
 
-{Player Attacking Monster}
+{Player Attacking Monster
+Return values:
+False - Damage value Dmg 0 or more...
+True  - Monster dead because the Damage did them in.
+
+ChrstphrR 2004/04/27 - changes made so that all Exits give a valid, not an
+undefined Result value.
+
+No Memory Leaks here. :)
+}
 function TfrmMain.DamageProcess1(tm:TMap; tc:TChara; ts:TMob; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;
 var
-        {Random Variables}
-		i,j,b :integer;
-        w :Cardinal;
-        xy:TPoint;
-        tg    :TGuild;
-		bb  :array of byte;
+	{Random Variables}
+	i  : Integer;
+	j  : Integer;
+	b  : Integer;
+	w  : Cardinal;
+	xy : TPoint;
+	tg : TGuild;
+	bb : array of byte;
 begin
+	Result := False; //Assume false
 
-  // AlexKreuz: Needed to stop damage to Emperium
-  // From Splash Attacks.
-  if (ts.isEmperium) then begin
-    j := GuildList.IndexOf(tc.GuildID);
-    if (j <> -1) then begin
-	  tg := GuildList.Objects[j] as TGuild;
-      if (tg.GSkill[10000].Lv < 1) then begin
-        dmg := 0;
-        Exit;
-      end;
-    end else begin
-        dmg := 0;
-        Exit;
-    end;
-  end;
-        //Cancel Monster Casting
+	// AlexKreuz: Needed to stop damage to Emperium
+	// From Splash Attacks.
+	if (ts.isEmperium) then begin
+		j := GuildList.IndexOf(tc.GuildID);
+		if (j > -1) then begin
+		tg := GuildList.Objects[j] as TGuild;
+			if (tg.GSkill[10000].Lv < 1) then begin
+				Dmg := 0;
+				Exit;//result is defined
+			end;
+		end else begin
+			Dmg := 0;
+			Exit;//result is defined
+		end;
+	end;
 
-        if (ts.Mode = 3) and (ts.NoDispel = false) then begin
-                ts.Mode := 0;
-                ts.MPoint.X := 0;
-                ts.MPoint.Y := 0;
-                WFIFOW(0, $01b9);
-                WFIFOL(2, ts.ID);
-                SendBCmd(tm, ts.Point, 6);
-        end;
+	//Cancel Monster Casting
+	if (ts.Mode = 3) AND NOT ts.NoDispel then begin
+		ts.Mode := 0;
+		ts.MPoint.X := 0;
+		ts.MPoint.Y := 0;
+		WFIFOW(0, $01b9);
+		WFIFOL(2, ts.ID);
+		SendBCmd(tm, ts.Point, 6);
+	end;
 	ts.Status := 'BESERK_ST';
-  CalculateSkillIf(tm, ts, Tick);
-  // Reset Lex Aeterna
+	CalculateSkillIf(tm, ts, Tick);
+	// Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
-    // Dmg := Dmg * 2;  // Done in the DamageCalc functions
-    ts.EffectTick[0] := 0;
-  end;
+		// Dmg := Dmg * 2;  // Done in the DamageCalc functions
+		ts.EffectTick[0] := 0;
+	end;
 
-  {Item Skill - Fatal Blow}
-  if (tc.SpecialAttack = 2) and (ts.Data.MEXP = 0) then begin {Fatal Blow}
-    if Random(10000) < 10 then Dmg := ts.HP;
-  end;
+	{Item Skill - Fatal Blow}
+	if (tc.SpecialAttack = 2) and (ts.Data.MEXP = 0) then begin {Fatal Blow}
+		if Random(10000) < 10 then Dmg := ts.HP;
+	end;
 
 	if ts.HP < Dmg then Dmg := ts.HP;
 
 	if Dmg = 0 then begin
-		Result := False;
-		Exit;
+		Exit;//result is defined.
 	end;
 	if (ts.Stat1 <> 0) and isBreak then begin
-    if ts.Stat1 <> 5 then begin   //code for ankle snar, not to break
-		ts.BodyTick := Tick + tc.aMotion;
-    end;
+		if ts.Stat1 <> 5 then begin   //code for ankle snar, not to break
+			ts.BodyTick := Tick + tc.aMotion;
+		end;
 	end;
 
-  UpdateMonsterLocation(tm, ts);
+	UpdateMonsterLocation(tm, ts);
 
 	ts.HP := ts.HP - Dmg;
 	for i := 0 to 31 do begin
 		if (ts.EXPDist[i].CData = nil) or (ts.EXPDist[i].CData = tc) then begin
 			ts.EXPDist[i].CData := tc;
 			Inc(ts.EXPDist[i].Dmg, Dmg);
-			break;
+			Break;
 		end;
 	end;
 	if ts.Data.MEXP <> 0 then begin
@@ -3039,11 +3045,11 @@ begin
 			if (ts.MVPDist[i].CData = nil) or (ts.MVPDist[i].CData = tc) then begin
 				ts.MVPDist[i].CData := tc;
 				Inc(ts.MVPDist[i].Dmg, Dmg);
-				break;
+				Break;
 			end;
 		end;
 	end;
-        
+
 	if (ts.HP > 0) then begin
 		//ターゲット設定
 		if (EnableMonsterKnockBack) then begin
@@ -3061,35 +3067,34 @@ begin
 				ts.pcnt := 0
 			else if (ts.pcnt <> 0)  then begin
 				//DebugOut.Lines.Add('Monster Knockback!');
-				        SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
-				        SendBCmd(tm, ts.Point, 58, tc,True);
+				SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
+				SendBCmd(tm, ts.Point, 58, tc,True);
 			end;
 			ts.DmgTick := 0;
 		end;
-    xy := ts.Point;
+		xy := ts.Point;
 
-    { Alex: Monster searching for attack path towards player - checks attackrange over cliffs and sightrange w/o cliffs. }
-    if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
-    ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin
-        if (ts.ATarget = 0) or (ts.isActive) then begin
-		ts.ATarget := tc.ID;
-		ts.AData := tc;
-		ts.isLooting := False;
-        end;
-    end;
-		Result := False;
+		{ Alex: Monster searching for attack path towards player - checks attackrange over cliffs and sightrange w/o cliffs. }
+		if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
+		( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin
+			if (ts.ATarget = 0) or (ts.isActive) then begin
+				ts.ATarget := tc.ID;
+				ts.AData := tc;
+				ts.isLooting := False;
+			end;
+		end;
 	end else begin
 		//Kill Monster
 		MonsterDie(tm, tc, ts, Tick);
-		Result := True;
+		Result := True;//Only condition where Result is true.
 	end;
 end;
 //------------------------------------------------------------------------------
 function TfrmMain.DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
-        {Random Variables}
+				{Random Variables}
 	i :integer;
-        w :Cardinal;
+				w :Cardinal;
 begin
 
   // Reset Lex Aeterna
