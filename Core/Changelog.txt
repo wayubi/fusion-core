@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-13-04: Cosmetic Changes. [AlexKreuz]
 - 03-13-04: Removed Talkie Box server outputs. Less Lag. [AlexKreuz]
 - 03-13-04: FusionSQL -> Fixed Double Logins Bug. [AlexKreuz]
 - 03-13-04: Disabled Ghostring Card. Incorrect effects. [AlexKreuz]

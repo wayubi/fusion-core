@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 105
-  Top = 363
+  Left = 248
+  Top = 358
   Width = 765
   Height = 435
   Caption = '#33'
@@ -16,14 +16,14 @@ object frmMain: TfrmMain
   OnResize = FormResize
   DesignSize = (
     757
-    408)
+    401)
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 16
   object lbl00: TLabel
-    Left = 177
-    Top = 8
-    Width = 28
-    Height = 15
+    Left = 189
+    Top = 9
+    Width = 30
+    Height = 16
     Alignment = taRightJustify
     AutoSize = False
     Caption = '('#180'-`)'
@@ -31,13 +31,13 @@ object frmMain: TfrmMain
   object cmdStart: TButton
     Left = 5
     Top = 5
-    Width = 63
-    Height = 22
+    Width = 68
+    Height = 24
     Caption = 'Start'
     Enabled = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -12
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
@@ -45,9 +45,9 @@ object frmMain: TfrmMain
     OnClick = cmdStartClick
   end
   object Edit1: TEdit
-    Left = 144
+    Left = 80
     Top = 5
-    Width = 427
+    Width = 529
     Height = 24
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
@@ -57,19 +57,19 @@ object frmMain: TfrmMain
     Font.Style = []
     MaxLength = 83
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
     OnKeyPress = Edit1KeyPress
   end
   object Button1: TButton
-    Left = 575
+    Left = 613
     Top = 5
-    Width = 101
-    Height = 22
+    Width = 108
+    Height = 24
     Anchors = [akTop, akRight]
     Caption = 'Send Message'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -12
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
@@ -78,7 +78,7 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 389
+    Top = 382
     Width = 757
     Height = 19
     Color = clCream
@@ -97,9 +97,9 @@ object frmMain: TfrmMain
   end
   object txtDebug: TMemo
     Left = 0
-    Top = 63
+    Top = 34
     Width = 757
-    Height = 326
+    Height = 348
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = 14071432
@@ -111,22 +111,22 @@ object frmMain: TfrmMain
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssVertical
-    TabOrder = 2
+    TabOrder = 1
   end
   object Button2: TButton
-    Left = 683
+    Left = 729
     Top = 5
-    Width = 21
-    Height = 22
+    Width = 22
+    Height = 24
     Anchors = [akTop, akRight]
     Caption = 'T'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -12
     Font.Name = 'Trebuchet MS'
     Font.Style = []
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 5
     OnClick = cmdMinTray
   end
   object sv1: TServerSocket
