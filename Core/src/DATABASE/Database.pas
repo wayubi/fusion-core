@@ -1657,7 +1657,12 @@ begin
 			sl.Delete(0);
 		end;
 	end;
-	ScriptList.Clear;
+
+    try
+        ScriptList.Clear;
+    except
+    end;
+
 	for i := 0 to sl1.Count - 1 do begin
 		if FindFirst(sl1.Strings[i] + '*.txt', $27, sr) = 0 then begin
 			repeat
