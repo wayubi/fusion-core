@@ -452,16 +452,6 @@ begin
 	sl1 := TStringList.Create;
 	sl1.Delimiter := '.';
 
-    { -- Resolving WAN_IP -- }
-	sl1.DelimitedText := sl.Values['WAN_IP'];
-    WAN_IP := sl.Values['WAN_IP'];
-    WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
-    hostEnt := gethostbyname(PChar(WAN_IP));
-    addr := hostEnt^.h_addr_list^;
-    IP := Format ('%d.%d.%d.%d', [byte (addr [0]), byte (addr [1]), byte (addr [2]), byte (addr [3])]);
-    WAN_ADDR := cardinal(inet_addr(PChar(IP)));
-    { -- Resolving WAN_IP -- }
-
 
     { -- Automatically assigning LAN_IP -- }
     gethostname(hostName, sizeof (hostName));
@@ -470,6 +460,22 @@ begin
     LAN_IP := Format ('%d.%d.%d.%d', [byte (addr [0]), byte (addr [1]), byte (addr [2]), byte (addr [3])]);
     LAN_ADDR := cardinal(inet_addr(PChar(LAN_IP)));
     { -- Automatically assigning LAN_IP -- }
+
+    { -- Resolving WAN_IP -- }
+	sl1.DelimitedText := sl.Values['WAN_IP'];
+    WAN_IP := sl.Values['WAN_IP'];
+    WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
+    hostEnt := gethostbyname(PChar(WAN_IP));
+    try
+        addr := hostEnt^.h_addr_list^;
+        IP := Format ('%d.%d.%d.%d', [byte (addr [0]), byte (addr [1]), byte (addr [2]), byte (addr [3])]);
+        WAN_ADDR := cardinal(inet_addr(PChar(IP)));
+    except
+        on EAccessViolation do begin
+            WAN_ADDR := LAN_ADDR;
+        end;
+    end;
+    { -- Resolving WAN_IP -- }
 
 
 	if sl.IndexOfName('Name') > -1 then begin
