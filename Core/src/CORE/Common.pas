@@ -1759,7 +1759,7 @@ begin
 							DEF1 := DEF1 + Item[i].Refine;
 						end;
 						o := 1;
-					end else if (Item[i].Data.IType = 10) and (Weapon = 11) then begin //–î
+					end else if (Item[i].Data.IType = 10) then begin //–î
 						Arrow := i;
 						WElement[1] := Item[i].Data.Element;
 						ATK[1][2] := Item[i].Data.ATK;
