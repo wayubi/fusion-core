@@ -1,9 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
-
-- 02-26-04: Updated Pet SKills, see post in journal for details. [Darkhelmet]
-- 02-25-04: Added Hunter Fly Pet SKill. [Darkhelmet]
+- 02-27-04: Fixed SQL Error regarding guild positions. [AlexKreuz]
+- 02-26-04: Added more Pet Skills. About 80% Done. [Darkhelmet]
+- 02-25-04: Added Hunter Fly Pet Skill. [Darkhelmet]
 - 02-25-04: Fixed "Unknown Skill" bug on GC while in Guild. [Darkhelmet]
 - 02-25-04: Added Smokie's Perfect Hide (Cannot be detected by demons or insects). [Darkhelmet]
 - 02-25-04: Restructuring SQL Format; Part 1/3 - The Database. [AlexKreuz]

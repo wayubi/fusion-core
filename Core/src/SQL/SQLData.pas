@@ -334,7 +334,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会称号资料}
-			if ExecuteSqlCmd(Format('SELECT * FROM guild_members WHERE GDID=''%d'' LIMIT 20', [ID])) then
+			if ExecuteSqlCmd(Format('SELECT * FROM guild_positions WHERE GDID=''%d'' LIMIT 20', [ID])) then
 			begin
 			  j := 0;
 				while not SQLDataSet.Eof do
