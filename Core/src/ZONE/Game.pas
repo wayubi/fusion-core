@@ -1899,166 +1899,23 @@ end;
 										if (mi.noTele = true) then j := 0;
 									end;
 									if (j <> 0) then begin
-                                                                        
-                                                                                tm := tc.MData;
-                                                                                MapName := tc.Map;
-                                                                                ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
 
-                                                                                // AlexKreuz: Required to get Maptypes from Maps.
-                                                                                // Tried to turn this into function but encountered too many
-                                                                                // TZip errors.
-                                                                                if ta.Ext = 'af2' then begin
-                                                                        
-                                                                                  afm_compressed := tzip.create(afm_compressed);
-                                                                                  afm_compressed.Filename := AppPath+'map\'+MapName+'.af2';
-                                                                                  afm_compressed.Extract;
-                                                                                  afm_compressed.Free;
-                                                                        
-                                                                                  assignfile(afm,AppPath + 'map/' + MapName + '.out');
-                                                                                  Reset(afm);
-                                                                        
-                                                                                  ReadLn(afm,str);
-                                                                                  if (str <> 'ADVANCED FUSION MAP') then begin
-                                                                                    DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-                                                                                    tm.Free;
-                                                                                    exit;
-                                                                                  end;
-                                                                        
-                                                                                  ReadLn(afm,str);
-                                                                                  if (str <> MapName) then begin
-                                                                                    DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
-                                                                                    tm.Free;
-                                                                                    exit;
-                                                                                  end;
-                                                                        
-                                                                                  ReadLn(afm,ta.Size.x,ta.Size.y);
-                                                                                  ReadLn(afm,str);
-                                                                        
-                                                                                  SetLength(tm.gat, ta.Size.X, ta.Size.Y);
-                                                                                  for j := 0 to ta.Size.Y - 1 do begin
-                                                                                    for i := 0 to ta.Size.X - 1 do begin
-                                                                                      Read(afm,letter);
-                                                                                      tm.gat[i][j] := strtoint(letter);
-                                                                                    end;
-                                                                                    ReadLn(afm,str);
-                                                                                  end;
-                                                                                  CloseFile(afm);
-                                                                                  deletefile(AppPath+'map\'+MapName+'.out');
-                                                                                end
+                                        tm := tc.MData;
 
-                                                                                else if ta.Ext = 'afm' then begin
-                                                                        
-                                                                                  assignfile(afm,AppPath + 'map/' + MapName + '.afm');
-                                                                                  Reset(afm);
-                                                                        
-                                                                                  ReadLn(afm,str);
-                                                                                  if (str <> 'ADVANCED FUSION MAP') then begin
-                                                                                    DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-                                                                                    tm.Free;
-                                                                                    exit;
-                                                                                  end;
-                                                                        
-                                                                                  ReadLn(afm,str);
-                                                                                  if (str <> MapName) then begin
-                                                                                    DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
-                                                                                    tm.Free;
-                                                                                    exit;
-                                                                                  end;
+                                        j := 0;
 
-                                                                                  ReadLn(afm,ta.Size.x,ta.Size.y);
-                                                                                  ReadLn(afm,str);
-                                                                        
-                                                                                  SetLength(tm.gat, ta.Size.X, ta.Size.Y);
-                                                                                  for j := 0 to ta.Size.Y - 1 do begin
-                                                                                    for i := 0 to ta.Size.X - 1 do begin
-                                                                                      Read(afm,letter);
-                                                                                      tm.gat[i][j] := strtoint(letter);
-                                                                                    end;
-                                                                                    ReadLn(afm,str);
-                                                                                  end;
-                                                                                  CloseFile(afm);
-                                                                                end
-                                                                        
-                                                                                else begin
-                                                                        
-                                                                                  if ta.Ext = 'map' then begin
-                                                                                    //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.map');
-                                                                                    dat.LoadFromFile(AppPath + 'map\' + MapName + '.map');
-                                                                                    SetLength(str, 3);
-                                                                                    dat.Read(str[1], 3);
-                                                                                  end else
-                                                                                  
-                                                                                  if ta.Ext = 'dwm' then begin
-                                                                                    //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.dwm');
-                                                                                    dat.LoadFromFile(AppPath + 'map\' + MapName + '.dwm');
-                                                                                    SetLength(str, 3);
-                                                                                    dat.Read(str[1], 3);
-                                                                                  end else
-                                                                                  
-                                                                                  if ta.Ext = 'gat' then begin
-                                                                                    //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
-                                                                                    dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
-                                                                                    SetLength(str, 4);
-                                                                                    dat.Read(str[1], 4);
-                                                                                  end;
-                                                                                  
-                                                                                  if (str <> 'MAP') and (str <> 'DWM') and (str <> 'GRAT') then begin
-                                                                                    DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-                                                                                    tm.Free;
-                                                                                    exit;
-                                                                                  end;
-                                                                        
-                                                                                  dat.Read(w, 2);
-                                                                                  dat.Read(ta.Size.X, 4);
-                                                                                  dat.Read(ta.Size.Y, 4);
-                                                                                  
-                                                                                  SetLength(tm.gat, ta.Size.X, ta.Size.Y);
-                                                                                  for j := 0 to ta.Size.Y - 1 do begin
-                                                                                    for i := 0 to ta.Size.X - 1 do begin
-                                                                                    
-                                                                                      if ta.Ext = 'map' then begin
-                                                                                        dat.Read(tm.gat[i][j],1);
-                                                                                      end else
-                                                                                      
-                                                                                      if ta.Ext = 'dwm' then begin
-                                                                                        dat.Read(tm.gat[i][j],1);
-                                                                                      end else
-                                                                                      
-                                                                                      if ta.Ext = 'gat' then begin
-                                                                                        dat.Read(h2[0], 4);
-                                                                                        dat.Read(h2[1], 4);
-                                                                                        dat.Read(h2[2], 4);
-                                                                                        dat.Read(h2[3], 4);
-                                                                                        dat.Read(maptype, 4);
-                                                                                        
-                                                                                        if (maptype = 0) then begin
-                                                                                          if (h2[0] > 3) or (h2[1] > 3) or (h2[2] > 3) or (h2[3] > 3) then begin
-                                                                                            tm.gat[i][j] := 3;
-                                                                                          end else begin
-                                                                                            tm.gat[i][j] := 1;
-                                                                                          end;
-                                                                                        end else if (maptype = 5) then begin
-                                                                                          tm.gat[i][j] := 0;
-                                                                                        end;
-                                                                                      end;
-                                                                                    end;
-                                                                                  end;
-                                                                                  dat.Free;
-                                                                                end;
-
-                                                                                j := 0;
 									        repeat
-										        xy.X := Random(ta.Size.X - 2) + 1;
-										        xy.Y := Random(ta.Size.Y - 2) + 1;
+										        xy.X := Random(tm.Size.X - 2) + 1;
+										        xy.Y := Random(tm.Size.Y - 2) + 1;
 										        Inc(j);
 									        until (tm.gat[xy.X, xy.Y] and 1 <> 0) or (j = 100);
 
 									        if j <> 100 then begin
 										        UseUsableItem(tc, w);
 										        b := 1;
-                                                                                        SendCLeave(tc, 3);
+                                                SendCLeave(tc, 3);
 										        tc.Point := xy;
-                                                                                        MapMove(Socket, tc.Map, tc.Point);
+                                                MapMove(Socket, tc.Map, tc.Point);
 									        end;
                                                                         end;
                                                                 end;
