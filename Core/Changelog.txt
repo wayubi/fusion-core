@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
-
+- 01-27-04: Added effects for Armor cards, Garment cards coming soon [Colus]
+- 01-27-04: Updated Lex Aeterna calculations, probably will again [Colus]
+- 01-27-04: Fixed improper calculation of shield card dmg reductions by race [Colus]
 - 01-27-04: Corrected Deviace Card effect [Colus]
 - 01-27-04: Some comment cleanups [Colus]
 - 01-27-04: Updated damage process for stone/freeze conditions [Colus]

@@ -1789,7 +1789,7 @@ begin
 			dmg[0] := dmg[0] + ATK[0][4]; //èCó˚ï‚ê≥    ' Practice correction'?  (skill bonus?)
 
 			// Japn. comment: 'Card correction'
-			if Arms = 0then begin // Japn. comment: 'When there are no card corrections for the left hand'
+			if Arms = 0 then begin // Japn. comment: 'When there are no card corrections for the left hand'
 				dmg[0] := dmg[0] * DamageFixS[ts.Data.scale] div 100;
 				dmg[0] := dmg[0] * DamageFixR[0][ts.Data.Race] div 100;
 				dmg[0] := dmg[0] * DamageFixE[0][ts.Element mod 20] div 100;
@@ -2102,7 +2102,7 @@ begin
 			end;
 			if (tc.Point.X = tn.Point.X) and (tc.Point.Y = tn.Point.Y) then begin
 				case tn.JID of
-				$7e: //ÉZÉCÉtÉeÉBÉEÉHÅ[Éã
+				$7e: // Safety Wall
 					begin
 						miss := true;
 						if not avoid then Dec(tn.Count);
@@ -2113,7 +2113,7 @@ begin
 						//DebugOut.Lines.Add('Safety Wall OK >>' + IntToStr(tn.Count));
 						dmg[6] := 0;
 					end;
-				$85: //ÉjÉÖÅ[É}
+				$85: // Pneuma
 					begin
 						if ts.Data.Range1 >= 4 then miss := true;
 						//DebugOut.Lines.Add('Pneuma OK');
@@ -2145,8 +2145,22 @@ begin
 		//dmg[0] := dmg[0] * ElementTable[AElement][ts.Data.Element] div 100; //ëÆê´ëäê´ï‚ê≥
 
 		//ÉJÅ[Éhï‚ê≥
-		dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][ts.Data.Race] )div 100;
+    // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
+		dmg[0] := dmg[0] * (tc.DamageFixR[1][ts.Data.Race] )div 100;
+
+    // Determine element based on status/armor type...
+
+    //Below line is commented because the only elemental hits come on skills.
 		//dmg[0] := dmg[0] * tc.DEFFixE[ts.Data.Element mod 20] div 100;
+
+		if tc.Stat1 = 2 then i := 21 // Frozen?  Water 1
+		else if tc.Stat1 = 1 then i := 22 // Stone?  Earth 1
+    else if tc.ArmorElement <> 0 then i := tc.ArmorElement
+    else i := 1;
+
+    dmg[0] := dmg[0] * ElementTable[0][i] div 100;
+
+    if (tc.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 
                 //Auto Gaurd
                 if ((miss = False) and (tc.Skill[249].Tick > Tick)) then begin
@@ -2408,10 +2422,11 @@ begin
 			dmg[0] := dmg[0] + ATK[0][4]; //èCó˚ï‚ê≥
 
 			//ÉJÅ[Éhï‚ê≥
-			if Arms = 0then begin //ç∂éËÇ…ÇÕÉJÅ[Éhï‚ê≥Ç»Çµ
+			if Arms = 0 then begin //ç∂éËÇ…ÇÕÉJÅ[Éhï‚ê≥Ç»Çµ
 				dmg[0] := dmg[0] * DamageFixS[1] div 100;
 				dmg[0] := dmg[0] * DamageFixR[0][1] div 100;
-				//dmg[0] := dmg[0] * DamageFixE[0][ts.Element mod 20] div 100;
+        // Colus, 20040127: Readded + to element card effects
+				dmg[0] := dmg[0] * DamageFixE[0][tc1.ArmorElement mod 20] div 100;
 			end;
 			//ëÆê´ê›íË
 			if AElement = 0 then begin
@@ -2421,11 +2436,15 @@ begin
 					AElement := WElement[Arms];
 				end;
 			end;
+
+      // Determine element based on status/armor type...
 			if tc1.Stat1 = 2 then i := 21 // Frozen?  Water 1
       else if tc1.Stat1 = 1 then i := 22 // Stone?  Earth 1
+      else if tc1.ArmorElement <> 0 then i := tc1.ArmorElement // PC's armor type
 			else i := 1;
-			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; //ëÆê´ëäê´ï‚ê≥
-			if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; //ÉåÉbÉNÉX_ÉGÅ[ÉeÉãÉi
+			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; // Damage modifier based on elements
+
+			if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 		end else begin
 			//çUåÇÉ~ÉX
 			dmg[0] := 0;
@@ -3687,6 +3706,7 @@ begin
 								if dmg[0] < 1 then dmg[0] := 1;
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								dmg[0] := dmg[0] * tl.Data2[MUseLV];
+                if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 								if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
                                                                 //Send Attack
 								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV]);
@@ -5976,6 +5996,9 @@ begin
                                         if dmg[0] < 0 then
                                                 dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
                                         //ÉpÉPëóêM
+
+          if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
 					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
 					case MSkill of
@@ -5997,6 +6020,7 @@ begin
 					if dmg[0] < 0 then
                                                 dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
 
+          if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
                                         //Send Attacking Packets
 					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 
@@ -6069,6 +6093,7 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								dmg[0] := dmg[0] * tl.Data2[MUseLV];
 								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 								if ts = ts1 then k := 0 else k := 5;
 								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV], k);
 								//É_ÉÅÅ[ÉWèàóù
@@ -6088,6 +6113,7 @@ begin
 							        dmg[0] := ((BaseLV + Param[3]) div 8) * tl.Data1[MUseLV] * ElementTable[6][ts.Element] div 200;
 
 							        if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                      if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 							        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 							        DamageProcess1(tm, tc, ts, dmg[0], Tick);
 						        end else begin
@@ -6295,6 +6321,7 @@ begin
 
                       // Shouldn't need to cap this any more...
 							        //if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //ï€åØ
+                        if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 
 							          SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 							          DamageProcess1(tm, tc, ts, dmg[0], Tick);
@@ -6606,6 +6633,8 @@ begin
 							end;
 							//ëŒÉAÉìÉfÉbÉh
 							//if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //ï€åØ
+              // Lex Aeterna effect
+              if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;              
 							SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 							DamageProcess1(tm, tc, ts, dmg[0], Tick);
 							tc.MTick := Tick + 3000;
@@ -6689,7 +6718,8 @@ begin
 						dmg[0] := dmg[0] * tl.Data2[MUseLV];
 						if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
 						//ÉpÉPëóêM
-                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
+            if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+            SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 						//ÉmÉbÉNÉoÉbÉNèàóù
 						if (dmg[0] > 0) then begin
 							SetLength(bb, tl.Data2[MUseLV] div 2);
@@ -6727,6 +6757,8 @@ begin
         if dmg[0] < 0 then
           dmg[0] := 0;
 
+        if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+                  
         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1 , 5);
 
         if (ts.Data.race <> 1) and (ts.Data.MEXP = 0) and (dmg[0] <> 0) then begin
@@ -6808,6 +6840,9 @@ begin
                                                         if dmg[0] < 1 then dmg[0] := 1;
                                                         dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
                                                         if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+
+                                                        if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         //É_ÉÅÅ[ÉWèàóù
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
@@ -6832,6 +6867,7 @@ begin
                                                                         if dmg[0] < 1 then dmg[0] := 1;
                                                                         dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
                                                                         if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                                                                        if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
                                                                         SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
                                                                         //É_ÉÅÅ[ÉWèàóù
                                                                         DamageProcess1(tm, tc, ts1, dmg[0], Tick)
@@ -6873,7 +6909,7 @@ begin
 					begin
 						xy := ts.Point;
 						//É_ÉÅÅ[ÉWéZè
-                                                if tc.Option and 16 <> 0 then begin
+            if tc.Option and 16 <> 0 then begin
 						sl.Clear;
 						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
 							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
@@ -6896,6 +6932,7 @@ begin
 								ts1 := sl.Objects[k1] as TMob;
 								dmg[0] := dmg[1] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], MUseLV);
 								//É_ÉÅÅ[ÉWèàóù
 								DamageProcess1(tm, tc, ts1, dmg[0], Tick);
@@ -7028,20 +7065,20 @@ begin
           end;
 				152: //êŒìäÇ∞
 					begin
-                                                j := SearchCInventory(tc, 7049, false);
+            j := SearchCInventory(tc, 7049, false);
 						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
 							UseItem(tc, j);
-                                                dmg[0] := 30;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-            if Random(1000) < Skill[152].Data.Data1[MUseLV] * 10 then begin
-								if (ts.Stat1 <> 3) then begin
+              dmg[0] := 30;
+						  dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+              if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+	  					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+              if Random(1000) < Skill[152].Data.Data1[MUseLV] * 10 then begin
+ 								if (ts.Stat1 <> 3) then begin
 									ts.nStat := 3;
 									ts.BodyTick := Tick + tc.aMotion;
 								end else ts.BodyTick := ts.BodyTick + 30000;
-            end;
-						DamageProcess1(tm, tc, ts, dmg[0], Tick, False);
+              end;
+			  			DamageProcess1(tm, tc, ts, dmg[0], Tick, False);
 						end else begin
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
@@ -7808,9 +7845,10 @@ begin
                         if dmg[0] < 1 then dmg[0] := 1; 
                         dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100; 
                         dmg[0] := dmg[0] * tl.Data2[MUseLV]; 
-                        if dmg[0] < 0 then dmg[0] := 0; 
-                        if ts = ts1 then k := 0 else k := 5; 
-                        SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV], k); 
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+                        if ts = ts1 then k := 0 else k := 5;
+                        SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV], k);
                         DamageProcess1(tm, tc, ts1, dmg[0], Tick); 
                      end; 
                   end; 
@@ -8873,6 +8911,8 @@ begin
 						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
 						dmg[0] := dmg[0] * tl.Data2[MUseLV];
 						if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+
+            if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 						//ÉpÉPëóêM
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
 						DamageProcess2(tm, tc, tc1, dmg[0], Tick);
@@ -8894,6 +8934,7 @@ begin
 						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
 						if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
 						//ÉpÉPëóêM
+            if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;            
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                 if (1 <> 1) and (dmg[0] <> 0)then begin
                                                         if Random(1000) < tl.Data1[MUseLV] * 10 then begin
@@ -8962,6 +9003,7 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
 								dmg[0] := dmg[0] * tl.Data2[MUseLV];
 								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 								if (tc1 = tc2) or (tc = tc2)  then k := 0 else k := 5;
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], tl.Data2[MUseLV], k);
 								//É_ÉÅÅ[ÉWèàóù
@@ -9303,7 +9345,7 @@ begin
 				77: // Turn Undead vs. Player
 					begin
             // Colus, 20040127: Fixed check to be for players
-						if (1 = 1) then begin
+						if (tc1.ArmorElement mod 20 = 9) then begin
 							m := MUseLV * 20 + Param[3] + Param[5] + BaseLV + (200 - 200 * Cardinal(tc1.HP) div tc1.HP) div 200;
 							if (Random(1000) < m) then begin
 								dmg[0] := tc1.HP;
@@ -9313,6 +9355,8 @@ begin
 							end;
 							// Damage cap (removed)
 							//if (dmg[0] div $010000) <> 0 then dmg[0] := $07FFF; //ï€åØ
+              // Lex Aeterna effect
+              if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 							SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 							DamageProcess2(tm, tc, tc1, dmg[0], Tick);
 							tc.MTick := Tick + 3000;
@@ -9368,9 +9412,10 @@ begin
 						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
 						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
 						if dmg[0] < 1 then dmg[0] := 1;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
 						dmg[0] := dmg[0] * tl.Data2[MUseLV];
 						if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+            if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 						//ÉpÉPëóêM
                                                 // AlexKreuz: Monk Heal
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
@@ -9397,7 +9442,8 @@ begin
 					end;
 				88: //ÉtÉçÉXÉgÉmÉîÉ@
 					begin
-          SendCSkillAtk2(tm, tc, tc1, 15, 35000, 1, 6);
+          //Colus: A stray 35,000 damage thing for Frost Nova.
+          //SendCSkillAtk2(tm, tc, tc1, 15, 35000, 1, 6);
 						xy := tc1.Point;
 						sl.Clear;
 						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
@@ -9417,15 +9463,17 @@ begin
 								dmg[0] := dmg[0] * (100 - tc2.MDEF1) div 100; //MDEF%
 								dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 								if dmg[0] < 1 then dmg[0] := 1;
-								dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+								dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], 1 , 5);
-                                                                if (1 <> 1) and (dmg[0] <> 0)then begin
-                                                                        if Random(1000) < tl.Data1[MUseLV] * 10 then begin
-								                //tc2.Stat1 := 2;
-								                tc2.BodyTick := Tick + tc.aMotion;
-                                                                        end;
-						                end;
+                // Colus: What the hell is this?  1 <>1?
+                if (1 <> 1) and (dmg[0] <> 0)then begin
+                  if Random(1000) < tl.Data1[MUseLV] * 10 then begin
+								    //tc2.Stat1 := 2;
+								    tc2.BodyTick := Tick + tc.aMotion;
+                  end;
+						    end;
 								//É_ÉÅÅ[ÉWèàóù
 								DamageProcess2(tm, tc, tc2, dmg[0], Tick);
 							end;
@@ -9441,8 +9489,9 @@ begin
                                                         dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
                                                         dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
                                                         if dmg[0] < 1 then dmg[0] := 1;
-                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
                                                         if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                                                        if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         //É_ÉÅÅ[ÉWèàóù
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
@@ -9465,8 +9514,9 @@ begin
                                                                         dmg[0] := dmg[0] * (100 - tc2.MDEF1) div 100; //MDEF%
                                                                         dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
                                                                         if dmg[0] < 1 then dmg[0] := 1;
-                                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][0] div 100;
+                                                                        dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
                                                                         if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                                                                        if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
                                                                         SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], 1);
                                                                         //É_ÉÅÅ[ÉWèàóù
                                                                         DamageProcess2(tm, tc, tc2, dmg[0], Tick)
@@ -9502,8 +9552,9 @@ begin
 							dmg[1] := dmg[1] * MUseLV;
 							for k1 := 0 to sl.Count - 1 do begin
 								tc2 := sl.Objects[k1] as TChara;
-								dmg[0] := dmg[1] * ElementTable[tl.Element][0] div 100;
+								dmg[0] := dmg[1] * ElementTable[tl.Element][tc2.ArmorElement] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //ñÇñ@çUåÇÇ≈ÇÃâÒïúÇÕñ¢é¿ëï
+                if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], MUseLV);
 								//É_ÉÅÅ[ÉWèàóù
 								DamageProcess2(tm, tc, tc2, dmg[0], Tick);

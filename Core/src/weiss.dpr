@@ -3,8 +3,8 @@ program Weiss;
 {$R 'manifest.res' 'manifest.rc'}
 
 uses
-  madExcept,
-  madLinkDisAsm,
+  //madExcept,
+  //madLinkDisAsm,
   Forms,
   Main in 'Main.pas' {frmMain},
   List32 in '..\lib\List32.pas',

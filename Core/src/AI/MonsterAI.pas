@@ -332,11 +332,17 @@ var
         tc      :TChara;
         bb      :array of byte;
         xy      :TPoint;
-        //i   :integer;
+        j       :integer;
 begin
 
         //for i := 0 to 3 do begin
         tc := ts.AData;
+
+    		if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
+        else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
+        else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
+    		else j := 1;
+
         case tsAI.Skill[i] of
                 //dmg[0] := dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data1[tsAI.SkillLV[i]];
                 5:      {Bash}
@@ -360,9 +366,8 @@ begin
                                 //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
                                 {Unsure about magic calculations so just using the attack calc algorithm [Darkhelmet]}
                                 MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-
                                 if dmg[0] < 1 then dmg[0] := 1;
-                                dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][0] div 100;
+                                dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
                                 dmg[0] := dmg[0] * tc.Skill[tsAI.Skill[i]].Data.Data2[tsAI.SkillLV[i]];
 
                                 if dmg[0] < 0 then dmg[0] := 0;
@@ -376,7 +381,7 @@ begin
                         //dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
                         //dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
                         if dmg[0] < 1 then dmg[0] := 1;
-                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][0] div 100;
+                        dmg[0] := dmg[0] * ElementTable[tc.Skill[tsAI.Skill[i]].Data.Element][j] div 100;
                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                         //Send Packets
@@ -1006,7 +1011,22 @@ begin
 		//dmg[0] := dmg[0] * ElementTable[AElement][ts.Data.Element] div 100; //‘®«‘Š«•â³
 
 		//ƒJ[ƒh•â³
-		dmg[0] := dmg[0] * (100 - tc.DamageFixR[1][ts.Data.Race] )div 100;
+    // Colus, 20040127: The race reduction shield cards are direct values, not 100-val.
+		//dmg[0] := dmg[0] * (tc.DamageFixR[1][ts.Data.Race] )div 100;
+
+    // Added elemental property reduction cards...
+    //dmg[0] := dmg[0] * (tc.DamageFixE[1][ts.Element] )div 100;
+
+    // Moving element determination to the separate skills...
+{    // Determine element based on status/armor type...
+		if tc.Stat1 = 2 then i := 21 // Frozen?  Water 1
+    else if tc.Stat1 = 1 then i := 22 // Stone?  Earth 1
+    else if tc.ArmorElement <> 0 then i := tc.ArmorElement // PC's armor type
+		else i := 1;
+		dmg[0] := dmg[0] * ElementTable[ts.Element][i] div 100; // Damage modifier based on elements}
+
+
+		if (tc.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
 		//dmg[0] := dmg[0] * tc.DEFFixE[ts.Data.Element mod 20] div 100;
 
                 {//Auto Gaurd
@@ -1114,6 +1134,10 @@ procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:card
 
 begin
 //R 01de <skill ID>.w <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1>.l <param2>.w <param3>.w <type>.B
+
+  // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
+	if (tc.Skill[78].Tick > Tick) then k := k * 2; // Lex Aeterna effect
+
         tc.HP := tc.HP - dmg[0];  //Subtract Damage
         WFIFOW( 0, $01de);
 	WFIFOW( 2, tsAI.Skill[i]);

@@ -73,15 +73,15 @@ type TItemDB = class
 	//Rare      :boolean;
 	//Box       :byte;
 {変更}
-	DamageFixR :array[0..9] of Word; //種族
-	DamageFixE :array[0..9] of Word; //属性
-	DamageFixS :array[0..2] of Word; //サイズ
-	SFixPer1   :array[0..5] of Word; //状態１
-	SFixPer2   :array[0..4] of Word; //状態２
-	DrainFix   :array[0..1] of Word; //吸収量
-	DrainPer   :array[0..1] of Word; //吸収確率
-	AddSkill   :array[0..336] of Word; //スキル追加
-	SplashAttack  :boolean;          //スプラッシュ
+	DamageFixR :array[0..9] of Word; // Race mod
+	DamageFixE :array[0..9] of Word; // Element mod
+	DamageFixS :array[0..2] of Word; // Size mod
+	SFixPer1   :array[0..5] of Word; // Option 1 mod
+	SFixPer2   :array[0..4] of Word; // Option 2 mod
+	DrainFix   :array[0..1] of Word; // Drain amount
+	DrainPer   :array[0..1] of Word; // Drain chance
+	AddSkill   :array[0..336] of Word; // Skill addition
+	SplashAttack  :boolean;          // Splash attack
         WeaponSkill   :integer;
         WeaponSkillLV :integer;
         WeaponID      :integer;
@@ -633,19 +633,19 @@ type TChara = class
 	Bonus         :array[0..5] of word;
 	Param         :array[0..5] of word;
 	ParamUp       :array[0..5] of word;
-	WeaponType    :array[0..1] of word; //右手左手それぞれの武器のタイプ
+	WeaponType    :array[0..1] of word; // Right(0), left(1) hand weapon types
   WeaponSprite  :array[0..1] of word; // Item IDs for wpn sprites. 0=rt., 1=lt.
 {追加}
-	WeaponLv      :array[0..1] of word; //それぞれの武器レベル
+	WeaponLv      :array[0..1] of word; // Weapon levels for right/left
 {追加ココまで}
-	ArmsFix       :array[0..1] of word; //右手左手修練
-	ATK           :array[0..1] of array[0..5] of word; //表示攻撃力
-	ATKFix        :array[0..1] of array[0..2] of integer; //敵サイズによる武器補正
+	ArmsFix       :array[0..1] of word; // Right/left training (mastery?)
+	ATK           :array[0..1] of array[0..5] of word; // Displayed ATK power
+	ATKFix        :array[0..1] of array[0..2] of integer; // Weapon correction based on enemy size
 {変更}
-	AttPower      :Word; //カード等による加算攻撃力
-	DamageFixR    :array[0..1] of array[0..9] of Integer; //種族補正% 0:攻撃 1:防御
-	DamageFixE    :array[0..1] of array[0..9] of Integer; //属性補正% 0:攻撃 1:防御
-	DamageFixS    :array[0..2] of Integer;                //サイズ補正%
+	AttPower      :Word; // Attack power additions from cards, etc.
+	DamageFixR    :array[0..1] of array[0..9] of Integer; //Race correction %: 0=weapon, 1=armor
+	DamageFixE    :array[0..1] of array[0..9] of Integer; //Element correction %: 0=weapon, 1=armor
+	DamageFixS    :array[0..2] of Integer;                //Size correction %: 0=S, 1=M, 2=L
 {変更ココまで}
 	DAPer         :integer; //DA発動確率
 	DAFix         :integer; //DA発動時の2発合計攻撃力%
@@ -653,9 +653,9 @@ type TChara = class
 	MATK1         :integer;
 	MATK2         :integer;
 	MATKFix       :integer;
-	DEF1          :integer; //防御力%
-	DEF2          :integer; //防御力-
-	DEF3          :integer; //ディヴァインプロテクション
+	DEF1          :integer; // Defense Power %
+	DEF2          :integer; // Defense Power - (VIT soak)
+	DEF3          :integer; // Divine Protection
 	MDEF1         :integer;
 	MDEF2         :integer;
 	HIT           :integer;
@@ -676,7 +676,8 @@ type TChara = class
 	SPDelayFix    :Integer;
 {追加ココまで}
 	Range         :word;
-	WElement      :array[0..1] of byte; //武器属性
+	WElement      :array[0..1] of byte; // Weapon elements
+  ArmorElement  :byte; // Armor element (from card or armor type)
 	HPR           :word; //HP回復スキルの回復値
 	SPR           :word; //SP回復スキルの回復値
 {変更}
@@ -758,15 +759,15 @@ type TChara = class
 
 	Dir           :byte;
 	HeadDir       :word;
-	Sit           :byte; //0:移動 1:死亡 2:座り 3:立ち
+	Sit           :byte; // 0: moving 1: dead 2: sitting 3: standing
 	AMode         :byte;
-	//0=攻撃中でない 1=1回攻撃 2=攻撃し続ける 3=NPCと会話中 4=倉庫オープン中
-	//5=トレード中
-	ATarget       :cardinal; //攻撃対象のID
-	AData         :Pointer; //攻撃対象のTNPC型データ
-	ATick         :cardinal; //最後に攻撃したときのTick
-	ScriptStep    :integer; //NPCトークのステップ
-	DmgTick       :cardinal; //ノックバック
+	//0: Not attacking  1: single attack  2: continuous attack  3: NPC dialog
+	//4: Open Vending shop  5: Trade window
+	ATarget       :cardinal; // ID of attacked target
+	AData         :Pointer; // TNPC/TChara Data of attacked target
+	ATick         :cardinal; // tick of next attack
+	ScriptStep    :integer; // Step of NPC talk (script)
+	DmgTick       :cardinal; // Knockback
 	TargetedTick  :cardinal; //何匹に囲まれてるかのチェックの最終確認時のTick
 	TargetedFix   :integer;  //敵に囲まれての回避率減少(1/10%)
 
@@ -774,7 +775,7 @@ type TChara = class
 	MSkill        :word;
 	MUseLV        :word;
 	MTarget       :cardinal;
-	MTargetType   :byte; //ADataの種類。0=to Mob, 1=to Player
+	MTargetType   :byte; // Category of AData. 0 = mob, 1 = player.
 	MPoint        :rPoint;
 	MTick         :cardinal;
 
@@ -1629,6 +1630,15 @@ begin
 		FLEE1 := FLEE1 + td.FLEE; //回避
 		Critical := Critical + td.Crit; //クリティカル
 		Lucky := Lucky + td.Avoid; //完全回避
+
+    // Colus, 20040127: If item/card is armor and has an element, set player's element to its 1
+    // Example: Swordfish card grants a user Water 1, Pasana Fire 1...
+    // NB: If you have a carded element armor (Armor of <ele>) with an element card, the
+    // card takes precedence!
+    
+    if (td.Loc = 16) and (td.Element <> 0) then
+      ArmorElement := 20 + td.Element;
+
 		for j := 0 to 5 do begin
 			Bonus[j] := Bonus[j] + td.Param[j];
 		end;
@@ -1734,7 +1744,7 @@ begin
 							1:		j := 2;
 							2:		j := 3;
 							3:		j := 5;
-							4:		j := 7; //Comodo Patch以降は7、それ以前は5
+							4:		j := 7; // 5->7 after the Comodo patch
 							else	j := 0;
 							end;
 							ATK[Side][3] := Item[i].Refine * j;
@@ -1743,13 +1753,13 @@ begin
 						if Side = 0 then Range := Range + Item[i].Data.Range;
 						WElement[Side] := Item[i].Data.Element;
 					end else if Item[i].Data.IType = 5 then begin
-						if (Item[i].Equip and 256) <> 0 then begin //頭上段
+						if (Item[i].Equip and 256) <> 0 then begin // Upper headgear
 							Head1 := Item[i].Data.View;
-						end else if (Item[i].Equip and 512) <> 0 then begin //頭中段
+						end else if (Item[i].Equip and 512) <> 0 then begin // Mid headgear
 							Head2 := Item[i].Data.View;
-						end else if (Item[i].Equip and 1) <> 0 then begin //頭下段
+						end else if (Item[i].Equip and 1) <> 0 then begin // Lower headgear
 							Head3 := Item[i].Data.View;
-						end else if (Item[i].Equip and 32) <> 0 then begin //盾
+						end else if (Item[i].Equip and 32) <> 0 then begin // Shield
               {Colus, 20040114: Set shield sprite and reset weapon sprite}
 							// Shield := Item[i].Data.View;
  							Shield := Item[i].Data.ID;
@@ -1759,7 +1769,7 @@ begin
 							DEF1 := DEF1 + Item[i].Refine;
 						end;
 						o := 1;
-					end else if (Item[i].Data.IType = 10) then begin //矢
+					end else if (Item[i].Data.IType = 10) then begin // Arrow
 						Arrow := i;
 						WElement[1] := Item[i].Data.Element;
 						ATK[1][2] := Item[i].Data.ATK;
@@ -2035,6 +2045,10 @@ begin
 			DrainFix[i] := 0;
 			DrainPer[i] := 0;
 		end;
+
+    // Colus, 20040127: Initialize armor element
+    ArmorElement := 0;
+    
 		for i:=0 to 9 do begin
 			DamageFixR[0][i] := 100;
 			DamageFixR[1][i] := 0;
@@ -3833,7 +3847,8 @@ begin
   end;
   
   // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
-	if (ts.EffectTick[0] > Tick) then dmg := dmg * 2; // Lex Aeterna effect
+  // Commented.  When it gets here from DamageCalcX, it should be correct.
+	// if (ts.EffectTick[0] > Tick) then dmg := dmg * 2; // Lex Aeterna effect
 
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
@@ -3856,7 +3871,8 @@ procedure SendCSkillAtk2(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; dmg:Inte
 begin
 
   // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
-	if (tc1.Skill[78].Tick > Tick) then dmg := dmg * 2;
+  // Commented.  When it gets here from DamageCalcX, it should be correct.
+	// if (tc1.Skill[78].Tick > Tick) then dmg := dmg * 2;
 
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
