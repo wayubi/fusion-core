@@ -9781,6 +9781,14 @@ Begin
                             tn.Script[k].Data3[4] := StrToInt(SL1[5]);
                             tn.Script[k].Data3[5] := StrToInt(SL1[6]);
                             Inc(k);
+                        end else if str = 'gstore' then begin //------- 78 gstore
+                            if SL1.Count <> 0 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 78;
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
