@@ -17,6 +17,11 @@ const
   LOWER_JOB_END = 23;
   UPPER_JOB_BEGIN = 4000;
   MONSTER_ATK_RANGE = 9;
+
+const
+	MAX_PARTY_SIZE = 12;
+
+
 type TLiving = class
   public
     ID      :cardinal;
@@ -381,12 +386,12 @@ type TMob = class(TLiving)
 	ATarget     :cardinal;
 	AData       :Pointer;
 	ARangeFlag  :boolean;
-  MMode       :byte;
+	MMode       :byte;
 	ATKPer      :word; //プロボックなどによる攻撃力補正
 	DEFPer      :word; //プロボックなどによる防御力補正
 	EXPDist     :array[0..31] of rEXPDist; //経験値配分用カウンタ
 	MVPDist     :array[0..31] of rEXPDist; //MVP判定用カウンタ
-  Slaves      :Array[1..12] of Cardinal;
+	Slaves      :Array[1..12] of Cardinal;
 	Data        :TMobDB;
 {追加}
 	Element     :Byte;
@@ -439,7 +444,7 @@ end;
 //------------------------------------------------------------------------------
 {キューペット}
 // ペットデータベース
-type TPetDB = class
+TPetDB = class
 	MobID           :word; // ペットモンスターのID
 	ItemID          :word; // 捕獲アイテムのID
 	EggID           :word; // 卵のアイテムID
@@ -456,7 +461,7 @@ type TPetDB = class
 end;
 
 // ペットデータ
-type TPet = class
+TPet = class
         PlayerID        :cardinal;
         CharaID         :cardinal;
         Cart            :byte;
@@ -467,25 +472,26 @@ type TPet = class
         Name            :string;
         Renamed         :byte;
         LV              :word;
-				Relation        :integer;
+	Relation        :integer;
         Fullness        :integer;
         Accessory       :word;
         Data            :TPetDB;
-		    isLooting       :boolean;  //Tracks if the pet is looting
+	isLooting       :boolean;  //Tracks if the pet is looting
         ATarget         :cardinal;  //Pets attacking target as well as looting
         Item            :array[1..25] of TItem;  //Items a pet is holding
-        MobData         :Pointer;
+//	MobData         :Pointer;
+	MobData         :TMobDB; //Reference to the Pet's Monster attributes.
         SkillTick       :cardinal;  //Tracks when to use a skill
         SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
         LastTick        :cardinal;  //Used for tracking a minute
         Saved           :byte;
-end;
+end;//TPet
 {キューペットここまで}
 //------------------------------------------------------------------------------
 // スキルデータベース
 //N,ID,JName,Type,MLV,SP1,2,3,4,5,6,7,8,9,10,HP,Cast,Lv+,AR,Ele,
 //Dat1,2,3,4,5,6,7,8,9,10,Dat2,2,3,4,5,6,7,8,9,10,Req1,LV,Req2,LV,Req3,LV
-type TSkillDB = class
+TSkillDB = class
 	ID         :word;
 	IDC        :string;
 	Name       :string;
@@ -509,21 +515,21 @@ type TSkillDB = class
 	Job2        :array[0..MAX_JOB_NUMBER] of boolean;
 	ReqSkill2   :array[0..9] of word;
 	ReqLV2      :array[0..9] of word;
-end;
+end;//TSkillDB
 //------------------------------------------------------------------------------
 // スキルデータ
-type TSkill = class
+TSkill = class
 	Lv          :word;
 	Card        :boolean;
-        Plag        :boolean;
+	Plag        :boolean;
 	//Up        :byte;
 	Tick        :cardinal; //時間制限有りのスキルのリミット
 	EffectLV    :word;     //時間制限有りのスキルの効果LV
 	Effect1     :integer;  //時間制限有りのスキルの効果データ1
 	Data        :TSkillDB;
-end;
+end;//TSkill
 //------------------------------------------------------------------------------
-type TeNPC = class
+TeNPC = class
 	ID            :Cardinal;  //ID
 	JID           :Word;      //(Chara)ジョブ (Mob)スプライト
 	CID           :Cardinal;
@@ -647,14 +653,19 @@ type TeNPC = class
 
 	ATKSplash	    :Boolean; //9マス攻撃
 
-end;
+end;//TeNPC
 //------------------------------------------------------------------------------
 // Character Data
-type TChara = class(TLiving)
+	TPlayer = class; //forward declaration - PData field in TChara
+	TNPC = class;    //forward declaration - PetNPC " " "
+	TMap = class;    //forward declaration - MData " " "
+
+	TChara = class(TLiving)
 	// Control Variables
 	//ID	          :cardinal;
 	Socket        :TCustomWinSocket;
-	PData         :Pointer;
+//	PData         :Pointer;
+	PData         :TPlayer; // Reference back to owning TPlayer
 	IP            :string;
 	Login         :byte; // 0 = offline; 1 = loading; 2 = online
 
@@ -810,7 +821,7 @@ type TChara = class(TLiving)
 {追加ココまで}
 	Range         :word;
 	WElement      :array[0..1] of byte; // Weapon elements
-  ArmorElement  :byte; // Armor element (from card or armor type)
+	ArmorElement  :byte; // Armor element (from card or armor type)
 	HPR           :word; //HP回復スキルの回復値
 	SPR           :word; //SP回復スキルの回復値
 {変更}
@@ -825,7 +836,7 @@ type TChara = class(TLiving)
   KnockBackSuccess  :boolean;
         WeaponSkill   :integer;
         WeaponSkillLv :integer;
-		WeaponID      :integer;
+	WeaponID      :integer;
 	NoJamstone    :boolean;
         NoTrap        :boolean;
         LessSP        :boolean;
@@ -867,7 +878,8 @@ type TChara = class(TLiving)
 	SkillTick     :cardinal; //次にスキルが切れるときのTick
 	SkillTickID   :word; //次にどのスキルが切れるか
 
-	MData         :Pointer;
+//	MData         :Pointer;
+	MData         :TMap;//ChrstphrR - typed pointer, req. forward declaration
 	//ppos          :integer;
 	//pcnt          :integer;
 	//path          :array[0..999] of byte; //キャラの経路(向きで記録されてます)
@@ -880,7 +892,7 @@ type TChara = class(TLiving)
 	GuildID       :word;
 	ClassName     :string;
 {精錬NPC機能追加}
-  EqLock        :Boolean; //精錬用装備ロック
+	EqLock        :Boolean; //精錬用装備ロック
 {精錬NPC機能追加ココまで}
 {チャットルーム機能追加}
 	ChatRoomID    :cardinal; //チャットルームID
@@ -918,9 +930,9 @@ type TChara = class(TLiving)
 	MTargetType   :byte; // Category of AData. 0 = mob, 1 = player.
 	MPoint        :rPoint;
 	MTick         :cardinal;
-        SPAmount      :integer;         {Total amount of SP used by a skill}
+	SPAmount      :integer;         {Total amount of SP used by a skill}
 
-  spiritSpheres :word;  // Spirit spheres per character.  Moved from global scope.
+	spiritSpheres :word;  // Spirit spheres per character.  Moved from global scope.
 
 	TalkNPCID     :cardinal;
 	UseItemID     :word;
@@ -933,10 +945,14 @@ type TChara = class(TLiving)
 	ActTick       :Cardinal;
 {追加ココまで}
 {キューペット}
-        PetData       :Pointer;
-        PetNPC        :Pointer;
-		PetMoveTick   :cardinal;
-        Crusader      :Pointer;
+//	PetData       :Pointer;
+//	PetNPC        :Pointer;
+	PetData       : TPet; //ChrstphrR 2004/04/21
+	PetNPC        : TNPC; //typed pointers, requires forward declare
+
+	PetMoveTick   :cardinal;
+//	Crusader      :Pointer;
+	Crusader      :TChara; //Reference ONLY to a Crusader for certain skills.
         Autocastactive :Boolean;
         noday         :Boolean;
 
@@ -992,7 +1008,9 @@ type TChara = class(TLiving)
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
-type TPlayer = class
+{ChrstphrR 2004/04/20 - no type before, in the same "type" block as the forward
+declaration and TChara which points back to ... TPlayer here}
+TPlayer = class
 	Login         :byte; //0=オフライン 1=ログイン中
 	ID	          :cardinal;
 	IP            :string;
@@ -1009,7 +1027,7 @@ type TPlayer = class
 	LoginID1      :cardinal;
 	LoginID2      :cardinal;
 	ver2          :word;
-  Saved         :byte;
+	Saved         :byte;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1017,48 +1035,48 @@ end;
 //------------------------------------------------------------------------------
 {パーティー機能追加}
 // パーティーデータ
-type TParty = class
+TParty = class
 	Name      :string;//パーティーの名前
 	MinLV     :word;//パーティー内最低レベル
 	MaxLV     :word;//パーティー内最大レベル
 	EXPShare  :word;//パーティー経験値設定(0がバラバラで1が公平)
 	ITEMShare :word;//パーティーアイテム設定(0がバラバラで1が共有？未実装要素)
-	MemberID  :array[0..11] of cardinal;//メンバーのID
-	Member    :array[0..11] of TChara;//メンバー
+	MemberID  :array[0..MAX_PARTY_SIZE-1] of cardinal;//メンバーのID
+	Member    :array[0..MAX_PARTY_SIZE-1] of TChara;//メンバー
 	EXP       :Cardinal; //経験値分配用
 	JEXP      :Cardinal; //経験値分配用
-        PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
-        PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
+	PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
+	PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
 end;
 {パーティー機能追加ココまで}
 //------------------------------------------------------------------------------
-type TCastle = class
-	Name    :string;
-  GID     :word;
-  GName   :string;
-  GMName  :string;
-  GKafra  :integer;
-  EDegree :cardinal;
-  ETrigger:integer;
-  DDegree :cardinal;
-  DTrigger:integer;
-  GuardStatus:array [0..7] of integer;
+TCastle = class
+	Name        :string;
+	GID         :word;
+	GName       :string;
+	GMName      :string;
+	GKafra      :integer;
+	EDegree     :cardinal;
+	ETrigger    :integer;
+	DDegree     :cardinal;
+	DTrigger    :integer;
+	GuardStatus :array [0..7] of integer;
 end;
 //------------------------------------------------------------------------------
-type TEmp = class
+TEmp = class
 	Map    :string;
-  EID    :cardinal;
+	EID    :cardinal;
 end;
 //------------------------------------------------------------------------------
 // 店売りアイテム
-type TShopItem = class
+TShopItem = class
 	ID    :word;
 	Price :cardinal;
 	Data  :TItemDB;
 end;
 //------------------------------------------------------------------------------
 // NPCスクリプト
-type rScript = record
+rScript = record
 	ID      :word; //コマンドID
 	Data1   :array of string;
 	Data2   :array of string;
@@ -1067,7 +1085,7 @@ type rScript = record
 end;
 //------------------------------------------------------------------------------
 // NPCデータ
-type TNPC = class(TLiving)
+TNPC = class(TLiving)
 	//ID          :cardinal;
 	//Name        :string;
 {NPCイベント追加}
@@ -1108,7 +1126,7 @@ type TNPC = class(TLiving)
 	//skill
 	Count       :word;
 	CData       :TChara;
-  MData       :TMob;
+	MData       :TMob;
 {追加}
 	MSkill      :Word;
 {追加ココまで}
@@ -1128,7 +1146,7 @@ end;
 //------------------------------------------------------------------------------
 {NPCイベント追加}
 // タイマーデータ
-type NTimer = class
+NTimer = class
 	ID        :cardinal;//タイマーID
 	Tick      :cardinal;//タイマー
 	Cnt       :word;//タイマーインデックス数
@@ -1137,7 +1155,7 @@ type NTimer = class
 	Done      :array of byte;//実行済みフラグ
 end;
 //マップ設定データ
-type MapTbl = class
+MapTbl = class
 	noMemo    :Boolean;
 	noSave    :Boolean;
 {アジト機能追加}
@@ -1150,15 +1168,14 @@ type MapTbl = class
 	Agit      :Boolean;
 {アジト機能追加ココまで}
 	noTele    :Boolean;
-        PvP       :Boolean;
-        PvPG      :Boolean;
-        noDay     :Boolean;
-
+	PvP       :Boolean;
+	PvPG      :Boolean;
+	noDay     :Boolean;
 end;
 {NPCイベント追加ココまで}
 //------------------------------------------------------------------------------
 // マップブロックデータ
-type TBlock = class
+TBlock = class
 	NPC         :TIntList32;
 	Mob         :TIntList32;
 	CList       :TIntList32;
@@ -1170,7 +1187,7 @@ type TBlock = class
 end;
 //------------------------------------------------------------------------------
 // マップデータ
-type TMap = class
+TMap = class
 	Name      :string;
 	Size      :TPoint;
 	gat       :array of array of byte; //bit1=移動可能 bit2=水たまり bit3=Warp
@@ -1519,22 +1536,22 @@ var
 	buf             :array[0..32767] of byte;
   buf2            :array[0..32767] of byte;
 	stra            :array[0..32767] of char;
-{オプション関連}
-        //キャラクター初期データ関連
-        WarpEnabled :boolean;
-        WarpItem    :cardinal;
-        GMCheck         :cardinal; // GMコマンドをGM以外も使えるか
-        DebugCMD        :cardinal; // デバッグコマンドが使えるか
-DeathBaseLoss     :integer;
-DeathJobLoss      :integer;
-MonsterMob        :boolean;
-SummonMonsterExp  :boolean;
-SummonMonsterAgo  :boolean;
-SummonMonsterName :boolean;
-SummonMonsterMob  :boolean;
-GlobalGMsg        :string;
-MapGMsg           :string;
-{オプション関連ここまで}
+{Things related to Options}
+	//キャラクター初期データ関連
+	WarpEnabled :boolean;
+	WarpItem    :cardinal;
+	GMCheck         :cardinal; // Can the GM commands be used by non-GM's?
+	DebugCMD        :cardinal; // Can use Debug Commands?
+	DeathBaseLoss     :integer;
+	DeathJobLoss      :integer;
+	MonsterMob        :boolean;
+	SummonMonsterExp  :boolean;
+	SummonMonsterAgo  :boolean;
+	SummonMonsterName :boolean;
+	SummonMonsterMob  :boolean;
+	GlobalGMsg        :string;
+	MapGMsg           :string;
+{Things related to Options}
 
 // Fusion SQL Declarations
 UseSQL            :Boolean;
@@ -2096,7 +2113,7 @@ end;
 procedure CalcSkill(tc:TChara; Tick:cardinal);
 var
 	i :Integer;
-  j :Integer;
+//	j :Integer;//unused.
 begin
 	with tc do begin
 		//修練 ATK[0][4]
@@ -2308,7 +2325,8 @@ begin
 	with tc do begin
 
                 if (tc.guildid > 0) then begin
-                        tg := tguild.create;
+                        //tg := tguild.create;
+                        {ChrstphrR 2004/04/21 Memory Leak!}
                         tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
 
                         tg.SLV := 0;
@@ -3951,10 +3969,10 @@ begin
     WFIFOL(10, Tick);
     WFIFOL(14, aMotion);
     WFIFOL(18, ts.Data.dMotion);
-    WFIFOW(22, dmg0); //ダメージ
-    WFIFOW(24, dmg4); //分割数
-    WFIFOB(26, dmg5); //0=単攻撃 8=複数 10=クリティカル
-    WFIFOW(27, dmg1); //逆手
+    WFIFOW(22, dmg0); //Right Hand Damage
+    WFIFOW(24, dmg4); //Number of Hits that make up total damage
+    WFIFOB(26, dmg5); //Attack Values: 0= Single 8= Multiple 10= Critical
+    WFIFOW(27, dmg1); //Left Hand Damage
     SendBCmd(tm, ts.Point, 29);
   end;
 end;
@@ -6873,7 +6891,7 @@ var
 begin
           //guard := guard - 1;
           tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
-	        j := CastleList.IndexOf(tm.Name);
+          j := CastleList.IndexOf(tm.Name);
           if (j <> - 1) then begin
           tgc := CastleList.Objects[j] as TCastle;
           j := EmpList.IndexOf(tm.Name);
@@ -7231,20 +7249,64 @@ end;
 
 
 //==============================================================================
-procedure MapLoad(MapName:string);
-var
-	i,j,k,l :integer;
-	i1,g,ii :integer;
-  m       :integer;
-  x,p       :integer;
-	cnt     :array[0..3] of integer;
+(*-----------------------------------------------------------------------------*
+ChrstphrR 2004/04/21
+I am NOT the original author here ...  just checking to ensure the code is safe.
+MapLoad() loads the map object that associated with mapname.
+
+MapLoad helps implement the nifty load-on-first-request design for maps -- Maps
+are only loaded into memory as people walk / warp / logon into them.
+
+Input -> MapName
+Acts on "Map" StringList
+
+Changes made:
+- Japanese -> English comment translation
+- Fixed Memory Leaks when Exit; called without freeing created local objects
+  (Even fixed the commented out Exits ... just in case.)
+  Approx 145 fixed in place here across ~2000 lines of code.
+- Added local procs to do the cleanup work, and reduce code bloat.
+- Added local Constants for one of the routines.
+- Added one or two local vars for naming clarity.
+
+*-----------------------------------------------------------------------------*)
+Procedure MapLoad(
+		MapName : string
+	);
+Const
+	SCRIPT_SYNTAX_ERR = 0;
+	SCRIPT_SYNT_2_ERR = 1;
+	SCRIPT_FUNCTN_ERR = 2;
+	SCRIPT_SELECT_ERR = 3;
+	SCRIPT_RANGE1_ERR = 4;
+	SCRIPT_RANGE2_ERR = 5;
+	SCRIPT_RANGE3_ERR = 6;
+	SCRIPT_RANGE4_ERR = 7;
+	SCRIPT_DIV_Z3_ERR = 8;
+	SCRIPT_LBLNOT_ERR	= 9;
+
+Var
+	i   : Integer; // X direction loop iterator
+	j   : Integer; // Y direction loop iterator
+
+	Idx  : Integer; // Loop Iterator - used several times.
+	Idx2 : Integer; // Loop Iterator - used several times.
+
+	k   : Integer;
+	g   : Integer;
+	ii  : Integer;
+	m   : Integer;
+	x   : Integer;
+	p   : Integer;
+	cnt : array[0..3] of integer;
 	lines   :integer;
 	mcnt    :integer;
 	SDelay  :cardinal;
 	w       :word;
-	str     :string;
-  str2    :string;
-	ScriptPath :string;
+	str        : string;
+	mathop     : string; //holds string representing a binary compare op like '<>'
+	str2       : string;
+	ScriptPath : string;
 	Tick    :cardinal;
 	dat     :TMemoryStream;
 	txt     :TextFile;
@@ -7252,34 +7314,84 @@ var
 	tn      :TNPC;
 	tn1     :TNPC;
 	ts      :TMob;
-  tgc     :TCastle;
-  te      :TEmp;
+	tgc     :TCastle;
+	te      :TEmp;
 	ts0     :TMob;
-  ts1     :TMob;
-  tss     :TSlaveDB;
-  tc1     :TChara;
-	h  :array[0..3] of single;
+	ts1     :TMob;
+	tss     :TSlaveDB;
+	tc1     :TChara;
+	h       :array[0..3] of single;
 	maptype :integer;
-	sl:TStringList;
-	sl1:TStringList;
-	sl2:TStringList;
-	flag:boolean;
+	SL      :TStringList;
+	SL1     :TStringList;
+	SL2     :TStringList;
+	flag    :boolean;
 {NPCイベント追加}
 	tc      :TChara;
 	tr      :NTimer;
-	ta	:TMapList;
+	ta      :TMapList;
 {NPCイベント追加ココまで}
 
-        afm :textfile;
-        letter :char;
-begin
+	afm     :textfile;
+	letter  :char;
+
+	procedure MapErr(const EMsg : String);
+	begin
+		DebugOut.Lines.Add(EMsg);
+		tm.Free;
+	end;
+
+	procedure ScriptErr(
+	          const
+	          	ScriptErrType : Integer;
+	          	Args: array of const
+	          );
+	var
+		EMsg : String;
+	begin
+		case ScriptErrType of
+		SCRIPT_SYNTAX_ERR : //Syntax Error (2 params in Args)
+			EMsg := Format('%s %.4d: syntax error', Args);
+		SCRIPT_SYNT_2_ERR : //Syntax Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] syntax error (2)', Args);
+		SCRIPT_FUNCTN_ERR : //Function Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] function error', Args);
+		SCRIPT_SELECT_ERR : //Too Many Selections (3 params in ARgs)
+			EMsg := Format('%s %.4d: [%s] too many selections', Args);
+		SCRIPT_RANGE1_ERR : //Range Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] range error (1)', Args);
+		SCRIPT_RANGE2_ERR : //Range Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] range error (2)', Args);
+		SCRIPT_RANGE3_ERR : //Range Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] range error (3)', Args);
+		SCRIPT_RANGE4_ERR : //Range Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] range error (4)', Args);
+		SCRIPT_DIV_Z3_ERR : //Div by Zero Error (3 params in Args)
+			EMsg := Format('%s %.4d: [%s] div 0 error (3)', Args);
+		SCRIPT_LBLNOT_ERR : //Label not found (2 params in Args)
+			EMsg := Format('%s : label "%s" not found', Args);
+
+		else
+			begin
+			end;//else-case
+		end;//case
+
+		DebugOut.Lines.Add(EMsg);
+		SL.Free;
+		SL1.Free;
+		SL2.Free;
+	end;
+
+Begin
 	MapName := ChangeFileExt(MapName, '');
-	dat := TMemoryStream.Create; //読み込み用メモリバッファ
+//	dat := TMemoryStream.Create; //Memory Buffer to read in Map
+	{ChrstphrR -- dat is NOT freed up proper in most early Exits, moving so it IS
+	in a safe position}
 
-
+	//Safety check - don't try loading maps that don't exist in the List already
 	if MapList.IndexOf(MapName) = -1 then begin
-		//DebugOut.Lines.Add('Map Not found : ' + MapName);
-		exit;
+		MapErr('Map Not Found : ' + MapName);
+		Exit; //CRW - 2004/04/21 - Safe
 	end;
 
 	tm := TMap.Create;
@@ -7287,111 +7399,120 @@ begin
 	Map.AddObject(MapName, tm);
 	tm.Mode := 1;
 
-        ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
+	ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
 
-        if ta.Ext = 'af2' then begin
+	//AF2 style map file
+	if ta.Ext = 'af2' then begin
 
-          assignfile(afm,AppPath + 'map\tmpFiles\' + MapName + '.out');
-          Reset(afm);
+		AssignFile(afm,AppPath + 'map\tmpFiles\' + MapName + '.out');
+		Reset(afm);
 
-          ReadLn(afm,str);
-          if (str <> 'ADVANCED FUSION MAP') then begin
-            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-            tm.Free;
-            exit;
-          end;
+		ReadLn(afm,str);
+		if (str <> 'ADVANCED FUSION MAP') then begin
+			MapErr('Mapfile error 500 : ' + MapName);
+			Exit; //CRW - 2004/04/21 - Safe
+		end;
 
-          ReadLn(afm,str);
-          if (str <> MapName) then begin
-            DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
-            tm.Free;
-            exit;
-          end;
+		ReadLn(afm,str);
+		if (str <> MapName) then begin
+			MapErr('The loaded map was not in the memory map : ' + MapName);
+			Exit; //CRW - 2004/04/21 - Safe
+		end;
 
-          ReadLn(afm,tm.Size.x,tm.Size.y);
-          ReadLn(afm,str);
+		ReadLn(afm,tm.Size.x,tm.Size.y);
+		ReadLn(afm,str);
 
-          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
-          for j := 0 to tm.Size.Y - 1 do begin
-            for i := 0 to tm.Size.X - 1 do begin
-              Read(afm,letter);
-              tm.gat[i][j] := strtoint(letter);
-            end;
-            ReadLn(afm,str);
-          end;
-          CloseFile(afm);
-        end
+		//Set the size of the interal Map
+		SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+		//NB, the afm data is flipped in both directions vs how the map is
+		//oriented when we see it in the client
+		for j := 0 to tm.Size.Y - 1 do begin
+			for i := 0 to tm.Size.X - 1 do begin
+				Read(afm,letter);
+				tm.gat[i][j] := StrToInt(letter);
+			end;
+			ReadLn(afm,str);
+		end;
+		CloseFile(afm);
+	end
+	//AF2 style map file
 
-        else if ta.Ext = 'afm' then begin
+	//AFM style map file
+	else if ta.Ext = 'afm' then begin
+		AssignFile(afm,AppPath + 'map/' + MapName + '.afm');
+		Reset(afm);
 
-          assignfile(afm,AppPath + 'map/' + MapName + '.afm');
-          Reset(afm);
+		ReadLn(afm,str);
+		if (str <> 'ADVANCED FUSION MAP') then begin
+			MapErr('Mapfile error 500 : ' + MapName);
+			Exit; //CRW - 2004/04/21 - Safe
+		end;
 
-          ReadLn(afm,str);
-          if (str <> 'ADVANCED FUSION MAP') then begin
-            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-            tm.Free;
-            exit;
-          end;
+		ReadLn(afm,str);
+		if (str <> MapName) then begin
+			MapErr('The loaded map was not the memory map : ' + MapName);
+			Exit; //CRW - 2004/04/21 - Safe
+		end;
 
-          ReadLn(afm,str);
-          if (str <> MapName) then begin
-            DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
-            tm.Free;
-            exit;
-          end;
+		ReadLn(afm,tm.Size.x,tm.Size.y); //Read Map Size
+		ReadLn(afm,str);  //Eat Blank line
 
-          ReadLn(afm,tm.Size.x,tm.Size.y);
-          ReadLn(afm,str);
+		//Set the size of the interal Map
+		SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+		//NB, the afm data is flipped in both directions vs how the map is
+		//oriented when we see it in the client
+		for j := 0 to tm.Size.Y - 1 do begin
+			for i := 0 to tm.Size.X - 1 do begin
+				Read(afm,letter);
+				tm.gat[i][j] := StrToInt(letter);
+			end;
+			ReadLn(afm,str);
+		end;
+		CloseFile(afm);
+	end
+	//AFM style map file
 
-          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
-          for j := 0 to tm.Size.Y - 1 do begin
-            for i := 0 to tm.Size.X - 1 do begin
-              Read(afm,letter);
-              tm.gat[i][j] := strtoint(letter);
-            end;
-            ReadLn(afm,str);
-          end;
-          CloseFile(afm);
-        end
+	//GAT style map file
+	else begin
+		dat := TMemoryStream.Create; //Memory Buffer to read in Map
+		{ChrstphrR -- dat is NOT freed up proper in most early Exits}
+		if ta.Ext = 'gat' then begin
+			//DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
+			dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
+			SetLength(str, 4);
+			dat.Read(str[1], 4);
+		end;
 
-        else begin
-         
-          if ta.Ext = 'gat' then begin
-            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
-            dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
-            SetLength(str, 4);
-            dat.Read(str[1], 4);
-          end;
-          
-          if (str <> 'GRAT') then begin
-            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-            tm.Free;
-            exit;
-          end;
 
-          dat.Read(w, 2);
-          dat.Read(tm.Size.X, 4);
-          dat.Read(tm.Size.Y, 4);
-          
-          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
-          for j := 0 to tm.Size.Y - 1 do begin
-            for i := 0 to tm.Size.X - 1 do begin
-                         
-              if ta.Ext = 'gat' then begin
-                dat.Read(h[0], 4);
-                dat.Read(h[1], 4);
-                dat.Read(h[2], 4);
-                dat.Read(h[3], 4);
-                dat.Read(maptype, 4);
+		if (str <> 'GRAT') then begin
+			MapErr('Mapfile error 500 : ' + MapName);
+			if Assigned(dat) then dat.Free;
+			Exit; //CRW - 2004/04/21 - Safe
+		end;
 
-                tm.gat[i][j] := maptype;
+		dat.Read(w, 2);
+		dat.Read(tm.Size.X, 4);
+		dat.Read(tm.Size.Y, 4);
 
-              end;
-            end;
-          end;
-          dat.Free;
-        end;
+		SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+		for j := 0 to tm.Size.Y - 1 do begin
+			for i := 0 to tm.Size.X - 1 do begin
+
+				if ta.Ext = 'gat' then begin
+					dat.Read(h[0], 4);
+					dat.Read(h[1], 4);
+					dat.Read(h[2], 4);
+					dat.Read(h[3], 4);
+					dat.Read(maptype, 4);
+
+					tm.gat[i][j] := maptype;
+
+				end;
+			end;
+		end;
+		dat.Free;
+	end;
+	//GAT style map file
 
 	tm.BlockSize.X := (tm.Size.X + 7) div 8;
 	tm.BlockSize.Y := (tm.Size.Y + 7) div 8;
@@ -7399,60 +7520,69 @@ begin
 		for i := 0 - 3 to tm.BlockSize.X + 3 do begin
 			tm.Block[i][j] := TBlock.Create;
 			if (i < 0) or (j < 0) or (i >= tm.BlockSize.X) or (j >= tm.BlockSize.Y) then
-				tm.Block[i][j].MobProcTick := $FFFFFFFF //画面外ブロックはモンスター処理を行わない
+				tm.Block[i][j].MobProcTick := $FFFFFFFF
+				//The 3 Block "border" on the outside of the map does NOT perform
+				// monster processing, thus it's set to the $FFFFFFFF value.
 			else
 				tm.Block[i][j].MobProcTick := 0;
+				//Otherwise you Zero out the value :D
 		end;
 	end;
 
-	//スクリプトロード
+	//Script Load
 	//DebugOut.Lines.Add('Loading script...');
 	for i := 0 to 3 do cnt[i] := 0;
-	Tick := timeGetTime();
+	Tick := timeGetTime;
 	lines := 0;
-	sl := TStringList.Create;
-	sl1 := TStringList.Create;
-	sl2 := TStringList.Create;
-	for i1 := 0 to ScriptList.Count - 1 do begin
-		AssignFile(txt, ScriptList.Strings[i1]);
+	SL  := TStringList.Create;
+	SL1 := TStringList.Create;
+	SL2 := TStringList.Create;
+	for Idx := 0 to ScriptList.Count - 1 do begin
+		AssignFile(txt, ScriptList.Strings[Idx]);
 		Reset(txt);
 		while not eof(txt) do begin
 			Readln(txt, str);
 			Inc(lines);
-			sl.Delimiter := #9;
-			sl.QuoteChar := '"';
-			sl.DelimitedText := str;
-			if sl.Count = 4 then begin
-				sl1.DelimitedText := sl.Strings[0];
-				if ChangeFileExt(sl1.Strings[0], '') = MapName then begin
-	// ワープポイント ------------------------------------------------------------
-          // Colus, 20040122: Added parsing for hidden warps.
-					if (sl.Strings[1] = 'warp') or (sl.Strings[1] = 'hiddenwarp') then begin
+			SL.Delimiter := #9;
+			SL.QuoteChar := '"';
+			SL.DelimitedText := str;
+			if SL.Count = 4 then begin
+				SL1.DelimitedText := SL[0];
+				if ChangeFileExt(SL1[0], '') = MapName then begin
+	// ワープポイント Lit. "Loom Point" in Katakana ------------------------------
+					// Colus, 20040122: Added parsing for hidden warps.
+					if (SL[1] = 'warp') OR (SL[1] = 'hiddenwarp') then begin
 						tn := TNPC.Create;
 						tn.ID := NowNPCID;
 						Inc(NowNPCID);
-						tn.Name := sl.Strings[2];
+						tn.Name := SL[2];
 						//DebugOut.Lines.Add('-> adding warp point ' + tn.Name);
 						if WarpDebugFlag then begin
-              tn.JID := 1002;
-            end else begin
-              if sl.Strings[1] = 'warp' then tn.JID := 45 else tn.JID := 139;
-            end;
-						tn.Map := MapName;
-						tn.Point.X := StrToInt(sl1.Strings[1]);
-						tn.Point.Y := StrToInt(sl1.Strings[2]);
-						tn.Dir := StrToInt(sl1.Strings[3]);
-						sl1.DelimitedText := sl.Strings[3];
-						tn.CType := 0;
-						tn.WarpSize.X := StrToInt(sl1.Strings[0]);
-						tn.WarpSize.Y := StrToInt(sl1.Strings[1]);
-						tn.WarpMap := ChangeFileExt(sl1.Strings[2], '');
-						tn.WarpPoint.X :=  StrToInt(sl1.Strings[3]);
-						tn.WarpPoint.Y :=  StrToInt(sl1.Strings[4]);
-{NPCイベント追加}
-						tn.Enable := true;
+							tn.JID := 1002;
+						end else begin
+							if SL[1] = 'warp' then
+								tn.JID := 45
+							else
+								tn.JID := 139;
+						end;
+						tn.Map     := MapName;
+						tn.Point.X := StrToInt(SL1[1]);
+						tn.Point.Y := StrToInt(SL1[2]);
+						tn.Dir     := StrToInt(SL1[3]);
+
+						SL1.DelimitedText := SL[3];
+						tn.CType       := 0;
+						tn.WarpSize.X  := StrToInt(SL1[0]);
+						tn.WarpSize.Y  := StrToInt(SL1[1]);
+						tn.WarpMap     := ChangeFileExt(SL1[2], '');
+						tn.WarpPoint.X := StrToInt(SL1[3]);
+						tn.WarpPoint.Y := StrToInt(SL1[4]);
+
+						{NPC Event}
+						tn.Enable      := true;
 						tn.ScriptInitS := -1;
-{NPCイベント追加ココまで}
+						{NPC Event}
+
 						tm.NPC.AddObject(tn.ID, tn);
 						tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 						for j := tn.Point.Y - tn.WarpSize.Y to tn.Point.Y + tn.WarpSize.Y do begin
@@ -7461,365 +7591,370 @@ begin
 							end;
 						end;
 						Inc(cnt[0]);
-	// NPCショップ ---------------------------------------------------------------
-					end else if sl.Strings[1] = 'shop' then begin
+	// NPC Shop ------------------------------------------------------------------
+					end else if SL[1] = 'shop' then begin
 						tn := TNPC.Create;
-						tn.ID := NowNPCID;
+						tn.ID      := NowNPCID;
 						Inc(NowNPCID);
-						tn.Name := sl.Strings[2];
+						tn.Name    := SL[2];
 						//DebugOut.Lines.Add('-> adding shop ' + tn.Name);
-						tn.Map := MapName;
-						tn.Point.X := StrToInt(sl1.Strings[1]);
-						tn.Point.Y := StrToInt(sl1.Strings[2]);
-						tn.Dir := StrToInt(sl1.Strings[3]);
-						sl1.DelimitedText := sl.Strings[3];
+						tn.Map     := MapName;
+						tn.Point.X := StrToInt(SL1[1]);
+						tn.Point.Y := StrToInt(SL1[2]);
+						tn.Dir     := StrToInt(SL1[3]);
+
+						SL1.DelimitedText := SL[3];
 						tn.CType := 1;
-						tn.JID := StrToInt(sl1.Strings[0]);
-						SetLength(tn.ShopItem, sl1.Count - 1);
-						for i := 0 to sl1.Count - 2 do begin
-							tn.ShopItem[i] := TShopItem.Create;
-							j := Pos(':', sl1.Strings[i+1]);
-							tn.ShopItem[i].ID := StrToInt(Copy(sl1.Strings[i+1], 1, j - 1));
-							tn.ShopItem[i].Price := StrToInt(Copy(sl1.Strings[i+1], j + 1, 8));
-							tn.ShopItem[i].Data := ItemDB.IndexOfObject(tn.ShopItem[i].ID) as TItemDB;
+						tn.JID := StrToInt(SL1[0]);
+						SetLength(tn.ShopItem, SL1.Count - 1);
+						for Idx2 := 0 to sl1.Count - 2 do begin
+							tn.ShopItem[Idx2] := TShopItem.Create;
+							j := Pos(':', SL1[Idx+1]);
+							tn.ShopItem[Idx2].ID    := StrToInt(Copy(SL1[Idx2+1], 1, j - 1));
+							tn.ShopItem[Idx2].Price := StrToInt(Copy(SL1[Idx2+1], j + 1, 8));
+							tn.ShopItem[Idx2].Data  := ItemDB.IndexOfObject(tn.ShopItem[Idx2].ID) as TItemDB;
 						end;
 
-{NPCイベント追加}
+						{NPC Event}
 						tn.Enable := true;
 						tn.ScriptInitS := -1;
-{NPCイベント追加ココまで}
+						{NPC Event}
 						tm.NPC.AddObject(tn.ID, tn);
 						tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
+						//Mark squares covered by Warp as Warpable..
 						for j := tn.Point.Y - tn.WarpSize.Y to tn.Point.Y + tn.WarpSize.Y do begin
 							for i := tn.Point.X - tn.WarpSize.X to tn.Point.X + tn.WarpSize.X do begin
 								tm.gat[i][j] := (tm.gat[i][j] and $fe);
 							end;
 						end;
 						Inc(cnt[1]);
-{d$0100fix5より}
-	// スクリプト ----------------------------------------------------------------
-					end else if sl.Strings[1] = 'script' then begin
+{d$0100fix5}
+	// Script --------------------------------------------------------------------
+					end else if SL[1] = 'script' then begin
 						tn := TNPC.Create;
 						tn.ID := NowNPCID;
 						Inc(NowNPCID);
-						tn.Name := sl.Strings[2];
+						tn.Name := SL[2];
 						//DebugOut.Lines.Add('-> adding script ' + tn.Name);
 						tn.Map := MapName;
-						tn.Point.X := StrToInt(sl1.Strings[1]);
+						tn.Point.X := StrToIntDef(SL1[1],0);
 						if (tn.Point.X < 0) or (tn.Point.X >= tm.Size.X) then tn.Point.X := 0;
-						tn.Point.Y := StrToInt(sl1.Strings[2]);
+						tn.Point.Y := StrToIntDef(SL1[2],0);
 						if (tn.Point.Y < 0) or (tn.Point.Y >= tm.Size.Y) then tn.Point.Y := 0;
-						tn.Dir := StrToInt(sl1.Strings[3]);
+						tn.Dir := StrToInt(SL1[3]);
 						tn.CType := 2;
-						sl1.DelimitedText := sl.Strings[3];
-						tn.JID := StrToInt(sl1.Strings[0]);
-						ScriptPath := ExtractRelativePath(AppPath, ScriptList.Strings[i1]);
-{NPCイベント追加}
+
+						SL1.DelimitedText := SL[3];
+						tn.JID := StrToInt(SL1[0]);
+						ScriptPath := ExtractRelativePath(AppPath, ScriptList[Idx]);
+						{NPC Event}
 						tn.ScriptInitS := -1;
-						tn.ScriptInitD := false;
-						tn.Enable := true;
-{NPCイベント追加ココまで}
+						tn.ScriptInitD := False;
+						tn.Enable      := True;
+						{NPC Event}
 						k := 0;
-						sl2.Clear;
+						SL2.Clear;
 						while not eof(txt) do begin
-							//スクリプト読み込み
+							//Reading Script.
 							Readln(txt, str);
 							Inc(lines);
 							if str = '}' then break; //注：スクリプト終了文字「}」は１行にそれのみ書くこと
+
+							//Convert Multiple tabs to one tab, then convert remaining tabs to spaces
 							while Pos(#9#9, str) <> 0 do str := StringReplace(str, #9#9, #9, [rfReplaceAll]);
 							str := StringReplace(str, #9, ' ', [rfReplaceAll]);
 							str := Trim(str);
 							if Copy(str, Length(str), 1) = ';' then str := Copy(str, 1, Length(str) - 1);
 							str := Trim(str);
-							sl.Delimiter := ' ';
-							sl.QuoteChar := #1;
-							sl.DelimitedText := str;
-							if sl.Count > 2 then begin
-								for i := 2 to sl.Count - 1 do begin
-									sl.Strings[1] := sl.Strings[1] + ' ' + sl.Strings[2];
-									sl.Delete(2);
+							SL.Delimiter := ' ';
+							SL.QuoteChar := #1;
+							SL.DelimitedText := str;
+							if SL.Count > 2 then begin
+								for i := 2 to SL.Count - 1 do begin
+									SL[1] := SL[1] + ' ' + SL[2];
+									SL.Delete(2);
 								end;
 							end;
-							case sl.Count of
-							1:	sl1.Clear;
-							2:	sl1.DelimitedText := sl.Strings[1];
+							case SL.Count of
+							1:	SL1.Clear;
+							2:	SL1.DelimitedText := SL[1];
 							else
 								begin
-									DebugOut.Lines.Add(Format('%s %.4d: syntax error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, lines]);
+									Exit; // Safe - 2004/04/21
 								end;
 							end;
-							str := LowerCase(sl.Strings[0]);
-							sl.Delete(0);
+							str := LowerCase(SL[0]);
+							SL.Delete(0);
 							if str = 'mes' then begin //------- 1 mes
-								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [mes] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 1 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 1;
 								SetLength(tn.Script[k].Data1, 1);
-								sl1.Strings[0] := StringReplace(sl1.Strings[0], '&sp;', ' ', [rfReplaceAll]);
-								sl1.Strings[0] := StringReplace(sl1.Strings[0], '&amp;', '&', [rfReplaceAll]);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								SL1[0] := StringReplace(SL1[0], '&sp;', ' ', [rfReplaceAll]);
+								SL1[0] := StringReplace(SL1[0], '&amp;', '&', [rfReplaceAll]);
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 							end else if str = 'next' then begin //------- 2 next
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [next] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 2;
 								Inc(k);
 							end else if str = 'close' then begin //------- 3 close
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [close] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 3;
 								Inc(k);
 							end else if str = 'menu' then begin //------- 4 menu
 								if sl1.Count <> sl1.Count div 2 * 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [menu] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								if sl1.Count > 40 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [menu] too many selections', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_SELECT_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 4;
-								SetLength(tn.Script[k].Data1, sl1.Count div 2);
-								SetLength(tn.Script[k].Data2, sl1.Count div 2);
-								SetLength(tn.Script[k].Data3, sl1.Count div 2);
+								SetLength(tn.Script[k].Data1, SL1.Count div 2);
+								SetLength(tn.Script[k].Data2, SL1.Count div 2);
+								SetLength(tn.Script[k].Data3, SL1.Count div 2);
 								tn.Script[k].DataCnt := sl1.Count div 2;
-								for i := 0 to sl1.Count div 2 - 1 do begin
-									sl1.Strings[i*2] := StringReplace(sl1.Strings[i*2], '&sp;', ' ', [rfReplaceAll]);
-									sl1.Strings[i*2] := StringReplace(sl1.Strings[i*2], '&amp;', '&', [rfReplaceAll]);
-									tn.Script[k].Data1[i] := sl1.Strings[i*2];
-									tn.Script[k].Data2[i] := LowerCase(sl1.Strings[i*2+1]);
+								for i := 0 to SL1.Count div 2 - 1 do begin
+									SL1[i*2] := StringReplace(SL1[i*2], '&sp;', ' ', [rfReplaceAll]);
+									SL1[i*2] := StringReplace(SL1[i*2], '&amp;', '&', [rfReplaceAll]);
+									tn.Script[k].Data1[i] := SL1[i*2];
+									tn.Script[k].Data2[i] := LowerCase(SL1[i*2+1]);
 								end;
 								Inc(k);
 							end else if str = 'goto' then begin //------- 5 goto
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [goto] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 5;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
 							end else if str = 'cutin' then begin //------- 6 cutin
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [cutin] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								Val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 255) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [cutin] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 6;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								if ExtractFileExt(tn.Script[k].Data1[0]) = '' then ChangeFileExt(tn.Script[k].Data1[0], '.bmp');
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'store' then begin //------- 7 store
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [store] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 7;
 								Inc(k);
 							end else if str = 'warp' then begin //------- 8 warp
 								if sl1.Count <> 3 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warp] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warp] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warp] range error (3)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 8;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[2]);
 								Inc(k);
 							end else if str = 'save' then begin //------- 9 save
 								if sl1.Count <> 3 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [save] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [save] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [save] range error (3)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 9;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[2]);
 								Inc(k);
 							end else if str = 'heal' then begin //------- 10 heal
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [heal] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if (j <> 0) or (i < 0) or (i > 30000) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [heal] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 30000) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [heal] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 10;
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'set' then begin //------- 11 set
-								sl.Strings[0] := StringReplace(sl.Strings[0], '+=', '+', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '-=', '-', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '*=', '*', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '/=', '/', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '+', ',1,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '-', ',2,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=', ',0,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '*', ',3,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '/', ',4,', []);
-								while Pos('- ', sl.Strings[0]) <> 0 do
-									sl.Strings[0] := StringReplace(sl.Strings[0], '- ', '-',	[]);
-								sl1.DelimitedText := sl.Strings[0];
+								SL[0] := StringReplace(SL[0], '+=', '+', []);
+								SL[0] := StringReplace(SL[0], '-=', '-', []);
+								SL[0] := StringReplace(SL[0], '*=', '*', []);
+								SL[0] := StringReplace(SL[0], '/=', '/', []);
+								SL[0] := StringReplace(SL[0], '+', ',1,', []);
+								SL[0] := StringReplace(SL[0], '-', ',2,',	[]);
+								SL[0] := StringReplace(SL[0], '=', ',0,', []);
+								SL[0] := StringReplace(SL[0], '*', ',3,', []);
+								SL[0] := StringReplace(SL[0], '/', ',4,', []);
+								while Pos('- ', SL[0]) <> 0 do
+									SL[0] := StringReplace(SL[0], '- ', '-',	[]);
+								sl1.DelimitedText := SL[0];
 								if sl1.Count = 3 then sl1.Add('0');
 								if sl1.Count <> 4 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [set] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 4) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [set] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if j = 0 then begin
 									if (i < -999999999) or (i > 999999999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [set] range error (3)', [ScriptPath, lines]));
-										exit;
-									end else if (StrToInt(sl1.Strings[1]) = 3) and (i = 0) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [set] div 0 error (3)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
+									end else if (StrToInt(SL1[1]) = 3) and (i = 0) then begin
+										ScriptErr(SCRIPT_DIV_Z3_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[3], i, j);
+								val(SL1[3], i, j);
 								if (j <> 0) or (i < -999999999) or (i > 999999999) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [set] range error (4)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE4_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 11;
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[3]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[3]);
 								Inc(k);
 							end else if str = 'additem' then begin //------- 12 additem
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [additem] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [additem] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 30000) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [additem] range error (2)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 12;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
 							end else if str = 'delitem' then begin //------- 13 delitem
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [delitem] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [delitem] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 30000) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [delitem] range error (2)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 13;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
 							end else if str = 'checkitem' then begin //------- 14 checkitem
-								if sl1.Count <> 4 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [checkitem] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 4 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [checkitem] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 30000) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [checkitem] range error (2)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
@@ -7827,34 +7962,34 @@ begin
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data2, 2);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[3]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[2]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[3]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
 							end else if str = 'check' then begin //------- 15 check
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=>', '>=', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=<', '<=', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '==', '=',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '><', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '!=', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '>',	',>,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '<',	',<,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=',	',=,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',>,,=,', ',>=,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,=,', ',<=,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,>,', ',<>,', []);
-								sl1.DelimitedText := sl.Strings[0];
-								if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [check] function error', [ScriptPath, lines]));
-									exit;
+								SL[0] := StringReplace(SL[0], '=>', '>=', []);
+								SL[0] := StringReplace(SL[0], '=<', '<=', []);
+								SL[0] := StringReplace(SL[0], '==', '=',	[]);
+								SL[0] := StringReplace(SL[0], '><', '<>', []);
+								SL[0] := StringReplace(SL[0], '!=', '<>', []);
+								SL[0] := StringReplace(SL[0], '>',	',>,',	[]);
+								SL[0] := StringReplace(SL[0], '<',	',<,',	[]);
+								SL[0] := StringReplace(SL[0], '=',	',=,',	[]);
+								SL[0] := StringReplace(SL[0], ',>,,=,', ',>=,', []);
+								SL[0] := StringReplace(SL[0], ',<,,=,', ',<=,', []);
+								SL[0] := StringReplace(SL[0], ',<,,>,', ',<>,', []);
+								SL1.DelimitedText := SL[0];
+								if SL1.Count <> 5 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 999999999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [check] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
@@ -7862,43 +7997,43 @@ begin
 								SetLength(tn.Script[k].Data1, 3);
 								SetLength(tn.Script[k].Data2, 2);
 								SetLength(tn.Script[k].Data3, 3);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data1[2] := sl1.Strings[1];
-								str := sl1.Strings[1];
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+								tn.Script[k].Data1[2] := SL1[1];
+								mathop := SL1.Strings[1];
 								j := -1;
-										 if str = '>=' then j := 0
-								else if str = '<=' then j := 1
-								else if str = '='	then j := 2
-								else if str = '<>' then j := 3
-								else if str = '>'	then j := 4
-								else if str = '<'	then j := 5;
+										 if mathop = '>=' then j := 0
+								else if mathop = '<=' then j := 1
+								else if mathop = '='	then j := 2
+								else if mathop = '<>' then j := 3
+								else if mathop = '>'	then j := 4
+								else if mathop = '<'	then j := 5;
 								if j = -1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [check] syntax error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_SYNT_2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								tn.Script[k].Data3[2] := j;
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[3]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[4]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[3]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[4]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
 							end else if str = 'checkadditem' then begin //------- 16 checkadditem
 								if sl1.Count <> 4 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [checkadditem] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [checkadditem] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 30000) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [checkadditem] range error (2)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
@@ -7906,392 +8041,378 @@ begin
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data2, 2);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[3]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[2]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[3]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
 							end else if str = 'jobchange' then begin //------- 17 jobchange
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [jobchange] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if (j <> 0) or (i < 0) or (i > MAX_JOB_NUMBER) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [jobchange] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 17;
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[0]);
 								Inc(k);
 
 							end else if str = 'viewpoint' then begin //------- 18 viewpoint
-								if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [viewpoint] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 5 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								Val(SL1[0], i, j);
 								if (j <> 0) or (i < 1) or (i > 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [viewpoint] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								Val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [viewpoint] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								Val(SL1[2], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [viewpoint] range error (3)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[3], i, j);
+								Val(SL1[3], i, j);
 								if (j <> 0) or (i < 0) or (i > 255) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [viewpoint] range error (4)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE4_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								sl1.Strings[4] := StringReplace(sl1.Strings[4], '0x', '', []);
-								if Copy(sl1.Strings[4], 1, 1) <> '$' then sl1.Strings[4] := '$' + sl1.Strings[4];
+								SL1[4] := StringReplace(SL1[4], '0x', '', []);
+								if Copy(SL1[4], 1, 1) <> '$' then SL1[4] := '$' + SL1[4];
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 18;
 								SetLength(tn.Script[k].Data3, 5);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[2] := StrToInt(sl1.Strings[2]);
-								tn.Script[k].Data3[3] := StrToInt(sl1.Strings[3]);
-								tn.Script[k].Data3[4] := StrToInt(sl1.Strings[4]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[2] := StrToInt(SL1[2]);
+								tn.Script[k].Data3[3] := StrToInt(SL1[3]);
+								tn.Script[k].Data3[4] := StrToInt(SL1[4]);
 								Inc(k);
 							end else if str = 'input' then begin //------- 19 input
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [input] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 19;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 							end else if str = 'random' then begin //------- 20 random
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [random] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 999999999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [random] range error (1)', [ScriptPath, lines]));
-										exit;
-									end;
+								val(SL1[0], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 999999999)) then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 999999999) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [random] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 20;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'option' then begin //------- 21 option
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [option] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if (j <> 0) or (i < 0) or (i > 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [option] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [option] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 21;
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'speed' then begin //------- 22 speed
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [speed] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								Val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 25) or (i > 1000) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [speed] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 22;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 							end else if str = 'die' then begin //------- 23 die
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [die] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 23;
 								Inc(k);
 							end else if str = 'ccolor' then begin //------- 24 ccolor
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [ccolor] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								{val(sl1.Strings[0], i, j);
+								{val(SL1[0], i, j);
 								if (j <> 0) or (i > 5) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [ccolor] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21 - commented out but replacing.
 								end;}
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 24;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 							end else if str = 'refine' then begin //------- 25 refine	 refine[itemID][fail][+val]
 								if sl1.Count <> 3 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [refine] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								//val(sl1.Strings[0], i, j);
-								//val(sl1.Strings[1], i, j);
-								val(sl1.Strings[2], i, j);
+								//val(SL1[0], i, j);
+								//val(SL1[1], i, j);
+								val(SL1[2], i, j);
 								if (j <> 0) or (i > 10) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [refine] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 25;
 								SetLength(tn.Script[k].Data1, 3);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data1[1] := sl1.Strings[1];
-								tn.Script[k].Data1[2] := sl1.Strings[2];
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data1[1] := SL1[1];
+								tn.Script[k].Data1[2] := SL1[2];
 								Inc(k);
 							end else if str = 'getitemamount' then begin //------- 26 getitemamount
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getitemamount] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [getitemamount] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 26;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
 {追加:スクリプト144}
 							end else if str = 'getskilllevel' then begin //--------27 getskilllevel // S144 addstart
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getskilllevel] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 27;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
 							end else if str = 'setskilllevel' then begin //--------28 setskilllevel
-								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setskilllevel] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 2 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								Val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 10) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [setskilllevel] range error(2)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 28;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);                                    // S144 addend
 {追加:スクリプト144ここまで}
 {精錬NPC機能追加}
 							end else if str = 'refinery' then begin //--------29 refinery
-								if sl1.Count <> 3 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [refinery] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 3 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 10) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [refinery] range error (1)', [ScriptPath, lines]));
-										exit;
-									end;
+								Val(SL1[0], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 10)) then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 2) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [refinery] range error (2)', [ScriptPath, lines]));
-										exit;
-									end;
+								Val(SL1[1], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 2)) then begin
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 10) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [refinery] range error (3)', [ScriptPath, lines]));
-										exit;
-									end;
+								Val(SL1[2], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 10)) then begin
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 29;
 								SetLength(tn.Script[k].Data1, 3);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-								tn.Script[k].Data1[2] := LowerCase(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data1[2] := LowerCase(SL1[2]);
 								Inc(k);
 							end else if str = 'equipmenu' then begin //--------30 equipmenu
-								if sl1.Count <> 3 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [equipmenu] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 3 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 30;
 								SetLength(tn.Script[k].Data1, 3);
 								SetLength(tn.Script[k].Data2, 10);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-								tn.Script[k].Data1[2] := LowerCase(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data1[2] := LowerCase(SL1[2]);
 								Inc(k);
 							end else if str = 'lockitem' then begin //--------31 lockitem
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [lockitem] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 1) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [lockitem] range error', [ScriptPath, lines]));
-										exit;
-									end;
+								val(SL1[0], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 1)) then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 31;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
 {精錬NPC機能追加ココまで}
 {髪色変更追加}
 							end else if str = 'hcolor' then begin //------- 32 hcolor
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [hcolor] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 8) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [hcolor] range error', [ScriptPath, lines]));
-										exit;
-									end;
+								val(SL1[0], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 8)) then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 32;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
 {髪色変更追加ココまで}
 {NPCイベント追加}
 							end else if str = 'callmob' then begin //------- 33 callmob
 								if (sl1.Count = 6) then sl1.Add('');
 								if (sl1.Count <> 7) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [callmob] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								i := 0;
-								if (tn.Map <> ChangeFileExt(sl1.Strings[0], '')) then i := 1;
-								if (MobDB.IndexOf(StrToInt(sl1.Strings[4])) = -1) then i := 1;
+								if (tn.Map <> ChangeFileExt(SL1[0], '')) then i := 1;
+								if (MobDB.IndexOf(StrToInt(SL1[4])) = -1) then i := 1;
 								if i <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [callmob] range error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 33;
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data2, 1);
 								SetLength(tn.Script[k].Data3, 4);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[2]);
-								tn.Script[k].Data1[1] := sl1.Strings[3];
-								tn.Script[k].Data3[2] := StrToInt(sl1.Strings[4]);
-								tn.Script[k].Data3[3] := StrToInt(sl1.Strings[5]);
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[6]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+								tn.Script[k].Data1[1] := SL1[3];
+								tn.Script[k].Data3[2] := StrToInt(SL1[4]);
+								tn.Script[k].Data3[3] := StrToInt(SL1[5]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[6]);
 								Inc(k);
 							end else if str = 'broadcast' then begin //------- 34 broadcast
 								if (sl1.Count = 1) then sl1.Add('0');
 								if (sl1.Count <> 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [broadcast] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 34;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								sl1.Strings[0] := StringReplace(sl1.Strings[0], '&sp;', ' ', [rfReplaceAll]);
-								sl1.Strings[0] := StringReplace(sl1.Strings[0], '&amp;', '&', [rfReplaceAll]);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								SL1[0] := StringReplace(SL1[0], '&sp;', ' ', [rfReplaceAll]);
+								SL1[0] := StringReplace(SL1[0], '&amp;', '&', [rfReplaceAll]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'npctimer' then begin //------- 35 npctimer
 								if (sl1.Count <> 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [npctimer] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
-								if j = 0 then begin
-									if (i < 0) or (i > 8) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [npctimer] range error', [ScriptPath, lines]));
-										exit;
-									end;
+								val(SL1[0], i, j);
+								if (j = 0) AND ((i < 0) OR (i > 8)) then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 35;
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[0]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[0]);
 								Inc(k);
 							end else if str = 'addnpctimer' then begin //------- 36 addnpctimer
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [addnpctimer] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < -999999999) or (i > 999999999) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [addnpctimer] range error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 36;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'return' then begin //------- 37 return
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [return] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 37;
@@ -8299,471 +8420,476 @@ begin
 							end else if str = 'warpallpc' then begin //------- 38 warpallpc
 								if (sl1.Count = 3) then sl1.Add('0');
 								if (sl1.Count <> 4) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warpallpc] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warpallpc] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if (j <> 0) or (i < 0) or (i > 511) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warpallpc] range error (3)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[3], i, j);
+								val(SL1[3], i, j);
 								if (j <> 0) or (i < 0) or (i > 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [warpallpc] range error (4)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE4_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 38;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 3);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[2]);
-								tn.Script[k].Data3[2] := StrToInt(sl1.Strings[3]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[2]);
+								tn.Script[k].Data3[2] := StrToInt(SL1[3]);
 								Inc(k);
 							end else if str = 'waitingroom' then begin //------- 39 waitingroom
 								if (sl1.Count <> 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [waitingroom] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 2) or (i > 20) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [waitingroom] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 39;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								tn.Script[k].Data3[1] := k + 1;
 								Inc(k);
 							end else if str = 'enablenpc' then begin //------- 40 enablenpc
 								if (sl1.Count <> 3) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [enablenpc] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if (j <> 0) or (i < 0) or (i > 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [enablenpc] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 40;
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data1[1] := sl1.Strings[1];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data1[1] := SL1[1];
+								tn.Script[k].Data3[0] := StrToInt(SL1[2]);
 								Inc(k);
 							end else if str = 'resetmymob' then begin //------- 41 resetmymob
 								if (sl1.Count <> 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [resetmymob] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 41;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 							end else if str = 'getmapusers' then begin //------- 42 getmapusers
 								if (sl1.Count <> 2) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getmapusers] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 42;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
 							end else if str = 'setstr' then begin //------- 43 setstr
-								sl.Strings[0] := StringReplace(sl.Strings[0], '+=', '+', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '+', ',1,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=', ',0,', []);
-								sl1.DelimitedText := sl.Strings[0];
+								SL[0] := StringReplace(SL[0], '+=', '+', []);
+								SL[0] := StringReplace(SL[0], '+', ',1,', []);
+								SL[0] := StringReplace(SL[0], '=', ',0,', []);
+								sl1.DelimitedText := SL[0];
 								if (sl1.Count <> 3) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setstr] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								if (Copy(sl1.Strings[0], 1, 1) <> '$') and (Copy(sl1.Strings[0], 1, 2) <> '\$') then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setstr] range error (1)', [ScriptPath, lines]));
-									exit;
+								if (Copy(SL1[0], 1, 1) <> '$') and (Copy(SL1[0], 1, 2) <> '\$') then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setstr] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 43;
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := sl1.Strings[2];
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := SL1[2];
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 								Inc(k);
 							end else if str = 'checkstr' then begin //------- 44 checkstr
-								sl.Strings[0] := StringReplace(sl.Strings[0], '==', '=',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '><', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '!=', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=',	',=,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '<>', ',<>,', []);
-								sl1.DelimitedText := sl.Strings[0];
+								SL[0] := StringReplace(SL[0], '==', '=',	[]);
+								SL[0] := StringReplace(SL[0], '><', '<>', []);
+								SL[0] := StringReplace(SL[0], '!=', '<>', []);
+								SL[0] := StringReplace(SL[0], '=',	',=,',	[]);
+								SL[0] := StringReplace(SL[0], '<>', ',<>,', []);
+								sl1.DelimitedText := SL[0];
 								if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [checkstr] function error', [ScriptPath, lines]));
-									exit;
-								if (Copy(sl1.Strings[0], 1, 1) <> '$') and (Copy(sl1.Strings[0], 1, 2) <> '\$') then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [checkstr] range error (1)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
+								if (Copy(SL1[0], 1, 1) <> '$') and (Copy(SL1[0], 1, 2) <> '\$') then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 44;
 								SetLength(tn.Script[k].Data1, 3);
 								SetLength(tn.Script[k].Data2, 2);
 								SetLength(tn.Script[k].Data3, 3);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data1[2] := sl1.Strings[1];
-								str := sl1.Strings[1];
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+								tn.Script[k].Data1[2] := SL1[1];
+								mathop := SL1[1];
 								j := -1;
-								if str = '='	then j := 0
-								else if str = '<>' then j := 1;
+								if mathop = '='	then j := 0
+								else if mathop = '<>' then j := 1;
 								if j = -1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [checkstr] syntax error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								tn.Script[k].Data3[2] := j;
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[3]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[4]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[3]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[4]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
 {アジト機能追加}
 							{Colus, 20040110: Updated guild territory command codes}
 							end else if str = 'getagit' then begin //------- 58 getagit
 								if (sl1.Count <> 3) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getagit] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								if (Copy(sl1.Strings[1], 1, 1) <> '$') and (Copy(sl1.Strings[1], 1, 2) <> '\$') then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getagit] range error (2)', [ScriptPath, lines]));
-									exit;
+								if (Copy(SL1[1], 1, 1) <> '$') and (Copy(SL1[1], 1, 2) <> '\$') then begin
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								if (Copy(sl1.Strings[2], 1, 1) <> '$') and (Copy(sl1.Strings[2], 1, 2) <> '\$') then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getagit] range error (3)', [ScriptPath, lines]));
-									exit;
+								if (Copy(SL1[2], 1, 1) <> '$') and (Copy(SL1[2], 1, 2) <> '\$') then begin
+									ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 58;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data2, 2);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[1]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[2]);
+								tn.Script[k].Data1[0] := SL1[0];
+								tn.Script[k].Data2[0] := LowerCase(SL1[1]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[2]);
 								Inc(k);
 							end else if str = 'getmyguild' then begin //------- 59 getguild
 								if (sl1.Count <> 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getmyguild] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								if (Copy(sl1.Strings[0], 1, 1) <> '$') and (Copy(sl1.Strings[0], 1, 2) <> '\$') then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getmyguild] range error (1)', [ScriptPath, lines]));
-									exit;
+								if (Copy(SL1[0], 1, 1) <> '$') and (Copy(SL1[0], 1, 2) <> '\$') then begin
+									ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 59;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
 
 
 							end else if str = 'agitregist' then begin //------- 60 agitregist
 								if (sl1.Count <> 1) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [agitregist] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 60;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := SL1[0];
 								Inc(k);
 
-              end else if str = 'resetstat' then begin //------- 45 resetstat
+							end else if str = 'resetstat' then begin //------- 45 resetstat
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [resetstat] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 45;
 								Inc(k);
-                                                                     
-              end else if str = 'resetbonusstat' then begin //------- 57 resetbonusstat
+
+							end else if str = 'resetbonusstat' then begin //------- 57 resetbonusstat
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [resetstat] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 57;
 								Inc(k);
-              end else if str = 'resetskill' then begin //------- 46 resetskill
+							end else if str = 'resetskill' then begin //------- 46 resetskill
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [resetskill] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 46;
 								Inc(k);
-              end else if str = 'hstyle' then begin //------- 47 hstyle
+							end else if str = 'hstyle' then begin //------- 47 hstyle
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [hstyle] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 19) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [hstyle] range error', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 47;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
-              end else if str = 'guildreg' then begin //------- 48 guildreg
+							end else if str = 'guildreg' then begin //------- 48 guildreg
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [guildreg] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-                //j := CastleList.IndexOf(sl1.Strings[0]);
+								//j := CastleList.IndexOf(SL1[0]);
 								//if j = - 1 then begin
-                  //DebugOut.Lines.Add(Format('%s %.4d: [guildreg] map error', [ScriptPath, lines]));
-                  //exit;
+									//DebugOut.Lines.Add(Format('%s %.4d: [guildreg] map error', [ScriptPath, lines]));
+									{ChrstphrR - adding in proper cleanup even though this is
+									all commented out...}
+									//SL.Free;
+									//SL1.Free;
+									//SL2.Free;
+									//exit;
 								//end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 48;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
-              end else if str = 'getgskilllevel' then begin //--------49 getgskilllevel
+							end else if str = 'getgskilllevel' then begin //--------49 getgskilllevel
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getgskilllevel] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 49;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
-              end else if str = 'getguardstatus' then begin //--------50 getguardstatus
+							end else if str = 'getguardstatus' then begin //--------50 getguardstatus
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [getguardstatus] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 50;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
-              end else if str = 'setguildkafra' then begin //------- 51 setguildkafra
+							end else if str = 'setguildkafra' then begin //------- 51 setguildkafra
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setguildkafra] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 1) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [setguildkafra] range error', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 51;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
-              end else if str = 'setguardstatus' then begin //--------52 setguardstatus
+							end else if str = 'setguardstatus' then begin //--------52 setguardstatus
 								if sl1.Count <> 2 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [setguardstatus] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-                val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 1) or (i > 8) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [setguardstatus] range error', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-                val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 1) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [setguardstatus] range error', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 52;
 								SetLength(tn.Script[k].Data1, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
 								Inc(k);
-              end else if str = 'callguard' then begin //------- 53 callguard
+							end else if str = 'callguard' then begin //------- 53 callguard
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [callguard] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[0], i, j);
+								val(SL1[0], i, j);
 								if j = 0 then begin
 									if (i < 1) or (i > 8) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [callguard] range error', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 53;
 								SetLength(tn.Script[k].Data1, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
-              end else if str = 'callmymob' then begin //------- 54 callmymob
+							end else if str = 'callmymob' then begin //------- 54 callmymob
 								if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [callmymob] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 54;
 								SetLength(tn.Script[k].Data1, 5);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-                tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-                tn.Script[k].Data1[2] := LowerCase(sl1.Strings[2]);
-                tn.Script[k].Data1[3] := LowerCase(sl1.Strings[3]);
-                tn.Script[k].Data1[4] := LowerCase(sl1.Strings[4]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data1[2] := LowerCase(SL1[2]);
+								tn.Script[k].Data1[3] := LowerCase(SL1[3]);
+								tn.Script[k].Data1[4] := LowerCase(SL1[4]);
 								Inc(k);
-              end else if str = 'resetguild' then begin //------- 55 resetguild
+							end else if str = 'resetguild' then begin //------- 55 resetguild
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [resetguild] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 55;
 								Inc(k);
-              end else if str = 'guilddinvest' then begin //------- 56 guilddinvest
+							end else if str = 'guilddinvest' then begin //------- 56 guilddinvest
 								if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [guilddinvest] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 56;
 								Inc(k);
-              {end else if str = 'movenpc' then begin //------- 61 Move NPC
-                                                                if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [guilddinvest] function error', [ScriptPath, lines]));
-									exit;
+							{end else if str = 'movenpc' then begin //------- 61 Move NPC
+							if sl1.Count <> 0 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21 -- changed even if commented out
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 61;
-                                                                SetLength(tn.Script[k].Data1, 1);
+								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);}
 							end else if str = 'removeequipment' then begin //----- 63 Remove Equipment
-                if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [Reset Equipment] function error', [ScriptPath, lines]));
-									exit;
+								if sl1.Count <> 0 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-                SetLength(tn.Script, k + 1);
-                tn.Script[k].ID := 63;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 63;
 								Inc(k);
-              end else if str = 'basereset' then begin //----- 64 BaseReset
-                if sl1.Count <> 0 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [Base Reset] function error', [ScriptPath, lines]));
-									exit;
+							end else if str = 'basereset' then begin //----- 64 BaseReset
+								if sl1.Count <> 0 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 
-                SetLength(tn.Script, k + 1);
-                tn.Script[k].ID := 64;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 64;
 								Inc(k);
-              end else if str = 'global' then begin //----- 65 Global Variable
-                //We convert literal math into easier things to work with
-                sl.Strings[0] := StringReplace(sl.Strings[0], '+=', '+', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '-=', '-', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '*=', '*', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '/=', '/', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '+', ',1,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '-', ',2,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=', ',0,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '*', ',3,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '/', ',4,', []);
-								while Pos('- ', sl.Strings[0]) <> 0 do
-									sl.Strings[0] := StringReplace(sl.Strings[0], '- ', '-',	[]);
-								sl1.DelimitedText := sl.Strings[0];
-								if sl1.Count = 3 then sl1.Add('0');
-								if sl1.Count <> 4 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [global] function error', [ScriptPath, lines]));
-									exit;
+							end else if str = 'global' then begin //----- 65 Global Variable
+								//We convert literal math into easier things to work with
+								SL[0] := StringReplace(SL[0], '+=', '+', []);
+								SL[0] := StringReplace(SL[0], '-=', '-', []);
+								SL[0] := StringReplace(SL[0], '*=', '*', []);
+								SL[0] := StringReplace(SL[0], '/=', '/', []);
+								SL[0] := StringReplace(SL[0], '+', ',1,', []);
+								SL[0] := StringReplace(SL[0], '-', ',2,',	[]);
+								SL[0] := StringReplace(SL[0], '=', ',0,', []);
+								SL[0] := StringReplace(SL[0], '*', ',3,', []);
+								SL[0] := StringReplace(SL[0], '/', ',4,', []);
+								while Pos('- ', SL[0]) <> 0 do
+									SL[0] := StringReplace(SL[0], '- ', '-',	[]);
+								SL1.DelimitedText := SL[0];
+								if SL1.Count = 3 then SL1.Add('0');
+								if SL1.Count <> 4 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[1], i, j);
+								val(SL1[1], i, j);
 								if (j <> 0) or (i < 0) or (i > 4) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [global] range error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if j = 0 then begin
 									if (i < -999999999) or (i > 999999999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [global] range error (3)', [ScriptPath, lines]));
-										exit;
-									end else if (StrToInt(sl1.Strings[1]) = 3) and (i = 0) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [global] div 0 error (3)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE3_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
+									end else if (StrToInt(SL1[1]) = 3) and (i = 0) then begin
+										ScriptErr(SCRIPT_DIV_Z3_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
-								val(sl1.Strings[3], i, j);
+								Val(SL1[3], i, j);
 								if (j <> 0) or (i < -999999999) or (i > 999999999) then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [set] range error (4)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_RANGE4_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 65;
 								SetLength(tn.Script[k].Data1, 2);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
-								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[3]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+								tn.Script[k].Data3[0] := StrToInt(SL1[1]);
+								tn.Script[k].Data3[1] := StrToInt(SL1[3]);
 								Inc(k);
-              end else if str = 'gcheck' then begin //------- 66 Global Check
-                sl.Strings[0] := StringReplace(sl.Strings[0], '=>', '>=', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=<', '<=', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '==', '=',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '><', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '!=', '<>', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '>',	',>,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '<',	',<,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], '=',	',=,',	[]);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',>,,=,', ',>=,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,=,', ',<=,', []);
-								sl.Strings[0] := StringReplace(sl.Strings[0], ',<,,>,', ',<>,', []);
-								sl1.DelimitedText := sl.Strings[0];
+							end else if str = 'gcheck' then begin //------- 66 Global Check
+								SL[0] := StringReplace(SL[0], '=>', '>=', []);
+								SL[0] := StringReplace(SL[0], '=<', '<=', []);
+								SL[0] := StringReplace(SL[0], '==', '=',	[]);
+								SL[0] := StringReplace(SL[0], '><', '<>', []);
+								SL[0] := StringReplace(SL[0], '!=', '<>', []);
+								SL[0] := StringReplace(SL[0], '>',	',>,',	[]);
+								SL[0] := StringReplace(SL[0], '<',	',<,',	[]);
+								SL[0] := StringReplace(SL[0], '=',	',=,',	[]);
+								SL[0] := StringReplace(SL[0], ',>,,=,', ',>=,', []);
+								SL[0] := StringReplace(SL[0], ',<,,=,', ',<=,', []);
+								SL[0] := StringReplace(SL[0], ',<,,>,', ',<>,', []);
+								sl1.DelimitedText := SL[0];
 								if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [gcheck] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								val(sl1.Strings[2], i, j);
+								val(SL1[2], i, j);
 								if j = 0 then begin
 									if (i < 0) or (i > 999999999) then begin
-										DebugOut.Lines.Add(Format('%s %.4d: [gcheck] range error (1)', [ScriptPath, lines]));
-										exit;
+										ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+										Exit; // Safe - 2004/04/21
 									end;
 								end;
 								SetLength(tn.Script, k + 1);
@@ -8771,73 +8897,72 @@ begin
 								SetLength(tn.Script[k].Data1, 3);
 								SetLength(tn.Script[k].Data2, 2);
 								SetLength(tn.Script[k].Data3, 3);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-								tn.Script[k].Data1[1] := LowerCase(sl1.Strings[2]);
-								tn.Script[k].Data1[2] := sl1.Strings[1];
-								str := sl1.Strings[1];
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[2]);
+								tn.Script[k].Data1[2] := SL1[1];
+								mathop := SL1[1];
 								j := -1;
-										 if str = '>=' then j := 0
-								else if str = '<=' then j := 1
-								else if str = '='	then j := 2
-								else if str = '<>' then j := 3
-								else if str = '>'	then j := 4
-								else if str = '<'	then j := 5;
+										 if mathop = '>=' then j := 0
+								else if mathop = '<=' then j := 1
+								else if mathop = '='	then j := 2
+								else if mathop = '<>' then j := 3
+								else if mathop = '>'	then j := 4
+								else if mathop = '<'	then j := 5;
 								if j = -1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [gcheck] syntax error (2)', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_SYNT_2_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								tn.Script[k].Data3[2] := j;
-								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[3]);
-								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[4]);
+								tn.Script[k].Data2[0] := LowerCase(SL1[3]);
+								tn.Script[k].Data2[1] := LowerCase(SL1[4]);
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
-              end else if str = 'eventmob' then begin //------ 67 Event Monster
-                if sl1.Count <> 5 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [Event Mob] function error', [ScriptPath, lines]));
-									exit;
+							end else if str = 'eventmob' then begin //------ 67 Event Monster
+								if sl1.Count <> 5 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-                SetLength(tn.Script, k + 1);
+								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 67;
-                SetLength(tn.Script[k].Data1, 5);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-                tn.Script[k].Data1[1] := LowerCase(sl1.Strings[1]);
-                tn.Script[k].Data1[2] := LowerCase(sl1.Strings[2]);
-                tn.Script[k].Data1[3] := LowerCase(sl1.Strings[3]);
-                tn.Script[k].Data1[4] := LowerCase(sl1.Strings[4]);
-                Inc(k);
+								SetLength(tn.Script[k].Data1, 5);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								tn.Script[k].Data1[1] := LowerCase(SL1[1]);
+								tn.Script[k].Data1[2] := LowerCase(SL1[2]);
+								tn.Script[k].Data1[3] := LowerCase(SL1[3]);
+								tn.Script[k].Data1[4] := LowerCase(SL1[4]);
+								Inc(k);
 
-    end else if str = 'addskillpoints' then begin //----- 68 Add Skill Point
-        if sl1.Count <> 1 then begin
-            DebugOut.Lines.Add(Format('%s %.4d: [Add Skill Point] function error', [ScriptPath, lines]));
-            exit;
-        end;
-        SetLength(tn.Script, k + 1);
-        tn.Script[k].ID := 68;
-        SetLength(tn.Script[k].Data1, 1);
-        tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-        Inc(k);
-    end else if str = 'addstatpoints' then begin //---- 69 Add Stat Point
-        if sl1.Count <> 1 then begin
-            DebugOut.Lines.Add(Format('%s %.4d: [Add Stat Point] function error', [ScriptPath, lines]));
-            exit;
-        end;
-        SetLength(tn.Script, k + 1);
-        tn.Script[k].ID := 69;
-        SetLength(tn.Script[k].Data1, 1);
-        tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
-        Inc(k);
-
+							end else if str = 'addskillpoints' then begin //----- 68 Add Skill Point
+								if sl1.Count <> 1 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
+								end;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 68;
+								SetLength(tn.Script[k].Data1, 1);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								Inc(k);
+							end else if str = 'addstatpoints' then begin //---- 69 Add Stat Point
+								if sl1.Count <> 1 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
+								end;
+								SetLength(tn.Script, k + 1);
+								tn.Script[k].ID := 69;
+								SetLength(tn.Script[k].Data1, 1);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+								Inc(k);
 
 							end else if str = 'script' then begin //------- 99 script
 								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [script] function error', [ScriptPath, lines]));
-									exit;
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 99;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 4);
-								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
+								tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 								Inc(k);
 							end else if Copy(str, Length(str), 1) = ':' then begin //label
 {NPCイベント追加}
@@ -8861,20 +8986,20 @@ begin
 									end;
 								end else if (LowerCase(Copy(str, 1, 6)) = 'oninit') then begin
 									tn.ScriptInitS := k;
-                end else if (LowerCase(Copy(str, 1, 11)) = 'onmymobdead') then begin
+								end else if (LowerCase(Copy(str, 1, 11)) = 'onmymobdead') then begin
 									tn.ScriptInitMS := k;
 								end;
 
 								str := Copy(str, 1, Length(str) - 1);
 								sl2.Add(str + '=' + IntToStr(k));
 							end else if str = 'scriptlabel' then begin //scriptlabel
-								if sl1.Count <> 1 then begin
-									DebugOut.Lines.Add(Format('%s %.4d: [scriptlabel] function error', [ScriptPath, lines]));
-									exit;
+								if SL1.Count <> 1 then begin
+									ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+									Exit; // Safe - 2004/04/21
 								end;
-								tn.ScriptLabel := LowerCase(sl1.Strings[0]);
+								tn.ScriptLabel := LowerCase(SL1[0]);
 							end;
-						end;
+						end;//while not eof(txt)
 						tn.ScriptCnt := k;
 						for i := 0 to k - 1 do begin
 							case tn.Script[i].ID of
@@ -8884,8 +9009,8 @@ begin
 										if tn.Script[i].Data2[j] = '-' then begin //nopラベル
 											tn.Script[i].Data3[j] := i + 1;
 										end else if sl2.IndexOfName(tn.Script[i].Data2[j]) = -1 then begin
-											DebugOut.Lines.Add(Format('%s : label "%s" not found', [ScriptPath, tn.Script[i].Data2[j]]));
-											exit;
+											ScriptErr(SCRIPT_LBLNOT_ERR, [ScriptPath, tn.Script[i].Data2[j]]);
+											Exit; // Safe - 2004/04/21
 											//tn.Script[i].Data3[j] := $FFFF;
 										end else begin
 											tn.Script[i].Data3[j] := StrToInt(sl2.Values[tn.Script[i].Data2[j]]);
@@ -8895,8 +9020,8 @@ begin
 							5:
 								begin
 									if sl2.IndexOfName(tn.Script[i].Data1[0]) = -1 then begin
-										DebugOut.Lines.Add(Format('%s : label "%s" not found', [ScriptPath, tn.Script[i].Data1[0]]));
-										exit;
+										ScriptErr(SCRIPT_LBLNOT_ERR, [ScriptPath, tn.Script[i].Data2[j]]);
+										Exit; // Safe - 2004/04/21
 										//tn.Script[i].Data3[0] := $FFFF;
 									end else begin
 										tn.Script[i].Data3[0] := StrToInt(sl2.Values[tn.Script[i].Data1[0]]);
@@ -8913,24 +9038,24 @@ begin
 						Inc(cnt[2]);
 {d$0100fix5よりココまで}
 	// モンスター ----------------------------------------------------------------
-					end else if sl.Strings[1] = 'monster' then begin
+					end else if SL[1] = 'monster' then begin
 						for i := sl.Count to 4 do sl.Add('0');
 						ts0 := TMob.Create;
-						ts0.Name := sl.Strings[2];
+						ts0.Name := SL[2];
 						//DebugOut.Lines.Add('-> adding mob ' + ts0.Name);
 						ts0.Map := MapName;
-						ts0.Point1.X := StrToInt(sl1.Strings[1]);
-						ts0.Point1.Y := StrToInt(sl1.Strings[2]);
+						ts0.Point1.X := StrToInt(SL1[1]);
+						ts0.Point1.Y := StrToInt(SL1[2]);
 						ts0.Dir := 3;
-						ts0.Point2.X := StrToInt(sl1.Strings[3]);
-						ts0.Point2.Y := StrToInt(sl1.Strings[4]);
-						sl1.DelimitedText := sl.Strings[3];
+						ts0.Point2.X := StrToInt(SL1[3]);
+						ts0.Point2.Y := StrToInt(SL1[4]);
+						sl1.DelimitedText := SL[3];
 						for i := sl.Count to 4 do sl.Add('0');
-						ts0.JID := StrToInt(sl1.Strings[0]);
-						mcnt := StrToInt(sl1.Strings[1]);
-						ts0.SpawnDelay1 := StrToInt(sl1.Strings[2]);
-						ts0.SpawnDelay2 := StrToInt(sl1.Strings[3]);
-						ts0.SpawnType := StrToInt(sl1.Strings[4]);
+						ts0.JID := StrToInt(SL1[0]);
+						mcnt := StrToInt(SL1[1]);
+						ts0.SpawnDelay1 := StrToInt(SL1[2]);
+						ts0.SpawnDelay2 := StrToInt(SL1[3]);
+						ts0.SpawnType := StrToInt(SL1[4]);
 						if MobDB.IndexOf(ts0.JID) = -1 then continue;
 						ts0.Data := MobDB.IndexOfObject(ts0.JID) as TMobDB;
 						if (ts0.Point1.X = 0) and (ts0.Point1.Y = 0) and (ts0.Point2.X = 0) and (ts0.Point2.Y = 0) then begin
@@ -8954,26 +9079,26 @@ begin
 							ts.Point2.X := ts0.Point2.X;
 							ts.Point2.Y := ts0.Point2.Y;
 
-{追加}        if (ts.JID = 1288) then begin
-              ts.isEmperium := true;
-              m := CastleList.IndexOf(ts.Map);
-              if (m <> - 1) then begin
-              tgc := CastleList.Objects[m] as TCastle;
-              ts.GID := tgc.GID;
-              end;
-              k := EmpList.IndexOf(ts.Map);
-              if (k = -1) then begin
-              te := TEmp.Create;
-		          with te do begin
-              Map := ts.Map;
-              EID := ts.ID;
-              end;
-		          EmpList.AddObject(te.Map, te);
-              end;
-              end;
+{追加}				if (ts.JID = 1288) then begin
+								ts.isEmperium := true;
+								m := CastleList.IndexOf(ts.Map);
+								if (m <> - 1) then begin
+									tgc := CastleList.Objects[m] as TCastle;
+									ts.GID := tgc.GID;
+								end;
+								k := EmpList.IndexOf(ts.Map);
+								if (k = -1) then begin
+									te := TEmp.Create;
+									with te do begin
+										Map := ts.Map;
+										EID := ts.ID;
+									end;
+									EmpList.AddObject(te.Map, te);
+								end;
+							end;
 
 							ts.isLooting := False;
-  						for j:= 1 to 10 do begin
+							for j:= 1 to 10 do begin
 								ts.Item[j].ID := 0;
 								ts.Item[j].Amount := 0;
 								ts.Item[j].Equip := 0;
@@ -8984,7 +9109,7 @@ begin
 								ts.Item[j].Card[1] := 0;
 								ts.Item[j].Card[2] := 0;
 								ts.Item[j].Card[3] := 0;
-						  end;
+							end;
 {追加ココまで}
 							j := 0;
 							repeat
@@ -9001,7 +9126,7 @@ begin
 								//---
 								Inc(j);
 							until ( (tm.gat[ts.Point.X][ts.Point.Y] <> 1) and (tm.gat[ts.Point.X][ts.Point.Y] <> 5) or (j = 100) );
-            if j <> 100 then begin
+							if j <> 100 then begin
 								ts.Dir := Random(8);
 								ts.HP := ts0.Data.HP;
 								ts.Speed := ts0.Data.Speed;
@@ -9012,12 +9137,12 @@ begin
 								if ts0.Data.isDontMove then
 									ts.MoveWait := 4294967295
 								else
-                ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
+									ts.MoveWait := Tick + 5000 + Cardinal(Random(10000));
 								ts.ATarget := 0;
-								ts.ATKPer := 100;
-								ts.DEFPer := 100;
+								ts.ATKPer  := 100;
+								ts.DEFPer  := 100;
 								ts.DmgTick := 0;
-								ts.Data := ts0.Data;
+								ts.Data    := ts0.Data;
 								for j := 0 to 31 do begin
 									ts.EXPDist[j].CData := nil;
 									ts.EXPDist[j].Dmg := 0;
@@ -9027,25 +9152,23 @@ begin
 										ts.MVPDist[j].CData := nil;
 										ts.MVPDist[j].Dmg := 0;
 									end;
-									ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+									ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //In FA 30%
 								end;
-{追加}					ts.Element := ts.Data.Element;
+{追加}					ts.Element  := ts.Data.Element;
 {追加}					ts.isActive := ts.Data.isActive;
-                ts.EmperiumID := 0;
+								ts.EmperiumID := 0;
 								tm.Mob.AddObject(ts.ID, ts);
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
 							end else begin
 								ts.Free;
 							end;
 
-if (MonsterMob = true) then begin
-    k := SlaveDBName.IndexOf(ts0.Data.Name);
-    if (k <> -1) then begin
-     ts.isLeader := true;
-    end;
-end;
-
-
+							if (MonsterMob = true) then begin
+								k := SlaveDBName.IndexOf(ts0.Data.Name);
+								if (k <> -1) then begin
+									ts.isLeader := true;
+								end;
+							end;
 
 						end;
 						ts0.Free;
@@ -9055,12 +9178,13 @@ end;
 			end;
 		end;
 		CloseFile(txt);
-	end;
-	//スクリプトのコピー
-	for i1 := 0 to tm.NPC.Count - 1 do begin
-		tn := tm.NPC.Objects[i1] as TNPC;
+	end;//for Idx
+
+	//Copy of script
+	for Idx := 0 to tm.NPC.Count - 1 do begin
+		tn := tm.NPC.Objects[Idx] as TNPC;
 		if (tn.CType = 2) and (tn.ScriptCnt <> 0) then begin
-      // Using script 'scriptlabel'...
+			// Using script 'scriptlabel'...
 			if tn.Script[0].ID = 99 then begin
 				j := tm.NPCLabel.IndexOf(tn.Script[0].Data1[0]);
 				if j <> -1 then begin
@@ -9071,13 +9195,13 @@ end;
 						tn.Script[i] := tn1.Script[i];
 					end;
 					tn.ScriptCnt := tn1.ScriptCnt;
-          // Colus, 20040130: Copy over script label data when you go to a script
-          //tn.ScriptInitS := tn1.ScriptInitS;
-          //tn.ScriptInitD := tn1.ScriptInitD;
-          //tn.ScriptInitMS := tn1.ScriptInitMS;
+					// Colus, 20040130: Copy over script label data when you go to a script
+					//tn.ScriptInitS := tn1.ScriptInitS;
+					//tn.ScriptInitD := tn1.ScriptInitD;
+					//tn.ScriptInitMS := tn1.ScriptInitMS;
 
 				end;
-{NPCイベント追加}
+			{NPC Event}
 			end else begin
 				for i := 0 to tn.ScriptCnt - 1 do begin
 					//callmobイベントチェック
@@ -9098,9 +9222,9 @@ end;
 					end;
 				end;
 			end;
-{NPCイベント追加ココまで}
+			{NPC Event}
 		end;
-	end;
+	end;//for Idx
 
 	//DebugOut.Lines.Add('WarpPoint: ' + IntToStr(cnt[0]));
 	//DebugOut.Lines.Add('Shop: ' + IntToStr(cnt[1]));
@@ -9108,12 +9232,14 @@ end;
 	//DebugOut.Lines.Add('Monster: ' + IntToStr(cnt[3]));
 	//DebugOut.Lines.Add('-> Map load success.');
 
-	sl.Free;
-	sl1.Free;
-	sl2.Free;
+	SL.Free;
+	SL1.Free;
+	SL2.Free;
 
 	tm.Mode := 2;
-end;
+End;(* Proc MapLoad()
+*-----------------------------------------------------------------------------*)
+
 //------------------------------------------------------------------------------
 procedure MapMove(Socket:TCustomWinSocket; MapName:string; Point:TPoint);
 var

@@ -1,3 +1,4 @@
+- 04-20-04: Small memory leaks plugged in map load routines. [ChrstphrR]
 - 04-20-04: Dead Branch summon monster code improvments. [ChrstphrR]
 - 04-19-04: Quick Fix for Kyuubi's fix -- please check and adjust if 
 I made the wrong assumption :) [ChrstphrR]
