@@ -7931,6 +7931,7 @@ begin
             tc.MPoint.Y := 0;
             Exit;
             end;
+            end;
 
 				111: //アドレナリン_ラッシ
 					begin
