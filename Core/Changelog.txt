@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-03-04: REED: Restructured Castle Loading. Last of the REED_LOADS. [AlexKreuz]
 - 09-30-04: Added #jail and #unjail commands. [Tiko]
 - 09-29-04: NPC can check accesslevel. [Tsusai]
 - 09-29-04: Can now modify accesslevel from server window. [Tsusai]

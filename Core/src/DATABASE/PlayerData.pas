@@ -19,7 +19,8 @@ uses
     REED_LOAD_CHARACTERS,
     REED_LOAD_PETS,
     REED_LOAD_PARTIES,
-    REED_LOAD_GUILDS;
+    REED_LOAD_GUILDS,
+    REED_LOAD_CASTLES;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -90,7 +91,6 @@ uses
 
 
     { Castle Data - Basic Data }
-    procedure PD_Load_Castles(UID : String = '*');
     procedure PD_Save_Castles(forced : Boolean = False);
 
 
@@ -133,7 +133,7 @@ uses
         PD_Load_Guilds_Pre_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Castles ­');
-        PD_Load_Castles(UID);
+        PD_Load_Castles_Pre_Parse(UID);
     end;
 
     procedure PD_PlayerData_Save(forced : Boolean = False);
@@ -1808,107 +1808,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Castle Data - Basic Data ---------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Castles(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        tgc : TCastle;
-        i : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Castles');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-        saveflag := False;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Castles\' + searchResult.Name + '\Castle.txt') then begin
-
-            	try
-                	datafile.LoadFromFile(AppPath + 'gamedata\Castles\' + searchResult.Name + '\Castle.txt');
-                    sl.delimiter := ':';
-
-                    tg := nil;
-                    tgc := nil;
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-
-                            if tp.CData[i] = nil then Continue;
-
-                            sl.DelimitedText := datafile[1];
-                            if (tp.CData[i].GuildID = StrToint(sl.Strings[1])) then begin
-                            	if GuildList.IndexOf(tp.CData[i].GuildID) = -1 then Continue;
-                                tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-                                tgc := CastleList.Objects[CastleList.IndexOf(searchResult.Name)] as TCastle;
-                                Break;
-                            end;
-                        end;
-
-                        if tg = nil then Continue;
-                        if tgc = nil then Continue;
-
-                	end else begin
-                        tgc := TCastle.Create;
-                    end;
-
-                    if assigned(tg) then begin
-                        for i := 0 to tg.RegUsers - 1 do begin
-                            if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
-                        	if tg.MemberID[i] <> 0 then begin
-                            	if tg.Member[i].Login <> 0 then begin
-                                	saveflag := True;
-                                    Break;
-                                end;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    tgc.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-                    tgc.GID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
-                    tgc.GName := ( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
-                    tgc.GMName := ( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
-                    tgc.GKafra := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
-                    tgc.EDegree := StrToInt( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
-                    tgc.ETrigger := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-                    tgc.DDegree := StrToInt( Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3) );
-                    tgc.DTrigger := StrToInt( Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3) );
-                    tgc.GuardStatus[0] := StrToInt( Copy(datafile[9], Pos(' : ', datafile[9]) + 3, length(datafile[9]) - Pos(' : ', datafile[9]) + 3) );
-                    tgc.GuardStatus[1] := StrToInt( Copy(datafile[10], Pos(' : ', datafile[10]) + 3, length(datafile[10]) - Pos(' : ', datafile[10]) + 3) );
-                    tgc.GuardStatus[2] := StrToInt( Copy(datafile[11], Pos(' : ', datafile[11]) + 3, length(datafile[11]) - Pos(' : ', datafile[11]) + 3) );
-                    tgc.GuardStatus[3] := StrToInt( Copy(datafile[12], Pos(' : ', datafile[12]) + 3, length(datafile[12]) - Pos(' : ', datafile[12]) + 3) );
-                    tgc.GuardStatus[4] := StrToInt( Copy(datafile[13], Pos(' : ', datafile[13]) + 3, length(datafile[13]) - Pos(' : ', datafile[13]) + 3) );
-                    tgc.GuardStatus[5] := StrToInt( Copy(datafile[14], Pos(' : ', datafile[14]) + 3, length(datafile[14]) - Pos(' : ', datafile[14]) + 3) );
-                    tgc.GuardStatus[6] := StrToInt( Copy(datafile[15], Pos(' : ', datafile[15]) + 3, length(datafile[15]) - Pos(' : ', datafile[15]) + 3) );
-                    tgc.GuardStatus[7] := StrToInt( Copy(datafile[16], Pos(' : ', datafile[16]) + 3, length(datafile[16]) - Pos(' : ', datafile[16]) + 3) );
-
-                    if (UID = '*') then
-                        CastleList.AddObject(tgc.Name, tgc);
-
-                    //debugout.Lines.Add(tgc.Name + ' castle data loaded.');
-                except
-                	DebugOut.Lines.Add('Castle data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Castles(forced : Boolean = False);
     var
     	datafile : TStringList;

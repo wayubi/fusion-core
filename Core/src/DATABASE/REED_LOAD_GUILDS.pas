@@ -17,9 +17,6 @@ uses
     procedure PD_Load_Guilds_Diplomacy(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Storage(tg : TGuild; path : String);
 
-    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
-    function guild_is_online(tg : TGuild) : Boolean;
-
 implementation
 
     { ------------------------------------------------------------------------------------- }
@@ -319,78 +316,6 @@ implementation
     procedure PD_Load_Guilds_Storage(tg : TGuild; path : String);
     begin
         retrieve_inventories(path, tg.Storage.Item);
-    end;
-    { ------------------------------------------------------------------------------------- }
-
-
-    { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - Guild Supplemental Functions                                                }
-    { ------------------------------------------------------------------------------------- }
-
-    
-    { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - select_load_guild                                                           }
-    { ------------------------------------------------------------------------------------- }
-    { Purpose: To allow guild parsing to create or select the proper guild for loading.     }
-    { Parameters:                                                                           }
-    {  - UID : String, Represents the account ID to load.                                   }
-    {  - tp : TPlayer, Represents the player data.                                          }
-    {  - guildid : Cardinal, Represents the guild's ID.                                     }
-    { Results:                                                                              }
-    {  - Result : TParty, Represents the selected guild.                                    }
-    { ------------------------------------------------------------------------------------- }
-    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
-    var
-        i : Integer;
-        tg : TGuild;
-    begin
-
-        if (UID <> '*') then begin
-
-            for i := 0 to 8 do begin
-                if tp.CName[i] = '' then Continue;
-                if tp.CData[i] = nil then Continue;
-
-                if (tp.CData[i].GuildID = guildid) then begin
-                    if GuildList.IndexOf(guildid) = -1 then Continue;
-                    tg := GuildList.Objects[GuildList.IndexOf(guildid)] as TGuild;
-                    Break;
-                end;
-            end;
-
-        end else begin
-            tg := TGuild.Create;
-        end;
-
-        Result := tg;
-    end;
-    { ------------------------------------------------------------------------------------- }
-
-
-    { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - guild_is_online                                                             }
-    { ------------------------------------------------------------------------------------- }
-    { Purpose: To see if any guild members are online for loading purposes.                 }
-    { Parameters:                                                                           }
-    {  - tg : TGuild, Represents the party data to check.                                   }
-    { Results:                                                                              }
-    {  - Result : Boolean, Represents the return value of whether or not onnline.           }
-    { ------------------------------------------------------------------------------------- }
-    function guild_is_online(tg : TGuild) : Boolean;
-    var
-        i : Integer;
-    begin
-        Result := False;
-
-        for i := 0 to tg.RegUsers - 1 do begin
-            if (tg.MemberID[i] <> 0) then begin
-                if tg.Member[i].Login <> 0 then begin
-                    Result := True;
-                    Break;
-                end;
-            end;
-        end;
-
     end;
     { ------------------------------------------------------------------------------------- }
 
