@@ -3574,12 +3574,14 @@ begin
 			if ATick + ADelay - 200 < Tick then ATick := Tick - ADelay + 200;
 		end;}
 
-		if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
+        if (Path_Finding(path, tm, Point.X, Point.Y,ts.Point.X, ts.Point.Y, 2) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
+		//if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//攻撃
 			if ts = nil then begin
 				AMode := 0;
 				Exit;
 			end;
+
 			if Weapon = 11 then begin  //Bow
 
 				if (Arrow = 0) or (Item[Arrow].Amount = 0) then begin
@@ -3606,6 +3608,7 @@ begin
 					Arrow := 0;
 				end;
 			end;
+
 			if Weight * 100 div MaxWeight >= 90 then begin
 				//Weight is over 90%
 				WFIFOW(0, $013b);
@@ -3617,7 +3620,6 @@ begin
 
       //Pet Attacks
       if (EnablePetSkills) and ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetAttackSkill(tm, ts, tc);
-
 
 			// + 激 し く 自 動 鷹 +
 			if (Option and 16 <> 0) and (Skill[129].Lv <> 0) and (Random(1000) < Param[5] * 10 div 3) then begin //確率チェック
@@ -3668,7 +3670,7 @@ begin
 					end;
 				end;
 				sl.Free;
-{変更ココまで}
+                        {変更ココまで}
 			end else begin
 				dmg[7] := 0;
 			end;
@@ -3697,9 +3699,7 @@ begin
               20040122: No more Snatching with ranged weapons.}
       {TODO: Figure out proper modification of Snatcher by Steal skill.}
       if ((dmg[0] <> 0) and (tc.Skill[210].Lv <> 0) and (tc.Weapon <> 11) and (Random(1000) < ((tc.Skill[210].Data.Data1[Skill[210].Lv] * 10) + tc.Skill[50].Data.Data1[Skill[50].Lv]))) then begin
-
         StealItem(tc, ts);
-
       end;
       SendCAttack1(tc, dmg[0], dmg[1], dmg[4], dmg[5], tm, ts, Tick);
 
@@ -3718,15 +3718,11 @@ begin
       
 			//スプラッシュ攻撃千葉滋賀佐賀(ﾟ∀ﾟ)
 			if SplashAttack then begin
-{追加}  CharaSplash(tc,Tick);
+                                CharaSplash(tc,Tick);
 			end;
-			//ダメージ処理
 
 			if not DamageProcess1(tm, tc, ts, dmg[0] + dmg[1] + dmg[7], Tick) then
-{追加}	StatCalc1(tc, ts, Tick);
-			//イヴァァールァギィー(;´Д`)
-
-			//Tick加算
+                                StatCalc1(tc, ts, Tick);
 			ATick := ATick + ADelay;
 
 		end;
