@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-26-04: Fixed #1000 - Gungnir with attack-type skills caused Unknown-Skill crash. [AlexKreuz]
 - 06-26-04: Fixed #999 - Skill cards would not add skills to list. [AlexKreuz]
 - 06-26-04: Fixed #924 - Double Strafe doubling damage each fatal kill on PVP. [AlexKreuz]
 - 06-25-04: Uncapped ASPD to 199. [AlexKreuz]

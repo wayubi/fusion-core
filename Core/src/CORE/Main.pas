@@ -2501,7 +2501,7 @@ begin
 		end;
 
 
-		if (tc.GungnirEquipped) and (25 >= Random(100)) then begin
+		if (tc.GungnirEquipped) and (25 >= Random(100)) and (SkillPer = 0) then begin
 			tc.MTarget := tc.ATarget;
 			ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
 
@@ -9006,7 +9006,7 @@ begin
 					if ATarget <> ts.ID then begin
 						ATarget := ts.ID;
 						AData := ts;
-						if ATick + tc.ADelay - 200 < Tick then
+						if ATick + (tc.ADelay - 200) < Tick then
 							ATick := Tick - ADelay + 200;
 					end;
 					ActTick := Tick + 200 - ADelay + aMotion;
