@@ -786,6 +786,7 @@ type TPlayer = class
 	Gender        :byte;
 	Mail          :string;
 	GMMode        :byte;
+	CID           :array[0..8] of cardinal;
 	CName         :array[0..8] of string;
 	CData         :array[0..8] of TChara;
 	Kafra         :TItemList;
