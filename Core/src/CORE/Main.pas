@@ -565,12 +565,12 @@ begin
                 if sl.IndexOfName('Option_Back_Color') <> -1 then begin
                         Option_Back_Color := sl.Values['Option_Back_Color'];
                 end else begin
-                        Option_Back_Color := '88B6D6';
+                        Option_Back_Color := 'FFFFFF';
                 end;
                 if sl.IndexOfName('Option_Font_Color') <> -1 then begin
                         Option_Font_Color := sl.Values['Option_Font_Color'];
                 end else begin
-                        Option_Font_Color := '000080';
+                        Option_Font_Color := 'FFB933';
                 end;
                 if sl.IndexOfName('Option_Font_Size') <> -1 then begin
                         Option_Font_Size := strtoint(sl.Values['Option_Font_Size']);
@@ -580,7 +580,12 @@ begin
                 if sl.IndexOfName('Option_Font_Face') <> -1 then begin
                         Option_Font_Face := sl.Values['Option_Font_Face'];
                 end else begin
-                        Option_Font_Face := 'Trebuchet MS';
+                        Option_Font_Face := 'Century Gothic';
+                end;
+                if sl.IndexOfName('Option_Font_Style') <> -1 then begin
+                        Option_Font_Style := sl.Values['Option_Font_Style'];
+                end else begin
+                        Option_Font_Style := 'B';
                 end;
 
                 sl.Clear;
@@ -705,6 +710,20 @@ begin
 
         txtDebug.Font.Name := Option_Font_Face;
         txtDebug.Font.Size := Option_Font_Size;
+
+        txtDebug.Font.Style := [];
+        for a := 1 to length(Option_Font_Style) do begin
+                if (copy(Option_Font_Style,a,1)) = 'B' then begin
+                        txtDebug.Font.Style := txtDebug.Font.Style + [fsBold];
+                end else if (copy(Option_Font_Style,a,1)) = 'I' then begin
+                        txtDebug.Font.Style := txtDebug.Font.Style + [fsItalic];
+                end else if (copy(Option_Font_Style,a,1)) = 'U' then begin
+                        txtDebug.Font.Style := txtDebug.Font.Style + [fsUnderline];
+                end else if (copy(Option_Font_Style,a,1)) = 'S' then begin
+                        txtDebug.Font.Style := txtDebug.Font.Style + [fsStrikeOut];
+                end;
+        end;
+
 
 	ini.Free;
 	sl.Free;
@@ -834,6 +853,7 @@ begin
         ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
         ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
         ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
+        ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
         // Fusion INI Lines
         
         // MySQL Server Lines

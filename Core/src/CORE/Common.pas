@@ -1533,6 +1533,7 @@ Option_Back_Color : string;
 Option_Font_Color : string;
 Option_Font_Size : integer;
 Option_Font_Face : string;
+Option_Font_Style : string;
 // Fusion INI Declarations
 
 
