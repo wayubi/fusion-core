@@ -794,14 +794,14 @@ begin
                     //Global Broadcasting
                     for i := 0 to CharaName.Count - 1 do begin
                         tc1 := CharaName.Objects[i] as TChara;
-                        broadcast_handle(tc,tc1,str,true,l,tn);
+                        if tc1.Login = 2 then broadcast_handle(tc,tc1,str,true,l,tn);
                     end;
                 end else begin
                     //MAP broadcasting
                     tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
                     for i := 0 to tm.CList.Count - 1 do begin
                         tc1 := tm.CList.Objects[i] as TChara;
-                        broadcast_handle(tc,tc1,str,true,l,tn);
+                        if tc1.Login = 2 then broadcast_handle(tc,tc1,str,true,l,tn);
                     end;
                 end;
                 Inc(tc.ScriptStep);
@@ -1662,7 +1662,7 @@ begin
                         (tc1.Point.X <= tn.Script[tc.ScriptStep].Data3[2]) and
                         (tc1.Point.Y >= tn.Script[tc.ScriptStep].Data3[1]) and
                         (tc1.Point.Y <= tn.Script[tc.ScriptStep].Data3[3]) then begin
-                            broadcast_handle(tc,tc1,str,true,l,tn);
+                            if tc1.Login = 2 then broadcast_handle(tc,tc1,str,true,l,tn);
                     end;
                 end;
                 Inc(tc.ScriptStep);
