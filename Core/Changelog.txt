@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-24-04: Added Athena's @zeny command to ALBGM system.
 - 06-24-04: Added Athena's @help command to ALBGM system. Only displays all lines if you're in debug mode, otherwise it only displays 1. It also truncates all lines to 15 characters. [Trihan]
 - 06-24-04: Fixed #977 - Weapon Skill errors. Light Epsilon/Crusader Example. Skills dont remove. [AlexKreuz]
 - 06-24-04: Removed DarkHelmet's "Monster does x damage" Debugs. *sigh*. [AlexKreuz]

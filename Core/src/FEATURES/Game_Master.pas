@@ -94,6 +94,7 @@ var
     GM_ATHENA_WARPP : Byte;
     GM_ATHENA_CHARWARP : Byte;
     GM_ATHENA_HELP : Byte;
+    GM_ATHENA_ZENY : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -160,6 +161,7 @@ var
     function command_charskillpoint(tc : TChara; str : String) : String;
 
     function command_athena_help(tc : TChara) : String;
+    function command_athena_zeny(tc : TChara; str : String) : String;
 
 implementation
 
@@ -256,6 +258,7 @@ implementation
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
         GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_HELP'], 1);
+        GM_ATHENA_ZENY := StrToIntDef(sl.Values['ATHENA_ZENY'], 1);
 
         sl.Free;
         ini.Free;
@@ -361,6 +364,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
         ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
         ini.WriteString('Athena GM Commands', 'ATHENA_HELP', IntToStr(GM_ATHENA_HELP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_ZENY', IntToStr(GM_ATHENA_ZENY));
 
         ini.Free;
 
@@ -439,6 +443,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
+            else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2301,5 +2306,35 @@ Called when we're shutting down the server *only*
 	    finally
 		    Help.Free;
 	    end;
+    end;
+
+    function command_athena_zeny(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+    begin
+        Result := 'GM_ATHENA_ZENY Failure.';
+
+        Val(Copy(str, 6, 256), i, k);
+        if (k = 0) and (i >= -2147483647) and (i <= 2147483647) then begin
+            if (tc.Zeny + i <= 2147483647) and (tc.Zeny + i >= 0) then begin
+                tc.Zeny := tc.Zeny + i;
+                SendCStat1(tc, 1, $0014, tc.Zeny);
+
+                Result := 'GM_ATHENA_ZENY Success. ' + IntToStr(abs(i)) + ' Zeny';
+                if (i = 0) then begin
+                    tc.Zeny := i;
+                    Result := Result + ' set.';
+                end else
+                if (i > 0) then begin
+                    Result := Result + ' added.';
+                end else if (i < 0) then begin
+                    Result := Result + ' subtracted.';
+                end;
+            end else begin
+                Result := Result + ' Zeny on hand amount out of range [0-2147483647].';
+            end;
+        end else begin
+            Result := Result + ' Zeny amount out of range [-2147483647-2147483647].';
+        end;
     end;
 end.
