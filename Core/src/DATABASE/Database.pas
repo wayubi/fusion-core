@@ -104,14 +104,16 @@ begin
         if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
 		repeat
 
+                        CreateDir('map\tmpFiles');
                         afm_compressed := tzip.create(afm_compressed);
                         afm_compressed.Filename := AppPath+'map\'+sr.Name;
+                        afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
                         afm_compressed.Extract;
 
                         sr.Name := StringReplace(sr.Name, '.af2', '.out',
                           [rfReplaceAll, rfIgnoreCase]);
 
-			assignfile(afm,AppPath + 'map\' + sr.Name);
+			assignfile(afm,AppPath + 'map\tmpFiles\' + sr.Name);
 			Reset(afm);
 			
 			ReadLn(afm,str);
@@ -138,8 +140,6 @@ begin
 			ta.Size := xy;
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
-
-                        deletefile(AppPath+'map\'+sr.Name);
 
 		until FindNext(sr) <> 0;
 		FindClose(sr);
@@ -177,72 +177,6 @@ begin
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
 
-		until FindNext(sr) <> 0;
-		FindClose(sr);
-        end;
-
-        if FindFirst(AppPath + 'map\*.map', $27, sr) = 0 then begin
-		repeat
-			dat := TFileStream.Create(AppPath + 'map\' + sr.Name, fmOpenRead, fmShareDenyWrite);
-
-			SetLength(str, 3);
-			dat.Read(str[1], 3);
-			if str <> 'MAP' then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
-                                Application.Terminate;
-                                exit;
-			end;
-
-			dat.Read(w, 2);
-			dat.Read(xy.X, 4);
-			dat.Read(xy.Y, 4);
-			dat.Free;
-			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
-				Application.Terminate;
-				exit;
-			end;
-			//txtDebug.Lines.Add(Format('MapData: %s [%dx%d]', [sr.Name, xy.X, xy.Y]));
-			//Application.ProcessMessages;
-			ta := TMapList.Create;
-			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-                        ta.Ext := 'map';
-			ta.Size := xy;
-			ta.Mode := 0;
-			MapList.AddObject(ta.Name, ta);
-		until FindNext(sr) <> 0;
-		FindClose(sr);
-        end;
-
-        if FindFirst(AppPath + 'map\*.dwm', $27, sr) = 0 then begin
-		repeat
-			dat := TFileStream.Create(AppPath + 'map\' + sr.Name, fmOpenRead, fmShareDenyWrite);
-
-			SetLength(str, 3);
-			dat.Read(str[1], 3);
-			if str <> 'DWM' then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
-                                Application.Terminate;
-                                exit;
-			end;
-
-			dat.Read(w, 2);
-			dat.Read(xy.X, 4);
-			dat.Read(xy.Y, 4);
-			dat.Free;
-			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
-				Application.Terminate;
-				exit;
-			end;
-			//txtDebug.Lines.Add(Format('MapData: %s [%dx%d]', [sr.Name, xy.X, xy.Y]));
-			//Application.ProcessMessages;
-			ta := TMapList.Create;
-			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-                        ta.Ext := 'dwm';
-			ta.Size := xy;
-			ta.Mode := 0;
-			MapList.AddObject(ta.Name, ta);
 		until FindNext(sr) <> 0;
 		FindClose(sr);
         end;
@@ -2322,7 +2256,19 @@ var
 	tgb :TGBan;
 	tgl :TGRel;
 {ギルド機能追加ココまで}
+    sr	:TSearchRec;
 begin
+
+
+    if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
+        repeat
+            DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
+        until FindNext(sr) <> 0;
+        FindClose(sr);
+    end;
+
+    //rmDir(AppPath+'map\tmpFiles');
+
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';

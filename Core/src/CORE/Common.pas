@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
-	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32, Zip;
+	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32;
 
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -5701,7 +5701,6 @@ var
 	ta	:TMapList;
 {NPCイベント追加ココまで}
 
-        afm_compressed :TZip;
         afm :textfile;
         letter :char;
 begin
@@ -5723,12 +5722,7 @@ begin
 
         if ta.Ext = 'af2' then begin
 
-          afm_compressed := tzip.create(afm_compressed);
-          afm_compressed.Filename := AppPath+'map\'+MapName+'.af2';
-          afm_compressed.Extract;
-          afm_compressed.Free;
-
-          assignfile(afm,AppPath + 'map/' + MapName + '.out');
+          assignfile(afm,AppPath + 'map\tmpFiles\' + MapName + '.out');
           Reset(afm);
 
           ReadLn(afm,str);
@@ -5757,7 +5751,6 @@ begin
             ReadLn(afm,str);
           end;
           CloseFile(afm);
-          deletefile(AppPath+'map\'+MapName+'.out');
         end
 
         else if ta.Ext = 'afm' then begin
@@ -5794,21 +5787,7 @@ begin
         end
 
         else begin
-
-          if ta.Ext = 'map' then begin
-            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.map');
-            dat.LoadFromFile(AppPath + 'map\' + MapName + '.map');
-            SetLength(str, 3);
-            dat.Read(str[1], 3);
-          end else
-          
-          if ta.Ext = 'dwm' then begin
-            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.dwm');
-            dat.LoadFromFile(AppPath + 'map\' + MapName + '.dwm');
-            SetLength(str, 3);
-            dat.Read(str[1], 3);
-          end else
-          
+         
           if ta.Ext = 'gat' then begin
             //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
             dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
@@ -5816,7 +5795,7 @@ begin
             dat.Read(str[1], 4);
           end;
           
-          if (str <> 'MAP') and (str <> 'DWM') and (str <> 'GRAT') then begin
+          if (str <> 'GRAT') then begin
             DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
             tm.Free;
             exit;
@@ -5829,15 +5808,7 @@ begin
           SetLength(tm.gat, tm.Size.X, tm.Size.Y);
           for j := 0 to tm.Size.Y - 1 do begin
             for i := 0 to tm.Size.X - 1 do begin
-            
-              if ta.Ext = 'map' then begin
-                dat.Read(tm.gat[i][j],1);
-              end else
-              
-              if ta.Ext = 'dwm' then begin
-                dat.Read(tm.gat[i][j],1);
-              end else
-              
+                         
               if ta.Ext = 'gat' then begin
                 dat.Read(h[0], 4);
                 dat.Read(h[1], 4);

@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
-- 12-23-03: Fixed skill sharing by multiple classes bug. [AlexKreuz]
+- 12-24-03: Removed MAP & DWM compatibility (Bugs in Maps). [AlexKreuz]
+- 12-24-03: Fixed map-share conflict with AF2 Map format. [AlexKreuz]
+- 12-24-03: Fixed skill sharing by multiple classes bug. [AlexKreuz]
 - 12-23-03: Added period of no HP/SP Recovery for 5m after Extremity [Colus]
 - 12-23-03: Added no HP/SP Recovery during Critical Explosion [Colus]
 - 12-23-03: Fixed Steel Body, now DEF/MDEF = 90 instead of +90 [Colus]
