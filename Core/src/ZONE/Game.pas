@@ -215,7 +215,7 @@ begin
 						end;
 
                         if (Option_WelcomeMsg) then begin
-                            str2 := 'blueWelcome '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
+                            str2 := 'blueWelcome, '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
                             w := 200;
                             WFIFOW(0, $009a);
                             WFIFOW(2, w);
