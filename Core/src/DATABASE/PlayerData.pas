@@ -577,7 +577,10 @@ uses
                         tc.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
                         tc.ID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
                         tc.CID := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
+
                         tc.JID := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
+                        if (tc.JID > LOWER_JOB_END) then tc.JID := tc.JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
+
                         tc.BaseLV := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
                         tc.BaseEXP := StrToInt( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
                         tc.StatusPoint := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
