@@ -963,31 +963,49 @@ Called when we're shutting down the server *only*
 
     function command_hcolor(tc : TChara; str : String) : String;
     var
-        tm : TMap;
-        i, k : Integer;
+        colour, k : Integer;
     begin
-        Result := 'GM_HCOLOR Success.';
+        Result := 'GM_HCOLOR Failure.';
 
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) then begin
-            tc.HairColor := i;
-            UpdateLook(tm, tc, 6, i, 0, true);
+        Val(Copy(str, 8, 256), colour, k);
+        if k = 0 then begin
+            if (colour >= 0) and (colour <= 8) then begin
+                Result := 'GM_HCOLOR Success.';
+                tc.HairColor := colour;
+                UpdateLook(tc.MData, tc, 6, colour, 0, true);
+            end
+
+            else begin
+                Result := Result + ' Colour must be in range [0-8].';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Colour must be a valid integer.';
         end;
     end;
 
     function command_ccolor(tc : TChara; str : String) : String;
     var
-        tm : TMap;
-        i, k : Integer;
+        colour, k : Integer;
     begin
-        Result := 'GM_CCOLOR Success.';
+        Result := 'GM_CCOLOR Failure.';
 
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) then begin
-            tc.ClothesColor := i;
-            UpdateLook(tm, tc, 7, i, 0, true);
+        Val(Copy(str, 8, 256), colour, k);
+        if k = 0 then begin
+            if (colour >= 0) and (colour <= 4) then begin
+                Result := 'GM_CCOLOR Success.';
+                tc.ClothesColor := colour;
+                UpdateLook(tc.MData, tc, 7, colour, 0, true);
+            end
+
+            else begin
+                Result := Result + ' Colour must be in range [0-4].';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Colour must be a valid integer.';
         end;
     end;
 
