@@ -2663,6 +2663,7 @@ begin
 	for i := 0 to PetList.Count - 1 do begin
 
 		tpe := PetList.Objects[i] as TPet;
+        if (tpe.Index < 0) or (tpe.Index > 100) then Continue;
 
 		if tpe.PlayerID = 0 then continue;
 
@@ -2692,6 +2693,7 @@ begin
 			end;
 		end else begin
 			tc := Chara.IndexOfObject( tpe.CharaID ) as TChara;
+
 			if tpe.Cart = 0 then begin
 				with tc.Item[ tpe.Index ] do begin
 					Attr    := tpe.Incubated;
