@@ -92,7 +92,9 @@ uses
                 PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
                 tpa.Free;
             end else begin
-            	SendPartyList(tpa.Member[0]);
+            	if assigned(tpa.Member[0]) then begin
+	            	SendPartyList(tpa.Member[0]);
+                end;
             end;
         end;
     end;

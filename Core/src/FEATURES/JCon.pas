@@ -49,8 +49,10 @@ uses
 	    frmMain.Edit2.Text := IntToStr(AccountItem.ID);
     	frmMain.Edit3.Text := AccountItem.Name;
 	    frmMain.Edit4.Text := AccountItem.Pass;
+        frmMain.ComboBox15.ItemIndex := -1;
         frmMain.ComboBox15.ItemIndex := AccountItem.Gender;
 	    frmMain.Edit6.Text := AccountItem.Mail;
+        frmMain.ComboBox18.ItemIndex := -1;
         frmMain.ComboBox18.ItemIndex := AccountItem.Banned;
 	    frmMain.Edit8.Text := AccountItem.CName[0];
     	frmMain.Edit9.Text := AccountItem.CName[1];
