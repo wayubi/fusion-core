@@ -23,7 +23,33 @@ uses GameProcesses, ScktComp, SysUtils, Globals, Dialogs, Common, Classes;
         CodeBase : CodeArray;
 
 implementation
-uses Main;
+//uses Main;
+
+function SearchPacketListing(tc : TChara; Socket : TCustomWinSocket; Ver :integer; pkt : string; plth : integer) :boolean ;
+var
+    j : integer;
+begin
+    Result := false;
+    for j := 0 to Length(CodeBase[Ver].Packet) - 1 do begin
+        if (CodeBase[Ver].Packet[j].ID = pkt) and
+        ((CodeBase[Ver].Packet[j].Length = plth) or (CodeBase[Ver].Packet[j].Length = -1) )then begin
+            if CodeBase[Ver].Packet[j].Command = 'loadendack' then begin
+                DisplayMap(tc,Socket);
+                Result := True;
+            end else if CodeBase[Ver].Packet[j].Command = 'ticksend' then begin
+                Tick(Socket);
+                Result := true;
+            end else if CodeBase[Ver].Packet[j].Command = 'walktoxy' then begin
+                CharacterWalk(CodeBase[Ver].Packet[j].ReadPoints[0],tc,Socket);
+                Result := true;
+            end else if CodeBase[Ver].Packet[j].Command = 'actionrequest' then begin
+                ActionRequest(tc,Socket,CodeBase[Ver].Packet[j].ReadPoints[0],CodeBase[Ver].Packet[j].ReadPoints[1]);
+                Result := true;
+            end;
+        end;
+        if Result then break;
+    end;
+end;
 
 Procedure NEWsv3PacketProcess(Socket: TCustomWinSocket);
 var
@@ -41,41 +67,36 @@ Begin
 		RFIFOW(0, packetIDnum);
         packet := '0x' + IntToHex(packetIDnum,4);
 		tc := Socket.Data;
-//        if Option_Packet_Out then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, packetID]));
+
+        if tc <> nil then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, packetIDnum]));
 
         found := false;
         if tc = nil then begin
             for i := (Length(CodeBase) -1) downto 0 do begin
+
                 for j := 0 to Length(CodeBase[i].Packet) - 1 do begin
 
-                    if (CodeBase[i].Packet[j].ID = packet) and (CodeBase[i].Packet[j].Length = lth) and (CodeBase[i].Packet[j].Command = 'wanttoconnect') then begin
-
-                        MapConnect(i, CodeBase[i].Packet[j].ReadPoints[0],
+                    if (CodeBase[i].Packet[j].ID = packet) then begin
+                        if (CodeBase[i].Packet[j].Length = lth) then begin
+                            if (CodeBase[i].Packet[j].Command = 'wanttoconnection') then begin
+                                MapConnect(i, CodeBase[i].Packet[j].ReadPoints[0],
                                     CodeBase[i].Packet[j].ReadPoints[1],
                                     CodeBase[i].Packet[j].ReadPoints[2],Socket);
-                        found := true;
-                        break;
-                    end else console('0x' + IntToHex(packetIDnum,4));
+                                found := true;
+                                break;
+                            end;
+                        end;
+                    end;
                 end;
 
                 if found then break;
             end;
 
-        if not found then console('IP ' + Socket.RemoteHost + ' attempted to login with an unknown client');
+        if not found then console('IP ' + Socket.RemoteAddress + ' attempted to login with an unknown client');
 
         end else begin
-            for i := tc.clientver downto 0 do begin
-                for j := 0 to Length(CodeBase[i].Packet) - 1 do begin
-                    if (CodeBase[i].Packet[j].ID = '0x' + IntToHex(packetIDnum,4)) and
-                    ((CodeBase[i].Packet[j].Length = lth) or (CodeBase[i].Packet[j].Length = -1) )then begin
-                        found := true;
-                        if CodeBase[i].Packet[j].Command = 'loadendack' then DisplayMap(tc,Socket)
-                        else if CodeBase[i].Packet[j].Command = 'ticksend' then Tick(Socket)
-                        else if CodeBase[i].Packet[j].Command = 'walktoxy' then CharacterWalk(CodeBase[i].Packet[j].ReadPoints[0],tc,Socket);
-                        break;
-                    end;
-                    if found then break;
-                end;
+            if not SearchPacketListing(tc,Socket,tc.clientver,packet,lth) then begin //look for
+                if not SearchPacketListing(tc,Socket,0,packet,lth) then Exit;
             end;
         end;
     end;
@@ -117,7 +138,7 @@ procedure Load_PacketDB;
                 end;
 
                 if (sl.Count >= 2) then begin
-                    CodeBase[CB].Packet[PK].ID := sl[0]; //Compile error
+                    CodeBase[CB].Packet[PK].ID := sl[0];
                     CodeBase[CB].Packet[PK].Length := StrToInt(sl[1]);//Save the packet length
                 end;
                 if sl.Count = 4 then begin

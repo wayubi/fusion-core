@@ -16,7 +16,7 @@ uses
     {Shared}
     Classes, SysUtils, IniFiles,
     {Fusion}
-    Globals;
+    Globals, Game2;
 
 //==============================================================================
 // ŠÖ”’è‹`
@@ -1868,6 +1868,8 @@ begin
 
     debugout.lines.add('Loading R.E.E.D Database ... Please wait ...');
     PD_PlayerData_Load();
+
+    Load_PacketDB;
     
 	Application.ProcessMessages;
 end;
