@@ -10010,8 +10010,8 @@ begin
 						tc1.Sit := 3;
             SkillTick := tc1.Skill[MSkill].Tick;
             SkillTickID := MSkill;
-            tc1.SP := tc1.SP + 5;
-            if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+            //tc1.SP := tc1.SP + 5; { Alex: Why give 5 SP? }
+            //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
             CalcStat(tc1, Tick);
 						end else begin
 							tc1.Sit := 1;
@@ -13266,7 +13266,8 @@ begin
 		  				WFIFOW(2, tc.Skill[SkillTickID].Data.Icon);
 			  			WFIFOL(4, tc.ID);
 				  		WFIFOB(8, 0);
-					  	Socket.SendBuf(buf, 9);
+                        	  		//Socket.SendBuf(buf, 9);
+                        	  		SendBCmd(tm, tc.Point, 9);
             end;
 					end;
 
