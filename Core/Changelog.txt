@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-01-04: Increased MaxJob# to allow baby classes (No Skills). [Tsusai]
 - 12-01-04: Fixed Fusion form again. [AlexKreuz]
 - 12-01-04: Undid dependancy of weiss.ini autoupdate on release version. [AlexKreuz]
 - 11-30-04: Checkstr can now also check case sensitive strings (==). [Tsusai]

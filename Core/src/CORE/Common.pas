@@ -25,7 +25,7 @@ const
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;
-	MAX_JOB_NUMBER = 45;
+	MAX_JOB_NUMBER = 68;
 	LOWER_JOB_END = 23;
 	UPPER_JOB_BEGIN = 4000;
 	MONSTER_ATK_RANGE = 9;
