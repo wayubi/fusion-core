@@ -778,6 +778,8 @@ type TChara = class
 	MPoint        :rPoint;
 	MTick         :cardinal;
 
+  spiritSpheres :word;  // Spirit spheres per character.  Moved from global scope.
+
 	TalkNPCID     :cardinal;
 	UseItemID     :word;
 

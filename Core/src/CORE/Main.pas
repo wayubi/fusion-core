@@ -131,7 +131,7 @@ var
 	dmg           :array[0..7] of integer;
 
         //Skill variables
-        spiritSpheres :integer;
+
         spbonus       :integer;
         //Icon
         TrayIcon      : TNotifyIconData;
@@ -4118,7 +4118,7 @@ begin
                                         end;
                                         264:
                                         begin
-                                         if spiritSpheres <> 0 then begin
+                                         if tc.spiritSpheres <> 0 then begin
                                                 //Cast Point
                                                 xy.X := MPoint.X;
                                                 xy.Y := MPoint.Y;
@@ -4127,8 +4127,8 @@ begin
 
                                                 tn.MSkill := MSkill;
                                                 tn.MUseLV := MUseLV;
-                                                spiritSpheres := spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
                                           end else begin
                                                 tc.MMode := 4;
@@ -5547,7 +5547,7 @@ begin
                                 271:    {Extremity Fist}
                                 begin
                                         if tc.Skill[270].Tick > Tick then begin
-                                                if spiritSpheres = 5 then begin
+                                                if tc.spiritSpheres = 5 then begin
                                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
                                                         dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
@@ -5576,8 +5576,8 @@ begin
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                         tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
-                                                        spiritSpheres := spiritSpheres - 5;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        tc.spiritSpheres := tc.spiritSpheres - 5;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
                                                         {20031223, Colus: Cancel Explosion Spirits after Ashura
                                                          Ashura's tick will control SP lockout time}
@@ -5612,7 +5612,7 @@ begin
                                 end;
 
                                 273:    {Combo Finish Effect}
-                                if spiritSpheres <> 0 then begin
+                                if tc.spiritSpheres <> 0 then begin
                                                 PassiveAttack := False;
                                                 ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                                 if ts = nil then Exit;
@@ -5675,8 +5675,8 @@ begin
 							
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-                                                        spiritSpheres := spiritSpheres - 1;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 							StatCalc1(tc, ts, Tick);
 
                                                 tc.MTick := Tick + 2000;
@@ -5684,7 +5684,7 @@ begin
 
                                 266:    {Investigate}
                                 begin
-                                        if spiritSpheres <> 0 then begin
+                                        if tc.spiritSpheres <> 0 then begin
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 1 then begin
                                                         dmg[0] := 1;
@@ -5698,14 +5698,14 @@ begin
 
 
                                                 tc.MTick := Tick + 1000;
-                                                spiritSpheres := spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                         end;
                                 end;
                                 267:    {Finger Offensive}
                                 begin
                                     if (SearchAttack(path, tm, Point.X, Point.Y, ts.Point.X, ts.Point.Y) <> 0) then begin
-                                        if spiritSpheres >= tc.MUseLV then begin
+                                        if tc.spiritSpheres >= tc.MUseLV then begin
 					//É_ÉÅÅ[ÉWéZè
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						if dmg[0] < 1 then begin
@@ -5719,8 +5719,8 @@ begin
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 						DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                 tc.MTick := Tick + 1000;
-                                                spiritSpheres := spiritSpheres - tc.MUseLV;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - tc.MUseLV;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                         end;
                                 end;
                                 end;
@@ -6070,7 +6070,7 @@ begin
 
                                 264:   {Body Relocation}  //New Version Oatmeal style U_U
 
-                                        if spiritSpheres <> 0 then begin
+                                        if tc.spiritSpheres <> 0 then begin
                                                 //Send Graphics Packet
                                                 WFIFOW( 0, $011a);
                                                 WFIFOW( 2, MSkill);
@@ -6078,8 +6078,8 @@ begin
                                                 WFIFOL( 6, ts.ID);
                                                 WFIFOL(10, ID);
                                                 WFIFOB(14, 1);
-                                                spiritSpheres := spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 SendBCmd(tm, ts.Point, 15);
 
                                                 if tc.Skill[264].EffectLV > 1 then begin
@@ -7217,9 +7217,9 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
-                                                spiritSpheres := spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
-                                                if spiritSpheres > 5 then spiritSpheres := 5;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
+                                                if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 {WFIFOW( 0, $01d0);
                                                 WFIFOL( 2, tc.ID);
                                                 WFIFOW( 6, spiritspheres);
@@ -7227,28 +7227,28 @@ begin
                                                 //Create_Spirit_Sphere(1, spiritSpheres);}
                                         end;
                                 262:  //Absorb Spirits
-                                        if spiritSpheres <> 0 then begin
-                                                spiritSpheres := spiritSpheres - 1;
+                                        if tc.spiritSpheres <> 0 then begin
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
                                                 tc.SP := (tc.SP + Skill[262].Data.Data2[Skill[262].Lv]);
                                                 if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                         end;
                                 268:   //Steel Body
-                                                if spiritSpheres = 5 then begin
+                                                if tc.spiritSpheres = 5 then begin
                                                         tc1 := tc;
                                                         ProcessType := 3;
-                                                        spiritSpheres := spiritSpheres - 5;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        tc.spiritSpheres := tc.spiritSpheres - 5;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 end else begin
                                                   exit;  // Colus - This ability must have 5 spheres!
                                                 end;
                                  270:   //Explosion Spirits
 
-                                                if spiritSpheres = 5 then begin
+                                                if tc.spiritSpheres = 5 then begin
                                                         tc1 := tc;
                                                         ProcessType := 3;
-                                                        spiritSpheres := spiritSpheres - 5;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        tc.spiritSpheres := tc.spiritSpheres - 5;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 end else begin
                                                         exit;
                                                 end;
@@ -8157,7 +8157,7 @@ begin
                                         end;
                                         end;
                                 264:   {Body Relocation}
-                               if spiritSpheres <> 0 then begin
+                               if tc.spiritSpheres <> 0 then begin
 						//ÉpÉPëóêM
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
@@ -8165,8 +8165,8 @@ begin
 						WFIFOL( 6, ts.ID);
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
-                                                spiritSpheres := spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 						SendBCmd(tm, ts.Point, 15);
 
 						if tc.Skill[264].EffectLV > 1 then begin
@@ -8493,17 +8493,17 @@ begin
                                                 tc1.MTick := Tick + Skill[269].Data.Data1[MUseLV] * 1000;
                                         end;
                                 270:   //Explosion Spirits
-                                       if spiritSpheres = 5 then begin
+                                       if tc.spiritSpheres = 5 then begin
                                                 tc1 := tc;
                                                 ProcessType := 3;
-                                                spiritSpheres := spiritSpheres - 5;
+                                                tc.spiritSpheres := tc.spiritSpheres - 5;
                                         end;
 
                                 271:    {Extremity Fist}
                                 begin
                                                 if tc.Skill[270].Tick > Tick then begin
                                                         processtype := 255;
-                                                        if spiritSpheres = 5 then begin
+                                                        if tc.spiritSpheres = 5 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
                                                         dmg[0] := dmg[0] *(8 + tc.SP div 100) + 250 + (tc.Skill[271].Lv * 150);
@@ -8532,8 +8532,8 @@ begin
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                         tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
-                                                        spiritSpheres := spiritSpheres - 5;
-                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        tc.spiritSpheres := tc.spiritSpheres - 5;
+                                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
                                                         {20031223, Colus: Cancel Explosion Spirits after Ashura
                                                          Ashura's tick will control SP lockout time}
@@ -8548,7 +8548,7 @@ begin
                                 end;
                                 
                                 266:  //Investigate
-                                                if spiritSpheres <> 0 then begin
+                                                if tc.spiritSpheres <> 0 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                                         if dmg[0] < 1 then begin
                                                         dmg[0] := 1;
@@ -8562,11 +8562,11 @@ begin
                                                                         if MSkill = 266 then begin
                                                                         tc.MTick := Tick + 1000;
                                                                         end;
-                                                spiritSpheres := spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 end;
                                 267:  //Finger Offensive
-                                                if spiritSpheres >= tc.MUseLV then begin
+                                                if tc.spiritSpheres >= tc.MUseLV then begin
 						        //É_ÉÅÅ[ÉWéZè
 						        DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
 						        if dmg[0] < 1 then begin
@@ -8580,8 +8580,8 @@ begin
 						                SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
 						                DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                                 tc.MTick := Tick + 1000;
-                                                spiritSpheres := spiritSpheres - tc.MUseLV;
-                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                tc.spiritSpheres := tc.spiritSpheres - tc.MUseLV;
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                                 end;
                                 273:  //Combo Finish
                                         if Skill[272].Tick > Tick then begin
@@ -12971,7 +12971,7 @@ begin
 							end;
              261:    {Call Spirits}
               begin
-                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
               end;
 					end;
 					//ÉAÉCÉRÉìï\é¶âèú

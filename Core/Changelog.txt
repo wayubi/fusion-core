@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Updated spirit sphere usage and display [Colus]
+- 01-22-04: Fixed bug #208 for scripts as well [Colus]
 - 01-22-04: Fixed problem with #warp (bug #208) [Colus]
 - 01-21-04: Updated Graphics for Chemical protection Alchemist -[Oatmeal]
 - 01-21-04: Added steal coin graphics when success-[Oatmeal]

@@ -590,8 +590,7 @@ begin
           end;
 
           // Colus, 20040118: Update Spirit Spheres for monks
-          // TODO: Get spiritSpheres into tc and not a main variable
-          //if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, spiritSpheres);
+          if (tc.spiritSpheres > 0) then UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
           
           {if (mi.noDay = true) {or (tc.noDay = true) then begin
                 WFIFOW(0, $0119);
@@ -858,15 +857,16 @@ end;
 							Val(sl.Strings[2], j, k);
 							if k <> 0 then continue;
 							//マップ存在チェック
-							if MapList.IndexOf(sl.Strings[0]) = -1 then continue;
+              // Colus, 20040122: Lower-case to prevent problems with 'Prontera' mapname
+							if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then continue;
 							//座標チェック
-							ta := MapList.Objects[MapList.IndexOf(sl.Strings[0])] as TMapList;
+							ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
 							if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
 							//ワープ開始
 							if (tc.Hidden = false) then SendCLeave(tc, 2);
-							tc.tmpMap := sl.Strings[0];
+							tc.tmpMap := LowerCase(sl.Strings[0]);
 							tc.Point := Point(i,j);
-							MapMove(Socket, sl.Strings[0], Point(i,j));
+							MapMove(Socket, LowerCase(sl.Strings[0]), Point(i,j));
 
 						finally
 							sl.Free();
