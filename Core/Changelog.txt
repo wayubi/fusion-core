@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-26-04: Fixed #924 - Double Strafe doubling damage each fatal kill on PVP. [AlexKreuz]
 - 06-25-04: Uncapped ASPD to 199. [AlexKreuz]
 - 06-25-04: Uncapped #changestat to max 32767. [AlexKreuz]
 - 06-25-04: Uncapped #jlevel to max 32767. [AlexKreuz]

@@ -628,6 +628,9 @@ uses
     begin
         SKILL_TYPE := 3;
 
+        { Alex: We need to reset this to standard damage to prevent doubling. }
+        dmg[0] := dmg[0] div 2;
+
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tl := tc.Skill[tc.MSkill].Data;
 
