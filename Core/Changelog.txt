@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Fixed Adrenaline Rush Effect doesn't wear off with weapon change. [AlexKreuz]
+- 01-22-04: Fixed Spear Quicken Effect doesn't wear off with weapon change. [AlexKreuz]
 - 01-22-04: Fixed 2HQ Effect doesn't wear off with weapon change. [AlexKreuz]
 - 01-22-04: Fixed NPC Jobchange didn't reset options bug. [AlexKreuz]
 - 01-22-04: Added hidden warp support [Colus]

@@ -2222,8 +2222,15 @@ begin
                     SkillTick := Tick;
                 end;
 
-                if (Skill[111].Tick > Tick) and (tc.Weapon <> (6 or 7)) then Skill[111].Tick := Tick;
-                if (Skill[258].Tick > Tick) and (tc.Weapon <> (4 or 5)) then Skill[258].Tick := Tick;
+                if (Skill[111].Tick > Tick) and (tc.Weapon <> (6 or 7)) then begin
+                    Skill[111].Tick := Tick;
+                    SkillTick := Tick;
+                end;
+
+                if (Skill[258].Tick > Tick) and (tc.Weapon <> (4 or 5)) then begin
+                    Skill[258].Tick := Tick;
+                    SkillTick := Tick;
+                end;
 
 
         if ((Option and 32) <> 0) then begin
