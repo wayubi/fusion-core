@@ -1224,6 +1224,7 @@ end;
 //------------------------------------------------------------------------------
 procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
 var
+  i1,j1,k1:integer;
   tn:TNPC;
   tn1:TNPC;
   tpe:TPet;
@@ -1231,24 +1232,53 @@ var
   Tick:cardinal;
   xy:TPoint;
   Damage:integer;
+  ts1:TMob;
 
 begin
-  // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
-  // Hammer Fall on enemy when Master is attacking
+  sl := TStringList.Create;
   tn := tc.PetNPC;
   tpe := tc.PetData;
   Tick := timeGetTime();
   if tpe.Accessory > 0 then begin
+    //Ork Warrior Attack (ignores Defense)
+    if tpe.JID = 1023 then begin
+      if Random(10000) < (tpe.Relation) then begin
+        dmg[0] := 100;
+        PetDamageProcess(tm, ts, tc, dmg[0], Tick);
+        SendPetSkillAttack(tm, tc, ts, Tick, 158);
+      end;
+    end;
+    //Munak Attack (undead)
+    if tpe.JID = 1026 then begin
+      if Random(10000) < (tpe.Relation) then begin
+        dmg[0] := 444;
+        dmg[0] := dmg[0] * (ElementTable[7][ts.Element] div 100);
+        if dmg[0] < 0 then dmg[0] := 0;
+        PetDamageProcess(tm, ts, tc, dmg[0], Tick);
+        SendPetSkillAttack(tm, tc, ts, Tick, 190);
+      end;
+    end;
+    //Hunter Fly Wind Attack
     if tpe.JID = 1035 then begin
       if Random(10000) < (tpe.Relation) then begin
         dmg[0] := 444;
-        //dmg[0] := dmg[0] * (2 * (ElementTable[4][ts.Element] div 100));
-        if Damage < 0 then Damage := 0;
+        dmg[0] := dmg[0] * (ElementTable[4][ts.Element] div 100);
+        if dmg[0] < 0 then dmg[0] := 0;
         PetDamageProcess(tm, ts, tc, dmg[0], Tick);
         SendPetSkillAttack(tm, tc, ts, Tick, 187);
       end;
     end;
+    //Poison Spore Attack
+    if tpe.JID = 1077 then begin
+      if Random(10000) < (tpe.Relation) then begin
+        if not Boolean(ts.Stat2 and 1) then
+        ts.HealthTick[0] := Tick + tc.aMotion
+        else ts.HealthTick[0] := ts.HealthTick[0] + 30000;
+      end;
+    end;
 
+    // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
+    // Hammer Fall on enemy when Master is attacking
     if (tpe.JID = 1110) and (tc.AData <> nil) then begin
       if Random(10000) < (tpe.Relation) then begin
         xy.X := ts.Point.X;
@@ -1289,6 +1319,55 @@ begin
         end else begin
           WFIFOB(14, 0);
           SendBCmd(tm, tn.Point, 15);
+        end;
+      end;
+      // Petit Heaven Drive: x% of casting Level 1 Heaven's Drive (MATK 500~600)
+      //(x = Intimacy Level/100)
+      if (tpe.JID = 1155) and (Random(10000) < tpe.Relation) then begin
+            xy.X := ts.Point.X;
+						xy.Y := ts.Point.Y;
+
+						sl.Clear;
+						for j1 := (xy.Y - tc.Skill[91].Data.Range2) div 8 to (xy.Y + tc.Skill[91].Data.Range2) div 8 do begin
+							for i1 := (xy.X - tc.Skill[91].Data.Range2) div 8 to (xy.X + tc.Skill[91].Data.Range2) div 8 do begin
+								for k1 := 0 to tm.Block[i1][j1].Mob.Count -1 do begin
+									ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+									if (abs(ts1.Point.X - xy.X) > tc.Skill[91].Data.Range2) or (abs(ts1.Point.Y - xy.Y) > tc.Skill[91].Data.Range2) then
+										Continue;
+									sl.AddObject(IntToStr(ts1.ID),ts1)
+								end;
+							end;
+						end;
+
+                                                //If Monster is in the Area
+						if sl.Count <> 0 then begin
+							for k1 := 0 to sl.Count -1 do begin
+								ts1 := sl.Objects[k1] as TMob;
+
+								//Caculate Damage
+								dmg[0] := 500 + Random(600 - 500 + 1) * tc.Skill[91].Data.Data1[1] div 100;
+								dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+								dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+								if dmg[0] < 1 then dmg[0] := 1;
+								dmg[0] := dmg[0] * ElementTable[tc.Skill[91].Data.Element][ts1.Element] div 100;
+								dmg[0] := dmg[0] * tc.Skill[91].Data.Data2[1];
+                if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+								if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+                //Send Attack
+                PetDamageProcess(tm, ts1, tc, dmg[0], Tick);
+                SendPetSkillAttack(tm, tc, ts1, Tick, 91);
+
+                //Send Graphic
+                WFIFOW( 0, $0117);
+                WFIFOW( 2, 91);
+			          WFIFOL( 4, tn.ID);
+			          WFIFOW( 8, 1);
+			          WFIFOW(10, ts.Point.X);
+                WFIFOW(12, ts.Point.Y);
+			          WFIFOL(14, 1);
+			          SendBCmd(tm, xy, 18);
+
+							end;
         end;
       end;
     end;
@@ -1621,6 +1700,7 @@ begin
 	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
 	SendBCmd(tm, ts.Point, 33);
 end;
+//------------------------------------------------------------------------------
 
 end.
 
