@@ -545,8 +545,10 @@ begin
 						case tn.Script[tc.ScriptStep].Data3[0] of
 						0:
                                                     begin
-                                                    tc.Option := (tc.Option and $F877) or $0008;
-                                                    SendCart(tc);
+                                                      if (tc.Option <> 8) then begin
+                                                        tc.Option := (tc.Option and $F877) or $0008;
+                                                        SendCart(tc);
+                                                      end;
                                                     end; //ÉJÅ[Ég1
 						1: tc.Option := tc.Option or $0010; //ÇΩÇ©
 						2: tc.Option := tc.Option or $0020; //ÇÿÇ±
