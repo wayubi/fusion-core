@@ -1158,6 +1158,42 @@ end;
 
 						end;
 
+
+        end else if (Copy(str, 1, 6) = 'where ') and (tid.BroadCast = 1) then begin
+            s := Copy(str, 7, 256);
+            if s = '' then begin
+              //Location of self
+              str := tc.Name + ' located at: ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
+              w := Length(str) + 4;
+              WFIFOW (0, $009a);
+              WFIFOW (2, w);
+              WFIFOS (4, str, w - 4);
+              tc.socket.sendbuf(buf, w);
+            end else if CharaName.IndexOf(s) <> -1 then begin
+              tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
+              if tc1.Login <> 2 then begin
+                str := tc1.Name + ' is not logged in!';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc1.socket.sendbuf(buf, w);
+              end else begin
+                str := tc1.Name + ' located at: ' + tc1.Map + ' (' + IntToStr(tc1.Point.X) + ',' + IntToStr(tc1.Point.Y) + ')';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc1.socket.sendbuf(buf, w);
+              end;
+            end else begin
+              str := 'Couldnt find player: ' + s;
+              w := Length(str) + 4;
+              WFIFOW (0, $009a);
+              WFIFOW (2, w);
+              WFIFOS (4, str, w - 4);
+              tc.socket.sendbuf(buf, w);
+            end;
         { Mitch 01-29-2004: Revive goes under "killdiealive" }
         end else if (Copy(str, 1, 7) = 'revive ') and ((DebugCMD and $0008) <> 0) and (tid.KillDieAlive = 1) then begin
             s := Copy(str, 8, 256);
