@@ -3,10 +3,11 @@ unit FusionSQL;
 interface
 
 uses
-        Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
+        Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils, SQLData;
 
         function MySQL_Query(sqlcmd: String) : Boolean;
         function Load_Accounts(userid: String; AID: cardinal = 0) : Boolean;
+        function Call_Characters(AID: cardinal) : Boolean;
 
 implementation
 
@@ -14,7 +15,6 @@ var
         SQLDataSet : TSQLDataSet;
         SQLConnection : TSQLConnection;
 
-{ Makes an SQL Connection - Parses SQL Commands }        
 function MySQL_Query(sqlcmd: String) : Boolean;
 begin
         Result := False;
@@ -83,6 +83,7 @@ begin
         sl := TStringList.Create;
         sl.QuoteChar := '"';
         sl.Delimiter := ',';
+        tp := TPlayer.Create;
 
         if AID = 0 then begin
                 if (PlayerName.IndexOf(userid) <> -1) then begin
@@ -152,6 +153,34 @@ begin
 
                 Result := True;
         end;
+end;
+
+function Call_Characters(AID: cardinal) : Boolean;
+var
+        i : integer;
+        tp : TPlayer;
+        query : string;
+begin
+        Result := False;
+
+        tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
+
+        query := 'SELECT GID, Name, CharaNumber FROM characters WHERE AID='+''''+inttostr(AID)+''''+' LIMIT 9';
+        if MySQL_Query(query) then begin
+                while not SQLDataSet.Eof do begin
+                        tp.CID[StrToInt(SQLDataSet.FieldValues['CharaNumber'])] := StrToInt(SQLDataSet.FieldValues['GID']);
+                        SQLDataSet.Next;
+                end;
+        end else begin
+                Exit;
+        end;
+
+        for i := 0 to 8 do begin
+                if (tp.CID[i] <> 0) then begin
+                        GetCharaData(tp.CID[i]); // This is the problem function
+                end;
+        end;
+        Result := True;
 end;
 
 end.

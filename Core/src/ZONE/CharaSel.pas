@@ -6,7 +6,7 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows, SysUtils, ScktComp, Common, SQLData;
+	Windows, SysUtils, ScktComp, Common, SQLData, FusionSQL;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -60,6 +60,24 @@ begin
 				RFIFOL(10, id2);
 				if Player.IndexOf(l) <> -1 then begin
 					tp := Player.IndexOfObject(l) as TPlayer;
+
+                                        // Character Loads should be in Character Select Area
+                                        // Speeds up login time, needed especially for SQL
+                                        if UseSQL then Call_Characters(tp.ID);
+                                        if tp.Login = 1 then begin
+                                                count := 0;
+                                                while count < 8 do begin
+                                                        if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
+                                                        WFIFOW(0, $0081);
+                                                        WFIFOB(2, 08);
+                                                        Socket.SendBuf(buf, 3);
+                                                        tp.Login := 0;
+                                                        tp.CData[count].Login := 0;
+                                                        end;
+                                                        inc(count);
+                                                end;
+                                        end;
+
 					//if tp.IP = Socket.RemoteAddress then begin
 					if (tp.LoginID1 = id1) and (tp.LoginID2 = id2) and (tp.LoginID1 <> 0) then begin
 						Socket.Data := tp;

@@ -70,24 +70,6 @@ begin
     end else
 
     if tp.Pass = userpass then begin
-    if UseSQL then
-		  GetAccCharaData(tp.ID); // 取得帐号的人物资料
-        if tp.Login = 1 then begin
-            count := 0;
-
-            while count < 8 do begin
-                if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
-                    WFIFOW(0, $0081);
-                    WFIFOB(2, 08);
-                    Socket.SendBuf(buf, 3); // AlexKreuz: Fix Double Login Crash
-                    //DebugOut.Lines.Add('Double Login.');
-                    tp.Login := 0; // AlexKreuz
-                    tp.CData[count].Login := 0; // AlexKreuz
-                    //tp.CData[count] := nil;
-                end;
-                inc(count);
-            end;
-        end;
 
         tp.IP := Socket.RemoteAddress;
         tp.Login := 1;
@@ -263,7 +245,6 @@ begin
 			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then begin
-			  //WILLDELETEif GetPlayerData(userid) then begin
                           if Load_Accounts(userid) then begin
           sv1PacketProcessSub(Socket,w,userid,userpass);
 			  end else begin

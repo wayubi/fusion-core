@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-03-04: Optimized Login Code. Faster Logins needed for SQL Timeout. [AlexKreuz]
+- 03-03-04: FusionSQL -> Created Call_Characters Function. [AlexKreuz]
 - 03-03-04: FusionSQL -> Created Load_Accounts Function. [AlexKreuz]
 - 03-01-04: Added Sage Skill Dispel. [Darkhelmet]
 - 02-29-04: Removed Perfect Hide, Monsters aggressive again, Code Error on my part. [Darkhelmet]
