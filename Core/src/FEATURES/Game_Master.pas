@@ -3877,37 +3877,55 @@ Called when we're shutting down the server *only*
 
     function command_athena_where(tc : TChara; str : String) : String;
     var
-        sl : TStringList;
-        str2 : String;
+        s : String;
         tc1 : TChara;
         i, w : Integer;
     begin
         Result := 'GM_ATHENA_WHERE Failure.';
-        sl := tstringlist.Create;
-        sl.DelimitedText := str;
 
-        if sl.count < 2 then Exit;
+        s := Copy(str, 7, 256);
+        s := Trim(s);
 
-        str2 := '';
-        for i := 1 to (sl.Count - 1) do begin
-            str2 := str2 + ' ' + sl.Strings[i];
-        end;
-        str2 := Trim(str2);
+        if s = '' then s := tc.Name;
+        if (CharaName.IndexOf(s) <> -1) then begin
+            tc1 := charaname.objects[charaname.indexof(s)] as tchara;
+            if tc1.Login = 2 then begin
+                str := tc1.Name + ': ' + tc1.map + '.gat (' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y) + ')';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
 
-        if (CharaName.Indexof(str2) <> -1) then begin
-            tc1 := charaname.objects[charaname.indexof(str2)] as tchara;
-            str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
-
+                Result := 'GM_ATHENA_WHERE Success.';
+            end else begin
+                str := 'Character not found.';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+                str := '@where failed.';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+            end;
+        end else begin
+            str := 'Character not found.';
             w := Length(str) + 4;
             WFIFOW (0, $009a);
             WFIFOW (2, w);
             WFIFOS (4, str, w - 4);
             tc.socket.sendbuf(buf, w);
-
-            Result := 'GM_ATHENA_WHERE Success.';
+            str := '@where failed.';
+            w := Length(str) + 4;
+            WFIFOW (0, $009a);
+            WFIFOW (2, w);
+            WFIFOS (4, str, w - 4);
+            tc.socket.sendbuf(buf, w);
         end;
-
-        sl.Free;
     end;
 
     function command_athena_rura(tc : TChara; str : String) : String;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-15-04: Made some changes to @where. [Trihan]
 - 10-15-04: REED: Restructured Guild saving (1/2). [AlexKreuz]
 - 10-15-04: Uncommented packet debugs from game.pas -- Pay attention when committing. [AlexKreuz]
 - 10-14-04: Added @whomap, @whomap2 and @whomap3. [Trihan]
