@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-29-04: Attempting to load nonexistant AF2 map caused crash. [AlexKreuz]
+- 08-29-04: Fixed memory leak in AF2 loading procedure. [AlexKreuz]
 - 08-29-04: REED: Added intelligent error reporting for corrupted databases. [AlexKreuz]
 - 08-28-04: Added the damage division to Grand Cross Skill. [BieL®]
 - 08-28-04: Added message to Grand Cross Skill, when you don't stay near a monster. [BieL®]

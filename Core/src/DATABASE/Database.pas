@@ -465,15 +465,17 @@ begin
     if FileExists(AppPath + 'UnzDll.dll') then begin
 
 	    if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
+            afm_compressed := tzip.create(afm_compressed);
 	    	repeat
     			CreateDir('map\tmpFiles');
-			    afm_compressed := tzip.create(afm_compressed);
 		    	afm_compressed.Filename := AppPath+'map\'+sr.Name;
 	    		afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
     			afm_compressed.Extract;
 
 	    		sr.Name := StringReplace(sr.Name, '.af2', '.out',
     				[rfReplaceAll, rfIgnoreCase]);
+
+                if not FileExists(AppPath + 'map\tmpFiles\' + sr.Name) then Continue;
 
 	    		assignfile(afm,AppPath + 'map\tmpFiles\' + sr.Name);
     			Reset(afm);
