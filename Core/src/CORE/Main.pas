@@ -13560,13 +13560,15 @@ var
         ta: TMapList;
         str: string;
         sl: TStringList;
-
+label ExitParse;
 begin
 
         if Copy(Edit1.Text, 1, 1) = '-' then begin
 
                 sl := TStringList.Create;
                 sl.DelimitedText := Copy(Edit1.Text, 2, 256);
+
+                if sl.Count = 0 then goto ExitParse;
 
                 if sl.Strings[0] = 'users' then begin
                 // Displays List of Online Users
@@ -13693,12 +13695,6 @@ begin
                 else if str = '-unban' then begin
                 // Unbans IP Address [global]
                 // Syntax: -unban ip.addresss
-
-                end
-
-                else if str = '-save' then begin
-                // Saves Data
-                // Syntax: -save
 
                 end
 
@@ -14117,6 +14113,8 @@ begin
                 // Syntax: -move chara_name map_name x_coord y_coord
 
                 end;
+
+ExitParse:
 
                 sl.free();
         end
