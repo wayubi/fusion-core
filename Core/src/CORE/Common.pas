@@ -3940,8 +3940,13 @@ begin
 	WFIFOW(14, tc.JID);
 	WFIFOW(16, tc.Hair);
 	WFIFOW(18, tc.WeaponSprite[0]); // Weapon->WeaponSprite[0];
-	WFIFOW(20, tc.WeaponSprite[1]); // Head3->WeaponSprite[1];
-	WFIFOW(22, tc.Head3); // Shield -> Head3
+
+	//WFIFOW(20, tc.WeaponSprite[1]); // Head3->WeaponSprite[1];
+	//WFIFOW(22, tc.Head3); // Shield -> Head3
+
+    WFIFOW(20, tc.Head3); // Shield -> Head3
+    WFIFOW(22, tc.WeaponSprite[1]); // Head3->WeaponSprite[1];
+
 	WFIFOW(24, tc.Head1);
 	WFIFOW(26, tc.Head2);
 	WFIFOW(28, tc.HairColor);
@@ -4048,9 +4053,15 @@ begin
 	WFIFOW(14, tc.JID);
 	WFIFOW(16, tc.Hair);
 	WFIFOW(18, tc.WeaponSprite[0]);  // Weapon->WeaponSprite[0]
-	WFIFOW(20, tc.WeaponSprite[1]); //Head3->WeaponSprite[1]
-	WFIFOW(22, tc.Head3); // time -> Shield
-	WFIFOL(24, timeGetTime()); // Shield -> time
+
+	//WFIFOW(20, tc.WeaponSprite[1]); //Head3->WeaponSprite[1]
+	//WFIFOW(22, tc.Head3); // time -> Shield
+	//WFIFOL(24, timeGetTime()); // Shield -> time
+
+	WFIFOW(20, tc.Head3); // time -> Shield
+	WFIFOL(22, timeGetTime()); // Shield -> time
+    WFIFOW(26, tc.WeaponSprite[1]); //Head3->WeaponSprite[1]
+
 	WFIFOW(28, tc.Head1);
 	WFIFOW(30, tc.Head2);
 	WFIFOW(32, tc.HairColor);
