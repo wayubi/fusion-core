@@ -7047,44 +7047,75 @@ begin
 
 
 			case tc.MSkill of
-                                //Assassain Skills
-                                139: //Poison React
-                                        begin
-                                                tc1 := tc;
-                                                ProcessType := 3;
-                                                MTick := Tick + 100;
-                                        end;
-                                //Alchemist Skills
-                                231:  //Potion Pitcher
-                                begin
-                                              j := SearchCInventory(tc, 501, false);
-                                              if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+        //Assassin Skills
+        139: //Poison React
+          begin
+            tc1 := tc;
+            ProcessType := 3;
+            MTick := Tick + 100;
+          end;
 
-                                                UseItem(tc, j);
-                                                
-                                                if (tc1.Sit <> 1) then begin
-                                                k := 501;
-                                                td := ItemDB.IndexOfObject(k) as TItemDB;
-						dmg[0] := ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;
-						tc1.HP := tc1.HP + dmg[0];
-						        if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
-                                                        SendCStat1(tc1, 0, 5, tc1.HP);
-						        ProcessType := 0;
-						        tc.MTick := Tick + 1000;
-                                                        WFIFOW( 0, $013d);
-						        WFIFOW( 2, $0005);
-						        WFIFOW( 4, dmg[0]);
-						        Socket.SendBuf(buf, 6);
-						        WFIFOW( 0, $00b0);
-						        WFIFOW( 2, $0005);
-						        WFIFOL( 4, HP);
-						Socket.SendBuf(buf, 8);
-                                                        end else begin
-                                                        MMode :=4;
-                                                        Exit;
-                                                        end;
-					        end;
-                                              end;
+        //Alchemist Skills
+        231:  //Potion Pitcher
+          begin
+            j := SearchCInventory(tc, tc.Skill[231].Data.Data2[MUseLV], false);
+            if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+
+              UseItem(tc, j);
+
+              if (tc1.Sit <> 1) then begin
+                k := tc.Skill[231].Data.Data2[MUseLV];
+                td := ItemDB.IndexOfObject(k) as TItemDB;
+
+                {Colus, 20040116:
+                  Level 5 Potion Pitcher is a blue pot, not a green one.  Don't
+                  change this no matter what people claim. :)
+                  Also, using target's VIT/INT on this instead of alch's...it's definitely
+                  possible to get a 4K heal on a crusader with a white pot.
+                  }
+                if (td.SP1 <> 0) then begin
+									dmg[0] := ((td.SP1 + Random(td.SP2 - td.SP1 + 1)) * (100 + tc1.Param[3]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;
+                  if (tc.ID = tc1.ID) then dmg[0] := dmg[0] * tc.Skill[227].Data.Data1[tc.Skill[227].Lv] div 100;
+      						tc1.SP := tc1.SP + dmg[0];
+									if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+									SendCStat1(tc1, 0, 7, tc.SP);
+
+                  // Is there no way to show SP heal graphic on the target to others?
+                  // I guess there isn't one...oh, well.  SP recovery to self is done
+                  // with the SP recovery graphic.
+
+                  WFIFOW( 0, $013d);
+                  WFIFOW( 2, $0007);
+    						  WFIFOW( 4, dmg[0]);
+    						  tc1.Socket.SendBuf(buf, 6);
+
+                end else begin
+  						    dmg[0] := ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc1.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100 * (100 + tc1.Skill[4].Lv * 10) div 100;
+                  if (tc.ID = tc1.ID) then dmg[0] := dmg[0] * tc.Skill[227].Data.Data1[tc.Skill[227].Lv] div 100;
+      						tc1.HP := tc1.HP + dmg[0];
+  				        if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
+                  SendCStat1(tc1, 0, 5, tc1.HP);
+
+                  // Show heal graphics on target
+                  WFIFOW( 0, $011a);
+                  WFIFOW( 2, 28);  // We cheat and use the heal skill for the gfx
+                  WFIFOW( 4, dmg[0]);
+                  WFIFOL( 6, tc1.ID);
+                  WFIFOL(10, tc.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, tc1.Point, 15);
+
+                end;
+
+						    ProcessType := 0;
+						    tc.MTick := Tick + 500; // Delay after is .5s
+
+              end else begin
+                MMode := 4;
+                Exit;
+              end;
+            end;
+          end;
                                 //New skills ---- Crusader
                                 249: //Auto Gaurd
                                         begin
@@ -8061,33 +8092,67 @@ begin
                                   }
                                   //New skills ---- Alchemist
                                 231:  //Potion Pitcher
-                                begin
-                                              j := SearchCInventory(tc, 501, false);
-                                              if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-                                              
-                                                UseItem(tc, j);
+          begin
+            j := SearchCInventory(tc, tc.Skill[231].Data.Data2[MUseLV], false);
+            if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
 
-                                                if (tc1.Sit <> 1) then begin
-                                                k := 501;
-                                                td := ItemDB.IndexOfObject(k) as TItemDB;
-						dmg[0] := ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;
-						tc1.HP := tc1.HP + dmg[0];
-						        if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
-                                                        WFIFOW( 0, $011a);
-                                                        WFIFOW( 2, MSkill);
-                                                        WFIFOW( 4, dmg[0]);
-                                                        WFIFOL( 6, MTarget);
-                                                        WFIFOL(10, ID);
-                                                        WFIFOB(14, 1);
-                                                        SendCStat1(tc1, 0, 5, tc1.HP);
-						        ProcessType := 0;
-						        tc.MTick := Tick + 1000;
-                                                        end else begin
-                                                        MMode :=4;
-                                                        Exit;
-                                                        end;
-					        end;
-                                              end;
+              UseItem(tc, j);
+
+              if (tc1.Sit <> 1) then begin
+                k := tc.Skill[231].Data.Data2[MUseLV];
+                td := ItemDB.IndexOfObject(k) as TItemDB;
+
+
+                {Colus, 20040116:
+                  Level 5 Potion Pitcher is a blue pot, not a green one.  Don't
+                  change this no matter what people claim. :)
+                  Also, using target's VIT/INT on this instead of alch's...it's definitely
+                  possible to get a 4K heal on a crusader with a white pot.
+                  }
+                if (td.SP1 <> 0) then begin
+									dmg[0] := ((td.SP1 + Random(td.SP2 - td.SP1 + 1)) * (100 + tc1.Param[3]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;
+                  if (tc.ID = tc1.ID) then dmg[0] := dmg[0] * tc.Skill[227].Data.Data1[tc.Skill[227].Lv] div 100;
+      						tc1.SP := tc1.SP + dmg[0];
+									if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+									SendCStat1(tc1, 0, 7, tc.SP);
+
+                  // Is there no way to show SP heal graphic on the target to others?
+                  // I guess there isn't one...oh, well.  SP recovery to self is done
+                  // with the SP recovery graphic.
+
+
+                  WFIFOW( 0, $013d);
+                  WFIFOW( 2, $0007);
+    						  WFIFOW( 4, dmg[0]);
+    						  tc1.Socket.SendBuf(buf, 6);
+
+                end else begin
+  						    dmg[0] := ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc1.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100 * (100 + tc1.Skill[4].Lv * 10) div 100;
+                  if (tc.ID = tc1.ID) then dmg[0] := dmg[0] * tc.Skill[227].Data.Data1[tc.Skill[227].Lv] div 100;
+      						tc1.HP := tc1.HP + dmg[0];
+  				        if tc1.HP > tc1.MAXHP then tc1.HP := tc1.MAXHP;
+                  SendCStat1(tc1, 0, 5, tc1.HP);
+
+                  // Show heal graphics on target
+                  WFIFOW( 0, $011a);
+                  WFIFOW( 2, 28);    // We cheat and use the heal skill for the gfx
+                  WFIFOW( 4, dmg[0]);
+                  WFIFOL( 6, tc1.ID);
+                  WFIFOL(10, tc.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, tc1.Point, 15);
+
+                end;
+
+						    ProcessType := 0;
+						    tc.MTick := Tick + 500; // Delay after is .5s
+
+              end else begin
+                MMode := 4;
+                Exit;
+              end;
+            end;
+          end;
                                 234:  //Chemical Protection --- Weapon
                                         begin
                                                 tc1 := tc;
