@@ -1795,6 +1795,14 @@ end;
                 WFIFOS (4, str, w - 4);
                 tc.socket.sendbuf(buf, w);
                 continue;
+              end else if (sl.strings[2] <> '1') and (sl.strings[2] <> '0') then begin
+                str := 'Gender can only be: 1 - Male, or 2 - Female.';
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+                continue;
               end;
               tp := TPlayer.Create;
               tp.ID := 110000 + PlayerName.Count;
