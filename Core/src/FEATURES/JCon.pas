@@ -269,6 +269,7 @@ uses
         frmMain.ComboBox17.ItemIndex := abs(StrToInt(BoolToStr(EnableLowerClassDyes)));
 
         frmMain.ComboBox21.ItemIndex := abs(StrToInt(BoolToStr(Option_Use_UPnP)));
+        frmMain.ComboBox22.ItemIndex := abs(StrToInt(BoolToStr(Option_Enable_WAC)));
     end;
 
 
@@ -342,13 +343,13 @@ uses
                 destroy_upnp(sv1port);
                 destroy_upnp(sv2port);
                 destroy_upnp(sv3port);
+                destroy_upnp(wacport);
             end;
         end;
 
-        if (Option_Enable_WAC) then begin
-            destroy_wac();
-            create_wac();
-        end;
+        if (Option_Enable_WAC) then destroy_wac(true);
+        Option_Enable_WAC := StrToBool(IntToStr(abs(frmMain.ComboBox22.ItemIndex)));
+        if (Option_Enable_WAC) then create_wac();
 
         UseSQL := StrToBool(IntToStr(abs(frmMain.ComboBox1.ItemIndex)));
         DBHost := frmMain.Edit24.Text;

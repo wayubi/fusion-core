@@ -831,9 +831,13 @@ uses
         ports : Variant;
     begin
         if not (LAN_IP = '127.0.0.1') then begin
-            nat := CreateOleObject('HNetCfg.NATUPnP');
-            ports := nat.StaticPortMappingCollection;
-            ports.Remove(port, 'TCP');
+            try
+                nat := CreateOleObject('HNetCfg.NATUPnP');
+                ports := nat.StaticPortMappingCollection;
+                ports.Remove(port, 'TCP');
+            except
+                ShowMessage('An Error occured while trying to remove the UPnP Ports. If you have a router with UPnP enabled, please check the Internet Gateway to make sure the Fusion ports are closed. Make sure to disable UPnP if your router does not support it.');
+            end;
         end;
     end;
 

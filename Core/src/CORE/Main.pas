@@ -354,6 +354,8 @@ type
     ListBox9: TListBox;
     Label137: TLabel;
     ComboBox21: TComboBox;
+    Label139: TLabel;
+    ComboBox22: TComboBox;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -558,7 +560,7 @@ begin
 
     ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
     ini.ReadSectionValues('Version', sl);
-        if not (sl.Values['VER'] = '1.212 R - R.E.E.D Beta 3 Release') then begin
+        if not (sl.Values['VER'] = '1.212 S - R.E.E.D Beta 3 Release') then begin
             DeleteFile(AppPath + 'weiss.ini');
         end;
     ini.Free;
@@ -978,6 +980,11 @@ begin
         create_upnp(sv3port, 'Fusion Game Zone');
     end;
 
+    if (Option_Enable_WAC) then begin
+        create_wac();
+        EnableWebAccountCreator1.Caption := 'Disable Web Account Creator';
+    end;
+
     if sl.IndexOfName('Option_Minimize_Tray') > -1 then begin
         try
             Option_Minimize_Tray := StrToBool(sl.Values['Option_Minimize_Tray']);
@@ -1251,10 +1258,7 @@ begin
 
 
     if (Option_Enable_ISCS) then frmMain.ConnecttoISCS1Click(self);
-    if (Option_Enable_WAC) then begin
-        create_wac();
-        EnableWebAccountCreator1.Caption := 'Disable Web Account Creator';
-    end;
+
 
 {U0x003bÉRÉRÇ‹Ç≈}
 end;

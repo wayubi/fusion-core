@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 250
-  Top = 187
+  Left = 325
+  Top = 248
   Width = 608
   Height = 368
   Caption = 's'
@@ -49,8 +49,6 @@ object frmMain: TfrmMain
     Height = 300
     ActivePage = TabSheet1
     Align = alClient
-    Constraints.MaxHeight = 300
-    Constraints.MaxWidth = 600
     Constraints.MinHeight = 300
     Constraints.MinWidth = 600
     Font.Charset = DEFAULT_CHARSET
@@ -347,11 +345,18 @@ object frmMain: TfrmMain
             Caption = 'W.A.C. Port'
           end
           object Label137: TLabel
-            Left = 148
-            Top = 200
+            Left = 12
+            Top = 152
             Width = 69
             Height = 18
             Caption = 'Enable UPnP'
+          end
+          object Label139: TLabel
+            Left = 148
+            Top = 200
+            Width = 64
+            Height = 18
+            Caption = 'Enable WAC'
           end
           object Edit17: TEdit
             Left = 12
@@ -569,12 +574,23 @@ object frmMain: TfrmMain
             TabOrder = 11
           end
           object ComboBox21: TComboBox
+            Left = 12
+            Top = 168
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 24
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox22: TComboBox
             Left = 148
             Top = 216
             Width = 121
             Height = 26
             ItemHeight = 18
-            TabOrder = 24
+            TabOrder = 25
             Items.Strings = (
               'No'
               'Yes')
