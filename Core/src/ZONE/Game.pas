@@ -3083,84 +3083,87 @@ end;
 		//--------------------------------------------------------------------------
 		$0113: //ターゲット指定or瞬時発動スキル
 			begin
-        // OK, you have to know what you're trying to cast first.  Is it
-        // Cast Cancel?
+            	// OK, you have to know what you're trying to cast first.  Is it
+                // Cast Cancel?
 
-        RFIFOW(4, w);
+                RFIFOW(4, w);
+                //if ((tc.MMode <> 0) and (tc.MSkill <> 275)) then continue;   // <- Leave that in!
+                //if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
 
-        //if ((tc.MMode <> 0) and (tc.MSkill <> 275)) then continue;   // <- Leave that in!
-        //if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
+                if (((tc.MMode <> 0) and (w <> 275)) or ((tc.MMode = 0) and ((tc.MTick > timeGetTime()) or (w = 275))) ) then continue;
+                {チャットルーム機能追加}
 
-				if (((tc.MMode <> 0) and (w <> 275)) or
-            ((tc.MMode = 0) and ((tc.MTick > timeGetTime()) or (w = 275))) ) then continue;
-{チャットルーム機能追加}
-				//入室中のスキル使用無効
-				if (tc.ChatRoomID <> 0) then continue;
-{チャットルーム機能追加ココまで}
-{露店スキル追加}
-				//露店中のスキル使用無効
+                //入室中のスキル使用無効
+                if (tc.ChatRoomID <> 0) then continue;
+                {チャットルーム機能追加ココまで}
+                {露店スキル追加}
+
+                //露店中のスキル使用無効
 				if (tc.VenderID <> 0) then continue;
-{露店スキル追加ココまで}
+                {露店スキル追加ココまで}
 
+                // Now we need to save the previous spell off somewhere to pick it up
+                // when we actually perform the Cast Cancel effect.
+                if (w = 275) then begin
+                	tc.Skill[275].Effect1 := tc.MSkill;
+                    tc.Skill[275].EffectLV := tc.MUseLV;
+                end;
 
-        // Now we need to save the previous spell off somewhere to pick it up
-        // when we actually perform the Cast Cancel effect.
-        if (w = 275) then begin
-          tc.Skill[275].Effect1 := tc.MSkill;
-          tc.Skill[275].EffectLV := tc.MUseLV;
-        end;
+                RFIFOW(2, tc.MUseLV);
+                tc.MSkill := w; // We already read this above... RFIFOW(4, tc.MSkill);
+                RFIFOL(6, tc.MTarget);
+                tc.MPoint.X := 0;
+                tc.MPoint.Y := 0;
 
-				RFIFOW(2, tc.MUseLV);
-				tc.MSkill := w; // We already read this above... RFIFOW(4, tc.MSkill);
-				RFIFOL(6, tc.MTarget);
-				tc.MPoint.X := 0;
-				tc.MPoint.Y := 0;
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Skill:' + IntToStr(tc.MSkill));
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Level:' + IntToStr(tc.MUseLV));
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Target:' + IntToStr(tc.MTarget));
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mode:' + IntToStr(tc.MMode));
+                //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Item:' + IntToStr(tc.UseItemID));
 
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Skill:' + IntToStr(tc.MSkill));
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Level:' + IntToStr(tc.MUseLV));
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Target:' + IntToStr(tc.MTarget));
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Mode:' + IntToStr(tc.MMode));
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Use Item:' + IntToStr(tc.UseItemID));
+                if (tc.Sit <> 1) or (tc.MSkill = 143) then begin
+                	if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
+                    {NPCイベント追加}
 
-        if (tc.Sit <> 1) or (tc.MSkill = 143) then begin
-				if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
-{NPCイベント追加}
-				i := MapInfo.IndexOf(tc.Map);
-				j := -1;
-				if (i <> -1) then begin
-					mi := MapInfo.Objects[i] as MapTbl;
-					if ((mi.noTele = true) or (mi.noPortal = true) or (tc.Option and 6 <> 0)) then j := 0;
-				end;
-				if (tc.MSkill = 26) and (j = 0) then continue;
-{アジト機能追加ココまで}
-{Colus, 20040116: This whole section seems redundant...
-				RFIFOW(2, tc.MUseLV);
-				RFIFOW(4, tc.MSkill);
-				RFIFOL(6, tc.MTarget);
-				tc.MPoint.X := 0;
-				tc.MPoint.Y := 0;
+                    i := MapInfo.IndexOf(tc.Map);
+                    j := -1;
+                    if (i <> -1) then begin
+                    	mi := MapInfo.Objects[i] as MapTbl;
+                        if ((mi.noTele = true) or (mi.noPortal = true) or (tc.Option and 6 <> 0)) then j := 0;
+                    end;
 
-				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
-// Japanese comment: 'Begin agit consideration'
-				if (tc.MSkill = 26) and mi.noPortal then continue;
-// Japanese comment: 'Agit consideration ends here.'  We rolled this into the above checks.
-}
-{修正}	if (tc.ver2 = 9) and (tc.MUseLV > 30) then tc.MUseLV := tc.MUseLV - 30;
-				if ((tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0)) then begin
-					tk := tc.Skill[tc.MSkill];
-					tl := tc.Skill[tc.MSkill].Data;
+                    if (tc.MSkill = 26) and (j = 0) then continue;
+                    {アジト機能追加ココまで}
+                    {Colus, 20040116: This whole section seems redundant...
+                    RFIFOW(2, tc.MUseLV);
+                    RFIFOW(4, tc.MSkill);
+                    RFIFOL(6, tc.MTarget);
+                    tc.MPoint.X := 0;
+                    tc.MPoint.Y := 0;
 
-					k := UseTargetSkill(tc,timeGetTime());
-					if k <> 0 then SendSkillError(tc,k);
-        end else if (tc.ItemSkill) then begin
-          tk := tc.Skill[tc.MSkill];
-					tl := tc.Skill[tc.MSkill].Data;
+                    if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
+                    // Japanese comment: 'Begin agit consideration'
 
-					k := UseTargetSkill(tc,timeGetTime());
-					if k <> 0 then SendSkillError(tc,k);
-				end;
-        end;
-			end;
+                    if (tc.MSkill = 26) and mi.noPortal then continue;
+                    // Japanese comment: 'Agit consideration ends here.'  We rolled this into the above checks. }
+
+                    {修正}
+                    if (tc.ver2 = 9) and (tc.MUseLV > 30) then tc.MUseLV := tc.MUseLV - 30;
+
+                    if ((tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0)) then begin
+						tk := tc.Skill[tc.MSkill];
+                        tl := tc.Skill[tc.MSkill].Data;
+
+                        k := UseTargetSkill(tc,timeGetTime());
+                        if k <> 0 then SendSkillError(tc,k);
+                    end else if (tc.ItemSkill) then begin
+                    	tk := tc.Skill[tc.MSkill];
+                        tl := tc.Skill[tc.MSkill].Data;
+                        k := UseTargetSkill(tc,timeGetTime());
+                        if k <> 0 then SendSkillError(tc,k);
+                    end;
+                end;
+            end;
 		//--------------------------------------------------------------------------
 		$0116: //場所指定スキル
 			begin

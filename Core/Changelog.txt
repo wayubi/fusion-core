@@ -1,3 +1,5 @@
+- 06-05-04: Testing of PSS using SM_PROVOKE. [AlexKreuz]
+- 06-05-04: Creation of PSS, Partitioned Skill Structure. [AlexKreuz]
 - 06-05-04: Removed all Athena GM command ports. Will implement into ALBGM later. ALBGM completed. [AlexKreuz]
 - 06-05-04: Switched GM Command, #USERS to ALBGM system. [AlexKreuz]
 - 06-05-04: Switched GM Command, #PWORD to ALBGM system. [AlexKreuz]

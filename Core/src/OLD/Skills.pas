@@ -39,7 +39,7 @@ uses
 	{Delphi VCL Units}
 	Windows, Classes,
 	{Fusion Units}
-	Common, Skill_Constants,
+	Common, Skill_Constants, Player_Skills,
 	{3rd Party Units}
 	List32;
 
@@ -169,6 +169,14 @@ Begin
 	  	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl
     else exit;  //safe exit if map isn't found in mapinfo
 
+
+    	{ Alex: Holy Shit, here we go. This needs to be
+        called before any tests for target type are made
+        the reason being that one skill function should
+        be used for both types of targets. }
+        parse_skills(tc);
+
+
 		if MTargetType = 0 then begin //Target is a monster
 			ts := tc.AData;
 
@@ -221,9 +229,13 @@ Begin
 				//June 02, 2004 - Darkhelmet, I'm going to begin cleaning and organizing all these skills,
 				//wish me luck!
 
+
+
+				{ Alex: This is the test skill. We'll base the new structure
+                on this for now. So we'll disable this section. }
 				{Swordman Skills Player vs monster begin}
-				6:  {Provoke}
-					begin
+				{6:  {Provoke}
+					{begin
 						ts.ATarget := tc.ID;
 						ts.ARangeFlag := false;
 						ts.AData := tc;
@@ -241,7 +253,7 @@ Begin
 							WFIFOB(14, 0);
 						end;
 						SendBCmd(tm, ts.Point, 15);
-					end;
+					end;}
 				7:  {Magnum Break}
 					begin
 						//Calculate the Damage the Skill Does
@@ -2628,6 +2640,46 @@ Begin
 
 {TC1 BECOMES TARGET}
 
+
+
+
+
+
+
+
+
+
+
+
+
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+{ SKILL SPLIT }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		end else begin //MTargetType = 0
 			tc1 := tc.AData;
 			if tc1.NoTarget then begin
@@ -4753,8 +4805,11 @@ Begin
 						if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
 							frmMain.StatCalc2(tc, tc1, Tick);
 					end;
-			6: // PVP Provoke
-				begin
+
+            { Alex: This is the test skill. We'll base the new structure
+            on this for now. So we'll disable this section. }
+			{6: // PVP Provoke
+				{begin
 					frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 					tc1.ATarget := tc.ID;
 					tc1.AData := tc;
@@ -4768,7 +4823,7 @@ Begin
 					tc1.DamageFixS[1] := word(tl.Data1[MUseLV]); // ATK Increase upon the medium size to ease the pain.
 					tc1.DEF1 := word(tl.Data2[MUseLV]) * tc1.DEF1 div 100;
 					SendBCmd(tm, tc1.Point, 15);
-				end;
+				end;}
 			7: //MB、アローシャワー、グリム
 				begin
 					//ダメージ算出1
