@@ -196,7 +196,7 @@ begin
 		6: begin Inc(xy.X);           end;
 		7: begin Inc(xy.X);Inc(xy.Y); end;
 		end;
-		if (tm.gat[xy.X][xy.Y] and 1) = 0 then begin
+		if (tm.gat[xy.X][xy.Y] = 1) then begin
 			xy := xy1;
 			exit;
 		end;
