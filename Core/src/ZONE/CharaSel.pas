@@ -216,11 +216,20 @@ begin
 				end;
 				//名前が既に使われていないかチェック
 				str1 := RFIFOS(2, 24);
+				if UseSQL then begin
+				  if CheckUserExist(str1) then begin
+			  		WFIFOW(0, $006e);
+			  		WFIFOB(2, 0);
+			  		Socket.SendBuf(buf, 3);
+			  		exit;
+			  	end;
+				end else begin
 				if CharaName.IndexOf(str1) <> -1 then begin
 					WFIFOW(0, $006e);
 					WFIFOB(2, 0);
 					Socket.SendBuf(buf, 3);
 					exit;
+				end;
 				end;
 
 				//キャラデータ作成
