@@ -16,8 +16,14 @@ uses
 		procedure SQLDataSave();
 		function  GetPlayerData(userid: String) : Boolean; {取得帐号资料}
 		function  GetCharaData(AID: cardinal) : Boolean; {取得帐号的人物资料}
+		function  GetPetData(AID: cardinal) : Boolean; {取得帐号的宠物资料}
 		function  DeleteChar(GID: cardinal) : Boolean; {从数据库删除人物}
 		function  CheckUserExist(userid: String) : Boolean; {检查人物是否存在}
+		function  GetNowLoginID() : cardinal; {取得当前的帐号ID编号}
+		function  GetNowCharaID() : cardinal; {取得当前的人物ID编号}
+		function  GetNowPetID() : cardinal; {取得当前的宠物ID编号}
+		function  SavePetData(tpe : Tpet; PIndex: Integer; place: Integer) : Boolean; {保存宠物资料}
+		function  SaveGuildMPosition(tg: TGuild) : Boolean; {保存工会头衔资料}
 //==============================================================================
 
 implementation
@@ -121,7 +127,6 @@ var
 	sl  :TStringList;
 	tpa	:TParty;
   tgc :TCastle;
-	tpe :TPet;
 	tg  :TGuild;
 	tgb :TGBan;
 	tgl :TGRel;
@@ -373,48 +378,6 @@ begin
 	DebugOut.Lines.Add(Format('*** Total %d Guild(s) data loaded.', [GuildList.Count]));
 	Application.ProcessMessages;
 
-  {读取宠物资料}
-	DebugOut.Lines.Add('Pet data loading from SQL...');
-	Application.ProcessMessages;
-
-	if ExecuteSqlCmd('SELECT * FROM pet') then
-	begin
-	  while not SQLDataSet.Eof do
-    begin
-		  i := PetDB.IndexOf( StrToInt( SQLDataSet.FieldValues['PID'] ) );
-		  if i <> -1 then begin
-        tpe := TPet.Create;
-        with tpe do begin
-          PlayerID    := StrToInt( SQLDataSet.FieldValues['PlayerID'] );
-          CharaID     := StrToInt( SQLDataSet.FieldValues['CharaID'] );
-          Cart        := StrToInt( SQLDataSet.FieldValues['Cart'] );
-          Index       := StrToInt( SQLDataSet.FieldValues['PIndex'] );
-          Incubated   := StrToInt( SQLDataSet.FieldValues['Incubated'] );
-          PetID       := StrToInt( SQLDataSet.FieldValues['PID'] );
-          JID         := StrToInt( SQLDataSet.FieldValues['JID'] );
-          Name        :=           SQLDataSet.FieldValues['Name'];
-          Renamed     := StrToInt( SQLDataSet.FieldValues['Renamed'] );
-          LV          := StrToInt( SQLDataSet.FieldValues['LV'] );
-					Relation    := StrToInt( SQLDataSet.FieldValues['Relation'] );
-          Fullness    := StrToInt( SQLDataSet.FieldValues['Fullness'] );
-          Accessory   := StrToInt( SQLDataSet.FieldValues['Accessory'] );
-
-          Data        := PetDB.Objects[i] as TPetDB;
-        end;
-        PetList.AddObject( tpe.PetID, tpe );
-				if NowPetID <= tpe.PetID then NowPetID := tpe.PetID + 1;
-      end;
-
-	    SQLDataSet.Next;
-	  end;
-	end else begin
-	  DebugOut.Lines.Add('Pet data loading error...');
-		Exit;
-	end;
-  
-	DebugOut.Lines.Add( Format( '*** Total %d Pet(s) data loaded.', [PetList.Count] ) );
-	Application.ProcessMessages;
-
 	sl.Free;
 end;
 
@@ -477,7 +440,7 @@ begin
 
 	Application.ProcessMessages;
 
-	{保存人物资料 --删除人物时需要删除相应记录}
+	{保存人物资料}
 	if CharaName.Count <> 0 then begin
 	  for i := 0 to CharaName.Count - 1 do begin
 		  sl.Clear;
@@ -527,6 +490,7 @@ begin
         sl.Add(IntToStr(Plag));
         sl.Add(IntToStr(PLv));
         sl.Add(IntToStr(ID));
+				bindata := '';
 				bindata := 'GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
 				bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID';
 
@@ -534,7 +498,7 @@ begin
 				  DebugOut.Lines.Add('*** Save Character data error.');
 				end;
 
-				{保存技能资料 --删除人物时需要删除相应记录}
+				{保存技能资料}
 				bindata := '';
 				for j := 1 to 336 do begin
 				  if Skill[j].Lv <> 0 then begin
@@ -546,7 +510,7 @@ begin
 				  DebugOut.Lines.Add('*** Save Character Skill data error.');
 				end;
 
-				{保存人物身上物品资料 --删除人物时需要删除相应记录}
+				{保存人物身上物品资料}
 				bindata := '';
 			  for j := 1 to 100 do begin
 				  if Item[j].ID <> 0 then begin
@@ -566,7 +530,8 @@ begin
 				  DebugOut.Lines.Add('*** Save Character Item data error.');
 				end;
 
-				{保存人物手推车中物品的资料 --删除人物时需要删除相应记录}
+				{保存人物手推车中物品的资料}
+				bindata := '';
 			  for j := 1 to 100 do begin
 		  		if Cart.Item[j].ID <> 0 then begin
 					  bindata := bindata + IntToHex(Cart.Item[j].ID, 4);
@@ -648,7 +613,7 @@ begin
 
 	Application.ProcessMessages;
 
-	{保存组队资料 --唯一索引有问题，解散组队时需要删除相应的组队记录}
+	{保存组队资料 --解散组队时需要删除相应的组队记录}
   if PartyNameList.Count <> 0 then
 	begin
 	  for i := 0 to PartyNameList.Count - 1 do
@@ -708,14 +673,6 @@ begin
 					end;
 			  end;
 
-				{保存工会头衔资料 --唯一索引有问题，将会只记录一条}
-			  for j := 0 to 19 do begin
-				  if not ExecuteSqlCmd(Format('REPLACE INTO guildMPosition (GDID,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%s'',''%d'',''%s'',''%s'')', [ID, PosName[j], BoolToStr(PosInvite[j]), BoolToStr(PosPunish[j])])) then
-				  begin
-				    DebugOut.Lines.Add('*** Save Guild Position data error.');
-				  end;
-			  end;
-
 				{保存工会开除会员记录 --唯一索引有问题，将会只记录一条}
 			  for j := 0 to GuildBanList.Count - 1 do begin
 				  tgb := GuildBanList.Objects[j] as TGBan;
@@ -757,10 +714,7 @@ begin
           k := Card[2] + Card[3] * $10000;
           if PetList.IndexOf( k ) <> -1 then begin
             tpe := PetList.IndexOfObject( k ) as TPet;
-  		      if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''0'',''0'',''%d'',''0'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [k, tp.ID, j, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
-				    begin
-				      DebugOut.Lines.Add('*** Save Kafra Pet data error.');
-				    end;
+						SavePetData(tpe, j, 2);
 		      end;
         end;
       end;
@@ -778,10 +732,7 @@ begin
           k := Card[2] + Card[3] * $10000;
           if PetList.IndexOf( k ) <> -1 then begin
             tpe := PetList.IndexOfObject( k ) as TPet;
-  		      if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''0'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [k, tc.ID, tc.CID, j, Attr, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
-				    begin
-				      DebugOut.Lines.Add('*** Save Character Pet data error.');
-				    end;
+						SavePetData(tpe, j, 1);
 	        end;
         end;
       end;
@@ -793,10 +744,7 @@ begin
           k := Card[2] + Card[3] * $10000;
           if PetList.IndexOf( k ) <> -1 then begin
             tpe := PetList.IndexOfObject( k ) as TPet;
-  		      if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''1'',''%d'',''0'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [k, tc.ID, tc.CID, j, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
-				    begin
-				      DebugOut.Lines.Add('*** Save Cart Pet data error.');
-				    end;
+						SavePetData(tpe, j, 3);
           end;
         end;
       end;
@@ -888,7 +836,7 @@ end;
 function GetCharaData(AID: cardinal) : Boolean;
 var
   i,j,k,tmp  : Integer;
-	tc : TChara;
+	tc, tc2 : TChara;
 	ta : TMapList;
 	tp  :TPlayer;
 begin
@@ -905,12 +853,15 @@ begin
 				CID           := StrToInt(SQLDataSet.FieldValues['GID']);
 				Name          :=          SQLDataSet.FieldValues['Name'];
 				
-				if assigned(CharaName) then {如果该人物已经读入，就不用再读了}
+				if assigned(CharaName) then {如果该人物已经读入，并且正在游戏中，就不用再读了}
 				begin
 					if CharaName.IndexOf(Name) <> -1 then
 					begin
-					  SQLDataSet.Next;
-						continue;
+					  tc2 := CharaName.Objects[CharaName.IndexOf(Name)] as TChara;
+						if tc2.Login = 2 then begin
+					    SQLDataSet.Next;
+						  continue;
+						end;
 					end;
 				end;
 
@@ -983,7 +934,6 @@ begin
 				end;
 
 				if CID < 100001 then CID := CID + 100001;
-  			if CID >= NowCharaID then NowCharaID := CID + 1;
 
 				{检查地图是否存在}
 				if MapList.IndexOf(Map) = -1 then begin
@@ -1090,6 +1040,9 @@ begin
 	  DebugOut.Lines.Add(format('Get Character data from MySQL Error: %d', [AID]));
 		Exit;
 	end;
+
+	{读取宠物资料}
+	GetPetData(AID);
 end;
 
 //------------------------------------------------------------------------------
@@ -1148,6 +1101,194 @@ begin
 	end;
 	if SQLDataSet.FieldValues['count'] = 0 then
 	  Exit;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 取得帐号的宠物资料
+//------------------------------------------------------------------------------
+function  GetPetData(AID: cardinal) : Boolean;
+var
+  i   : Integer;
+  tpe : TPet;
+	tp  : TPlayer;
+	tc  : TChara;
+begin
+  Result := False;
+
+	DebugOut.Lines.Add(format('Load Character''s Pet Data From MySQL: PlayerID = %d', [AID]));
+
+	if ExecuteSqlCmd(Format('SELECT * FROM pet WHERE PlayerID=''%d''', [AID])) then begin
+	  while not SQLDataSet.Eof do
+    begin
+      i := PetDB.IndexOf( StrToInt( SQLDataSet.FieldValues['JID'] ) );
+		  if i <> -1 then begin
+        tpe := TPet.Create;
+        with tpe do begin
+          PlayerID    := StrToInt( SQLDataSet.FieldValues['PlayerID'] );
+          CharaID     := StrToInt( SQLDataSet.FieldValues['CharaID'] );
+          Cart        := StrToInt( SQLDataSet.FieldValues['Cart'] );
+          Index       := StrToInt( SQLDataSet.FieldValues['PIndex'] );
+          Incubated   := StrToInt( SQLDataSet.FieldValues['Incubated'] );
+          PetID       := StrToInt( SQLDataSet.FieldValues['PID'] );
+          JID         := StrToInt( SQLDataSet.FieldValues['JID'] );
+          Name        :=           SQLDataSet.FieldValues['Name'];
+          Renamed     := StrToInt( SQLDataSet.FieldValues['Renamed'] );
+          LV          := StrToInt( SQLDataSet.FieldValues['LV'] );
+					Relation    := StrToInt( SQLDataSet.FieldValues['Relation'] );
+          Fullness    := StrToInt( SQLDataSet.FieldValues['Fullness'] );
+          Accessory   := StrToInt( SQLDataSet.FieldValues['Accessory'] );
+
+          Data        := PetDB.Objects[i] as TPetDB;
+        end;
+        PetList.AddObject( tpe.PetID, tpe );
+
+        {把宠物资料对应到人物、帐号上}
+			  if tpe.PlayerID <> 0 then begin
+				  if tpe.CharaID = 0 then begin  // 在仓库里
+            tp := Player.IndexofObject( tpe.PlayerID ) as TPlayer;
+						with tp.Kafra.Item[ tpe.Index ] do begin
+							Attr    := 0;
+							Card[0] := $FF00;
+							Card[2] := tpe.PetID mod $10000;
+							Card[3] := tpe.PetID div $10000;
+						end;
+					end else begin
+						tc := Chara.IndexOfObject( tpe.CharaID ) as TChara;
+						if tpe.Cart = 0 then begin  // 在身上
+							with tc.Item[ tpe.Index ] do begin
+								Attr    := tpe.Incubated;
+								Card[0] := $FF00;
+								Card[2] := tpe.PetID mod $10000;
+								Card[3] := tpe.PetID div $10000;
+							end;
+						end else begin  // 在手推车里
+							with tc.Cart.Item[ tpe.Index ] do begin
+								Attr    := 0;
+								Card[0] := $FF00;
+								Card[2] := tpe.PetID mod $10000;
+								Card[3] := tpe.PetID div $10000;
+							end;
+						end;
+					end;
+		  	end;
+      end;
+
+			SQLDataSet.Next;
+		end;
+	end else begin
+	  DebugOut.Lines.Add('Pet data loading error...');
+		Exit;
+	end;
+end;
+
+//------------------------------------------------------------------------------
+// 取得当前的帐号ID编号
+//------------------------------------------------------------------------------
+function  GetNowLoginID() : cardinal;
+begin
+  Result := 100101;
+	if not ExecuteSqlCmd('SELECT AID FROM login ORDER BY AID DESC LIMIT 1') then begin
+		Exit;
+	end;
+  SQLDataSet.First;
+
+  if SQLDataSet.Eof then exit;
+
+	Result := StrToInt( SQLDataSet.FieldValues['AID'] ) + 1;
+end;
+//------------------------------------------------------------------------------
+// 取得当前的人物ID编号
+//------------------------------------------------------------------------------
+function  GetNowCharaID() : cardinal;
+begin
+  Result := 100001;
+	if not ExecuteSqlCmd('SELECT GID FROM Characters ORDER BY GID DESC LIMIT 1') then begin
+		Exit;
+	end;
+  SQLDataSet.First;
+
+  if SQLDataSet.Eof then exit;
+
+	Result := StrToInt( SQLDataSet.FieldValues['GID'] ) + 1;
+end;
+//------------------------------------------------------------------------------
+// 取得当前的宠物ID编号
+//------------------------------------------------------------------------------
+function  GetNowPetID() : cardinal;
+begin
+  Result := 1;
+	if not ExecuteSqlCmd('SELECT PID FROM pet ORDER BY PID DESC LIMIT 1') then begin
+		Exit;
+	end;
+  SQLDataSet.First;
+
+  if SQLDataSet.Eof then exit;
+
+	Result := StrToInt( SQLDataSet.FieldValues['PID'] ) + 1;
+end;
+
+//------------------------------------------------------------------------------
+// 保存宠物资料(place是指宠物存放的地点，1是身上，2是仓库，3是手推车)
+//------------------------------------------------------------------------------
+function  SavePetData(tpe : Tpet; PIndex: Integer; place: Integer) : Boolean;
+var
+  CharaID   : cardinal;
+	Cart      : byte;
+	Incubated : byte;
+begin
+  Result := False;
+
+  case place of
+	  1: begin
+			Cart      := 0;
+		  CharaID   := tpe.CharaID;
+		  Incubated := tpe.Incubated;
+		end;
+		2: begin
+		  Cart      := 0;
+		  CharaID   := 0;
+		  Incubated := 0;
+		end;
+		3: begin
+			Cart      := 1;
+		  CharaID   := tpe.CharaID;
+		  Incubated := 0;
+		end;
+    else begin
+	  Exit;
+	  end;
+	end;
+
+  if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [tpe.PetID, tpe.PlayerID, CharaID, Cart, PIndex, Incubated, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
+  begin
+    DebugOut.Lines.Add('*** Save Pet data error.');
+		Exit;
+  end;
+
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 保存工会头衔资料
+//------------------------------------------------------------------------------
+function  SaveGuildMPosition(tg: TGuild) : Boolean;
+var
+  i : Integer;
+begin
+  Result := False;
+
+  {删除旧资料}
+	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d''', [tg.ID]));
+	{保存工会头衔资料 --唯一索引有问题，将会只记录一条}
+	for i := 0 to 19 do begin
+	  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%s'',''%s'',''%s'',''%d'')', [tg.ID, tg.PosName[i], BoolToStr(tg.PosInvite[i]), BoolToStr(tg.PosPunish[i]), tg.PosEXP[i]])) then
+	  begin
+	    DebugOut.Lines.Add('*** Save Guild Position data error.');
+			Exit;
+	  end;
+	end;
 
 	Result := True;
 end;
