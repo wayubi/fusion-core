@@ -1,11 +1,11 @@
 object frmMain: TfrmMain
-  Left = 325
-  Top = 248
+  Left = 415
+  Top = 182
   Width = 608
-  Height = 368
+  Height = 365
   Caption = 's'
   Color = clCream
-  Constraints.MaxHeight = 368
+  Constraints.MaxHeight = 365
   Constraints.MaxWidth = 608
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -70,7 +70,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 0
         Width = 592
-        Height = 261
+        Height = 262
         Anchors = [akLeft, akTop, akRight, akBottom]
         Color = 14071432
         Font.Charset = DEFAULT_CHARSET
@@ -85,7 +85,7 @@ object frmMain: TfrmMain
       end
       object Edit1: TEdit
         Left = 0
-        Top = 263
+        Top = 264
         Width = 486
         Height = 26
         Anchors = [akLeft, akRight, akBottom]
@@ -152,7 +152,7 @@ object frmMain: TfrmMain
       end
       object Combo_ISCS: TComboBox
         Left = 488
-        Top = 263
+        Top = 264
         Width = 104
         Height = 26
         Anchors = [akLeft, akRight, akBottom]
