@@ -3083,7 +3083,7 @@ Begin
 					end;
 				end;
 
-				10,24: {Ruwatch, Sight}
+				24: {Ruwatch}
 					begin
 						if (MSkill = 10) then Option := Option or 1 else Option := Option or $2000;
 						UpdateOption(tm, tc);

@@ -7,29 +7,33 @@ uses
 
 var
 	SKILL_TYPE : Byte;
-    {
-    	1: Process Effect
-        3: Process Skill Attack
-    }
 
+    { Initialization Procedures }
     procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
 
+    { Finalization Procedures }
     procedure process_effect(tc : TChara; success : Integer; Tick : Cardinal);
     procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
-    procedure process_skill_splash_attack(tc : TChara; j : Integer; Tick : Cardinal);
+    procedure process_skill_splash_attack(tc : TChara; sl : TStringList; Tick : Cardinal);
 
+    { Calculation Procedures }
     procedure use_sp(tc : TChara; SkillID : word; LV : byte);
+    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer) : TStringList;
 
+    { Skill Procedures - Swordsman }
     function skill_sword_mastery(tc : TChara) : Integer;
 	function skill_two_handed_sword_mastery(tc : TChara) : Integer;
     function skill_hp_recovery(tc : TChara; Tick : Cardinal) : Integer;
     function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
 	function skill_provoke(tc : TChara) : Integer;
-    function skill_magnum_break() : Integer;
+    function skill_magnum_break(tc : TChara; sl : TStringList) : TStringList;
     function skill_endure() : Integer;
 
+    { Skill Procedures - Mage }
     function skill_sp_recovery(tc : TChara; Tick : Cardinal) : Integer;
+    function skill_sight(tc : TChara; Tick : Cardinal) : Integer;
 
+    { Skill Procedures - Archer }
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
 
 implementation
@@ -40,8 +44,11 @@ uses
 	procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
     var
     	success : Integer;
+        targets : TStringList;
     begin
     	SKILL_TYPE := 0;
+        targets := TStringList.Create;
+        targets.Clear;
 
         if ( (effect = 1) and (tc.HP <= 0) ) then effect := -1;
 
@@ -56,9 +63,10 @@ uses
         { 4} if (tc.Skill[4].Lv <> 0) and (effect = 1) then success := skill_hp_recovery(tc, Tick);
         { 5} if (tc.MSkill = 5) and (effect = 0) then success := skill_bash(tc, Tick);
         { 6} if (tc.MSkill = 6) and (effect = 0) then success := skill_provoke(tc);
-        { 7} if (tc.MSkill = 7) and (effect = 0) then success := skill_magnum_break();
+        { 7} if (tc.MSkill = 7) and (effect = 0) then targets := skill_magnum_break(tc, targets);
         { 8} if (tc.MSkill = 8) and (effect = 0) then success := skill_endure();
         { 9} if (tc.Skill[9].Lv <> 0) and (effect = 1) then success := skill_sp_recovery(tc, Tick);
+        {10} if (tc.MSkill = 10) and (effect = 0) then success := skill_sight(tc, Tick);
         {46} if (tc.MSkill = 46) and (effect = 0) then success := skill_double_strafe(tc, Tick);
 
         {
@@ -80,7 +88,7 @@ uses
         	1: process_effect(tc, success, Tick);
             2: process_effect(tc, success, Tick);
             3: process_skill_attack(tc, success, Tick);
-            4: process_skill_splash_attack(tc, success, Tick);
+            4: process_skill_splash_attack(tc, targets, Tick);
         end;
 
         if ( (SKILL_TYPE = 1) and (success = -1) ) or (SKILL_TYPE = 2) or (SKILL_TYPE = 3) then begin
@@ -88,6 +96,7 @@ uses
         end;
 
         SKILL_TYPE := 0;
+        targets.Free;
 	end;
 
 	procedure process_effect(tc : TChara; success : Integer; Tick : Cardinal);
@@ -183,40 +192,18 @@ uses
 		end;
     end;
 
-    procedure process_skill_splash_attack(tc : TChara; j : Integer; Tick : Cardinal);
+    procedure process_skill_splash_attack(tc : TChara; sl : TStringList; Tick : Cardinal);
     var
-    	j1, i1, k1 : Integer;
+    	k1 : Integer;
         tm : TMap;
         tl : TSkillDB;
-        xy : TPoint;
-        tx, ts : TMob;
+        ts : TMob;
         tc1 : TChara;
-        sl : TStringList;
-        mi : MapTbl;
     begin
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
         tl := tc.Skill[tc.MSkill].Data;
 
-        sl := TStringList.Create;
         tc1 := tc.AData;
-        xy := tc1.Point;
-
-        for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-        	for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-            	for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-                	ts := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-                    if (abs(ts.Point.X - xy.X) <= tl.Range2) and (abs(ts.Point.Y - xy.Y) <= tl.Range2) then sl.AddObject(IntToStr(ts.ID),ts);
-                end;
-
-            	for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
-                	if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then Continue;
-                    tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-                    if (tc = tc1) or ((mi.PvPG = true) and (tc.GuildID = tc1.GuildID) and (tc.GuildID <> 0)) then Continue;
-                    if (abs(tc1.Point.X - xy.X) <= tl.Range2) and (abs(tc1.Point.Y - xy.Y) <= tl.Range2) then sl.AddObject(IntToStr(tc1.ID),tc1);
-                end;
-            end;
-        end;
 
         if dmg[0] < 0 then dmg[0] := 0;
         if sl.Count <> 0 then begin
@@ -228,9 +215,8 @@ uses
     		            Exit;
 		            end;
                     
-                    if dmg[0] <0 then dmg[0] := 0;
                     frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data1[tc.MUseLV]);
-					SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], j);
+					SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
 					if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then frmMain.StatCalc2(tc, tc1, Tick);
                 end else begin
                 	ts := sl.Objects[k1] as TMob;
@@ -240,14 +226,11 @@ uses
 		            end;
 
                     frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[tc.MUseLV], tl.Element, tl.Data1[tc.MUseLV]);
-                    if dmg[0] <0 then dmg[0] := 0;
-                    SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
+                    SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
 					if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then frmMain.StatCalc1(tc, ts, Tick);
                 end;
             end;
         end;
-
-        sl.Free;
     end;
 
     procedure use_sp(tc : TChara; SkillID : word; LV : byte);
@@ -279,6 +262,52 @@ uses
         tc.MUseLv := 0;
     end;
     
+    function find_targets(tc : TChara; sl : TStringList; rangefield : Integer) : TStringList;
+    var
+    	j1, i1, k1 : Integer;
+        tm : TMap;
+        tl : TSkillDB;
+        xy : TPoint;
+        ts : TMob;
+        tc1 : TChara;
+        mi : MapTbl;
+    begin
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+        tl := tc.Skill[tc.MSkill].Data;
+
+        tc1 := tc.AData;
+        xy := tc1.Point;
+
+        for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+        	for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+            	for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                	ts := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+
+                    if (rangefield = 1) then begin
+                    	if (abs(ts.Point.X - xy.X) <= tl.Range) and (abs(ts.Point.Y - xy.Y) <= tl.Range) then sl.AddObject(IntToStr(ts.ID),ts);
+                    end else if (rangefield = 2) then begin
+                    	if (abs(ts.Point.X - xy.X) <= tl.Range2) and (abs(ts.Point.Y - xy.Y) <= tl.Range2) then sl.AddObject(IntToStr(ts.ID),ts);
+                    end;
+                end;
+
+            	for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
+                	if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then Continue;
+                    tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
+                    if (tc = tc1) or ((mi.PvPG = true) and (tc.GuildID = tc1.GuildID) and (tc.GuildID <> 0)) then Continue;
+
+                    if (rangefield = 1) then begin
+                    	if (abs(tc1.Point.X - xy.X) <= tl.Range) and (abs(tc1.Point.Y - xy.Y) <= tl.Range) then sl.AddObject(IntToStr(tc1.ID),tc1);
+                    end else if (rangefield = 2) then begin
+                    	if (abs(tc1.Point.X - xy.X) <= tl.Range2) and (abs(tc1.Point.Y - xy.Y) <= tl.Range2) then sl.AddObject(IntToStr(tc1.ID),tc1);
+                    end;
+                end;
+            end;
+        end;
+
+        Result := sl;
+    end;
+
 
     { -------------------------------------------------- }
     { - Job: Swordsman --------------------------------- }
@@ -483,10 +512,11 @@ uses
     { - Skill ID Name: SM_MAGNUM ----------------------- }
     { - Skill ID: 7 ------------------------------------ }
     { -------------------------------------------------- }
-    function skill_magnum_break() : Integer;
+    function skill_magnum_break(tc : TChara; sl : TStringList) : TStringList;
     begin
     	SKILL_TYPE := 4;
-        Result := 1;
+        sl := find_targets(tc, sl, 2);
+        Result := sl;
     end;
 
 
@@ -528,6 +558,57 @@ uses
             end;
             tc.SPRTick := Tick;
         end;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Mage -------------------------------------- }
+    { - Job ID: 2 -------------------------------------- }
+    { - Skill Name: Sight ------------------------------ }
+    { - Skill ID Name: MG_SIGHT ------------------------ }
+    { - Skill ID: 10 ----------------------------------- }
+    { -------------------------------------------------- }
+    function skill_sight(tc : TChara; Tick : Cardinal) : Integer;
+    var
+    	tm : TMap;
+        tc1 : TChara;
+        k1 : Integer;
+        sl : TStringList;
+    begin
+    	SKILL_TYPE := 2;
+    	Result := -1;
+
+        sl := TStringList.Create;
+        sl.Clear;
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        if (tc.MSkill = 10) then tc.Option := tc.Option or 1 else tc.Option := tc.Option or $2000;
+        UpdateOption(tm, tc);
+
+        sl := find_targets(tc, sl, 1);
+
+        if sl.Count <> 0 then begin
+        	for k1 := 0 to sl.Count - 1 do begin
+            	tc1 := sl.Objects[k1] as TChara;
+                if (tc1.Option and 6 <> 0) then begin
+                	tc1.Option := tc1.Option and $FFF9;
+                    tc1.Hidden := false;
+                    tc1.SkillTick := tc1.Skill[51].Tick;
+                    tc1.SkillTickID := 51;
+                    CalcStat(tc1, Tick);
+
+                    UpdateOption(tm, tc1);
+
+                    // Colus, 20031228: Tunnel Drive speed update
+                    if (tc1.Skill[213].Lv <> 0) then begin
+                    	SendCStat1(tc1, 0, 0, tc1.Speed);
+                    end;
+                end;
+            end;
+        end;
+
+        sl.Free;
     end;
 
 

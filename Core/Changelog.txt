@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-12-04: PSS structural changes regarding find_area_targets. [AlexKreuz]
+- 06-12-04: Switched skill [MG_SIGHT] to PSS system. [AlexKreuz]
 - 06-12-04: Fixed TS not defined crash in damageprocess & skillattack. [AlexKreuz]
 - 06-12-04: Slight Fix with parenthesis in SG/LOV pvp. [Darkhelmet]
 - 06-12-04: Added NPC command emotion <emotion #>. [Darkhelmet]
