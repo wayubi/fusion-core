@@ -2998,12 +2998,15 @@ var
 	dx,dy:integer;
 	tm:TMap;
 	tn:TNPC;
-        tc1:TChara;
+  tn1:TNPC;
+  tc1:TChara;
+  tpe:TPet;
 begin
         if ( tc.PetData = nil ) or ( tc.PetNPC = nil ) then exit;
 
         tm := tc.MData;
         tn := tc.PetNPC;
+        tpe := tc.PetData;
 
 	with tn do begin
 
@@ -3069,6 +3072,24 @@ begin
                         end;
                         //新しいブロックにデータ追加
                         tm.Block[Point.X div 8][Point.Y div 8].NPC.AddObject(ID, tn);
+                end;
+
+                if (tpe.ATarget <> 0) then begin
+				          if tpe.isLooting then begin
+					          tn1 := tm.NPC.IndexOfObject(tpe.ATarget) as TNPC;
+					          if tn1 = nil then begin
+                      UpdatePetLocation(tm, tn);
+
+						          tpe.isLooting := False;
+						          tpe.ATarget := 0;
+						          ppos := pcnt;
+						          //MoveWait := Tick + Data.dMotion;
+					          end else if (abs(tn.Point.X - tn1.Point.X) < 2) and (abs(tn.Point.Y - tn1.Point.Y) < 2) then begin
+						          tn.NextPoint := Point;
+						          ppos := pcnt;
+						        //ATick := Tick + Speed;
+					          end;
+                  end;
                 end;
 
                 if ppos = pcnt then begin
@@ -11166,7 +11187,7 @@ begin
 						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
-							if (abs(tn.Point.X - Point.X) <= 1) and (abs(tn.Point.Y - Point.Y) <= 1) then begin
+							if (abs(tn.Point.X - Point.X) <= 9) and (abs(tn.Point.Y - Point.Y) <= 9) then begin
 								//候補に追加
 								sl.AddObject(IntToStr(tn.ID), tn);
 							end;
@@ -11176,19 +11197,20 @@ begin
 				if sl.Count <> 0 then begin
 					j := Random(sl.Count);
 					tn := sl.Objects[j] as TNPC;
-					j := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
-					if (j <> 0) then begin
+					k := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
+					if (k <> 0) then begin
 					    //if ts.Item[10].ID = 0 then begin
 						tpe.isLooting := True;
 						tpe.ATarget := tn.ID;
 						//ATick := Tick;
 
-						pcnt := j;
+						pcnt := k;
 						ppos := 0;
 						MoveTick := Tick;
 
 						NextPoint := tn.Point;
-            SendPetMove(tc.Socket, tc, xy );
+            PetMoving(tc, Tick);
+            SendPetMove(tc.Socket, tc, NextPoint);
             SendBCmd( tm, tn.Point, 58, tc, True );
 					    //end;
 					end;
@@ -12960,7 +12982,7 @@ begin
 					tn := tm.NPC.IndexOfObject(ts.ATarget) as TNPC;
 					if tn = nil then begin
                                                 UpdateMonsterLocation(tm, ts);
-						
+
 						isLooting := False;
 						ATarget := 0;
 						ppos := pcnt;
@@ -12975,7 +12997,7 @@ begin
 					if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) and (ts.isSlave = false) then begin
 						//視界のそとまで逃げられた
                                                 UpdateMonsterLocation(tm, ts);
-						
+
 						ATarget := 0;
 						ARangeFlag := false;
 						MoveWait := Tick + 5000;
@@ -14340,7 +14362,25 @@ begin
                                               end;
                                             end;
                                           end else if tpe.isLooting then begin
-                                            PetPickup(tm, tpe, tc, Tick);
+                                            j := 0;
+                                            k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, tn.NextPoint.X, tn.NextPoint.Y );
+                                            if k > 1 then begin
+                                              //tn.NextPoint := xy;
+                                              SendPetMove( Socket, tc, tn.NextPoint );
+                                              SendBCmd( tm, tn.Point, 58, tc, True );
+                                              if tn.pcnt = 0 then MoveTick := Tick;
+                                                tn.pcnt := k;
+                                                tn.ppos := 0;
+
+                                                PetMoveTick := Tick + 1000;
+                                                if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
+
+                                                if tn.MoveTick + spd <= Tick then begin
+                                                  PetMoving( tc, Tick );
+                                                end;
+                                            end else begin
+                                              PetPickup(tm, tpe, tc, Tick);
+                                            end;
                                           end;
 
                                                 // 自動腹減りシステム
