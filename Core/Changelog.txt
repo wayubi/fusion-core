@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-15-04: Cleaned up the structure of #auto. [Trihan]
 - 10-15-04: Cleaned up the structure of #alive and #item. [Trihan]
 - 10-15-04: Made some changes to @where. [Trihan]
 - 10-15-04: REED: Restructured Guild saving (1/2). [AlexKreuz]

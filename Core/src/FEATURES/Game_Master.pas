@@ -834,8 +834,10 @@ Called when we're shutting down the server *only*
                                     tc.Item[k].Card[3] := 0;
                                     tc.Item[k].Data := td;
                                     tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(quantity);
+
                                     SendCStat1(tc, 0, $0018, tc.Weight);
                                     SendCGetItem(tc, k, quantity);
+
                                     Result := 'GM_ITEM Success.';
                                 end;
                             end
@@ -893,35 +895,69 @@ Called when we're shutting down the server *only*
     end;
 
     function command_die(tc : TChara) : String;
-    var
-        tm : TMap;
     begin
         Result := 'GM_DIE Success.';
 
-        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        CharaDie(tm, tc, 1);
+        CharaDie(tc.MData, tc, 1);
     end;
 
     function command_auto(tc : TChara; str : String) : String;
     var
         sl : TStringList;
-        j, k : Integer;
+        tl : TSkillDB;
+        mode, k : Integer;
     begin
-        Result := 'GM_AUTO Success.';
+        Result := 'GM_AUTO Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 5, 256);
 
-        if sl.Count = 0 then Exit;
-        Val(sl.Strings[0], j, k);
-        if (k <> 0) or (j < 0) then Exit;
-        tc.Auto := j;
+        if (sl.Count > 0) and (sl.Count < 4) then begin
+            if sl.Count = 3 then begin
+                Val(sl.Strings[1], tc.A_Skill, k);
+                if k = 0 then begin
+                    Val(sl.Strings[2], tc.A_Lv, k);
+                    if k <> 0 then begin
+                        Result := Result + ' Skill level must be a valid integer.';
+                        sl.Free;
+                        Exit;
+                    end
 
-        if sl.Count = 3 then begin
-            Val(sl.Strings[1], tc.A_Skill, k);
-            Val(sl.Strings[2], tc.A_Lv, k);
+                    else begin
+                        if tc.Skill[tc.A_Skill].Lv < tc.A_Lv then begin
+                            Result := Result + ' You do not have that level of the skill.';
+                            sl.Free;
+                            Exit;
+                        end;
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' Skill ID must be a valid integer.';
+                end;
+            end;
+            Val(sl.Strings[0], mode, k);
+            if k = 0 then begin
+                tc.Auto := mode;
+                Result := 'GM_AUTO Success.';
+                if tc.Auto = 0 then Result := Result + ' [Auto OFF]';
+                if tc.Auto AND 1 = 1 then Result := Result + ' [Auto attack ON]';
+                if tc.Auto AND 2 = 2 then begin
+                    tl := tc.Skill[tc.A_Skill].Data;
+                    Result := Result + ' [Auto Skill ON - ' + tl.Name + ' ' + IntToStr(tc.A_Lv) + ']';
+                end;
+                if tc.Auto AND 4 = 4 then Result := Result + ' [Auto loot ON]';
+                if tc.Auto AND 16 = 16 then Result := Result + ' [Auto move ON]';
+            end
+
+            else begin
+                Result := Result + ' Mode must be a valid integer.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Invalid input. Format is <mode> (1 = auto attack, 2 = auto skill, 4 = auto loot, 16 = auto move) [skill ID] [skill level].';
         end;
-
         sl.Free;
     end;
 
