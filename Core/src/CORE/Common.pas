@@ -21,6 +21,7 @@ uses
 
 const
 	RELEASE_VERSION = '1.212 I -- W.A.C Alpha 1 Release';
+    MAXINTEGER = 2147483647;
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;

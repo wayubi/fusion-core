@@ -1454,7 +1454,11 @@ begin
 		Readln(txt, str);
 		sl.DelimitedText := str;
 		if sl.Count = 1 then begin
-			GExpTable[i] := StrToInt(sl.Strings[0]);
+            try
+    			GExpTable[i] := StrToInt(sl.Strings[0]);
+            except
+                on EConvertError do GExpTable[i] := 1999999999;
+            end;
 			Inc(i);
 			if i > 49 then break;
 		end;
