@@ -9714,8 +9714,49 @@ Begin
 							tn.Script[k].Data1[1] := lowercase(SL1[1]);
 							//tn.Script[k].Data3[0] := StrToInt(SL1[2]);
 							Inc(k);
-//percentheal needs to go here
-						end else if str = 'checkpoint' then begin //------- 74 checkpoint
+						end else if str = 'percentheal' then begin //------- 72 percentheal
+							if sl1.Count <> 2 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[0], i, j);
+							if (j <> 0) or (i < 0) or (i > 30000) then begin
+								ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[1], i, j);
+							if (j <> 0) or (i < 0) or (i > 30000) then begin
+								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 72;
+							SetLength(tn.Script[k].Data3, 2);
+							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
+							Inc(k);
+					  {	end else if str = 'percentdamage' then begin //------- 73 percentdamage
+                        	if sl1.Count <> 2 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[0], i, j);
+							if (j <> 0) or (i < 0) or (i > 30000) then begin
+								ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							val(SL1[1], i, j);
+							if (j <> 0) or (i < 0) or (i > 30000) then begin
+								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 73;
+							SetLength(tn.Script[k].Data3, 2);
+							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
+							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
+							Inc(k);       }
+ 						end else if str = 'checkpoint' then begin //------- 74 checkpoint
 							if sl1.Count <> 3 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-18-04: Percentheal now passes script validation. [Tsusai]
 - 08-18-04: Corrupt pet in out of range inventory location caused crash. [AlexKreuz]
 - 08-18-04: Accessing map character list after character disconnects caused crash. [AlexKreuz]
 - 08-18-04: Inability to write backup file caused crash on backup. [AlexKreuz]
