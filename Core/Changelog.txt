@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-01-05: Undefined map blocks on packet sends to players caused crash. [AlexKreuz]
 - 01-01-05: Other characters disconnecting while moving caused missend of packet. [AlexKreuz]
 - 01-01-05: Added NPC areaset. [Tsusai]
 - 12-31-04: Added Packet tracing output switch to weiss.ini. [AlexKreuz]

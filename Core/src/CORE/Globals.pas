@@ -54,6 +54,8 @@ uses
     function JIDFixer(ID:integer) : integer;
 
     function get_nowguildid() : Integer;
+    procedure console(str : String);
+
 
 implementation
 
@@ -959,6 +961,12 @@ uses
         if (resultlist.Count = 0) then Result := 1
         else Result := StrToInt(resultlist[resultlist.Count-1])+1;
         resultlist.Free;
+    end;
+
+
+    procedure console(str : String);
+    begin
+        debugout.Lines.Add('[' + TimeToStr(Now) + '] ' + str);
     end;
 
 end.

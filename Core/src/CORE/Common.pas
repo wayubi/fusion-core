@@ -4404,32 +4404,42 @@ var
 	tc1     :TChara;
 begin
 
-  {Colus, 20040116: It had two X-checks instead of X and Y.}
-  if (Point.X >= 0) and (Point.X <= 511) and
-     (Point.Y >= 0) and (Point.Y <= 511) then begin
+    {Colus, 20040116: It had two X-checks instead of X and Y.}
+    if (Point.X >= 0) and (Point.X <= 511) and (Point.Y >= 0) and (Point.Y <= 511) then begin
 
-	for j := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
-		for i := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
-			//周囲の人に通知(tc <> nilの場合は自分を除く)
-			if assigned(tm) then begin // AlexKreuz
-					if assigned(tm.Block[i][j]) then begin
-						for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
-							tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
+    	for j := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+		    for i := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
 
-							if tc1 = nil then continue;
-							if (tc = nil) or (tc <> tc1) then begin
-								if (abs(Point.X - tc1.Point.X) < 50) and (abs(Point.Y - tc1.Point.Y) < 50) then begin
-									if tail and (tc1.Stat2 = 9) then begin
-										tc1.Socket.SendBuf(buf, (PacketLen+2));
-									end else begin
-										tc1.Socket.SendBuf(buf, PacketLen);
-									end;
-								end;
-							end;
-						end;
-{修正ココまで}
-					end;
-				end;
+    			if assigned(tm) then begin // AlexKreuz
+
+                try
+                    if assigned(tm.Block[i][j]) then begin
+                        for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
+                            tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
+
+                            if tc1 = nil then continue;
+                            if (tc = nil) or (tc <> tc1) then begin
+                                if (abs(Point.X - tc1.Point.X) < 50) and (abs(Point.Y - tc1.Point.Y) < 50) then begin
+                                    if tail and (tc1.Stat2 = 9) then begin
+                                        tc1.Socket.SendBuf(buf, (PacketLen+2));
+                                    end else begin
+                                        tc1.Socket.SendBuf(buf, PacketLen);
+                                    end;
+                                end;
+                            end;
+                        end;
+                    end;
+                except
+                    on EAccessViolation do begin
+                        if assigned(tc1) then
+                            console('Unable to send updated map ('+tm.Name+') packets to player ('+tc1.Name+')')
+                        else
+                            console('Unable to send updated map ('+tm.Name+') packets.');
+                    end;
+                end;
+
+                end;
+                
 			end;
 		end;
 	end
