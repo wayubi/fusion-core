@@ -1,3 +1,4 @@
+- 04-08-04: Fixed failure to check for a guild that caused Range Error. [KyuubiKitsune]
 - 04-16-04: Fixed Bug 139 - Intimidate Skill warped MVP Monsters. [AlexKreuz]
 - 04-16-04: Fixed Bug 193 - Auto Berkserk Skill not increasing damage. [AlexKreuz]
 - 04-16-04: Fixed Bug 710 - No skill points for novice with #jlevel. [AlexKreuz]

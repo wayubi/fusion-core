@@ -1319,7 +1319,7 @@ Begin(* Proc sv3PacketProcess() *)
 							SendCStat1(tc, 0, $0009, tc.StatusPoint);
 							SendCStat1(tc, 1, $0001, tc.BaseEXP);
 						end;        //Kyuubi - Glevel Command  Under Development
-					end else if (Copy(str,1, 7) = 'glevel ') then begin
+					end else if (Copy(str,1, 7) = 'glevel ') and (tc.GuildID) then begin
                   j := GuildList.IndexOf(tc.GuildID);
                   tg := GuildList.Objects[j] as TGuild;
                  if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
