@@ -9,7 +9,7 @@ uses
 	ComCtrls,
 	{Fusion Units}
 	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
-	SQLData, FusionSQL, Math, Game_Master,
+	SQLData, FusionSQL, Math, Game_Master, Player_Skills,
 	{3rd Party Units}
 	List32, Zip;
 
@@ -5807,6 +5807,11 @@ var
 ////	i1,j1,k1:integer;
 //	tm:TMap;
 begin
+
+    	{ Alex: For passsive skills also. We want to
+        place all skill effects into one area. }
+        parse_skills(tc, Tick, True);
+
 	with tc do begin
 		//HPSPâÒïúèàóù
 		if Weight * 2 < MaxWeight then begin
@@ -5859,20 +5864,6 @@ begin
 								SPSongTick := Tick;
 							end;
 						end;
-					end;
-
-					if (Skill[4].Lv <> 0) and (HPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
-						if HP <> MAXHP then begin
-							j := (5 + MAXHP div 500) * Skill[4].Lv;
-							if HP + j > MAXHP then j := MAXHP - HP;
-							HP := HP + j;
-							WFIFOW( 0, $013d);
-							WFIFOW( 2, $0005);
-							WFIFOW( 4, j);
-							Socket.SendBuf(buf, 6);
-							SendCStat1(tc, 0, 5, HP);
-						end;
-						HPRTick := Tick;
 					end;
 
 					{Colus, 20031223: Why is the SP part of Spiritual Relaxation here?}

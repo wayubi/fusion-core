@@ -12,13 +12,14 @@ var
         2: Process Skill Attack
     }
 
-    procedure parse_skills(tc : TChara; Tick : Cardinal);
+    procedure parse_skills(tc : TChara; Tick : Cardinal; passive : boolean = false);
 
     procedure process_effect(tc : TChara; success : Integer);
     procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
 
     function skill_sword_mastery(tc : TChara) : Integer;
 	function skill_two_handed_sword_mastery(tc : TChara) : Integer;
+    function skill_hp_recovery(tc : TChara; Tick : Cardinal) : Integer;
     function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
 	function skill_provoke(tc : TChara) : Integer;
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
@@ -28,20 +29,27 @@ implementation
 uses
 	Main;
 
-	procedure parse_skills(tc : TChara; Tick : Cardinal);
+	procedure parse_skills(tc : TChara; Tick : Cardinal; passive : boolean = false);
     var
     	success : Integer;
     begin
     	SKILL_TYPE := 0;
 
+        {
+        	tc.Skill[x].LV must be used for effect skills that have no target.
+            tc.MSkill must be used for active skills that have a target.
+            tc.Skill[x].LV must be used for passive skills. Also, passive must be true.
+        }
+
         { 2} if (tc.Skill[2].Lv <> 0) then success := skill_sword_mastery(tc);
 		{ 3} if (tc.Skill[3].Lv <> 0) then success := skill_two_handed_sword_mastery(tc);
+        { 4} if (tc.Skill[4].Lv <> 0) and (passive) then success := skill_hp_recovery(tc, Tick);
         { 5} if (tc.MSkill = 5) then success := skill_bash(tc, Tick);
         { 6} if (tc.MSkill = 6) then success := skill_provoke(tc);
         {46} if (tc.MSkill = 46) then success := skill_double_strafe(tc, Tick);
 
         {
-	        Success Codes:
+	        Process_Effect Success Codes:
     	    -1 : Success
         	0 : Skill Failed
 	        1 : Not enough SP
@@ -143,6 +151,33 @@ uses
     	if (tc.WeaponType[0] = 3) then begin
         	tc.ATK[0][4] := tc.Skill[3].Data.Data1[tc.Skill[3].Lv];
 		end;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Swordsman --------------------------------- }
+    { - Job ID: 1 -------------------------------------- }
+    { - Skill Name: HP Recovery ------------------------ }
+    { - Skill ID Name: SM_RECOVERY --------------------- }
+    { - Skill ID: 4 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_hp_recovery(tc : TChara; Tick : Cardinal) : Integer;
+    var
+    	j : Integer;
+    begin
+    	if (tc.HPRTick + 10000 <= Tick) and (tc.Sit <> 1) and (tc.Option and 6 = 0) then begin
+        	if tc.HP <> tc.MAXHP then begin
+            	j := (5 + tc.MAXHP div 500) * tc.Skill[4].Lv;
+                if tc.HP + j > tc.MAXHP then j := tc.MAXHP - tc.HP;
+                tc.HP := tc.HP + j;
+                WFIFOW(0, $013d);
+                WFIFOW(2, $0005);
+                WFIFOW(4, j);
+                tc.Socket.SendBuf(buf, 6);
+                SendCStat1(tc, 0, 5, tc.HP);
+            end;
+            tc.HPRTick := Tick;
+        end;
     end;
     
     
