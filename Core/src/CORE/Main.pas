@@ -3466,55 +3466,7 @@ begin
 			end;
 
       //Pet Attacks
-      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
-      // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
-      // Hammer Fall on enemy when Master is attacking
-        tn := tc.PetNPC;
-        tpe := tc.PetData;
-       if tpe.Accessory > 0 then begin
-        if (tpe.JID = 1110) and (tc.AData <> nil) then begin
-          if Random(100) < (tpe.Relation / 100.0) then begin
-            xy.X := ts.Point.X;
-            xy.Y := ts.Point.Y;
-
-            //Create Graphics and Set NPC
-            tn1 := SetSkillUnit(tm, tc.ID, xy, Tick, $6E, 0, 3000, tc);
-
-            tn1.MSkill := 110;
-            tn1.MUseLV := 2;
-
-            //Send Graphic
-            WFIFOW( 0, $0117);
-			      WFIFOW( 2, 110);
-			      WFIFOL( 4, tn.ID);
-			      WFIFOW( 8, 2);
-			      WFIFOW(10, ts.Point.X);
-			      WFIFOW(12, ts.Point.Y);
-			      WFIFOL(14, 1);
-			      SendBCmd(tm, xy, 18);
-          end;
-        end;
-        if (tpe.JID = 1107) and (Random(100) > 90) then begin
-          ts.ATarget := tc.ID;
-          ts.ARangeFlag := false;
-          ts.AData := tc;
-          //Send Graphic
-          WFIFOW( 0, $011a);
-          WFIFOW( 2, 6);
-          WFIFOW( 4, 1);
-          WFIFOL( 6, tn.ID);
-          WFIFOL(10, tn.ID);
-          if ts.Data.Race <> 1 then begin
-            WFIFOB(14, 1);
-            ts.ATKPer := word(tc.Skill[6].Data.Data1[1]);
-            ts.DEFPer := word(tc.Skill[6].Data.Data2[1]);
-          end else begin
-            WFIFOB(14, 0);
-            SendBCmd(tm, tn.Point, 15);
-          end;
-        end;
-       end;
-      end;
+      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetAttackSkill(tm, ts, tc);
 
 
 			// + Œƒ ‚µ ‚­ Ž© “® ‘é +

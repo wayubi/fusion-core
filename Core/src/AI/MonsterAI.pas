@@ -16,6 +16,10 @@ uses
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
         procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI:TMobAIDB; i:integer; Tick:cardinal);
 
+        procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
+        procedure PetDamageProcess(tm:TMap; ts:TMob; tc:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True);
+        procedure SendPetSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; SkillID:integer);
+
         function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Player Attacking Player}
         function DamageProcess3(tm:TMap; ts:TMob; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 
@@ -413,7 +417,7 @@ begin
                 begin
                         dmg[0] := (ts.Data.LV * 2 + 10);
                         ts.HP := ts.HP + dmg[0];
-                        if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
+                        if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
 
                         WFIFOW( 0, $011a);
                         WFIFOW( 2, tsAI.Skill[i]);
@@ -652,7 +656,7 @@ begin
                         if dmg[0] < 0 then dmg[0] := 0;
                         dmg[0] := dmg[0] * 2;
                         ts.HP := ts.HP + dmg[0];
-                        if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
+                        if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
 
@@ -1218,7 +1222,81 @@ begin
 end;
 
 //------------------------------------------------------------------------------
+procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
+var
+  tn:TNPC;
+  tn1:TNPC;
+  tpe:TPet;
+	sl:TStringList;
+  Tick:cardinal;
+  xy:TPoint;
+  Damage:integer;
 
+begin
+  // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
+  // Hammer Fall on enemy when Master is attacking
+  tn := tc.PetNPC;
+  tpe := tc.PetData;
+  Tick := timeGetTime();
+  if tpe.Accessory > 0 then begin
+    if tpe.JID = 1035 then begin
+      if Random(10000) < (tpe.Relation) then begin
+        dmg[0] := 444;
+        //dmg[0] := dmg[0] * (2 * (ElementTable[4][ts.Element] div 100));
+        if Damage < 0 then Damage := 0;
+        PetDamageProcess(tm, ts, tc, dmg[0], Tick);
+        SendPetSkillAttack(tm, tc, ts, Tick, 187);
+      end;
+    end;
+
+    if (tpe.JID = 1110) and (tc.AData <> nil) then begin
+      if Random(10000) < (tpe.Relation) then begin
+        xy.X := ts.Point.X;
+        xy.Y := ts.Point.Y;
+
+        //Create Graphics and Set NPC
+        tn1 := SetSkillUnit(tm, tc.ID, xy, Tick, $6E, 0, 3000, tc);
+
+        tn1.MSkill := 110;
+        tn1.MUseLV := 2;
+
+        //Send Graphic
+        WFIFOW( 0, $0117);
+        WFIFOW( 2, 110);
+        WFIFOL( 4, tn.ID);
+        WFIFOW( 8, 2);
+        WFIFOW(10, ts.Point.X);
+        WFIFOW(12, ts.Point.Y);
+        WFIFOL(14, 1);
+        SendBCmd(tm, xy, 18);
+      end;
+    end;
+      //Baby Desert Wolf Provoke
+      if (tpe.JID = 1107) and (Random(100) > 90) then begin
+        ts.ATarget := tc.ID;
+        ts.ARangeFlag := false;
+        ts.AData := tc;
+        //Send Graphic
+        WFIFOW( 0, $011a);
+        WFIFOW( 2, 6);
+        WFIFOW( 4, 1);
+        WFIFOL( 6, tn.ID);
+        WFIFOL(10, tn.ID);
+        if ts.Data.Race <> 1 then begin
+          WFIFOB(14, 1);
+          ts.ATKPer := word(tc.Skill[6].Data.Data1[1]);
+          ts.DEFPer := word(tc.Skill[6].Data.Data2[1]);
+        end else begin
+          WFIFOB(14, 0);
+          SendBCmd(tm, tn.Point, 15);
+        end;
+      end;
+    end;
+end;
+
+
+
+//------------------------------------------------------------------------------
 function DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True) : Boolean;  {Monster Attacking Player}
 var
         {Random Variables}
@@ -1403,6 +1481,145 @@ begin
                  SendBCmd(tm, tc1.Point, 7);
 		Result := True;
 	end;
+end;
+
+//------------------------------------------------------------------------------
+
+procedure PetDamageProcess(tm:TMap; ts:TMob; tc:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True);
+var
+  tn:TNPC;
+  tpe:TPet;
+  i,j :integer;
+  w :Cardinal;
+  xy:TPoint;
+  tg    :TGuild;
+begin
+  tn := tc.PetNPC;
+  tpe := tc.PetData;
+
+  // AlexKreuz: Needed to stop damage to Emperium
+  // From Splash Attacks.
+  if (ts.isEmperium) then begin
+    j := GuildList.IndexOf(tc.GuildID);
+    if (j <> -1) then begin
+	  tg := GuildList.Objects[j] as TGuild;
+      if (tg.GSkill[10000].Lv < 1) then begin
+        dmg := 0;
+        Exit;
+      end;
+    end else begin
+        dmg := 0;
+        Exit;
+    end;
+  end;
+        //Cancel Monster Casting
+        if ts.Mode = 3 then begin
+                ts.Mode := 0;
+                ts.MPoint.X := 0;
+                ts.MPoint.Y := 0;
+                WFIFOW(0, $01b9);
+                WFIFOL(2, ts.ID);
+                SendBCmd(tm, ts.Point, 6);
+        end;
+  // Reset Lex Aeterna
+	if (ts.EffectTick[0] > Tick) then begin
+    // Dmg := Dmg * 2;  // Done in the DamageCalc functions
+    ts.EffectTick[0] := 0;
+  end;
+
+	if ts.HP < Dmg then Dmg := ts.HP;
+
+	if Dmg = 0 then begin
+		Exit;
+	end;
+	if (ts.Stat1 <> 0) and isBreak then begin
+    if ts.Stat1 <> 5 then begin   //code for ankle snar, not to break
+		ts.BodyTick := Tick + tc.aMotion;
+    end;
+	end;
+
+  UpdateMonsterLocation(tm, ts);
+
+	if (ts.HP - Dmg > 0) then ts.HP := ts.HP - Dmg;
+	for i := 0 to 31 do begin
+		if (ts.EXPDist[i].CData = nil) or (ts.EXPDist[i].CData = tc) then begin
+			ts.EXPDist[i].CData := tc;
+			Inc(ts.EXPDist[i].Dmg, Dmg);
+			break;
+		end;
+	end;
+	if ts.Data.MEXP <> 0 then begin
+		for i := 0 to 31 do begin
+			if (ts.MVPDist[i].CData = nil) or (ts.MVPDist[i].CData = tc) then begin
+				ts.MVPDist[i].CData := tc;
+				Inc(ts.MVPDist[i].Dmg, Dmg);
+				break;
+			end;
+		end;
+	end;
+        
+	if (ts.HP > 0) then begin
+		//ターゲット設定
+		if (EnableMonsterKnockBack) then begin
+			ts.pcnt := 0;
+			if ts.ATarget = 0 then begin
+				w := Tick + ts.Data.dMotion + tc.aMotion;
+				ts.ATick := Tick + ts.Data.dMotion + tc.aMotion;
+			end else begin
+				w := Tick + ts.Data.dMotion div 2;
+			end;
+			if w > ts.DmgTick then ts.DmgTick := w;
+		end else begin
+			if ts.ATarget = 0 then ts.ATick := Tick;
+			if ts.ATarget <> tc.ID then
+				ts.pcnt := 0
+			else if (ts.pcnt <> 0)  then begin
+				//DebugOut.Lines.Add('Monster Knockback!');
+				        SendMMove(tc.Socket, ts, ts.Point, ts.tgtPoint,tc.ver2);
+				        SendBCmd(tm, ts.Point, 58, tc,True);
+			end;
+			ts.DmgTick := 0;
+		end;
+    xy := ts.Point;
+    j := SearchPath2(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y);
+    if j <> 0 then begin
+        if (ts.ATarget = 0) or (ts.isActive) then begin
+		ts.ATarget := tc.ID;
+		ts.AData := tc;
+		ts.isLooting := False;
+        end;
+    end;
+	end else begin
+		//Kill Monster
+		//MonsterDie(tm, tc, ts, Tick);
+	end;
+end;
+
+//------------------------------------------------------------------------------
+procedure SendPetSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; SkillID:integer);
+var
+  tn:TNPC;
+  tpe:TPet;
+begin
+  tn := tc.PetNPC;
+  tpe := tc.PetData;
+//01de <skill ID>.w <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1>.l <param2>.w <param3>.w <type>.B
+
+  if ts.HP < 0 then ts.HP := 0;
+  WFIFOW( 0, $01de);
+	WFIFOW( 2, SkillID);
+	WFIFOL( 4, tn.ID);
+	WFIFOL( 8, ts.ID);
+	WFIFOL(12, Tick);
+  WFIFOL(16, ts.Data.dMotion);
+	WFIFOL(20, tc.aMotion);
+	WFIFOL(24, dmg[0]);
+	WFIFOW(28, 1);
+	WFIFOW(30, 1);
+  WFIFOB(32, 6);
+	//else               WFIFOB(32, 8);
+	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
+	SendBCmd(tm, ts.Point, 33);
 end;
 
 end.
