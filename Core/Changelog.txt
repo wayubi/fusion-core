@@ -1,3 +1,5 @@
+- 04-12-04: Added loading of Fusion's AI database. [Darkhelmet]
+- 04-12-04: Added warping monster algorithm and skill support. [Darkhelmet]
 - 04-12-04: Script Command 'basereset' now changes your level back 1 and exp to 0. [Darkhelmet]
 - 04-12-04: Added 'global' script command. [Darkhelmet]
 - 04-12-04: Fixed 'gcheck' script command. [Darkhelmet]

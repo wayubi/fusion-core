@@ -63,7 +63,7 @@ var
 	tb  :TMobDB;
   ts  :TMobDB;
 	tsAI :TMobAIDB;
-  tsAI2 :TMobAIDBAegis;
+  tsAI2 :TMobAIDBFusion;
   twp :TWarpDatabase;
   tGlobal:TGlobalVars;
 
@@ -725,7 +725,7 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 	DebugOut.Lines.Add(Format('-> Total %d Pharmacy entries loaded.', [PharmacyDB.Count]));
 	Application.ProcessMessages;
  }
-DebugOut.Lines.Add('Monster AI database loading...');
+  {DebugOut.Lines.Add('Monster AI database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\mob_ai_db.txt');
 	Reset(txt);
@@ -753,72 +753,75 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	end;
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d monster(s) skills loaded.', [MobAIDB.Count]));
-	Application.ProcessMessages;
+	Application.ProcessMessages;}
 
   {Aegis Monster Skills Load}
 
-  DebugOut.Lines.Add('Aegis Monster AI database loading...');
+  DebugOut.Lines.Add('Fusion Monster AI database loading...');
 	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\NpcAddSkillInfo.txt');
+	AssignFile(txt, AppPath + 'database\Monster_AI.txt');
 	Reset(txt);
 	Readln(txt, str);
 
-  AssignFile(txt2, 'NpcAddSkillInfo.txt');
+  {
+  AssignFile(txt2, 'Monster_AI.txt');
   Rewrite(txt2);
   Writeln(txt2, 'ID,Name,STATUS,SKILL_ID,SKILL_LV,PERCENT,CASTING_TIME,COOLDOWN_TIME,DISPEL,IF,IfCondition');
+  }
   j := 1;
 	while not eof(txt) do begin
 		sl.Clear;
 		Readln(txt, str);
-    sl.Delimiter := ' ';
 		sl.DelimitedText := str;
     for i := sl.Count to 9 do
 			sl.Add('0');
 		for i := 0 to 9 do
 			if (sl.Strings[i] = '') then sl.Strings[i] := '0';
 
-    tsAI2 := TMobAIDBAegis.Create;
+    tsAI2 := TMobAIDBFusion.Create;
     if (sl.Strings[0] <> '//') and (sl.Strings[0] <> '') then begin
 		  with tsAI2 do begin
-
-      Number  := j;
-      tsAI2.Name    := sl.Strings[0];
-      tsAI2.Status  := sl.Strings[1];
-      tsAI2.SkillID := sl.Strings[2];
-      tsAI2.SkillLV := StrToInt(sl.Strings[3]);
-      tsAI2.Percent := StrToInt(sl.Strings[4]);
-      //tsAI2.Casting := StrToInt(sl.Strings[5]);
-      tsAI2.Cast_Time := StrToInt(sl.Strings[5]);
-      tsAI2.Cool_Time := StrToInt(sl.Strings[6]);
-      if (sl.Strings[7] = 'NO_DISPEL') or (sl.Strings[7] = '0') then begin
-        tsAI2.Dispel := sl.Strings[7];
-        tsAI2.IfState := sl.Strings[8];
-        tsAI2.IfCond := sl.Strings[9];
+      
+      tsAI2.ID      := StrToInt(sl.Strings[0]);
+      tsAI2.Number  := j;
+      tsAI2.Name    := sl.Strings[1];
+      tsAI2.Status  := sl.Strings[2];
+      tsAI2.SkillID := sl.Strings[3];
+      tsAI2.SkillLV := StrToInt(sl.Strings[4]);
+      tsAI2.Percent := StrToInt(sl.Strings[5]);
+      tsAI2.Cast_Time := StrToInt(sl.Strings[6]);
+      tsAI2.Cool_Time := StrToInt(sl.Strings[7]);
+      if (sl.Strings[7] = 'NO_DISPEL') or (sl.Strings[8] = '0') then begin
+        tsAI2.Dispel := sl.Strings[8];
+        tsAI2.IfState := sl.Strings[9];
+        tsAI2.IfCond := sl.Strings[10];
       end else begin
         tsAI2.Dispel := '0';
-        tsAI2.IfState := sl.Strings[7];
-        tsAI2.IfCond := sl.Strings[8];
+        tsAI2.IfState := sl.Strings[8];
+        tsAI2.IfCond := sl.Strings[9];
       end;
       j := j + 1;
       //DebugOut.Lines.Add(Format('%d', [j]));
       //Data Converting
-      //if MobDBName.IndexOf(tsAI2.Name) <> -1 then begin
-        //ts := MobDBName.Objects[MobDBName.IndexOf(tsAI2.Name)] as TMobDB;
+      {
+      if MobDBName.IndexOf(tsAI2.Name) <> -1 then begin
+        ts := MobDBName.Objects[MobDBName.IndexOf(tsAI2.Name)] as TMobDB;
 
-        //str1 := IntToStr(ts.ID) + ',' + str;
-        //str1 := IntToStr(ts.ID) + ',' + tsAI2.Name + ',' + tsAI2.Status + ',' + tsAI2.SkillID + ',' + IntToStr(tsAI2.SkillLv) + ',' +  IntToStr(tsAI2.Percent) + ',' +  IntToStr(tsAI2.Cast_Time) + ',' +  IntToStr(tsAI2.Cool_Time) + ',' +  tsAI2.Dispel + ',' +  tsAI2.IfState + ',' +  tsAI2.IfCond;
-	      //Writeln(txt2, str1);
-      //end else if tsAI2.Name <> '0' then begin
+        str1 := IntToStr(ts.ID) + ',' + str;
+        str1 := IntToStr(ts.ID) + ',' + tsAI2.Name + ',' + tsAI2.Status + ',' + tsAI2.SkillID + ',' + IntToStr(tsAI2.SkillLv) + ',' +  IntToStr(tsAI2.Percent) + ',' +  IntToStr(tsAI2.Cast_Time) + ',' +  IntToStr(tsAI2.Cool_Time) + ',' +  tsAI2.Dispel + ',' +  tsAI2.IfState + ',' +  tsAI2.IfCond;
+	      Writeln(txt2, str1);
+      end else if tsAI2.Name <> '0' then begin
         str1 := 'ID ERROR' + ',' + tsAI2.Name;
-	      //Writeln(txt2, str1);
-      //end;
-      MobAIDBAegis.AddObject(tsAI2.Number, tsAI2);
+	      Writeln(txt2, str1);
+      end;}
+      MobAIDBFusion.AddObject(tsAI2.Number, tsAI2);
+
       end;
+
     end;
 	end;
-  CloseFile(txt2);
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Aegis monster(s) skills loaded.', [MobAIDBAegis.Count]));
+	DebugOut.Lines.Add(Format('-> Total %d Fusion monster(s) skills loaded.', [MobAIDBFusion.Count]));
 	Application.ProcessMessages;
 
   {Global Variables Load}
@@ -852,7 +855,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
     end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [MobAIDBAegis.Count]));
+	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [GlobalVars.Count]));
 	Application.ProcessMessages;
 
 {Summon Monster List}

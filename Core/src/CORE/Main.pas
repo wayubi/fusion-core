@@ -208,8 +208,8 @@ begin
 
         //MobAIDBAegis:= TStringList.Create;
         //MobAIDBAegis.CaseSensitive := False;
-        MobAIDBAegis:= TIntList32.Create;
-        MobAIDBAegis.Sorted := true;
+        MobAIDBFusion := TIntList32.Create;
+        MobAIDBFusion.Sorted := true;
 
         GlobalVars := TStringList.Create;
 
@@ -890,7 +890,7 @@ begin
         MArrowDB.Free;
         WarpDatabase.Free;
         MobAIDB.Free;
-        MobAIDBAegis.Free;
+        MobAIDBFusion.Free;
         GlobalVars.Free;
   //      PharmacyDB.Free;
   IDTableDB.Free;
@@ -15877,7 +15877,7 @@ begin
                     SlaveDBName.Clear;
                     //PharmacyDB.Clear;
                     MobAIDB.Clear;
-                    MobAIDBAegis.Clear;
+                    MobAIDBFusion.Clear;
                     GlobalVars.Clear;
                     MArrowDB.Clear;
                     WarpDatabase.Clear;

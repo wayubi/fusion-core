@@ -211,7 +211,7 @@ type TMobAIDB = class
         //SkillType       :array[0..3] of integer;
 end;
 //------------------------------------------------------------------------------
-type TMobAIDBAegis = class
+type TMobAIDBFusion = class
 // ID, Name,	STATUS	SKILL_ID	SKILL_LV	  PERCENT	 CASTING_TIME	  COOLDOWN_TIME		IF IfCondition
   ID  :cardinal;
         Number  :integer;
@@ -1458,7 +1458,7 @@ var
         {Monster Skill Database}
         MobAIDB    :TIntList32;
         //MobAIDBAegis:TStringList;
-        MobAIDBAegis:TIntList32;
+        MobAIDBFusion:TIntList32;
         GlobalVars:TStringList;
         //PharmacyDB :TIntList32;
   SlaveDBName:TStringList;
@@ -1626,6 +1626,7 @@ Option_Font_Style : string;
                 procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);   //Kills a monster
 				procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
                 procedure SendPetRelocation(tm:TMap; tc:TChara; i:integer); //Move a pet
+                procedure SendMonsterRelocation(tm:TMap; ts:tMob; tc:TChara); //Move a monster
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
@@ -3317,6 +3318,53 @@ begin
   tc.Socket.SendBuf( buf, 35 );
 end;
 //------------------------------------------------------------------------------
+procedure SendMonsterRelocation(tm:TMap; ts:tMob; tc:TChara);
+var
+  l,j :integer;
+  xy  :TPoint;
+begin
+  WFIFOW( 0, $011a);
+  WFIFOW( 2, 26);
+  WFIFOW( 4, 1);
+  WFIFOL( 6, ts.ID);
+  WFIFOL(10, ts.ID);
+  WFIFOB(14, 1);
+  tc.Socket.SendBuf(buf, 15);
+  UpdateMonsterDead(tm, ts, 0);
+  //Delete block
+  l := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.IndexOf(ts.ID);
+  if l <> -1 then begin
+    tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.Delete(l);
+  end;
+
+  l := tm.MOB.IndexOf( ts.ID );
+  if l <> -1 then begin
+    tm.MOB.Delete(l);
+  end;
+  ts.ATarget := 0;
+  ts.AData := nil;
+  ts.AMode := 0;
+  //ts.Free;
+  if l <> -1 then begin
+    repeat
+      xy.X := Random(tm.Size.X - 2) + 1;
+      xy.Y := Random(tm.Size.Y - 2) + 1;
+      Inc(j);
+    until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+  ts.Point.X := xy.X;
+  ts.Point.Y := xy.Y;
+
+  tm.MOB.AddObject(ts.ID, ts);
+  tm.Block[ts.Point.X div 8][ts.Point.Y div 8].MOB.AddObject(ts.ID, ts);
+  UpdateMonsterLocation(tm, ts);
+  //SendNData(tc.Socket, tn, tc.ver2 );
+  SendBCmd(tm, ts.Point, 41, tc, False);
+
+  end;
+end;
+
+//------------------------------------------------------------------------------
+
 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
 
 begin

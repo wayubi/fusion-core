@@ -18,7 +18,7 @@ uses
 
         procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
         procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
-        procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBAegis; Tick:Cardinal);
+        procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBFusion; Tick:Cardinal);
         procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
 
         procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
@@ -424,6 +424,12 @@ begin
 					//DamageProcess1(tm, tc, ts, dmg[0], Tick, False);
 					//tc.MTick := Tick + 1500;
                 end;
+
+                26: {Teleport}
+                begin
+                  SendMonsterRelocation(tm, ts, tc);
+                end;
+
 
                 28:     {Heal}
                 begin
@@ -1246,7 +1252,7 @@ end;
 //------------------------------------------------------------------------------
 procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
 var
-  tsAI2 :TMobAIDBAegis;
+  tsAI2 :TMobAIDBFusion;
   j,k,m     :integer;
   sl    :TStringList;
 
@@ -1279,17 +1285,17 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
     IF_SLAVENUM
   }
 
-  //j := MobAIDBAegis.IndexOf(ts.Number);
+  //j := MobAIDBFusion.IndexOf(ts.Number);
   //k := j;
-  //j := MobAIDBAegis.IndexOf(ts.Name);
+  //j := MobAIDBFusion.IndexOf(ts.Name);
   //DebugOut.Lines.Add(ts.Name);
-  for m := 0 to MobAIDBAegis.Count do begin
-    if MobAIDBAegis.IndexOf(m) <> -1 then begin
+  for m := 0 to MobAIDBFusion.Count do begin
+    if MobAIDBFusion.IndexOf(m) <> -1 then begin
     //while (j > 0) do begin
-      //tsAI2 := MobAIDBAegis.IndexOf(j)] as TMobAIDBAegis;
-      tsAI2 := MobAIDBAegis.Objects[MobAIDBAegis.IndexOf(m)] as TMobAIDBAegis;
+      //tsAI2 := MobAIDBFusion.IndexOf(j)] as TMobAIDBFusion;
+      tsAI2 := MobAIDBFusion.Objects[MobAIDBFusion.IndexOf(m)] as TMobAIDBFusion;
       //DebugOut.Lines.Add(IntToStr(j));
-      if (lowercase(ts.Name) = lowercase(tsAI2.Name)) then begin
+      if (ts.Data.ID = tsAI2.ID) then begin
 
         sl.Add(IntToStr(m));
         ts.Data.SkillLocations := sl.DelimitedText;
@@ -1381,7 +1387,7 @@ var
 	i1,j1,k1:integer;
 	i2,j2,k2:integer;
   HPCount:integer;
-  tsAI2 :TMobAIDBAegis;
+  tsAI2 :TMobAIDBFusion;
   EnemyCount:word;
 
 begin
@@ -1393,7 +1399,7 @@ begin
   while i > 0 do begin
     i := i - 1;
     j := StrToInt(sl.Strings[i]);
-    tsAI2 := MobAIDBAegis.Objects[MobAIDBAegis.IndexOf(j)] as TMobAIDBAegis;
+    tsAI2 := MobAIDBFusion.Objects[MobAIDBFusion.IndexOf(j)] as TMobAIDBFusion;
     if tsAI2.IfState = 'IF_HP' then begin
       //if ts.Data.DebugFlag = false then begin
         //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' of the ' + ts.Name + ' has an if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
@@ -1440,7 +1446,7 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBAegis; Tick:Cardinal);
+procedure CheckSkill(tm:TMap; ts:TMob; tsAI2:TMobAIDBFusion; Tick:Cardinal);
 var
   TempSkill:TSkillDB;
 begin
