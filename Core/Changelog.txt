@@ -1,3 +1,4 @@
+- 05-03-04: Fixed (hopefully) the issue with invisible NPC IDs permanently.  Use -1 again. [Colus]
 - 05-01-04: Fixed stability problem regarding NPC IDs of value -1. [AlexKreuz]
 
 
