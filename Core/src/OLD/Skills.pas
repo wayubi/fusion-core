@@ -2715,12 +2715,14 @@ Begin
 						end;
 					end;
 				//New skills ---- Crusader
-				249: //Auto Gaurd
+				249: //Auto Guard
 					begin
-						if Shield <> 0 then begin;
+						if Shield <> 0 then begin
 							ProcessType := 3;
 							tc.MTick := Tick + 1000;
 						end else begin
+                            SendSkillError(tc,6);
+                            tc.MMode := 4;
 							Exit;
 						end;
 					end;
