@@ -818,7 +818,7 @@ end;
 function GetCharaData(AID: cardinal) : Boolean;
 var
   i,j,k,tmp  : Integer;
-	tc, tc2 : TChara;
+	tc : TChara;
 	ta : TMapList;
 	tp  :TPlayer;
 	tpa :TParty;
@@ -836,15 +836,12 @@ begin
 				CID           := StrToInt(SQLDataSet.FieldValues['GID']);
 				Name          :=          SQLDataSet.FieldValues['Name'];
 				
-				if assigned(CharaName) then {如果该人物已经读入，并且正在游戏中，就不用再读了}
+				if assigned(CharaName) then {如果该人物已经读入，就不用再读了}
 				begin
 					if CharaName.IndexOf(Name) <> -1 then
 					begin
-					  tc2 := CharaName.Objects[CharaName.IndexOf(Name)] as TChara;
-						if tc2.Login = 2 then begin
-					    SQLDataSet.Next;
-						  continue;
-						end;
+					  SQLDataSet.Next;
+						continue;
 					end;
 				end;
 
@@ -892,16 +889,6 @@ begin
 		    PLv           := StrToInt(SQLDataSet.FieldValues['PLv']);
 		    ID            := StrToInt(SQLDataSet.FieldValues['AID']);
 
-				{读取人物组队资料}
-				for i := 0 to PartyNameList.Count - 1 do begin
-					tpa := PartyNameList.Objects[i] as TParty;
-					for j := 0 to 11 do begin
-						if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = CID) then begin
-						  PartyName := tpa.Name;
-							tpa.Member[j] := tc;
-						end;
-					end;
-				end;
 				{读取MEMO记录点资料}
 				for i := 0 to 2 do begin
 					MemoMap[i]     := SQLDataSet.FieldValues['mapName' + IntToStr(i)];
@@ -1018,6 +1005,17 @@ begin
 					end;
 				end;
       end;
+			
+			{读取人物组队资料}
+			for i := 0 to PartyNameList.Count - 1 do begin
+				tpa := PartyNameList.Objects[i] as TParty;
+				for j := 0 to 11 do begin
+					if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
+					  tc.PartyName := tpa.Name;
+						tpa.Member[j] := tc;
+					end;
+				end;
+			end;
 			tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
 			tp.CName[tc.CharaNumber] := tc.Name;
 			tp.CData[tc.CharaNumber] := tc;
