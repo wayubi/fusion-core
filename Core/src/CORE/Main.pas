@@ -10671,12 +10671,14 @@ begin
 								end;
 							end;
 
-						$93: //LM
+						$93: {Land Mine]
 							begin
 								if not flag then Break; //“¥‚ñ‚Å‚È‚¢
-								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
+                                                                //Land Mine : [ (Dex/2 +75) * (1 + Int/100) x S.Lv ]
+                                                                dmg[0] := ( ((trunc(tc1.Param[5]/2)) + 75) * (1 + (tc1.Param[3] div 100)) * tc1.Skill[116].Lv );
 								dmg[0] := dmg[0] * tn.Count;
-								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+                                                                // AlexKreuz: Players have no element types - Neutral Element.
+								// dmg[0] := dmg[0] * ElementTable[tl.Element][tc2.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
 								tn.Tick := Tick;
 								WFIFOW( 0, $01de);
@@ -11146,7 +11148,8 @@ begin
 						$93: //LM
 							begin
 								if not flag then Break; //“¥‚ñ‚Å‚È‚¢
-								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
+                                                                //Land Mine : [ (Dex/2 +75) * (1 + Int/100) x S.Lv ]
+                                                                dmg[0] := ( ((trunc(tc1.Param[5]/2)) + 75) * (1 + (tc1.Param[3] div 100)) * tc1.Skill[116].Lv );
 								dmg[0] := dmg[0] * tn.Count;
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
