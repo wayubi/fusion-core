@@ -1175,6 +1175,7 @@ var
 	DisableEquipLimit      :boolean;
 	ItemDropType           :boolean;
 	ItemDropDenominator    :integer;
+  ItemDropMultiplier     :integer;
 	ItemDropPer            :integer;
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
@@ -3457,7 +3458,8 @@ begin
         WFIFOW( 0, $01d0);
         WFIFOL( 2, tc.ID);
         WFIFOW( 6, spiritspheres);
-        SendBCmd(tm, tc.Point, 16);
+        // Colus, 20031222: This packet only has 8 bytes, not 16!
+        SendBCmd(tm, tc.Point, 8);
 end;
 //------------------------------------------------------------------------------
 function DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
