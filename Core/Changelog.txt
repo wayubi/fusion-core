@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
-
-- 03-06-05: Added Palm Strike [Oatmeal]
+- 03-06-04: FusionSQL -> Fixed Character data not saving bug. [AlexKreuz]
+- 03-06-04: Added Palm Strike [Oatmeal]
 - 03-06-04: Added Tiger Claw [Oatmeal]
 - 03-06-04: Added Chain Crush [Oatmeal] 
 - 03-06-04: Added Clown/Gypsy Vulcan Arrow [Oatmeal]

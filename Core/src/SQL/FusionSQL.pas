@@ -567,16 +567,19 @@ var
 	tgl : TGRel;
         i, j : integer;
         sl : TStringList;
+        guildkey : Boolean;
 begin
 	sl := TStringList.Create;
 	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
         
         Result := False;
+        guildkey := False;
 
         query := 'SELECT G.*, M.* FROM guild_info AS G LEFT JOIN guild_members AS M ON (G.GDID=M.GDID) WHERE M.GID = '''+inttostr(GID)+''' LIMIT 1';
         if (MySQL_Query(query)) then begin
                 while not SQLDataSet.Eof do begin
+                        guildkey := True;
                         tg := TGuild.Create;
                         with tg do begin
                                 ID := StrToInt(SQLDataSet.FieldValues['GDID']);
@@ -619,6 +622,7 @@ begin
                 end;
         end;
 
+        if (guildkey) then begin
         with tg do begin
                 query := 'SELECT * FROM guild_members WHERE GDID = '''+inttostr(tg.ID)+'''';
                 if (MySQL_Query(query)) then begin
@@ -709,8 +713,10 @@ begin
                         end;
                 end;
         end;
+        end;
 
         Result := True;
+        guildkey := False;
         sl.Free;
 end;
 

@@ -758,10 +758,8 @@ begin
         
 	ini.Free;
 
-	if UseSQL then
-	  SQLDataSave()
-	else
-	DataSave();
+	if UseSQL then SQLDataSave()
+	else DataSave();
 
   { Mitch: Doesnt hurt to make sure the tray icon was deleted }
   Shell_notifyIcon(NIM_DELETE, @TrayIcon);
@@ -987,6 +985,7 @@ begin
         	tc.Login := 0;
         	tp := tc.PData;
         	tp.Login := 0;
+                if UseSQL then SQLDataSave();
         end;
 
         // AlexKreuz: Random 10053 Bug Fix
@@ -1005,6 +1004,7 @@ var
 	tp  :TPlayer;
 begin
         DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
+        if UseSQL then SQLDataSave();
 	if ErrorCode = 10053 then Socket.Close;
 	if ErrorCode = 10054 then Socket.Close;
 
