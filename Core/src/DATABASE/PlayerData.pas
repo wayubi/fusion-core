@@ -1431,8 +1431,6 @@ uses
 
             if not saveflag then Continue;
 
-            tg.Name := trim(tg.Name);
-
             datafile.Clear;
             datafile.Add('NAM : ' + tg.Name);
             datafile.Add('GID : ' + IntToStr(tg.ID));
