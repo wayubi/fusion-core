@@ -97,7 +97,7 @@ begin
 								tc.IP := Socket.RemoteAddress;
 								tc.tmpMap := '';
 								CalcStat(tc);
-								for k := 1 to 336 do begin
+								for k := 1 to MAX_SKILL_NUMBER do begin
 									tc.Skill[k].Tick := 0;
 								end;
 								tc.SkillTick := $FFFFFFFF;
@@ -325,7 +325,7 @@ begin
 						Card[3] := 0;
 						Data := ItemDB.IndexOfObject(DefaultItem2) as TItemDB;
 					end;
-					for i := 0 to 336 do begin
+					for i := 0 to MAX_SKILL_NUMBER do begin
 						if SkillDB.IndexOf(i) <> -1 then begin
 							tc.Skill[i].Data := SkillDB.IndexOfObject(i) as TSkillDB;
 						end;

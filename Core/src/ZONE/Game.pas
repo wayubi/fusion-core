@@ -788,7 +788,7 @@ end;
 						if (k = 0) and (i >= 1) and (i <= 99) then begin
 							tc.JobLV := i;
 
-              for i := 2 to 336 do begin
+              for i := 2 to MAX_SKILL_NUMBER do begin
               if not tc.Skill[i].Card then
 							tc.Skill[i].Lv := 0;
 					    end;
@@ -1299,7 +1299,7 @@ end;
                                                 begin
 						        //職業変更
 										Val(Copy(str, 5, 256), i, k);
-              if (k = 0) and (i >= 0) and (i <= 23) and (i <> 13) then begin
+              if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
                 // Colus, 20040203: Added unequip of items when you #job
             		for  j := 1 to 100 do begin
 					        if tc.Item[j].Equip = 32768 then begin
@@ -1318,7 +1318,7 @@ end;
                 end;
 
                 // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
-                for j := 1 to 336 do begin
+                for j := 1 to MAX_SKILL_NUMBER do begin
                   if tc.Skill[j].Data.Icon <> 0 then begin
                     if tc.Skill[j].Tick >= timeGetTime() then begin
   						        //DebugOut.Lines.Add('(Icon Removed');
@@ -1334,7 +1334,8 @@ end;
 					      end;
 
             					//tc.SkillPoint := 0;
-
+                      if (i > LOWER_JOB_END) then
+                        i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
 						        	tc.JID := i;
 											//ステータス再計算
 											tc.ClothesColor := 0; //強制的に初期値
@@ -1478,17 +1479,18 @@ end;
 						sl.Free();
 
 					end else if (Copy(str, 1, 7) = 'option ') and ((DebugCMD and $0400) <> 0) and (tid.ChangeOption = 1) then begin
+
 						if Copy(str, 8, 5) = 'sight' then begin
 							tc.Option := tc.Option or 1;
 						end else if Copy(str, 8, 6) = 'ruwach' then begin
 							tc.Option := tc.Option or 8192;
-						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18)) and (Copy(str, 8, 4) = 'cart') then begin
+						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
 							tc.Option := tc.Option or 8;
 							//カートデータ送信
 {追加}				SendCart(tc);
-						end else if (tc.JID = 11) and (Copy(str, 8, 6) = 'falcon') then begin
+						end else if (((tc.JID = 11) or (tc.JID = 4015)) and (Copy(str, 8, 6) = 'falcon')) then begin
 							tc.Option := tc.Option or $10;
-						end else if ((tc.JID = 7) or (tc.JID = 14)) and (Copy(str, 8, 4) = 'peko') then begin
+						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peko')) then begin
 							tc.Option := tc.Option or $20;
 						end else if Copy(str, 8, 3) = 'off' then begin
 							tc.Option := 0;
@@ -1597,7 +1599,7 @@ end;
 							Val(sl.Strings[1], j, k);
 							if k <> 0 then continue;
 
-            if ((i >= 0) and (i <= 157)) or ((i >= 210) and (i <= 336)) then begin
+            if ((i >= 0) and (i <= 157)) or ((i >= 210) and (i <= MAX_SKILL_NUMBER)) then begin
 
             if (j > tc.Skill[i].Data.MasterLV) then j := tc.Skill[i].Data.MasterLV;
            tc.Plag := i;
@@ -1612,20 +1614,22 @@ end;
 					end else if (Copy(str, 1, 8) = 'skillall') and ((DebugCMD and $4000) <> 0) and (tid.ChangeStatSkill = 1) then begin
 						//全スキル習得
 {修正}
+            j := tc.JID;
+            if (j > UPPER_JOB_BEGIN) then j := j - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
 						for i := 1 to 157 do begin
-              if (tc.Skill[i].Data.Job1[tc.JID]) or (tc.Skill[i].Data.Job2[tc.JID]) then begin
+              if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
 							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
               end;
             end;
-						for i := 210 to 336 do begin //韓国桜井専用
-              if (tc.Skill[i].Data.Job1[tc.JID]) or (tc.Skill[i].Data.Job2[tc.JID]) then begin
+						for i := 210 to MAX_SKILL_NUMBER do begin //韓国桜井専用
+              if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
 							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
               end;
 						end;
 {修正ココまで}
 						tc.SkillPoint := 1000;
 						//DebugOut.Lines.Add('DEBUG* Added all skills to ' + tc.Name);
-						SendCSKillList(tc);
+						SendCSkillList(tc);
 {追加}      CalcStat(tc);
             SendCStat(tc);
  					end else if (Copy(str, 1, 4) = 'auto') and ((DebugCMD and $8000) <> 0) and (tid.AutoRawUnit = 1) then begin
@@ -2698,7 +2702,11 @@ end;
 				RFIFOW(4, w2);
 				//DebugOut.Lines.Add(Format('Index:%d EquipType:%d', [w1, w2]));
 {修正}
-				wjob := 1 shl tc.JID;
+        // Colus, 20040304: Upper classes able to equip things now?
+        i := tc.JID;
+        if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
+        // wjob := 1 shl tc.JID;
+        wjob := Int64(1) shl i;
 {修正ココまで}
 				if (not DisableEquipLimit) and
 					 ((tc.Item[w1].Identify = 0) or (tc.BaseLV < tc.Item[w1].Data.eLV) or
@@ -2920,7 +2928,7 @@ end;
                                         Socket.SendBuf(buf, 11);
                                         end;
                                         if tc.Item[w1].Data.IType = 5 then begin 
-                                           WFIFOW(0, $00c3);  // real packet is 01d7 not sand this pk 
+                                           WFIFOW(0, $00c3);  // real packet is 01d7 not sand this pk
       WFIFOL(2, tc.ID); 
                               WFIFOB(6, 8); 
                               WFIFOB(7, tc.Item[w1].Data.view); 
@@ -4042,10 +4050,10 @@ end;
 						tpa.Member[0] := tc;
                                                 if tc.JID = 19 then begin
                                                         tpa.PartyBard[0] := tc;
-                                                        DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end else if tc.JID = 20 then begin
                                                         tpa.PartyDancer[0] := tc;
-                                                        DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);
@@ -4108,10 +4116,10 @@ end;
 							tpa.Member[i] := tc;
                                                         if tc.JID = 19 then begin
                                                                 tpa.PartyBard[0] := tc;
-                                                                DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                                //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                         end else if tc.JID = 20 then begin
                                                                 tpa.PartyDancer[0] := tc;
-                                                                DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                                //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                         end;
 							tc.PartyName := tpa.Name;
 							if (tc.BaseLV < tpa.MinLV) then tpa.MinLV := tc.BaseLV;
@@ -4358,7 +4366,7 @@ end;
         //DebugOut.Lines.Add('Use Item:' + IntToStr(tc.UseItemID));
 
         if (tc.Sit <> 1) or (tc.MSkill = 143) then begin
-				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
+				if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
 {NPCイベント追加}
 				i := MapInfo.IndexOf(tc.Map);
 				j := -1;
@@ -4425,7 +4433,7 @@ end;
 				RFIFOW(8, tc.MPoint.Y);
 				tc.MTarget := 0;
 
-				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
+				if (tc.MSkill = 0) or (tc.MSkill > MAX_SKILL_NUMBER) then continue;
 {アジト機能追加}
 				if ((tc.MSkill = 27) and (mi.noTele or (tc.Option and 6 <> 0))) then continue;
 {アジト機能追加ココまで}
@@ -6496,7 +6504,7 @@ end;
 					CalcStat(tc);
 
 				if (w = 1) and (tid.ChangeStatSkill = 1) then begin // ResetSkill
-					for i := 2 to 336 do begin
+					for i := 2 to MAX_SKILL_NUMBER do begin
             if not tc.Skill[i].Card then
 							tc.Skill[i].Lv := 0;
 					end;
@@ -7301,10 +7309,10 @@ end;
 						tpa.Member[0] := tc;
                                                 if tc.JID = 19 then begin
                                                         tpa.PartyBard[0] := tc;
-                                                        DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end else if tc.JID = 20 then begin
                                                         tpa.PartyDancer[0] := tc;
-                                                        DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        //DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
                                                 end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);

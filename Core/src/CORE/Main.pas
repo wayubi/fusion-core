@@ -17,6 +17,7 @@ const
         WM_NOTIFYICON  = WM_USER+333;
         htTitleBtn = htSizeLast + 1;
 
+
 type
 	TfrmMain = class(TForm)
 		sv1          :TServerSocket;
@@ -118,6 +119,7 @@ type
                 DelPointY       :array[0..999] of cardinal;  // mf
                 DelID           :array[0..999] of cardinal;  // mf
                 DelWait         :array[0..999] of cardinal;  // mf
+
 	end;
 
 
@@ -10503,7 +10505,7 @@ begin
                                         end;
                                 289:  {Dispell}
                                   begin
-                                    for i := 1 to 336 do begin
+                                    for i := 1 to MAX_SKILL_NUMBER do begin
                                       tc1.Skill[i].Tick := Tick;
 						                          tc1.Skill[i].EffectLV := 0;
 						                          tc1.Skill[i].Effect1 := 0;

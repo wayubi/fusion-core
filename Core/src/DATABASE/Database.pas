@@ -64,7 +64,7 @@ var
 	tl	:TSkillDB;
 	sr	:TSearchRec;
 	dat :TFileStream;
-	jf	:array[0..23] of boolean;
+	jf	:array[0..MAX_JOB_NUMBER] of boolean;
 
         afm_compressed :TZip;
         afm :textfile;
@@ -276,9 +276,12 @@ begin
 {Fix}
 			Job := StrToInt64(sl.Strings[24]); 
          if Job <> 0 then begin
-            //Bit recombination 
-            for i := 0 to 23 do begin 
-               jf[i] := boolean((Job and (1 shl i)) <> 0); 
+            //Bit recombination
+            for i := 0 to LOWER_JOB_END do begin
+               jf[i] := boolean((Job and (1 shl i)) <> 0);
+               if (i < (LOWER_JOB_END - 1)) and (jf[i]) then begin
+                  jf[i + LOWER_JOB_END + 1] := true;
+               end;
             end;
             //             Novice                     swordsman                mage                        archer 
             Job :=       Int64(jf[ 0]) * $0001 + Int64(jf[ 1]) * $0002 + Int64(jf[ 2]) * $0004 + Int64(jf[ 3]) * $0008; 
@@ -294,10 +297,12 @@ begin
             Job := Job or Int64(jf[16]) * $010000;  //Sage 
             Job := Job or Int64(jf[17]) * $020000;  //Rogue
             Job := Job or Int64(jf[18]) * $040000;  //Alchemist
-            Job := Job or Int64(jf[19]) * $080000;  //Bard 
-            Job := Job or Int64(jf[20]) * $100000;  //Dancer 
+            Job := Job or Int64(jf[19]) * $080000;  //Bard
+            Job := Job or Int64(jf[20]) * $100000;  //Dancer
 
             // $200000: Groom, $400000: Bride...
+            Job := Job or Int64(jf[23]) * $800000;  //Super Novice
+
             //Crusader Same as a swordsman and knight
             if Boolean(Job and $0002) or Boolean(Job and $0080) then Job := Job or $4000;
 
@@ -332,6 +337,12 @@ begin
                   if Boolean(Job and $0001) then Job := Job or $180000  end;
             end;
 
+            // Colus, 20040304: Kludged method of porting the reqs to upper jobs
+            for i := 0 to LOWER_JOB_END do begin
+               if (i < (LOWER_JOB_END - 1)) and (jf[i]) then begin
+                  Job := Job or Int64(1) shl (i + LOWER_JOB_END + 1);
+               end;
+            end;
 			end;
 {FIX Stop}
 			HP1 := StrToInt(sl.Strings[32]);
@@ -356,7 +367,7 @@ begin
 					SFixPer1[(i mod 10)-1] := StrToInt(sl.Strings[41]) mod 100;
 				end;
 			end;
-			for i := 0 to 336 do AddSkill[i] := 0;
+			for i := 0 to MAX_SKILL_NUMBER do AddSkill[i] := 0;
 			AddSkill[StrToInt(sl.Strings[42])] := StrToInt(sl.Strings[43]);
 				case ID of
 				        4115:
@@ -903,17 +914,26 @@ DebugOut.Lines.Add('Monster AI database loading...');
 			Icon := StrToInt(sl.Strings[43]);
 
 			wj := StrToInt64(sl.Strings[44]);
-			for i := 0 to 23 do begin
-				Job1[i] := boolean((wj and (1 shl i)) <> 0);
+			for i := 0 to LOWER_JOB_END do begin
+				Job1[i] := boolean((wj and (Int64(1) shl i)) <> 0);
+        if (i < (LOWER_JOB_END - 1)) and (Job1[i]) then begin
+          Job1[i + LOWER_JOB_END + 1] := true;
+        end;
+        //if (Job1[i + LOWER_JOB_END + 1]) then DebugOut.Lines.Add(Format('Job1[%d] set',[i+LOWER_JOB_END+1]));
 			end;
+      {for i := 0 to MAX_JOB_NUMBER do begin
+        if (Job1[i]) and (ID = 1) then
+          DebugOut.Lines.Add(Format('Skill %d, job %d is set',[tl.ID, i]));
+      end;}
 			for i := 0 to 4 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
 				ReqLV1[i] := StrToInt(sl.Strings[46+i*2]);
 			end;
 
 			wj := StrToInt64(sl.Strings[55]);
-			for i := 0 to 23 do begin
-				Job2[i] := boolean((wj and (1 shl i)) <> 0);
+			for i := 0 to MAX_JOB_NUMBER do begin
+				Job2[i] := boolean((wj and (Int64(1) shl i)) <> 0);
+        if (i < LOWER_JOB_END - 1) then Job2[i + LOWER_JOB_END + 1] := Job2[i];
 			end;
 			for i := 0 to 4 do begin
 				ReqSkill2[i] := StrToInt(sl.Strings[56+i*2]);
@@ -965,8 +985,9 @@ DebugOut.Lines.Add('Monster AI database loading...');
 			Range2 := StrToInt(sl.Strings[42]);
 			Icon := StrToInt(sl.Strings[43]);
 			wj := StrToInt64(sl.Strings[44]);
-			for i := 0 to 23 do begin
-				Job1[i] := boolean((wj and (1 shl i)) <> 0);
+			for i := 0 to MAX_JOB_NUMBER do begin
+				Job1[i] := boolean((wj and (Int64(1) shl i)) <> 0);
+        if (i < LOWER_JOB_END - 1) then Job1[i + LOWER_JOB_END + 1] := Job1[i];
 			end;
 			for i := 0 to 9 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
@@ -1171,7 +1192,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	//ジョブデータテーブル1読み込み
 	DebugOut.Lines.Add('Job database 1 loading...');
 	Application.ProcessMessages;
-	for i := 0 to 23 do begin
+	for i := 0 to MAX_JOB_NUMBER do begin
 		WeightTable[i] := 0;
 		HPTable[i] := 0;
 		SPTable[i] := 1;
@@ -1179,7 +1200,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	end;
 	AssignFile(txt, AppPath + 'database\job_db1.txt');
 	Reset(txt);
-	for i := 0 to 23 do begin
+	for i := 0 to MAX_JOB_NUMBER do begin
 		sl.Clear;
 		Readln(txt, str);
 		sl.DelimitedText := str;
@@ -1204,12 +1225,12 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	//ジョブデータテーブル2読み込み
 	DebugOut.Lines.Add('Job database 2 loading...');
 	Application.ProcessMessages;
-	for i := 0 to 23 do begin
+	for i := 0 to MAX_JOB_NUMBER do begin
 		for j := 1 to 255 do JobBonusTable[i][j] := 0;
 	end;
 	AssignFile(txt, AppPath + 'database\job_db2.txt');
 	Reset(txt);
-	for i := 0 to 23 do begin
+	for i := 0 to MAX_JOB_NUMBER do begin
 		sl.Clear;
 		Readln(txt, str);
 		sl.DelimitedText := str;
@@ -1840,7 +1861,7 @@ begin
 			end;
 		end;
 		//スキルロード
-		for i := 0 to 336 do begin
+		for i := 0 to MAX_SKILL_NUMBER do begin
 			if SkillDB.IndexOf(i) <> -1 then begin
 				tc.Skill[i].Data := SkillDB.IndexOfObject(i) as TSkillDB;
 			end;
@@ -2504,7 +2525,7 @@ begin
 			sl.Clear;
 			sl.Add('0');
 			cnt := 0;
-			for j := 1 to 336 do begin
+			for j := 1 to MAX_SKILL_NUMBER do begin
 				if tc.Skill[j].Lv <> 0 then begin
 					sl.Add(IntToStr(j));
 					sl.Add(IntToStr(tc.Skill[j].Lv));

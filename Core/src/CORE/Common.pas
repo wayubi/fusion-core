@@ -8,6 +8,13 @@ uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
 	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32;
 
+const
+  // Colus, 20040304: Let's see if this is truly global scope.
+  MAX_SKILL_NUMBER = 336;
+  MAX_JOB_NUMBER = 45;
+  LOWER_JOB_END = 23;
+  UPPER_JOB_BEGIN = 4000;
+
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
 type rPoint = record
@@ -81,7 +88,7 @@ type TItemDB = class
 	SFixPer2   :array[0..4] of Word; // Option 2 mod
 	DrainFix   :array[0..1] of Word; // Drain amount
 	DrainPer   :array[0..1] of Word; // Drain chance
-	AddSkill   :array[0..336] of Word; // Skill addition
+	AddSkill   :array[0..MAX_SKILL_NUMBER] of Word; // Skill addition
 	SplashAttack  :boolean;          // Splash attack
         WeaponSkill   :integer;
         WeaponSkillLV :integer;
@@ -423,10 +430,10 @@ type TSkillDB = class
 	Data2      :array[1..10] of integer;
 	Range2     :byte;
 	Icon       :word;
-	Job1        :array[0..23] of boolean;
+	Job1        :array[0..MAX_JOB_NUMBER] of boolean;
 	ReqSkill1   :array[0..9] of word;
 	ReqLV1      :array[0..9] of word;
-	Job2        :array[0..23] of boolean;
+	Job2        :array[0..MAX_JOB_NUMBER] of boolean;
 	ReqSkill2   :array[0..9] of word;
 	ReqLV2      :array[0..9] of word;
 end;
@@ -665,7 +672,7 @@ type TChara = class
 	MemoPoint     :array[0..2] of TPoint;
 
 	// Line 2: Skills
-	Skill         :array[0..336] of TSkill;
+	Skill         :array[0..MAX_SKILL_NUMBER] of TSkill;
 
 	// Line 3: Items
 	Item          :array[1..100] of TItem;
@@ -1404,12 +1411,12 @@ var
 	//exp_db
 	ExpTable        :array[0..3] of array[0..255] of cardinal;
 	//job_db1
-	WeightTable     :array[0..23] of word;
-	HPTable         :array[0..23] of word;
-	SPTable         :array[0..23] of word;
-	WeaponASPDTable :array[0..23] of array[0..16] of word;
+	WeightTable     :array[0..MAX_JOB_NUMBER] of word;
+	HPTable         :array[0..MAX_JOB_NUMBER] of word;
+	SPTable         :array[0..MAX_JOB_NUMBER] of word;
+	WeaponASPDTable :array[0..MAX_JOB_NUMBER] of array[0..16] of word;
 	//job_db2
-	JobBonusTable   :array[0..23] of array[1..255] of byte;
+	JobBonusTable   :array[0..MAX_JOB_NUMBER] of array[1..255] of byte;
 	//wp_db
 	WeaponTypeTable :array[0..2] of array[0..16] of word;
 	//ele_db
@@ -1707,8 +1714,12 @@ end;
 procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 var
 	j :Integer;
+  JID :word; // Sneaky scope change...
 begin
 	with tc do begin
+    JID := tc.JID;
+    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+    
 		if td.IType = 6 then begin
 			Inc(ATTPOWER, td.ATK);
 		end;
@@ -1799,7 +1810,7 @@ begin
                 if td.LVL4WeaponASPD then LVL4WeaponASPD := true;
                 if td.PerfectDamage then PerfectDamage := true;
 
-		for j :=1 to 336 do begin // Add card skills
+		for j :=1 to MAX_SKILL_NUMBER do begin // Add card skills
 			if td.AddSkill[j] <> 0 then begin
 				if (not Skill[j].Data.Job1[JID]) and (not Skill[j].Data.Job2[JID]) and (not DisableSkillLimit) then begin
 					Skill[j].Lv := td.AddSkill[j];
@@ -2108,10 +2119,12 @@ var
         tl        :TSkillDB;
         mi        :MapTbl;
         g         :double;
-
+  JID       :word; // Scope trickery.
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
+    JID := tc.JID;
+    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
                 {g := int (Tick / 3600000);
                  // Darkhelmet Auto Day/Night
                 if (Tick / 3600000) <= 110 then begin
@@ -2211,7 +2224,7 @@ begin
 		end;
 
 		if not DisableSkillLimit then begin //スキルツリーの再構築
-			for i := 1 to 336 do begin
+			for i := 1 to MAX_SKILL_NUMBER do begin
 				if (not Skill[i].Data.Job1[JID]) and (not Skill[i].Data.Job2[JID]) then begin
 					if not Skill[i].Card then begin
 						//SkillPoint := SkillPoint + Skill[i].Lv;
@@ -2585,11 +2598,12 @@ var
         tl        :TSkillDB;
         //mi        :MapTbl;
         //g         :double;
-
+  JID     :word;
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
-
+    JID := tc.JID;
+    if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
                 SPRedAmount := 0;
 
                 NoJamstone := false;
@@ -3707,15 +3721,19 @@ procedure SendCSkillList(tc:TChara);
 var
 	i, j, k :integer;
 	b       :byte;
+  JID     :word; // Scope trickery.
 begin
+  JID := tc.JID;
+  if (JID > UPPER_JOB_BEGIN) then JID := JID - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
+  //DebugOut.Lines.Add(Format('JID = %d',[JID]));
 	//スキル送信
 	WFIFOW( 0, $010f);
 	j := 0;
-	for i := 1 to 336 do begin
+	for i := 1 to MAX_SKILL_NUMBER do begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
-		if ((not (tc.Skill[i].Data.Job1[tc.JID])) and (not (tc.Skill[i].Data.Job2[tc.JID])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
+		if ((not (tc.Skill[i].Data.Job1[JID])) and (not (tc.Skill[i].Data.Job2[JID])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
-
+    //if (tc.Skill[i].Data.Job1[JID]) then DebugOut.Lines.Add(Format('Skill %d is true for JID %d',[i, JID]));
 		WFIFOW( 0+37*j+4, i);
 		WFIFOW( 2+37*j+4, tc.Skill[i].Data.SType);
 		WFIFOW( 4+37*j+4, 0);
@@ -3737,14 +3755,14 @@ begin
 		end else if (tc.Skill[i].Data.MasterLV <> 0) then begin
 			b := 1;
 			for k := 0 to 4 do begin
-                if tc.Skill[i].Data.Job1[tc.JID] and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
+                if tc.Skill[i].Data.Job1[JID] and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
 					b := 0;
 					continue;
 				end;
 			end;
       if (b <> 0) then begin
         for k := 0 to 4 do begin
-                if tc.Skill[i].Data.Job2[tc.JID] and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
+                if tc.Skill[i].Data.Job2[JID] and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
 					b := 0;
 					continue;
 				end;
@@ -8486,7 +8504,7 @@ var
 begin
 	inherited;
 
-	for i := 0 to 336 do
+	for i := 0 to MAX_SKILL_NUMBER do
 		Skill[i] := TSkill.Create;
 	for i := 1 to 100 do
 		Item[i] := TItem.Create;
@@ -8516,7 +8534,7 @@ destructor TChara.Destroy;
 var
 	i :integer;
 begin
-	for i := 0 to 336 do
+	for i := 0 to MAX_SKILL_NUMBER do
 		Skill[i].Free;
 	for i := 1 to 100 do
 		Item[i].Free;

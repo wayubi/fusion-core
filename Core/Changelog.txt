@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-05-04: Added upper job support (experimental) [Colus]
 - 03-03-04: FusionSQL -> Created Load_Characters Function. [AlexKreuz]
 - 03-03-04: FusionSQL -> Created Assign_AccountID Function. [AlexKreuz]
 - 03-03-04: Optimized Login Code. Faster Logins needed for SQL Timeout. [AlexKreuz]

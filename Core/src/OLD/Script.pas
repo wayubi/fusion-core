@@ -390,7 +390,10 @@ begin
 				begin
 					str := tn.Script[tc.ScriptStep].Data1[0];
 							 if str = 'zeny'        then begin i := tc.Zeny;        end
-					else if str = 'job'         then begin i := tc.JID;         end
+					else if str = 'job'         then begin
+            i := tc.JID;
+            if (i > UPPER_JOB_BEGIN) then i := i - UPPER_JOB_BEGIN + LOWER_JOB_END;
+          end
 					else if str = 'baselevel'   then begin i := tc.BaseLV;      end
 					else if str = 'joblevel'    then begin i := tc.JobLV;       end
 					else if str = 'statuspoint' then begin i := tc.StatusPoint; end
@@ -488,7 +491,11 @@ begin
                         SendBCmd(tc.MData, tc.Point, 13);
                     end;
 
-					tc.JID := tn.Script[tc.ScriptStep].Data3[0];
+          // Colus, 20040304: Adding job offset for upper classes
+					j := tn.Script[tc.ScriptStep].Data3[0];
+          if (j > LOWER_JOB_END) then
+            j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+          tc.JID := j;
 					tc.JobEXP := 0;
 					tc.ClothesColor := 0;
 					tc.JobLV := 1;
@@ -499,11 +506,13 @@ begin
 					CalcStat(tc);
 					SendCStat(tc, true);
 					SendCSkillList(tc);
-					WFIFOW(0, $00c3);
+          // Colus, 20040304: New view packet for jobchange
+					WFIFOW(0, $01d7);
 					WFIFOL(2, tc.ID);
 					WFIFOB(6, 0);
-					WFIFOB(7, tc.JID);
-					SendBCmd(tc.MData, tc.Point, 8); //Ç±Ç±Ç‹Ç≈
+					WFIFOW(7, tc.JID);
+          WFIFOW(9, 0);
+					SendBCmd(tc.MData, tc.Point, 11); //Ç±Ç±Ç‹Ç≈
                                    {ÉoÉOïÒçê 657}
 					Inc(tc.ScriptStep);
 				end;
@@ -1449,7 +1458,7 @@ begin
 				end;
       46: //resetskill
 				begin
-          for i := 2 to 336 do begin
+          for i := 2 to MAX_SKILL_NUMBER do begin
           if not tc.Skill[i].Card then
           tc.Skill[i].Lv := 0;
 					end;
