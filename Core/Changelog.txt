@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-30-04: Fixed GOlden Thief Bug Card. [Darkhelmet]
 - 01-30-04: Updated scripts to use a scriptlabel's OnInit. [Colus]
 - 01-30-04: Enabled guild flags. [Colus]
 - 01-30-04: Added support for guild territories. [Colus]

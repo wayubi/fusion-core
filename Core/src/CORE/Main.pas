@@ -10738,7 +10738,8 @@ begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
-                        case tn.JID of
+                                        if (tc2.NoTarget = false) then begin
+                                          case tn.JID of
                                                 {//$46: //Sanctuary
                                                      begin
                                                                 if tc2.MTick < Tick then begin
@@ -10881,6 +10882,7 @@ begin
                                                                 tc2.Skill[320].Tick := Tick + tn.CData.Skill[320].Data.Data1[tn.MUseLV];
 
                                                         end;}
+                                                end;
                                 end;
                         end;
                         end;
@@ -10888,7 +10890,7 @@ begin
                         if sl2.Count <> 0 then begin
                                 for c1 := 0 to sl2.Count - 1 do begin
                                         tc2 := sl2.Objects[c1] as TChara;
-                                    if tc2 <> tn.CData then begin
+                                    if (tc2 <> tn.CData) and (tc2.NoTarget = false) then begin
                                         case tn.JID of
                                                 $74://ブラストマイン発動
 							begin
