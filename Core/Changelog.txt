@@ -1,6 +1,17 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
+
+- 01-11-04: Began Cleaning up Japanese Comments [Darkhelmet]
+- 01-11-04: Updated Holy Cross Damage Calculation [Darkhelmet]
+- 01-11-04: Added Monster SKill Self Destrucition [Darkhelmet]
+- 01-11-04: Added Monster SKill Suicide [Darkhelmet]
+	-Note Self destruction and Suicide are the same coding, I'm not sure if this is correct.  Also, monster may not respawn.
+- 01-11-04: Added Monster SKill Fire Attack [Darkhelmet]
+- 01-11-04: Added Monster SKill Wind Attack [Darkhelmet]
+- 01-11-04: Updated Monster SKill Magical Attack [Darkhelmet]
+- 01-11-04: Updated Monster SKill Energy Drain [Darkhelmet]
+- 01-11-04: Added Monster SKill Hide - Tell me what you think, it may be buggy as a warning.[Darkhelmet]
 - 01-11-04: Fixed Layout. [AlexKreuz]
 - 01-10-04: Added Monster SKill Silence. [Darkhelmet]
 - 01-10-04: Added Sage SKill Freecast - Note: doesn't reduce speed. [Darkhelmet]

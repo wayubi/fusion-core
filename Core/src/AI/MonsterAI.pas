@@ -346,62 +346,6 @@ begin
                         dmg[0] := dmg[0] * tc.Skill[5].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
-                170:    {Npc- Critical}
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-
-                171:    {Npc-combo hit}
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * 3;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 3, i);
-                end;
-                199:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * 2;
-                        ts.HP := ts.HP + dmg[0];
-                        if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-                 192:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[192].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-
-                200:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[200].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-
-                202:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-
-                191:
-                begin
-                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[191].Data.Data1[tsAI.SkillLV[i]] div 100;
-                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
-                end;
-
 
                 11,13,14,19,20:
                                 { 11  : Napalm Beat
@@ -566,11 +510,53 @@ begin
                         end;
                 end;
 
+                170:    {Npc- Critical}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[170].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+                171:    {Npc-combo hit}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 3;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 3, i);
+                end;
+
+                173:    {Self Destruction}
+                begin
+                        dmg[0] := ts.HP;
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        ts.HP := 0;
+                        WFIFOW( 0, $0080);
+	                WFIFOL( 2, ts.ID);
+	                WFIFOB( 6, 1);
+	                SendBCmd(tm, ts.Point, 7);
+                        
+                end;
+
+                175:    {Suicide Attack}
+                begin
+                        dmg[0] := ts.HP;
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        ts.HP := 0;
+                        WFIFOW( 0, $0080);
+	                WFIFOL( 2, ts.ID);
+	                WFIFOB( 6, 1);
+	                SendBCmd(tm, ts.Point, 7);
+                        
+                end;
+
                 176:    {Posion Attack}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
                         if dmg[0] < 0 then dmg[0] := 0;
-                        dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        //dmg[0] := dmg[0] * tc.Skill[176].Data.Data1[tsAI.SkillLV[i]] div 100;
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                         tc.isPoisoned := True;
                         tc.PoisonTick := tick + 15000;
@@ -598,6 +584,75 @@ begin
                         tc.isSilenced := True;
                         tc.SilencedTick := Tick + 15000;
                         SilenceCharacter(tm, tc, Tick);
+                end;
+
+                186:    {Fire Attack}
+                begin
+                        ts.Element := 3;  //Fire
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        ts.Element := ts.Data.Element;
+                end;
+
+                187:    {Wind Attack}
+                begin
+                        ts.Element := 4;  //Wind
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                        ts.Element := ts.Data.Element;
+                end;
+
+                191:    {Telekenesis Attack}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        //dmg[0] := dmg[0] * tc.Skill[191].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+
+                192:    {Magical Attack}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] + tc.DEF1 + tc.DEF2;
+                        dmg[0] := dmg[0] - tc.MDEF1 - tc.MDEF2;
+                        dmg[0] := dmg[0] * tc.Skill[192].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+                199:    {Blood Drain}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 2;
+                        ts.HP := ts.HP + dmg[0];
+                        if ts.HP > ts.Data.HP then ts.HP := ts.Data.HP;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+                end;
+
+                200:    {Energy Drain}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        //dmg[0] := dmg[0] * tc.Skill[200].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        if dmg[0] > 0 then begin
+                                tc.SP := tc.SP - (dmg[0] div 4);
+                                if tc.SP < 0 then tc.SP := 0;
+                        end;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
+
+                end;
+
+                202:    {Dark Breath}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[tsAI.SkillLV[i]] div 100;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                 end;
         end;
 
@@ -687,6 +742,11 @@ begin
 with ts do begin
         ProcessType := 0;
         case tsAI.Skill[i] of
+                51:     {Hide}
+                begin
+                        ProcessType := 1;
+                end;
+
                 114:    {Power Maximize}
                 begin
                         ProcessType := 1;
@@ -694,7 +754,7 @@ with ts do begin
         end;
 
         case ProcessType of
-                0:  //Skill Used on Oneself Like Hiding
+                0:  //Skill Used on Oneself
                         begin
                                 //Packet Process
                                 WFIFOW( 0, $011a);
@@ -715,52 +775,31 @@ with ts do begin
                                 WFIFOB(14, 1);
                                 SendBCmd(tm, ts.Point, 15);
 
-                                {if (tc1.MSkill = 51) then begin
+                                if (tsAI.Skill[i] = 51) then begin
 
-                                        if tc1.Option = 6 then begin
-                                                tc1.Skill[MSkill].Tick := Tick;
-	    					tc1.Option := tc1.Optionkeep;
-                                                SkillTick := tc1.Skill[MSkill].Tick;
-                                                SkillTickID := MSkill;
-                                                tc1.SP := tc1.SP + 10;
-                                                tc1.Hidden := false;
-                                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                        if ts.Hidden = true then begin
+                                                ts.Hidden := false;
+                                                WFIFOW(0, $0119);
+    					        WFIFOL(2, ts.ID);
+    					        WFIFOW(6, 0);
+    					        WFIFOW(8, 0);
+    					        WFIFOW(10, 0);
+    					        WFIFOB(12, 0);
+    					        SendBCmd(tm, ts.Point, 13);
 
                                         end else begin
-                                                // Required to place Hide on a timer.
-                                                tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
-
-    						if SkillTick > tc1.Skill[MSkill].Tick then begin
-							    SkillTick := tc1.Skill[MSkill].Tick;
-							    SkillTickID := MSkill;
-    						end;
-
-                                                tc1.Optionkeep := tc1.Option;
-                                                tc1.Option := 6;
-                                                tc1.Hidden := true;
-
-                                        end;
-
-                                        CalcStat(tc1, Tick);
-
-                                        WFIFOW(0, $0119);
-    					WFIFOL(2, tc1.ID);
-    					WFIFOW(6, tc1.Stat1);
-    					WFIFOW(8, tc1.Stat2);
-    					WFIFOW(10, tc1.Option);
-    					WFIFOB(12, 0);
-    					SendBCmd(tm, tc1.Point, 13);
-
-                                        // Colus, 20031228: Tunnel Drive speed update
-                                        if (tc1.Skill[213].Lv <> 0) then begin
-    						WFIFOW(0, $00b0);
-    						WFIFOW(2, $0000);
-    						WFIFOL(4, tc1.Speed);
-    						tc1.Socket.SendBuf(buf, 8);
+                                                ts.Hidden := true;
+                                                WFIFOW(0, $0119);
+    					        WFIFOL(2, ts.ID);
+    					        WFIFOW(6, 0);
+    					        WFIFOW(8, 0);
+    					        WFIFOW(10, 6);
+    					        WFIFOB(12, 0);
+    					        SendBCmd(tm, ts.Point, 13);
                                         end;
 
                                 end;
-
+                                {
                                 if (tc1.MSkill = 143) then begin
                                         if tc1.Sit = 1 then begin
 						tc1.Sit := 3;

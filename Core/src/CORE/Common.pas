@@ -327,6 +327,8 @@ type TMob = class
   isCasting   :boolean;
   Stolen      :cardinal;
 
+        Hidden     :boolean;
+
 {NPCイベント追加ココまで}
 	constructor Create;
 	destructor Destroy; override;
@@ -3505,6 +3507,9 @@ begin
 			Result := 2;
 			Exit;
 		end;
+
+                //Grand Cross No Interrupt
+                if tc.MSkill = 254 then tc.NoCastInterrupt := True;
 
 		if (tc.MSkill = 42) and (tc.Zeny < cardinal(tl.Data2[tc.MUseLV])) then begin
 			//金欠メマー
