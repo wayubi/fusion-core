@@ -4409,7 +4409,7 @@ end;
 					if (tc.Cart.item[w1].ID = 0) then begin
 						continue;
 					end;
-	
+
 					//Inventory内検索
 					j := SearchCInventory(tc, tc.Cart.item[w1].ID, tc.Cart.item[w1].Data.IEquip);
 	
@@ -4459,7 +4459,7 @@ end;
 					WFIFOW( 2, w1);
 					WFIFOL( 4, l);
 					Socket.SendBuf(buf, 8);
-	
+
 					//カート重量、容量データの送信
 					WFIFOW(0, $0121);
 					WFIFOW(2, tc.Cart.Count);
@@ -5232,6 +5232,24 @@ end;
 					//変更通知
 					WFIFOW( 0, $0174);
 					SendGuildMCmd(tc, w, false);
+
+          {  Mitch: Fix bug 0000365 (first guild rank doesnt change) }
+          for i := 0 to 36 do begin
+            if tg.MemberID[i] <> 0 then begin
+              j := Chara.IndexOf(tg.MemberID[i]);
+              if j <> -1 then begin
+                tc1 := Chara.Objects[j] as TChara;
+						    tc1.GuildName := tg.Name;
+						    tc1.GuildID := tg.ID;
+						    tc1.ClassName := tg.PosName[tg.MemberPos[i]];
+						    tc1.GuildPos := i;
+						    tg.Member[i] := tc1;
+						    if (i = 0) then tg.MasterName := tc1.Name;
+					    	tg.SLV := tg.SLV + tc1.BaseLV;
+              end;
+            end;
+          end;
+
 				end;
 			end;
 		//--------------------------------------------------------------------------

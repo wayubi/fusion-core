@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-28-04: Fixed Guild "Master" position wont update until server restarts bug [Mitch]
 - 01-28-04: Fixed attacking monsters on same square as players [Mitch]
 - 01-27-04: Fixed Sanctuary healing dead players (yes, this includes Play Dead!) [Colus]
 - 01-27-04: Updated item reqs for Graffiti, Talkie Box, Warp Portal, Venom Dust [Colus]
