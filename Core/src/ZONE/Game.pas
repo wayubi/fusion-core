@@ -776,13 +776,20 @@ end;
 						tc.SaveMap := tc.Map;
 						tc.SavePoint.X := tc.Point.X;
 						tc.SavePoint.Y := tc.Point.Y;
+
+            //Mitch 01-29-2004: Tell the user its saved
+            str2 := 'Saved at ' + tc.Map + ' (' + IntToStr(tc.Point.X) + ',' + IntToStr(tc.Point.Y) + ')';
+            w := Length(str2) + 4;
+            WFIFOW(0, $009a);
+            WFIFOW(2, w);
+            WFIFOS(4, str2, w - 4);
+            Socket.SendBuf(buf, w);
 					end else if (Copy(str, 1, 6) = 'return') and ((DebugCMD and $0002) <> 0) and (tid.SaveReturn = 1) then begin
 						//セーブポイントまで戻る
 						SendCLeave(Socket.Data, 2);
 						tc.Map := tc.SaveMap;
 						tc.Point := tc.SavePoint;
 						MapMove(Socket, tc.Map, tc.Point);
-
 					end else if (Copy(str, 1, 7) = 'blevel ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeLevel = 1) then begin
 						Val(Copy(str, 8, 256), i, k);
 						if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc.BaseLV) then begin
@@ -930,12 +937,13 @@ end;
         end;
         end;
         DebugOut.Lines.Add(str2);
-        w := 200;
+
+        {Mitch 01-29-2004: Make w the correct length of the packet instead of just 200 }
+        w := Length(str2) + 4;
         WFIFOW(0, $009a);
         WFIFOW(2, w);
         WFIFOS(4, str2, w - 4);
         tc.Socket.SendBuf(buf, w);
-
   end else if (Copy(str, 1, 8) = 'monster ') and ((DebugCMD and $0004) <> 0) and (tid.MonsterSummon = 1) then begin
       sl := TStringList.Create;
       sl.DelimitedText := Copy(str, 9, 256);
@@ -1225,13 +1233,15 @@ else if (Copy(str, 1, 4) = 'ban ') then begin
         tp1.Banned := 0;
       end;
 
+      { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
+      w := Length(str) + 4;
       WFIFOW (0, $009a);
-      WFIFOW (2, 256);
-      WFIFOS (4, str, 256);
+      WFIFOW (2, w);
+      WFIFOS (4, str, w - 4);
 
-      tc.socket.sendbuf(buf, 256);
+      tc.socket.sendbuf(buf, w);
       if tc1.Login = 2 then begin
-        tc1.socket.sendbuf(buf, 256);
+        tc1.socket.sendbuf(buf, w);
       end;
     end;
   finally
@@ -1248,11 +1258,13 @@ else if (Copy(str, 1, 5) = 'kick ') then begin
       if tc1.Login = 2 then begin
         tc1.Socket.Close;
 
+        { Mitch 01-29-2004: Fix: Correct w size now made instead of just 256 }
         str := tc.Name +' has kicked ' + s;
+        w := Length(str) + 4;
         WFIFOW (0, $009a);
-        WFIFOW (2, 256);
-        WFIFOS (4, str, 256);
-        tc.socket.sendbuf(buf, 256);
+        WFIFOW (2, w);
+        WFIFOS (4, str, w - 4);
+        tc.socket.sendbuf(buf, w);
       end;
     end;
   finally
@@ -1581,21 +1593,44 @@ end;
                                         if (Copy(str, 1, 5) = 'pword') then begin
                                                 if length(copy(str,7,256)) < 4 then begin
                                                         //DebugOut.Lines.Add('Password Change Failed');
+                                                        { Mitch 01-29-2004: Notify user why it failed! }
+                                                        str := 'Passwords must be at least 4 characters long!';
+                                                        w := Length(str) + 4;
+                                                        WFIFOW (0, $009a);
+                                                        WFIFOW (2, w);
+                                                        WFIFOS (4, str, w - 4);
+                                                        tc.socket.sendbuf(buf, w);
                                                 end
                                                 else if (copy(str,7,1)) = ' ' then begin
                                                         //DebugOut.Lines.Add('Password Change Failed');
+                                                        { Mitch 01-29-2004: Notify user why it failed! }
+                                                        str := 'You have to enter a new password!';
+                                                        w := Length(str) + 4;
+                                                        WFIFOW (0, $009a);
+                                                        WFIFOW (2, w);
+                                                        WFIFOS (4, str, w - 4);
+                                                        tc.socket.sendbuf(buf, w);
                                                 end
                                                 else begin
                                                         tp1 := Player.IndexOfObject(tc.ID) as TPlayer;
+                                                        { Mitch: Removed the following because it isnt used yet:
                                                         if tp1.Gender = 0 then begin
                                                                 //DebugOut.Lines.Add(tc.Name + ' is changing her password.');
                                                         end
                                                         else begin
                                                                 //DebugOut.Lines.Add(tc.Name + ' is changing his password.');
                                                         end;
+                                                        }
                                                         //DebugOut.Lines.Add('Old Password: ' + tp1.Pass);
                                                         tp1.Pass := Copy(str, 7, 256);
                                                         //DebugOut.Lines.Add('New Password: ' + tp1.Pass);
+                                                        { Mitch 01-29-2004: Notify user that the password is changed! }
+                                                        str := 'Password changed. New Password: ' + tp1.Pass;
+                                                        w := Length(str) + 4;
+                                                        WFIFOW (0, $009a);
+                                                        WFIFOW (2, w);
+                                                        WFIFOS (4, str, w - 4);
+                                                        tc.socket.sendbuf(buf, w);
                                                 end;                                        
                                         end else
                                         // AlexKreuz: Change Password
@@ -1631,7 +1666,7 @@ end;
                                                         WFIFOW(0, $009a);
                                                         WFIFOW(2, w);
                                                         WFIFOS(4, str2, w - 4);
-                                                        tc.Socket.SendBuf(buf, w);        
+                                                        tc.Socket.SendBuf(buf, w);
                                                 end;
 
                                 end
