@@ -10484,10 +10484,16 @@ begin
 	Mob.Free;   //ref list
 {NPCƒCƒxƒ“ƒg’Ç‰Á}
 
-	for Idx := TimerAct.Count-1 downto 0 do
-		if Assigned(TimerAct.Objects[Idx]) then
+	for Idx := TimerAct.Count-1 downto 0 do begin
+		if Assigned(TimerAct.Objects[Idx]) then begin
+		for Idy := TimerDef.Count-1 downto 0 do
+			if TimerDef.Objects[Idy] = TimerAct.Objects[Idx] then
+				TimerDef.Delete(Idy); //Remove entry pointing to what we're about to free
 			(TimerAct.Objects[Idx] AS NTimer).Free;
+		end;
+	end;
 	TimerAct.Free;
+
 	for Idx := TimerDef.Count-1 downto 0 do
 		if Assigned(TimerDef.Objects[Idx]) then
 			(TimerDef.Objects[Idx] AS NTimer).Free;
