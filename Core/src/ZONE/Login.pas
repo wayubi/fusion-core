@@ -164,26 +164,29 @@ begin
 
 		if (Option_Username_MF = True) then begin
 			option_mf := copy(userid, length(userid) - 1, 2);
-			userid := copy(userid, 0, length(userid) - 2);
 
-            if (option_mf = '_M') then begin
-            	tp := TPlayer.Create;
-        	    tp.ID := PlayerName.Count + 100101;
-    	        tp.Name := userid;
-	            tp.Pass := userpass;
-            	tp.Gender := 1;
-        	    tp.Mail := '-@-';
-    	        PlayerName.AddObject(tp.Name, tp);
-	            Player.AddObject(tp.ID, tp);
-            end else if (option_mf = '_F') then begin
-            	tp := TPlayer.Create;
-        	    tp.ID := PlayerName.Count + 100101;
-    	        tp.Name := userid;
-	            tp.Pass := userpass;
-            	tp.Gender := 0;
-        	    tp.Mail := '-@-';
-    	        PlayerName.AddObject(tp.Name, tp);
-	            Player.AddObject(tp.ID, tp);
+            if (option_mf = '_M') or (option_mf = '_F') then begin
+				userid := copy(userid, 0, length(userid) - 2);
+
+	            if (option_mf = '_M') then begin
+    	        	tp := TPlayer.Create;
+        		    tp.ID := PlayerName.Count + 100101;
+    	    	    tp.Name := userid;
+	            	tp.Pass := userpass;
+	            	tp.Gender := 1;
+    	    	    tp.Mail := '-@-';
+    		        PlayerName.AddObject(tp.Name, tp);
+	        	    Player.AddObject(tp.ID, tp);
+	            end else if (option_mf = '_F') then begin
+    	        	tp := TPlayer.Create;
+        		    tp.ID := PlayerName.Count + 100101;
+    	    	    tp.Name := userid;
+	            	tp.Pass := userpass;
+	            	tp.Gender := 0;
+    	    	    tp.Mail := '-@-';
+    		        PlayerName.AddObject(tp.Name, tp);
+	        	    Player.AddObject(tp.ID, tp);
+                end;
             end;
 
             if UseSQL then
@@ -315,27 +318,26 @@ begin
 			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			if UseSQL then Load_Accounts(userid);
 
-		userid2 := userid;
-		if (Option_Username_MF = True) then begin
-			option_mf := copy(userid, length(userid) - 1, 2);
-            if (option_mf = '_M') or (option_mf = '_F') then
-				userid := copy(userid, 0, length(userid) - 2);
-        end;
+            if PlayerName.IndexOf(userid) > -1 then begin
+            	//DebugOut.Lines.Add ('User Exists');
+                //DebugOut.Lines.Add ('ID: '+inttostr(id));
+                sv1PacketProcessSub(Socket,w,userid,userpass);
+            end else begin
+            	userid2 := userid;
+				if (Option_Username_MF = True) then begin
+					option_mf := copy(userid, length(userid) - 1, 2);
+            		if (option_mf = '_M') or (option_mf = '_F') then
+						userid := copy(userid, 0, length(userid) - 2);
 
-
-				if PlayerName.IndexOf(userid) > -1 then begin
-					//DebugOut.Lines.Add ('User Exists');
-					//DebugOut.Lines.Add ('ID: '+inttostr(id));
-					sv1PacketProcessSub(Socket,w,userid,userpass);
-				end else begin
-					//DebugOut.Lines.Add ('New User');
-					if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
-						ZeroMemory(@buf[0],23);
-						WFIFOW( 0, $006a);
-						WFIFOB( 2, 0);//Unregistered ID
-						Socket.SendBuf(buf, 23);
-					end;
-				end;
+                    //DebugOut.Lines.Add ('New User');
+                    if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
+                    	ZeroMemory(@buf[0],23);
+                        WFIFOW( 0, $006a);
+                        WFIFOB( 2, 0);//Unregistered ID
+                        Socket.SendBuf(buf, 23);
+                    end;
+                end;
+            end;
 		end;//if buf[0]&buf[1]
 	end;//if SRL>=55...
 end;//sv1PacketProcess()

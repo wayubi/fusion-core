@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-29-04: Fixed #891 - Logins were allowed with usernamexy (xy = any chars). [AlexKreuz]
 - 06-29-04: Fixed #481 - Target disconnecting while wizard casting caused crash. [AlexKreuz]
 - 06-29-04: (Hopefully) fixed limit on packets allowed by Fusion. [Colus]
 - 06-28-04: Fixed Card effects such as 'Baphomet Splash'. Broke with #977. [AlexKreuz]
