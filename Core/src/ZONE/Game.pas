@@ -3571,7 +3571,13 @@ end;
 						tpa.ITEMShare := 1;
 						tpa.MemberID[0] := tc.CID; //ÉäÅ[É_:0
 						tpa.Member[0] := tc;
-
+                                                if tc.JID = 19 then begin
+                                                        tpa.PartyBard[0] := tc;
+                                                        DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                end else if tc.JID = 20 then begin
+                                                        tpa.PartyDancer[0] := tc;
+                                                        DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                end;
 						tc.PartyName := tpa.Name;
 						PartyNameList.AddObject(tpa.Name, tpa);
 						//DebugOut.Lines.Add(Format('PartyName %s : from %d to %d : ID = %d : Name = %s', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
@@ -3627,6 +3633,13 @@ end;
 						if (tpa.MemberID[i] = 0) and (tpa.Member[i] = nil) then begin
 							tpa.MemberID[i] := tc.CID;
 							tpa.Member[i] := tc;
+                                                        if tc.JID = 19 then begin
+                                                                tpa.PartyBard[0] := tc;
+                                                                DebugOut.Lines.Add(Format('Bard Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        end else if tc.JID = 20 then begin
+                                                                tpa.PartyDancer[0] := tc;
+                                                                DebugOut.Lines.Add(Format('Dancer Added To Party', [tpa.Name, tpa.MinLV, tpa.MaxLV, tpa.MemberID[0], tpa.Member[0].Name]));
+                                                        end;
 							tc.PartyName := tpa.Name;
 							if (tc.BaseLV < tpa.MinLV) then tpa.MinLV := tc.BaseLV;
 							if (tc.BaseLV > tpa.MaxLV) then tpa.MaxLV := tc.BaseLV;

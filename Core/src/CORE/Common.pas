@@ -811,6 +811,8 @@ type TParty = class
 	Member    :array[0..11] of TChara;//メンバー
 	EXP       :Cardinal; //経験値分配用
 	JEXP      :Cardinal; //経験値分配用
+        PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
+        PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
 end;
 {パーティー機能追加ココまで}
 //------------------------------------------------------------------------------
