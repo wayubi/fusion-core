@@ -179,6 +179,10 @@ uses
         columns := TStringList.Create;
         columns.Delimiter := ':';
 
+        if not FileExists(path) then begin
+            reed_shutdown_server(path + ' is missing.');
+        end;
+
         datafile.LoadFromFile(path);
         columns.DelimitedText := datafile[row + 2];
 
