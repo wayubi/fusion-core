@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-22-03: Flywings don't teleport you to be stuck anymore. [AlexKreuz]
 - 12-22-03: Added ItemDropMultiplier for people who can't divide :) [Colus]
 - 12-22-03: Fixed Monk spirit spheres display (wrong packet length) [Colus]
 - 12-22-03: Modified source for AFM 2.0 Map format. Smaller size. [AlexKreuz]
