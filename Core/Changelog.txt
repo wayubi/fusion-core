@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
-- 06-30-04: Added Athena @kill command to ALBGM. [Trihan]
-- 06-30-04: Added Athena @alive command to ALBGM. [Trihan]
+- 06-29-04: Fixed JCon Account Delete to also delete Characters, Parties, Guilds. [AlexKreuz]
+- 06-29-04: Added Athena @kill command to ALBGM. [Trihan]
+- 06-29-04: Added Athena @alive command to ALBGM. [Trihan]
 - 06-29-04: Minor stability fixes to JCon. [AlexKreuz]
 - 06-29-04: Banned and Gender in JCon Accounts not drop down menus. [AlexKreuz]
 - 06-29-04: New unique ID assigning method for accounts. [AlexKreuz]

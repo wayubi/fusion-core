@@ -4,7 +4,7 @@ interface
 
 uses
 	SysUtils, WinSock,
-	Common, Database, WeissINI;
+	Common, Database, WeissINI, Globals, Game_Master;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate();
@@ -140,11 +140,44 @@ uses
     end;
 
     procedure JCon_Accounts_Delete();
+    var
+    	tp : TPlayer;
+        tpe : TPet;
+        i, j : Integer;
     begin
     	if (frmMain.Edit3.Text = '') then begin
         	Exit;
         end else begin
-        	PlayerName.Delete(PlayerName.IndexOf(frmMain.Edit3.Text));
+        	tp := PlayerName.Objects[PlayerName.IndexOf(frmMain.Edit3.Text)] as TPlayer;
+
+            for i := 0 to 8 do begin
+            	if assigned(tp.CData[i]) then begin
+                    leave_party(tp.CData[i]);
+                    leave_guild(tp.CData[i]);
+
+                    { I'm leaving pets out for now. They're whacked }
+		            {for j := 0 to PetList.Count - 1 do begin
+        		    	if PetList.IndexOf(j) <> -1 then begin
+		                	tpe := PetList.IndexOfObject(j) as TPet;
+                		    if (tpe.CharaID = tp.CData[i].ID) or (tpe.PlayerID = tp.ID) then PetList.Delete(j);
+        		        end;
+		            end;}
+
+                    CharaName.Delete(CharaName.IndexOf(tp.CData[i].Name));
+                    Chara.Delete(Chara.IndexOf(tp.CData[i].CID));
+                end;
+            end;
+
+            if (IDTableDB.IndexOf(tp.ID) <> -1) then begin
+            	IDTableDB.Delete(IDTableDB.IndexOf(tp.ID));
+            end;
+
+            if (GM_Access_DB.IndexOf(tp.ID) <> -1) then begin
+            	GM_Access_DB.Delete(GM_Access_DB.IndexOf(tp.ID));
+            end;
+
+        	PlayerName.Delete(PlayerName.IndexOf(tp.Name));
+            Player.Delete(Player.IndexOf(tp.ID));
         end;
 
         JCon_Accounts_Load();
