@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-25-04: Fixed #569 (Again) - Hunter range exploit. Not sure what was smoking. [AlexKreuz]
 - 06-25-04: Added Athena @skpoint command to ALBGM system. [Trihan]
 - 06-25-04: Added Athena @joblvup command to ALBGM system. [Trihan]
 - 06-25-04: Modified @joblvlup. Max levels: Novice 10, first/second jobs 50, advanced jobs 70. [Trihan]
