@@ -69,20 +69,9 @@ begin
     if tp.Pass = userpass then begin
 
         if tp.Login = 1 then begin
-            count := 0;
-
-            while count < 8 do begin
-                if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
-                    WFIFOW( 0, $0081);
-                    WFIFOB( 2, 08);
-                    Socket.SendBuf(buf, 3); // AlexKreuz: Fix Double Login Crash
-                    //DebugOut.Lines.Add('Double Login.');
-                    tp.Login := 0; // AlexKreuz
-                    tp.CData[count].Login := 0; // AlexKreuz
-                    tp.CData[count] := nil;
-                end;
-                inc(count);
-            end;
+            WFIFOW(0, $0081);
+            WFIFOB(2, 08);
+            Socket.SendBuf(buf, 3);
         end;
 
         tp.IP := Socket.RemoteAddress;
@@ -248,7 +237,7 @@ begin
 			userid := RFIFOS(6, 24);
 			userpass := RFIFOS(30, 24);
 
-			DebugOut.Lines.Add('User: ' + userid + ' -  Pass: ' + userpass);
+			DebugOut.Lines.Add('User: ' + userid + ' - Pass: ' + userpass);
 			//DebugOut.Lines.Add('ver1 = ' + IntToStr(l) + ':ver2 = ' + IntToStr(w));
 			id := PlayerName.IndexOf(userid);
 			if id <> -1 then begin

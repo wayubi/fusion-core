@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-26-04: Fixed Characters disappear after double-login Bug. [AlexKreuz]
 - 01-26-04: Fixed Rogue's Discount Skill No Effect Bug. [AlexKreuz]
 - 01-26-04: Fixed Lex Aeterna cast delay/freezing monsters [Colus]
 - 01-26-04: Updated Endure under Lucky Flee conditions [Colus]
