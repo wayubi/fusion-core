@@ -491,43 +491,43 @@ begin
 	end else begin
 		DeathJobLoss := 1;
 	end;
-  if sl.IndexOfName('MonsterMob') <> -1 then begin
+	if sl.IndexOfName('MonsterMob') <> -1 then begin
 		MonsterMob := StrToBool(sl.Values['MonsterMob']);
 	end else begin
 		MonsterMob := true;
 	end;
-  if sl.IndexOfName('SummonMonsterExp') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterExp') <> -1 then begin
 		SummonMonsterExp := StrToBool(sl.Values['SummonMonsterExp']);
 	end else begin
 		SummonMonsterExp := true;
 	end;
-    if sl.IndexOfName('SummonMonsterAgo') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterAgo') <> -1 then begin
 		SummonMonsterAgo := StrToBool(sl.Values['SummonMonsterAgo']);
 	end else begin
 		SummonMonsterAgo := false;
 	end;
-    if sl.IndexOfName('SummonMonsterName') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterName') <> -1 then begin
 		SummonMonsterName := StrToBool(sl.Values['SummonMonsterName']);
 	end else begin
 		SummonMonsterName := true;
 	end;
-  if sl.IndexOfName('SummonMonsterMob') <> -1 then begin
+	if sl.IndexOfName('SummonMonsterMob') <> -1 then begin
 		SummonMonsterMob := StrToBool(sl.Values['SummonMonsterMob']);
 	end else begin
 		SummonMonsterMob := true;
 	end;
-  if sl.IndexOfName('GlobalGMsg') <> -1 then begin
+	if sl.IndexOfName('GlobalGMsg') > -1 then begin
 		GlobalGMsg := sl.Values['GlobalGMsg'];
 	end else begin
 		GlobalGMsg := 'The [$castlename] castle has been taken by [$guildname] guild.';
-    // Unoccupied version: 'The [$castlename] castle is claimed by [$guildname] guild.'
+		// Unoccupied version: 'The [$castlename] castle is claimed by [$guildname] guild.'
 	end;
-  if sl.IndexOfName('MapGMsg') <> -1 then begin
+	if sl.IndexOfName('MapGMsg') > -1 then begin
 		MapGMsg := sl.Values['MapGMsg'];
 	end else begin
 		MapGMsg := 'Emperium Has Been Destroyed';
 	end;
-        if sl.IndexOfName('Timer') <> -1 then begin
+	if sl.IndexOfName('Timer') > -1 then begin
 		Timer := StrToBool(sl.Values['Timer']);
 	end else begin
 		Timer := true;
@@ -787,6 +787,7 @@ var
 	ini : TIniFile;
 	sr  : TSearchRec;
 	Idx : Integer; // Loop Iterator for freeing our global lists.
+	Dupe : Integer;
 begin
 
     if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
@@ -896,6 +897,7 @@ begin
 		if Assigned(ItemDB.Objects[Idx]) then
 			(ItemDB.Objects[Idx] AS TItemDB).Free;
 	ItemDB.Free; //CR - Frees up 1.4Mb properly on close down that is leaked.
+	ItemDBName.Free;
 
 {アイテム製造追加}
 	for Idx := MaterialDB.Count-1 downto 0 do
@@ -907,12 +909,16 @@ begin
 		if Assigned(MobDB.Objects[Idx]) then
 			(MobDB.Objects[Idx] AS TMobDB).Free;
 	MobDB.Free;
+	MobDBName.Free;
 
 	for Idx := MArrowDB.Count-1 downto 0 do
 		if Assigned(MArrowDB.Objects[Idx]) then
 			(MArrowDB.Objects[Idx] AS TMArrowDB).Free;
 	MArrowDB.Free;
 
+	for Idx := WarpDatabase.Count-1 downto 0 do
+		if Assigned(WarpDatabase.Objects[Idx]) then
+			(WarpDatabase.Objects[Idx] AS TWarpDatabase).Free;
 	WarpDatabase.Free;
 
 	MobAIDB.Free; //CR - Empty list.
@@ -956,12 +962,30 @@ begin
 	CharaName.Free;
 	CharaPID.Free;
 {チャットルーム機能追加}
+	for Idx := ChatRoomList.Count-1 downto 0 do
+		if Assigned(ChatRoomList.Objects[Idx]) then
+			(ChatRoomList.Objects[Idx] AS TChatRoom).Free;
 	ChatRoomList.Free;
 {チャットルーム機能追加ココまで}
 {パーティー機能追加}
+	for Idx := PartyNameList.Count-1 downto 0 do
+		if Assigned(PartyNameList.Objects[Idx]) then
+			(PartyNameList.Objects[Idx] AS TParty).Free;
 	PartyNameList.Free;
+
+	for Idx := CastleList.Count-1 downto 0 do
+		if Assigned(CastleList.Objects[Idx]) then
+			(CastleList.Objects[Idx] AS TCastle).Free;
 	CastleList.Free;
+
+	for Idx := TerritoryList.Count-1 downto 0 do
+		if Assigned(TerritoryList.Objects[Idx]) then
+			(TerritoryList.Objects[Idx] AS TTerritoryDB).Free;
 	TerritoryList.Free;
+
+	for Idx := EmpList.Count-1 downto 0 do
+		if Assigned(EmpList.Objects[Idx]) then
+			(EmpList.Objects[Idx] AS TEmp).Free;
 	EmpList.Free;
 {パーティー機能追加ココまで}
 {キューペット}
@@ -976,9 +1000,16 @@ begin
 	PetList.Free;
 {キューペットここまで}
 {露店スキル追加}
+	for Idx := VenderList.Count-1 downto 0 do
+		if Assigned(VenderList.Objects[Idx]) then
+			(VenderList.Objects[Idx] AS TVender).Free;
 	VenderList.Free;
 {露店スキル追加ココまで}
 {取引機能追加}
+
+	for Idx := DealingList.Count-1 downto 0 do
+		if Assigned(DealingList.Objects[Idx]) then
+			(DealingList.Objects[Idx] AS TDealings).Free;
 	DealingList.Free;
 {取引機能追加ココまで}
 {氏{箱追加}
@@ -995,12 +1026,8 @@ begin
 	SummonIOWBList.Free;
 {氏{箱追加ココまで}
 {NPCイベント追加}
-	ServerFlag.Free;//empty list
+	ServerFlag.Free;//Strings Only List - safe as is.
 
-	for Idx := MapInfo.Count-1 downto 0 do
-		if Assigned(MapInfo.Objects[Idx]) then
-			(MapInfo.Objects[Idx] AS MapTbl).Free;
-	MapInfo.Free;
 {NPCイベント追加ココまで}
 {ギルド機能追加}
 	for Idx := GuildList.Count-1 downto 0 do
@@ -1020,6 +1047,16 @@ begin
 		if Assigned(Map.Objects[Idx]) then
 			(Map.Objects[Idx] AS TMap).Free;
 	Map.Free;
+
+	for Idx := MapInfo.Count-1 downto 0 do
+		if Assigned(MapInfo.Objects[Idx]) then
+			(MapInfo.Objects[Idx] AS MapTbl).Free;
+	MapInfo.Free;
+
+	for Idx := MapList.Count-1 downto 0 do
+		if Assigned(MapList.Objects[Idx]) then
+			(MapList.Objects[Idx] AS TMapList).Free;
+	MapList.Free;
 end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.FormResize(Sender: TObject);
