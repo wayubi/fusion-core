@@ -9453,6 +9453,25 @@ Begin
 							SetLength(tn.Script[k].Data1, 1);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 							Inc(k);
+                        end else if str = 'donpcevent' then begin //------- 71 donpcevent
+							if (sl1.Count <> 2) then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							//val(SL1[2], i, j);
+							//if (j <> 0) or (i < 0) or (i > 1) then begin
+							//	ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
+							//	Exit; // Safe - 2004/04/21
+							//end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 71;
+							SetLength(tn.Script[k].Data1, 2);
+                            SetLength(tn.Script[k].Data3, 1);
+							//SetLength(tn.Script[k].Data3, 1);
+							tn.Script[k].Data1[0] := SL1[0];
+							tn.Script[k].Data1[1] := lowercase(SL1[1]);
+							//tn.Script[k].Data3[0] := StrToInt(SL1[2]);
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);

@@ -2568,7 +2568,7 @@ begin
                                 WFIFOB(26, 0); //0=単攻撃 8=複数 10=クリティカル
                                 WFIFOW(27, 0); //逆手
                                 SendBCmd(tm, ts.Point, 29);
-																SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                 StatCalc1(tc, ts, Tick);
                                 dmg[0] := 0;

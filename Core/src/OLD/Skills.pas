@@ -6116,8 +6116,8 @@ Var
 	AChara : TChara;
 Begin
 	Area := Rect( //Ordered Left, Right, Top, Bottom
-		TrgtPt.X - SData.Range2, TrgtPt.X + SData.Range2,
-		TrgtPt.Y - SData.Range2, TrgtPt.Y + SData.Range2
+		TrgtPt.X - SData.Range2, TrgtPt.Y - SData.Range2,
+		TrgtPt.X + SData.Range2, TrgtPt.Y + SData.Range2
 	);
 	//TRect convention is screen coords, not cartesian, so the properties
 	// might look odd below:
