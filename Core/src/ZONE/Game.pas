@@ -821,6 +821,22 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.Free;
                                         end
 
+                                        else if (copy(str, 1, 5) = 'where') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
+                                                str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+
+                                                w := Length(str) + 4;
+                                                WFIFOW (0, $009a);
+                                                WFIFOW (2, w);
+                                                WFIFOS (4, str, w - 4);
+                                                tc.socket.sendbuf(buf, w);
+
+                                                sl.Free;
+                                        end
+
                                         else begin
                                         end;
                                                                                 
