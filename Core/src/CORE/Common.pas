@@ -105,7 +105,7 @@ type TItemDB = class
         WeaponSkillLV :integer;
         WeaponID      :integer;
 	NoJamstone    :boolean;
-        
+
         FastWalk      :boolean;
         NoTarget      :boolean;
         FullRecover   :boolean;
@@ -122,8 +122,14 @@ type TItemDB = class
         LVL4WeaponASPD :boolean;
         PerfectDamage   :boolean;
 
+  public
+
+    Procedure Assign(Source : TItemDB);
+
 {変更ココまで}
-end;
+End;(* TItenDB *)
+
+
 //------------------------------------------------------------------------------
 // アイテムデータ
 type TItem = class
@@ -1610,12 +1616,30 @@ Option_GraceTime_PvPG :cardinal;
 		procedure DelSkillUnit(tm:TMap; tn:TNPC);
 //------------------------------------------------------------------------------
     //所持アイテム
-		function  MoveItem(ti1:TItemList; ti2:TitemList; Index:Word; cnt:Word) : Integer;
-
-		function  GetItemStore(ti:TItemList; td:TItem; cnt:Word; IsEquip:Boolean = False) : Integer;
-		function  DeleteItem(ti:TItemList; index:Word; cnt:Word) : Integer;
-		function  SearchInventory(ti:TItemList; ItemID:word; IEquip:boolean) : word;//SearchCInventory()等と使い方は同じ
-		procedure CalcInventory(ti:TItemList);
+		Function  MoveItem(
+                Dest    : TItemList;
+                Source  : TitemList;
+                Index   : Word;
+                Quant   : Word
+              ) : Integer;
+		function  GetItemStore(
+                AList   : TItemList;
+                AnItem  : TItem;
+                Quant   : Word;
+                IsEquip : Boolean = False
+              ) : Integer;
+		function  DeleteItem(
+                AList : TItemList;
+                Index : Word;
+                Quant : Word
+              ) : Integer;
+		function  SearchInventory(
+                AList   : TItemList;
+                ItemID  : Word;
+                IEquip  : Boolean
+                ) : Word;//SearchCInventory()等と使い方は同じ
+		procedure CalcInventory( AList : TItemList );
+    
 		procedure SendCart(tc:TChara);
 //------------------------------------------------------------------------------
 {パーティー機能追加}
@@ -1979,7 +2003,8 @@ end;
 //------------------------------------------------------------------------------
 procedure CalcSkill(tc:TChara; Tick:cardinal);
 var
-	i,j :Integer;
+	i :Integer;
+  j :Integer;
 begin
 	with tc do begin
 		//修練 ATK[0][4]
@@ -5005,135 +5030,340 @@ end;
 
 
 
-
-
 //==============================================================================
-function	MoveItem(ti1:TItemList; ti2:TitemList; Index:Word; cnt:Word) : Integer; overload;
-var
-	i,j:Integer;
-begin
+(*= Func MoveItem() : Integer ===================*
+
+CRW - 2004/04/04
+  Adding useful comments, renaming parameters and
+  internal variables for clarity.
+
+  No changes to external behavior or parameter
+  order were made! :)
+
+  Copies a 'Quant' amount of Items inside the
+  'Source' container to the
+
+  Returns:
+
+  -1  - When Index is out of bounds, or the
+        Source container doesn't have any items
+        at Index.
+
+   0  - ??
+
+   2  - ??
+
+   3  - No existing Item nodes in Dest have
+        the item that Source is moving over,
+        and/or the Source container is FULL.
+
+(*-- relies on --
+  DeleteItem()
+  GetItemStore()
+  SearchInventory()
+(*==============================================*)
+Function	MoveItem(
+            Dest    : TItemList;
+            Source  : TItemList;
+            Index   : Word;
+            Quant   : Word
+          ) : Integer; overload;
+Var
+  J : Integer;
+  K : Integer;
+  //CRW - I hate using "i" and "l" as iterative variable names
+  //  -- they're too easy to confuse for '1' '1' 'l' |'.
+  //  Avoid them like the plague, I tell you! :)
+Begin
+  //自分範囲外
+  //自分アイテム持ってない
 	Result := -1;
-	if 100 < index then Exit; //自分範囲外
-	if ti2.Item[Index].ID = 0 then Exit; //自分アイテム持ってない
-	i := SearchInventory(ti1, ti2.Item[Index].ID, ti2.Item[Index].Data.IEquip);
-	if i = 0 then begin //相手空き無し
+	if (100 < index) OR (Source.Item[Index].ID = 0) then
+    begin // Index OOB, or Item at Index is empty.
+    Exit;
+    end;//if (100...
+
+  // Are there any Item nodes with the item ID inside the destination?
+	K := SearchInventory(Dest, Source.Item[Index].ID, Source.Item[Index].Data.IEquip);
+	if K = 0 then begin //相手空き無し
 		Result := 3;
 		Exit;
 	end;
-	//個数多すぎたら持ってる数に
-	if ti2.Item[Index].Amount < cnt then cnt := ti2.Item[Index].Amount;
-	j := GetItemStore(ti1, ti2.Item[Index], cnt);
+
+  // if there's less of the Item in Source than asked for,
+  // only send that amount over, instead.
+	if Source.Item[Index].Amount < Quant then Quant := Source.Item[Index].Amount;
+	J := GetItemStore(Dest, Source.Item[Index], Quant);
 	if j = 0 then begin
-		DeleteItem(ti2,Index,cnt);
+		DeleteItem(Source,Index,Quant);
 		Result := 0;
 	end else if j = 2 then begin //相手重量オーバー
 		Result := j;
 	end else if j = 3 then begin //相手種類オーバー
 		Result := j;
 	end;
-end;
+End;(* Func MoveItem() : Integer ===============*)
+
+
 //------------------------------------------------------------------------------
-function  GetItemStore(ti:TItemList; td:TItem; cnt:Word; IsEquip:Boolean = False) : Integer;
-var
-	i:Integer;
+(*= Func GetItemStore() : Integer ===============*
+
+CRW - 2004/04/05
+  Adding useful comments, renaming parameters and
+  internal variables for clarity.
+
+  No changes to external behavior or parameter
+  order were made! :)
+
+
+
+Returns:
+
+-1
+0
+3
+
+  -1  - When Index is out of bounds, or the
+        AList container doesn't have any items.
+
+   0  - ??
+
+   2  - ??
+
+   3  - No existing Item nodes in Dest have
+        the item that Source is moving over,
+        and/or the Source container is FULL.
+
+
+(*-- relies on --
+  SearchInventory()
+(*==============================================*)
+Function  GetItemStore(
+            AList   : TItemList;
+            AnItem  : TItem;
+            Quant   : Word;
+            IsEquip : Boolean = False
+          ) : Integer;
+Var
+	Idx : Integer;
 begin
 	Result := 0;
-	with ti do begin
+	with AList do
+    begin
 		//重量オーバー
-		if MaxWeight < (Weight + td.Data.Weight * cnt) then begin
+		if MaxWeight < (Weight + AnItem.Data.Weight * Quant) then
+      begin
 			Result := 2;
 			Exit;
-		end;
-		if not IsEquip then IsEquip := td.Data.IEquip;
-		i := SearchInventory(ti,td.ID,IsEquip);
+  		end;//if MaxWeight...
+
+		if not IsEquip then IsEquip := AnItem.Data.IEquip;
+		Idx := SearchInventory(AList,AnItem.ID,IsEquip);
 		//所持種類オーバー
-		if i = 0 then begin
+		if Idx = 0 then begin
 			Result := 3;
 			Exit;
 		end;
 		//所持個数オーバー
-		if cnt + Item[i].Amount > 30000 then begin
+		if Quant + Item[Idx].Amount > 30000 then begin
 			Result := -1;
 			Exit;
 		end;
-		with Item[i] do begin
-			if Amount = 0 then Inc(Count);
-			ID := td.ID;
-			Inc(Amount,cnt);
-			Equip := 0;
-			Identify := td.Identify;
-			Refine := td.Refine;
-			Attr := td.Attr;
-			Card[0] := td.Card[0];
-			Card[1] := td.Card[1];
-			Card[2] := td.Card[2];
-			Card[3] := td.Card[3];
-			Data := td.Data;
-		end;
-		Inc(Weight,(td.Data.Weight * cnt));
-	end;
-end;
+		with Item[Idx] do
+      begin
+			if Amount = 0 then
+        Count := Count + 1;
+
+			ID        := AnItem.ID;
+			Amount    := Amount + Quant;
+			Equip     := 0;
+			Identify  := AnItem.Identify;
+			Refine    := AnItem.Refine;
+			Attr      := AnItem.Attr;
+			Card[0]   := AnItem.Card[0];
+			Card[1]   := AnItem.Card[1];
+			Card[2]   := AnItem.Card[2];
+			Card[3]   := AnItem.Card[3];
+
+      Data := AnItem.Data;
+      //
+      //CRW - Wrong! You need to Assign() Data or copy EVERYTHING
+      // field by field..  pointing Data to Data means the original
+      // AList.Item[Idx].Data 's TItenDB is freefloating, unreferenced...
+      //
+      // This is a memory leak, using := improperly.
+      //
+      // CRW -- Made the Assign() method now for TItemDB, so people won't
+      // perpetuate this mistake.  It and other goodies in
+      // TitemDB, TItem, TItemList are pending :)
+      //
+      // Right way:
+			//Data.Assign( AnItem.Data );
+
+  		end;
+		Weight := Weight + (AnItem.Data.Weight * Quant);
+  	end;//w AList
+end;(* Func GetItemStore() : Integer ===========*)
+
+
 //------------------------------------------------------------------------------
-function DeleteItem(ti:TItemList; index:Word; cnt:Word) : Integer;
-begin
+(*= Func DeleteItem() : Integer =================*
+
+CRW - 2004/04/04
+  Adding useful comments, renaming parameters and
+  internal variables for clarity.
+
+  No changes to external behavior or parameter
+  order were made! :)
+
+Deletes a given Quantity of an item at Index
+inside the ItemList 'AList'
+
+Returns:
+ -1 : Failed to delete.
+  0 : Deletion successful.
+
+(*==============================================*)
+Function  DeleteItem(
+            AList : TItemList;
+            Index : Word;
+            Quant : Word
+          ) : Integer;
+Begin
+  //CRW - internally, removing some of these
+  // Dec() calls, for future changes I want to do
+  // with TItem / TItemList
+
 	Result := -1;
 	if 100 < index then Exit; //範囲外
-	with ti.item[index] do begin
+	with AList.Item[Index] do
+    begin
 		if ID = 0 then Exit;       //所持していない
-		if Amount > cnt then begin //所有個数以下
-			Dec(Amount,cnt);
-			Dec(ti.Weight,(Data.Weight * cnt));
-		end else begin
+		if Amount > Quant then
+      begin //所有個数以下
+			Amount := Amount - Quant;
+			AList.Weight := AList.Weight  - (Data.Weight * Quant);
+  		end
+    else
+      begin
 			ID := 0;
-			Dec(ti.Weight,(Data.Weight * Amount));
+			AList.Weight := AList.Weight - (Data.Weight * Amount);
 			Amount := 0;
-			Dec(ti.Count);
-		end;
-	end;
+			Dec(AList.Count);
+  		end;//if-else
+  	end;//with AList.Item{Index]
 	Result := 0;
-end;
+end;(* Func GetItemStore() : Integer ===========*)
+
+
 //------------------------------------------------------------------------------
-procedure CalcInventory(ti:TItemList);
-var
-	i,j:Integer;
-begin
-	ti.Weight := 0;
-	j := 0;
+(*= Proc CalcInventory ==========================*
+
+CRW - 2004/04/05
+  Adding useful comments, renaming parameters and
+  internal variables for clarity.
+
+  No changes to external behavior or parameter
+  order were made! :)
+
+Recalculates a Cart or Kafra Storage container's
+Weight and iten mode Count.
+
+(*==============================================*)
+Procedure CalcInventory( AList : TItemList );
+Var
+	ItmIdx    : Integer;
+  NewCount  : Integer;
+Begin
+	AList.Weight := 0;
+	NewCount := 0;
 	//アイテム重量を計算
-	for i := 1 to 100 do begin
-		if ti.Item[i].ID <> 0 then begin
-                        //if ti.Item[i].Amount <= 0 then ti.Item[i].Amount := 0;
-			Inc(ti.Weight,(ti.item[i].Data.Weight * ti.item[i].Amount));
-			Inc(j);
-		end;
-	end;
-	ti.Count := j;
-end;
+	for ItmIdx := 1 to 100 do
+    begin
+    with AList.Item[ItmIdx] do
+      begin
+  		if ID <> 0 then
+        begin
+        //if ti.Item[i].Amount <= 0 then ti.Item[i].Amount := 0;
+		  	AList.Weight := AList.Weight + (Data.Weight * Amount);
+  			Inc(NewCount);
+	    	end;//if ID
+      end;//w
+  	end;//for
+
+	AList.Count := NewCount;
+End;(* Proc CalcInventory : Integer ============*)
+
+
 //------------------------------------------------------------------------------
-function SearchInventory(ti:TItemList; ItemID:Word; IEquip:Boolean) : Word;
-var
-	i :integer;
-begin
+(*= Func SearchInventory : Integer ==============*
+
+CRW - 2004/04/04
+  Adding useful comments, renaming parameters and
+  internal variables for clarity.
+
+  No changes to external behavior or parameter
+  order were made! :)
+
+Passes An ItemList container, an Iten ID to search
+for, and notes if the Item ID is a piece of
+Equipment (Weapons/Armour/PetEgg)
+
+Returns:
+  0       : When Cart is full
+
+  1..100  : Index of first node item can be placed
+            into (if the item exists, it's stacked
+            into an existing node, if not, it's
+            the first free item node).
+
+(*==============================================*)
+Function  SearchInventory(
+            AList   : TItemList;
+            ItemID  : Word;
+            IEquip  : Boolean
+          ) : Word;
+Var
+	ItmIdx : Integer;
+Begin
 	Result := 0;
-	if not IEquip then begin
-		for i := 1 to 100 do begin
+
+  //CRW moved this ahead of the for loop - this is an
+  // easy quick comparison to avoid serching a cart that
+  // you know is FULL from the start of the routine.
+  // No change in end results occur, except, when
+  // the cart's completely full, you save time. :)
+  //
+  //if full, leave with result of Zero - no room
+	if AList.Count = 100 then Exit;
+
+  // If stackable
+	if NOT IEquip then
+    begin
+		for ItmIdx := 1 to 100 do
+      begin
 			//同じアイテムを持ってるか探す
-			if ti.Item[i].ID = ItemID then begin
-				Result := i;
+			if AList.Item[ItmIdx].ID = ItemID then
+        begin
+				Result := ItmIdx;
 				Exit;
-			end;
-		end;
-	end;
-	if ti.Count = 100 then Exit;
-	for i := 1 to 100 do begin
+  			end;//if AList.Itemp[].ID
+  		end;//for
+  	end;//if NOT...
+
+  //otherwise, find the first empty spot in the Items array, return
+  // that index.
+	for ItmIdx := 1 to 100 do begin
 		//空きindexを探す
-		if ti.Item[i].ID = 0 then begin
-			ti.Item[i].Amount := 0;
-			Result := i;
+		if AList.Item[ItmIdx].ID = 0 then begin
+			AList.Item[ItmIdx].Amount := 0;
+			Result := ItmIdx;
 			Exit;
 		end;
 	end;
-end;
+End;(* Func SearchInventory() : Integer ========*)
+
+
 //------------------------------------------------------------------------------
 {カート機能追加}
 procedure SendCart(tc:TChara);
@@ -5848,13 +6078,13 @@ begin
 				w := 4;
 				WFIFOW( 0, $0154);
 				for i := 0 to 35 do begin
-                    if tg.Member[i] <> nil then begin
-				                if UseSQL then begin
-                                                        j := Chara.IndexOf(tg.MemberID[i]);
-                                                        if j = -1 then begin
-                                                                Load_Characters(tg.Member[i].CID);
-                                                        end;
-                                                end;
+          if tg.Member[i] <> nil then begin
+              if UseSQL then begin
+                j := Chara.IndexOf(tg.MemberID[i]);
+                if j = -1 then begin
+                  Load_Characters(tg.Member[i].CID);
+                end;
+              end;
                     end;
 					tc1 := Member[i];
 					if (tc1 <> nil) then begin
@@ -8715,6 +8945,160 @@ end;
 
 
 
+
+
+{===========================}
+{== Start of TItemDB Code ==}
+{===========================}
+
+
+(*----- TItemDB.Assign ----------------*
+start: CRW 2004/04/04
+last: CRW 2004/04/05
+
+Summary:
+  Tedious field by field copy routine for duplicating
+  the essentials of one TItemDB to another TItemDB instance.
+
+  This saves writing out the transfer of EVERY property.
+
+  Not Copied:
+
+Caveat Emptor:
+  Assign() is used to copy values, and avoid novice mistakes like this:
+
+  procedure FooBlarg(AnotherItem : TItem; TakeThisMany : Cardinal);
+  var
+    AnItem : TItem;
+  begin
+    AnItem := TItem.Create;
+    //Newbie note - I'm copying AnotherItem into AnItem.
+
+    //Right way to copy :)
+    AnItem.Assign(AnotherItem);
+    MyCart.AddItem(AnItem);
+
+    //Wrong - lost the reference to the Data object - memory leak!
+    AnItem.Data  := AnotherItem.Data;
+
+  end;
+
+*-------------------------------------*)
+Procedure TItemDB.Assign(Source: TItemDB);
+Var
+  J : Integer; // Index Variable for array transfer.
+Begin
+  //Transfer fields
+	ID        := Source.ID;
+	Name      := Source.Name;
+	JName     := Source.JName;
+
+	IType     := Source.IType;
+	IEquip    := Source.IEquip;
+
+	Price     := Source.Price;
+	Sell      := Source.Sell;
+
+	Weight    := Source.Weight;
+	ATK       := Source.ATK;
+	MATK      := Source.MATK;
+	DEF       := Source.DEF;
+	MDEF      := Source.MDEF;
+	Range     := Source.Range;
+	Slot      := Source.Slot;
+
+  Param[0]  := Source.Param[0];
+  Param[1]  := Source.Param[1];
+  Param[2]  := Source.Param[2];
+  Param[3]  := Source.Param[3];
+  Param[4]  := Source.Param[4];
+  Param[5]  := Source.Param[5];
+
+	HIT       := Source.HIT;
+	FLEE      := Source.FLEE;
+	Crit      := Source.Crit;
+	Avoid     := Source.Avoid;
+	Cast      := Source.Cast;
+
+	Job       := Source.Job;
+	Gender    := Source.Gender;
+
+	Loc       := Source.Loc;
+	wLV       := Source.wLV;
+	eLV       := Source.eLV;
+	View      := Source.View;
+	Element   := Source.Element;
+	Effect    := Source.Effect;
+	HP1       := Source.HP1;
+	HP2       := Source.HP2;
+	SP1       := Source.SP1;
+	SP2       := Source.SP2;
+	//Rare      := Source.Rare;
+	//Box       := Source.Box;
+
+  for J := 0 to 9 do
+    begin
+    DamageFixR[J] := Source.DamageFixR[J];
+    DamageFixE[J] := Source.DamageFixE[J];
+    end;
+  DamageFixS[0] := Source.DamageFixS[0];
+  DamageFixS[1] := Source.DamageFixS[1];
+  DamageFixS[2] := Source.DamageFixS[2];
+
+  SFixPer1[0]   := Source.SFixPer1[0];
+  SFixPer1[1]   := Source.SFixPer1[1];
+  SFixPer1[2]   := Source.SFixPer1[2];
+  SFixPer1[3]   := Source.SFixPer1[3];
+  SFixPer1[4]   := Source.SFixPer1[4];
+  SFixPer1[5]   := Source.SFixPer1[5];
+
+  SFixPer2[0]   := Source.SFixPer2[0];
+  SFixPer2[1]   := Source.SFixPer2[1];
+  SFixPer2[2]   := Source.SFixPer2[2];
+  SFixPer2[3]   := Source.SFixPer2[3];
+  SFixPer2[4]   := Source.SFixPer2[4];
+
+  DrainFix[0]   := Source.DrainFix[0];
+  DrainFix[1]   := Source.DrainFix[1];
+
+  DrainPer[0]   := Source.DrainPer[0];
+  DrainPer[1]   := Source.DrainPer[1];
+
+  for J:= 0 to MAX_SKILL_NUMBER do
+    begin
+  	AddSkill[J] := Source.AddSkill[J];  // Skill addition
+    end;
+
+	SplashAttack  := Source.SplashAttack;
+  WeaponSkill   := Source.WeaponSkill;
+  WeaponSkillLV := Source.WeaponSkillLV;
+  WeaponID      := Source.WeaponID;
+	NoJamstone    := Source.NoJamStone;
+
+  FastWalk          := Source.FastWalk;
+  NoTarget          := Source.NoTarget;
+  FullRecover       := Source.FullRecover;
+  LessSP            := Source.LessSP;
+  OrcReflect        := Source.OrcReflect;
+  AnolianReflect    := Source.AnolianReflect;
+  UnlimitedEndure   := Source.UnlimitedEndure;
+  DoppelgagnerASPD  := Source.DoppelgagnerASPD;
+  GhostArmor        := Source.GhostArmor;
+  NoCastInterrupt   := Source.NoCastInterrupt;
+  MagicReflect      := Source.MagicReflect;
+  SkillWeapon       := Source.SkillWeapon;
+  GungnirEquipped   := Source.GungnirEquipped;
+  LVL4WeaponASPD    := Source.Lvl4WeaponASPD;
+  PerfectDamage     := Source.PerfectDamage;
+
+  // No politeness with inherited Assign calls -- this one isn't
+  // derived from TPersistant, so there is no virtual Assign stub.
+end;(*- TItemDB.Assign ---------------*)
+
+
+{=========================}
+{== End of TItemDB Code ==}
+{=========================}
 
 
 
