@@ -1867,7 +1867,8 @@ begin
 
                                 tc.MTarget := tc.ATarget;
                                 ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-
+                                if ts = nil then Exit;
+                                
                                 tc.MTargetType := 0;
                                 tc.AData := ts;
 

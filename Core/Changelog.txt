@@ -2,6 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-03-04: Fixed Crash with Gugnir.   [Darkhelmet]
 - 01-03-04: Modifyed Amount of Packets Bard/Dancer skills use.  Performace Increase [Darkhelmet]
 - 01-03-04: Fixed Triple Blows [Darkhelmet]
 - 01-02-04: Added Loading of Pharmacy's Database [Darkhelmet]
