@@ -44,22 +44,6 @@ object frmMain: TfrmMain
     TabOrder = 0
     OnClick = cmdStartClick
   end
-  object cmdStop: TButton
-    Left = 72
-    Top = 5
-    Width = 64
-    Height = 22
-    Caption = 'Stop'
-    Enabled = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Trebuchet MS'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 1
-    OnClick = cmdStopClick
-  end
   object Edit1: TEdit
     Left = 144
     Top = 5

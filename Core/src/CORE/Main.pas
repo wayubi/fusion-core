@@ -24,7 +24,6 @@ type
 		sv2          :TServerSocket;
 		sv3          :TServerSocket;
 		cmdStart     :TButton;
-		cmdStop      :TButton;
                 lbl00        :TLabel;
 		txtDebug     :TMemo;
 		DBsaveTimer  :TTimer;
@@ -92,7 +91,6 @@ type
 		procedure sv3ClientRead(Sender: TObject; Socket: TCustomWinSocket);
 		procedure sv3ClientError(Sender: TObject; Socket: TCustomWinSocket; ErrorEvent: TErrorEvent; var ErrorCode: Integer);
 		procedure cmdStartClick(Sender: TObject);
-		procedure cmdStopClick(Sender: TObject);
                 procedure Button1Click(Sender: TObject);
                 procedure Edit1KeyPress(Sender: TObject; var Key: Char);
 
@@ -681,7 +679,7 @@ begin
     end;
 
 	if ServerRunning then begin
-		cmdStop.Enabled := false;
+		//cmdStop.Enabled := false;
 		CancelFlag := true;
 		repeat
 			Application.ProcessMessages;
@@ -14394,18 +14392,23 @@ var
 label ExitWarpSearch;
 begin
 
+if (cmdStart.Caption = 'Start') then begin
+
         edit1.SetFocus;
+
+        cmdStart.Caption := 'Stop';
+        debugout.Lines.add('Server has been started.');
 
 	sl := TStringList.Create;
 	try
-	cmdStart.Enabled := false;
+	//cmdStart.Enabled := false;
   
 	sv1.Active := true;
 	sv2.Active := true;
 	sv3.Active := true;
 
 	ServerRunning := true;
-	cmdStop.Enabled := true;
+	//cmdStop.Enabled := true;
 	TickCheckCnt := 0;
 
         OnlineTime := timeGetTime(); // AlexKreuz
@@ -15138,19 +15141,24 @@ begin
 	for i := 0 to sv3.Socket.ActiveConnections - 1 do
 		sv3.Socket.Disconnect(i);
 	sv3.Active := false;
-	cmdStop.Enabled := false;
+	//cmdStop.Enabled := false;
 	ServerRunning := false;
 	CancelFlag := false;
-	cmdStart.Enabled := true;
+	//cmdStart.Enabled := true;
 	//lbl00.Caption := '(ÅL-ÅM)';
 	end;
+
+end
+
+else if (cmdStart.Caption = 'Stop') then begin
+        cmdStart.Caption := 'Start';
+        debugout.Lines.add('Server has been stopped.');
+	CancelFlag := true;
+	//cmdStop.Enabled := false;
 end;
 
-procedure TfrmMain.cmdStopClick(Sender: TObject);
-begin
-	CancelFlag := true;
-	cmdStop.Enabled := false;
 end;
+
 //------------------------------------------------------------------------------
 {U0x003b}
 procedure TfrmMain.DBsaveTimerTimer(Sender: TObject);
