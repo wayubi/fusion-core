@@ -2142,7 +2142,11 @@ var
 	tatk  :boolean;
 	tg    :TGuild;
 begin
+
+
+    if assigned(ts) then begin
 	with tc do begin
+
 		GraceTick := Tick;
 
 		if (ts.isEmperium) then begin
@@ -2481,6 +2485,9 @@ begin
 	if ts.Stat1 <> 0 then begin
 		ts.BodyTick := Tick + tc.aMotion;
 	end;
+    end else begin
+        debugout.lines.add('DAMAGECALC1 TS NOT ASSIGNED');
+    end;
 
 	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
 end;//proc TFrmMain.DamageCalc1()

@@ -4825,6 +4825,9 @@ var
   tg: TGuild;
 begin
 
+
+  if assigned(ts) then begin
+
   // AlexKreuz: Needed to stop damage to Emperium
   // From Splash Attacks.
   if (ts.isEmperium) then begin
@@ -4860,6 +4863,9 @@ begin
 	else               WFIFOB(32, 8);
 
 	SendBCmd(tm, tc.Point, 33);
+  end else begin
+        debugout.lines.add('SENDCSKILLATK1 TS NOT ASSIGNED');
+  end;
 end;
 //------------------------------------------------------------------------------
 procedure SendCSkillAtk2(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
