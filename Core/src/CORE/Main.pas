@@ -11231,6 +11231,41 @@ begin
       end;
     end;
 
+    // Isis Magnificat: When HP/SP both are lower than 50%, she will use Level
+    // 2 Magnificat once per minute, until HP/SP are higher than 50%
+    if (tpe.JID = 1029) and (tc.HP < tc.MAXHP / 2) and (tc.SP < tc.MAXSP / 2) then begin
+      if tpe.SkillTick < _Tick then begin
+        tpe.SkillTick := _Tick + 60000;
+        //Add Magnificat
+        WFIFOW( 0, $011a);
+        WFIFOW( 2, 74);
+        WFIFOW( 4, 0);
+        WFIFOL( 6, tc.ID);
+        WFIFOL(10, tn1.ID);
+        WFIFOB(14, 1);
+        SendBCmd(tm, tc.Point, 15);
+
+        tc.Skill[74].Tick := _Tick + cardinal(tc.Skill[74].Data.Data1[2]) * 1000;
+        tc.Skill[tc.MSkill].EffectLV := 2;
+        tc.Skill[tc.MSkill].Effect1 := tc.Skill[74].Data.Data2[2];
+        if tc.SkillTick > tc.Skill[74].Tick then begin
+          tc.SkillTick := tc.Skill[74].Tick;
+          tc.SkillTickID := 74;
+        end;
+
+        CalcStat(tc, _Tick);
+        SendCStat(tc);
+
+        //Send Icon
+        WFIFOW(0, $0196);
+        WFIFOW(2, 20);
+        WFIFOL(4, tc.ID);
+        WFIFOB(8, 1);
+        tc.Socket.SendBuf(buf, 9);
+      end;
+    end;
+
+
 
     if MobData.isLoot = true then begin
 
