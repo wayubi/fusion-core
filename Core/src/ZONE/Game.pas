@@ -5892,7 +5892,7 @@ end;
 							else begin//•Ší»‘¢(¬Œ÷—¦‚ÍjobLv * 0.3 + DEX * 0.1 + LUK * 0.1 + ƒXƒLƒ‹•â³ + 15 ‚Æ‰¼’è)
                 // Colus 20040118: Adding Pharamacy check here
                 if (tma.RequireSkill = 228) then begin
-                  if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100)) then i := 0;
+                  if (Random(2000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100)) then i := 0;
                 end else begin
                   if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100) + 150 + (tc.Skill[107].Lv * 10) + anvil - (w2 + (tma.ItemLV -1) * 100)) then i := 0;
                 end;
