@@ -7360,6 +7360,12 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
+                                                tc.spiritSpheres := tc.spiritSpheres + Skill[261].Data.Data1[Skill[261].Lv];
+                                                if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
+                                                if tc.spiritSpheres > Skill[261].Data.Data2[Skill[261].Lv] then tc.spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                               { tc1 := tc;
+                                                ProcessType := 2;
                                                 tc.spiritSpheres := tc.spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
                                                 if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
@@ -7371,10 +7377,16 @@ begin
                                         end;
                                 262:  //Absorb Spirits
                                         if tc.spiritSpheres <> 0 then begin
-                                                tc.spiritSpheres := tc.spiritSpheres - 1;
-                                                tc.SP := (tc.SP + Skill[262].Data.Data2[Skill[262].Lv]);
-                                                if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                          // Colus, 20040203: Fixed proper SP recovery amount, show SP recovery effect
+                                          i := tc.spiritSpheres * Skill[262].Data.Data2[Skill[262].Lv];
+                                          tc.spiritSpheres := 0;
+                                          tc.SP := tc.SP + i;
+                                          if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+                                          UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                          WFIFOW( 0, $013d);
+                                          WFIFOW( 2, $0007);
+                            						  WFIFOW( 4, i);
+                            						  tc1.Socket.SendBuf(buf, 6);
                                         end;
                                 268:   //Steel Body
                                                 if tc.spiritSpheres = 5 then begin
@@ -7908,6 +7920,20 @@ begin
 						end;
                   214: //Raid
                   begin
+                  if (tc.Option = 6) then begin
+                  tc.Option := tc.Optionkeep;
+                  tc.Hidden := false;
+                  tc.Skill[51].Tick := Tick;
+                  tc.SkillTick := Tick;
+                  tc.SkillTickID := 51;
+                  CalcStat(tc, Tick);
+                  WFIFOW(0, $0119);
+                  WFIFOL(2, tc.ID);
+                  WFIFOW(6, tc.Stat1);
+                  WFIFOW(8, tc.Stat2);
+                  WFIFOW(10, tc.Option);
+                  WFIFOB(12, 0);
+                  SendBCmd(tm, tc.Point, 13);
                   xy := tc.Point;
                   sl.Clear;
                   j := tl.Range2;
@@ -7931,6 +7957,13 @@ begin
                   DamageProcess1(tm, tc, ts1, dmg[0], Tick);
                   end;
                   end;
+            end else begin
+            SendSkillError(tc, 0);
+            tc.MMode := 4;
+            tc.MPoint.X := 0;
+            tc.MPoint.Y := 0;
+            Exit;
+            end;
                   end;
 
 				111: //アドレナリン_ラッシ
@@ -13237,7 +13270,7 @@ begin
 								MPoint.X := 0;
 								MPoint.Y := 0;
 						 end;
-            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) then begin
+            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
               if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
@@ -13319,7 +13352,7 @@ begin
 							end;
              261:    {Call Spirits}
               begin
-                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                //UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
               end;
 					end;
 					//アイコン表示解除

@@ -1114,8 +1114,9 @@ end;
 end;
           end else if (Copy(str, 1, 5) = 'zeny ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
 						Val(Copy(str, 6, 256), i, k);
-						if (k = 0) and (i >= 0) and (i <= 9999999) and (tc.Zeny + i <= 9999999) then begin
-                                                        if tc.Zeny > 1000000 then exit;
+            // Colus, 20040203: Zeny limit was off by a 0.  Bumped the limit up to 1BZ (it can handle it!)
+						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + i <= 999999999) then begin
+                                                        if tc.Zeny > 1000000000 then exit;
 							tc.Zeny := tc.Zeny + i;
 							WFIFOW(0, $00b1);
 					    WFIFOW(2, $0014);
@@ -1177,14 +1178,14 @@ end;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc1.socket.sendbuf(buf, w);
+                tc.socket.sendbuf(buf, w);
               end else begin
                 str := tc1.Name + ' located at: ' + tc1.Map + ' (' + IntToStr(tc1.Point.X) + ',' + IntToStr(tc1.Point.Y) + ')';
                 w := Length(str) + 4;
                 WFIFOW (0, $009a);
                 WFIFOW (2, w);
                 WFIFOS (4, str, w - 4);
-                tc1.socket.sendbuf(buf, w);
+                tc.socket.sendbuf(buf, w);
               end;
             end else begin
               str := 'Couldnt find player: ' + s;
@@ -1341,7 +1342,26 @@ end;
                                                 begin
 						        //職業変更
 										Val(Copy(str, 5, 256), i, k);
-										if (k = 0) and (i >= 0) and (i <= 23) and (i <> 13) then begin
+              if (k = 0) and (i >= 0) and (i <= 23) and (i <> 13) then begin
+                // Colus, 20040203: Added unequip of items when you #job
+            		for  j := 1 to 100 do begin
+					        if tc.Item[j].Equip = 32768 then begin
+                    tc.Item[j].Equip := 0;
+					          WFIFOW(0, $013c);
+				            WFIFOW(2, 0);
+					          tc.Socket.SendBuf(buf, 4);
+					        end else if tc.Item[j].Equip <> 0 then begin
+					          WFIFOW(0, $00ac);
+					          WFIFOW(2, j);
+					          WFIFOW(4, tc.Item[j].Equip);
+					          tc.Item[j].Equip := 0;
+					          WFIFOB(6, 1);
+					          tc.Socket.SendBuf(buf, 7);
+                  end;
+                end;
+
+            					//tc.SkillPoint := 0;
+
 						        	tc.JID := i;
 											//ステータス再計算
 											tc.ClothesColor := 0; //強制的に初期値
@@ -1666,9 +1686,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been enabled!';
               w := Length(str) + 4;
@@ -1688,9 +1708,9 @@ end;
 							tc1.Socket.SendBuf(buf, 4);   }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'PvP has been disabled!';
               w := Length(str) + 4;
@@ -1718,9 +1738,9 @@ end;
               tc1.Socket.SendBuf(buf, 14);  }
 
 							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
+							tc1.tmpMap := LowerCase(tc1.Map);
 							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
+							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
 
               str := 'Guild PVP has been enabled!';
               w := Length(str) + 4;
@@ -4225,8 +4245,15 @@ end;
 		$0113: //ターゲット指定or瞬時発動スキル
 			begin
 
-				//if tc.MMode <> 0 then continue;
-                                if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
+        {
+				if (((tc.MMode <> 0) and (tc.MSkill <> 277)) or
+            ((tc.MMode = 0) and (tc.MTick > timeGetTime())) ) then continue;}
+        // Colus, 20040203: You can't comment this out.  Otherwise people can
+        // recast self-targeted spells indefinitely.  Figure out an if check
+        // that incorporates both cases and use that.  I started above, but
+        // that isn't correct yet.
+        if tc.MMode <> 0 then continue;   // <- Leave that in!
+        if ((tc.MMode = 0) and (tc.MTick > timeGetTime())) or (tc.MSkill = 277) then Continue;
 {チャットルーム機能追加}
 				//入室中のスキル使用無効
 				if (tc.ChatRoomID <> 0) then continue;
