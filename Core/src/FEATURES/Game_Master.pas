@@ -3,7 +3,7 @@ unit Game_Master;
 interface
 
 uses
-    IniFiles, Classes, SysUtils, Common, List32;
+    IniFiles, Classes, SysUtils, Common, List32, MMSystem;
 
 type TGM_Table = class
     ID : Integer;
@@ -97,6 +97,11 @@ var
     function command_ccolor(tc : TChara; str : String) : String;
     function command_hstyle(tc : TChara; str : String) : String;
     function command_kill(str : String) : String;
+    function command_goto(tc : TChara; str : String) : String;
+    function command_summon(tc : TChara; str : String) : String;
+    function command_warp(tc : TChara; str : String) : String;
+    function command_banish(str : String) : String;
+    function command_job(tc : TChara; str : String) : String;
 
 implementation
 
@@ -120,6 +125,11 @@ implementation
         if sl.IndexOfName('CCOLOR') > -1 then GM_CCOLOR := StrToInt(sl.Values['CCOLOR']) else GM_CCOLOR := 1;
         if sl.IndexOfName('HSTYLE') > -1 then GM_HSTYLE := StrToInt(sl.Values['HSTYLE']) else GM_HSTYLE := 1;
         if sl.IndexOfName('KILL') > -1 then GM_KILL := StrToInt(sl.Values['KILL']) else GM_KILL := 1;
+        if sl.IndexOfName('GOTO') > -1 then GM_GOTO := StrToInt(sl.Values['GOTO']) else GM_GOTO := 1;
+        if sl.IndexOfName('SUMMON') > -1 then GM_SUMMON := StrToInt(sl.Values['SUMMON']) else GM_SUMMON := 1;
+        if sl.IndexOfName('WARP') > -1 then GM_WARP := StrToInt(sl.Values['WARP']) else GM_WARP := 1;
+        if sl.IndexOfName('BANISH') > -1 then GM_BANISH := StrToInt(sl.Values['BANISH']) else GM_BANISH := 1;
+        if sl.IndexOfName('JOB') > -1 then GM_JOB := StrToInt(sl.Values['JOB']) else GM_JOB := 1;
 
         sl.Free;
         ini.Free;
@@ -141,6 +151,11 @@ implementation
         ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
         ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
         ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
+        ini.WriteString('Fusion GM Commands', 'GOTO', IntToStr(GM_GOTO));
+        ini.WriteString('Fusion GM Commands', 'SUMMON', IntToStr(GM_SUMMON));
+        ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
+        ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
+        ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
 
         ini.Free;
     end;
@@ -162,10 +177,15 @@ implementation
         else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
         else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
         else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
+        else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
+        else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
+        else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
+        else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
+        else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
-        if (Option_GM_Logs) then save_gm_log(tc, error_msg);
+        if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
     end;
 
     function check_level(id : Integer; cmd : Integer) : Boolean;
@@ -425,6 +445,219 @@ implementation
             end;
         end else begin
             Result := 'GM_KILL Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
+    function command_goto(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_GOTO Activated';
+
+        s := Copy(str, 6, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            if (tc.Hidden = false) then SendCLeave(tc, 2);
+            tc.tmpMap := tc1.Map;
+            tc.Point := tc1.Point;
+            MapMove(tc.Socket, tc1.Map, tc1.Point);
+
+            Result := 'GM_GOTO Success. ' + tc.Name + ' warped to ' + s + '.';
+        end else begin
+            Result := 'GM_GOTO Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
+    function command_summon(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_SUMMON Activated';
+
+        s := Copy(str, 8, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            Result := 'GM_SUMMON Success. ' + s + ' warped to ' + tc.Name + '.';
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+
+            if (tc1.Login = 2) then begin
+                SendCLeave(tc1, 2);
+                tc1.Map := tc.Map;
+                tc1.Point := tc.Point;
+                MapMove(tc1.Socket, tc.Map, tc.Point);
+            end else begin
+                tc1.Map := tc.Map;
+                tc1.Point := tc.Point;
+
+                Result := Result + ' But ' + s + ' is offline.';
+            end;
+
+        end else begin
+            Result := 'GM_SUMMON Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
+    function command_warp(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k : Integer;
+        ta : TMapList;
+    begin
+        Result := 'GM_WARP Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if sl.Count <> 3 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if k <> 0 then Exit;
+        Val(sl.Strings[2], j, k);
+
+        if k <> 0 then Exit;
+        if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then Exit;
+
+        ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
+        if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then Exit;
+
+        if (tc.Hidden = false) then SendCLeave(tc, 2);
+        tc.tmpMap := LowerCase(sl.Strings[0]);
+        tc.Point := Point(i,j);
+        MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(i,j));
+
+        sl.Free;
+        Result := 'GM_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').'; 
+    end;
+
+    function command_banish(str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k : Integer;
+        ta : TMapList;
+        tc1 : TChara;
+        s : String;
+    begin
+        Result := 'GM_BANISH Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 8, 256);
+
+        if (sl.Count <> 4) then begin
+            Result := Result + ' Missing information.';
+            Exit;
+        end;
+
+        Val(sl[sl.Count - 2], i, k);
+        if k <> 0 then Exit;
+
+        Val(sl[sl.Count - 1], j, k);
+        if k <> 0 then Exit;
+
+        if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
+            ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
+            if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then Exit;
+
+            for k := 0 to sl.Count - 4 do begin
+                s := s + ' ' + sl.Strings[k];
+                s := Trim(s);
+            end;
+
+            if CharaName.Indexof(s) <> -1 then begin
+                tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+                Result := 'GM_BANISH Success. ' + s + ' warped to ' + ta.Name + ' (' + IntToStr(i) + ', ' + IntToStr(j) + ').';
+
+                if (tc1.Login = 2) then begin
+                    SendCLeave(tc1, 2);
+                    tc1.tmpMap := sl.Strings[sl.Count - 3];
+                    tc1.Point := Point(i,j);
+                    MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                end else begin
+                    tc1.Map := sl.Strings[sl.Count - 3];
+                    tc1.Point := Point(i,j);
+                    Result := Result + ' ' + s + ' is offline.';
+                end;
+            end else begin
+                Result := Result + ' ' + s + ' is an invalid character name.';
+            end;
+        end else begin
+            Result := 'GM_BANISH Failure. ' + sl.Strings[sl.Count - 3] + ' is not a valid map name.';
+        end;
+
+        sl.Free;
+    end;
+
+    function command_job(tc : TChara; str : String) : String;
+    var
+        i, j, k : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_JOB Failure.';
+
+        if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then begin
+            Val(Copy(str, 5, 256), i, k);
+            if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+                // Colus, 20040203: Added unequip of items when you #job
+                for  j := 1 to 100 do begin
+                    if tc.Item[j].Equip = 32768 then begin
+                        tc.Item[j].Equip := 0;
+                        WFIFOW(0, $013c);
+                        WFIFOW(2, 0);
+                        tc.Socket.SendBuf(buf, 4);
+                    end else if tc.Item[j].Equip <> 0 then begin
+                        WFIFOW(0, $00ac);
+                        WFIFOW(2, j);
+                        WFIFOW(4, tc.Item[j].Equip);
+                        tc.Item[j].Equip := 0;
+                        WFIFOB(6, 1);
+                        tc.Socket.SendBuf(buf, 7);
+                    end;
+                end;
+
+                // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+                for j := 1 to MAX_SKILL_NUMBER do begin
+                    if tc.Skill[j].Data.Icon <> 0 then begin
+                        if tc.Skill[j].Tick >= timeGetTime() then begin
+                            UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
+                        end;
+                    end;
+                    tc.Skill[j].Tick := timeGetTime();
+                    tc.Skill[j].Effect1 := 0;
+                end;
+
+                if (i > LOWER_JOB_END) then begin
+                    i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                    tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+                end else begin
+                    tc.ClothesColor := 0; // Reset the clothes color to the default value.
+                end;
+
+                tc.JID := i; // Set the JID to the corrected value.
+
+                if (tc.Option <> 0) then begin
+                    tc.Option := 0;
+                    WFIFOW(0, $0119);
+                    WFIFOL(2, tc.ID);
+                    WFIFOW(6, 0);
+                    WFIFOW(8, 0);
+                    WFIFOW(10, tc.Option);
+                    WFIFOB(12, 0);
+                    SendBCmd(tc.MData, tc.Point, 13);
+                end;
+
+                CalcStat(tc);
+                SendCStat(tc, true); // Add the true to recalc sprites
+                SendCSkillList(tc);
+
+                // Colus, 20040303: Using newer packet to allow upper job changes
+                UpdateLook(tm, tc, 0, i);
+
+                Result := 'GM_JOB Success. New Job ID is ' + IntToStr(i) + '.';
+            end else begin
+                Result := Result + ' Job ID is out of range.';
+            end;
         end;
     end;
 

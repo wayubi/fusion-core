@@ -1351,31 +1351,6 @@ Begin(* Proc sv3PacketProcess() *)
 							SendCStat1(tc, 0, $000c, tc.SkillPoint);
 							SendCStat1(tc, 1, $0002, tc.JobEXP);
 						end;
-					end else if (Copy(str, 1, 5) = 'warp ') and ((DebugCMD and $0004) <> 0) and (tid.Warp = 1) then begin
-						//任意の場所にワープ
-						SL := TStringList.Create;
-						SL.DelimitedText := Copy(str, 6, 256);
-						try
-							if SL.Count <> 3 then continue;
-							Val(SL.Strings[1], i, k);
-							if k <> 0 then continue;
-							Val(sl.Strings[2], j, k);
-							if k <> 0 then continue;
-							//マップ存在チェック
-							// Colus, 20040122: Lower-case to prevent problems with 'Prontera' mapname
-							if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then continue;
-							//座標チェック
-							ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
-							if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
-							//ワープ開始
-							if (tc.Hidden = false) then SendCLeave(tc, 2);
-							tc.tmpMap := LowerCase(sl.Strings[0]);
-							tc.Point := Point(i,j);
-							MapMove(Socket, LowerCase(sl.Strings[0]), Point(i,j));
-
-						finally
-							SL.Free();
-						end;
 
           end else if (Copy(str, 1, 11) = 'skillpoint ') and ((DebugCMD and $0008) <> 0) and (tid.ChangeStatSkill = 1) then begin
 						Val(Copy(str, 12, 256), i, k);
@@ -1631,20 +1606,6 @@ Begin(* Proc sv3PacketProcess() *)
 						end;
 					end //gm cmd #zeny
 
-					else if (Copy(str, 1, 5) = 'goto ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
-						s := Copy(str, 6, 256);
-						try
-							if CharaName.Indexof(s) <> -1 then begin
-								tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-								if (tc.Hidden = false) then SendCLeave(tc, 2);
-								tc.tmpMap := tc1.Map;
-								tc.Point := tc1.Point;
-								MapMove(Socket, tc1.Map, tc1.Point);
-							end;
-						finally
-						end;
-					end //gm cmd #goto
-
 					else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
 						s := Copy(str, 7, 256);
 						if s = '' then begin
@@ -1713,63 +1674,6 @@ Begin(* Proc sv3PacketProcess() *)
           finally
           end;
         end //GM cmd #revive
-        else if (Copy(str, 1, 7) = 'summon ') AND
-        				((DebugCMD AND $0008) <> 0) and (tid.GotoSummonBanish = 1) then
-				begin
-          s := Copy(str, 8, 256);
-          try
-            if CharaName.Indexof(s) <> -1 then begin
-		          tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-			        if tc1.Login = 2 then begin
-			          SendCLeave(tc1, 2);
-			          tc1.tmpMap := tc.Map;
-			          tc1.Point := tc.Point;
-					      MapMove(tc1.Socket, tc.Map, tc.Point);
-		          end;
-            end;
-          finally
-          end;
-				end //GM cmd #summon
-
-				else if (Copy(str, 1, 7) = 'banish ') AND
-								((DebugCMD AND $0008) <> 0) AND (tid.GotoSummonBanish = 1) then
-				begin
-					SL := TStringList.Create;
-					SL.DelimitedText := Copy(str, 8, 256);
-					try
-						Val(SL[SL.Count - 2], i, k);
-						if k <> 0 then continue;
-
-						Val(SL[SL.Count - 1], j, k);
-						if k <> 0 then continue;
-
-						if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
-							ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
-							if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
-
-							for k := 0 to sl.Count - 4 do begin
-								s := s + ' ' + sl.Strings[k];
-								s := Trim(s);
-							end;
-
-							if CharaName.Indexof(s) <> -1 then begin
-								tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
-								if tc1.Login = 2 then begin
-				          SendCLeave(tc1, 2);
-				          tc1.tmpMap := sl.Strings[sl.Count - 3];
-				          //CRW  Point() does same as temp var here...
-				          tc1.Point := Point(i,j);
-				          MapMove(tc1.Socket, tc1.tmpMap, tc1.Point);
-				        end else begin
-					        tc1.Map := sl.Strings[sl.Count - 3];
-					        tc1.Point := Point(i,j);
-					      end;//if-else
-					    end;//if CharaName else
-						end;//if Maplist.IndexOf
-					finally
-						SL.Free();
-					end;//try-finally
-				end //GM cmd #banish
 
 				else if (Copy(str, 1, 4) = 'ban ') then begin
 					s := Copy(str, 5, 256);
@@ -1824,78 +1728,6 @@ Begin(* Proc sv3PacketProcess() *)
 			  finally
 				end;
 			end //GM cmd #kick
-
-			else if (Copy(str, 1, 4) = 'job ') AND ((DebugCMD and $0010) <> 0) AND
-							(tid.ChangeJob = 1) then
-			begin
-			{修正} {Lit. "Correction"}
-        if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then //ノービスからは出来ない
-        begin
-          //職業変更  Lit. "Occupation modification"
-          Val(Copy(str, 5, 256), i, k);
-          if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
-            // Colus, 20040203: Added unequip of items when you #job
-            for  j := 1 to 100 do begin
-              if tc.Item[j].Equip = 32768 then begin
-                tc.Item[j].Equip := 0;
-                WFIFOW(0, $013c);
-                WFIFOW(2, 0);
-                tc.Socket.SendBuf(buf, 4);
-              end else if tc.Item[j].Equip <> 0 then begin
-                WFIFOW(0, $00ac);
-                WFIFOW(2, j);
-                WFIFOW(4, tc.Item[j].Equip);
-                tc.Item[j].Equip := 0;
-                WFIFOB(6, 1);
-                tc.Socket.SendBuf(buf, 7);
-              end;
-            end;
-
-            // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
-            for j := 1 to MAX_SKILL_NUMBER do begin
-              if tc.Skill[j].Data.Icon <> 0 then begin
-                if tc.Skill[j].Tick >= timeGetTime() then begin
-                  //debugout.lines.add('[' + TimeToStr(Now) + '] ' + '(Icon Removed');
-                  UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
-                end;
-              end;
-              tc.Skill[j].Tick := timeGetTime();
-              tc.Skill[j].Effect1 := 0;
-            end;
-
-            //tc.SkillPoint := 0;
-            if (i > LOWER_JOB_END) then begin
-              i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-              tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
-            end else begin
-              tc.ClothesColor := 0; // Reset the clothes color to the default value.
-            end;
-
-            tc.JID := i; // Set the JID to the corrected value.
-            //ステータス再計算
-
-            //オプション初期化
-            if (tc.Option <> 0) then begin
-              tc.Option := 0;
-              //見た目変更
-              WFIFOW(0, $0119);
-              WFIFOL(2, tc.ID);
-              WFIFOW(6, 0);
-              WFIFOW(8, 0);
-              WFIFOW(10, tc.Option);
-              WFIFOB(12, 0);
-              SendBCmd(tc.MData, tc.Point, 13);
-            end;
-            // Colus, 20040203: Don't need two of these, do we?
-            //SendCStat(tc);
-            CalcStat(tc);
-            SendCStat(tc, true); // Add the true to recalc sprites
-            SendCSkillList(tc);
-            // Colus, 20040303: Using newer packet to allow upper job changes
-            UpdateLook(tm, tc, 0, i);
-          end;
-        end;
-      end //GM cmd #job
 
       else if (Copy(str, 1, 5) = 'icon ') and ((DebugCMD and $0040) <> 0) then begin
         // Set the specified icon
