@@ -352,8 +352,8 @@ begin
         tc := ts.AData;
 
     		if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
-        else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
-        else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
+                else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
+                else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
     		else j := 1;
 
         case tsAI.Skill[i] of
@@ -746,7 +746,7 @@ begin
                                 WFIFOW(10, (AttackData.Point.X));
                                 WFIFOW(12, (AttackData.Point.Y));
                                 WFIFOL(14, 1);
-                                SendBCmd(tm, xy, 18)
+                                SendBCmd(tm, xy, 18);
                         end;
                 end;  //end case
         //end;

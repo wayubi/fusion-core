@@ -2557,7 +2557,15 @@ begin
         Exit;
     end;
   end;
-
+        //Cancel Monster Casting
+        if ts.Mode = 3 then begin
+                ts.Mode := 0;
+                ts.MPoint.X := 0;
+                ts.MPoint.Y := 0;
+                WFIFOW(0, $01b9);
+                WFIFOL(2, ts.ID);
+                SendBCmd(tm, ts.Point, 6);
+        end;
   // Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
     // Dmg := Dmg * 2;  // Done in the DamageCalc functions
@@ -3160,6 +3168,7 @@ begin
 			AMode := 0;
 			Exit;
 		end;
+
 		{if (pcnt <> 0) and (abs(Point.X - ts.Point.X) <= Range) and (abs(Point.Y - ts.Point.Y) <= Range) then begin
 			//à⁄ìÆíÜÇÃéûÇÕà⁄ìÆí‚é~
 			Sit := 3;
@@ -12258,6 +12267,7 @@ begin
 
 	k := 0;
 	with ts do begin
+
         //if (tm.gat[ts.Point.X][ts.Point.Y] <> 0) then continue;
 		if (path[ppos] and 1) = 0 then begin
 			spd := Speed;
@@ -13048,6 +13058,7 @@ var
 	ts:TMob;
 	ts1:TMob;
 	ts2:TMob;
+        CastingMonster:TMob;  //Get if a monster is casting a skill
 	tk	:TSkill;
 	tl	:TSkillDB;
 	spd:cardinal;
@@ -13137,26 +13148,26 @@ begin
 
 		for i := 0 to CharaName.Count - 1 do begin
 			tc := CharaName.Objects[i] as TChara;
-			if tc.Login <> 2 then continue;
+			if tc.Login <> 2 then continue;  //Character is logged in
 			with tc do begin
 				tm := MData;
 				if tm = nil then continue;
-        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
-{í«â¡}	//é©ìÆçsìÆ
+                                mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+
 				if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin
 					AutoAction(tc,Tick);
 				end;
-{í«â¡ÉRÉRÇ‹Ç≈}
-				//à⁄ìÆèàóù
+
+				//Able to move
 				if (pcnt <> 0)  then begin
-          if (Path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
+                                        if (Path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
 					if MoveTick + spd <= Tick then begin
 {èCê≥}
 						if CharaMoving(tc,Tick) then begin
 							goto ExitWarpSearch;
 						end;
 {èCê≥ÉRÉRÇ‹Ç≈}
-          end;
+                                        end;
 				end;
 
 {U0x003b}
@@ -13214,27 +13225,29 @@ begin
 			except
 				//DebugOut.Lines.Add('Move processing error');
 			end;
-{U0x003bÉRÉRÇ‹Ç≈}
-{èCê≥}
+
+                        //Auto Attacking
 				if (AMode = 1) or (AMode = 2) then begin
 					if (tc.Sit = 1) or (tc.Option and 6 <> 0) then begin
-          AMode := 0;
+                                                AMode := 0;
 					end else if ATick + ADelay < Tick then begin
-          if (tm.CList.IndexOf(tc.ATarget) <> -1) and ((mi.Pvp = true) or (mi.PvPG = true)) then begin
-          if (mi.PvPG = true) then begin
-          tc1 := tc.AData;
-          if ((tc1.GuildID <> tc.GuildID) or (tc.GuildID = 0)) then begin
-          CharaAttack2(tc,Tick);
-          end;
-          end else begin
-          CharaAttack2(tc,Tick);
-          end;
-          end else begin
-          ts := tc.AData;
-          if (ts.GID <> tc.GuildID) and (ts.isGuardian <> tc.GuildID) or (tc.GuildID = 0) then begin
-					CharaAttack(tc,Tick);
-          end;
-          end;
+                                                if (tm.CList.IndexOf(tc.ATarget) <> -1) and ((mi.Pvp = true) or (mi.PvPG = true)) then begin
+                                                        if (mi.PvPG = true) then begin
+                                                                tc1 := tc.AData;
+                                                                //Check if character is in guild
+                                                                if ((tc1.GuildID <> tc.GuildID) or (tc.GuildID = 0)) then begin
+                                                                        CharaAttack2(tc,Tick);
+                                                                end;
+                                                        end else begin
+                                                                CharaAttack2(tc,Tick);
+                                                end;
+                                        end else begin
+                                                ts := tc.AData;
+                                                if (ts.GID <> tc.GuildID) and (ts.isGuardian <> tc.GuildID) or (tc.GuildID = 0) then begin
+				                        CharaAttack(tc,Tick);
+                                        end;
+                                end;
+
 					if AMode = 1 then AMode := 0;
 					end;
 				end;
@@ -13243,24 +13256,47 @@ begin
                                 //Darkhelmet, ts isnt always defined i believe
                                 // so it does not always work.  But, this is the
                                 // correct way of doing the cast time.
-                                
-                                if (ts.MTick <= Tick) and (ts.Mode = 3) then begin
-                                        tl := tc.Skill[ts.NowSkill].Data;
-                                        tk := tc.Skill[ts.NowSkill];
+
+                                for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+					for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+			                        if tm.Block[a][b] = nil then continue;
+						//if not tm.Block[a][b].MobProcess then begin
+						if tm.Block[a][b].MobProcTick < Tick then begin
+							//ÉÇÉìÉXÉ^Å[à⁄ìÆèàóù(ïtãﬂÇÃÉÇÉìÉXÉ^Å[)
+							//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
+							k := 0;
+							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
+								//DebugOut.Lines.Add('mob : ' + IntToStr(k));
+                                                                if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
+                                                                        Inc(k);
+                                                                        continue;
+                                                                end;
+
+								CastingMonster := tm.Block[a][b].Mob.Objects[k] as TMob;
+								Inc(k);
+								//if CastingMonster = nil then Continue;
+
+                                                                if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
+                                                                        tl := tc.Skill[CastingMonster.NowSkill].Data;
+                                                                        tk := tc.Skill[CastingMonster.NowSkill];
 
 
-                                        //if Boolean(MMode and $02) then begin
-                                        MobSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
-                                        //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
-                                        MobFieldSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
-                                        MobStatSkills(tm, ts, ts.AI, Tick, ts.SkillSlot);
+                                                                        //if Boolean(MMode and $02) then begin
+                                                                        MobSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
+                                                                        //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
+                                                                        MobFieldSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
+                                                                        MobStatSkills(tm, CastingMonster, CastingMonster.AI, Tick, CastingMonster.SkillSlot);
                                         
-                                        //end else if Boolean(MMode and $01) then begin
-                                        pcnt := 0;
+                                                                        //end else if Boolean(MMode and $01) then begin
+                                                                        //pcnt := 0;
 
-                                        ts.MTick := Tick;
-                                        ts.Mode := 0;
-                                        //ts.MTarget := 0;
+                                                                        CastingMonster.MTick := Tick;
+                                                                        CastingMonster.Mode := 0;
+                                                                        //CastingMonster.MTarget := 0;
+                                                                end;
+                                                        end;
+                                                end;
+                                        end;
                                 end;
 
 
@@ -13438,10 +13474,10 @@ begin
 							k := 0;
 							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
 								//DebugOut.Lines.Add('mob : ' + IntToStr(k));
-                if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
-                Inc(k);
-                continue;
-                end;
+                                                                if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
+                                                                        Inc(k);
+                                                                        continue;
+                                                                end;
 
 								ts := tm.Block[a][b].Mob.Objects[k] as TMob;
 								Inc(k);
@@ -13449,7 +13485,7 @@ begin
 								if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
 									//Spawn
 									MonsterSpawn(tm, ts, Tick);
-                end;
+                                                                end;
 
 								with ts do begin
 									//èÛë‘ïœâª
@@ -13487,7 +13523,7 @@ begin
 
 										if (path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100; //éŒÇﬂÇÕ1.4î{éûä‘Ç™Ç©Ç©ÇÈ
 										if MoveTick + spd <= Tick then begin
-{èCê≥}								k := k + MobMoving(tm,ts,Tick);
+{èCê≥}								                        if ts.Mode <> 3 then k := k + MobMoving(tm,ts,Tick);
 										end;
                     
 									end else begin
