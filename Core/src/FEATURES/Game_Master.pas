@@ -1340,81 +1340,107 @@ Called when we're shutting down the server *only*
 
     function command_job(tc : TChara; str : String) : String;
     var
-        i, j, k, l : Integer;
-        tm : TMap;
+        job, j, k, l : Integer;
+        s : String;
     begin
         Result := 'GM_JOB Failure.';
 
-        if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then begin
-            Val(Copy(str, 5, 256), i, k);
-            if (k = 0) and (i >= 0) and (i <= MAX_JOB_NUMBER) and (i <> 13) then begin
-                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        s := Copy(str, 5, 256);
 
-                // Colus, 20040203: Added unequip of items when you #job
-                for  j := 1 to 100 do begin
-                    if tc.Item[j].Equip = 32768 then begin
-                        tc.Item[j].Equip := 0;
-                        WFIFOW(0, $013c);
-                        WFIFOW(2, 0);
-                        tc.Socket.SendBuf(buf, 4);
-                    end else if tc.Item[j].Equip <> 0 then begin
-                    	reset_skill_effects(tc);
-                        WFIFOW(0, $00ac);
-                        WFIFOW(2, j);
-                        WFIFOW(4, tc.Item[j].Equip);
-                        tc.Item[j].Equip := 0;
-                        WFIFOB(6, 1);
-                        tc.Socket.SendBuf(buf, 7);
-                        remove_equipcard_skills(tc, j);
-                    end;
-                end;
+        if s <> '' then begin
+            if (tc.JID <> 0) or ((DebugCMD and $0020) <> 0) then begin
+                Val(Copy(str, 5, 256), job, k);
+                if k = 0 then begin
+                    if (job >= 0) and (job <= MAX_JOB_NUMBER) then begin
 
-                // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
-                for j := 1 to MAX_SKILL_NUMBER do begin
-                    if tc.Skill[j].Data.Icon <> 0 then begin
-                        if tc.Skill[j].Tick >= timeGetTime() then begin
-                            UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
+                        // Colus, 20040203: Added unequip of items when you #job
+                        for  j := 1 to 100 do begin
+                            if tc.Item[j].Equip = 32768 then begin
+                                tc.Item[j].Equip := 0;
+
+                                WFIFOW(0, $013c);
+                                WFIFOW(2, 0);
+
+                                tc.Socket.SendBuf(buf, 4);
+                            end
+
+                            else if tc.Item[j].Equip <> 0 then begin
+                    	        reset_skill_effects(tc);
+
+                                WFIFOW(0, $00ac);
+                                WFIFOW(2, j);
+                                WFIFOW(4, tc.Item[j].Equip);
+
+                                tc.Item[j].Equip := 0;
+
+                                WFIFOB(6, 1);
+
+                                tc.Socket.SendBuf(buf, 7);
+
+                                remove_equipcard_skills(tc, j);
+                            end;
                         end;
+
+                        // Darkhelmet, 20040212: Added to remove all ticks when changing jobs.
+                        for j := 1 to MAX_SKILL_NUMBER do begin
+                            if tc.Skill[j].Data.Icon <> 0 then begin
+                                if tc.Skill[j].Tick >= timeGetTime() then begin
+                                    UpdateIcon(tc.MData, tc, tc.Skill[j].Data.Icon, 0);
+                                end;
+                            end;
+                            tc.Skill[j].Tick := timeGetTime();
+                            tc.Skill[j].Effect1 := 0;
+                        end;
+
+                        if (job > LOWER_JOB_END) then begin
+                            l := job - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                            if (DisableAdv2ndDye) and (job > 30) then
+                                tc.ClothesColor := 0
+                        end
+
+                        else begin
+                            l := job;
+                            tc.ClothesColor := 0;
+                        end;
+
+                        tc.JID := l;
+
+                        if (tc.Option <> 0) then begin
+                            tc.Option := 0;
+                            WFIFOW(0, $0119);
+                            WFIFOL(2, tc.ID);
+                            WFIFOW(6, 0);
+                            WFIFOW(8, 0);
+                            WFIFOW(10, tc.Option);
+                            WFIFOB(12, 0);
+                            SendBCmd(tc.MData, tc.Point, 13);
+                        end;
+
+                        CalcStat(tc);
+
+                        SendCStat(tc, true); // Add the true to recalc sprites
+                        SendCSkillList(tc);
+
+                        // Colus, 20040303: Using newer packet to allow upper job changes
+                        UpdateLook(tc.Mdata, tc, 0, l);
+                        UpdateLook(tc.MData, tc, 7, tc.ClothesColor, 0, true);
+
+                        Result := 'GM_JOB Success. New Job ID is ' + IntToStr(job) + '.';
+                    end
+
+                    else begin
+                        Result := Result + ' Job ID is out of range.';
                     end;
-                    tc.Skill[j].Tick := timeGetTime();
-                    tc.Skill[j].Effect1 := 0;
+                end
+
+                else begin
+                    Result := Result + ' Job ID must be a valid integer.';
                 end;
-
-                if (i > LOWER_JOB_END) then begin
-                    l := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-                    if (DisableAdv2ndDye) and (i > 30) then
-                        tc.ClothesColor := 0
-                    else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
-                end else begin
-                    l := i;
-                    tc.ClothesColor := 0;
-                end;
-
-                tc.JID := l;
-
-                if (tc.Option <> 0) then begin
-                    tc.Option := 0;
-                    WFIFOW(0, $0119);
-                    WFIFOL(2, tc.ID);
-                    WFIFOW(6, 0);
-                    WFIFOW(8, 0);
-                    WFIFOW(10, tc.Option);
-                    WFIFOB(12, 0);
-                    SendBCmd(tc.MData, tc.Point, 13);
-                end;
-
-                CalcStat(tc);
-                SendCStat(tc, true); // Add the true to recalc sprites
-                SendCSkillList(tc);
-
-                // Colus, 20040303: Using newer packet to allow upper job changes
-                UpdateLook(tm, tc, 0, l);
-                UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
-
-                Result := 'GM_JOB Success. New Job ID is ' + IntToStr(i) + '.';
-            end else begin
-                Result := Result + ' Job ID is out of range.';
             end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient input. Format is <new job ID>.';
         end;
     end;
 
