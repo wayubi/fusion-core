@@ -1487,6 +1487,8 @@ begin
       48: //guildreg
 				begin
           tn.Reg := tn.Script[tc.ScriptStep].Data1[0];
+          // Colus, 20040130: Setting the agit here too.  No need for getagit.
+          tn.Agit := tn.Script[tc.ScriptStep].Data1[0];
 					Inc(tc.ScriptStep);
 				end;
       49: //getgskilllevel //S144 addstart

@@ -59,8 +59,8 @@ var
 	tb  :TMobDB;
 	tsAI :TMobAIDB;
 
-        tPharm  :TPharmacyDB;  {Pharmacy's Database}
-        
+      //  tPharm  :TPharmacyDB;  {Pharmacy's Database}
+  tt  :TTerritoryDB;
 	tl	:TSkillDB;
 	sr	:TSearchRec;
 	dat :TFileStream;
@@ -96,7 +96,7 @@ begin
 					FileExists(AppPath + 'database\exp_guild_db.txt') and
 {ギルド機能追加ココまで}
 					FileExists(AppPath + 'database\exp_db.txt')) then begin
-		MessageBox(Handle, 'You have missing files. Go to eWeiss uploader to get them', 'eWeiss', MB_OK or MB_ICONSTOP);
+		MessageBox(Handle, 'You have missing files. Go to the Fusion Download Center to get them.', 'Fusion', MB_OK or MB_ICONSTOP);
 		Application.Terminate;
 		exit;
 	end;
@@ -122,7 +122,7 @@ begin
 			
 			ReadLn(afm,str);
 			if (str <> 'ADVANCED FUSION MAP') then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
                                 Application.Terminate;
                                 exit;
                         end;
@@ -132,7 +132,7 @@ begin
 			CloseFile(afm);
 
 			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
 				Application.Terminate;
 				exit;
 			end;
@@ -158,7 +158,7 @@ begin
 			
 			ReadLn(afm,str);
 			if (str <> 'ADVANCED FUSION MAP') then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
                                 Application.Terminate;
                                 exit;
                         end;
@@ -168,7 +168,7 @@ begin
 			CloseFile(afm);
 
 			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
 				Application.Terminate;
 				exit;
 			end;
@@ -192,7 +192,7 @@ begin
 			SetLength(str, 4);
                         dat.Read(str[1], 4);
                         if str <> 'GRAT' then begin
-                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
                                 Application.Terminate;
                                 exit;
 			end;
@@ -202,7 +202,7 @@ begin
 			dat.Read(xy.Y, 4);
 			dat.Free;
 			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
 				Application.Terminate;
 				exit;
 			end;
@@ -220,7 +220,7 @@ begin
         
 	if MapList.IndexOf('prontera') = -1 then begin
 		//最低限、prontera.gatがないと起動しない
-		MessageBox(Handle, 'prontera map file missing', 'eWeiss', MB_OK or MB_ICONSTOP);
+		MessageBox(Handle, 'prontera map file missing', 'Fusion', MB_OK or MB_ICONSTOP);
 		Application.Terminate;
 		exit;
 	end;
@@ -272,10 +272,10 @@ begin
 			View := StrToInt(sl.Strings[29]);
 			Element := StrToInt(sl.Strings[30]);
 			Effect := StrToInt(sl.Strings[31]);
-                        
+
 {Fix}
 			Job := StrToInt64(sl.Strings[24]); 
-         if Job <> 0 then begin 
+         if Job <> 0 then begin
             //Bit recombination 
             for i := 0 to 23 do begin 
                jf[i] := boolean((Job and (1 shl i)) <> 0); 
@@ -648,7 +648,9 @@ begin
 
 {氏{箱追加}
 	//枝データベース読み込み
-
+{Colus, 20040130: Since we put the pharmacy entires in the metalprocess we don't
+ need this here any more...}
+ {
 DebugOut.Lines.Add('Pharmacy database loading...');
 	Application.ProcessMessages;
         AssignFile(txt, AppPath + 'database\PharmacyDB.txt');
@@ -678,7 +680,7 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d Pharmacy entries loaded.', [PharmacyDB.Count]));
 	Application.ProcessMessages;
-
+ }
 DebugOut.Lines.Add('Monster AI database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\mob_ai_db.txt');
@@ -977,6 +979,29 @@ DebugOut.Lines.Add('Monster AI database loading...');
 	CloseFile(txt);
 	DebugOut.Lines.Add(Format('-> Total %d guild skill(s) database loaded.', [GSkillDB.Count]));
 	Application.ProcessMessages;
+
+  // Colus, 20040130: Adding territory name DB.
+  DebugOut.Lines.Add('Guild Territory database loading...');
+	Application.ProcessMessages;
+	AssignFile(txt, AppPath + 'database\territory_db.txt');
+	Reset(txt);
+	Readln(txt, str);
+	while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+		sl.DelimitedText := str;
+    if (sl.Count = 2) then begin
+  		tt := TTerritoryDB.Create;
+  		with tt do begin
+        MapName := sl.Strings[0];
+        TerritoryName := sl.Strings[1];
+  		end;
+  		TerritoryList.AddObject(tt.MapName, tt);
+  	end;
+  end;
+ 	CloseFile(txt);
+ 	DebugOut.Lines.Add(Format('-> Total %d guild territories loaded.', [TerritoryList.Count]));
+ 	Application.ProcessMessages;
 
 
   DebugOut.Lines.Add('Slave Summon Mobs List loading...');

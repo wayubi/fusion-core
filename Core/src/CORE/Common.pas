@@ -160,6 +160,14 @@ type TPharmacyDB = class
         MaterialID      :array [1..5] of integer;
         MaterialAmount  :array [1..5] of byte;
 end;
+
+//------------------------------------------------------------------------------
+// MapName, TerritoryName
+type TTerritoryDB = class
+  MapName       :ShortString;
+  TerritoryName :ShortString;
+end;
+
 //------------------------------------------------------------------------------
 type TMobAIDB = class
 // ID,SKILL1,LEVEL1,PERCENT1,TYPE1,SKILL2,LEVEL2,PERCENT2,TYPE2,SKILL3,LEVEL3,PERCENT3,TYPE3,SKILL4,LEVEL4,PERCENT4,TYPE4
@@ -1255,6 +1263,7 @@ var
 {パーティー機能追加}
 	PartyNameList	:TStringList;
   CastleList    :TStringList;
+  TerritoryList :TStringList;
   EmpList       :TStringList;
 {パーティー機能追加ココまで}
 {キューペット}
@@ -4201,6 +4210,7 @@ var
 	w1 :word;
 	w2 :word;
 	tg :TGuild;
+  tgc:TCastle;
 {アジト機能追加ココまで}
 procedure SendNData(Socket: TCustomWinSocket; tn:TNPC; ver2:Word; Use0079:boolean = false);
 begin
@@ -4277,7 +4287,28 @@ begin
 		WFIFOW(14, tn.JID);
 		w1 := 0;
 		w2 := 0;
+    // Colus, 20040130: We can't use this method because guilds are allowed
+    // to have more than one castle, thus, their territory value keeps changing.
+    // Instead we need to:
+    //  1) Look up the NPC's guild (it is a mapname)
+    //  2) Look for the castle with that name
+    //  3) If on the list, find the guild with that castle, if any
+    //     If not, well, no emblem.
+    //  4) Get the guild's emblem and set it.
 		if (tn.Agit <> '') then begin
+      i := CastleList.IndexOf(tn.Agit);
+      if (i <> -1) then begin
+        tgc := CastleList.Objects[i] as TCastle;
+        with tgc do begin
+          // No check of j.  Castle wouldn't have been made w/o a proper guild ID.
+          j := GuildList.IndexOf(tgc.GID);
+          tg := GuildList.Objects[j] as TGuild;
+          w1 := tg.Emblem;
+					w2 := tg.ID;
+        end;
+      end;
+		end; 
+{		if (tn.Agit <> '') then begin
 			for i := 0 to GuildList.Count - 1 do begin
 				tg := GuildList.Objects[i] as TGuild;
 				if (tg.Agit = tn.Agit) then begin
@@ -4286,7 +4317,7 @@ begin
 					break;
 				end;
 			end;
-		end;
+		end;}
 		WFIFOL(22, w1);
 		WFIFOL(26, w2);
 		WFIFOM1(46, tn.Point, tn.Dir);
@@ -7840,6 +7871,7 @@ end;
 	for i1 := 0 to tm.NPC.Count - 1 do begin
 		tn := tm.NPC.Objects[i1] as TNPC;
 		if (tn.CType = 2) and (tn.ScriptCnt <> 0) then begin
+      // Using script 'scriptlabel'...
 			if tn.Script[0].ID = 99 then begin
 				j := tm.NPCLabel.IndexOf(tn.Script[0].Data1[0]);
 				if j <> -1 then begin
@@ -7850,6 +7882,11 @@ end;
 						tn.Script[i] := tn1.Script[i];
 					end;
 					tn.ScriptCnt := tn1.ScriptCnt;
+          // Colus, 20040130: Copy over script label data when you go to a script
+          tn.ScriptInitS := tn1.ScriptInitS;
+          tn.ScriptInitD := tn1.ScriptInitD;
+          tn.ScriptInitMS := tn1.ScriptInitMS;
+
 				end;
 {NPCイベント追加}
 			end else begin

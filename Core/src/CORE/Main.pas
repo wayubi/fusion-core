@@ -227,9 +227,11 @@ begin
 
 	PartyNameList := TStringList.Create;
 	PartyNameList.CaseSensitive := True;
-        CastleList := TStringList.Create;
+  CastleList := TStringList.Create;
 	CastleList.CaseSensitive := True;
-        EmpList := TStringList.Create;
+  TerritoryList := TStringList.Create;
+	TerritoryList.CaseSensitive := True;
+  EmpList := TStringList.Create;
 	EmpList.CaseSensitive := True;
 
 	ChatRoomList := TIntList32.Create;
@@ -473,12 +475,13 @@ begin
   if sl.IndexOfName('GlobalGMsg') <> -1 then begin
 		GlobalGMsg := sl.Values['GlobalGMsg'];
 	end else begin
-		GlobalGMsg := 'Guild Base $mapname has been taken by $guildname guild.';
+		GlobalGMsg := 'The [$castlename] castle has been taken by [$guildname] guild.';
+    // Unoccupied version: 'The [$castlename] castle is claimed by [$guildname] guild.'
 	end;
   if sl.IndexOfName('MapGMsg') <> -1 then begin
 		MapGMsg := sl.Values['MapGMsg'];
 	end else begin
-		MapGMsg := 'Empelium Has Been Destroyed';
+		MapGMsg := 'Emperium Has Been Destroyed';
 	end;
         if sl.IndexOfName('Timer') <> -1 then begin
 		Timer := StrToBool(sl.Values['Timer']);
@@ -734,6 +737,7 @@ begin
 {パーティー機能追加}
 	PartyNameList.Free;
   CastleList.Free;
+  TerritoryList.Free;
   EmpList.Free;
 {パーティー機能追加ココまで}
 {キューペット}
@@ -1164,6 +1168,7 @@ var
 	tpa:TParty;     {Party Class}
 	tg  :TGuild;    {Guild Glass}
         tgc :TCastle;
+  tt  :TTerritoryDB;
         tn1 :TNPC;
 	ge  :cardinal;
 
@@ -1221,11 +1226,15 @@ begin
 if (ts.isEmperium) then begin
 
         j := GuildList.IndexOf(tc.GuildID);
-        if (j <> -1) then begin
+        m := TerritoryList.IndexOf(ts.Map);
+        if (j <> -1) and (m <> -1) then begin
                 tg := GuildList.Objects[j] as TGuild;
+                tt := TerritoryList.Objects[m] as TTerritoryDB;
                 str := GlobalGMsg;
+
                 str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
                 str := StringReplace(str, '$mapname', ts.Map, [rfReplaceAll]);
+                str := StringReplace(str, '$castlename', tt.TerritoryName, [rfReplaceAll]);
                 str := StringReplace(str, '$guildname', tg.Name, [rfReplaceAll]);
                 str := StringReplace(str, '$guildmaster', tg.MasterName, [rfReplaceAll]);
         end else begin
