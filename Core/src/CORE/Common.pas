@@ -9737,18 +9737,18 @@ Begin
 							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
 							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
 							Inc(k);
-					  {	end else if str = 'percentdamage' then begin //------- 73 percentdamage
-                        	if sl1.Count <> 2 then begin
+					  	end else if str = 'percentdamage' then begin //------- 73 percentdamage
+			                        	if sl1.Count <> 2 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
 							end;
-							val(SL1[0], i, j);
-							if (j <> 0) or (i < 0) or (i > 30000) then begin
+							val(SL1[0], i, j); // going to 1000% instead of 100% because of coolness - Tsusai
+							if (j <> 0) or (i < 0) or (i > 1000) then begin
 								ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
 							end;
 							val(SL1[1], i, j);
-							if (j <> 0) or (i < 0) or (i > 30000) then begin
+							if (j <> 0) or (i < 0) or (i > 1000) then begin
 								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21
 							end;
@@ -9757,7 +9757,7 @@ Begin
 							SetLength(tn.Script[k].Data3, 2);
 							tn.Script[k].Data3[0] := StrToInt(SL1[0]);
 							tn.Script[k].Data3[1] := StrToInt(SL1[1]);
-							Inc(k);       }
+							Inc(k);       
  						end else if str = 'checkpoint' then begin //------- 74 checkpoint
 							if sl1.Count <> 3 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);

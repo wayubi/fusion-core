@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-23-04: Percentdamage finished. [Tsusai]
+		Usage: percentdamage HPpercent,SPpercent;
 - 08-22-04: Major R.E.E.D overhaul to fix international characters. [AlexKreuz]
 - 08-22-04: JCon account deletion now permanent. [AlexKreuz]
 - 08-22-04: Proper character id assigning on character create. [AlexKreuz]

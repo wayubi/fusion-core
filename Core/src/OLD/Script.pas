@@ -1899,40 +1899,49 @@ begin
 					Inc(tc.ScriptStep);
 				end;
 
-        73: //percentheal2
-        {   usage: percentheal2 HPpercent,SPpercent;
-            the percent of healing is based upon
-            the difference of MAX and remaining HP and SP }
-                begin
-                    Inc(tc.HP, tn.Script[tc.ScriptStep].Data3[0]);
-                    //Healing
-                    j := (tc.MAXHP - tc.HP) * tn.Script[tc.ScriptStep].Data3[0] div 100;
-                    tc.HP := tc.HP + j;
-                    if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
-                    //SP Increasing
-					Inc(tc.SP, tn.Script[tc.ScriptStep].Data3[1]);
-                    i := (tc.MAXSP - tc.SP) * tn.Script[tc.ScriptStep].Data3[1] div 100;
-                    tc.SP := tc.SP + i;
-					if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-					//ƒpƒP‘—M
-					WFIFOW( 0, $011a);
-					WFIFOW( 2, 28);
-					WFIFOW( 4, j);
-					WFIFOL( 6, tc.ID);
-					WFIFOL(10, tn.ID);
-					WFIFOB(14, 1);
-					SendBCmd(tc.MData, tn.Point, 15);
-					{
-					WFIFOW( 0, $013d);
-					WFIFOW( 2, $0007);
-					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
-					tc.Socket.SendBuf(buf, 6);
-					}
-					SendCStat1(tc, 0, 5, tc.HP);
-					SendCStat1(tc, 0, 7, tc.SP);
+        73: {Percent Damage by Tsusai}
+            //Usage: percentdamage HPpercent,SPpercent;
+            // the percent of damage is based upon total HP and SP }
+            begin
+                //Basic Damage
+                j := tc.MAXHP * tn.Script[tc.ScriptStep].Data3[0] div 100; //Calculate the damage
+                if tc.HP - j > 0 then
+                tc.HP := tc.HP - j
+                else tc.HP := 0; //Safe
 
-					Inc(tc.ScriptStep);
-				end;
+                //Check if it will kill the character
+                if (tc.HP = 0) then begin
+                    tc.HP := 0;
+                    tc.Sit := 1;
+                    SendCStat1(tc, 0, 5, tc.HP);
+                    WFIFOW(0, $0080);
+                    WFIFOL(2, tc.ID);
+                    WFIFOB(6, 1);
+                    tc.Socket.SendBuf(buf, 7); //You didn't finish your packet process
+                end else begin
+                    //Damage Packet Process
+                    WFIFOW( 0, $008a);
+                    WFIFOL( 2, tc.ID);
+                    WFIFOL( 6, tc.ID);
+                    WFIFOL(10, timeGetTime());
+                    WFIFOL(14, tc.aMotion);
+                    WFIFOL(18, tc.dMotion);
+                    WFIFOW(22, j);
+                    WFIFOW(24, 1);
+                    WFIFOB(26, 0);
+                    WFIFOW(27, 0);
+                    SendBCmd(tm, tc.Point, 29);
+                    end;
+                //SP Decreasing
+                i := tc.MAXSP * tn.Script[tc.ScriptStep].Data3[1] div 100;
+                if tc.SP - i > 0 then
+                    tc.SP := tc.SP - i
+                else tc.SP := 0;
+                //Update Your HP and SP
+                SendCStat1(tc, 0, 5, tc.HP);
+                SendCStat1(tc, 0, 7, tc.SP);
+                Inc(tc.ScriptStep);
+            end;
 
         74: //checkpoint
                 begin
