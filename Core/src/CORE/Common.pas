@@ -1666,6 +1666,7 @@ Option_GM_Logs     :Boolean;
 Option_Enable_WAC : Boolean;
 Option_Minimize_Tray : Boolean;
 Option_Pet_Capture_Rate :word;
+Option_Mob_Spawn_Rate : word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
 Option_Username_MF : boolean;
@@ -9932,6 +9933,9 @@ Begin
 					ts0.SpawnDelay2 := StrToInt(SL1[3]);
 					ts0.SpawnType   := StrToInt(SL1[4]);
 
+                    { Alex: Mob Rate }
+                    mcnt := mcnt * Option_Mob_Spawn_Rate div 100; 
+
 					if MobDB.IndexOf(ts0.JID) = -1 then continue;
 					ts0.Data := MobDB.IndexOfObject(ts0.JID) as TMobDB;
 					if (ts0.Point1.X = 0) and (ts0.Point1.Y = 0) and (ts0.Point2.X = 0) and (ts0.Point2.Y = 0) then begin
@@ -9955,7 +9959,7 @@ Begin
 						ts.Point2.X := ts0.Point2.X;
 						ts.Point2.Y := ts0.Point2.Y;
 
-{’Ç‰Á}			if (ts.JID = 1288) then begin
+                        if (ts.JID = 1288) then begin
 							ts.isEmperium := true;
 							m := CastleList.IndexOf(ts.Map);
 							if (m <> - 1) then begin
@@ -10021,8 +10025,8 @@ Begin
 								end;
 								ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //In FA 30%
 							end;
-{’Ç‰Á}				ts.Element  := ts.Data.Element;
-{’Ç‰Á}				ts.isActive := ts.Data.isActive;
+                            ts.Element  := ts.Data.Element;
+                            ts.isActive := ts.Data.isActive;
 							ts.EmperiumID := 0;
 							tm.Mob.AddObject(ts.ID, ts);
 							tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);

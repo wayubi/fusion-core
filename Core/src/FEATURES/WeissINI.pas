@@ -93,6 +93,7 @@ uses
         ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
         ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
         ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
+        ini.WriteString('Fusion', 'Option_Mob_Spawn_Rate', InttoStr(Option_Mob_Spawn_Rate));
         ini.WriteString('Fusion', 'Option_Minimize_Tray', BoolToStr(Option_Minimize_Tray));
         ini.WriteString('Fusion', 'Option_Enable_WAC', BoolToStr(Option_Enable_WAC));
         // Fusion INI Lines

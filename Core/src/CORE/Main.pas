@@ -847,6 +847,11 @@ begin
     end;
 
 
+	if sl.IndexOfName('Option_Mob_Spawn_Rate') > -1 then begin
+                        Option_Mob_Spawn_Rate := StrToInt(sl.Values['Option_Mob_Spawn_Rate']);
+                end else begin
+                        Option_Mob_Spawn_Rate := 100;
+                end;
 	if sl.IndexOfName('Option_Pet_Capture_Rate') > -1 then begin
                         Option_Pet_Capture_Rate := StrToInt(sl.Values['Option_Pet_Capture_Rate']);
                 end else begin
