@@ -2241,7 +2241,7 @@ Called when we're shutting down the server *only*
                 if (k = 0) and (i >= 1) and (i <= 1001) and (i <> tc1.SkillPoint) then begin
                     tc1.SkillPoint := i;
 
-                    SendCStat1(tc, 0, $000c, tc.SkillPoint);
+                    SendCStat1(tc1, 0, $000c, tc1.SkillPoint);
 
                     Result := 'GM_CHARSKILLPOINT Success, skill points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.SkillPoint) + '.';
                 end else begin

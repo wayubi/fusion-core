@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-23-04: Fixed a small bug in #charskillpoint. [Trihan]
 - 06-23-04: Added feature request #853 - New GM commands. [Trihan]
 	    - #charblevel
 	    - #charjlevel
