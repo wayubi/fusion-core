@@ -1026,7 +1026,7 @@ TChara = class(TLiving)
         tmpPvPRank    :integer;
 
         guild_storage : Boolean;
-        NPC_Touch     : Boolean; //to make sure you don't keep setting off the same npc ontouch script.
+        OnTouchIDs      :TIntList32; //to make sure you don't keep setting off the same npc ontouch script.
 
     {Mercenary System}
     mercenaryID       :cardinal;  {The ID of a character's Mercenary}

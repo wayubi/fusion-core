@@ -19,7 +19,8 @@ uses
     Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData, ISCS,
     REED_SAVE_PARTIES,
     REED_SAVE_GUILDS,
-    REED_DELETE;
+    REED_DELETE,
+    List32;
 
 //==============================================================================
 // ä÷êîíËã`
@@ -240,6 +241,8 @@ Begin(* Proc sv3PacketProcess() *)
     						SendMOTD(tc);
     					end;//if (Option_MOTD)
 
+                        tc.OnTouchIDs := TIntList32.Create;
+
 					end else begin
 						WFIFOW(0, $0074); //Ç†Ç¡ÇƒÇÈÇ©Ç»ÅH
 						WFIFOB(2, 0);
@@ -273,6 +276,8 @@ Begin(* Proc sv3PacketProcess() *)
                         {Tsusai: Reapply Status options like blind and silence.
                         These things have to carry over upon map change.  Thanks Trihan!}
                         UpdateOption(tm,tc);
+
+                        tc.OnTouchIDs.Clear;
 
                         //Grace Time
                         if mi.PvPG = true then tc.GraceTick := timeGetTime() + 15000

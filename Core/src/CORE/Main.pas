@@ -1787,6 +1787,8 @@ begin
         end;
     end;
 
+    tc.OnTouchIDs.Free;
+
     NowUsers := sv3.Socket.ActiveConnections;
     if NowUsers > 0 then Dec(NowUsers);
 
@@ -4231,7 +4233,7 @@ with tc do begin
                                 end;
                             end;
                         end;
-    
+
                     end;
                 end;
                 
@@ -4339,7 +4341,7 @@ with tc do begin
 
                             if (abs(Point.X - tn.Point.X) <= tn.WarpSize.X) and
                             (abs(Point.Y - tn.Point.Y) <= tn.WarpSize.Y) then begin
-                                if not tc.NPC_Touch then begin
+                                if tc.OnTouchIDs.IndexOf(tn.ID) = -1 then begin
                                     tc.TalkNPCID := tn.ID;
                                     if tn.OnTouchLabel <> 0 then tc.ScriptStep := tn.OnTouchLabel
                                     else tc.ScriptStep := 0;
@@ -4350,11 +4352,13 @@ with tc do begin
                                         UpdateOption(tm, tc);
                                     end;
                                     tc.AData := tn;
+                                    tc.OnTouchIDs.Add(tn.ID);
                                     NPCScript(tc);
-                                    tc.NPC_Touch := true; // trigger once
                                 end;
-                            end else if tc.NPC_Touch then
-                              tc.NPC_Touch := false; //disable after leaving (i hope)
+                            end else begin
+                                if tc.OnTouchIDs.IndexOf(tn.ID) <> -1 then
+                                    tc.OnTouchIDs.Delete(tc.OnTouchIDs.IndexOf(tn.ID));
+                            end;
                         end;
 
 
@@ -4367,7 +4371,7 @@ with tc do begin
             Sit := 3;
 
             if (tc.Skill[144].Lv = 0) then HPTick := Tick;
-            
+
             HPRTick := Tick - 500;
             SPRTick := Tick;
             pcnt := 0;
@@ -4381,11 +4385,11 @@ with tc do begin
                 end;
             end;
             }
-            
+
             //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('		Move OK', [ID]));
             break;
         end;
-        
+
         MoveTick := MoveTick + cardinal(spd);
     end;
 end;
