@@ -19,12 +19,16 @@ uses
     procedure JCon_Accounts_Delete();
     procedure JCon_Accounts_Chara_Delete(str : String);
 
+    procedure JCon_Characters_Load();
+    procedure JCon_Characters_Populate();
+    procedure JCon_Characters_Save();
+
     procedure JCon_INI_Server_Load();
     procedure JCon_INI_Server_Save();
 
     procedure JCon_INI_Game_Load();
     procedure JCon_INI_Game_Save();
-    //procedure JCon_Character_Save();
+
 
 implementation
 
@@ -444,52 +448,134 @@ uses
 		weiss_ini_save();
     end;
 
-{    procedure JCon_Character_Save();
+
+	procedure JCon_Characters_Load();
     var
-        tc : TChara;
-    begin
-        tc.Name := frmMain.Edit7.Text;
-        tc.ID := StrToInt(frmMain.Edit8.Text);
-        tc.CID := StrToInt(frmMain.Edit9.Text);
-        tc.JID := StrToInt(frmMain.Edit10.Text);
-        tc.BaseLV := StrToInt(frmMain.Edit14.Text);
-        tc.BaseEXP := StrToInt(frmMain.Edit15.Text);
-        tc.StatusPoint := StrToInt(frmMain.Edit11.Text);
-        tc.JobLV := StrToInt(frmMain.Edit12.Text);
-        tc.JobEXP := StrToInt(frmMain.Edit13.Text);
-        tc.SkillPoint := StrToInt(frmMain.Edit16.Text);
-        tc.Zeny := StrToInt(frmMain.Edit36.Text);
-        tc.Stat1 := StrToInt(frmMain.Edit55.Text);
-        tc.Stat2 := StrToInt(frmMain.Edit56.Text);
-        tc.Option := StrToInt(frmMain.Edit54.Text);
+		i : Integer;
+    	CharacterItem : TChara;
+	begin
 
-        if StrToInt(frmMain.Edit58.Text) > tc.MAXHP then begin
-            tc.HP := tc.MAXHP;
-            frmMain.Edit58.Text := IntToStr(tc.MAXHP);
-        end else
-            tc.HP := StrToInt(frmMain.Edit58.Text);
-        if StrToInt(frmMain.Edit53.Text) > tc.MAXSP then begin
-            tc.SP := tc.MAXSP;
-            frmMain.Edit53.Text := IntToStr(tc.MAXSP);
-        end else
-            tc.SP := StrToInt(frmMain.Edit53.Text);
+		frmMain.ListBox2.Clear;
 
-        tc.Speed := StrToInt(frmMain.Edit41.Text);
-        tc.Hair := StrToInt(frmMain.Edit46.Text);
-        tc.HairColor := StrToInt(frmMain.Edit47.Text);
-        tc.ClothesColor := StrToInt(frmMain.Edit48.Text);
-        tc.ParamBase[0] := StrToInt(frmMain.Edit67.Text);
-        tc.ParamBase[1] := StrToInt(frmMain.Edit66.Text);
-        tc.ParamBase[2] := StrToInt(frmMain.Edit65.Text);
-        tc.ParamBase[3] := StrToInt(frmMain.Edit63.Text);
-        tc.ParamBase[4] := StrToInt(frmMain.Edit63.Text);
-        tc.ParamBase[5] := StrToInt(frmMain.Edit61.Text);
-        tc.Map := frmMain.Edit52.Text;
-        tc.Point.X := StrToInt(frmMain.Edit57.Text);
-        tc.Point.Y := StrToInt(frmMain.Edit59.Text);
-        tc.SaveMap := frmMain.Edit49.Text;
-        tc.SavePoint.X := StrToInt(frmMain.Edit50.Text);
-        tc.SavePoint.X := StrToInt(frmMain.Edit51.Text);
+		for i := 0 to (CharaName.Count - 1) do begin
+			CharacterItem := CharaName.Objects[i] as TChara;
+	        frmMain.listbox2.Items.AddObject(CharaName.Strings[i], CharacterItem);
+    	    frmMain.listbox2.Sorted := True;
+	    end;
     end;
-}
+
+
+    procedure JCon_Characters_Populate();
+	var
+    	CharacterItem : TChara;
+
+	begin
+    	if (frmMain.listbox2.ItemIndex = -1) then Exit;
+
+		CharacterItem := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+	    frmMain.Edit7.Text := CharacterItem.Name;
+    	frmMain.Edit9.Text := IntToStr(CharacterItem.CID);
+        frmMain.Edit10.Text := IntToStr(CharacterItem.JID);
+        frmMain.Edit14.Text := IntToStr(CharacterItem.BaseLV);
+        frmMain.Edit12.Text := IntToStr(CharacterItem.JobLV);
+        frmMain.Edit15.Text := IntToStr(CharacterItem.BaseEXP);
+        frmMain.Edit13.Text := IntToStr(CharacterItem.JobEXP);
+        frmMain.Edit36.Text := IntToStr(CharacterItem.Zeny);
+
+        frmMain.Edit41.Text := IntToStr(CharacterItem.Speed);
+        frmMain.Edit16.Text := IntToStr(CharacterItem.SkillPoint);
+        frmMain.Edit11.Text := IntToStr(CharacterItem.StatusPoint);
+        frmMain.Edit49.Text := CharacterItem.SaveMap;
+        frmMain.Edit50.Text := IntToStr(CharacterItem.SavePoint.X);
+        frmMain.Edit51.Text := IntToStr(CharacterItem.SavePoint.Y);
+        frmMain.Edit46.Text := IntToStr(CharacterItem.Hair);
+        frmMain.Edit47.Text := IntToStr(CharacterItem.HairColor);
+        frmMain.Edit48.Text := IntToStr(CharacterItem.ClothesColor);
+        frmMain.Edit52.Text := CharacterItem.Map;
+        frmMain.Edit57.Text := IntToStr(CharacterItem.Point.X);
+        frmMain.Edit59.Text := IntToStr(CharacterItem.Point.Y);
+        frmMain.Edit56.Text := IntToStr(CharacterItem.Stat1);
+        frmMain.Edit55.Text := IntToStr(CharacterItem.Stat2);
+        frmMain.Edit54.Text := IntToStr(CharacterItem.Option);
+        frmMain.Edit67.Text := IntToStr(CharacterItem.Parambase[0]);
+        frmMain.Edit66.Text := IntToStr(CharacterItem.Parambase[1]);
+        frmMain.Edit65.Text := IntToStr(CharacterItem.Parambase[2]);
+        frmMain.Edit63.Text := IntToStr(CharacterItem.Parambase[3]);
+        frmMain.Edit64.Text := IntToStr(CharacterItem.Parambase[4]);
+        frmMain.Edit61.Text := IntToStr(CharacterItem.Parambase[5]);
+        frmMain.Edit58.Text := IntToStr(CharacterItem.HP);
+        frmMain.Edit53.Text := IntToStr(CharacterItem.SP);
+        frmMain.Label98.Caption := IntToStr(CharacterItem.MAXHP);
+        frmMain.Label99.Caption := IntToStr(CharacterItem.MAXSP);
+    end;
+
+    procedure JCon_Characters_Save();
+    var
+        CharacterItem : TChara;
+	begin
+    	if (frmMain.Edit7.Text = '') then begin
+        	Exit;
+        end else if CharaName.IndexOf(frmMain.Edit7.Text) <> -1 then begin
+			CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Edit7.Text)] as TChara;
+
+        if assigned(CharacterItem) then begin
+            if assigned(CharacterItem.Socket) then begin
+                if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
+                    CharacterItem.Socket := nil;
+                end;
+            end;
+        end;
+
+        CharacterItem.Name := frmMain.Edit7.Text;
+        CharacterItem.CID := StrToInt(frmMain.Edit9.Text);
+        CharacterItem.JID := StrToInt(frmMain.Edit10.Text);
+        CharacterItem.BaseLV := StrToInt(frmMain.Edit14.Text);
+        CharacterItem.BaseEXP := StrToInt(frmMain.Edit15.Text);
+        CharacterItem.StatusPoint := StrToInt(frmMain.Edit11.Text);
+        CharacterItem.JobLV := StrToInt(frmMain.Edit12.Text);
+        CharacterItem.JobEXP := StrToInt(frmMain.Edit13.Text);
+        CharacterItem.SkillPoint := StrToInt(frmMain.Edit16.Text);
+        CharacterItem.Zeny := StrToInt(frmMain.Edit36.Text);
+        CharacterItem.Stat1 := StrToInt(frmMain.Edit55.Text);
+        CharacterItem.Stat2 := StrToInt(frmMain.Edit56.Text);
+        CharacterItem.Option := StrToInt(frmMain.Edit54.Text);
+
+        if StrToInt(frmMain.Edit58.Text) > CharacterItem.MAXHP then begin
+            CharacterItem.HP := CharacterItem.MAXHP;
+            frmMain.Edit58.Text := IntToStr(CharacterItem.MAXHP);
+        end else begin
+            if StrToInt(frmMain.Edit58.Text) < 1 then CharacterItem.MAXHP := 1;
+            CharacterItem.HP := StrToInt(frmMain.Edit58.Text);
+        end;
+
+        if StrToInt(frmMain.Edit53.Text) > CharacterItem.MAXSP then begin
+            CharacterItem.SP := CharacterItem.MAXSP;
+            frmMain.Edit53.Text := IntToStr(CharacterItem.MAXSP);
+        end else begin
+            if StrToInt(frmMain.Edit53.Text) <= 0 then CharacterItem.MAXSP := 1;
+            CharacterItem.SP := StrToInt(frmMain.Edit53.Text);
+        end;
+
+        CharacterItem.Speed := StrToInt(frmMain.Edit41.Text);
+        CharacterItem.Hair := StrToInt(frmMain.Edit46.Text);
+        CharacterItem.HairColor := StrToInt(frmMain.Edit47.Text);
+        CharacterItem.ClothesColor := StrToInt(frmMain.Edit48.Text);
+        CharacterItem.ParamBase[0] := StrToInt(frmMain.Edit67.Text);
+        CharacterItem.ParamBase[1] := StrToInt(frmMain.Edit66.Text);
+        CharacterItem.ParamBase[2] := StrToInt(frmMain.Edit65.Text);
+        CharacterItem.ParamBase[3] := StrToInt(frmMain.Edit63.Text);
+        CharacterItem.ParamBase[4] := StrToInt(frmMain.Edit63.Text);
+        CharacterItem.ParamBase[5] := StrToInt(frmMain.Edit61.Text);
+        CharacterItem.Map := frmMain.Edit52.Text;
+        CharacterItem.Point.X := StrToInt(frmMain.Edit57.Text);
+        CharacterItem.Point.Y := StrToInt(frmMain.Edit59.Text);
+        CharacterItem.SaveMap := frmMain.Edit49.Text;
+        CharacterItem.SavePoint.X := StrToInt(frmMain.Edit50.Text);
+        CharacterItem.SavePoint.X := StrToInt(frmMain.Edit51.Text);
+
+        DataSave(true);
+        JCon_Characters_Load();
+    end;
+
+
 end.

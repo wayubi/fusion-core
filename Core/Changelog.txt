@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-23-04: Character Tab finished, GUI updated. [Tsusai]
 - 09-22-04: Made Minamize to Tray a Windows OS only feature. [Tsusai]
 - 09-22-04: Updated JCon's use of sockets to WSocket from WinSocket. [Tsusai]
 - 09-22-04: Winsock isn't used in the http segment, commented out. [Tsusai]
