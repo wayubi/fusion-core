@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-01-04: Added Athena @warp+, @send and @rura+ commands to ALBGM. [Trihan]
 - 07-01-04: Fixed #1031 - All card/equip skills removed on weapon remove. [AlexKreuz]
 - 07-01-04: Fixed #1022 - Card stat changes dont work. Please no more card crap. [AlexKreuz]
 - 07-01-04: Finished capping Fire Wall. [Trihan]

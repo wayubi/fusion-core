@@ -187,6 +187,9 @@ var
     function command_athena_where(tc : TChara; str : String) : String;
     function command_athena_rura(tc : TChara; str : String) : String;
     function command_athena_warp(tc : TChara; str : String) : String;
+    function command_athena_rurap(tc : Tchara; str : String) : String;
+    function command_athena_send(tc : TChara; str : String) : String;
+    function command_athena_warpp(tc : TChara; str : String) : String;
     function command_athena_charwarp(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
@@ -511,8 +514,11 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('jumpto')) = 'jumpto') and (check_level(tc.ID, GM_ATHENA_JUMPTO)) ) then error_msg := command_athena_jumpto(tc, str)
             else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
             else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_ATHENA_WHERE)) ) then error_msg := command_athena_where(tc, str)
+            else if ( (copy(str, 1, length('rura+')) = 'rura+') and (check_level(tc.ID, GM_ATHENA_RURAP)) ) then error_msg := command_athena_rurap(tc, str)
             else if ( (copy(str, 1, length('rura')) = 'rura') and (check_level(tc.ID, GM_ATHENA_RURA)) ) then error_msg := command_athena_rura(tc, str)
+            else if ( (copy(str, 1, length('warp+')) = 'warp+') and (check_level(tc.ID, GM_ATHENA_WARPP)) ) then error_msg := command_athena_warpp(tc, str)
             else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
+            else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc.ID, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
             else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc.ID, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
@@ -3015,6 +3021,171 @@ Called when we're shutting down the server *only*
             tc.Point := point(i, j);
             mapmove(tc.Socket, tc.tmpMap, tc.Point);
             Result := 'GM_ATHENA_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').';
+        end;
+        sl.Free;
+    end;
+
+    function command_athena_warpp(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k, w, ii : Integer;
+        s : string;
+        ta : TMapList;
+        tc1 : TChara;
+    begin
+        Result := 'GM_ATHENA_WARP+ failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 5 then Exit;
+
+        val(sl.Strings[2], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[3], j, ii);
+        if ii <> 0 then Exit;
+
+        if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+            ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
+            if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then Exit;
+
+            for k := 4 to sl.Count - 1 do begin
+            s := s + ' ' + sl.Strings[k];
+            s := Trim(s);
+            end;
+
+            if (charaname.IndexOf(s) <> -1) then begin
+                tc1 := charaname.objects[charaname.indexof(s)] as tchara;
+                str := tc.Name + ' warped ' + tc1.Name + ' to ' + sl.strings[1] + ' ' + inttostr(i) + ' ' + inttostr(j);
+
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+
+                if tc1.Login = 2 then begin
+                    sendcleave(tc1, 2);
+                    tc1.tmpMap := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                    mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                    Result := 'GM_ATHENA_WARP+ success.';
+                end
+
+                else begin
+                    tc1.Map := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                end;
+            end;
+        end;
+        sl.Free;
+    end;
+
+    function command_athena_send(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k, w, ii : Integer;
+        s : string;
+        ta : TMapList;
+        tc1 : TChara;
+    begin
+        Result := 'GM_ATHENA_SEND failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 5 then Exit;
+
+        val(sl.Strings[2], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[3], j, ii);
+        if ii <> 0 then Exit;
+
+        if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+            ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
+            if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then Exit;
+
+            for k := 4 to sl.Count - 1 do begin
+            s := s + ' ' + sl.Strings[k];
+            s := Trim(s);
+            end;
+
+            if (charaname.IndexOf(s) <> -1) then begin
+                tc1 := charaname.objects[charaname.indexof(s)] as tchara;
+                str := tc.Name + ' warped ' + tc1.Name + ' to ' + sl.strings[1] + ' ' + inttostr(i) + ' ' + inttostr(j);
+
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+
+                if tc1.Login = 2 then begin
+                    sendcleave(tc1, 2);
+                    tc1.tmpMap := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                    mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                    Result := 'GM_ATHENA_SEND success.';
+                end
+
+                else begin
+                    tc1.Map := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                end;
+            end;
+        end;
+        sl.Free;
+    end;
+
+    function command_athena_rurap(tc : Tchara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k, w, ii : Integer;
+        s : string;
+        ta : TMapList;
+        tc1 : TChara;
+    begin
+        Result := 'GM_ATHENA_RURA+ failure.';
+        sl := tstringlist.Create;
+        sl.DelimitedText := str;
+
+        if sl.count <> 5 then Exit;
+
+        val(sl.Strings[2], i, ii);
+        if ii <> 0 then Exit;
+        val(sl.Strings[3], j, ii);
+        if ii <> 0 then Exit;
+
+        if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+            ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
+            if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then Exit;
+
+            for k := 4 to sl.Count - 1 do begin
+            s := s + ' ' + sl.Strings[k];
+            s := Trim(s);
+            end;
+
+            if (charaname.IndexOf(s) <> -1) then begin
+                tc1 := charaname.objects[charaname.indexof(s)] as tchara;
+                str := tc.Name + ' warped ' + tc1.Name + ' to ' + sl.strings[1] + ' ' + inttostr(i) + ' ' + inttostr(j);
+
+                w := Length(str) + 4;
+                WFIFOW (0, $009a);
+                WFIFOW (2, w);
+                WFIFOS (4, str, w - 4);
+                tc.socket.sendbuf(buf, w);
+
+                if tc1.Login = 2 then begin
+                    sendcleave(tc1, 2);
+                    tc1.tmpMap := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                    mapmove(tc1.Socket, tc1.tmpMap, tc1.Point);
+                    Result := 'GM_ATHENA_RURA+ success.';
+                end
+
+                else begin
+                    tc1.Map := sl.Strings[1];
+                    tc1.Point := point(i, j);
+                end;
+            end;
         end;
         sl.Free;
     end;
