@@ -1579,6 +1579,30 @@ end;
                                         end else
                                         // AlexKreuz: Change Password
 
+                                        // AlexKreuz: Get list of users
+                                        if (Copy(str, 1, 5) = 'users') then begin
+                                            str2 := 'Users Currently Logged in:';
+                                            for i := 0 to CharaName.Count - 1 do begin
+                                            tc1 := CharaName.Objects[i] as TChara;
+                                                if tc1.Login = 2 then begin
+                                                    if str2 = 'Users Currently Logged in:' Then begin
+                                                        str2 := str2 + tc1.Name;
+                                                    end else begin
+                                                        str2 := str2 + ',' + tc1.Name;
+                                    				end;
+                                                end;
+                                            end;
+                                            DebugOut.Lines.Add(str2);
+                                            w := 200;
+                                            WFIFOW(0, $009a);
+                                            WFIFOW(2, w);
+                                            WFIFOS(4, str2, w - 4);
+                                            tc.Socket.SendBuf(buf, w);
+                                        end else
+                                        // AlexKreuz: Get list of users
+
+
+
                                                 if (Copy(str, 1, 6) = 'server') then begin
                                                         str2 := 'Powered by Fusion 1.2.0.7 -- http://www.izlude.net/';
                                                         DebugOut.Lines.Add(str2);

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
-
+- 01-10-04: Added User command '-users'. Lists online players. [AlexKreuz]
 - 01-10-04: Added WelcomeMsg option to Weiss.ini (Welcomes users globally). [AlexKreuz]
 - 01-10-04: Added monster Skill Blind. [Darkhelmet]
 - 01-10-04: Fixed Alcolyte Skill Cure. [Darkhelmet]
