@@ -8,5 +8,6 @@ December 23, 2003
 - Monster Skills
 - Tweak New Map Format
 - Wedding System (Low Priority)
+- GM commands #ban , #kick (very helpful) [Eliot]
 
 -----------------------------------------------
