@@ -25,14 +25,20 @@ uses GameProcesses, ScktComp, SysUtils, Globals, Dialogs, Common, Classes;
 implementation
 //uses Main;
 
-function SearchPacketListing(tc : TChara; Socket : TCustomWinSocket; Ver :integer; pkt : string; plth : integer) :boolean ;
+function SearchPacketListing(tc : TChara; Socket : TCustomWinSocket; Ver :integer; pkt : string) :boolean ;
 var
     j : integer;
+    size : word;
 begin
     Result := false;
     for j := 0 to Length(CodeBase[Ver].Packet) - 1 do begin
-        if (CodeBase[Ver].Packet[j].ID = pkt) and
-        ((CodeBase[Ver].Packet[j].Length = plth) or (CodeBase[Ver].Packet[j].Length = -1) )then begin
+        if (CodeBase[Ver].Packet[j].ID = pkt) then begin
+            if CodeBase[Ver].Packet[j].Length <> -1 then Socket.ReceiveBuf(buf[2], CodeBase[Ver].Packet[j].Length - 2)
+            else begin
+                Socket.ReceiveBuf(buf[2], 2);
+			    RFIFOW(2, size);
+			    Socket.ReceiveBuf(buf[4], size - 4);
+            end;
             if CodeBase[Ver].Packet[j].Command = 'loadendack' then begin
                 DisplayMap(tc,Socket);
                 Result := True;
@@ -61,27 +67,28 @@ var
     found : boolean;
     packet : string;
 Begin
-    if Socket.ReceiveLength >= 2 then begin
+    while Socket.ReceiveLength >= 2 do begin
         lth := Socket.ReceiveLength;
-        Socket.ReceiveBuf(buf[0], lth);
+        Socket.ReceiveBuf(buf[0], 2);
 		RFIFOW(0, packetIDnum);
-        packet := '0x' + IntToHex(packetIDnum,4);
+        packet := LowerCase('0x' + IntToHex(packetIDnum,4));
 		tc := Socket.Data;
 
         if tc <> nil then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('3:%.8d CMD %.4x', [tc.ID, packetIDnum]));
 
         found := false;
         if tc = nil then begin
-            for i := (Length(CodeBase) -1) downto 0 do begin
+            for i := (Length(CodeBase) -1) downto 0 do begin //Go through all the codebases w/ packets
 
-                for j := 0 to Length(CodeBase[i].Packet) - 1 do begin
+                for j := 0 to Length(CodeBase[i].Packet) - 1 do begin //Search for the packet from this codebase
 
                     if (CodeBase[i].Packet[j].ID = packet) then begin
                         if (CodeBase[i].Packet[j].Length = lth) then begin
                             if (CodeBase[i].Packet[j].Command = 'wanttoconnection') then begin
+                                Socket.ReceiveBuf(buf[2], (lth - 2)); //Get the rest of the packet info
                                 MapConnect(i, CodeBase[i].Packet[j].ReadPoints[0],
                                     CodeBase[i].Packet[j].ReadPoints[1],
-                                    CodeBase[i].Packet[j].ReadPoints[2],Socket);
+                                    CodeBase[i].Packet[j].ReadPoints[2],Socket); // Load the map
                                 found := true;
                                 break;
                             end;
@@ -95,9 +102,11 @@ Begin
         if not found then console('IP ' + Socket.RemoteAddress + ' attempted to login with an unknown client');
 
         end else begin
-            if not SearchPacketListing(tc,Socket,tc.clientver,packet,lth) then begin //look for
-                if not SearchPacketListing(tc,Socket,0,packet,lth) then Exit;
-            end;
+            if tc.clientver <> 0 then begin
+                if not SearchPacketListing(tc,Socket,tc.clientver,packet) then begin //look for
+                    if not SearchPacketListing(tc,Socket,0,packet) then Exit;
+                end;
+            end else if not SearchPacketListing(tc,Socket,0,packet) then Exit;
         end;
     end;
 end;

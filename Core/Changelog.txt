@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.214 - Sometime before we die
 --------------------------------------------------------------------------------
+- 02-18-05: Packet_db packet process framework complete. [Tsusai]
+- 02-16-05: Fixed testing ini entry, added packet_db work. [Tsusai]
 - 02-16-05: Updated charserver character deletion for 9 slot exe's. [Tsusai]
 - 02-15-05: packet_db loading complete. [Tsusai]
 - 02-05-05: Error proofed Default_Map and added framework for packet_db reading. [Tsusai]

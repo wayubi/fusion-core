@@ -385,7 +385,6 @@ procedure CharacterWalk(Loc1 : integer; tc : TChara; Socket : TCustomWinSocket);
             WFIFOW( 8, tc.NextPoint.Y);
             SendPCmd(tc,10,true,true);
         end;
-        console('AMode: ' + IntToStr(tc.AMode));
     end;
 
 procedure ActionRequest(tc : TChara; Socket : TCustomWinSocket; Loc1, Loc2 : integer);
