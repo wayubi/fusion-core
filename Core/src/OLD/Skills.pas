@@ -142,6 +142,12 @@ Begin
 	// this, but it should be declared in the skill section, not out here.
 	ProcessType := 99;
 
+    	{ Alex: Holy Shit, here we go. This needs to be
+        called before any tests for target type are made
+        the reason being that one skill function should
+        be used for both types of targets. }
+        parse_skills(tc, Tick);
+
 	if tc.Skill[269].Tick > Tick then begin  //Check if BladeStop is active
 		case tc.Skill[269].Effect1 of
 		1: Exit;
@@ -168,14 +174,6 @@ Begin
     if Mapinfo.IndexOf(tm.Name) <> -1 then
 	  	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl
     else exit;  //safe exit if map isn't found in mapinfo
-
-
-    	{ Alex: Holy Shit, here we go. This needs to be
-        called before any tests for target type are made
-        the reason being that one skill function should
-        be used for both types of targets. }
-        parse_skills(tc, Tick);
-
 
 		if MTargetType = 0 then begin //Target is a monster
 			ts := tc.AData;

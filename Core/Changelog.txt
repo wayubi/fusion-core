@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-11-04: Fixed #929 - No SP Used for certain PSS skills. [AlexKreuz]
 - 06-09-04: Fixed using attack type skills too fast will target self. [AlexKreuz]
 - 06-07-04: Switched skill [SM_RECOVERY] to PSS system. [AlexKreuz]
 - 06-07-04: Minor PVP pathfinding fixes. [AlexKreuz]

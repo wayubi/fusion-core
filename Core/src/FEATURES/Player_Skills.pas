@@ -16,6 +16,7 @@ var
 
     procedure process_effect(tc : TChara; success : Integer);
     procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
+    procedure use_sp(tc : TChara; SkillID : word; LV : byte);
 
     function skill_sword_mastery(tc : TChara) : Integer;
 	function skill_two_handed_sword_mastery(tc : TChara) : Integer;
@@ -66,6 +67,10 @@ uses
         case SKILL_TYPE of
         	1: process_effect(tc, success);
             2: process_skill_attack(tc, success, Tick);
+        end;
+
+        if ( (SKILL_TYPE = 1) and (success = -1) ) or (SKILL_TYPE = 2) then begin
+        	use_sp(tc, tc.MSkill, tc.MUseLV);
         end;
 
         SKILL_TYPE := 0;
@@ -129,6 +134,35 @@ uses
         tc.AData := nil;
     end;
 
+    procedure use_sp(tc : TChara; SkillID : word; LV : byte);
+    begin
+    	tc.SPAmount := 0;
+
+        if SkillID = 0 then Exit;
+        if tc.SP < tc.Skill[SkillID].Data.SP[LV] then Exit;
+
+        tc.SPAmount := tc.Skill[SkillID].Data.SP[LV];
+
+        if tc.LessSP then tc.SPAmount := tc.SPAmount * 70 div 100;
+        if tc.NoJamstone then tc.SPAmount := tc.SPAmount * 125 div 100;
+        if tc.SPRedAmount > 0 then tc.SPAmount := tc.SPAmount - (tc.Skill[SkillID].Data.SP[LV] * tc.SPRedAmount div 100);
+
+        if (tc.Autocastactive) then begin
+        	tc.SPAmount := tc.SPAmount * 2 div 3;
+            tc.Autocastactive := False;
+        end;
+
+        // Golen Thief Bug Card (Alex: Should cards be processed here?)
+        if tc.NoTarget then tc.SPAmount := tc.SPAmount * 2;
+
+        tc.SP := tc.SP - tc.SPAmount;
+
+        SendCStat1(tc, 0, 7, tc.SP);
+        tc.MMode  := 0;
+        tc.MSkill := 0;
+        tc.MUseLv := 0;
+    end;
+    
 
     { -------------------------------------------------- }
     { - Job: Swordsman --------------------------------- }

@@ -9585,6 +9585,8 @@ begin
 										// Colus, 20040204: The reason we are testing that we _are_ hidden is b/c we use
 										// the mode set in the skill code previously.  This means you are hiding successfully.
 										if (((MSkill <> 51) and (MSkill <> 135)) or ((MSkill = 51) and (Option and 2 <> 0)) or ((MSkill = 135) and (Option and 4 <> 0))) then begin
+                                        	{ Alex: This must be moved into the new PSS system
+                                            as soon as all the skills have made the transition. }
 											DecSP(tc, MSkill, MUseLV);
 										end;
 									end else begin
