@@ -45,7 +45,7 @@ OutputDir=..\
 UnitOutputDir=..\obj
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=
+SearchPath=..\
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls;VCLXPCtrls
 Conditionals=madExcept
 DebugSourceDirs=
@@ -84,14 +84,19 @@ LegalTrademarks=Cobax, Fusion
 OriginalFilename=weiss.exe
 ProductName=Fusion Project
 ProductVersion=1.2.0.0
+[HistoryLists\hlConditionals]
+Count=1
+Item0=madExcept
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=..\lib\zlib
-Item1=..\lib\grfio
-Item2=..\lib\winsock2
+Count=5
+Item0=..\
+Item1=..\lib
+Item2=..\lib\zlib
+Item3=..\lib\grfio
+Item4=..\lib\winsock2
 [HistoryLists\hlUnitOutputDirectory]
 Count=1
 Item0=..\obj
