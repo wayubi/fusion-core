@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-01-04: Fixed #1022 - Card stat changes dont work. Please no more card crap. [AlexKreuz]
 - 07-01-04: Finished capping Fire Wall. [Trihan]
 - 07-01-04: Fixed #1037 - Minor registration errors with addplayer.txt & _M/_F. [AlexKreuz]
 - 07-01-04: Fixed setting XP Multis too high causes crash. Limit is 2147483647. [AlexKreuz]

@@ -1665,7 +1665,7 @@ Option_Font_Style : string;
 //------------------------------------------------------------------------------
 		procedure PickUpItem(tc:TChara; l:Cardinal);
 
-		procedure CalcAbility(tc:TChara; idx:Integer; o:Integer = 0);
+		procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 		procedure CalcEquip(tc:TChara);
 		procedure CalcSkill(tc:TChara; Tick:cardinal);
 		procedure CalcStat(tc:TChara; Tick:cardinal = 0);
@@ -1959,15 +1959,12 @@ end;
 
 //------------------------------------------------------------------------------
 
-procedure CalcAbility(tc:TChara; idx:Integer; o:Integer = 0);
+procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 var
 	j :Integer;
   i :byte;
   JIDFix :word; // JID correction
-  td : TItemDB;
-  td2 : TItemDB;
 begin
-	td := ItemDB.IndexOfObject(tc.Item[idx].Data.ID) as TItemDB;
 	with tc do begin
 
     JIDFix := tc.JID;
@@ -2069,52 +2066,12 @@ begin
                 if td.LVL4WeaponASPD then LVL4WeaponASPD := true;
                 if td.PerfectDamage then PerfectDamage := true;
 
-
-        for i := 0 to tc.Item[idx].Data.Slot - 1 do begin
-        	td2 := ItemDB.IndexOfObject(tc.Item[idx].Card[i]) as TItemDB;
-            if assigned(td2) then begin
-            	if (td.IEquip) then begin
-
-					if td2.SplashAttack then SplashAttack := true;
-					if td2.SpecialAttack = 1 then tc.SpecialAttack := 1;
-		    		if td2.SpecialAttack = 2 then tc.SpecialAttack := 2;
-        	        if td2.NoJamstone then  NoJamstone := true;
-            	    if td2.AnolianReflect then AnolianReflect := true;
-                	if td2.FullRecover then FullRecover := true;
-	                if td2.FastWalk then FastWalk := true;
-    	            if td2.NoTarget then NoTarget := true;
-        	        if td2.LessSP then LessSP := true;
-            	    if td2.OrcReflect then OrcReflect := true;
-	                if td2.UnlimitedEndure then UnlimitedEndure := true;
-    	            if td2.DoppelgagnerASPD then DoppelgagnerASPD := true;
-        	        if td2.MagicReflect then MagicReflect := true;
-            	    if td2.NoCastInterrupt then  NoCastInterrupt := true;
-	                if td2.GhostArmor then GhostArmor := true;
-    	            if td2.SkillWeapon then SkillWeapon := true;
-        	        if td2.GungnirEquipped then GungnirEquipped := true;
-            	    if td2.LVL4WeaponASPD then LVL4WeaponASPD := true;
-                	if td2.PerfectDamage then PerfectDamage := true;
-
-					for j := 1 to MAX_SKILL_NUMBER do begin
-						if td2.AddSkill[j] <> 0 then begin
-                        	if (tc.Skill[j].Lv = 0) then begin
-								//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
-	        			        if (not DisableSkillLimit) then begin
-									tc.Skill[j].Lv := td2.AddSkill[j];
-									tc.Skill[j].Card := True;
-                                end;
-		                    end;
-						end;
-					end;
-				end; //for j :=1 to 336 do begin
-            end;
-        end;
-
  		for j := 1 to MAX_SKILL_NUMBER do begin
 			if td.AddSkill[j] <> 0 then begin
 				//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
                 if (not DisableSkillLimit) then begin
-                	if (td.IEquip) and (tc.Skill[j].Lv = 0) then begin
+                	//(td.IEquip) and 
+                	if (tc.Skill[j].Lv = 0) then begin
 						tc.Skill[j].Lv := td.AddSkill[j];
 						tc.Skill[j].Card := True;
                     end;
@@ -2150,7 +2107,11 @@ end;
 procedure CalcEquip(tc:TChara);
 var
 	i,j,k,o :integer;
+    cardspot : Integer;
+    cardloop : Integer;
 	Side    :byte;
+    td : TItemDB;
+    td2 : TItemDB;
 begin
 	with tc do begin
 		for i := 1 to 100 do begin
@@ -2205,7 +2166,18 @@ begin
 						WElement[1] := Item[i].Data.Element;
 						ATK[1][2] := Item[i].Data.ATK;
 					end;
-					CalcAbility(tc, i, o);
+
+                    td := ItemDB.IndexOfObject(tc.Item[i].ID) as TItemDB;
+					CalcAbility(tc, td, o);
+
+                    for cardloop := 0 to tc.Item[i].Data.Slot - 1 do begin
+                    	td2 := ItemDB.IndexOfObject(tc.Item[i].Card[cardloop]) as TItemDB;
+                        if assigned(td2) then begin
+                        	CalcAbility(tc, td2, o);
+                        end;
+                    end;
+
+
 
 					//êªë¢ïêäÌÇÃëÆê´ÅAêØÇÃÇ©ÇØÇÁÇÃîªíË
 					if (Item[i].Card[0] = $00FF) and (Item[i].Card[1] <> 0) then begin
