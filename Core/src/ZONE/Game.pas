@@ -914,6 +914,20 @@ Begin(* Proc sv3PacketProcess() *)
                                                 end;
                                         end
 
+                                        else if (copy(str, 1, 4) = 'who3') then begin
+                                                for i := 0 to CharaName.Count - 1 do begin
+                                                        tc1 := CharaName.Objects[i] as TChara;
+                                                        if tc1.Login = 2 then begin
+                                                                str := 'Name: ' + tc1.Name + ' -- Party: ' + tc1.PartyName + ' -- Guild: ' + tc1.GuildName;
+                                                                w := Length(str) + 4;
+                                                                WFIFOW (0, $009a);
+                                                                WFIFOW (2, w);
+                                                                WFIFOS (4, str, w - 4);
+                                                                tc.socket.sendbuf(buf, w);
+                                                        end;
+                                                end;
+                                        end
+
                                         else if (copy(str, 1, 3) = 'who') then begin
                                                 for i := 0 to CharaName.Count - 1 do begin
                                                         tc1 := CharaName.Objects[i] as TChara;
