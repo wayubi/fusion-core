@@ -4596,11 +4596,17 @@ begin
                                                 xy.Y := tc.Point.Y;
                                                 tc.LastSong := MSkill;
                                                 tc.LastSongLV := MUseLV;
+                                                j1 := 1;
+                                                i1 := 1;
                                                 for j1 := 1 to 9 do begin
                                                   for i1 := 1 to 9 do begin
+                                                     //if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) or ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
+                                                     if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) and ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
+                                                        //if (j1 = 2 or 4 or 6 or 8) or (i1 = 2 or 4 or 6 or 8) then continue;
+                                                        //if (i1 = 2 or 4 or 6 or 8) then xy.X := (tc.Point.X) - 5 + i1;
+                                                        //if (j1 = 2 or 4 or 6 or 8) then xy.Y := (tc.Point.Y) - 5 + j1;
                                                         xy.X := (tc.Point.X) - 5 + i1;
                                                         xy.Y := (tc.Point.Y) - 5 + j1;
-
                                                         case MSkill of
 
                                                                 306:	{Lullaby}
@@ -4645,8 +4651,12 @@ begin
                                                         tn.MSkill := MSkill;
                                                         tn.MUseLV := MUseLV;
                                                         tc.SongTick := Tick + tc.Skill[MSkill].Data.Data1[MUseLV] * 1000;
+                                                        //i1 := i1 + 2;
+                                                        //1 := j1 + 2;
+                                                     end;
                                                   end;
 						end;
+
                                         end;
 
                                         314:    {Ragnarok}
