@@ -1,12 +1,12 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
-- 01-12-04: Fixed ExtremityFist Calculations. [AlexKreuz]
+- 01-12-04: Fixed Extremity Fist Crash in PvP Mode. [AlexKreuz]
+- 01-12-04: Fixed Extremity Fist Calculations. [AlexKreuz]
 - 01-12-04: Added Graffiti and Talkie Box (incomplete). [Colus]
 - 01-12-04: Updated script commands involving guild wars (not done yet) [Colus]
 - 01-12-04: Updated Icewall, no more sticking or bouncing (hopefully) [Colus]
 - 01-11-04: PVP Extremity Fist now updates SP after usage. [AlexKreuz]
-- 01-11-04: Set ProcessType 0 dmg[0] fifo to L. Fixed Extremity Fist Crash. [AlexKreuz]
 - 01-11-04: Backsliding Now works properly [Darkhelmet]
 - 01-11-04: Added procedure UpdatePlayerLocation to simplify packet sending [Darkhelmet]
 - 01-11-04: Began Resolving warnings in main.pas [Darkhelmet]

@@ -8304,6 +8304,7 @@ begin
                                 271:    {Extremity Fist}
                                 begin
                                                 if tc.Skill[270].Tick > Tick then begin
+                                                        processtype := 255;
                                                         if spiritSpheres = 5 then begin
                                                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                                                         spbonus := tc.SP;
