@@ -3437,6 +3437,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if tg.Member[j] = nil then Continue;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-23-04: Unassigned guild member caused crash in castle save routine. [AlexKreuz]
 - 08-23-04: Mob Spawn Rate exception added for Emperiums. [AlexKreuz]
 - 08-23-04; Calculating PVPRank after deleting CList caused crash. [AlexKreuz]
 - 08-23-04: JCon account deletion on account not connected caused crash. [AlexKreuz]
