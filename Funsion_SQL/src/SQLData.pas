@@ -784,6 +784,9 @@ begin
 				Karma         := StrToInt(SQLDataSet.FieldValues['Karma']);
 				Manner        := StrToInt(SQLDataSet.FieldValues['Manner']);
 				HP            := StrToInt(SQLDataSet.FieldValues['HP']);
+        if (HP < 0) then begin
+          HP := 0;
+        end;
 				SP            := StrToInt(SQLDataSet.FieldValues['SP']);
 				DefaultSpeed  := StrToInt(SQLDataSet.FieldValues['DefaultSpeed']);
 				Hair          := StrToInt(SQLDataSet.FieldValues['Hair']);
@@ -1068,28 +1071,37 @@ begin
         {把宠物资料对应到人物、帐号上}
 			  if tpe.PlayerID <> 0 then begin
 				  if tpe.CharaID = 0 then begin  // 在仓库里
-            tp := Player.IndexofObject( tpe.PlayerID ) as TPlayer;
-						with tp.Kafra.Item[ tpe.Index ] do begin
-							Attr    := 0;
-							Card[0] := $FF00;
-							Card[2] := tpe.PetID mod $10000;
-							Card[3] := tpe.PetID div $10000;
+					  try
+              tp := Player.IndexofObject( tpe.PlayerID ) as TPlayer;
+						  with tp.Kafra.Item[ tpe.Index ] do begin
+						  	Attr    := 0;
+						  	Card[0] := $FF00;
+						  	Card[2] := tpe.PetID mod $10000;
+						  	Card[3] := tpe.PetID div $10000;
+						  end;
+						except
 						end;
 					end else begin
 						tc := Chara.IndexOfObject( tpe.CharaID ) as TChara;
 						if tpe.Cart = 0 then begin  // 在身上
-							with tc.Item[ tpe.Index ] do begin
-								Attr    := tpe.Incubated;
-								Card[0] := $FF00;
-								Card[2] := tpe.PetID mod $10000;
-								Card[3] := tpe.PetID div $10000;
+						  try
+							  with tc.Item[ tpe.Index ] do begin
+							  	Attr    := tpe.Incubated;
+							  	Card[0] := $FF00;
+							  	Card[2] := tpe.PetID mod $10000;
+							  	Card[3] := tpe.PetID div $10000;
+							  end;
+							except
 							end;
 						end else begin  // 在手推车里
-							with tc.Cart.Item[ tpe.Index ] do begin
-								Attr    := 0;
-								Card[0] := $FF00;
-								Card[2] := tpe.PetID mod $10000;
-								Card[3] := tpe.PetID div $10000;
+						  try
+							  with tc.Cart.Item[ tpe.Index ] do begin
+						  		Attr    := 0;
+						  		Card[0] := $FF00;
+						  		Card[2] := tpe.PetID mod $10000;
+					  			Card[3] := tpe.PetID div $10000;
+								end;
+							except
 							end;
 						end;
 					end;
@@ -1471,6 +1483,9 @@ begin
     end;
 		sl.Add(IntToStr(Karma));
 		sl.Add(IntToStr(Manner));
+    if (HP < 0) then begin
+      HP := 0;
+    end;
 		sl.Add(IntToStr(HP));
 		sl.Add(IntToStr(SP));
 		sl.Add(IntToStr(DefaultSpeed));
