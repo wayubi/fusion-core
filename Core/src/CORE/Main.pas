@@ -199,6 +199,9 @@ begin
         MobAIDB := TIntList32.Create;
         MobAIDB.Sorted := true;
 
+        PharmacyDB := TIntList32.Create;
+        PharmacyDB.Sorted := true;
+
 	MobDBName := TStringList.Create;
 	MobDBName.CaseSensitive := True;
         SlaveDBName := TStringList.Create;
@@ -657,6 +660,7 @@ begin
 	MobDB.Free;
         MArrowDB.Free;
         MobAIDB.Free;
+        PharmacyDB.Free;
   IDTableDB.Free;
         SlaveDBName.Free;
 	SkillDB.Free;
@@ -7599,6 +7603,29 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
+                                228:    {Pharmacy}
+                                        begin
+                                                WFIFOW(0, $01ad);
+                                                j := 4;
+                                                for i := 1 to 100 do begin
+                                                        k := PharmacyDB.IndexOf(tc.Item[i].ID);
+                                                        if (tc.Item[i].ID <> 0) and (tc.Item[i].Amount > 0) and (k <> -1) then begin
+                                                                l := tc.Item[i].ID;
+                                                                WFIFOW(j, l);
+                                                                j := j + 2;
+                                                        end;
+                                                end;
+                                                if j <> 4 then begin
+                                                        WFIFOW(2, j);
+                                                        Socket.SendBuf(buf, j);
+                                                        tc.UseItemID := w;
+                                                end;
+                                                WFIFOW( 0, $00a8);
+                                                WFIFOW( 2, w);
+                                                WFIFOW( 4, 0);
+                                                WFIFOB( 6, 0);
+                                                Socket.SendBuf(buf, 7);
+                                        end;
         258:
           begin
             // AlexKreuz: Fixed Spear Quicken - Set type to Spear [4 & 5]
@@ -12854,6 +12881,7 @@ begin
                     SkillDB.Clear;
                     GSkillDB.Clear;
                     SlaveDBName.Clear;
+                    PharmacyDB.Clear;
                     MobAIDB.Clear;
                     MArrowDB.Clear;
                     IDTableDB.Clear;

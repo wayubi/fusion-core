@@ -58,6 +58,9 @@ var
 {NPCイベント追加ココまで}
 	tb  :TMobDB;
 	tsAI :TMobAIDB;
+
+        tPharm  :TPharmacyDB;  {Pharmacy's Database}
+        
 	tl	:TSkillDB;
 	sr	:TSearchRec;
 	dat :TFileStream;
@@ -644,6 +647,37 @@ begin
 
 {氏{箱追加}
 	//枝データベース読み込み
+
+DebugOut.Lines.Add('Pharmacy database loading...');
+	Application.ProcessMessages;
+        AssignFile(txt, AppPath + 'database\PharmacyDB.txt');
+        Reset(txt);
+	Readln(txt, str);
+        while not eof(txt) do begin
+		sl.Clear;
+		Readln(txt, str);
+		sl.DelimitedText := str;
+
+                tPharm := TPharmacyDB.Create;
+//ID,BookNeededID,Material1ID,Material2ID,Material3ID,Material4ID,Material5ID,Material1Amount,Material2Amount,
+        //Material3Amount,Material4Amount,Material5Amount
+
+
+		with tPharm do begin
+                        ID := StrToInt(sl.Strings[0]);
+                        BookNeededID  := StrToInt(sl.Strings[1]);
+                        for j := 1 to 5 do begin
+                                MaterialID[j] := StrToInt(sl.Strings[1 + j]);
+                                MaterialAmount[j] := StrToInt(sl.Strings[6 + j]);
+                        end;
+		end;
+
+                PharmacyDB.AddObject(tPharm.ID, tPharm);
+	end;
+	CloseFile(txt);
+	DebugOut.Lines.Add(Format('-> Total %d Pharmacy entries loaded.', [PharmacyDB.Count]));
+	Application.ProcessMessages;
+
 DebugOut.Lines.Add('Monster AI database loading...');
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\mob_ai_db.txt');

@@ -152,6 +152,14 @@ type rDropItem = record
   Stolen:cardinal;
 end;
 //------------------------------------------------------------------------------
+type TPharmacyDB = class
+//ID,BookNeededID,Material1ID,Material2ID,Material3ID,Material4ID,Material5ID,Material1Amount,Material2Amount,Material3Amount,Material4Amount,Material5Amount
+        ID              :cardinal;
+        BookNeededID    :integer;
+        MaterialID      :array [1..5] of integer;
+        MaterialAmount  :array [1..5] of byte;
+end;
+//------------------------------------------------------------------------------
 type TMobAIDB = class
 // ID,SKILL1,LEVEL1,PERCENT1,TYPE1,SKILL2,LEVEL2,PERCENT2,TYPE2,SKILL3,LEVEL3,PERCENT3,TYPE3,SKILL4,LEVEL4,PERCENT4,TYPE4
         ID              :cardinal;
@@ -1258,6 +1266,7 @@ var
 	MobDBName  :TStringList;
         {Monster Skill Database}
         MobAIDB    :TIntList32;
+        PharmacyDB :TIntList32;
   SlaveDBName:TStringList;
   MArrowDB   :TIntList32;
   IDTableDB  :TIntList32;
