@@ -4451,9 +4451,9 @@ begin
 		79:     {Magnus Exorcism}
 			begin
 				j := SearchCInventory(tc, 717, false);
-				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone) then begin
 
-					if NoJamstone = False then UseItem(tc, j); //Function Call to Use item
+					if NOT NoJamstone then UseItem(tc, j); //Function Call to Use item
 					for j1 := 1 to 7 do begin
 						for i1 := 1 to 7 do begin
 							if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
@@ -4748,8 +4748,8 @@ begin
 		140: //venom dust
 			begin
 				j := SearchCInventory(tc, 716, false);
-				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
-					if NoJamstone = False then UseItem(tc, j);
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone) then begin
+					if NOT NoJamstone then UseItem(tc, j);
 					xy.X := (tc.Point.X);
 					xy.Y := (tc.Point.Y) + 1;
 					WFIFOW( 0, $0117);
@@ -4878,8 +4878,7 @@ begin
 					WFIFOL(14, 1);
 					SendBCmd(tm, xy, 18);
 				end;
-
-			end;
+			end;{Quagmire}
 
 		110:    {Hammer Fall}
 			if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
@@ -4898,7 +4897,7 @@ begin
 				tc.MPoint.Y := 0;
 				sl.Free;
 				Exit;//safe 2004/04/26
-			end;
+			end;{Hammer Fall}
 		264:
 			begin
 				if tc.spiritSpheres <> 0 then begin
@@ -4960,7 +4959,7 @@ begin
 					sl.Free;
 					Exit;//safe 2004/04/26
 				end;
-			end;
+			end;{Skid Trap}
 		116:    {Land Mine}
 			begin
 				j := SearchCInventory(tc, 1065, false);
@@ -4982,7 +4981,7 @@ begin
 					tc.MPoint.Y := 0;
 					Exit;
 				end;
-			end;
+			end;{Land Mine}
 		117:    {Ankle Snare Trap}
 			begin
 				j := SearchCInventory(tc, 1065, false);
@@ -5003,7 +5002,7 @@ begin
 					sl.Free;
 					Exit;//safe 2004/04/26
 				end;
-			end;
+			end;{Ankle Snare Trap}
 
 		118:    {Shock Wave Trap}
 			begin
@@ -5026,7 +5025,7 @@ begin
 					sl.Free;
 					Exit;//safe 2004/04/26
 				end;
-			end;
+			end;{Shock Wave Trap}
 
 		119:    {Sandman Trap}
 			begin
@@ -5045,9 +5044,10 @@ begin
 					tc.MMode := 4;
 					tc.MPoint.X := 0;
 					tc.MPoint.Y := 0;
-					Exit;
+					sl.Free;
+					Exit;//safe 2004/04/26
 				end;
-			end;
+			end;{Sandman Trap}
 		120:    {Flasher Trap}
 			begin
 				j := SearchCInventory(tc, 1065, false);
@@ -5072,14 +5072,12 @@ begin
 			begin
 				j := SearchCInventory(tc, 1065, false);
 				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
 					UseItem(tc, j); //Use Item Function Call
 
 					xy.X := MPoint.X;
 					xy.Y := MPoint.Y;
 					tn := SetSkillUnit(tm, ID, xy, Tick, $97, MUseLV, tl.Data2[MUseLV] * 1000, tc);
 					tn.MSkill := MSkill;
-
 				end else begin
 					tc.MMode := 4;
 					tc.MPoint.X := 0;
@@ -5103,9 +5101,10 @@ begin
 					tc.MMode := 4;
 					tc.MPoint.X := 0;
 					tc.MPoint.Y := 0;
-					Exit;
+					sl.Free;
+					Exit;//safe 2004/04/26
 				end;
-			end;
+			end;{Blast Mine}
 		//264:    {Body Relocation}
 			{begin
 				if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
@@ -5650,6 +5649,7 @@ end;//proc TfrmMain.CreateField()
 
 
 //------------------------------------------------------------------------------
+{ChrstphrR 2004/04/27 - Memory Leak Fixes}
 procedure TfrmMain.SkillEffect(tc:TChara; Tick:Cardinal);
 var
 	j,k,m,b         :Integer;
@@ -5675,31 +5675,36 @@ var
   tn :TNPC;
 
 begin
-	sl := TStringList.Create;
 	ProcessType := 0;
 
   if tc.Skill[269].Tick > Tick then begin  //Check if BladeStop is active
     case tc.Skill[269].Effect1 of
-      1: exit;
+		1: Exit;
       2: if tc.MSkill <> 267 then exit;
       3: if ((tc.MSkill <> 267) and (tc.MSkill <> 266)) then exit;
       4: if ((tc.MSkill <> 267) and (tc.MSkill <> 266) and (tc.MSkill <> 273)) then exit;
       5: if ((tc.MSkill <> 267) and (tc.MSkill <> 266) and (tc.MSkill <> 273) and (tc.MSkill <> 271)) then exit;
-    end;
+		end;//case -- all exits here are safe 2004/04/27
   end;
         if tc.isSilenced then begin
                 SilenceCharacter(tm, tc, Tick);
-                Exit;
+		Exit;//safe 2004/04/27
         end;
+
+	{ChrstphrR 2004/04/26 -- moved this away from the first Exit calls.}
+	sl := TStringList.Create;
 
 	with tc do begin
 		tm := MData;
-		tl := Skill[MSkill].Data;
+		tL := Skill[MSkill].Data;
     mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
     if MTargetType = 0 then begin
 			ts := tc.AData;
 
-      if tl = nil then exit;
+			if tL = NIL then begin
+				sl.Free;
+				Exit;//safe 2004/04/26
+			end;
 
       if (ts is TMob) and (PassiveAttack = false) then begin // Edited by AlexKreuz
         if ts.isEmperium then begin
@@ -5711,7 +5716,8 @@ begin
               MUseLv := 0;
               MMode := 0;
               MTarget := 0;
-              Exit;
+							sl.Free;
+							Exit;//safe 2004/04/26
             end;
           end;
         end;
@@ -5721,7 +5727,8 @@ begin
           MUseLv := 0;
           MMode := 0;
           MTarget := 0;
-          Exit;
+					sl.Free;
+					Exit;//safe 2004/04/26
         end;
       end;
 
@@ -5730,7 +5737,8 @@ begin
 				MUseLv := 0;
 				MMode := 0;
 				MTarget := 0;
-				Exit;
+				sl.Free;
+				Exit;//safe 2004/04/26
 			end;
 
 			//射程チェック
@@ -5783,11 +5791,11 @@ begin
                                   // Delay after stealing
                                   tc.MTick := Tick + 1000;
 
-                                end; {end case}
+				end; {end Steal}
 
                                 250:    {Shield Charge}
                                 begin
-                                        if (tc.Shield <> 0) then begin
+					if (tc.Shield > 0) then begin
                                         {If Wearing Shield}
                                                 xy.X := ts.Point.X - Point.X;
 						xy.Y := ts.Point.Y - Point.Y;
@@ -5834,7 +5842,7 @@ begin
 							//ブロック移動
 							if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
 								with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-									assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
+										Assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
 									Delete(IndexOf(ts.ID));
 								end;
 								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
@@ -5842,7 +5850,6 @@ begin
 							ts.pcnt := 0;
 							//Update Monster Location
                                                         UpdateMonsterLocation(tm, ts);
-							
 						end;
                                                 if Random(100) < Skill[250].Data.Data2[MUseLV] then begin
                                                         if (ts.Stat1 <> 3) then begin
@@ -5870,7 +5877,8 @@ begin
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
-                                                Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
                                         end;
                                 end;
                                 230:  //acid terror
@@ -5888,7 +5896,8 @@ begin
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
-                                                Exit;
+						SL.Free;
+						Exit;//safe 2004/04/26
                                         end;
                                 end;
 
@@ -5903,21 +5912,15 @@ begin
                                         if Random(100) < Skill[253].Data.Data2[MUseLV] then begin
                                                         if (ts.Stat2 <> 32) and (ts.Data.Race = 1)  then begin
 								ts.nStat := 32;
-
                                                         end
-
                                                 end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
                                         end;
 
-
-                                        
-
       368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
         begin
         if tc.Weapon = 2 then begin
-
           DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
           if dmg[0] < 0 then dmg[0] := 0;
           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
@@ -5926,7 +5929,8 @@ begin
           end else begin
             SendSkillError(tc, 6);
             MMode := 4;
-            Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
            end;
            end;
 
@@ -5941,19 +5945,20 @@ begin
             end else begin
             SendSkillError(tc, 6);
             MMode := 4;
-            Exit;
+						sl.Free;
+						Exit;//safe 2004/04/27
            end;
            end;
 
-
-    382:     //Sniper Shot
+			382:     {Sniper Shot}
                   begin
                   if (Arrow = 0) or (Item[Arrow].Amount < 1) then begin
                   WFIFOW(0, $013b);
                   WFIFOW(2, 0);
                   Socket.SendBuf(buf, 4);
                   ATick := ATick + ADelay;
-                  Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
                   end;
 
                   Dec(Item[Arrow].Amount,1);
@@ -5967,7 +5972,7 @@ begin
                   Item[Arrow].ID := 0;
                   Arrow := 0;
                   end;
-                  begin
+
                   if tc.Weapon = 11 then begin
                    DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                    if dmg[0] < 0 then dmg[0] := 0;
@@ -5977,11 +5982,11 @@ begin
             end else begin
             SendSkillError(tc, 6);
             MMode := 4;
-            Exit;
-
-                  end;
-                  end;
+						sl.Free;
+						Exit;//safe 2004/04/26
                  end;
+				end;{Sniper Shot}
+
           394:     {Arrow Shower}
                   begin
                   if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
@@ -5989,7 +5994,8 @@ begin
                   WFIFOW(2, 0);
                   Socket.SendBuf(buf, 4);
                   ATick := ATick + ADelay;
-                  Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
                   end;
 
                   Dec(Item[Arrow].Amount,9);
@@ -6013,16 +6019,15 @@ begin
             end else begin
             SendSkillError(tc, 6);
             MMode := 4;
-            Exit;
-                  tc.MTick := Tick + 500;
+						tc.MTick := Tick + 500;//CR - moved ahead of Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
                   end;
-                  end;
+				end;{Arrow Shower}
 
-
-        381:    //Falcon assault
-        //Damace calc needs to be redone not much info about this skill.
+			381:    {Falcon Assault}
+				//Damage calc needs to be redone not much info about this skill.
         if tc.Option and 16 <> 0 then begin
-
          DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
           if dmg[0] < 0 then dmg[0] := 0;
           SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
@@ -6031,23 +6036,19 @@ begin
             end else begin
             SendSkillError(tc, 0);
             MMode := 4;
-            Exit;
-
-            end;
-
-
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;{Falcon Assault}
 
             /// We can cheat and use Spear stab
-           370:     //Palm Strike
+			370:     {Palm Strike}
                                                  if tc.Skill[270].Tick > Tick then begin
-
 						                xy.X := ts.Point.X - Point.X;
 						                xy.Y := ts.Point.Y - Point.Y;
 						                if abs(xy.X) > abs(xy.Y) * 3 then begin
 							                //Knockback Distance?
 							                if xy.X > 0 then b := 6 else b := 2;
 							        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-
 								        if xy.Y > 0 then b := 0 else b := 4;
 								end else begin
 									if xy.X > 0 then begin
@@ -6074,7 +6075,7 @@ begin
 							                //Knockback Monster
 							                if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
 								                with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
-									                assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
+								Assert(IndexOf(ts.ID) > -1, 'MobBlockDelete Error');
 									                Delete(IndexOf(ts.ID));
 								                end;
 								                tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
@@ -6087,15 +6088,15 @@ begin
 
 						                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							                StatCalc1(tc, ts, Tick);
-
                                                         end else begin
                                                           SendSkillError(tc, 0);
                                                                 MMode := 4;
-                                                                Exit;
-                                                        end;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;{Palm Strike}
+
            365:   //Magic Crusher
                                 begin
-
 					//Magic Attack Calculation
 					dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
 					dmg[0] := dmg[0] * (100 - ts.Data.DEF) div 100;
@@ -6114,7 +6115,6 @@ begin
                                                      end;
 
         367: //Pressure
-
           begin
             DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
             j := 1;
@@ -6128,14 +6128,15 @@ begin
             for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
             for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
             for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-            if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue;
+								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
             if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
             if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
             sl.AddObject(IntToStr(ts1.ID),ts1);
-                end;
-                end;
-                end;
-                if sl.Count <> 0 then begin
+							end;//for k1
+						end;//for i1
+					end;//for j1
+					if sl.Count > 0 then begin
                 for k1 := 0 to sl.Count - 1 do begin
                 ts1 := sl.Objects[k1] as TMob;
                 DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
@@ -6145,11 +6146,9 @@ begin
                 //SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
                 if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
 		StatCalc1(tc, ts1, Tick);
+						end;//for k1
+					end;//if sl.Count
                 end;
-                end;
-                end;
-
-
 
                                 254:    {Grand Cross}
                                 begin
@@ -6159,13 +6158,12 @@ begin
                                         //tc.MPoint.X := tc.Point.X;
                                         //tc.MPoint.Y := tc.Point.Y;
                                         //DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-
 				//end;
                                         //属性攻撃での回復は未実装
                                         //パケ送信
 				       	//SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], j);
 			                //if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-                                        //        StatCalc1(tc, ts, Tick);
+						//StatCalc1(tc, ts, Tick);
 		       			//xy := ts.Point;
 		      			//ダメージ算出
                                         xy.X := tc.Point.X;
@@ -6177,14 +6175,14 @@ begin
 		 						if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then
                                                                        Continue;
                                                                 ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-								if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then
+								if (ts = ts1) or ((tc.GuildID > 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID > 0) and (ts1.GID = tc.GuildID)) then
                                                                         Continue;
 								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
 									sl.AddObject(IntToStr(ts1.ID),ts1);
-							end;
-						end;
-					end;
-					if sl.Count <> 0 then begin
+							end;//for k1
+						end;//for i1
+					end;//for j1
+					if sl.Count > 0 then begin
 						for k1 := 0 to sl.Count - 1 do begin
 							ts1 := sl.Objects[k1] as TMob;
 							DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
@@ -6222,9 +6220,7 @@ begin
                                                                                 end;
                                                                                 {Colus, 20031216: end cast-timer cancel}
 					                                end;
-
 				                                end else begin
-
 					                                tc.HP := 1;
 					                                {WFIFOW( 0, $0080);
 					                                WFIFOL( 2, tc.ID);
@@ -6270,22 +6266,22 @@ begin
                                                 end;
                                         end;
                                 end;
+
                                 //New skills ---- Crusader
                                 257:    {Defender}
 	     			begin
 	     				tc1 := tc;
 	     				ProcessType := 3;
 	     			end;
+
                                 //New skills ---- Alchemist
                                 {231:    Potion Pitcher
                                 begin
                                         j := SearchCInventory(tc, 501, false);
                                         if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
                                                 UseItem(tc, j);
-
                                                 if (tc.HP > 0) then begin
                                                         dmg[0] := tc.HP + ((td.HP1 + Random(td.HP2 - td.HP1 + 1)) * (100 + tc.Param[2]) div 100) * tc.Skill[231].Data.Data1[tc.Skill[231].Lv] div 100;;
-
                                                         ts.HP := ts.HP + dmg[0];
 
                                                         WFIFOW( 0, $011a);
@@ -6299,25 +6295,25 @@ begin
                                                 end;
                                         end;
                                 end;}
-                           {     234:    {Chemical Protection --- Weapon}
-                            {    begin
+			{234:    {Chemical Protection --- Weapon}
+				{begin
 
                                         ProcessType := 3;
                                 end;
                                 235:    {Chemical Protection --- Shield}
-
-                              {  begin
+				{begin
                                         ProcessType := 3;
                                 end;
                                 236:    {Chemical Protection --- Armor}
-                               { begin
+				{begin
                                         ProcessType := 3;
                                 end;
                                 237:    {Chemical Protection --- Helmet}
                                 {begin
                                         ProcessType := 3;
                                 end;}
-                                //New skills ---- Rouge
+
+			//New skills ---- Rogue
                                 211:    {Steal Coin}
                                 begin
                                         j := Random(7);
@@ -6335,7 +6331,7 @@ begin
 						// Update Zeny
 						SendCStat1(tc, 1, $0014, tc.Zeny);
                                         end;
-                                end;
+				end;{Steal Coin}
                                 212:    {Back Stab}
                                 if ts.Dir = tc.Dir then begin
                                   if (tc.Option and 2 <> 0) then begin
@@ -6350,6 +6346,7 @@ begin
                                   {end else begin
                                     SendSkillError(tc, 0);
                                     tc.MMode := 4;
+						sl.Free;//CR - just in case!
                                     Exit;}
                                   end;
                                     DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
@@ -6362,10 +6359,10 @@ begin
                                     end else begin
                                         SendSkillError(tc, 0);
                                         MMode := 4;
-                                        Exit;
+					sl.Free;
+					Exit;//safe 2004/04/26
                                 end;
 
-                                      
                                 {214:    {Raid}
                                 {begin
                                         if (tc.Option = 6) then begin
@@ -6385,9 +6382,9 @@ begin
                                                                                 Continue;
 									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
 										sl.AddObject(IntToStr(ts1.ID),ts1);
-								end;
-							end;
-						end;
+								end;//for k1
+							end;//for i1
+						end;//for j1
 						if sl.Count <> 0 then begin
 							for k1 := 0 to sl.Count - 1 do begin
 								ts1 := sl.Objects[k1] as TMob;
@@ -6405,7 +6402,8 @@ begin
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
-                                                Exit;
+						sl.Free;
+						Exit;//safe 2004/04/26
                                         end;
 				end;}
 
@@ -6462,7 +6460,6 @@ begin
                                                 tc.intimidateActive := true;
                                                 tc.intimidateTick := Tick + 1000;
 
-
 									{i := MapInfo.IndexOf(tc.Map);
 									j := -1;
 									if (i <> -1) then begin
@@ -6470,7 +6467,6 @@ begin
 										if (mi.noTele = true) then j := 0;
 									end;
 									if (j <> 0) then begin
-
 										tm := tc.MData;
 									j := 0;
 									repeat
@@ -6480,20 +6476,17 @@ begin
 									until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
 
 									if j <> 100 then begin
-
 										SendCLeave(tc, 3);
 										tc.Point := xy;
 										MapMove(Socket, tc.Map, tc.Point);
 									end;
-
                                                                         ts.Point.X := tc.Point.X;
                                                                         ts.Point.Y := tc.Point.Y;
                                                                         if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
                                                         	end;  }
 
+				end;{Intimidate}
 
-
-                                        end;
                                 //New skills ---- Monk
                                 {261:  Call Spirits
                                 begin
@@ -6508,7 +6501,6 @@ begin
 	                                WFIFOB(14, $88);
 	                                WFIFOB(15, 1);
 	                                SendBCmd(tm, tc.Point, 16)
-
                                 end;
                                 262:  Absorb Spirits
                                 begin
@@ -6522,9 +6514,7 @@ begin
 
                                 263:   {Triple Blows}
                                 begin
-
                                         if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
-
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0;
                                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
@@ -6539,9 +6529,10 @@ begin
                                                 StatCalc1(tc, ts, Tick);
                                         end else begin
                                                 MMode := 4;
-                                                Exit;
-                                        end;
+						sl.Free;
+						Exit;//safe 2004/04/26
                                 end;
+				end;{Triple Blows}
 
                                 {264:   {Body Relocation}
                                 {begin
@@ -6561,12 +6552,14 @@ begin
                                                 MapMove(Socket, tc.Map, tc.Point);
                                                 tc.SP := tc.SP - tl.SP[tc.MUseLV];
                                                 MMode := 4;
-                                                Exit;
+						sl.Free;//just in case...
+						Exit;//safe 2004/04/26
                                         end else begin
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
 						tc.MPoint.Y := 0;
-						Exit;
+						sl.Free;//just in case.
+						Exit;//safe 2004/04/26
                                         end;}
                                 //end;
 
@@ -6590,7 +6583,6 @@ begin
 
                                 271:    {Extremity Fist}
                                 begin
-
                                         if tc.Skill[270].Tick > Tick then begin
                                                 if (tc.Skill[271].Data.SType = 1) then begin
                                                   if tc.spiritSpheres = 5 then begin
@@ -6610,7 +6602,7 @@ begin
 
                                                         if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
                                                                 with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
-                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
                                                                         Delete(IndexOf(tc.ID));
                                                                 end;
                                                                 tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
@@ -6638,7 +6630,10 @@ begin
                                                 end else begin
                                                   if tc.spiritSpheres >= 4 then begin
                            ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-                                        if ts = nil then Exit;
+								if ts = nil then begin
+									sl.Free;
+									Exit;//safe 2004/04/26
+								end;
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
@@ -6658,7 +6653,7 @@ begin
 
                                                         if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
                                                                 with tm.Block[xy.X div 8][xy.Y div 8].Clist do begin
-                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+										Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
                                                                         Delete(IndexOf(tc.ID));
                                                                 end;
                                                                 tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist.AddObject(tc.ID, tc);
@@ -6716,7 +6711,10 @@ begin
                                     begin
                                 if tc.spiritSpheres >= 1 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-                                        if ts = nil then Exit;
+						if ts = nil then begin
+							sl.Free;
+							Exit;//safe 2004/04/27
+						end;
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
@@ -6742,10 +6740,14 @@ begin
                                         end;
                                 end;
                                 end;
+
                                     371:  //Tiger Crush
                                  if tc.spiritSpheres >= 1 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-                                        if ts = nil then Exit;
+					if ts = nil then begin
+						sl.Free;
+						Exit;//safe 2004/04/27
+					end;
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
@@ -6764,12 +6766,15 @@ begin
                                         UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
                                         StatCalc1(tc, ts, Tick);
                                         tc.MTick := Tick + 500;
+				end;{Tiger Crush}
 
-                                end;
                                      372:   //Chain Crush
                                  if tc.spiritSpheres >= 2 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-                                        if ts = nil then Exit;
+					if ts = nil then begin
+						sl.Free;
+						Exit;//safe 2004/04/27
+					end;
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
@@ -6789,14 +6794,16 @@ begin
                                         StatCalc1(tc, ts, Tick);
 
                                         tc.MTick := Tick + 500;
-
-                                end;
+				end;{Chain Crush}
 
                                 {273:    {Combo Finish Effect}
                                 {if tc.spiritSpheres <> 0 then begin
                                                 PassiveAttack := False;
                                                 ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
-                                                if ts = nil then Exit;
+					if ts = nil then begin
+						sl.Free;//just in case
+						Exit;//safe 2004/04/27
+					end;
                                                 ts.IsEmperium := False;
 			                        tc.AData := ts;
                                                 xy.X := ts.Point.X - Point.X;
@@ -6853,7 +6860,6 @@ begin
 							ts.pcnt := 0;
 							//Update Monster Location
                                                         UpdateMonsterLocation(tm, ts);
-
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                         tc.spiritSpheres := tc.spiritSpheres - 1;
@@ -6876,7 +6882,6 @@ begin
                                                 end;
 						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], tl.Data2[MUseLV]);
 						DamageProcess1(tm, tc, ts, dmg[0], Tick);
-
 
                                                 tc.MTick := Tick + 1000;
                                                 tc.spiritSpheres := tc.spiritSpheres - 1;
@@ -6905,6 +6910,7 @@ begin
                                         end;
                                 end;
                                 end;
+
                                 //Sage
                                 290:    {Abracadabra}
                                 begin
@@ -6925,10 +6931,9 @@ begin
                                                 10: tc.MSkill := 88;
                                                 11: tc.MSkill := 90;
                                                 12: tc.MSkill := 91;
-                                        end;
+						end;//case
                                         tc.MUseLV := Random(10);
-                                        if tc.MUseLV < 1
-                                                then tc.MUseLV := 1;
+						if tc.MUseLV < 1 then tc.MUseLV := 1;
                                         if tc.MUseLV > tc.Skill[i].Data.MasterLV then
                                                 tc.MUseLV := tc.Skill[i].Data.MasterLV;
                                         {CreateField(tc, Tick);}
@@ -6946,7 +6951,8 @@ begin
                                   end else begin
                                     SendSkillError(tc, 0);
                                     MMode := 4;
-                                    Exit;
+							sl.Free;
+							Exit;//safe 2004/04/26
                                   end;
                                 end;
         {CODE-ERROR: You have got to be joking...}
@@ -12597,7 +12603,8 @@ begin
             SendBCmd( tm, tn.Point, 58, tc, True );
 					    //end;
 					end;
-					Exit;
+					sl.Free;
+					Exit;//safe 2004/04/26
 				end;
       end;
 			//end;
@@ -12605,6 +12612,7 @@ begin
     end;
   end;
   end;
+	sl.Free;//safe 2004/04/26
 end;
 
 
