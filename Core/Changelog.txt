@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-15-04: Fixed weapon sprites viewable by others broke with dye fix. [AlexKreuz]
 - 06-15-04: Performance increase. Less map area processing. 336 less tiles. 5376 less spots. [AlexKreuz]
 - 06-14-04: Fixed Kafra Storage equipment check on undefined item caused crash. [AlexKreuz]
 - 06-14-04: Fixed 80% lag increase due to increase in bandwidth usage. [AlexKreuz]

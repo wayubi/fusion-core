@@ -284,6 +284,11 @@ Begin(* Proc sv3PacketProcess() *)
 				tm.CList.AddObject(tc.ID, tc);
 				tm.Block[tc.Point.X div 8][tc.Point.Y div 8].CList.AddObject(tc.ID, tc);
 
+        // Colus, 20040409: Gave the option to enable lower class dyes.
+        // This should be removed when Gravity reenables them.
+        { Alex: moved up here to prevent the flicker of changing colors }
+        UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);                
+
         //Grace Time
         if mi.PvPG = true then begin
           tc.GraceTick := timeGetTime() + 15000;
@@ -539,9 +544,9 @@ Begin(* Proc sv3PacketProcess() *)
           Socket.SendBuf(buf, 13)
         end;}
 
-        // Colus, 20040409: Gave the option to enable lower class dyes.
-        // This should be removed when Gravity reenables them.
-        UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+
+
+
         end;
         end;
 
