@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 210
-  Top = 108
+  Left = 314
+  Top = 155
   Width = 408
   Height = 535
   Caption = 's'
@@ -1288,7 +1288,7 @@ object frmMain: TfrmMain
         Top = 0
         Width = 393
         Height = 433
-        ActivePage = TabSheet6
+        ActivePage = TabSheet9
         TabOrder = 0
         OnChange = PageControl3Change
         object TabSheet6: TTabSheet
@@ -1353,6 +1353,15 @@ object frmMain: TfrmMain
             TabOrder = 4
             Visible = False
             OnClick = Button19Click
+          end
+          object Button20: TButton
+            Left = 264
+            Top = 72
+            Width = 97
+            Height = 25
+            Caption = 'Kick / Ban'
+            TabOrder = 5
+            OnClick = Button20Click
           end
         end
         object TabSheet9: TTabSheet
@@ -1609,6 +1618,20 @@ object frmMain: TfrmMain
             Height = 18
             Caption = 'N/A'
           end
+          object Label102: TLabel
+            Left = 296
+            Top = 296
+            Width = 21
+            Height = 18
+            Caption = 'N/A'
+          end
+          object Label101: TLabel
+            Left = 296
+            Top = 280
+            Width = 21
+            Height = 18
+            Caption = 'AID:'
+          end
           object Edit52: TEdit
             Left = 16
             Top = 216
@@ -1746,7 +1769,7 @@ object frmMain: TfrmMain
           end
           object Button16: TButton
             Left = 16
-            Top = 328
+            Top = 336
             Width = 81
             Height = 25
             Caption = 'Save'

@@ -281,6 +281,9 @@ type
     Label96: TLabel;
     Edit8: TEdit;
     Button19: TButton;
+    Button20: TButton;
+    Label101: TLabel;
+    Label102: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -384,6 +387,7 @@ type
     procedure ListBox3Click(Sender: TObject);
     procedure Edit8KeyPress(Sender: TObject; var Key: Char);
     procedure Button19Click(Sender: TObject);
+    procedure Button20Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -11486,6 +11490,29 @@ begin
 
         debugout.lines.add('[' + TimeToStr(Now) + '] Server Message to ' + tc1.Name + ': ' + edit8.text);
     edit8.Clear;
+end;
+
+procedure TfrmMain.Button20Click(Sender: TObject);
+var
+    CharacterItem : TChara;
+begin
+    if (frmMain.Label95.Caption = '') then begin
+        Exit;
+    end else if CharaName.IndexOf(frmMain.Label95.Caption) <> -1 then begin
+        CharacterItem := CharaName.Objects[CharaName.IndexOf(frmMain.Label95.Caption)] as TChara;
+
+    if assigned(CharacterItem) then begin
+        if assigned(CharacterItem.Socket) then begin
+            if CharacterItem.Login <> 0 then CharacterItem.Socket.Close;
+                CharacterItem.Socket := nil;
+            end;
+        end;
+    end;
+
+    CharacterItem.PData.Banned := 1;
+    JCon_Characters_Online();
+    DataSave(true);
+
 end;
 
 end.

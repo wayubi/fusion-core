@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-27-04: Can now kickban an online user from the server. [Tsusai].
 - 09-27-04: REED: Abnormally missing database files crashed server. [AlexKreuz]
 - 09-27-04: REED: Server crash when gamedata inventories contains unknown item. [AlexKreuz]
 - 09-27-04: Fixed 100% CPU usage on player ALT-F4 disconnect. Infinite loop. [AlexKreuz]
