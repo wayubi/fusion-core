@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
-- 06-24-04: Fixed bug with @die that upon using the command the character sprite would not change and the dialog would not display [Tiko]
+- 06-24-04: Fixed bug with @die that upon using the command the character sprite would not change and the dialog would not display. [Tiko]
 - 06-24-04: Added Athena's @die command to ALBGM system. [Tiko]
 - 06-24-04: Added Athena's @zeny command to ALBGM system. [Trihan]
 - 06-24-04: Added Athena's @help command to ALBGM system. Only displays all lines if you're in debug mode, otherwise it only displays 1. It also truncates all lines to 15 characters. [Trihan]
