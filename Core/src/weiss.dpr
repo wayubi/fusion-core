@@ -16,7 +16,7 @@ uses
   Script in 'Script.pas',
   Skills in 'Skills.pas',
   WeissINI in 'WeissINI.pas',
-  JCon in 'JCon.pas';
+  JCon in 'JCon.pas',
   PlayerData in 'PlayerData.pas',
   SQLData in 'SQLData.pas',
   FusionSQL in 'FusionSQL.pas',

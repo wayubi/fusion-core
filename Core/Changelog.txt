@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-22-04: I'm tired .. fixed silly command in one file. Compile Error. [AlexKreuz]
 - 07-22-04: Initial R.E.E.D Release. [AlexKreuz]
 - 07-22-04: Many .. Many fixes for R.E.E.D to work correctly. [AlexKreuz]
 - 07-22-04: Error in Game_Master caused compile error. [AlexKreuz]
