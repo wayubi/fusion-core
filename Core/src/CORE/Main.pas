@@ -10976,7 +10976,7 @@ end;
 //online list kick
 procedure TfrmMain.Button18Click(Sender: TObject);
 begin
-    JCon_Chara_KickProcess(False);
+    JCon_Chara_KickProcess;
 end;
 
 //Kick Ban

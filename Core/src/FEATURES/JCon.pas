@@ -21,7 +21,7 @@ uses
 
     procedure JCon_Characters_Online();
     procedure JCon_Chara_Online_Populate();
-    procedure JCon_Chara_KickProcess(Ban : boolean);
+    procedure JCon_Chara_KickProcess(Ban : boolean=false);
     procedure JCon_Chara_Online_Rescue();
     procedure JCon_Chara_Online_PM();
 
@@ -454,7 +454,7 @@ uses
     end;
 
 
-    procedure JCon_Chara_KickProcess(Ban : Boolean);
+    procedure JCon_Chara_KickProcess(Ban : Boolean=false);
     var
         tc : TChara;
     begin

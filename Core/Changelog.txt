@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-12-04: Tweaked the kick/ban of online characters. [Tsusai]
 - 12-12-04: Nuked JCon Characters page. Needed to optimize loading speeds. [AlexKreuz]
 - 12-12-04: Account.txt now records last IP used when logging in. [Tsusai]
 - 12-12-04: Forgot to remove my debug stuff again... [Tsusai]
