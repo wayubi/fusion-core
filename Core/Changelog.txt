@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-14-04: Updated the packet table. [Tsusai]
 - 12-14-04: Fixed login packet lengths. [Tsusai]
 - 12-13-04: Preparing indeces. Midway release for conversion. [AlexKreuz]
 - 12-13-04: Fixed form again. [AlexKreuz]
