@@ -873,6 +873,47 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.Free;
                                         end
 
+                                        else if (copy(str, 1, 4) = 'who2') then begin
+                                                for i := 0 to CharaName.Count - 1 do begin
+                                                        tc1 := CharaName.Objects[i] as TChara;
+                                                        if tc1.Login = 2 then begin
+
+                                                                if tc1.JID = 0 then str :='Novice' else
+                                                                if tc1.JID = 1 then str :='Swordsman' else
+                                                                if tc1.JID = 2 then str :='Mage' else
+                                                                if tc1.JID = 3 then str :='Archer' else
+                                                                if tc1.JID = 4 then str :='Acolyte' else
+                                                                if tc1.JID = 5 then str :='Merchant' else
+                                                                if tc1.JID = 6 then str :='Thief' else
+                                                                if tc1.JID = 7 then str :='Knight' else
+                                                                if tc1.JID = 8 then str :='Priest' else
+                                                                if tc1.JID = 9 then str :='Wizard' else
+                                                                if tc1.JID = 10 then str :='Blacksmith' else
+                                                                if tc1.JID = 11 then str :='Hunter' else
+                                                                if tc1.JID = 12 then str :='Assassin' else
+                                                                if tc1.JID = 13 then str :='Knight 2' else
+                                                                if tc1.JID = 14 then str :='Crusader' else
+                                                                if tc1.JID = 15 then str :='Monk' else
+                                                                if tc1.JID = 16 then str :='Sage' else
+                                                                if tc1.JID = 17 then str :='Rogue' else
+                                                                if tc1.JID = 18 then str :='Alchemist' else
+                                                                if tc1.JID = 19 then str :='Bard' else
+                                                                if tc1.JID = 20 then str :='Dancer' else
+                                                                if tc1.JID = 21 then str :='Crusader 2' else
+                                                                if tc1.JID = 22 then str :='Wedding' else
+                                                                if tc1.JID = 23 then str :='Super Novice' else
+                                                                str := 'Unknown Class';
+
+                                                                str := 'Name: ' + tc1.Name + ' -- Job: ' + str + ' -- Base Level:  ' + inttostr(tc1.baselv) + ' -- Job Level: ' + inttostr(tc1.joblv);
+                                                                w := Length(str) + 4;
+                                                                WFIFOW (0, $009a);
+                                                                WFIFOW (2, w);
+                                                                WFIFOS (4, str, w - 4);
+                                                                tc.socket.sendbuf(buf, w);
+                                                        end;
+                                                end;
+                                        end
+
                                         else if (copy(str, 1, 3) = 'who') then begin
                                                 for i := 0 to CharaName.Count - 1 do begin
                                                         tc1 := CharaName.Objects[i] as TChara;
