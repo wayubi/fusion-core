@@ -362,7 +362,9 @@ begin
 
         //for i := 0 to 3 do begin
 
-        if assigned(ts.AData) then begin
+        if (assigned(ts.AData)) then begin
+
+        if tc.AData <> nil then tc:= ts.AData;
 
         tc := ts.AData;
         if tc <> nil then begin
@@ -370,7 +372,7 @@ begin
           else if tc.Stat1 = 1 then j := 22 // Stone?  Earth 1
           else if tc.ArmorElement <> 0 then j := tc.ArmorElement // PC's armor type
     		  else j := 1;
-        end;
+
 
         case ts.MSkill of
                 //dmg[0] := dmg[0] := dmg[0] * tc.Skill[ts.MSKill].Data.Data1[ts.MSKill];
@@ -423,27 +425,6 @@ begin
                                         end;}
 					//DamageProcess1(tm, tc, ts, dmg[0], Tick, False);
 					//tc.MTick := Tick + 1500;
-                end;
-
-                26: {Teleport}
-                begin
-                  SendMonsterRelocation(tm, ts, tc);
-                end;
-
-
-                28:     {Heal}
-                begin
-                        dmg[0] := (ts.Data.LV * 2 + 10);
-                        ts.HP := ts.HP + dmg[0];
-                        if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
-
-                        WFIFOW( 0, $011a);
-                        WFIFOW( 2, ts.MSKill);
-                        WFIFOW( 4, dmg[0]);
-                        WFIFOL( 6, ts.ID);
-                        WFIFOL(10, ts.ID);
-                        WFIFOB(14, 1);
-                        SendBCmd(tm, ts.Point, 15);
                 end;
 
                 46:     {Double Strafe}
@@ -668,16 +649,6 @@ begin
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
 
-                197:  {NPC Emotion}
-                  begin
-                    j := Random(31) + 1;
-
-                    WFIFOW(0, $00c0);
-                    WFIFOL(2, ts.ID);
-                    WFIFOB(6, j);
-                    SendBCmd(tm, ts.Point, 7);
-                  end;
-
                 199:    {Blood Drain}
                 begin
                         MobSkillDamageCalc(tm, tc, ts, Tick);
@@ -708,6 +679,7 @@ begin
                         dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
+            end;
         end;
 
         end;
@@ -791,20 +763,53 @@ procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
 
 var
 ProcessType     :Byte;
+j :integer;
 
 begin
 with ts do begin
         ProcessType := 0;
         case ts.MSKill of
-                51:     {Hide}
+          26: {Teleport}
+                begin
+                  //SendMonsterRelocation(tm, ts);
+                end;
+          28:     {Heal}
+                begin
+                  dmg[0] := (ts.Data.LV * 2 + 10);
+                  ts.HP := ts.HP + dmg[0];
+                  if ts.HP > integer(ts.Data.HP) then ts.HP := ts.Data.HP;
+
+                  WFIFOW( 0, $011a);
+                  WFIFOW( 2, ts.MSKill);
+                  WFIFOW( 4, dmg[0]);
+                  WFIFOL( 6, ts.ID);
+                  WFIFOL(10, ts.ID);
+                  WFIFOB(14, 1);
+                  SendBCmd(tm, ts.Point, 15);
+                end;
+
+
+          51:     {Hide}
                 begin
                         ProcessType := 1;
                 end;
 
-                114:    {Power Maximize}
+          114:    {Power Maximize}
                 begin
                         ProcessType := 1;
                 end;
+
+          197:  {NPC Emotion}
+                  begin
+                    j := Random(31) + 1;
+
+                    // Not sure on the exact emotion its supposed to do,
+                    // So I just did it with a random emotion
+                    WFIFOW(0, $00c0);
+                    WFIFOL(2, ts.ID);
+                    WFIFOB(6, j);
+                    SendBCmd(tm, ts.Point, 7);
+                  end;
         end;
 
         case ProcessType of
@@ -1396,6 +1401,7 @@ begin
   sl.Delimiter := ',';
   sl.DelimitedText := ts.Data.SkillLocations;
   i :=  ts.Data.SkillCount;
+  if ts.Data.Loaded = false then LoadMonsterAIData(tm, ts, Tick);
   while i > 0 do begin
     i := i - 1;
     j := StrToInt(sl.Strings[i]);
@@ -1460,7 +1466,7 @@ begin
       ts.MLevel := tsAI2.SkillLV;
       ts.CastTime := tsAI2.Cast_Time;
       ts.Data.WaitTick := tsAI2.Cool_Time;
-      ts.Mode := 3;
+      ts.Mode := TempSkill.SType;
       NewMonsterCastTime(tm, ts, Tick);
     end;
     //MobSkills(tm, ts, Tick);
