@@ -2577,8 +2577,13 @@ end;
 
                                                                 end;
 
-							100: //»‘¢ŠÖŒWƒAƒCƒeƒ€
+							100: // Forging items (mini-furnace, hammers)
 								begin
+                  // Colus, 20040214:
+                  // Save the ID of the item you're using first.
+                  // If it's the last one, UseUsableItem will make its ID 0.
+                  w3 := tc.Item[w].ID;
+
 									UseUsableItem(tc, w);
                                                                         
 									b := 1;
@@ -2596,7 +2601,7 @@ end;
 											begin
 
 												for w2 := 0 to 2 do begin
-													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (tc.Item[w].ID <> 612) then begin
+													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (w3 <> 612) then begin
 														e2 := 1;
 														continue;
 													end;
@@ -2621,7 +2626,7 @@ end;
 
 												for w2 := 0 to 2 do begin
 
-													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (tc.Item[w].ID = 612) or ((tma.ItemLV > 1) and (tc.Item[w].ID = 613)) or ((tma.ItemLV = 3) and (tc.Item[w].ID = 614)) then begin
+													if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (w3 = 612) or ((tma.ItemLV > 1) and (w3 = 613)) or ((tma.ItemLV = 3) and (w3 = 614)) then begin
 														e2 := 1;
 														continue;
 													end;
