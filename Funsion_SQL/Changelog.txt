@@ -1,13 +1,14 @@
 --------------------------------------------------------------------------------
 Fusion_SQL 1.0.0.0 - 
 --------------------------------------------------------------------------------
+- 01-14-04: Fixed: SQLData can't save string with special char. [Michen]
 - 01-14-04: Prevent Saving of Negative HP. Fixed Crash. [Michen]
-- 01-02-04: Fixed Create Chara and Delete Chara Bug. [Michen]
-- 01-01-04: Fixed Chara name has special char bug. [Michen]
-- 12-30-03: Fixed reading guild member data error. [Michen]
-- 12-30-03: Fixed Party member will auto delete after reboot. [Michen]
-- 12-30-03: Modify get chara data by gid not aid. [Michen]
-- 12-29-03: Fixed ExecuteSqlCmd function. [Michen]
+- 01-02-04: Fixed: Create Chara and Delete Chara Bug. [Michen]
+- 01-01-04: Fixed: Chara name has special char bug. [Michen]
+- 12-30-03: Fixed: reading guild member data error. [Michen]
+- 12-30-03: Fixed: Party member will auto delete after reboot. [Michen]
+- 12-30-03: Modify: get chara data by gid not aid. [Michen]
+- 12-29-03: Fixed: ExecuteSqlCmd function. [Michen]
 - 12-28-03: Fixed: Relogin can't see party info. [Michen]
 - 12-28-03: Fixed: Fix bug MySQL only save one character. [Michen]
 - 12-27-03: Fixed: Guild member list doesn't show member without login. [Michen]

@@ -33,6 +33,8 @@ uses
 		function  SavePetData(tpe : Tpet; PIndex: Integer; place: Integer) : Boolean; {保存宠物资料}
 		function  SaveGuildMPosition(GDID: cardinal; PosName: string; PosInvite: boolean; PosPunish: boolean; PosEXP: byte; Grade: Integer) : Boolean; {保存工会头衔资料}
 		function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) : Boolean; {保存同盟、敌对工会资料}
+		function  addslashes(Strings: String) : String; {数据库字符串处理}
+		function  unaddslashes(Strings: String) : String; {数据库字符串处理}
 //==============================================================================
 
 implementation
@@ -143,7 +145,7 @@ var
 	str :string;
 begin
 	sl := TStringList.Create;
-	sl.QuoteChar := '''';
+	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
 
 	if not FileExists(AppPath + 'status.txt') then begin
@@ -178,10 +180,10 @@ begin
     begin
       tgc := TCastle.Create;
       with tgc do begin
-			  Name     := SQLDataSet.FieldValues['Name'];
+			  Name     := unaddslashes(SQLDataSet.FieldValues['Name']);
         GID      := StrToInt(SQLDataSet.FieldValues['GDID']);
-        GName    := SQLDataSet.FieldValues['GName'];
-        GMName   := SQLDataSet.FieldValues['GMName'];
+        GName    := unaddslashes(SQLDataSet.FieldValues['GName']);
+        GMName   := unaddslashes(SQLDataSet.FieldValues['GMName']);
         GKafra   := StrToInt(SQLDataSet.FieldValues['GKafra']);
         EDegree  := StrToInt(SQLDataSet.FieldValues['EDegree']);
         ETrigger := StrToInt(SQLDataSet.FieldValues['ETrigger']);
@@ -217,7 +219,7 @@ begin
     begin
       tpa := TParty.Create;
       with tpa do begin
-			  Name     := SQLDataSet.FieldValues['Name'];
+			  Name     := unaddslashes(SQLDataSet.FieldValues['Name']);
         EXPShare      := StrToInt(SQLDataSet.FieldValues['EXPShare']);
         ITEMShare    := StrToInt(SQLDataSet.FieldValues['ITEMShare']);
         MemberID[0]   := StrToInt(SQLDataSet.FieldValues['MemberID0']);
@@ -258,13 +260,13 @@ begin
       with tg do begin
 			  ID := StrToInt(SQLDataSet.FieldValues['GDID']);
 			  if (ID > NowGuildID) then NowGuildID := ID;
-			  Name := SQLDataSet.FieldValues['Name'];
+			  Name := unaddslashes(SQLDataSet.FieldValues['Name']);
 			  LV := StrToInt(SQLDataSet.FieldValues['LV']);
 			  EXP := StrToInt(SQLDataSet.FieldValues['EXP']);
 			  GSkillPoint := StrToInt(SQLDataSet.FieldValues['GSkillPoint']);
-			  Notice[0] := SQLDataSet.FieldValues['Subject'];
-			  Notice[1] := SQLDataSet.FieldValues['Notice'];
-			  Agit := SQLDataSet.FieldValues['Agit'];
+			  Notice[0] := unaddslashes(SQLDataSet.FieldValues['Subject']);
+			  Notice[1] := unaddslashes(SQLDataSet.FieldValues['Notice']);
+			  Agit := unaddslashes(SQLDataSet.FieldValues['Agit']);
 			  Emblem := StrToInt(SQLDataSet.FieldValues['Emblem']);
 			  Present := StrToInt(SQLDataSet.FieldValues['Present']);
 			  DisposFV := StrToInt(SQLDataSet.FieldValues['DisposFV']);
@@ -337,7 +339,7 @@ begin
 			  j := 0;
 				while not SQLDataSet.Eof do
 				begin
-					PosName[j]   := SQLDataSet.FieldValues['PosName'];
+					PosName[j]   := unaddslashes(SQLDataSet.FieldValues['PosName']);
 				  PosInvite[j] := StrToBool(SQLDataSet.FieldValues['PosInvite']);
 				  PosPunish[j] := StrToBool(SQLDataSet.FieldValues['PosPunish']);
 				  PosEXP[j]    := StrToInt(SQLDataSet.FieldValues['PosEXP']);
@@ -354,9 +356,9 @@ begin
 			  while not SQLDataSet.Eof do
 				begin
           tgb := TGBan.Create;
-				  tgb.Name    := SQLDataSet.FieldValues['MemberName'];
-				  tgb.AccName := SQLDataSet.FieldValues['MemberAccount'];
-				  tgb.Reason  := SQLDataSet.FieldValues['Reason'];
+				  tgb.Name    := unaddslashes(SQLDataSet.FieldValues['MemberName']);
+				  tgb.AccName := unaddslashes(SQLDataSet.FieldValues['MemberAccount']);
+				  tgb.Reason  := unaddslashes(SQLDataSet.FieldValues['Reason']);
 				  GuildBanList.AddObject(tgb.Name, tgb);
 					SQLDataSet.Next;
 				end;
@@ -370,8 +372,8 @@ begin
 			  while not SQLDataSet.Eof do
 				begin
           tgl := TGRel.Create;
-				  tgl.ID        := SQLDataSet.FieldValues['GDID'];
-				  tgl.GuildName := SQLDataSet.FieldValues['GuildName'];
+				  tgl.ID        := StrToInt(SQLDataSet.FieldValues['GDID']);
+				  tgl.GuildName := unaddslashes(SQLDataSet.FieldValues['GuildName']);
 					if SQLDataSet.FieldValues['Relation'] = 1 then
 				    RelAlliance.AddObject(tgl.GuildName, tgl)  // 同盟工会
 					else
@@ -411,18 +413,9 @@ var
 	sl  :TStringList;
 	txt :TextFile;
 	cnt :integer;
-//  sr	:TSearchRec;
 begin
-{  if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
-    repeat
-      DeleteFile(AppPath+'map\tmpFiles\'+sr.Name);
-    until FindNext(sr) <> 0;
-    FindClose(sr);
-  end;
-}
-  //rmDir(AppPath+'map\tmpFiles');
 	sl := TStringList.Create;
-	sl.QuoteChar := '''';
+	sl.QuoteChar := '"';
 	sl.Delimiter := ',';
   {保存帐号和仓库资料}
   if PlayerName.Count <> 0 then
@@ -433,7 +426,7 @@ begin
       tp := PlayerName.Objects[i] as TPlayer;
       with tp do
       begin
-			  if not ExecuteSqlCmd(Format('REPLACE INTO login (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, Name, Pass, Gender, Mail, Banned])) then begin
+			  if not ExecuteSqlCmd(Format('REPLACE INTO login (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, addslashes(Name), addslashes(Pass), Gender, addslashes(Mail), Banned])) then begin
           DebugOut.Lines.Add('*** Save Player Account data error.');
 				end;
 
@@ -463,7 +456,6 @@ begin
 	{保存人物资料}
 	if CharaName.Count <> 0 then begin
 	  for i := 0 to CharaName.Count - 1 do begin
-		  sl.Clear;
 		  tc := CharaName.Objects[i] as TChara;
       SaveCharaData(tc);
 		end;
@@ -498,23 +490,22 @@ begin
 	begin
 	  for i := 0 to CastleList.Count - 1 do
     begin
-		  sl.Clear;
       tgc := CastleList.Objects[i] as TCastle;
       with tgc do
       begin
-			  sl.Add('''' + Name + '''');
-			  sl.Add(IntToStr(GID));
-        sl.Add('''' + GName + '''');
-        sl.Add('''' + GMName + '''');
-        sl.Add(IntToStr(GKafra));
-        sl.Add(IntToStr(EDegree));
-        sl.Add(IntToStr(ETrigger));
-        sl.Add(IntToStr(DDegree));
-        sl.Add(IntToStr(DTrigger));
+			  bindata := '''' + addslashes(Name) + '''';
+			  bindata := bindata + ' ,' + IntToStr(GID);
+			  bindata := bindata + ' ,''' + addslashes(GName) + '''';
+			  bindata := bindata + ' ,''' + addslashes(GMName) + '''';
+			  bindata := bindata + ' ,' + IntToStr(GKafra);
+			  bindata := bindata + ' ,' + IntToStr(EDegree);
+			  bindata := bindata + ' ,' + IntToStr(ETrigger);
+			  bindata := bindata + ' ,' + IntToStr(DDegree);
+			  bindata := bindata + ' ,' + IntToStr(DTrigger);
         for j := 0 to 7 do begin
-          sl.Add(IntToStr(GuardStatus[j]));
+			    bindata := bindata + ' ,' + IntToStr(GuardStatus[j]);
         end;
-				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [sl.CommaText])) then
+				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Castle data error.');
 				end;
@@ -529,18 +520,17 @@ begin
 	begin
 	  for i := 0 to PartyNameList.Count - 1 do
     begin
-		  sl.Clear;
       tpa := PartyNameList.Objects[i] as TParty;
       with tpa do
       begin
-			  sl.Add(IntToStr(i + 1));
-        sl.Add('''' + Name + '''');
-        sl.Add(IntToStr(EXPShare));
-        sl.Add(IntToStr(ITEMShare));
+			  bindata := IntToStr(i + 1);
+			  bindata := bindata + ' ,''' + addslashes(Name) + '''';
+			  bindata := bindata + ' ,' + IntToStr(EXPShare);
+			  bindata := bindata + ' ,' + IntToStr(ITEMShare);
 			  for j := 0 to 11 do begin
-				  sl.Add(IntToStr(MemberID[j]));
+			    bindata := bindata + ' ,' + IntToStr(MemberID[j]);
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [sl.CommaText])) then
+			  if not ExecuteSqlCmd(Format('REPLACE INTO party (GRID,Name,EXPShare,ITEMShare,MemberID0,MemberID1,MemberID2,MemberID3,MemberID4,MemberID5,MemberID6,MemberID7,MemberID8,MemberID9,MemberID10,MemberID11) VALUES (%s)', [bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Party data error.');
 				end;
@@ -568,7 +558,7 @@ begin
 					  bindata := bindata + IntToHex(GSkill[j].Lv, 4);
 				  end;
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO guildinfo (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, Name, LV, EXP, GSkillPoint, Notice[0], Notice[1], Agit, Emblem, present, DisposFV, DisposRW, bindata])) then
+			  if not ExecuteSqlCmd(Format('REPLACE INTO guildinfo (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, addslashes(Name), LV, EXP, GSkillPoint, addslashes(Notice[0]), addslashes(Notice[1]), addslashes(Agit), Emblem, present, DisposFV, DisposRW, bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Guild data error.');
 				end;
@@ -659,7 +649,7 @@ begin
 		end;
 		DebugOut.Lines.Add(format('Load User Data From MySQL: userid = %s', [userid]));
 
-		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [userid])) then begin
+		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then begin
 			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %s', [userid]));
 			Exit;
 		end
@@ -686,11 +676,11 @@ begin
   tp := TPlayer.Create;
   with tp do begin
     ID := StrToInt(SQLDataSet.FieldValues['AID']);
-    Name := SQLDataSet.FieldValues['ID'];
-    Pass := SQLDataSet.FieldValues['passwd'];
-    Gender := SQLDataSet.FieldValues['Gender'];
-    Mail := SQLDataSet.FieldValues['Mail'];
-    Banned := SQLDataSet.FieldValues['Banned'];
+    Name := unaddslashes(SQLDataSet.FieldValues['ID']);
+    Pass := unaddslashes(SQLDataSet.FieldValues['passwd']);
+    Gender := StrToInt(SQLDataSet.FieldValues['Gender']);
+    Mail := unaddslashes(SQLDataSet.FieldValues['Mail']);
+    Banned := StrToInt(SQLDataSet.FieldValues['Banned']);
 		ver2 := 9;
 
 		if SQLDataSet.FieldValues['storeitem'] <> '' then
@@ -756,7 +746,7 @@ begin
       tc := TChara.Create;
       with tc do begin
 				CID           := StrToInt(SQLDataSet.FieldValues['GID']);
-				Name          :=          SQLDataSet.FieldValues['Name'];
+				Name          := unaddslashes(SQLDataSet.FieldValues['Name']);
 				
 				if assigned(CharaName) then {如果该人物已经读入，就不用再读了}
 				begin
@@ -806,10 +796,10 @@ begin
 		    ParamBase[4]  := StrToInt(SQLDataSet.FieldValues['DEX']);
 		    ParamBase[5]  := StrToInt(SQLDataSet.FieldValues['LUK']);
 		    CharaNumber   := StrToInt(SQLDataSet.FieldValues['CharaNumber']);
-		    Map           := SQLDataSet.FieldValues['Map'];
+		    Map           := unaddslashes(SQLDataSet.FieldValues['Map']);
 		    Point.X       := StrToInt(SQLDataSet.FieldValues['X']);
 		    Point.Y       := StrToInt(SQLDataSet.FieldValues['Y']);
-		    SaveMap       := SQLDataSet.FieldValues['SaveMap'];
+		    SaveMap       := unaddslashes(SQLDataSet.FieldValues['SaveMap']);
 		    SavePoint.X   := StrToInt(SQLDataSet.FieldValues['SX']);
 		    SavePoint.Y   := StrToInt(SQLDataSet.FieldValues['SY']);
 		    Plag          := StrToInt(SQLDataSet.FieldValues['Plag']);
@@ -819,7 +809,7 @@ begin
 
 				{读取MEMO记录点资料}
 				for i := 0 to 2 do begin
-					MemoMap[i]     := SQLDataSet.FieldValues['mapName' + IntToStr(i)];
+					MemoMap[i]     := unaddslashes(SQLDataSet.FieldValues['mapName' + IntToStr(i)]);
 					MemoPoint[i].X := StrToInt(SQLDataSet.FieldValues['xPos' + IntToStr(i)]);
 					MemoPoint[i].Y := StrToInt(SQLDataSet.FieldValues['yPos' + IntToStr(i)]);
 					{检查MEMO记录点地图是否有效}
@@ -1018,7 +1008,7 @@ function  CheckUserExist(userid: String) : Boolean;
 begin
   Result := False;
 
-  if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [userid])) then begin
+  if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [addslashes(userid)])) then begin
     DebugOut.Lines.Add(format('Get character data from MySQL Error: %s', [userid]));
 		Result := True;
 		Exit;
@@ -1057,7 +1047,7 @@ begin
           Incubated   := StrToInt( SQLDataSet.FieldValues['Incubated'] );
           PetID       := StrToInt( SQLDataSet.FieldValues['PID'] );
           JID         := StrToInt( SQLDataSet.FieldValues['JID'] );
-          Name        :=           SQLDataSet.FieldValues['Name'];
+          Name        := unaddslashes(SQLDataSet.FieldValues['Name']);
           Renamed     := StrToInt( SQLDataSet.FieldValues['Renamed'] );
           LV          := StrToInt( SQLDataSet.FieldValues['LV'] );
 					Relation    := StrToInt( SQLDataSet.FieldValues['Relation'] );
@@ -1194,7 +1184,7 @@ begin
 	  end;
 	end;
 
-  if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [tpe.PetID, tpe.PlayerID, CharaID, Cart, PIndex, Incubated, tpe.JID, tpe.Name, tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
+  if not ExecuteSqlCmd(Format('REPLACE INTO pet (PID,PlayerID,CharaID,Cart,PIndex,Incubated,JID,Name,Renamed,LV,Relation,Fullness,Accessory) VALUES (''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%d'',''%s'',''%d'',''%d'',''%d'',''%d'',''%d'')', [tpe.PetID, tpe.PlayerID, CharaID, Cart, PIndex, Incubated, tpe.JID, addslashes(tpe.Name), tpe.Renamed, tpe.LV, tpe.Relation, tpe.Fullness, tpe.Accessory])) then
   begin
     DebugOut.Lines.Add('*** Save Pet data error.');
 		Exit;
@@ -1212,7 +1202,7 @@ begin
 
   {删除旧资料}
 	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
-  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, PosName, BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
+  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, addslashes(PosName), BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild Position data error.');
 	  Exit;
@@ -1273,7 +1263,7 @@ begin
   Result := False;
 	
 	if mtype = 2 then begin
-	  if not ExecuteSqlCmd(format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, tgb.Name, tgb.AccName, tgb.Reason])) then begin
+	  if not ExecuteSqlCmd(format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, addslashes(tgb.Name), addslashes(tgb.AccName), addslashes(tgb.Reason)])) then begin
       DebugOut.Lines.Add(format('INSERT guildBanishInfo data to MySQL Error: %d', [GID]));
 //		  Exit;
 	  end;
@@ -1294,7 +1284,7 @@ function  DeleteParty(Name: string) : Boolean;
 begin
   Result := False;
 	
-	if not ExecuteSqlCmd(format('DELETE FROM party WHERE Name=''%s'' LIMIT 1', [Name])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM party WHERE Name=''%s'' LIMIT 1', [addslashes(Name)])) then begin
     DebugOut.Lines.Add(format('Delete party data from MySQL Error: %s', [Name]));
 		Exit;
 	end;
@@ -1309,7 +1299,7 @@ function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) :
 begin
   Result := False;
 
-  if not ExecuteSqlCmd(Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, GuildName, mtype])) then
+  if not ExecuteSqlCmd(Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, addslashes(GuildName), mtype])) then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
 		exit;
@@ -1325,7 +1315,7 @@ function  DeleteGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer)
 begin
   Result := False;
 	
-	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, GuildName, mtype])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, addslashes(GuildName), mtype])) then begin
     DebugOut.Lines.Add(format('Delete guildAllyInfo data from MySQL Error: %s', [GuildName]));
 		Exit;
 	end;
@@ -1457,64 +1447,60 @@ function  SaveCharaData(tc : TChara) : Boolean;
 var
   bindata : String;
 	j :integer;
-	sl  :TStringList;
 begin
   Result := False;
-	sl := TStringList.Create;
-	sl.QuoteChar := '''';
-	sl.Delimiter := ',';
 	with tc do begin
-		sl.Add(IntToStr(CID));
-		sl.Add('''' + Name + '''');
-		sl.Add(IntToStr(JID));
-		sl.Add(IntToStr(BaseLV));
-		sl.Add(IntToStr(BaseEXP));
-		sl.Add(IntToStr(StatusPoint));
-		sl.Add(IntToStr(JobLV));
-		sl.Add(IntToStr(JobEXP));
-		sl.Add(IntToStr(SkillPoint));
-		sl.Add(IntToStr(Zeny));
-		sl.Add(IntToStr(Stat1));
-		sl.Add(IntToStr(Stat2));
+		bindata := '(GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
+		bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID) VALUES (';
+    bindata := bindata + IntToStr(CID);
+    bindata := bindata + ' ,''' + addslashes(Name) + '''';
+    bindata := bindata + ' ,' + IntToStr(JID);
+    bindata := bindata + ' ,' + IntToStr(BaseLV);
+    bindata := bindata + ' ,' + IntToStr(BaseEXP);
+    bindata := bindata + ' ,' + IntToStr(StatusPoint);
+    bindata := bindata + ' ,' + IntToStr(JobLV);
+    bindata := bindata + ' ,' + IntToStr(JobEXP);
+    bindata := bindata + ' ,' + IntToStr(SkillPoint);
+    bindata := bindata + ' ,' + IntToStr(Zeny);
+    bindata := bindata + ' ,' + IntToStr(Stat1);
+    bindata := bindata + ' ,' + IntToStr(Stat2);
     if Option = 4 then begin
-      sl.Add('0');
+      bindata := bindata + ' ,0';
     end else begin
-      sl.Add(IntToStr(Option));
+      bindata := bindata + ' ,' + IntToStr(Option);
     end;
-		sl.Add(IntToStr(Karma));
-		sl.Add(IntToStr(Manner));
+    bindata := bindata + ' ,' + IntToStr(Karma);
+    bindata := bindata + ' ,' + IntToStr(Manner);
     if (HP < 0) then begin
       HP := 0;
     end;
-		sl.Add(IntToStr(HP));
-		sl.Add(IntToStr(SP));
-		sl.Add(IntToStr(DefaultSpeed));
-		sl.Add(IntToStr(Hair));
-		sl.Add(IntToStr(_2));
-		sl.Add(IntToStr(_3));
-		sl.Add(IntToStr(Weapon));
-		sl.Add(IntToStr(Shield));
-		sl.Add(IntToStr(Head1));
-		sl.Add(IntToStr(Head2));
-		sl.Add(IntToStr(Head3));
-		sl.Add(IntToStr(HairColor));
-		sl.Add(IntToStr(ClothesColor));
+    bindata := bindata + ' ,' + IntToStr(HP);
+    bindata := bindata + ' ,' + IntToStr(SP);
+    bindata := bindata + ' ,' + IntToStr(DefaultSpeed);
+    bindata := bindata + ' ,' + IntToStr(Hair);
+    bindata := bindata + ' ,' + IntToStr(_2);
+    bindata := bindata + ' ,' + IntToStr(_3);
+    bindata := bindata + ' ,' + IntToStr(Weapon);
+    bindata := bindata + ' ,' + IntToStr(Shield);
+    bindata := bindata + ' ,' + IntToStr(Head1);
+    bindata := bindata + ' ,' + IntToStr(Head2);
+    bindata := bindata + ' ,' + IntToStr(Head3);
+    bindata := bindata + ' ,' + IntToStr(HairColor);
+    bindata := bindata + ' ,' + IntToStr(ClothesColor);
 		for j := 0 to 5 do
-			sl.Add(IntToStr(ParamBase[j]));
-		sl.Add(IntToStr(CharaNumber));
-		sl.Add('''' + Map + '''');
-		sl.Add(IntToStr(Point.X));
-		sl.Add(IntToStr(Point.Y));
-		sl.Add('''' + SaveMap + '''');
-		sl.Add(IntToStr(SavePoint.X));
-		sl.Add(IntToStr(SavePoint.Y));
-    sl.Add(IntToStr(Plag));
-    sl.Add(IntToStr(PLv));
-    sl.Add(IntToStr(ID));
-		bindata := '';
-		bindata := 'GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
-		bindata := bindata + 'ClothesColor,STR,AGI,VIT,INTS,DEX,LUK,CharaNumber,Map,X,Y,SaveMap,SX,SY,Plag,PLv,AID';
-	  if not ExecuteSqlCmd(Format('REPLACE INTO Characters (%s) VALUES (%s)', [bindata, sl.CommaText])) then begin
+      bindata := bindata + ' ,' + IntToStr(ParamBase[j]);
+    bindata := bindata + ' ,' + IntToStr(CharaNumber);
+    bindata := bindata + ' ,''' + addslashes(Map) + '''';
+    bindata := bindata + ' ,' + IntToStr(Point.X);
+    bindata := bindata + ' ,' + IntToStr(Point.Y);
+    bindata := bindata + ' ,''' + addslashes(SaveMap) + '''';
+    bindata := bindata + ' ,' + IntToStr(SavePoint.X);
+    bindata := bindata + ' ,' + IntToStr(SavePoint.Y);
+    bindata := bindata + ' ,' + IntToStr(Plag);
+    bindata := bindata + ' ,' + IntToStr(PLv);
+    bindata := bindata + ' ,' + IntToStr(ID);
+    bindata := bindata + ')';
+	  if not ExecuteSqlCmd(Format('REPLACE INTO Characters %s', [bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character data error.');
 			Exit;
 		end;
@@ -1575,11 +1561,32 @@ begin
 		end;
 
 		{保存人物MEMO记录点资料}
-		if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, MemoMap[0], MemoPoint[0].X, MemoPoint[0].Y, MemoMap[1], MemoPoint[1].X, MemoPoint[1].Y, MemoMap[2], MemoPoint[2].X, MemoPoint[2].Y])) then begin
+		if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, addslashes(MemoMap[0]), MemoPoint[0].X, MemoPoint[0].Y, addslashes(MemoMap[1]), MemoPoint[1].X, MemoPoint[1].Y, addslashes(MemoMap[2]), MemoPoint[2].X, MemoPoint[2].Y])) then begin
 		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
 			Exit;
 		end;
 	end;
-	sl.Free;
 end;
+
+//------------------------------------------------------------------------------
+// 数据库字符串处理
+//------------------------------------------------------------------------------
+function  addslashes(Strings: String) : String;
+begin
+  Result := Strings;
+	Result := StringReplace(Result, '\', '\\', [rfReplaceAll]);
+	Result := StringReplace(Result, '''', '\''', [rfReplaceAll]);
+end;
+
+//------------------------------------------------------------------------------
+// 数据库字符串处理
+//------------------------------------------------------------------------------
+function  unaddslashes(Strings: String) : String;
+begin
+  Result := Strings;
+	Result := StringReplace(Result, '\''', '''', [rfReplaceAll]);
+	Result := StringReplace(Result, '\\', '\', [rfReplaceAll]);
+end;
+
+
 end.
