@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
-
+- 03-08-04: Cleaned up some debugs. [Colus]
+- 03-08-04: Added UpdateOption and UpdateIcon functions. [Colus]
+- 03-08-04: Fixed bug in some skills (Hide/Cloak/MP) draining SP to 0. [Colus]
 - 03-07-04: Added Cart Boost Skill. [Oatmeal]
 - 03-07-04: Added Lord Knight Parry. [Oatmeal]
 - 03-07-04: Added High Wizard Magic Crush. [Oatmeal]
