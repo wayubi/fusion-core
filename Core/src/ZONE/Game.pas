@@ -853,6 +853,26 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl.Free;
                                         end
 
+                                        else if (copy(str, 1, 4) = 'jump') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                i := strtoint(sl.strings[1]);
+                                                j := strtoint(sl.strings[2]);
+
+                                                if (maplist.IndexOf(tc.Map) <> -1) then begin
+                                                        ta := maplist.objects[maplist.indexof(tc.map)] as tmaplist;
+                                                        if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then continue;
+
+                                                        sendcleave(tc, 2);
+                                                        tc.tmpMap := tc.map;
+                                                        tc.Point := point(i, j);
+                                                        mapmove(tc.Socket, tc.tmpMap, tc.Point);
+                                                end;
+
+                                                sl.Free;
+                                        end
+
                                         else begin
                                         end;
                                                                                 
