@@ -3411,7 +3411,7 @@ end;
 					WFIFOW(4, w);
 					WFIFOB(6, 1);
 					Socket.SendBuf(buf, 7);
-				end else if (tc.Item[w1].Data.Loc = $2) and ((tc.JID = 12) or (tc.JID = 4013)) and (w2 = $22) then begin
+				end else if (tc.Item[w1].Data.Loc = $2) and ((tc.JID = 12) or (tc.JID = 4013)) and (w2 = $2) then begin
 					//アサシン二刀流用処理
 					w := $22;
 					j := 0;

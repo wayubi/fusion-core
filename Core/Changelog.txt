@@ -1,3 +1,4 @@
+- 05-26-04: Fixed #873 - Assassin Cross can now equip two daggers. [AlexKreuz]
 - 05-26-04: Added named constants for Damage correction arrays for Race and Element. [ChrspthrR]
 - 05-25-04: Fixed #882 - Blacksmith Weapon Research increases Hit Rate. [AlexKreuz]
 - 05-25-04: Fixed #855 - Character stops attack when monster and character share same point. [AlexKreuz]
