@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-18-04: Updated Sanctuary/Apple of Idun effects [Colus]
+- 01-18-04: Updated item creation packets for forging/Pharmacy [Colus]
 - 01-17-04: SearchPath Algorithm v2.0 - 37%-87% performance increase over original. [AlexKreuz]
 - 01-16-04: Fixed weapon requirements/error displays for some skills [Colus]
 - 01-16-04: Updated error return values [Colus]
