@@ -8776,7 +8776,7 @@ begin
 			sflag := True;
 		end;
 	end;
-	if sflag then begin
+	if ( (sflag) and (ts.Data.MEXP = 0) ) then begin
 		WFIFOW(0, $0119);
 		WFIFOL(2, ts.ID);
 		WFIFOW(6, ts.nStat);
