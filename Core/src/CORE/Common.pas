@@ -1367,6 +1367,7 @@ MapGMsg           :string;
 Option_PVP        :boolean;
 Option_MaxUsers   :word;
 Option_AutoSave   :word;
+Option_AutoBackup   :word;
 Option_WelcomeMsg :boolean;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;

@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;
@@ -31,6 +31,7 @@ type
                 Button1: TButton;
                 StatusBar1: TStatusBar;
     Button2: TButton;
+    BackupTimer: TTimer;
                 
                 procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -96,6 +97,7 @@ type
                 //Iconify procedures
     procedure cmdMinTray(Sender: TObject);
     procedure CMClickIcon(var msg: TMessage); message WM_NOTIFYICON;
+    procedure BackupTimerTimer(Sender: TObject);
 
 		//procedure cbxPriorityClick(Sender: TObject);
     //procedure cbxPriorityChange(Sender: TObject);
@@ -502,6 +504,11 @@ begin
                 end else begin
                         Option_AutoSave := 600;
                 end;
+                if sl.IndexOfName('Option_AutoBackup') <> -1 then begin
+                        Option_AutoBackup := StrToInt(sl.Values['Option_AutoBackup']);
+                end else begin
+                        Option_AutoBackup := 0;
+                end;
                 if sl.IndexOfName('Option_WelcomeMsg') <> -1 then begin
                         Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
                 end else begin
@@ -605,6 +612,14 @@ begin
 {U0x003b}
 	DBsaveTimer.Enabled := True;
     DBSaveTimer.Interval := Option_AutoSave * 1000;
+
+    if (Option_AutoBackup = 0) then begin
+        BackupTimer.Enabled := False;
+    end
+    else begin
+        BackupTimer.Enabled := True;
+        BackupTimer.Interval := Option_AutoBackup * 1000;
+    end;
 {U0x003bココまで}
 end;
 //------------------------------------------------------------------------------
@@ -684,6 +699,7 @@ begin
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
+        ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
         ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         // Fusion INI Lines
         
@@ -12894,6 +12910,9 @@ var
 {NPCイベント追加}
 	tr      :NTimer;
 {NPCイベント追加ココまで}
+
+    zfile :TZip;
+
 label ExitWarpSearch;
 begin
 
@@ -14185,6 +14204,39 @@ begin
         SetWindowLong(Application.Handle, GWL_EXSTYLE,WS_EX_APPWINDOW);
         Shell_notifyIcon(NIM_DELETE, @TrayIcon);
   end;
+
+procedure TfrmMain.BackupTimerTimer(Sender: TObject);
+var
+    zfile :TZip;
+    fileslist :TStringList;
+    filename :string;
+begin
+
+    DateSeparator      := '-';
+    TimeSeparator      := '-';
+    ShortDateFormat    := 'yyyy/mm/dd';
+    LongTimeFormat    := 'hh:mm:ss';
+
+    filename := datetostr(date) + ' - ' +timetostr(time);
+
+    CreateDir('backup');
+    zfile := tzip.create(self);
+    zfile.Filename := AppPath + 'backup\' + filename + '.zip';
+
+    fileslist := tstringlist.Create;
+    fileslist.Add(AppPath + 'chara.txt');
+    fileslist.Add(AppPath + 'gcastle.txt');
+    fileslist.Add(AppPath + 'guild.txt');
+    fileslist.Add(AppPath + 'party.txt');
+    fileslist.Add(AppPath + 'pet.txt');
+    fileslist.Add(AppPath + 'player.txt');
+
+    zfile.FileSpecList := fileslist;
+    zfile.Add;
+    zfile.Free;
+
+    fileslist.Free;
+
 end;
 
 end.
