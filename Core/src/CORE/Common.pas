@@ -21,7 +21,7 @@ const
 	MONSTER_ATK_RANGE = 9;
 
 	MAX_PARTY_SIZE = 12;
-  MAX_PACKET_NUMBER = $020B; // The highest packet number so far.
+    MAX_PACKET_NUMBER = $020B; // The highest packet number so far.
 
 	//NPC CType Constants
 	//Byte-sized ... Mmmmm-mmm!
