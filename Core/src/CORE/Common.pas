@@ -794,7 +794,7 @@ type TPlayer = class
 	Pass          :string;
 	Gender        :byte;
 	Mail          :string;
-	GMMode        :byte;
+	Banned        :byte;
 	CName         :array[0..8] of string;
 	CData         :array[0..8] of TChara;
 	Kafra         :TItemList;

@@ -1286,7 +1286,7 @@ begin
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
-					GMMode := StrToInt(sl.Strings[5]);
+					Banned := StrToInt(sl.Strings[5]);
 					CName[0] := sl.Strings[6];
 					CName[1] := sl.Strings[7];
 					CName[2] := sl.Strings[8];
@@ -1335,7 +1335,7 @@ begin
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
-					GMMode := 0;
+					Banned := 0;
 					CName[0] := sl.Strings[5];
 					CName[1] := sl.Strings[6];
 					CName[2] := sl.Strings[7];
@@ -1517,7 +1517,7 @@ begin
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
-					GMMode := StrToInt(sl.Strings[5]);
+					Banned := StrToInt(sl.Strings[5]);
 					CName[0] := sl.Strings[6];
 					CName[1] := sl.Strings[7];
 					CName[2] := sl.Strings[8];
@@ -1566,7 +1566,7 @@ begin
 					Pass := sl.Strings[2];
 					Gender := StrToInt(sl.Strings[3]);
 					Mail := sl.Strings[4];
-					GMMode := 0;
+					Banned := 0;
 					CName[0] := sl.Strings[5];
 					CName[1] := sl.Strings[6];
 					CName[2] := sl.Strings[7];
@@ -2292,7 +2292,7 @@ begin
 				sl.Add(Pass);
 				sl.Add(IntToStr(Gender));
 				sl.Add(Mail);
-				sl.Add(IntToStr(GMMode));
+				sl.Add(IntToStr(Banned));
 				sl.Add(CName[0]);
 				sl.Add(CName[1]);
 				sl.Add(CName[2]);

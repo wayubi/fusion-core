@@ -55,6 +55,13 @@ begin
         Socket.SendBuf(buf, 23);
     end else
 
+    if (tp.Banned = 1) then begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 4);
+        Socket.SendBuf(buf, 23);
+    end else
+
     if tp.Pass = userpass then begin
 
         if tp.Login = 1 then begin

@@ -1165,6 +1165,36 @@ end else if (Copy(str, 1, 7) = 'banish ') and ((DebugCMD and $0008) <> 0) and (t
     end;
   finally
   sl.Free();
+  end;
+end
+
+else if (Copy(str, 1, 4) = 'ban ') then begin
+  s := Copy(str, 5, 256);
+  s := Trim(s);
+
+  try
+    if CharaName.Indexof(s) <> -1 then begin
+      tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+      tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
+      if tp1.Banned = 0 then begin
+        str := tc.Name +' has banned ' + s;
+        tp1.Banned := 1;
+      end
+      else begin
+        str := tc.Name +' has un-banned ' + s;
+        tp1.Banned := 0;
+      end;
+
+      WFIFOW (0, $009a);
+      WFIFOW (2, 256);
+      WFIFOS (4, str, 256);
+
+      tc.socket.sendbuf(buf, 256);
+      if tc1.Login = 2 then begin
+        tc1.socket.sendbuf(buf, 256);
+      end;
+    end;
+  finally
 end;
 
 					end else if (Copy(str, 1, 4) = 'job ') and ((DebugCMD and $0010) <> 0) and (tid.ChangeJob = 1) then begin
