@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-22-04: Fixed #server gives wrong version number. [AlexKreuz]
 - 01-22-04: Updated Lord of Vermillion / Storm Gust calculations. [AlexKreuz]
 - 01-22-04: Fixed Character deletion in slots 4/5 bug. [AlexKreuz]
 - 01-22-04: Updated spirit sphere usage and display [Colus]

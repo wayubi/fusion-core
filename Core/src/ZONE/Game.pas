@@ -1490,7 +1490,7 @@ end;
 						end;
 
                                         end else if (Copy(str, 1, 6) = 'server') then begin
-                                        	str2 := 'Powered by Fusion 1.2.0.6 -- http://www.izlude.net/';
+                                        	str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
                                         	DebugOut.Lines.Add(str2);
                                         	w := 200;
                                         	WFIFOW(0, $009a);
@@ -1624,7 +1624,7 @@ end;
 
 
                                                 if (Copy(str, 1, 6) = 'server') then begin
-                                                        str2 := 'Powered by Fusion 1.2.0.7 -- http://www.izlude.net/';
+                                                        str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
                                                         DebugOut.Lines.Add(str2);
                                                         w := 200;
                                                         WFIFOW(0, $009a);
