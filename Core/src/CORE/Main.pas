@@ -11793,8 +11793,16 @@ var
 begin
 //反撃モード
 	with ts do begin
+                tc2 := nil;
 		tc1 := AData;
-                if tc1.Skill[255].Tick > Tick then tc2 := tc1.Crusader;
+                if tc1.Skill[255].Tick > Tick then begin
+                        tc2 := tc1.Crusader;
+                        if (tc2.Login <> 2) and (tc1 <> tc2) then begin
+                                tc2 := nil;
+                                tc1.Skill[255].Tick := Tick;
+                        end;
+                end;
+
 		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Hidden = true) ) and (ts.isLooting = false) then begin
 		//攻撃対象が死んでいるかログアウトしている
 			ATarget := 0;
@@ -11852,6 +11860,7 @@ begin
 						end;
 					end;
 				end;
+
 				if tc2.HP > dmg[0] then begin
 					tc2.HP := tc2.HP - dmg[0];
 					if dmg[0] <> 0 then begin
@@ -11883,7 +11892,7 @@ begin
 					WFIFOW( 2, $0005);
 					WFIFOL( 4, tc2.HP);
 					tc2.Socket.SendBuf(buf, 8);
-					ATick := ATick + abs(Data.ADelay);
+                                        ts.ATick := ts.ATick + abs(ts.Data.ADelay);
                                 end else if tc1.Skill[255].Tick <= Tick then begin
 				DamageCalc2(tm, tc1, ts, Tick);
                                 if dmg[0] <= 0 then dmg[0] := 0;
@@ -12562,7 +12571,6 @@ begin
                                         /// alexkreuz: xxx
 					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) then begin
 						//追加移動
-                                                if (tc.MMode = 0) and tc.Skill[278]
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
 						if k <> 0 then begin
