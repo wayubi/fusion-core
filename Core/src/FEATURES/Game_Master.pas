@@ -99,6 +99,7 @@ var
     GM_ATHENA_LVUP : Byte;
     GM_ATHENA_JOBLVLUP : Byte;
     GM_ATHENA_JOBLVUP : Byte;
+    GM_ATHENA_SKPOINT :  Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -171,6 +172,7 @@ var
     function command_athena_lvup(tc : TChara; str : String) : String;
     function command_athena_joblvlup(tc : TChara; str : String) : String;
     function command_athena_joblvup(tc : TChara; str : String) : String;
+    function command_athena_skpoint(tc : TChara; str : String) : String;
 
 implementation
 
@@ -272,6 +274,7 @@ implementation
         GM_ATHENA_LVUP := StrToIntDef(sl.Values['ATHENA_LVUP'], 1);
         GM_ATHENA_JOBLVLUP := StrToIntDef(sl.Values['ATHENA_JOBLVLUP'], 1);
         GM_ATHENA_JOBLVUP := StrToIntDef(sl.Values['ATHENA_JOBLVUP'], 1);
+        GM_ATHENA_SKPOINT := StrToIntDef(sl.Values['ATHENA_SKPOINT'], 1);
 
         sl.Free;
         ini.Free;
@@ -381,7 +384,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_BASELVLUP', IntToStr(GM_ATHENA_BASELVLUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_LVUP', IntToStr(GM_ATHENA_LVUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVLUP', IntToStr(GM_ATHENA_JOBLVLUP));
-        ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVUP', IntToStr(GM_ATHENA_JOBLVUP);
+        ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVUP', IntToStr(GM_ATHENA_JOBLVUP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_SKPOINT', IntToStr(GM_ATHENA_SKPOINT));
 
         ini.Free;
 
@@ -466,6 +470,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('lvup')) = 'lvup') and (check_level(tc.ID, GM_ATHENA_LVUP)) ) then error_msg := command_athena_lvup(tc, str)
             else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
             else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
+            else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_SKPOINT(tc, str)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2640,6 +2645,46 @@ Called when we're shutting down the server *only*
             Result := 'GM_ATHENA_JOBLVUP Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
         end else begin
             Result := Result + ' Incomplete information or level out of range.';
+        end;
+    end;
+
+    function command_athena_skpoint(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+        oldpoints : Integer;
+    begin
+        Result := 'GM_ATHENA_SKPOINT Failure.';
+
+        oldpoints := tc.SkillPoint;
+
+        Val(Copy(str, 9, 256), i, k);
+        if (k = 0) and (i >= -1001) and (i <= 1001) then begin
+            if i < 0 then begin
+                if (tc.SkillPoint + i >= 0) then tc.SkillPoint := tc.SkillPoint + i
+                else if (tc.SkillPoint + i < 0) and (tc.SkillPoint > 0) then begin
+                    tc.SkillPoint := 0;
+                end else begin
+                    Result := Result + ' Minimum number of points is 0.';
+                    Exit;
+                end;
+            end
+
+            else begin
+                if (tc.SkillPoint + i <= 1001) then tc.SkillPoint := tc.SkillPoint + i
+                else if (tc.SkillPoint + i > 1001) and (tc.SkillPoint < 1001) then begin
+                    tc.BaseLV := 1001;
+                end else begin
+                    Result := Result + ' Maximum number of points is 1001.';
+                    Exit;
+                end;
+            end;
+
+            SendCStat1(tc, 0, $000c, tc.SkillPoint);
+
+            if (i > 0) then Result := 'GM_ATHENA_SKPOINT Success. ' + IntToStr(tc.SkillPoint - oldpoints) + ' points added.'
+            else Result := 'GM_ATHENA_SKPOINT Success. ' + IntToStr(oldpoints - tc.SkillPoint) + ' points subtracted.'
+        end else begin
+            Result := Result + ' Skill Point amount out of range [-1001-1001].';
         end;
     end;
 end.
