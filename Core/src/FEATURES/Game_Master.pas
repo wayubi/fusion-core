@@ -3,7 +3,7 @@ unit Game_Master;
 interface
 
 uses
-    IniFiles, Classes, SysUtils, Common, List32, MMSystem;
+    IniFiles, Classes, SysUtils, Common, List32, MMSystem, Globals;
 
 type TGM_Table = class
     ID : Integer;
@@ -64,6 +64,7 @@ var
     GM_CHARJLEVEL : Byte;
     GM_CHARSTATPOINT : Byte;
     GM_CHARSKILLPOINT : Byte;
+    GM_CHANGES : Byte;
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
@@ -166,6 +167,7 @@ var
     function command_charjlevel(tc : TChara; str : String) : String;
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
+    function command_changes(tc : TChara; str : String) : String;
 
     function command_athena_die(tc : TChara) : String;
     function command_athena_help(tc : TChara) : String;
@@ -241,6 +243,7 @@ implementation
         GM_CHARJLEVEL := StrToIntDef(sl.Values['CHARJLEVEL'], 1);
         GM_CHARSTATPOINT := StrToIntDef(sl.Values['CHARSTATPOINT'], 1);
         GM_CHARSKILLPOINT := StrToIntDef(sl.Values['CHARSKILLPOINT'], 1);
+        GM_CHANGES := StrToIntDef(sl.Values['CHANGES'], 0);
 
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
@@ -353,6 +356,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'CHARJLEVEL', IntToStr(GM_CHARJLEVEL));
         ini.WriteString('Fusion GM Commands', 'CHARSTATPOINT', IntToStr(GM_CHARSTATPOINT));
         ini.WriteString('Fusion GM Commands', 'CHARSKILLPOINT', IntToStr(GM_CHARSKILLPOINT));
+        ini.WriteString('Fusion GM Commands', 'CHANGES', IntToStr(GM_CHANGES));
 
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
         ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -467,6 +471,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charjlevel')) = 'charjlevel') and (check_level(tc.ID, GM_CHARJLEVEL)) ) then error_msg := command_charjlevel(tc, str)
             else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
+            else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc.ID, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
         end else if gmstyle = '@' then begin
 			if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
@@ -2318,6 +2323,62 @@ Called when we're shutting down the server *only*
         end;
     sl.Free;
     end;
+
+    function command_changes(tc : TChara; str : String) : String;
+    var
+    	changefile : TStringList;
+        sl : TStringList;
+        length : Integer;
+        i : Integer;
+    begin
+        Result := 'GM_CHANGES Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if sl.Count = 2 then begin
+	    	changefile := TStringList.Create;
+    	    try
+            	if sl.Strings[1] = 'core' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_core.txt');
+                end else if sl.Strings[1] = 'scripts' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_scripts.txt');
+                end else if sl.Strings[1] = 'database' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_database.txt');
+                end else if sl.Strings[1] = 'client' then begin
+                	changefile.LoadFromFile(AppPath + 'documents\changes_client.txt');
+                end else begin
+                	Result := Result + ' Incorrect information.';
+                    changefile.Free;
+                    Exit;
+                end;
+	        except
+    	    	on EFOpenError do begin
+                    message_green(tc, 'File not accessible. Contact your server admin.');
+                    Result := Result + ' File not accessible.';
+                    changefile.Free;
+                	Exit;
+	            end;
+    	    end;
+
+	        if changefile.Count > 150 then length := 150 else length := changefile.Count;
+    	    for i := 0 to length do begin
+        		message_green(tc, changefile[150-i]);
+	        end;
+        end else begin
+        	message_green(tc, 'Command Syntax:');
+            message_green(tc, '#changes <type> -- core | client | database | scripts');
+
+        	Result := Result + ' Not enough information.';
+            sl.Free;
+            Exit;
+        end;
+
+        sl.Free;
+        changefile.Free;
+        Result := 'GM_CHANGES Success.';
+    end;
+
 
     function command_athena_die(tc : TChara) : String;
     var
