@@ -10565,6 +10565,22 @@ begin
 						tc.MTick := Tick + 1000;
 					end;
 
+
+        365:   //Magic Crusher PVP by Eliot
+          begin
+					 dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100; // Calculate Attack Power - Eliot
+					 dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; // Calculate Magic Defense - Eliot
+					 dmg[0] := dmg[0] - tc1.Param[3];
+					if dmg[0] < 1 then          // Check for negative damage
+           dmg[0] := 1;
+					 dmg[0] := dmg[0] * 1;
+           dmg[0] := dmg[0] * tl.Data2[MUseLV];
+          if dmg[0] < 0 then
+           dmg[0] := 0;
+               SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], tl.Data2[MUseLV]);
+               DamageProcess2(tm, tc, tc1, dmg[0], Tick);
+                  tc.MTick := Tick + 1000;
+          end;
         47:
           begin
           if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
