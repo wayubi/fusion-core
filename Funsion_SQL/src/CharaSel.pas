@@ -232,8 +232,11 @@ begin
 				with tc do begin
 					ID := tp.ID;
 					Gender := tp.Gender;
-					CID := NowCharaID;
-					Inc(NowCharaID);
+					if UseSQL then CID := GetNowCharaID()
+					else begin
+					  CID := NowCharaID;
+					  Inc(NowCharaID);
+					end;
 					Name := str1;
 					JID := 0;
 					BaseLV := 1;
