@@ -3235,8 +3235,9 @@ var
 	tc1     :TChara;
 begin
 
+  {Colus, 20040116: It had two X-checks instead of X and Y.}
   if (Point.X >= 0) and (Point.X <= 511) and
-     (Point.X >= 0) and (Point.X <= 511) then begin
+     (Point.Y >= 0) and (Point.Y <= 511) then begin
 
 	for j := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
 		for i := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
