@@ -2995,7 +2995,7 @@ begin
 		WFIFOL(2, ts.ID);
 		SendBCmd(tm, ts.Point, 6);
 	end;
-	ts.Status := 'BESERK_ST';
+	if ts.CanFindTarget then ts.Status := 'BESERK_ST';
 	CalculateSkillIf(tm, ts, Tick);
 	// Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
@@ -3062,7 +3062,7 @@ begin
 			ts.DmgTick := 0;
 		end;
 		xy := ts.Point;
-
+    ts.CanFindTarget := true;
 		{ Alex: Monster searching for attack path towards player - checks attackrange over cliffs and sightrange w/o cliffs. }
 		if ( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 2) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range1) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range1) and (ts.Data.Range1 >= MONSTER_ATK_RANGE) ) or
 		( (Path_Finding(ts.path, tm, xy.X, xy.Y, tc.Point.X, tc.Point.Y, 1) <> 0) and (abs(xy.X - tc.Point.X) <= ts.Data.Range2) and (abs(xy.Y - tc.Point.Y) <= ts.Data.Range2) ) then begin
@@ -3071,6 +3071,11 @@ begin
 				ts.AData := tc;
 				ts.isLooting := False;
 			end;
+    end else begin
+      ts.CanFindTarget := false;
+      ts.Status := 'IDLE_ST';
+      ts.SkillWaitTick := 0;
+      CalculateSkillIf(tm, ts, Tick);
 		end;
 	end else begin
 		//Kill Monster

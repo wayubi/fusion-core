@@ -449,6 +449,7 @@ type TMob = class(TLiving)
                       // 2 = Area Effect
                       // 3 = Target Skill
                       // 4 = Support skill
+  CanFindTarget :boolean;
 
 {NPCイベント追加ココまで}
 	constructor Create;

@@ -373,10 +373,12 @@ begin
         //for i := 0 to 3 do begin
 {ChrstphrR 2004/04/26 -- tc is NOT passed, it's not created -- it doesn't exist
 the next few lines will -guarantee- an access violation will occur}
+{Darkhelmet 2004/04/30 -- tc is defined by the monsters Adata as long as it's AData has
+something in it}
 
         if (assigned(ts.AData)) then begin
 
-        if tc.AData <> nil then tc:= ts.AData;
+        if ts.AData <> nil then tc:= ts.AData;
 
         if tc <> nil then begin
     		  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
@@ -784,7 +786,7 @@ with ts do begin
         case ts.MSKill of
           26: {Teleport}
                 begin
-                  //SendMonsterRelocation(tm, ts);
+                  SendMonsterRelocation(tm, ts);
                 end;
           28:     {Heal}
                 begin
@@ -1278,7 +1280,7 @@ begin
   sl := TStringList.Create;
   sl.Delimiter := ',';
   sl.Clear;
-
+  ts.SkillWaitTick := Tick;
   ts.Data.SkillCount := 0;
   {
   Monster Data: RAYDRIC BERSERK_ST NPC_DARKNESSATTACK 3 200 0 7500 0 0 0
@@ -1382,6 +1384,7 @@ Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
     end;
   end;
   ts.Data.Loaded := true;
+  ts.CanFindTarget := true;
 
   {
   DebugOut.Lines.Add('Locations of skills: ' + ts.Data.SkillLocations );
@@ -1438,6 +1441,8 @@ begin
     end else if tsAI2.IfState = 'IF_HIDING' then begin
       if ts.Hidden = true then CheckSkill(tm, ts, tsAI2, Tick);
 		end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
+    end else if tsAI2.IfState = 'IF_RUDEATTACK' then begin
+      if ts.CanFindTarget = false then CheckSkill(tm, ts, tsAI2, Tick);
 		end else if tsAI2.IfState = 'IF_ENEMYCOUNT' then begin
 			sl2 := TStringList.Create;
 			m := 9;
