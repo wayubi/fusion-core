@@ -13,6 +13,7 @@ uses
     function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
     procedure reed_shutdown_server(error_message : String);
     function reed_convert_type(in_value : Variant; ctype : Integer; line : Integer; path : String = '') : Variant;
+    function stringlist_load(path : String) : TStringList;
 
 implementation
 
@@ -227,6 +228,27 @@ uses
                     reed_shutdown_server('"' + in_value + '" is not a valid database id');
             end;
         end;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - stringlist_load                                                             }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To provide a general way to load data from a file into a stringlist.         }
+    { Parameters:                                                                           }
+    {  - path : String, Represents the path to the file to be opened.                       }
+    { Result:                                                                               }
+    {  - Result: TStringList, Represent the stringlist to return.                           }
+    { ------------------------------------------------------------------------------------- }
+    function stringlist_load(path : String) : TStringList;
+    var
+        datafile : TStringList;
+    begin
+        datafile := TStringList.Create;
+        datafile.LoadFromFile(path);
+
+        Result := datafile;
     end;
     { ------------------------------------------------------------------------------------- }
 

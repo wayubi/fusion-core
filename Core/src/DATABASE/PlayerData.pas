@@ -54,7 +54,6 @@ uses
     procedure PD_Save_Characters_Cart(forced : Boolean = False);
 
     { Character Data - Variables Data }
-    procedure PD_Load_Characters_Variables(UID : String = '*');
     procedure PD_Save_Characters_Variables(forced : Boolean = False);
 
     { Character Data - Pets Data }
@@ -126,7 +125,6 @@ uses
 
         if UID = '*' then debugout.Lines.add('­ Characters ­');
         PD_Load_Characters_Parse(UID);
-        PD_Load_Characters_Variables(UID);
 
         if UID = '*' then debugout.Lines.add('­ Pets ­');
         PD_Load_Characters_Pets(UID);
@@ -504,7 +502,7 @@ uses
                 datafile.Add('AID : ' + IntToStr(tc.ID));
                 datafile.Add('CID : ' + IntToStr(tc.CID));
 
-                if (tc.JID > UPPER_JOB_BEGIN) then datafile.Add('JOBID : ' + IntToStr(tc.JID - UPPER_JOB_BEGIN + LOWER_JOB_END))
+                if (tc.JID > UPPER_JOB_BEGIN) then datafile.Add('JID : ' + IntToStr(tc.JID - UPPER_JOB_BEGIN + LOWER_JOB_END))
                 else datafile.Add('JID : ' + IntToStr(tc.JID));
 
                 datafile.Add('BLV : ' + IntToStr(tc.BaseLV));
@@ -962,56 +960,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Variables Data --------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Variables(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-            	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Variables.txt') then begin
-                	try
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Variables.txt');
-
-                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
-                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-                        if (UID <> '*') then begin
-                            for i := 0 to datafile.Count - 1 do begin
-                                tc.Flag.Delete(0);
-                            end;
-                        end;
-
-                        for i := 0 to datafile.Count - 1 do begin
-                            tc.Flag.Add(datafile[i]);
-                        end;
-
-                        //debugout.Lines.Add(tc.Name + ' character variables data loaded.');
-                    except
-                    	DebugOut.Lines.Add('Character variables data could not be loaded.');
-                    end;
-                end;
-
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Characters_Variables(forced : Boolean = False);
     var
     	datafile : TStringList;

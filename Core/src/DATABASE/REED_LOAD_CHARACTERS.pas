@@ -13,6 +13,7 @@ uses
     procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
     procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    procedure PD_Load_Characters_Variables(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
 
 implementation
 
@@ -53,6 +54,9 @@ implementation
 
             pfile := 'Cart.txt';
             PD_Load_Characters_Cart(UID, tp, get_list(path, pfile), path, pfile);
+
+            pfile := 'Variables.txt';
+            PD_Load_Characters_Variables(UID, tp, get_list(path, pfile), path, pfile);
 
             if (UID <> '*') then Break;
         end;
@@ -284,6 +288,35 @@ implementation
             path := basepath + resultlist[i] + '\' + pfile;
 
             retrieve_inventories(path, tc.Cart.Item);
+
+        end;
+
+        FreeAndNil(resultlist);
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Characters Variables ----------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Characters_Variables(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String; pfile : String);
+    var
+        path : String;
+        i, j : Integer;
+        tc : TChara;
+    begin
+        for i := 0 to resultlist.Count - 1 do begin
+
+            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
+
+            path := basepath + resultlist[i] + '\' + pfile;
+
+            for j := 0 to tc.Flag.Count - 1 do begin
+                tc.Flag.Delete(0);
+            end;
+
+            tc.Flag := stringlist_load(path);
 
         end;
 
