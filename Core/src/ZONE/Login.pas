@@ -43,6 +43,9 @@ implementation
 
 procedure sv1PacketProcessSub(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string);
 var{ChrstphrR - 2004/04/25 - removed unused variables}
+    i         : integer;
+    tc        : TChara;   //Used for duplicate login
+    loggedIn  : boolean;
 	APlayer   : TPlayer;    //reference
 	PlayerIdx : Integer;
 begin
@@ -64,12 +67,21 @@ begin
 			WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
 			Socket.SendBuf(buf, 23);
 		end
-        else if APlayer.Login = 1 then begin  //Check if player is logged in already
+        else if (APlayer.Login = 1) then begin  //Check if player is logged in already
+            loggedIn := false;
+            {This way we check that a character of the player is also logged in}
+            for i := 0 to 8 do begin
+            //CharaName.IndexOfName()
+                tc := CharaName.Objects[CharaName.IndexOf(APlayer.CName[i])] as TChara;
+                if tc.Login = 2 then loggedIn := true;
+            end;
             //DebugOut.Lines.Add('Player already Logged in');
-            ZeroMemory(@buf[0],23);
-			WFIFOW( 0, $006a);
-			WFIFOB( 2, 3);//It will say rejected from server, but I'm not sure if this is the right message
-			Socket.SendBuf(buf, 23);
+            if loggedIn then begin
+                ZeroMemory(@buf[0],23);
+			    WFIFOW( 0, $006a);
+			    WFIFOB( 2, 3);//It will say rejected from server, but I'm not sure if this is the right message
+			    Socket.SendBuf(buf, 23);
+            end else tp.Login := 0;
         end
 		else if APlayer.Pass = userpass then begin
 
@@ -193,6 +205,7 @@ begin
 	            	tp.Pass := userpass;
 	            	tp.Gender := 1;
     	    	    tp.Mail := '-@-';
+                    tp.Login := 0;
                     PlayerName.AddObject(tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
 	            end else if (option_mf = '_F') then begin
@@ -202,9 +215,11 @@ begin
 	            	tp.Pass := userpass;
 	            	tp.Gender := 0;
     	    	    tp.Mail := '-@-';
+                    tp.Login := 0;
                     PlayerName.AddObject(tp.Name, tp);
 	        	    Player.AddObject(tp.ID, tp);
                 end;
+
                 PD_Save_Accounts(True);
             end;
 
