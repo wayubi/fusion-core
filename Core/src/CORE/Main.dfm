@@ -129,11 +129,11 @@ object frmMain: TfrmMain
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 658
+    Left = 656
     Top = 5
     Width = 22
     Height = 22
-    Anchors = []
+    Anchors = [akTop, akRight]
     Caption = 'T'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
