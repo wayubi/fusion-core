@@ -4133,9 +4133,9 @@ end;
 
 				//ƒMƒ‹ƒhì¬
 				tg := TGuild.Create;
-				NowGuildID := NowGuildID + 1;
 				with tg do begin
 					ID := NowGuildID;
+                    NowGuildID := NowGuildID + 1;
 					Name := str;
 					LV := 1;
 					EXP := 0;

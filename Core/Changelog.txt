@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-10-04: Guild creation skipped ID if user relogged in first. [AlexKreuz]
 - 12-09-04: Temporary server string variables being saved is fixed. [Tsusai]
 - 12-07-04: Advanced classes vending fixed. [Tsusai]
 - 12-06-04: MENU and SETSTR can replace variables. [Tsusai]
