@@ -2,7 +2,10 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
-- 02-08-05: Update SP and Hp regen formula to match Kro episode 6. [Oatmeal + Darkhelmet]
+- 02-08-05: Updated Stone Curse PvP, not working fully. [Darkhelmet]
+- 02-08-05: Updated Frost Driver PvP. [Darkhelmet]
+- 02-08-04: Updated Status Effects on players, not perfect yet. [Darkhelmet]
+- 02-08-04: Update SP and Hp regen formula to match Kro episode 6. [Oatmeal + Darkhelmet]
 - 02-08-04: Fixed bug that Ankle Snar won't trap monster after player's attack. [beita]
 - 02-08-04: Fixed Magnus Exorcismus effect time. [beita]
 - 02-08-04: Fixed Quagmire effect on monsters. [beita]

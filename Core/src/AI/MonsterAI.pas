@@ -580,7 +580,8 @@ begin
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                         tc.isPoisoned := True;
                         tc.PoisonTick := tick + 15000;
-                        PoisonCharacter(tm, tc, Tick);
+                        tc.Stat2 := 1;
+                        UpdateStatus(tm, tc, Tick);
                 end;
 
                 177:    {Blind Attack}
@@ -590,8 +591,10 @@ begin
 
                         SendMSkillAttack(tm, tc, ts, tsAI, Tick, 1, i);
                         tc.isBlind := True;
+                        tc.Stat2 := 16;
                         tc.BlindTick := tick + 15000;
-                        BlindCharacter(tm, tc, Tick);
+                        UpdateStatus(tm, tc, Tick);
+                        //BlindCharacter(tm, tc, Tick);
                 end;
 
                 178:    {Silence Attack}

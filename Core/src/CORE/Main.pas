@@ -1855,6 +1855,13 @@ begin
 				SendCStat1(tc, 0, 7, SP);
 			end;
 
+      if (tc.Stat1 <> 0) and (dmg[0] > 0) then begin
+        tc.Stat1 := 0;
+        tc.FreezeTick := Tick;
+        tc.isFrozen := false;
+        UpdateStatus(tm, tc, Tick);
+      end;
+
 		//アサシン二刀流修正
 		if dmg[0] > 0 then begin
 			dmg[0] := dmg[0] * ArmsFix[Arms] div 100;
@@ -2385,6 +2392,12 @@ begin
         end;
 
 		if not miss then begin
+      if tc1.Stat1 <> 0 then begin
+        tc1.Stat1 := 0;
+        tc1.FreezeTick := Tick;
+        tc1.isFrozen := false;
+        UpdateStatus(tm, tc1, Tick);
+      end;
                         if tc1.OrcReflect then begin
                                 i := dmg[0];
                                 //tc.MSkill := 61;
@@ -7805,9 +7818,13 @@ begin
 				35:     {Cure}
 					begin
 						//tc1.Stat2 := tc1.Stat2 and (not $1C);
-                                                tc1.isPoisoned := False;
-                                                tc1.PoisonTick := Tick;
-                                                PoisonCharacter(tm, tc1, Tick);
+            tc1.isPoisoned := False;
+            tc1.PoisonTick := Tick;
+            tc1.isBlind := false;
+            tc1.BlindTick := Tick;
+            tc1.Stat1 := 0;
+            tc1.Stat2 := 0;
+            UpdateStatus(tm, tc1, Tick);
 						//ProcessType := 0;
 					end;
         40:
@@ -9110,9 +9127,9 @@ begin
 						end;
 					end;
 {追加}
-				15: //FD
+				15: {Frost Driver PvP}
 					begin
-						//ダメージ算出
+						//Damage Calc
 						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * ( MUseLV + 100 ) div 100;
 						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
 						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
@@ -9124,19 +9141,21 @@ begin
 						//パケ送信
             if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;            
 						SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
-                                                if (1 <> 1) and (dmg[0] <> 0)then begin
-                                                        if Random(1000) < tl.Data1[MUseLV] * 10 then begin
-                                                                //tc1.Stat1 := 2;
-                                                                tc1.BodyTick := Tick + tc.aMotion;
-                                                        end;
-                                                end;
+            if (dmg[0] > 0)then begin
+              if Random(1000) < tl.Data1[MUseLV] * 10 then begin
+                tc1.Stat1 := 2;
+                tc1.FreezeTick := Tick + 15000;
+                tc1.isFrozen := true;
+                UpdateStatus(tm, tc1, Tick);
+              end;
+            end;
 						DamageProcess2(tm, tc, tc1, dmg[0], Tick, False);
 						tc.MTick := Tick + 1500;
 					end;
 
 {追加ココまで}
 {:119}
-				16: //SC
+				16: {Stone Curse PvP}
 					begin
           j := SearchCInventory(tc, 716, false);
 						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
@@ -9154,13 +9173,14 @@ begin
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
 						if Random(1000) < tl.Data1[MUseLV] * 10 then begin
-							if (tc1.Stat1 <> 1) then begin
-								//tc1.Stat1 := 1;
-								tc1.BodyTick := Tick + tc.aMotion;
-							end;
+							//if (tc1.Stat1 <> 1) then begin
+								tc1.Stat1 := 1;
+								tc1.StoneTick := Tick + 15000;
+                UpdateStatus(tm, tc1, Tick);
+							//end;
 						end;
 						end else begin
-                                                        SendSkillError(tc, 7); //No Red Gemstone
+              SendSkillError(tc, 7); //No Red Gemstone
 							tc.MMode := 4;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -10656,25 +10676,48 @@ begin
                         if tc.PoisonTick < Tick then begin
                                 tc.isPoisoned := False;
                                 tc.PoisonTick := Tick;
-                                PoisonCharacter(tm, tc, Tick);
+                                tc.Stat2 := 0;
+                                UpdateStatus(tm, tc, Tick);
+                        end;
+                end;
+
+                {Stone Curse Removal}
+                if tc.isStoned = true then begin
+                        if tc.StoneTick < Tick then begin
+                                tc.Stat1 := 0;
+                                tc.isStoned := false;
+                                tc.StoneTick := Tick;
+                                UpdateStatus(tm, tc, Tick);
                         end;
                 end;
 
                 {Blind Removal}
                 if tc.isBlind = true then begin
                         if tc.BlindTick < Tick then begin
+                                tc.Stat2 := 0;
                                 tc.isBlind := false;
                                 tc.BlindTick := Tick;
-                                BlindCharacter(tm, tc, Tick);
+                                UpdateStatus(tm, tc, Tick);
+                        end;
+                end;
+
+                {Freeze Removal}
+                if tc.isFrozen = true then begin
+                        if tc.FreezeTick < Tick then begin
+                                tc.Stat1 := 0;
+                                tc.isFrozen := false;
+                                tc.FreezeTick := Tick;
+                                UpdateStatus(tm, tc, Tick);
                         end;
                 end;
 
                 {Silenced Removal}
                 if tc.isSilenced = true then begin
                         if tc.SilencedTick < Tick then begin
-                                tc.isSilenced := false;
-                                tc.SilencedTick := Tick;
-                                //SilenceCharacter(tm, tc, Tick);
+                          tc.Stat2 := 0;
+                          tc.isSilenced := false;
+                          tc.SilencedTick := Tick;
+                          //SilenceCharacter(tm, tc, Tick);
                         end;
                 end;
 
@@ -13357,7 +13400,7 @@ begin
 					end else begin
                                         /// alexkreuz: xxx
 //					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
-					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
+					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) and (tc.FreezeTick < Tick) and (tc.StoneTick < Tick) then begin
 						//追加移動
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);

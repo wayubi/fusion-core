@@ -88,6 +88,8 @@ begin
                                                                         tc.Option := tc.Option and $FFF9;
                                                                         tc.Hidden := false;
                                                                 end;
+                tc.Stat1 := 0;
+                tc.Stat2 := 0;
 								with tc do begin
 									WFIFOL(w+(cnt*106)+  0, CID);
 									WFIFOL(w+(cnt*106)+  4, BaseEXP);

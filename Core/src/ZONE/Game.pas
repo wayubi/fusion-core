@@ -2236,7 +2236,8 @@ end;
                                                                 if td.Effect = 1 then begin
                                                                         tc.isPoisoned := False;
                                                                         tc.PoisonTick := timeGetTime();
-                                                                        PoisonCharacter(tm, tc, timeGetTime);
+                                                                        tc.Stat2 := 0;
+                                                                        UpdateStatus(tm, tc, timeGetTime);
                                                                 end;
 
 								if td.HP2 <> 0 then begin

@@ -285,7 +285,7 @@ type TMob = class
 	Speed       :word;
 	Stat1       :Byte; // 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep, 5 = ankle snar
 	Stat2       :Byte; // 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
-  nStat       :Cardinal; 
+  nStat       :Cardinal;
 	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
 	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
 	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire currently)
@@ -850,8 +850,16 @@ type TChara = class
         isCloaked     :Boolean;   {Says if Cloaking is Active}
         CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
 
+        // Darkhelmet, I used this method so you can theoretically be poisoned
+        // and cursed at the same time, even though graphics will only show one.
         PoisonTick    :Cardinal;  {Tracks how long a player is Poisoned}
         isPoisoned    :Boolean;   {Says if player is Poisoned}
+
+        FreezeTick    :Cardinal;  {Tracks how long a player is Frozen for}
+        isFrozen      :Boolean;   {Says if player is Frozen}
+
+        isStoned      :boolean;   {Says if a player is Stoned}
+        StoneTick     :Cardinal;   {Tracks the length of the curse}
 
         isBlind       :Boolean;   {Says if a player is blind}
         BlindTick     :Cardinal;  {Tracks how long a player is Blind}
@@ -1481,8 +1489,9 @@ Option_GraceTime_PvPG :cardinal;
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
-                procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
-                procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
+                //procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
+                //procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
+                procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
@@ -1690,6 +1699,31 @@ begin
     
     if (td.Loc = 16) and (td.Element <> 0) then
       ArmorElement := 20 + td.Element;
+
+    // Darkhelmet 20040208: if you have a status alignment, it will over rule your armor status
+    // Stat1: 1 = Stone, 2 = Freeze, 3 = Stun, 4 = Sleep, 5 = ankle snar
+    // Stat2: 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
+    {   0 Neutral
+       1 Water
+       2 Earth
+       3 Fire
+       4 Wind
+       5 Poison
+       6 Holy
+       7 Shadow
+       8 Telekenesis
+       9 Undead}
+    if tc.Stat1 <> 0 then begin
+      case Stat1 of
+        1:  ArmorElement := 2;
+        2:  Armorelement := 1;
+      end;
+    end;
+    if tc.Stat2 <> 0 then begin
+      case Stat2 of
+        1:  ArmorElement := 5;
+      end;
+    end;
 
 		for j := 0 to 5 do begin
 			Bonus[j] := Bonus[j] + td.Param[j];
@@ -2743,7 +2777,7 @@ begin
   end;
 end;}
 //------------------------------------------------------------------------------
-procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);
+{procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);
 begin
         tm := tc.MData;
         if tc.PoisonTick > Tick then begin
@@ -2785,9 +2819,20 @@ begin
                 WFIFOB(12, 0);
                 SendBCmd(tm, tc.Point, 13);
         end;
+end;}
+//------------------------------------------------------------------------------
+procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
+begin
+        tm := tc.MData;
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, tc.Stat1);
+        WFIFOW(8, tc.Stat2);
+        WFIFOW(10, tc.Option);
+        WFIFOB(12, 0); // attack animation
+        SendBCmd(tm, tc.Point, 13);
 end;
 //------------------------------------------------------------------------------
-
 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
 
 begin
@@ -3945,7 +3990,6 @@ begin
   // Moved Lex Aeterna calc up here.  It is display only (don't reset the tick here)
   // Commented.  When it gets here from DamageCalcX, it should be correct.
 	// if (tc1.Skill[78].Tick > Tick) then dmg := dmg * 2;
-
 	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
