@@ -6519,7 +6519,7 @@ begin
 								tn.Script[k].ID := 8;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 2);
-								tn.Script[k].Data1[0] := sl1.Strings[0];
+								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
 								tn.Script[k].Data3[0] := StrToInt(sl1.Strings[1]);
 								tn.Script[k].Data3[1] := StrToInt(sl1.Strings[2]);
 								Inc(k);
