@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 07-02-04: Converted Aegis /hide command to ALBGM. [Trihan]
 - 07-02-04: Converted Aegis /resetstate and /resetskill commands to ALBGM. [Trihan]
 - 07-02-04: Disconnect characters before JCon deletions. [AlexKreuz]
 - 07-02-04: Added Multi-Account deletion to JCon Accounts. [AlexKreuz]

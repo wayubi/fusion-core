@@ -175,7 +175,8 @@ var
     function command_aegis_bb(tc : TChara; str : String) : String;
     function command_aegis_nb(str : String) : String;
     function command_aegis_item(tc : TChara; str : String) : String;
-    function command_aegis_monster(tc : Tchara; str : String) : String;
+    function command_aegis_monster(tc : TChara; str : String) : String;
+    function command_aegis_hide(tc : TChara) : String;
     function command_aegis_resetstate(tc : TChara; str : String) : String;
     function command_aegis_resetskill(tc : Tchara; str : String) : String;
 
@@ -283,7 +284,6 @@ implementation
         GM_AEGIS_BB := StrToIntDef(sl.Values['AEGIS_BB'], 1);
         GM_AEGIS_ITEM := StrToIntDef(sl.Values['AEGIS_ITEM'], 1);
         GM_AEGIS_MONSTER := StrToIntDef(sl.Values['AEGIS_MONSTER'], 1);
-        GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_HIDE := StrToIntDef(sl.Values['AEGIS_HIDE'], 1);
         GM_AEGIS_RESETSTATE := StrToIntDef(sl.Values['AEGIS_RESETSTATE'], 1);
         GM_AEGIS_RESETSKILL := StrToIntDef(sl.Values['AEGIS_RESETSKILL'], 1);
@@ -559,8 +559,9 @@ Called when we're shutting down the server *only*
             else if ( (aegistype = 'B') and (Copy(str, 1, 4) = 'blue') and (check_level(tc. ID, GM_AEGIS_BB)) ) then error_msg := command_aegis_bb(tc, str)
             else if ( (aegistype = 'S') and (ItemDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_ITEM)) ) then error_msg := command_aegis_item(tc, str)
             else if ( (aegistype = 'S') and (MobDBName.IndexOf(str) <> -1) and (check_level(tc.ID, GM_AEGIS_MONSTER)) ) then error_msg := command_aegis_monster(tc, str)
-            else if ( (aegistype = 'R') and (StrToInt(str) = 0) and (check_level (tc.ID, GM_AEGIS_RESETSTATE)) ) then error_msg := command_aegis_resetstate(tc, str)
-            else if ( (aegistype = 'R') and (StrToInt(str) = 1) and (check_level (tc.ID, GM_AEGIS_RESETSKILL)) ) then error_msg := command_aegis_resetskill(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 0) and (check_level(tc.ID, GM_AEGIS_RESETSTATE)) ) then error_msg := command_aegis_resetstate(tc, str)
+            else if ( (aegistype = 'R') and (StrToInt(str) = 1) and (check_level(tc.ID, GM_AEGIS_RESETSKILL)) ) then error_msg := command_aegis_resetskill(tc, str)
+            else if ( (aegistype = 'H') and (check_level(tc.ID, GM_AEGIS_HIDE)) ) then error_msg := command_aegis_hide(tc)
         end;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -2848,6 +2849,30 @@ Called when we're shutting down the server *only*
         SendCSkillList(tc);
         CalcStat(tc);
         SendCStat(tc);
+    end;
+
+    function command_aegis_hide(tc : TChara) : String;
+    var
+        tm : TMap;
+    begin
+        tm := tc.MData;
+
+        if (tc.Option and 64 = 0) then begin
+            tc.Option := tc.Option or 64;
+            tc.Hidden := true;
+        end else begin
+            tc.Option := tc.Option and $FFBF;
+            tc.Hidden := false;
+        end;
+
+
+        WFIFOW(0, $0119);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, 0);
+        WFIFOW(8, 0);
+        WFIFOW(10, tc.Option);
+        WFIFOB(12, 0);
+        SendBCmd(tm, tc.Point, 13);
     end;
 
     function command_athena_alive(tc : TChara) : String;

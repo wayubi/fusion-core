@@ -4930,33 +4930,9 @@ end;
 		//--------------------------------------------------------------------------
 		$019d: //GM Hide
     begin
-
-        tp := tc.PData;
-        h := IDTableDB.IndexOf(tc.ID);
-        if (h <> -1) then begin
-            tid := IDTableDB.Objects[h] as TIDTbl;
-            if (tid.ChangeOption = 1) then begin
-                tm := tc.MData;
-
-                if (tc.Option and 64 = 0) then begin
-                    tc.Option := tc.Option or 64;
-                    tc.Hidden := true;
-                end else begin
-                    tc.Option := tc.Option and $FFBF;
-                    tc.Hidden := false;
-                end;
-
-
-                WFIFOW(0, $0119);
-                WFIFOL(2, tc.ID);
-                WFIFOW(6, 0);
-                WFIFOW(8, 0);
-                WFIFOW(10, tc.Option);
-                WFIFOB(12, 0);
-                SendBCmd(tm, tc.Point, 13);
-            end;
-        end;
+        parse_commands(tc, '/H');
     end;
+        
 		//--------------------------------------------------------------------------
 {キューペット}
 		$019f: // ペットテイミング スロット停止
