@@ -1,3 +1,5 @@
+- 04-19-04: Quick Fix for Kyuubi's fix -- please check and adjust if 
+I made the wrong assumption :) [ChrstphrR]
 - 04-08-04: Fixed failure to check for a guild that caused Range Error. [KyuubiKitsune]
 - 04-16-04: Fixed Bug 139 - Intimidate Skill warped MVP Monsters. [AlexKreuz]
 - 04-16-04: Fixed Bug 193 - Auto Berkserk Skill not increasing damage. [AlexKreuz]

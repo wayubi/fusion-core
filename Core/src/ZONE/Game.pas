@@ -1319,7 +1319,13 @@ Begin(* Proc sv3PacketProcess() *)
 							SendCStat1(tc, 0, $0009, tc.StatusPoint);
 							SendCStat1(tc, 1, $0001, tc.BaseEXP);
 						end;        //Kyuubi - Glevel Command  Under Development
-					end else if (Copy(str,1, 7) = 'glevel ') and (tc.GuildID) then begin
+					//end else if (Copy(str,1, 7) = 'glevel ') and (tc.GuildID) then begin
+					//
+					//ChrstphR - 2004/04/19 - fix the build --
+					//Error was "Operator not applicable to this operand type -
+					//No WORD type can be treated like a boolean.
+					//
+					end else if (Copy(str,1, 7) = 'glevel ') and (GuildList.IndexOf(tc.GuildID) > -1) then begin
                   j := GuildList.IndexOf(tc.GuildID);
                   tg := GuildList.Objects[j] as TGuild;
                  if (tg <> NIL) and (tc.GuildID = tg.ID) then begin
