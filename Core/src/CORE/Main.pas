@@ -14204,6 +14204,7 @@ begin
         SetWindowLong(Application.Handle, GWL_EXSTYLE,WS_EX_APPWINDOW);
         Shell_notifyIcon(NIM_DELETE, @TrayIcon);
   end;
+end;
 
 procedure TfrmMain.BackupTimerTimer(Sender: TObject);
 var

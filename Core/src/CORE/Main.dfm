@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 107
-  Top = 235
+  Left = 591
+  Top = 510
   Width = 765
   Height = 435
   Caption = '#33'
@@ -109,6 +109,7 @@ object frmMain: TfrmMain
         Alignment = taRightJustify
         Width = 50
       end>
+    SimplePanel = False
   end
   object txtDebug: TMemo
     Left = 0
@@ -183,5 +184,11 @@ object frmMain: TfrmMain
     OnTimer = DBsaveTimerTimer
     Left = 112
     Top = 248
+  end
+  object BackupTimer: TTimer
+    Enabled = False
+    OnTimer = BackupTimerTimer
+    Left = 368
+    Top = 200
   end
 end
