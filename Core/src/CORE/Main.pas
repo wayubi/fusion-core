@@ -9291,8 +9291,12 @@ begin
 				tc := CharaName.Objects[i] as TChara;
 				if tc.Login <> 2 then continue;  //Character is logged in
 				with tc do begin
+
 					tm := MData;
 					if tm = nil then continue;
+
+                    UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+
 					mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
 					if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin
