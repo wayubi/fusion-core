@@ -415,6 +415,11 @@ begin
 	end else begin
 		EnablePetSkills := true;
 	end;
+	if sl.IndexOfName('EnableLowerClassDyes') <> -1 then begin
+		EnableLowerClassDyes := StrToBool(sl.Values['EnableLowerClassDyes']);
+	end else begin
+		EnableLowerClassDyes := false;
+	end;
 	if sl.IndexOfName('DisableFleeDown') <> -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
@@ -816,7 +821,8 @@ begin
  	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
  	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
 	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
-	ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));  
+	ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));
+	ini.WriteString('Server', 'EnableLowerClassDyes', BoolToStr(EnableLowerClassDyes, true));    
 	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
         ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
         ini.WriteString('Server', 'DefaultMap', DefaultMap);
@@ -12457,33 +12463,20 @@ begin
 				$81:// Warp Portal Opens
 					begin
 						tn.JID := $80;
-						WFIFOW(0, $00c3);
-						WFIFOL(2, tn.ID);
-						WFIFOB(6, 0);
-						WFIFOB(7, tn.JID);
-						SendBCmd(tm, tn.Point, 8);
+            UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 20000;
 					end;
 				$8F:// Blast Mine activated
 					begin
 						tn.JID := $74;
-						WFIFOW(0, $00c3);
-						WFIFOL(2, tn.ID);
-						WFIFOB(6, 0);
-						WFIFOB(7, tn.JID);
-						SendBCmd(tm, tn.Point, 8);
+            UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 2000;
 					end;
         $99: // Talkie Box Activated
           begin
 						tn.JID := $8c;
-                                                //DebugOut.Lines.Add('Talkie changed');
-						WFIFOW(0, $00c3);
-						WFIFOL(2, tn.ID);
-						WFIFOB(6, 0);
-						WFIFOB(7, tn.JID);
-						SendBCmd(tm, tn.Point, 8);
-
+            //DebugOut.Lines.Add('Talkie changed');
+            UpdateLook(tm, tn, 0, tn.JID, 0, true);
 						tn.Tick := Tick + 60000;
           end;
         { $8c: // Talkie Box fires

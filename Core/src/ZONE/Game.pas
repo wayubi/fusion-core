@@ -261,7 +261,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 			end;//$0072
 		//--------------------------------------------------------------------------
-		$007d: //MAPƒ[ƒhŠ®—¹..Lit. "Completion of MAP load"
+		$007d: // Map loading completed (display the map to user)
 			begin
 				if tc.tmpMap <> '' then begin
 					tc.Map := tc.tmpMap;
@@ -276,7 +276,8 @@ Begin(* Proc sv3PacketProcess() *)
 				if CharaPID.IndexOf(tc.ID) = -1 then CharaPID.AddObject(tc.ID, tc);
 
         mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
-				//ƒ}ƒbƒv‚É©•ª‚ª‹‚é‚±‚Æ‚ğ‹L˜^
+
+				// Add this character to the charlist for this map
 				tm.CList.AddObject(tc.ID, tc);
 				tm.Block[tc.Point.X div 8][tc.Point.Y div 8].CList.AddObject(tc.ID, tc);
 
@@ -287,7 +288,7 @@ Begin(* Proc sv3PacketProcess() *)
           tc.GraceTick := timeGetTime() + 5000;
         end;
 
-				//¶‚«•Ô‚èˆ—  Lit. "Reanimating processing"
+				// If dead, recover status/HP as necessary
 				if tc.Sit = 1 then tc.Sit := 3;
 				if tc.HP = 0 then begin
           if tc.JID = 0 then begin
@@ -306,30 +307,25 @@ Begin(* Proc sv3PacketProcess() *)
           end;
         end;
 
-{˜I“XƒXƒLƒ‹’Ç‰Á} {Lit. "Street stall skill addition"}
+        // Reset vending/chat/trade/deal status
 				tc.VenderID := 0;
-{˜I“XƒXƒLƒ‹’Ç‰ÁƒRƒR‚Ü‚Å} {Lit. "To street stall skill additional coconut"}
-{ƒ`ƒƒƒbƒgƒ‹[ƒ€‹@”\’Ç‰Á} {Lit. "Chat room functional addition"}
 				tc.ChatRoomID := 0;
-{ƒ`ƒƒƒbƒgƒ‹[ƒ€‹@”\’Ç‰ÁƒRƒR‚Ü‚Å} {Lit. "To Chat room functional additional coconut"}
-{æˆø‹@”\’Ç‰Á} {Lit. "Transaction functional addition"}
 				tc.DealingID := 0;
 				tc.PreDealID := 0;
-{æˆø‹@”\’Ç‰ÁƒRƒR‚Ü‚Å}{Lit. "Transaction functional additional cocout"}
 
 				//ƒuƒƒbƒNˆ—
 				for j := tc.Point.Y div 8 - 2 to tc.Point.Y div 8 + 2 do begin
 					for i := tc.Point.X div 8 - 2 to tc.Point.X div 8 + 2 do begin
-						//NPCƒ[ƒh
+						// Notify about nearby NPCs
 						for k := 0 to tm.Block[i][j].NPC.Count - 1 do begin
 							tn := tm.Block[i][j].NPC.Objects[k] as TNPC;
 							if (abs(tc.Point.X - tn.Point.X) < 16) and (abs(tc.Point.Y - tn.Point.Y) < 16) then begin
-{NPCƒCƒxƒ“ƒg’Ç‰Á} {Lit. "NPC Event Addition"}
+
                 //SendNData(Socket, tn, tc.ver2);
 								if (tn.Enable = true) then begin
 									SendNData(Socket, tn,tc.ver2);
 									if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
-										//OnInitƒ‰ƒxƒ‹‚ğÀs
+										//OnInit processing
 										//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
 										tc1 := TChara.Create;
 										tc1.TalkNPCID := tn.ID;
@@ -342,7 +338,7 @@ Begin(* Proc sv3PacketProcess() *)
 										tc1.Free;
 									end;
 									if (tn.ChatRoomID <> 0) then begin
-										//ƒ`ƒƒƒbƒgƒ‹[ƒ€‚ğ•\¦‚·‚é
+										// Show NPC chatrooms
 										ii := ChatRoomList.IndexOf(tn.ChatRoomID);
 										if (ii <> -1) then begin
 											tcr := ChatRoomList.Objects[ii] as TChatRoom;
@@ -363,26 +359,20 @@ Begin(* Proc sv3PacketProcess() *)
 										end;
 									end;
 								end;
-{NPCƒCƒxƒ“ƒg’Ç‰ÁƒRƒR‚Ü‚Å}
 							end;
 						end;
-						//ü‚è‚Ìl‚É’Ê’m&ü‚è‚É‚¢‚él‚ğ•\¦‚³‚¹‚é
+						// Notify nearby players about you (and you about them)
 						for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
 							tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
 							if (tc <> tc1) and (abs(tc.Point.X - tc1.Point.X) < 16) and (abs(tc.Point.Y - tc1.Point.Y) < 16) then begin
 								SendCData(tc, tc1);
 								SendCData(tc1, tc);
-{ƒ`ƒƒƒbƒgƒ‹[ƒ€‹@”\’Ç‰Á}
-								//ü•Ó‚Ìƒ`ƒƒƒbƒgƒ‹[ƒ€‚ğ•\¦
+								// Remove any chats or vends you may have had displayed (after death, perhaps...)
 								ChatRoomDisp(tc.Socket, tc1);
-{ƒ`ƒƒƒbƒgƒ‹[ƒ€‹@”\’Ç‰ÁƒRƒR‚Ü‚Å}
-{˜I“XƒXƒLƒ‹’Ç‰Á}
-								//ü•Ó‚Ì˜I“X‚ğ•\¦
 								VenderDisp(tc.Socket, tc1);
-{˜I“XƒXƒLƒ‹’Ç‰ÁƒRƒR‚Ü‚Å}
 							end;
 						end;
-						//ƒ‚ƒ“ƒXƒ^[ƒ[ƒh
+						// Update about mobs in your range of vision
 						for k := 0 to tm.Block[i][j].Mob.Count - 1 do begin
 							ts := tm.Block[i][j].Mob.Objects[k] as TMob;
 							if (abs(tc.Point.X - ts.Point.X) < 16) and (abs(tc.Point.Y - ts.Point.Y) < 16) then begin
@@ -392,39 +382,14 @@ Begin(* Proc sv3PacketProcess() *)
 					end;
 				end;
 
-				//ƒXƒLƒ‹‘—M
+				// Update skill list
 				SendCSkillList(tc);
-				{
-				WFIFOW( 0, $010f);
-				j := 0;
-				for i := 1 to 157 do begin
-					if tc.Skill[i].Lv <> 0 then begin
-						WFIFOW( 0+37*j+4, i);
-						WFIFOW( 2+37*j+4, tc.Skill[i].Data.SType);
-						WFIFOW( 4+37*j+4, 0);
-						WFIFOW( 6+37*j+4, tc.Skill[i].Lv);
-						WFIFOW( 8+37*j+4, tc.Skill[i].Data.SP[tc.Skill[i].Lv]);
-						WFIFOW(10+37*j+4, tc.Skill[i].Data.Range);
-						WFIFOS(12+37*j+4, tc.Skill[i].Data.IDC, 24);
-						WFIFOB(36+37*j+4, 0);
-						Inc(j);
-					end;
-				end;
-				WFIFOW( 2, 4+37*j);
-				Socket.SendBuf(buf, 4+37*j);
-				}
 
-        {Colus, 20040113: This buffer makes no sense.  Why is it here?
-         It causes items to screw up, rather badly.}
-         {
-        WFIFOW( 2, 4+37*j);
-        Socket.SendBuf(buf, 4+37*j);
-         }
-				//ƒpƒ‰ƒ[ƒ^  Lit. "Parameter"
+				// Update character stats
 				CalcStat(tc);
 				SendCStat(tc, true);
 
-				//ƒAƒCƒeƒ€ƒf[ƒ  Lit. "Item Data"
+				// Update inventory data
 				WFIFOW(0, $00a3);
 				j := 0;
 				for i := 1 to 100 do begin
@@ -443,7 +408,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 				WFIFOW(2, 4+j*10);
 				Socket.SendBuf(buf, 4+j*10);
-				//‘•”õƒf[ƒ^  Lit. "Equipment data"
+				// Update equipment data
 				WFIFOW(0, $00a4);
 				j := 0;
 				for i := 1 to 100 do begin
@@ -471,7 +436,7 @@ Begin(* Proc sv3PacketProcess() *)
 				end;
 				WFIFOW(2, 4+j*20);
 				Socket.SendBuf(buf, 4+j*20);
-				//‚µ‚Ä‚¢‚é‹|  Lit. "The bow which it has done"
+				// Update arrow equipment status
 				j := 0;
 				for i := 1 to 100 do begin
 					if (tc.Item[i].ID <> 0) and (tc.Item[i].Equip = 32768) then begin
@@ -483,13 +448,14 @@ Begin(* Proc sv3PacketProcess() *)
 				WFIFOW(2, j);
 				Socket.SendBuf(buf, 4);
 
-				//ƒJ[ƒgƒf[ƒ^‘—M Lit. "Cart data transmission"
+        // Transmit cart data
 				// Colus, 20040123: Other carts weren't getting checked.
 				w3 := tc.Option and $0788;
 				if (w3 <> 0) then begin
 					SendCart(tc);
 				end;
 
+        // Reset regen/recovery ticks and combat status
 				tc.HPTick := timeGetTime();
 				tc.SPTick := timeGetTime();
 				tc.HPRTick := timeGetTime() - 500;
@@ -498,11 +464,11 @@ Begin(* Proc sv3PacketProcess() *)
 				tc.AMode := 0;
 				tc.DmgTick := 0;
 
+        // Set login data and send party info
 				tc.Login := 2;
-{ƒp[ƒeƒB[‹@”\’Ç‰Á} {Lit. "Party functional addition"}
 				SendPartyList(tc);
-{ƒp[ƒeƒB[‹@”\ƒRƒR‚Ü‚Å} {Lit. "To party functional coconut"}
-{ƒLƒ…[ƒyƒbƒg} {Lit. "Queue pet" or "Cute pet"}
+
+        // Find and show your active pet
         j := 0;
         for i := 1 to 100 do begin
           if ( tc.Item[i].ID <> 0 ) and ( tc.Item[i].Amount > 0 ) and
@@ -518,19 +484,19 @@ Begin(* Proc sv3PacketProcess() *)
             SendPetRelocation(tm, tc, i);
           end;
         end;
-{ƒLƒ…[ƒyƒbƒg‚±‚±‚Ü‚Å}
 
-{ƒMƒ‹ƒh‹@”\’Ç‰Á}
+
+        // Get and display the guild news
 				j := GuildList.IndexOf(tc.GuildID);
 				if (j <> -1) then begin
 					tg := GuildList.Objects[j] as TGuild;
-					//’m‘—M
 					WFIFOW( 0, $016f);
 					WFIFOS( 2, tg.Notice[0], 60);
 					WFIFOS(62, tg.Notice[1], 120);
 					Socket.SendBuf(buf, 182);
 				end;
 
+        // Is this map PvP?  Then set that mode and ladder status.
         if (mi.Pvp = true) then begin
           for j := 0 to tm.CList.Count - 1 do begin
             tc1 := tm.CList.Objects[j] as TChara;
@@ -547,6 +513,7 @@ Begin(* Proc sv3PacketProcess() *)
           end;
         end;
 
+        // Is this map GvG?  Then set that mode.
         if (mi.PvPG = true) then begin
           for j := 0 to tm.CList.Count - 1 do begin
             tc1 := tm.CList.Objects[j] as TChara;
@@ -569,7 +536,10 @@ Begin(* Proc sv3PacketProcess() *)
           Socket.SendBuf(buf, 13)
         end;}
 
-{ƒMƒ‹ƒh‹@”\’Ç‰ÁƒRƒR‚Ü‚Å} {Lit. "To guild functional additional coconut"}
+        // Colus, 20040409: Gave the option to enable lower class dyes.
+        // This should be removed when Gravity reenables them.
+        UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
+
 			end;//$007d
 		//--------------------------------------------------------------------------
 		$007e: //tick
@@ -1111,12 +1081,8 @@ Begin(* Proc sv3PacketProcess() *)
                                                         SendCSkillList(tc);
 
                                                         // Colus, 20040303: Using newer packet to allow upper job changes
-                                                        WFIFOW(0, $01d7);
-                                                        WFIFOL(2, tc.ID);
-                                                        WFIFOB(6, 0);
-                                                        WFIFOW(7, i);
-                                                        WFIFOW(9, 0);
-                                                        SendBCmd(tm, tc.Point, 11);
+                                                        UpdateLook(tm, tc, 0, i);
+
                                                 end;
                                                 
                                                 sl.Free;
@@ -1941,12 +1907,7 @@ Begin(* Proc sv3PacketProcess() *)
             SendCStat(tc, true); // Add the true to recalc sprites
             SendCSkillList(tc);
             // Colus, 20040303: Using newer packet to allow upper job changes
-            WFIFOW(0, $01d7);
-            WFIFOL(2, tc.ID);
-            WFIFOB(6, 0);
-            WFIFOW(7, i);
-            WFIFOW(9, 0);
-            SendBCmd(tm, tc.Point, 11);
+            UpdateLook(tm, tc, 0, i);
           end;
         end;
       end //GM cmd #job
@@ -1980,11 +1941,7 @@ Begin(* Proc sv3PacketProcess() *)
         Val(Copy(str, 8, 256), i, k);
         if (k = 0) and (i >= 0) and (i <= 77) then begin
           tc.ClothesColor := i;
-          WFIFOW(0, $00c3);
-          WFIFOL(2, tc.ID);
-          WFIFOB(6, 7);
-          WFIFOB(7, i);
-          SendBCmd(tm, tc.Point, 8);
+          UpdateLook(tm, tc, 7, i, 0, true);
         end;
       end //GM cmd #ccolor
 
@@ -1996,11 +1953,7 @@ Begin(* Proc sv3PacketProcess() *)
         Val(Copy(str, 8, 256), i, k);
         if (k = 0) and (i >= 0) and (i <= 8) then begin
           tc.HairColor := i;
-          WFIFOW(0, $00c3);
-          WFIFOL(2, tc.ID);
-          WFIFOB(6, 6);
-          WFIFOB(7, i);
-          SendBCmd(tm, tc.Point, 8);
+          UpdateLook(tm, tc, 6, i, 0, true);
         end;
 
       end else if (Copy(str, 1, 7) = 'hstyle ') and (tid.ChangeColorStyle = 1) then begin
@@ -2008,11 +1961,7 @@ Begin(* Proc sv3PacketProcess() *)
         Val(Copy(str, 8, 256), i, k);
         if (k = 0) and (i >= 0) and (i <= 19) then begin
           tc.Hair := i;
-          WFIFOW(0, $00c3);
-          WFIFOL(2, tc.ID);
-          WFIFOB(6, 1);
-          WFIFOB(7, i);
-          SendBCmd(tm, tc.Point, 8);
+          UpdateLook(tm, tc, 1, i, 0, true);
         end;
       end //GM cmd #hstyle
 
@@ -3590,31 +3539,14 @@ end;
 					end;
 				end;
 
-                                // Tumy
 				CalcStat(tc);
-{C³}  SendCSkillList(tc);
-        {Colus, 20040114: Moved sprite processing to SendCStat call}
-{
-                                        if (tc.Item[w1].Data.IType = 4) then begin
+        SendCSkillList(tc);
 
-                                        WFIFOW(0, $01d7);
-                                        WFIFOL(2, tc.ID);
-                                        WFIFOB(6, 2);
-                                        WFIFOW(7, tc.Item[w1].Data.id);
-                                        WFIFOW(9, tc.Shield);
-                                        Socket.SendBuf(buf, 11);
-                                        end;
-                                        if tc.Item[w1].Data.IType = 5 then begin 
-                                           WFIFOW(0, $00c3);  // real packet is 01d7 not sand this pk
-      WFIFOL(2, tc.ID); 
-                              WFIFOB(6, 8); 
-                              WFIFOB(7, tc.Item[w1].Data.view); 
-                              Socket.SendBuf(buf, 8); 
-                                        end;  }
-            SendCStat(tc, true);
-            // Tumy
+        // Recalculate stats with sprite update
+        SendCStat(tc, true);
 
-         end;
+
+      end;
 		//--------------------------------------------------------------------------
 		$00ab: //ƒAƒCƒeƒ€‘•”õ‰ğœ
 			begin
@@ -3639,23 +3571,7 @@ end;
                                WFIFOB(6, 1);
                                Socket.SendBuf(buf, 7);
                             end;
-        {Colus, 20040114: Moved sprite processing to SendCStat call}
-{                                if (tc.Item[w].Data.IType = 4) then begin
-                                WFIFOW(0, $01d7);
-                                WFIFOL(2, tc.ID);
-                                WFIFOB(6, 2);
-                                WFIFOW(7, 0);
-                                WFIFOW(9, tc.Shield);
-                                Socket.SendBuf(buf, 11);
-                                end;
-                                if (tc.Item[w].Data.IType = 5) then begin
-                                WFIFOW(0, $00c3);
-                                WFIFOL(2, tc.ID);
-                                WFIFOB(6, 8);
-                                WFIFOB(7, 0);
-                                Socket.SendBuf(buf, 8);
-                                end;
- }
+
             CalcStat(tc);
             SendCStat(tc, true);
             // Tumy

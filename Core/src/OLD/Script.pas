@@ -500,13 +500,8 @@ begin
 					SendCStat(tc, true);
 					SendCSkillList(tc);
           // Colus, 20040304: New view packet for jobchange
-					WFIFOW(0, $01d7);
-					WFIFOL(2, tc.ID);
-					WFIFOB(6, 0);
-					WFIFOW(7, tc.JID);
-          WFIFOW(9, 0);
-					SendBCmd(tc.MData, tc.Point, 11); //ここまで
-                                   {バグ報告 657}
+          UpdateLook(tc.MData, tc, 0, tc.JID);
+
 					Inc(tc.ScriptStep);
 				end;
 			18: //viewpoint
@@ -632,12 +627,7 @@ begin
 					if (i >= 0) and (i <= 77) then begin
 						CalcStat(tc);
 						tc.ClothesColor := i;
-						WFIFOW(0, $00c3);
-						WFIFOL(2, tc.ID);
-						WFIFOB(6, 7);
-						WFIFOB(7, i);
-						tc.Socket.SendBuf(buf, 8);
-						SendBCmd(tc.MData, tc.Point, 8, tc);
+            UpdateLook(tc.MData, tc, 7, i, 0, true);
 					end;
 					Inc(tc.ScriptStep);
 				end;
@@ -957,11 +947,7 @@ begin
 {NPCイベント追加ココまで}
 					if (i >= 0) and (i <= 8) then begin
 						tc.HairColor := i;
-						WFIFOW(0, $00c3);
-						WFIFOL(2, tc.ID);
-						WFIFOB(6, 6);
-						WFIFOB(7, i);
-						SendBCmd(tc.MData, tc.Point, 8);
+            UpdateLook(tc.MData, tc, 6, i, 0, true);
 					end;
 					Inc(tc.ScriptStep);
 				end;
@@ -1473,17 +1459,8 @@ begin
               j := tc.HairColor;
 						  tc.Hair := i;
 
-							WFIFOW(0, $00c3);
-							WFIFOL(2, tc.ID);
-							WFIFOB(6, 1);
-							WFIFOB(7, i);
-							SendBCmd(tm, tc.Point, 8);
-
-							WFIFOW(0, $00c3);
-							WFIFOL(2, tc.ID);
-							WFIFOB(6, 6);
-							WFIFOB(7, j);
-							SendBCmd(tm, tc.Point, 8);
+              UpdateLook(tc.MData, tc, 1, i, 0, true);
+              UpdateLook(tc.MData, tc, 6, j, 0, true);
 					end;
 					Inc(tc.ScriptStep);
 				end;

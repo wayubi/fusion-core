@@ -1364,12 +1364,12 @@ var
 	DisableMonsterActive   :boolean;
 	AutoStart              :boolean;
 	DisableLevelLimit      :boolean;
-        DefaultZeny            :cardinal;
-        DefaultMap             :string;
-        DefaultPoint_X         :cardinal;
-        DefaultPoint_Y         :cardinal;
-        DefaultItem1           :cardinal;
-        DefaultItem2           :cardinal;
+  DefaultZeny            :cardinal;
+  DefaultMap             :string;
+  DefaultPoint_X         :cardinal;
+  DefaultPoint_Y         :cardinal;
+  DefaultItem1           :cardinal;
+  DefaultItem2           :cardinal;
 	EnableMonsterKnockBack :boolean;
 	DisableEquipLimit      :boolean;
 	ItemDropType           :boolean;
@@ -1377,10 +1377,11 @@ var
   ItemDropMultiplier     :integer;
 	ItemDropPer            :integer;
   StealMultiplier        :integer;
-  EnablePetSkills        :boolean;  
+  EnablePetSkills        :boolean;
+  EnableLowerClassDyes   :boolean;
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
-        Timer                  :boolean;
+  Timer                  :boolean;
 
 	FormLeft:integer;
 	FormTop:integer;
@@ -1718,6 +1719,7 @@ Option_Font_Style : string;
 		procedure KillGuildRelation(tg:TGuild; tg1:TGuild; tc:TChara; tc1:TChara; RelType:byte);
 		function  LoadEmblem(tg:TGuild) : word;
 		procedure SaveEmblem(tg:TGuild; size:cardinal);
+    procedure UpdateLook(tm:TMap; tv:TLiving; option:byte; val1: word; val2: word = 0; use00c3: boolean = false);
 //------------------------------------------------------------------------------
 {アジト機能追加}
 		procedure SetFlagValue(tc:TChara; str:string; svalue:string);
@@ -1738,6 +1740,35 @@ implementation
 
 uses SQLData, FusionSQL;
 
+procedure UpdateLook(tm:TMap; tv:TLiving; option:byte; val1: word; val2: word; use00c3: boolean);
+begin
+  // Notes:
+  // Options for 'option' are
+  //  0: body (job), 1: hairstyle, 2: weapon, 3: head (lower), 4: head (upper),
+  //  5: head (mid), 6: hair color, 7: clothes color, 8: shield, 9: shoes.
+  //  (Shoes are not implemented yet it seems).
+  // IF you use the old 00c3 system, val1 can only be a byte.  val2 is ignored.
+  // IF you use the new system, and have an equipment update, shield ID goes in val2.
+  // IF you change clothing color and are lower class, EnableLowerClassDyes must be true.
+  // Why use Use00c3?  It saves a few bytes IF you don't need to update.
+
+  if (option = 7) and (tv.JID < UPPER_JOB_BEGIN) and (EnableLowerClassDyes = false) then exit;
+
+  if (use00c3) then begin
+    WFIFOW(0, $00c3);
+    WFIFOL(2, tv.ID);
+    WFIFOB(6, option);
+    WFIFOB(7, val1);
+    SendBCmd(tm, tv.Point, 8);
+  end else begin
+    WFIFOW(0, $01d7);
+    WFIFOL(2, tv.ID);
+    WFIFOB(6, option);
+    WFIFOW(7, val1);
+    WFIFOW(9, val2);
+    SendBCmd(tm, tv.Point, 11);
+  end;
+end;
 //==============================================================================
 {追加}
 procedure PickUpItem(tc:TChara; l:Cardinal);
@@ -3401,43 +3432,18 @@ begin
 	WFIFOW(2, tc.Range);
 	tc.Socket.SendBuf(buf, 4);
 
-//Tumy
-if View then begin
-      WFIFOW(0, $00c3);
-      WFIFOL(2, tc.ID);
-      //WFIFOB(6, 2);
-      //WFIFOB(7, tc.Weapon);
-      //tc.Socket.SendBuf(buf, 8); // patket change for view weapon
-      WFIFOB(6, 3);
-      WFIFOB(7, tc.Head3);
-      SendBCmd(tc.MData, tc.Point, 8);
-      //tc.Socket.SendBuf(buf, 8);
-      WFIFOB(6, 4);
-      WFIFOB(7, tc.Head1);
-      SendBCmd(tc.MData, tc.Point, 8);
-      //tc.Socket.SendBuf(buf, 8);
-      WFIFOB(6, 5);
-      WFIFOB(7, tc.Head2);
-      SendBCmd(tc.MData, tc.Point, 8);
-      //tc.Socket.SendBuf(buf, 8);
-      //WFIFOB(6, 8);
-      //WFIFOB(7, tc.Shield);
-      //tc.Socket.SendBuf(buf, 8); // patket change for view Shield
+  // Update the character's view packets if necessary.
+  if View then begin
+    UpdateLook(tc.MData, tc, 3, tc.Head3, 0, true);
+    UpdateLook(tc.MData, tc, 4, tc.Head1, 0, true);
+    UpdateLook(tc.MData, tc, 5, tc.Head2, 0, true);
+    if (tc.Shield <> 0) then begin
+      UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.Shield);
+    end else begin
+      UpdateLook(tc.MData, tc, 2, tc.WeaponSprite[0], tc.WeaponSprite[1]);
+    end;
 
-      {Colus, 20040114: Using new weapon sprite display packet.}
-      WFIFOW(0, $01d7);
-      WFIFOL(2, tc.ID);
-      WFIFOB(6, 2);
-      WFIFOW(7, tc.WeaponSprite[0]);
-      if (tc.Shield <> 0) then begin
-        WFIFOW(9, tc.Shield);
-      end else begin
-        WFIFOW(9, tc.WeaponSprite[1]);
-      end;
-      SendBCmd(tc.MData, tc.Point, 11);
-      //tc.Socket.SendBuf(buf, 11);
-end;
-// Tumy
+  end;
 
 end;
 //------------------------------------------------------------------------------
@@ -4875,9 +4881,11 @@ begin
         with tgc do begin
           // No check of j.  Castle wouldn't have been made w/o a proper guild ID.
           j := GuildList.IndexOf(tgc.GID);
-          tg := GuildList.Objects[j] as TGuild;
-          w1 := tg.Emblem;
-					w2 := tg.ID;
+          if (j <> -1) then begin
+            tg := GuildList.Objects[j] as TGuild;
+            w1 := tg.Emblem;
+  					w2 := tg.ID;
+          end;
         end;
       end;
 		end; 
