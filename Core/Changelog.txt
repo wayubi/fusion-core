@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 02-27-04: Restructuring SQL Format; Part 2/3 - Character Variables & Converter. [AlexKreuz]
 - 02-27-04: Fixed SQL Error regarding guild positions. [AlexKreuz]
 - 02-26-04: Added more Pet Skills. About 80% Done. [Darkhelmet]
 - 02-25-04: Added Hunter Fly Pet Skill. [Darkhelmet]

@@ -758,13 +758,18 @@ var
 	ta : TMapList;
 	tp  :TPlayer;
 	tpa :TParty;
+	sl  :TStringList;
     str :string;
 begin
+	sl := TStringList.Create;
+	sl.QuoteChar := '"';
+	sl.Delimiter := ',';
+
   Result := False;
 
 	DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
-	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM characters AS C ' + format('LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
+	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem, V.flagdata FROM characters AS C ' + format('LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) LEFT JOIN character_flags AS T ON (V.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
 	begin
 		SQLDataSet.First;
     if not SQLDataSet.Eof then begin
@@ -953,6 +958,11 @@ begin
 				end;
       end;
 
+            sl.DelimitedText := SQLDataSet.FieldValues['flagdata'];
+			for i := 0 to (sl.Count - 1) do begin
+                tc.Flag.Add(sl.Strings[i]);
+            end;
+
 			CharaName.AddObject(tc.Name, tc);
 		  Chara.AddObject(tc.CID, tc);
 
@@ -1026,6 +1036,11 @@ begin
   {删除人物MEMO记录点资料}
 	if not ExecuteSqlCmd(format('DELETE FROM warpmemo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete warpInfo data from MySQL Error: %d', [GID]));
+		Exit;
+	end;
+
+	if not ExecuteSqlCmd(format('DELETE FROM character_flags WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+    DebugOut.Lines.Add(format('Delete character_flag data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
 
@@ -1478,7 +1493,11 @@ function  SaveCharaData(tc : TChara) : Boolean;
 var
   bindata : String;
 	j :integer;
+    sl :TStringList;
 begin
+	sl := TStringList.Create;
+	sl.QuoteChar := '"';
+	sl.Delimiter := ',';
   Result := False;
 	with tc do begin
 		bindata := '(GID,Name,JID,BaseLV,BaseEXP,StatusPoint,JobLV,JobEXP,SkillPoint,Zeny,Stat1,Stat2,Options,Karma,Manner,HP,SP,DefaultSpeed,Hair,_2,_3,Weapon,Shield,Head1,Head2,Head3,HairColor,';
@@ -1594,6 +1613,18 @@ begin
 		{保存人物MEMO记录点资料}
 		if not ExecuteSqlCmd(Format('REPLACE INTO warpmemo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, addslashes(MemoMap[0]), MemoPoint[0].X, MemoPoint[0].Y, addslashes(MemoMap[1]), MemoPoint[1].X, MemoPoint[1].Y, addslashes(MemoMap[2]), MemoPoint[2].X, MemoPoint[2].Y])) then begin
 		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
+			Exit;
+		end;
+
+        sl.Clear;
+        for j := 0 to tc.Flag.Count - 1 do begin
+            if ((Copy(tc.Flag.Names[j], 1, 1) <> '@') and (Copy(tc.Flag.Names[j], 1, 2) <> '$@')) and ((tc.Flag.Values[tc.Flag.Names[j]] <> '0') and (tc.Flag.Values[tc.Flag.Names[j]] <> '')) then begin
+                sl.Add(tc.Flag.Strings[j]);
+            end;
+        end;
+
+		if not ExecuteSqlCmd(Format('REPLACE INTO character_flags (GID,flagdata) VALUES (''%d'',''%s'')', [CID, sl.DelimitedText])) then begin
+		  DebugOut.Lines.Add('*** Save Character Flags data error.');
 			Exit;
 		end;
 	end;
