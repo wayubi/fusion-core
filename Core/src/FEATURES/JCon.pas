@@ -416,7 +416,7 @@ uses
     	if (frmMain.listbox2.ItemIndex = -1) then Exit;
 
 		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
-	    frmMain.Edit7.Text := tc.Name;
+	    frmMain.Label134.Caption := tc.Name;
     	frmMain.Edit9.Text := IntToStr(tc.CID);
         if (tc.JID > LOWER_JOB_END) then frmMain.Edit10.Text := IntToStr(tc.JID - UPPER_JOB_BEGIN + LOWER_JOB_END)
         else frmMain.Edit10.Text := IntToStr(tc.JID);
@@ -468,10 +468,10 @@ uses
     var
         tc : TChara;
 	begin
-    	if (frmMain.Edit7.Text = '') then begin
+    	if (frmMain.ListBox2.ItemIndex = -1) then begin
         	Exit;
-        end else if CharaName.IndexOf(frmMain.Edit7.Text) <> -1 then begin
-			tc := CharaName.Objects[CharaName.IndexOf(frmMain.Edit7.Text)] as TChara;
+        end else if CharaName.IndexOf(frmMain.Label134.Caption) <> -1 then begin
+			tc := CharaName.Objects[CharaName.IndexOf(frmMain.Label134.Caption)] as TChara;
 
         if assigned(tc) then begin
             if assigned(tc.Socket) then begin
@@ -481,7 +481,6 @@ uses
             end;
         end;
 
-        tc.Name := frmMain.Edit7.Text;
         tc.CID := StrToInt(frmMain.Edit9.Text);
         if StrToInt(frmMain.Edit10.Text) > LOWER_JOB_END then
             tc.JID := (StrToInt(frmMain.Edit10.Text) - LOWER_JOB_END + UPPER_JOB_BEGIN)
