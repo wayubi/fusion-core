@@ -348,6 +348,27 @@ begin
 	end else begin
 		ItemDropPer := 10000;
 	end;
+{Colus, 20031222: ItemDropMultiplier works like this:
+    Default value is 1.
+    Making it higher than 1 will make IDD = 10000/IDM (which is a xIDM drop rate)
+    Maximum value is 10000.  Higher values become 10K.  (10000x drops?  Ugh...)
+    Values of 0 or less default to 1.
+
+    * The checking is done here so that we don't repeat it for every single drop.
+    * You currently can play with IDD and IDP independently.  They do the same
+      thing...I would rather see people use one or the other, but it's their
+      call.
+}
+ 	if sl.IndexOfName('ItemDropMultiplier') <> -1 then begin
+		ItemDropMultiplier := StrToInt(sl.Values['ItemDropMultiplier']);
+    if ItemDropMultiplier <= 1 then begin
+      ItemDropMultiplier := 1;
+    end else if ItemDropMultiplier > 10000 then begin
+      ItemDropMultiplier := 10000;
+    end;
+	end else begin
+		ItemDropMultiplier := 1;
+	end;
 	if sl.IndexOfName('DisableFleeDown') <> -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
@@ -583,6 +604,7 @@ begin
 	ini.WriteString('Server', 'ItemDropType', BoolToStr(ItemDropType, true));
 	ini.WriteString('Server', 'ItemDropDenominator', IntToStr(ItemDropDenominator));
 	ini.WriteString('Server', 'ItemDropPer', IntToStr(ItemDropPer));
+ 	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
 	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
 	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
         ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
@@ -1385,11 +1407,14 @@ end;
   if (ts.isSlave = false) then begin
 	for k := 0 to 7 do begin
 		DropFlag := false;
-		i := (ItemDropDenominator - ((ItemDropDenominator - ts.Data.Drop[k].Per) * 10000 div ItemDropPer));
+
+{Colus, 20031222: Added ItemDropMultiplier to the calc.  It modifies IDD.}
+    j := ItemDropDenominator div ItemDropMultiplier;
+		i := (j - ((j - ts.Data.Drop[k].Per) * 10000 div ItemDropPer));
 		if ItemDropType then begin
-			if Random(ItemDropDenominator) <= i then DropFlag := true; //重力仕様。リンゴを落とす。
+			if Random(j) <= i then DropFlag := true; //重力仕様。リンゴを落とす。
 		end else begin
-			if Random(ItemDropDenominator) < i then DropFlag := true; //本来の(?)仕様。リンゴは落とさない。
+			if Random(j) < i then DropFlag := true; //本来の(?)仕様。リンゴは落とさない。
 		end;
 		if DropFlag then begin
 			tn := TNPC.Create;
@@ -11948,10 +11973,10 @@ begin
         					SendBCmd(tm, tc.Point, 13);
                 end;
 							end;
-                                                261:    {Call Spirits}
-                                                        begin
-                                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
-                                                        end;
+             261:    {Call Spirits}
+              begin
+                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+              end;
 					end;
 					//アイコン表示解除
           if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
