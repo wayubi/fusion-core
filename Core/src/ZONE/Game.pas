@@ -3777,10 +3777,13 @@ end;
 			begin
 				str := RFIFOS(2, 24);
 				if (tc.Skill[1].Lv < 7) and (not DisableSkillLimit) then begin
-					//本来ならレベル不足のパケを出す？
-					WFIFOW( 0, $00fa);
-					WFIFOB( 2, 1);         // 1:同名～ 2:既に～
-					Socket.SendBuf(buf, 3);
+          { Mitch: Fix (Bug #394) }
+          str := 'You must be at least Basic Skill Level 7 to create a party!';
+          w := Length(str) + 4;
+          WFIFOW (0, $009a);
+          WFIFOW (2, w);
+          WFIFOS (4, str, w - 4);
+          tc.socket.sendbuf(buf, w);
 				end else begin
 					if tc.PartyName <> '' then begin
 						i := 2;
