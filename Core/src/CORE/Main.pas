@@ -3548,7 +3548,7 @@ with tc do begin
             begin  HeadDir := 0; dx :=  0; dy :=	0; end; //–{—ˆ‚Í‹N‚±‚é‚Í‚¸‚ª‚È‚¢
         end;
         Inc(ppos);
-        DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
+        //DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
     
         for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
             for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin
@@ -3558,7 +3558,7 @@ with tc do begin
                     if ((dx <> 0) and (abs(xy.Y - tn.Point.Y) < 16) and (xy.X = tn.Point.X + dx * 15)) or
                     ((dy <> 0) and (abs(xy.X - tn.Point.X) < 16) and (xy.Y = tn.Point.Y + dy * 15)) then begin
                         //DebugOut.Lines.Add(IntToStr(tn.Item.Identify));
-                        DebugOut.Lines.Add(Format('		NPC %s Delete', [tn.Name]));
+                        //DebugOut.Lines.Add(Format('		NPC %s Delete', [tn.Name]));
 
                         if tn.CType = 3 then begin
                             WFIFOW(0, $00a1);
@@ -3578,7 +3578,7 @@ with tc do begin
                     
                     if ((dx <> 0) and (abs(Point.Y - tn.Point.Y) < 16) and (Point.X = tn.Point.X - dx * 15)) or
                     ((dy <> 0) and (abs(Point.X - tn.Point.X) < 16) and (Point.Y = tn.Point.Y - dy * 15)) then begin
-                        DebugOut.Lines.Add(Format('		NPC %s Add', [tn.Name]));
+                        //DebugOut.Lines.Add(Format('		NPC %s Add', [tn.Name]));
 
                         //if tn.CType = 2 then begin
                             //SendNData(Socket, tn, tc.ver2);
@@ -3587,7 +3587,7 @@ with tc do begin
                         if (tn.Enable = true) then begin
                             SendNData(Socket, tn, tc.ver2);
                             if (tn.ScriptInitS <> -1) and (tn.ScriptInitD = false) then begin
-                                DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
+                                //DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn.ID]));
     
                                 tc1 := TChara.Create;
                                 tc1.TalkNPCID := tn.ID;
@@ -3634,7 +3634,7 @@ with tc do begin
                     if tc <> tc1 then begin
                         if ((dx <> 0) and (abs(xy.Y - tc1.Point.Y) < 16) and (xy.X = tc1.Point.X + dx * 15)) or
                         ((dy <> 0) and (abs(xy.X - tc1.Point.X) < 16) and (xy.Y = tc1.Point.Y + dy * 15)) then begin
-                            DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
+                            //DebugOut.Lines.Add(Format('		Chara %s Delete', [tc1.Name]));
                             
                             WFIFOW(0, $0080);
                             WFIFOL(2, ID);
@@ -3646,13 +3646,13 @@ with tc do begin
     
                         if ((dx <> 0) and (abs(Point.Y - tc1.Point.Y) < 16) and (Point.X = tc1.Point.X - dx * 15)) or
                         ((dy <> 0) and (abs(Point.X - tc1.Point.X) < 16) and (Point.Y = tc1.Point.Y - dy * 15)) then begin
-                            DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
+                            //DebugOut.Lines.Add(Format('		Chara %s Add', [tc1.Name]));
     
                             SendCData(tc, tc1);
                             SendCData(tc1, tc);
                             
                             if (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
-                                DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
+                                //DebugOut.Lines.Add(Format('		Chara %s Move (%d,%d)-(%d,%d)', [Name, xy.X, xy.Y, Point.X, Point.Y]));
     
                                 SendCMove(tc1.Socket, tc, Point, tgtPoint);
                             end;
@@ -3666,7 +3666,7 @@ with tc do begin
 
                     if ((dx <> 0) and (abs(xy.Y - ts.Point.Y) < 16) and (xy.X = ts.Point.X + dx * 15)) or
                     ((dy <> 0) and (abs(xy.X - ts.Point.X) < 16) and (xy.Y = ts.Point.Y + dy * 15)) then begin
-                        DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
+                        //DebugOut.Lines.Add(Format('		Mob %s Delete', [ts.Name]));
                         
                         UpdateMonsterDead(tm, ts, 0);
                         {WFIFOW(0, $0080);
@@ -3677,7 +3677,7 @@ with tc do begin
 
                     if ((dx <> 0) and (abs(Point.Y - ts.Point.Y) < 16) and (Point.X = ts.Point.X - dx * 15)) or
                     ((dy <> 0) and (abs(Point.X - ts.Point.X) < 16) and (Point.Y = ts.Point.Y - dy * 15)) then begin
-                        DebugOut.Lines.Add(Format('		Mob %s Add', [ts.Name]));
+                        //DebugOut.Lines.Add(Format('		Mob %s Add', [ts.Name]));
                         
                         SendMData(Socket, ts);
 
@@ -3690,7 +3690,7 @@ with tc do begin
         end;
 
         if (xy.X div 8 <> Point.X div 8) or (xy.Y div 8 <> Point.Y div 8) then begin
-        DebugOut.Lines.Add(Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
+            //DebugOut.Lines.Add(Format('		BlockMove (%d,%d)-(%d,%d)', [xy.X div 8, xy.Y div 8, Point.X div 8, Point.Y div 8]));
 
             with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
                 //DebugOut.Lines.Add('BlockDelete ' + inttostr(IndexOf(IntToStr(ID))));
@@ -3698,7 +3698,7 @@ with tc do begin
             end;
             
             tm.Block[Point.X div 8][Point.Y div 8].CList.AddObject(ID, tc);
-            DebugOut.Lines.Add('		BlockMove OK');
+            //DebugOut.Lines.Add('		BlockMove OK');
         end;
 
         if (tm.gat[Point.X][Point.Y] <> 1) and (tm.gat[Point.X][Point.Y] <> 5) then begin
@@ -3751,7 +3751,7 @@ with tc do begin
             end;
             }
             
-            DebugOut.Lines.Add(Format('		Move OK', [ID]));
+            //DebugOut.Lines.Add(Format('		Move OK', [ID]));
             break;
         end;
         
