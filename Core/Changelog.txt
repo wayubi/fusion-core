@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+
+- 01-29-04: Added garment card effects. [Colus]
 - 01-29-04: Fixed #117 - Turning off "Act Dead" doesn't display on other people's screens. [AlexKreuz]
 - 01-29-04: Fixed #113 - Archer Type Monsters can not attack through walls anymore. [AlexKreuz]
 - 01-29-04: Added email validation to -pword command. [Mitch]
