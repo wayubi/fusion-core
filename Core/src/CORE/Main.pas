@@ -5,7 +5,7 @@ interface
 uses
 	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock, ComCtrls,
-	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, Buttons;
+	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons;
 
 const
 	REALTIME_PRIORITY_CLASS = $100;
@@ -195,6 +195,10 @@ begin
 
 	MobDB := TIntList32.Create;
 	MobDB.Sorted := true;
+
+        MobAIDB := TIntList32.Create;
+        MobAIDB.Sorted := true;
+
 	MobDBName := TStringList.Create;
 	MobDBName.CaseSensitive := True;
         SlaveDBName := TStringList.Create;
