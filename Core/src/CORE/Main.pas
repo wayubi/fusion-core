@@ -118,7 +118,9 @@ type
 		{ Public 宣言 }
 		// AlexKreuz Online Timer
 		OnlineTime, ElapsedT: integer;
-		ElapsedD, ElapsedH, ElapsedM, ElapsedS: double;
+
+//		ElapsedD, ElapsedH, ElapsedM, ElapsedS: double;
+		ElapsedD, ElapsedH, ElapsedM, ElapsedS: DWORD;
 		// AlexKreuz Online Timer
 
 
@@ -1194,6 +1196,9 @@ begin
 		FormWidth := Width;
 		FormHeight := Height;
 	end;
+	StatusBar1.Panels[1].Width := 300;
+	StatusBar1.Panels[0].Width := FormWidth - 300;
+	// Keep the timer portion of the panels the same.
 end;
 //------------------------------------------------------------------------------
 //procedure TfrmMain.cbxPriorityClick(Sender: TObject);
@@ -1252,7 +1257,7 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.sv1ClientRead(Sender: TObject; Socket: TCustomWinSocket);
 begin
-  try
+	try
 	sv1PacketProcess(Socket);
   except
     exit;
@@ -1298,19 +1303,13 @@ end;
 procedure TfrmMain.sv2ClientRead(Sender: TObject;
 	Socket: TCustomWinSocket);
 begin
-  try
+	try
 	sv2PacketProcess(Socket);
-  except
-    exit;
-  end;
+	except
+		exit;
+	end;
 end;
 //==============================================================================
-
-
-
-
-
-
 
 
 
@@ -9194,9 +9193,9 @@ end;//func TFrmMain.DamageOverTime()
 //------------------------------------------------------------------------------
 procedure TfrmMain.cmdStartClick(Sender: TObject);
 var
-        DelDelayNum     :integer;       // mf
-        DelPoint        :TPoint;        // mf
-		DelCount        :integer;       // mf
+	DelDelayNum     :integer;       // mf
+	DelPoint        :TPoint;        // mf
+	DelCount        :integer;       // mf
 
 	i,j,k,l,m,n,a,b,c:integer;
 	i1,j1,k1:integer;
@@ -9207,21 +9206,21 @@ var
 	//tp1:TPlayer;
 	tc1:TChara;
 	tm:TMap;
-        mi:MapTbl;
+	mi:MapTbl;
 	tn:TNPC;
 	ts:TMob;
 	ts1:TMob;
 	ts2:TMob;
-        CastingMonster:TMob;  //Get if a monster is casting a skill
+	CastingMonster:TMob;  //Get if a monster is casting a skill
 	tk	:TSkill;
 	tl	:TSkillDB;
 	spd:cardinal;
 	Tick1:cardinal;
 	xy:TPoint;
-        xy2:TPoint;
+	xy2:TPoint;
 	dx,dy:integer;
-    rx,ry:integer;
-    r:integer;
+	rx,ry:integer;
+	r:integer;
 	DropFlag:boolean;
 	SkillProcessType:byte;
 	sl:TStringList;
@@ -9233,287 +9232,285 @@ var
 	tr      :NTimer;
 {NPCイベント追加ココまで}
 
-    zfile :TZip;
+	zfile :TZip;
 
 label ExitWarpSearch;
 begin
 
-        edit1.SetFocus;
+	edit1.SetFocus;
 
 	sl := TStringList.Create;
 	try
-	cmdStart.Enabled := false;
-  
-	sv1.Active := true;
-	sv2.Active := true;
-	sv3.Active := true;
+		cmdStart.Enabled := false;
 
-	ServerRunning := true;
-	cmdStop.Enabled := true;
-	TickCheckCnt := 0;
+		sv1.Active := true;
+		sv2.Active := true;
+		sv3.Active := true;
 
-        OnlineTime := timeGetTime(); // AlexKreuz
+		ServerRunning := true;
+		cmdStop.Enabled := true;
+		TickCheckCnt := 0;
 
-        DelDelayNum := 0; // mf
+		OnlineTime := timeGetTime(); // AlexKreuz
 
-	repeat
+		DelDelayNum := 0; // mf
 
-                DelCount := 0;                                                            // mf
-                repeat                                                                    // mf
-                        if (DelPointX[DelDelayNum] <> 0) and (DelWait[DelDelayNum] + 5000 < Tick) then begin    // mf
-                                DelPoint.X := DelPointX[DelDelayNum];                     // mf
-                                DelPoint.Y := DelPointY[DelDelayNum];                     // mf
-                           	WFIFOW( 0, $0080);                                        // mf
-                	        WFIFOL( 2, DelID[DelDelayNum]);                           // mf
-                	        WFIFOB( 6, 1);                                            // mf
-                	        SendBCmd(tm, DelPoint, 7);                                // mf
-                                DelPointX[DelDelayNum] := 0;                              // mf
-                                DelPointY[DelDelayNum] := 0;                              // mf
-                                DelID[DelDelayNum] := 0;                                  // mf
-                                DelWait[DelDelayNum] := 0;                                // mf
-                        end;                                                              // mf
-                                                                                          // mf
-                        DelDelayNum := DelDelayNum + 1;                                   // mf
-                                                                                          // mf
-                        if DelDelayNum > 999 then DelDelayNum := 0;                       // mf
-                        DelCount := DelCount + 1;                                         // mf
-                until DelCount > 9;                                                       // mf
-        //if Timer = true then begin
+		repeat
 
-		Tick := timeGetTime();
-
-                // AlexKreuz Online Time
-                ElapsedT := (Tick - Cardinal(OnlineTime));
-
-                ElapsedD := int (ElapsedT / 86400000);
-                ElapsedT := ElapsedT Mod 86400000;
-
-                ElapsedH := int (ElapsedT / 3600000);
-                ElapsedT := ElapsedT Mod 3600000;
-
-                ElapsedM := int (ElapsedT / 60000);
-                ElapsedT := ElapsedT Mod 60000;
-
-                ElapsedS := int (ElapsedT / 1000);
-
-                //statusbar1.Panels.Items[1].Text := floattostr(ElapsedT);
-                statusbar1.Panels.Items[2].Text := floattostr(ElapsedD) +' Days, '+ floattostr(ElapsedH) +' Hours, '+ floattostr(ElapsedM) +' Minutes, '+ floattostr(ElapsedS) +' Seconds.    '; // AlexKreuz (Status Bar)
-        //end;
-                // AlexKreuz Online Time
-
-
-		for i := 0 to CharaName.Count - 1 do begin
-			tc := CharaName.Objects[i] as TChara;
-			if tc.Login <> 2 then continue;  //Character is logged in
-			with tc do begin
-				tm := MData;
-				if tm = nil then continue;
-                                mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
-
-				if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin
-					AutoAction(tc,Tick);
+			// mf
+			DelCount := 0;
+			repeat
+				if (DelPointX[DelDelayNum] <> 0) and (DelWait[DelDelayNum] + 5000 < Tick) then begin
+					DelPoint.X := DelPointX[DelDelayNum];
+					DelPoint.Y := DelPointY[DelDelayNum];
+					WFIFOW( 0, $0080);
+					WFIFOL( 2, DelID[DelDelayNum]);
+					WFIFOB( 6, 1);
+					SendBCmd(tm, DelPoint, 7);
+					DelPointX[DelDelayNum] := 0;
+					DelPointY[DelDelayNum] := 0;
+					DelID[DelDelayNum] := 0;
+					DelWait[DelDelayNum] := 0;
 				end;
+				DelDelayNum := DelDelayNum + 1;
+				if DelDelayNum > 999 then DelDelayNum := 0;
+				DelCount := DelCount + 1;
+			until DelCount > 9;
+			//mf
+
+			Tick := timeGetTime();
+			// AlexKreuz Online Time
+			// ChrstphrR 2004/06/02 - minor rewrite, all integer math/types now
+			ElapsedT := (Tick - Cardinal(OnlineTime));
+
+			ElapsedD := (ElapsedT div 86400000);
+			ElapsedT := ElapsedT Mod 86400000;
+
+			ElapsedH := (ElapsedT div 3600000);
+			ElapsedT := ElapsedT Mod 3600000;
+
+			ElapsedM := (ElapsedT div 60000);
+			ElapsedT := ElapsedT Mod 60000;
+
+			ElapsedS := (ElapsedT div 1000);
+
+			StatusBar1.Panels[1].Text := Format(
+				'%d Days, %d Hours, %d Minutes, %d Seconds',
+				[ ElapsedD, ElapsedH, ElapsedM, ElapsedS ]
+			); // AlexKreuz (Status Bar)
+			// AlexKreuz Online Time
 
 
-            // This code checks to see if you are in attack mode.
-            // If you are this code will check to see if you and the mob share the same spot.
-            // If you do this code will move you to a random spot 1 tc.Range away from the mob.
-            // Purpose: Created to fix bug where you stop attacking when you and mob
-            // share same spot.
-						if (AMode = 1) or (AMode = 2) then begin
-                ts := AData;
-                if ( (ts.Point.x = tc.Point.x) and (ts.Point.y = tc.Point.Y) ) then begin
-                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'stuck');
-                    k := 0;
-                    r := 0;
-                    while ( (k = 0) and (r < 100) ) do begin
-                        Randomize;
-                        rx := randomrange(-tc.Range,tc.Range) + tc.Point.X;
-                        Randomize;
-                        ry := randomrange(-tc.Range,tc.Range) + tc.Point.Y;
-                        k := Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, rx, ry, 1);
-                        inc(r);
-                    end;
+			for i := 0 to CharaName.Count - 1 do begin
+				tc := CharaName.Objects[i] as TChara;
+				if tc.Login <> 2 then continue;  //Character is logged in
+				with tc do begin
+					tm := MData;
+					if tm = nil then continue;
+					mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 
-                    if ( (k <> 0) ) then begin
-                        NextFlag := true;
-                        nextpoint.X := rx;
-                        nextpoint.Y := ry;
-                    end;
-                end;
-            end;
-            // End Code: AlexKreuz
+					if (Sit <> 1) and (Auto <> 0) and (ActTick < Tick) then begin
+						AutoAction(tc,Tick);
+					end;
 
 
-				//Able to move
-				if (pcnt <> 0)  then begin
-                                        if (Path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
-					if MoveTick + spd <= Tick then begin
-{修正}
-						if CharaMoving(tc,Tick) then begin
-							goto ExitWarpSearch;
+					// This code checks to see if you are in attack mode.
+					// If you are this code will check to see if you and the mob share the same spot.
+					// If you do this code will move you to a random spot 1 tc.Range away from the mob.
+					// Purpose: Created to fix bug where you stop attacking when you and mob
+					// share same spot.
+					if (AMode = 1) or (AMode = 2) then begin
+						ts := AData;
+						if ( (ts.Point.x = tc.Point.x) and (ts.Point.y = tc.Point.Y) ) then begin
+							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'stuck');
+							k := 0;
+							r := 0;
+							while ( (k = 0) and (r < 100) ) do begin
+								Randomize;
+								rx := randomrange(-tc.Range,tc.Range) + tc.Point.X;
+								Randomize;
+								ry := randomrange(-tc.Range,tc.Range) + tc.Point.Y;
+								k := Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, rx, ry, 1);
+								inc(r);
+							end;
+
+							if ( (k <> 0) ) then begin
+								NextFlag := true;
+								nextpoint.X := rx;
+								nextpoint.Y := ry;
+							end;
 						end;
-{修正ココまで}
-                                        end;
-				end;
+					end;
+					// End Code: AlexKreuz
 
-{U0x003b}
-			try
-				//追加移動処理
-				if NextFlag and (DmgTick <= Tick) then begin
-					if (tm.Size.X < NextPoint.X) or (tm.Size.Y < NextPoint.Y) then begin
-						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
-					end else begin
-                                        /// alexkreuz: xxx
-//					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
-					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) and (tc.FreezeTick < Tick) and (tc.StoneTick < Tick) then begin
-						//追加移動
-						AMode := 0;
 
-                                                { Alex: Currently Unexplored - Type 1 for safety }
-                                                k := Path_Finding(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y, 1);
-						if k <> 0 then begin
-							if pcnt = 0 then MoveTick := Tick;
-								pcnt := k;
-								ppos := 0;
-								Sit := 0;
-								tgtPoint := NextPoint;
-								//経路探索OK
-								WFIFOW(0, $0087);
-								WFIFOL(2, MoveTick);
-								WFIFOM2(6, NextPoint, Point);
-								WFIFOB(11, 0);
-								Socket.SendBuf(buf, 12);
-								//ブロック処理
-								for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
-									for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
-										//周りの人に通知&周りにいる人を表示させる
-										for k := 0 to tm.Block[m][n].CList.Count - 1 do begin
-											tc1 := tm.Block[m][n].CList.Objects[k] as TChara;
-											if (tc <> tc1) and (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
-												SendCMove(tc1.Socket, tc, Point, NextPoint);
-{チャットルーム機能追加}
-												//周辺のチャットルームを表示
-												ChatRoomDisp(tc.Socket, tc1);
-{チャットルーム機能追加ココまで}
-{露店スキル追加}
-												//周辺の露店を表示
-												VenderDisp(tc.Socket, tc1);
-{露店スキル追加ココまで}
+					//Able to move
+					if (pcnt <> 0)  then begin
+						if (Path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
+
+						if MoveTick + spd <= Tick then begin
+	{修正}
+							if CharaMoving(tc,Tick) then begin
+								goto ExitWarpSearch;
+							end;
+	{修正ココまで}
+						end;
+					end;
+
+	{U0x003b}
+					try
+					//追加移動処理
+						if NextFlag and (DmgTick <= Tick) then begin
+							if (tm.Size.X < NextPoint.X) or (tm.Size.Y < NextPoint.Y) then begin
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
+							end else begin
+								/// alexkreuz: xxx
+	//						if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
+								if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) and (tc.FreezeTick < Tick) and (tc.StoneTick < Tick) then begin
+									//追加移動
+									AMode := 0;
+
+									{ Alex: Currently Unexplored - Type 1 for safety }
+									k := Path_Finding(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y, 1);
+									if k <> 0 then begin
+										if pcnt = 0 then MoveTick := Tick;
+										pcnt := k;
+										ppos := 0;
+										Sit := 0;
+										tgtPoint := NextPoint;
+										//経路探索OK
+										WFIFOW(0, $0087);
+										WFIFOL(2, MoveTick);
+										WFIFOM2(6, NextPoint, Point);
+										WFIFOB(11, 0);
+										Socket.SendBuf(buf, 12);
+										//ブロック処理
+										for n := Point.Y div 8 - 2 to Point.Y div 8 + 2 do begin
+											for m := Point.X div 8 - 2 to Point.X div 8 + 2 do begin
+												//周りの人に通知&周りにいる人を表示させる
+												for k := 0 to tm.Block[m][n].CList.Count - 1 do begin
+													tc1 := tm.Block[m][n].CList.Objects[k] as TChara;
+													if (tc <> tc1) and (abs(Point.X - tc1.Point.X) < 16) and (abs(Point.Y - tc1.Point.Y) < 16) then begin
+														SendCMove(tc1.Socket, tc, Point, NextPoint);
+	{チャットルーム機能追加}
+														//周辺のチャットルームを表示
+														ChatRoomDisp(tc.Socket, tc1);
+	{チャットルーム機能追加ココまで}
+	{露店スキル追加}
+														//周辺の露店を表示
+														VenderDisp(tc.Socket, tc1);
+	{露店スキル追加ココまで}
+													end;
+												end;
 											end;
 										end;
 									end;
+								end else begin
+									Sit := 3;
 								end;
+								NextFlag := false;
 							end;
-						end else begin
-							Sit := 3;
 						end;
-						NextFlag := false;
+					except
+						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
 					end;
-				end;
-			except
-				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Move processing error');
-			end;
 
-												//Auto Attacking
-				if (AMode = 1) or (AMode = 2) then begin
-					if (tc.Sit = 1) or (tc.Option and 6 <> 0) then begin
-						AMode := 0;
-					end else if ATick + ADelay < Tick then begin
-						if (tm.CList.IndexOf(tc.ATarget) <> -1) and ((mi.Pvp = true) or (mi.PvPG = true)) then begin
-							if (mi.PvPG = true) then begin
-                                tc1 := tc.AData;
-								//Check if character is in guild
-								if ((tc1.GuildID <> tc.GuildID) or (tc.GuildID = 0)) then begin
+					//Auto Attacking
+					if (AMode = 1) or (AMode = 2) then begin
+						if (tc.Sit = 1) or (tc.Option and 6 <> 0) then begin
+							AMode := 0;
+						end else if ATick + ADelay < Tick then begin
+							if (tm.CList.IndexOf(tc.ATarget) <> -1) and ((mi.Pvp = true) or (mi.PvPG = true)) then begin
+								if (mi.PvPG = true) then begin
+									tc1 := tc.AData;
+									//Check if character is in guild
+									if ((tc1.GuildID <> tc.GuildID) or (tc.GuildID = 0)) then begin
+										CharaAttack2(tc,Tick);
+									end;
+								end else begin
 									CharaAttack2(tc,Tick);
 								end;
 							end else begin
-								CharaAttack2(tc,Tick);
+								ts := tc.AData;
+								if (ts.GID <> tc.GuildID) and (ts.isGuardian <> tc.GuildID) or (tc.GuildID = 0) then begin
+									CharaAttack(tc,Tick);
+								end;
 							end;
-						end else begin
-                            ts := tc.AData;
-							if (ts.GID <> tc.GuildID) and (ts.isGuardian <> tc.GuildID) or (tc.GuildID = 0) then begin
-								CharaAttack(tc,Tick);
+							if AMode = 1 then AMode := 0;
+						end;
+					end;
+					//スキル処理
+
+					//Darkhelmet, ts isnt always defined i believe
+					// so it does not always work.  But, this is the
+					// correct way of doing the cast time.
+
+					for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+						for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+							if tm.Block[a][b] = nil then continue;
+							//if not tm.Block[a][b].MobProcess then begin
+							if tm.Block[a][b].MobProcTick < Tick then begin
+								//モンスター移動処理(付近のモンスター)
+								//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
+								k := 0;
+								while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
+									//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
+									if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
+										Inc(k);
+										continue;
+									end;
+
+									CastingMonster := tm.Block[a][b].Mob.Objects[k] as TMob;
+									Inc(k);
+									//if CastingMonster = nil then Continue;
+									if CastingMonster <> nil then begin
+										if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
+											if (tc.HP > 0) and (CastingMonster.Stat2 <> 4) then begin
+												tl := tc.Skill[CastingMonster.MSkill].Data;
+												tk := tc.Skill[CastingMonster.MSkill];
+
+												//if Boolean(MMode and $02) then begin
+												if (tl.SType = 1) then MobSkills(tm, CastingMonster, Tick)
+												//if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
+												else if (tl.SType = 2) then MobFieldSkills(tm, CastingMonster, Tick)
+												else MobStatSkills(tm, CastingMonster, Tick);
+												CastingMonster.SkillWaitTick := Tick + Cardinal(CastingMonster.Data.WaitTick);
+												ts.SkillType := 0;
+												//end else if Boolean(MMode and $01) then begin
+												//pcnt := 0;
+
+												CastingMonster.MTick := Tick;
+												CastingMonster.Mode := 0;
+												//CastingMonster.MTarget := 0;
+											end else if (CastingMonster.Stat2 = 4) then begin
+												tm := tc.MData;
+
+												WFIFOW(0, $00c0);
+												WFIFOL(2, CastingMonster.ID);
+												WFIFOB(6, 09);
+
+												SendBCmd(tm, tc.Point, 7);
+
+											end else begin
+												CastingMonster.MTick := 0;
+												CastingMonster.Mode := 0;
+											end;
+										end;
+									end;
+								end;
 							end;
 						end;
-
-						if AMode = 1 then AMode := 0;
 					end;
-				end;
-				//スキル処理
-
-                                //Darkhelmet, ts isnt always defined i believe
-                                // so it does not always work.  But, this is the
-                                // correct way of doing the cast time.
-
-                                for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
-			                        if tm.Block[a][b] = nil then continue;
-						//if not tm.Block[a][b].MobProcess then begin
-						if tm.Block[a][b].MobProcTick < Tick then begin
-							//モンスター移動処理(付近のモンスター)
-							//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
-							k := 0;
-							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
-                                                                if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
-                                                                        Inc(k);
-                                                                        continue;
-                                                                end;
-
-								CastingMonster := tm.Block[a][b].Mob.Objects[k] as TMob;
-								Inc(k);
-								//if CastingMonster = nil then Continue;
-                                                              if CastingMonster <> nil then begin
-                                                                if (CastingMonster.MTick <= Tick) and (CastingMonster.Mode = 3) then begin
-                                                                        if (tc.HP > 0) and (CastingMonster.Stat2 <> 4) then begin
-                                                                                tl := tc.Skill[CastingMonster.MSkill].Data;
-                                                                                tk := tc.Skill[CastingMonster.MSkill];
-
-                                                                                //if Boolean(MMode and $02) then begin
-                                                                                if (tl.SType = 1) then MobSkills(tm, CastingMonster, Tick)
-                                                                                //if tc.Skill[tsAI.Skill[i]].Data.SType = 2 then
-                                                                                else if (tl.SType = 2) then MobFieldSkills(tm, CastingMonster, Tick)
-                                                                                else MobStatSkills(tm, CastingMonster, Tick);
-                                                                                CastingMonster.SkillWaitTick := Tick + Cardinal(CastingMonster.Data.WaitTick);
-                                                                                ts.SkillType := 0;
-                                                                                //end else if Boolean(MMode and $01) then begin
-                                                                                //pcnt := 0;
-
-                                                                                CastingMonster.MTick := Tick;
-                                                                                CastingMonster.Mode := 0;
-                                                                                //CastingMonster.MTarget := 0;
-                                                                        end else if (CastingMonster.Stat2 = 4) then begin
-                                                                          tm := tc.MData;
-
-                                                                          WFIFOW(0, $00c0);
-                                                                          WFIFOL(2, CastingMonster.ID);
-                                                                          WFIFOB(6, 09);
-
-                                                                          SendBCmd(tm, tc.Point, 7);
-
-                                                                        end else begin
-                                                                                CastingMonster.MTick := 0;
-                                                                                CastingMonster.Mode := 0;
-                                                                        end;
-                                                                end;
-                                                              end;
-                                                        end;
-                                                end;
-                                        end;
-                                end;
 
 
-
-
-				if Boolean(MMode and $03) and (MTick <= Tick) then begin
-					tl := tc.Skill[tc.MSkill].Data;
-					tk := tc.Skill[tc.MSkill];
-					if (tc.SP < tl.SP[tc.MUseLV]) and
-              (((tc.MSkill <> 51) and (tc.MSkill <> 135)) or
-               (((tc.MSkill = 51) or (tc.MSkill = 135)) and (tc.Option and 6 = 0))) then begin
-						//SP不足
-						SendSkillError(tc, 1);
+					if Boolean(MMode and $03) and (MTick <= Tick) then begin
+						tl := tc.Skill[tc.MSkill].Data;
+						tk := tc.Skill[tc.MSkill];
+						if (tc.SP < tl.SP[tc.MUseLV]) and
+						 (((tc.MSkill <> 51) and (tc.MSkill <> 135)) or
+						 (((tc.MSkill = 51) or (tc.MSkill = 135)) and (tc.Option and 6 = 0))) then begin
+							//SP不足
+							SendSkillError(tc, 1);
 							if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
@@ -9522,41 +9519,12 @@ begin
 								MPoint.X := 0;
 								MPoint.Y := 0;
 							end;
-					end else if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
-						//重量オーバー
-						WFIFOW(0, $013b);
-						WFIFOW(2, 2);
-						Socket.SendBuf(buf, 4);
+						end else if tc.Weight * 100 div tc.MaxWeight >= 90 then begin
+							//重量オーバー
+							WFIFOW(0, $013b);
+							WFIFOW(2, 2);
+							Socket.SendBuf(buf, 4);
 							if MMode = 1 then begin
-								MMode := 0;
-								MTarget := 0;
-							end else begin
-								MMode := 0;
-								MPoint.X := 0;
-								MPoint.Y := 0;
-							end;
-					end else begin
-						if (tk.Lv < MUseLV) and (tc.ItemSkill = false) then begin
-							//レベルが足りない(不正パケット)
-							if MMode = 1 then begin
-								MMode := 0;
-								MTarget := 0;
-							end else begin
-								MMode := 0;
-								MPoint.X := 0;
-								MPoint.Y := 0;
-							end;
-            end else if ((tc.Sit = 1) and (tc.MSkill <> 143)) then begin
-             if MMode = 1 then begin
-								MMode := 0;
-								MTarget := 0;
-							end else begin
-								MMode := 0;
-								MPoint.X := 0;
-								MPoint.Y := 0;
-						 end;
-            end else if (tc.Option and 2 <> 0) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
-              if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
 							end else begin
@@ -9565,467 +9533,497 @@ begin
 								MPoint.Y := 0;
 							end;
 						end else begin
-							if Boolean(MMode and $02) then begin
-								CreateField(tc,Tick);
-							end else if Boolean(MMode and $01) then begin
-                                                                ts := tc.adata;
-                                                                if assigned(ts) then begin
-									if ( (Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, ts.Point.X, ts.Point.Y, 2) <> 0) or (ts.ID = tc.ID) ) then begin
+							if (tk.Lv < MUseLV) and (tc.ItemSkill = false) then begin
+								//レベルが足りない(不正パケット)
+								if MMode = 1 then begin
+									MMode := 0;
+									MTarget := 0;
+								end else begin
+									MMode := 0;
+									MPoint.X := 0;
+									MPoint.Y := 0;
+								end;
+							end else if ((tc.Sit = 1) and (tc.MSkill <> 143)) then begin
+								if MMode = 1 then begin
+									MMode := 0;
+									MTarget := 0;
+								end else begin
+									MMode := 0;
+									MPoint.X := 0;
+									MPoint.Y := 0;
+								end;
+							end else if (tc.Option and 2 <> 0) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
+								if MMode = 1 then begin
+									MMode := 0;
+									MTarget := 0;
+								end else begin
+									MMode := 0;
+									MPoint.X := 0;
+									MPoint.Y := 0;
+								end;
+							end else begin
+								if Boolean(MMode and $02) then begin
+									CreateField(tc,Tick);
+								end else if Boolean(MMode and $01) then begin
+									ts := tc.adata;
+									if assigned(ts) then begin
+										if ( (Path_Finding(tc.path, tm, tc.Point.X, tc.Point.Y, ts.Point.X, ts.Point.Y, 2) <> 0) or (ts.ID = tc.ID) ) then begin
+											SkillEffect(tc,Tick);
+										end;
+									end else begin
 										SkillEffect(tc,Tick);
 									end;
-								end else begin
-									SkillEffect(tc,Tick);
+									MTarget := 0;
+									pcnt := 0;
 								end;
-								MTarget := 0;
-								pcnt := 0;
-							end;
-            if Boolean(MMode xor $04) then
-								if (tc.ItemSkill = false) then begin
-									// Colus, 20040118: Unhiding should not drain SP...
-									// Colus, 20040204: The reason we are testing that we _are_ hidden is b/c we use
-									// the mode set in the skill code previously.  This means you are hiding successfully.
-									if (((MSkill <> 51) and (MSkill <> 135)) or ((MSkill = 51) and (Option and 2 <> 0)) or ((MSkill = 135) and (Option and 4 <> 0))) then begin
-										DecSP(tc, MSkill, MUseLV);
-									end;
-								end else begin
-									tc.ItemSkill := false;
-								end;
-							tc.MMode	:= 0;
-							tc.MSkill := 0;
-							tc.MUseLv := 0;
-						end;
-					end;
-				end;
-
-				CharaPassive(tc,Tick);
-				SkillPassive(tc,Tick);
-				if (EnablePetSkills) and ( tc.PetData <> nil ) and ( tc.PetNPC <> nil )then PetPassive(tc, Tick);
-
-				//時間制限スキルが切れたかどうかチェック
-				if SkillTick <= Tick then begin
-					case SkillTickID of
-					10,24: // Sight/Ruwach
-						begin
-							Option := Option and $DFFE;
-							UpdateOption(tm, tc);
-							Skill[SkillTickID].Tick := 0;
-							//Skill[10].Tick := 0;
-							//Skill[24].Tick := 0;
-						end;
-
-					51,135: // Hiding and Cloaking
-						begin
-							// AlexKreuz: Changed to expire Hide Skill
-							if (tc.Option and 6 <> 0) then begin
-								tc.Option := tc.Option and $FFF9;
-								SkillTick := tc.Skill[SkillTickID].Tick;
-								//tc.SP := tc.SP + 10;
-								tc.Hidden := false;
-								if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
-								CalcStat(tc, Tick);
-								UpdateOption(tm, tc);
-								// Colus, 20031228: Tunnel Drive speed update
-								if (tc.Skill[213].Lv <> 0) then begin
-									SendCStat1(tc, 0, 0, tc.Speed);
-								end;
-							end;
-						end;
-					261:    {Call Spirits}
-						begin
-							//UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-						end;
-					end;//case
-					// Remove icon if the skill has one...
-					if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
-						if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
-							//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('(Icon remove, skilltickid %d)',[SkillTickID]));
-							UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
-						end;
-					end;
-
-					CalcStat(tc, Tick);
-					SendCStat(tc);
-					CalcSkillTick(tm, tc, Tick);
-				end;
-
-				//PassiveIcons(tm, tc);
-
-				//Mob&Item Process
-				tm := tc.MData;
-				for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
-						if tm.Block[a][b] = nil then continue;
-						//if not tm.Block[a][b].MobProcess then begin
-						if tm.Block[a][b].MobProcTick < Tick then begin
-							//モンスター移動処理(付近のモンスター)
-							//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
-							k := 0;
-							while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
-								if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
-									Inc(k);
-									continue;
-								end;
-
-								ts := tm.Block[a][b].Mob.Objects[k] as TMob;
-								Inc(k);
-								if ts = nil then Continue;
-								if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
-									//Spawn
-									MonsterSpawn(tm, ts, Tick);
-								end;
-
-								with ts do begin
-									//状態変化
-									StatEffect(tm,ts,Tick);
-									//状態１では行動不可
-									if ts.Stat1 <> 0 then Continue;
-									MobAI(tm,ts,Tick);
-									if (ts = nil) then continue;
-
-									if (ts <> nil) then begin
-										if (EmperiumID <> 0) then begin
-											ts2 := tm.Mob.IndexOfObject(EmperiumID) as TMob;
-											if (ts2 = nil) or (ts2.HP = 0) or (ts2.Map <> ts.Map) then begin
-												EmperiumID := 0;
-												MonsterDie(tm,tc,ts,Tick);
-											end;
+								if Boolean(MMode xor $04) then begin
+									if NOT (tc.ItemSkill) then begin
+										// Colus, 20040118: Unhiding should not drain SP...
+										// Colus, 20040204: The reason we are testing that we _are_ hidden is b/c we use
+										// the mode set in the skill code previously.  This means you are hiding successfully.
+										if (((MSkill <> 51) and (MSkill <> 135)) or ((MSkill = 51) and (Option and 2 <> 0)) or ((MSkill = 135) and (Option and 4 <> 0))) then begin
+											DecSP(tc, MSkill, MUseLV);
 										end;
-									end;
-
-									if (ts <> nil) then begin
-										if (LeaderID <> 0) then begin
-											ts2 := tm.Mob.IndexOfObject(LeaderID) as TMob;
-											if (ts2 = nil) or (ts2.HP = 0) or (ts2.Map <> ts.Map) then begin
-												MonsterDie(tm,tc,ts,Tick);
-											end;
-										end;
-									end;
-
-									if (pcnt <> 0) then begin
-
-										if isLooting then begin
-										SendMMove(tc.Socket, ts, Point, tgtPoint, tc.ver2);
-										SendBCmd(tm,ts.Point,58,tc,True);
-										end;
-
-										if (path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100; //斜めは1.4倍時間がかかる
-										if MoveTick + spd <= Tick then begin
-											if ts.Mode <> 3 then k := k + MobMoving(tm,ts,Tick);
-										end;
-
 									end else begin
-										if (ts.HP = 0) then continue;
+										tc.ItemSkill := false;
+									end;
+								end;
+								tc.MMode	:= 0;
+								tc.MSkill := 0;
+								tc.MUseLv := 0;
+							end;
+						end;
+					end;
 
-										if isLooting then begin
-											if ATick < Tick then
-												PickUp(tm,ts,Tick);
-										end else if (ATarget <> 0) and (Data.Range1 > 0) then begin
-											MobAttack(tm,ts,Tick);
-										end else if (MoveWait < Tick) and (not isLooting) then begin
-											//移動開始
-											j := 0;
-											if LeaderID <> 0 then begin
-												//取り巻き用
+					CharaPassive(tc,Tick);
+					SkillPassive(tc,Tick);
+					if (EnablePetSkills) and ( tc.PetData <> nil ) and ( tc.PetNPC <> nil )then PetPassive(tc, Tick);
+
+					//時間制限スキルが切れたかどうかチェック
+					if SkillTick <= Tick then begin
+						case SkillTickID of
+						10,24: // Sight/Ruwach
+							begin
+								Option := Option and $DFFE;
+								UpdateOption(tm, tc);
+								Skill[SkillTickID].Tick := 0;
+								//Skill[10].Tick := 0;
+								//Skill[24].Tick := 0;
+							end;
+
+						51,135: // Hiding and Cloaking
+							begin
+								// AlexKreuz: Changed to expire Hide Skill
+								if (tc.Option and 6 <> 0) then begin
+									tc.Option := tc.Option and $FFF9;
+									SkillTick := tc.Skill[SkillTickID].Tick;
+									//tc.SP := tc.SP + 10;
+									tc.Hidden := false;
+									if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+									CalcStat(tc, Tick);
+									UpdateOption(tm, tc);
+									// Colus, 20031228: Tunnel Drive speed update
+									if (tc.Skill[213].Lv <> 0) then begin
+										SendCStat1(tc, 0, 0, tc.Speed);
+									end;
+								end;
+							end;
+						261:    {Call Spirits}
+							begin
+								//UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+							end;
+						end;//case
+						// Remove icon if the skill has one...
+						if tc.Skill[SkillTickID].Data.Icon <> 0 then begin
+							if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
+								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('(Icon remove, skilltickid %d)',[SkillTickID]));
+								UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
+							end;
+						end;
+
+						CalcStat(tc, Tick);
+						SendCStat(tc);
+						CalcSkillTick(tm, tc, Tick);
+					end;
+
+					//PassiveIcons(tm, tc);
+
+					//Mob&Item Process
+					tm := tc.MData;
+					for b := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+						for a := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+							if tm.Block[a][b] = nil then continue;
+							//if not tm.Block[a][b].MobProcess then begin
+							if tm.Block[a][b].MobProcTick < Tick then begin
+								//モンスター移動処理(付近のモンスター)
+								//for k := 0 to tm.Block[a][b].Mob.Count - 1 do begin
+								k := 0;
+								while (k >= 0) and (k < tm.Block[a][b].Mob.Count) do begin
+									//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
+									if ((tm.Block[a][b].Mob.Objects[k] is TMob) = false) then begin
+										Inc(k);
+										continue;
+									end;
+
+									ts := tm.Block[a][b].Mob.Objects[k] as TMob;
+									Inc(k);
+									if ts = nil then Continue;
+									if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
+										//Spawn
+										MonsterSpawn(tm, ts, Tick);
+									end;
+
+									with ts do begin
+										//状態変化
+										StatEffect(tm,ts,Tick);
+										//状態１では行動不可
+										if ts.Stat1 <> 0 then Continue;
+										MobAI(tm,ts,Tick);
+										if (ts = nil) then continue;
+
+										if (ts <> nil) then begin
+											if (EmperiumID <> 0) then begin
+												ts2 := tm.Mob.IndexOfObject(EmperiumID) as TMob;
+												if (ts2 = nil) or (ts2.HP = 0) or (ts2.Map <> ts.Map) then begin
+													EmperiumID := 0;
+													MonsterDie(tm,tc,ts,Tick);
+												end;
+											end;
+										end;
+
+										if (ts <> nil) then begin
+											if (LeaderID <> 0) then begin
 												ts2 := tm.Mob.IndexOfObject(LeaderID) as TMob;
 												if (ts2 = nil) or (ts2.HP = 0) or (ts2.Map <> ts.Map) then begin
-													LeaderID := 0;
 													MonsterDie(tm,tc,ts,Tick);
+												end;
+											end;
+										end;
+
+										if (pcnt <> 0) then begin
+
+											if isLooting then begin
+											SendMMove(tc.Socket, ts, Point, tgtPoint, tc.ver2);
+											SendBCmd(tm,ts.Point,58,tc,True);
+											end;
+
+											if (path[ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100; //斜めは1.4倍時間がかかる
+											if MoveTick + spd <= Tick then begin
+												if ts.Mode <> 3 then k := k + MobMoving(tm,ts,Tick);
+											end;
+
+										end else begin
+											if (ts.HP = 0) then continue;
+
+											if isLooting then begin
+												if ATick < Tick then
+													PickUp(tm,ts,Tick);
+											end else if (ATarget <> 0) and (Data.Range1 > 0) then begin
+												MobAttack(tm,ts,Tick);
+											end else if (MoveWait < Tick) and (not isLooting) then begin
+												//移動開始
+												j := 0;
+												if LeaderID <> 0 then begin
+													//取り巻き用
+													ts2 := tm.Mob.IndexOfObject(LeaderID) as TMob;
+													if (ts2 = nil) or (ts2.HP = 0) or (ts2.Map <> ts.Map) then begin
+														LeaderID := 0;
+														MonsterDie(tm,tc,ts,Tick);
+													end else begin
+														repeat
+															k := 0;
+															repeat
+																xy.X := ts2.Point.X + Random(11) - 5;
+																xy.Y := ts2.Point.Y + Random(11) - 5;
+																Inc(k);
+															until ((xy.X >= 0) and (xy.X <= tm.Size.X - 2) and (xy.Y >= 0) and (xy.Y <= tm.Size.Y - 2)) or (k = 100);
+															if k = 100 then begin
+																//移動可能箇所がないor少なすぎるときは移動しない
+																j := 100;
+																Break;
+															end;
+															if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
+																{ Alex: Currently Unexplored - Type 1 for safety }
+																pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
+															Inc(j);
+														until (pcnt <> 0) or (j = 100);
+													end;
 												end else begin
+													//AMode := 0;
+													//030316-2 名無しさん/030317
 													repeat
 														k := 0;
+														pcnt := 0;
 														repeat
-															xy.X := ts2.Point.X + Random(11) - 5;
-															xy.Y := ts2.Point.Y + Random(11) - 5;
+															xy.X := Point.X + Random(17) - 8;
+															xy.Y := Point.Y + Random(17) - 8;
 															Inc(k);
 														until ((xy.X >= 0) and (xy.X <= tm.Size.X - 2) and (xy.Y >= 0) and (xy.Y <= tm.Size.Y - 2)) or (k = 100);
 														if k = 100 then begin
 															//移動可能箇所がないor少なすぎるときは移動しない
 															j := 100;
-															Break;
+															break;
 														end;
+														//---
 														if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
 															{ Alex: Currently Unexplored - Type 1 for safety }
 															pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
+														ts.DeadWait := Tick;   // mf
 														Inc(j);
 													until (pcnt <> 0) or (j = 100);
 												end;
-											end else begin
-												//AMode := 0;
-												//030316-2 名無しさん/030317
-												repeat
-													k := 0;
-													pcnt := 0;
-													repeat
-														xy.X := Point.X + Random(17) - 8;
-														xy.Y := Point.Y + Random(17) - 8;
-														Inc(k);
-													until ((xy.X >= 0) and (xy.X <= tm.Size.X - 2) and (xy.Y >= 0) and (xy.Y <= tm.Size.Y - 2)) or (k = 100);
-													if k = 100 then begin
-														//移動可能箇所がないor少なすぎるときは移動しない
-														j := 100;
-														break;
-													end;
-													//---
-													if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
-														{ Alex: Currently Unexplored - Type 1 for safety }
-														pcnt := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
-													ts.DeadWait := Tick;   // mf
-													Inc(j);
-												until (pcnt <> 0) or (j = 100);
-											end;
 												if (j < 100) then begin
-												ppos := 0;
-												if (pcnt <> 0) and (ts.AnkleSnareTick < Tick) then begin
-													MoveTick := Tick;
-													tgtPoint := xy;
+													ppos := 0;
+													if (pcnt <> 0) and (ts.AnkleSnareTick < Tick) then begin
+														MoveTick := Tick;
+														tgtPoint := xy;
 
-                                                                                                        UpdateMonsterLocation(tm, ts);
+														UpdateMonsterLocation(tm, ts);
 
-													SendMMove(tc.Socket, ts, Point, tgtPoint, tc.ver2);
-													SendBCmd(tm,ts.Point,58,tc,True);
+														SendMMove(tc.Socket, ts, Point, tgtPoint, tc.ver2);
+														SendBCmd(tm,ts.Point,58,tc,True);
+													end;
+	{修正ココまで}
+												end else begin
+													if ts.isSlave then begin
+													MonsterDie(tm,tc,ts,Tick);
+													end else begin
+													//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('* * * * SearchPath Error (%d,%d)',[Point.X,Point.Y]));
+													end;
+													MoveWait := Tick + 10000;
 												end;
-{修正ココまで}
-											end else begin
-                        if ts.isSlave then begin
-                        MonsterDie(tm,tc,ts,Tick);
-                        end else begin
-												//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('* * * * SearchPath Error (%d,%d)',[Point.X,Point.Y]));
-                        end;
-												MoveWait := Tick + 10000;
 											end;
 										end;
 									end;
 								end;
-							end;
 
-							//アイテム&スキル効能地処理(付近のもののみ処理)
-							k := 0;
-							while (0 <= k) and (k < tm.Block[a][b].NPC.Count) do begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
-                if ((tm.Block[a][b].NPC.Objects[k] is TNPC) = false) then begin
-                Inc(k);
-                continue;
-                end;
-                
-								tn := tm.Block[a][b].NPC.Objects[k] as TNPC;
-								Inc(k);
-								if tn = nil then Continue;
-								k := k + NPCAction(tm,tn,Tick);
+								//アイテム&スキル効能地処理(付近のもののみ処理)
+								k := 0;
+								while (0 <= k) and (k < tm.Block[a][b].NPC.Count) do begin
+									//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'mob : ' + IntToStr(k));
+									if ((tm.Block[a][b].NPC.Objects[k] is TNPC) = false) then begin
+									Inc(k);
+									continue;
+									end;
+
+									tn := tm.Block[a][b].NPC.Objects[k] as TNPC;
+									Inc(k);
+									if tn = nil then Continue;
+									k := k + NPCAction(tm,tn,Tick);
+								end;
+								//フラグON
+								//tm.Block[a][b].MobProcess := true;
+								tm.Block[a][b].MobProcTick := Tick;
 							end;
-							//フラグON
-							//tm.Block[a][b].MobProcess := true;
-							tm.Block[a][b].MobProcTick := Tick;
 						end;
 					end;
-				end;
-{キューペット}
-                                        if ( PetData <> nil ) and ( PetNPC <> nil ) and (PetMoveTick < Tick) then begin
-                                          tpe := PetData;
-                                          tn := PetNPC;
-                                          if tpe.isLooting = false then begin
-                                            // 移動
-                                            j := 0;
-                                            { Alex: Currently Unexplored - Type 1 for safety }
-                                            k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y, 1);
-                                            if (k > 3) and (k < 15) then begin
+	{キューペット}
+					if ( PetData <> nil ) and ( PetNPC <> nil ) and (PetMoveTick < Tick) then begin
+						tpe := PetData;
+						tn := PetNPC;
+						if tpe.isLooting = false then begin
+							// 移動
+							j := 0;
+							{ Alex: Currently Unexplored - Type 1 for safety }
+							k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y, 1);
+							if (k > 3) and (k < 15) then begin
 
-                                              if Sit = 0 then begin
-                                                xy := Point;
-                                              end else begin
-                                                repeat
-                                                  if j >= 100 then begin
-                                                    xy := Point;
-                                                    break;
-                                                  end;
+								if Sit = 0 then begin
+									xy := Point;
+								end else begin
+									repeat
+										if j >= 100 then begin
+											xy := Point;
+											break;
+										end;
 
-                                                  xy.X := Point.X + Random(5) - 2;
-                                                  xy.Y := Point.Y + Random(5) - 2;
-                                                  Inc(j);
-                                                until ( xy.X <> Point.X ) or ( xy.Y <> Point.Y );
-                                                { Alex: Currently Unexplored - Type 1 for safety }
-                                                k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y, 1);
-                                              end;
+										xy.X := Point.X + Random(5) - 2;
+										xy.Y := Point.Y + Random(5) - 2;
+										Inc(j);
+									until ( xy.X <> Point.X ) or ( xy.Y <> Point.Y );
+									{ Alex: Currently Unexplored - Type 1 for safety }
+									k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, xy.X, xy.Y, 1);
+								end;
 
-                                              if k <> 0 then begin
-                                                tn.NextPoint := xy;
-                                                SendPetMove( Socket, tc, xy );
-                                                SendBCmd( tm, tn.Point, 58, tc, True );
+								if k <> 0 then begin
+									tn.NextPoint := xy;
+									SendPetMove( Socket, tc, xy );
+									SendBCmd( tm, tn.Point, 58, tc, True );
 
-                                                if tn.pcnt = 0 then MoveTick := Tick;
-                                                tn.pcnt := k;
-                                                tn.ppos := 0;
+									if tn.pcnt = 0 then MoveTick := Tick;
+									tn.pcnt := k;
+									tn.ppos := 0;
 
-                                                PetMoveTick := Tick + 1500;
-                                                if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
+									PetMoveTick := Tick + 1500;
+									if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
 
-                                                if tn.MoveTick + spd <= Tick then begin
-                                                  PetMoving( tc, Tick );
-                                                end;
+									if tn.MoveTick + spd <= Tick then begin
+										PetMoving( tc, Tick );
+									end;
 
-                                              end;
-                                            // k = 0 case makes pets dupe next to you...
-                                            end else if (k >= 15) then begin //or (k = 0) then begin
+								end;
+								// k = 0 case makes pets dupe next to you...
+							end else if (k >= 15) then begin //or (k = 0) then begin
 
-                                              WFIFOW( 0, $0080 );
-                                              WFIFOL( 2, tn.ID );
-                                              WFIFOB( 6, 0 );
-                                              SendBCmd( tm, tn.Point, 7 ,tc);
+								WFIFOW( 0, $0080 );
+								WFIFOL( 2, tn.ID );
+								WFIFOB( 6, 0 );
+								SendBCmd( tm, tn.Point, 7 ,tc);
 
-                                              //Delete block
-                                              l := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
-                                              if l <> -1 then begin
-                                                tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(l);
-                                              end;
+								//Delete block
+								l := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
+								if l <> -1 then begin
+									tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(l);
+								end;
 
-								                              l := tm.NPC.IndexOf( tn.ID );
-								                              if l <> -1 then begin
-												                        tm.NPC.Delete(l);
-								                              end;
+								l := tm.NPC.IndexOf( tn.ID );
+								if l <> -1 then begin
+									tm.NPC.Delete(l);
+								end;
 
-								                              tn.Free;
-								                              tc.PetNPC := nil;
-                                              n := 0;
-                                              for m := 1 to 100 do begin
-                                                if ( tc.Item[m].ID <> 0 ) and ( tc.Item[m].Amount > 0 ) and
-                                                  ( tc.Item[m].Card[0] = $FF00 ) and ( tc.Item[m].Attr <> 0 ) then begin
-                                                    n := m;
-                                                    break;
-                                                end;
-                                              end;
-                                              if n > 0 then begin
+								tn.Free;
+								tc.PetNPC := nil;
+								n := 0;
+								for m := 1 to 100 do begin
+									if ( tc.Item[m].ID <> 0 ) and ( tc.Item[m].Amount > 0 ) and
+										( tc.Item[m].Card[0] = $FF00 ) and ( tc.Item[m].Attr <> 0 ) then begin
+											n := m;
+											break;
+									end;
+								end;
+								if n > 0 then begin
 
-                                                l := PetList.IndexOf( tc.Item[n].Card[2] + tc.Item[n].Card[3] * $10000 );
+									l := PetList.IndexOf( tc.Item[n].Card[2] + tc.Item[n].Card[3] * $10000 );
 
-                                                if l <> -1 then begin
-                                                  SendPetRelocation(tm, tc, l);
-                                                end;
-                                              end;
-                                            end;
-                                          end else if tpe.isLooting then begin
-                                            j := 0;
-                                            { Alex: Currently Unexplored - Type 1 for safety }
-                                            k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, tn.NextPoint.X, tn.NextPoint.Y, 1);
-                                            if k > 1 then begin
-                                              //tn.NextPoint := xy;
-                                              SendPetMove( Socket, tc, tn.NextPoint );
-                                              SendBCmd( tm, tn.Point, 58, tc, True );
-                                              if tn.pcnt = 0 then MoveTick := Tick;
-                                                tn.pcnt := k;
-                                                tn.ppos := 0;
+									if l <> -1 then begin
+										SendPetRelocation(tm, tc, l);
+									end;
+								end;
+							end;
+						end else if tpe.isLooting then begin
+							j := 0;
+							{ Alex: Currently Unexplored - Type 1 for safety }
+							k := Path_Finding(tn.path, tm, tn.Point.X, tn.Point.Y, tn.NextPoint.X, tn.NextPoint.Y, 1);
+							if k > 1 then begin
+								//tn.NextPoint := xy;
+								SendPetMove( Socket, tc, tn.NextPoint );
+								SendBCmd( tm, tn.Point, 58, tc, True );
+								if tn.pcnt = 0 then MoveTick := Tick;
+								tn.pcnt := k;
+								tn.ppos := 0;
 
-                                                PetMoveTick := Tick + 1000;
-                                                if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
+								PetMoveTick := Tick + 1000;
+								if (tn.Path[tn.ppos] and 1) = 0 then spd := Speed else spd := Speed * 140 div 100;
 
-                                                if tn.MoveTick + spd <= Tick then begin
-                                                  PetMoving( tc, Tick );
-                                                end;
-                                            end else begin
-                                              PetPickup(tm, tpe, tc, Tick);
-                                            end;
-                                          end;
+								if tn.MoveTick + spd <= Tick then begin
+									PetMoving( tc, Tick );
+								end;
+							end else begin
+								PetPickup(tm, tpe, tc, Tick);
+							end;
+						end;
 
-					//Auto PetIsHungrier system
-					if tpe.Fullness > 0 then begin
-						if ( tn.HungryTick + tpe.Data.HungryDelay ) < Tick then begin
-							tpe.Fullness := tpe.Fullness -1;
+						//Auto PetIsHungrier system
+						if tpe.Fullness > 0 then begin
+							if ( tn.HungryTick + tpe.Data.HungryDelay ) < Tick then begin
+								tpe.Fullness := tpe.Fullness -1;
 
-							WFIFOW( 0, $01a4 );
-							WFIFOB( 2, 2 ); // Intimacy Changed
-							WFIFOL( 3, tn.ID );
-							WFIFOL( 7, tpe.Fullness );
-							tc.Socket.SendBuf( buf, 11 );
+								WFIFOW( 0, $01a4 );
+								WFIFOB( 2, 2 ); // Intimacy Changed
+								WFIFOL( 3, tn.ID );
+								WFIFOL( 7, tpe.Fullness );
+								tc.Socket.SendBuf( buf, 11 );
 
-							tn.HungryTick := Tick;
+								tn.HungryTick := Tick;
+							end;
 						end;
 					end;
+	{キューペットここまで}
 				end;
-{キューペットここまで}
+				ExitWarpSearch:
 			end;
-			ExitWarpSearch:
-		end;
 
-{NPCイベント追加}
-		for k := 0 to Map.Count - 1 do begin
-			tm := Map.Objects[k] as TMap;
-			with tm do begin
-				if (TimerAct.Count > 0) then begin
-					for i := 0 to TimerAct.Count - 1 do begin
-						tr := TimerAct.Objects[i] as NTimer;
-						tn := tm.NPC.IndexOfObject(tr.ID) as TNPC;
-						for a := 0 to tr.Cnt - 1 do begin
-							if (tr.Tick + cardinal(tr.Idx[a]) <= Tick) and (tr.Done[a] = 0) then begin
-								//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer Event(%d)', [tr.Idx[a]]));
-								tr.Done[a] := 1;
-								tc1 := TChara.Create;
-								tc1.TalkNPCID := tr.ID;
-								tc1.ScriptStep := tr.Step[a];
-								tc1.AMode := 3;
-								tc1.AData := tn;
-								tc1.Login := 0;
-								NPCScript(tc1,0,1);
-								tc1.Free;
+	{NPCイベント追加}
+			for k := 0 to Map.Count - 1 do begin
+				tm := Map.Objects[k] as TMap;
+				with tm do begin
+					if (TimerAct.Count > 0) then begin
+						for i := 0 to TimerAct.Count - 1 do begin
+							tr := TimerAct.Objects[i] as NTimer;
+							tn := tm.NPC.IndexOfObject(tr.ID) as TNPC;
+							for a := 0 to tr.Cnt - 1 do begin
+								if (tr.Tick + cardinal(tr.Idx[a]) <= Tick) and (tr.Done[a] = 0) then begin
+									//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer Event(%d)', [tr.Idx[a]]));
+									tr.Done[a] := 1;
+									tc1 := TChara.Create;
+									tc1.TalkNPCID := tr.ID;
+									tc1.ScriptStep := tr.Step[a];
+									tc1.AMode := 3;
+									tc1.AData := tn;
+									tc1.Login := 0;
+									NPCScript(tc1,0,1);
+									tc1.Free;
+								end;
 							end;
-						end;
-					end;
-				end;
-			end;
-		end;
-{NPCイベント追加ココまで}
-
-		//モンスター処理(キャラのそばにいないモンスターは簡易処理のみ)
-		for k := 0 to Map.Count - 1 do begin
-			tm := Map.Objects[k] as TMap;
-			with tm do begin
-				if (Mode = 2) and (CList.Count > 0) then begin
-					MobMoveL(tm,Tick);
-					//Spwan処理
-					for i := 0 to Mob.Count - 1 do begin
-						ts := Mob.Objects[i] as TMob;
-						if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
-							MonsterSpawn(tm, ts, Tick);
 						end;
 					end;
 				end;
 			end;
-		end;
+	{NPCイベント追加ココまで}
 
-		Application.ProcessMessages;
-		Tick1 := timeGetTime();
-		if (Tick + 30) > Tick1 then begin
-			Sleep(Tick + 30 - Tick1);
-			//Tick1 := timeGetTime();
-		end;
+			//モンスター処理(キャラのそばにいないモンスターは簡易処理のみ)
+			for k := 0 to Map.Count - 1 do begin
+				tm := Map.Objects[k] as TMap;
+				with tm do begin
+					if (Mode = 2) and (CList.Count > 0) then begin
+						MobMoveL(tm,Tick);
+						//Spwan処理
+						for i := 0 to Mob.Count - 1 do begin
+							ts := Mob.Objects[i] as TMob;
+							if (ts.HP = 0) and (ts.SpawnTick + ts.SpawnDelay1 + cardinal(Random(ts.SpawnDelay2 + 1)) <= Tick) then begin
+								MonsterSpawn(tm, ts, Tick);
+							end;
+						end;
+					end;
+				end;
+			end;
 
-		//if (Tick1 - Tick) <> 0 then begin
-			//TickCheck[TickCheckCnt] := Tick1 - Tick;
-			//Inc(TickCheckCnt);
-			//if TickCheckCnt = 10 then begin
-				//Tick1 := 0;
-				//for i := 0 to 9 do Tick1 := Tick1 + TickCheck[i];
-				//lbl00.Caption := IntToStr(Tick1 div 10);
-				//TickCheckCnt := 0;
+			Application.ProcessMessages;
+			Tick1 := timeGetTime();
+			if (Tick + 30) > Tick1 then begin
+				Sleep(Tick + 30 - Tick1);
+				//Tick1 := timeGetTime();
+			end;
+
+			//if (Tick1 - Tick) <> 0 then begin
+				//TickCheck[TickCheckCnt] := Tick1 - Tick;
+				//Inc(TickCheckCnt);
+				//if TickCheckCnt = 10 then begin
+					//Tick1 := 0;
+					//for i := 0 to 9 do Tick1 := Tick1 + TickCheck[i];
+					//lbl00.Caption := IntToStr(Tick1 div 10);
+					//TickCheckCnt := 0;
+				//end;
 			//end;
-		//end;
 
 
-	until CancelFlag;
+		until CancelFlag;
 	finally
-	sl.Free;
-	for i := 0 to sv1.Socket.ActiveConnections - 1 do
-		sv1.Socket.Disconnect(i);
-	sv1.Active := false;
-	for i := 0 to sv2.Socket.ActiveConnections - 1 do
+		sl.Free;
+		for i := 0 to sv1.Socket.ActiveConnections - 1 do
+			sv1.Socket.Disconnect(i);
+		sv1.Active := false;
+		for i := 0 to sv2.Socket.ActiveConnections - 1 do
 		sv2.Socket.Disconnect(i);
-	sv2.Active := false;
-	for i := 0 to sv3.Socket.ActiveConnections - 1 do
-		sv3.Socket.Disconnect(i);
-	sv3.Active := false;
-	cmdStop.Enabled := false;
-	ServerRunning := false;
-	CancelFlag := false;
-	cmdStart.Enabled := true;
-	//lbl00.Caption := '(´-｀)';
+		sv2.Active := false;
+		for i := 0 to sv3.Socket.ActiveConnections - 1 do
+			sv3.Socket.Disconnect(i);
+		sv3.Active := false;
+		cmdStop.Enabled := false;
+		ServerRunning := false;
+		CancelFlag := false;
+		cmdStart.Enabled := true;
+		//lbl00.Caption := '(´-｀)';
 	end;
 end;
 

@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 257
-  Top = 294
-  Width = 760
+  Left = 281
+  Top = 255
+  Width = 607
   Height = 382
   Caption = '#33'
   Color = clCream
@@ -28,25 +28,22 @@ object frmMain: TfrmMain
   object StatusBar1: TStatusBar
     Left = 0
     Top = 329
-    Width = 752
+    Width = 599
     Height = 19
     Color = clCream
     Panels = <
       item
-        Width = 100
-      end
-      item
+        Alignment = taRightJustify
         Width = 300
       end
       item
-        Alignment = taRightJustify
-        Width = 50
+        Width = 300
       end>
   end
   object txtDebug: TMemo
     Left = 0
     Top = 37
-    Width = 752
+    Width = 599
     Height = 292
     Align = alClient
     Color = 14071432
@@ -63,7 +60,7 @@ object frmMain: TfrmMain
   object TopPanel: TPanel
     Left = 0
     Top = 0
-    Width = 752
+    Width = 599
     Height = 37
     Align = alTop
     BevelOuter = bvNone
@@ -72,7 +69,7 @@ object frmMain: TfrmMain
     ParentColor = True
     TabOrder = 1
     DesignSize = (
-      752
+      599
       37)
     object cmdStart: TButton
       Left = 5
@@ -109,7 +106,7 @@ object frmMain: TfrmMain
     object Edit1: TEdit
       Left = 154
       Top = 5
-      Width = 450
+      Width = 297
       Height = 26
       Anchors = [akLeft, akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -123,7 +120,7 @@ object frmMain: TfrmMain
       OnKeyPress = Edit1KeyPress
     end
     object Button1: TButton
-      Left = 608
+      Left = 455
       Top = 5
       Width = 108
       Height = 24
@@ -139,7 +136,7 @@ object frmMain: TfrmMain
       OnClick = Button1Click
     end
     object Button2: TButton
-      Left = 724
+      Left = 571
       Top = 5
       Width = 22
       Height = 24
