@@ -2064,9 +2064,12 @@ begin
 
 		for j :=1 to MAX_SKILL_NUMBER do begin // Add card skills
 			if td.AddSkill[j] <> 0 then begin
-				if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
-					Skill[j].Lv := td.AddSkill[j];
-					Skill[j].Card := True;
+				//if (not Skill[j].Data.Job1[JIDFix]) and (not Skill[j].Data.Job2[JIDFix]) and (not DisableSkillLimit) then begin
+                if (not DisableSkillLimit) then begin
+                	if (td.IEquip) and (Skill[j].Lv = 0) then begin
+						Skill[j].Lv := td.AddSkill[j];
+						Skill[j].Card := True;
+                    end;
 				end;
 			end;
 		end; //for j :=1 to 336 do begin
@@ -2516,6 +2519,7 @@ begin
 			end;
 			if SkillPoint > 714 then SkillPoint := 714; //Ç±ÇÍÇæÇØóLÇÍÇŒè\ï™
 		end;
+
 		CalcEquip(tc);
 		DEF2 := Param[2];
 		CalcSkill(tc,Tick);
@@ -4446,6 +4450,7 @@ begin
 	for i := 1 to MAX_SKILL_NUMBER do begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
 		if ((not (tc.Skill[i].Data.Job1[JIDFix])) and (not (tc.Skill[i].Data.Job2[JIDFix])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
+
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
     //if (tc.Skill[i].Data.Job1[JID]) then debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('Skill %d is true for JID %d',[i, JID]));
 		WFIFOW( 0+37*j+4, i);

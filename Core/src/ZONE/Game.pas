@@ -1785,7 +1785,21 @@ end;
                                Socket.SendBuf(buf, 7);
                             end;
 
+
+
+
+
+		for j :=1 to MAX_SKILL_NUMBER do begin // Add card skills
+			if tc.Item[w].Data.AddSkill[j] <> 0 then begin
+            	if (tc.Skill[j].Card) then begin
+                	tc.Skill[j].Lv := tc.Skill[j].Lv - tc.Item[w].Data.AddSkill[j];
+                    tc.Skill[j].Card := False;
+				end;
+			end;
+		end; //for j :=1 to 336 do begin
+
             CalcStat(tc);
+            SendCSkillList(tc);
             SendCStat(tc, true);
             // Tumy
 
