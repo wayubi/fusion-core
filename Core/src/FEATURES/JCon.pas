@@ -375,61 +375,61 @@ uses
 
     procedure JCon_INI_Game_Load();
     begin
-    	frmMain.Edit42.Text := IntToStr(BaseExpMultiplier);
-        frmMain.Edit37.Text := IntToStr(JobExpMultiplier);
-        frmMain.Edit38.Text := IntToStr(ItemDropMultiplier);
+    	try frmMain.Edit42.Text := IntToStr(BaseExpMultiplier); except end;
+        try frmMain.Edit37.Text := IntToStr(JobExpMultiplier); except end;
+        try frmMain.Edit38.Text := IntToStr(ItemDropMultiplier); except end;
 
-        frmMain.Edit39.Text := IntToStr(StealMultiplier);
-        frmMain.Edit40.Text := IntToStr(Option_Pet_Capture_Rate);
+        try frmMain.Edit39.Text := IntToStr(StealMultiplier); except end;
+        try frmMain.Edit40.Text := IntToStr(Option_Pet_Capture_Rate); except end;
 
-        frmMain.ComboBox16.ItemIndex := abs(StrToInt(BoolToStr(DisableLevelLimit)));
-        frmMain.ComboBox9.ItemIndex := abs(StrToInt(BoolToStr(DisableEquipLimit)));
-        frmMain.ComboBox10.ItemIndex := abs(StrToInt(BoolToStr(EnablePetSkills)));
-        frmMain.ComboBox11.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP)));
-        frmMain.ComboBox12.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_Steal)));
-        frmMain.ComboBox13.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_XPLoss)));
+        try frmMain.ComboBox16.ItemIndex := abs(StrToInt(BoolToStr(DisableLevelLimit))); except end;
+        try frmMain.ComboBox9.ItemIndex := abs(StrToInt(BoolToStr(DisableEquipLimit))); except end;
+        try frmMain.ComboBox10.ItemIndex := abs(StrToInt(BoolToStr(EnablePetSkills))); except end;
+        try frmMain.ComboBox11.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP))); except end;
+        try frmMain.ComboBox12.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_Steal))); except end;
+        try frmMain.ComboBox13.ItemIndex := abs(StrToInt(BoolToStr(Option_PVP_XPLoss))); except end;
 
-        frmMain.Edit35.Text := IntToStr(DefaultZeny);
-        frmMain.Edit43.Text := IntToStr(DefaultItem1);
-        frmMain.Edit44.Text := IntToStr(DefaultItem2);
-        frmMain.Edit27.Text := DefaultMap;
-        frmMain.Edit28.Text := IntToStr(DefaultPoint_X);
-        frmMain.Edit45.Text := IntToStr(DefaultPoint_Y);
+        try frmMain.Edit35.Text := IntToStr(DefaultZeny); except end;
+        try frmMain.Edit43.Text := IntToStr(DefaultItem1); except end;
+        try frmMain.Edit44.Text := IntToStr(DefaultItem2); except end;
+        try frmMain.Edit27.Text := DefaultMap; except end;
+        try frmMain.Edit28.Text := IntToStr(DefaultPoint_X); except end;
+        try frmMain.Edit45.Text := IntToStr(DefaultPoint_Y); except end;
 
-        frmMain.Edit32.Text := IntToStr(DeathBaseLoss);
-        frmMain.Edit33.Text := IntToStr(DeathJobLoss);
-        frmMain.Edit34.Text := IntToStr(Option_PartyShare_Level);
-        frmMain.ComboBox14.ItemIndex := abs(StrToInt(BoolToStr(DisableSkillLimit)));
+        try frmMain.Edit32.Text := IntToStr(DeathBaseLoss); except end;
+        try frmMain.Edit33.Text := IntToStr(DeathJobLoss); except end;
+        try frmMain.Edit34.Text := IntToStr(Option_PartyShare_Level); except end;
+        try frmMain.ComboBox14.ItemIndex := abs(StrToInt(BoolToStr(DisableSkillLimit))); except end;
 
     end;
 
     procedure JCon_INI_Game_Save();
     begin
-        BaseExpMultiplier := StrToInt(frmMain.Edit42.Text);
-        JobExpMultiplier := StrToInt(frmMain.Edit37.Text);
-        ItemDropMultiplier := StrToInt(frmMain.Edit38.Text);
+        try BaseExpMultiplier := StrToInt(frmMain.Edit42.Text); except end;
+        try JobExpMultiplier := StrToInt(frmMain.Edit37.Text); except end;
+        try ItemDropMultiplier := StrToInt(frmMain.Edit38.Text); except end;
 
-        StealMultiplier := StrToInt(frmMain.Edit39.Text);
-        Option_Pet_Capture_Rate := StrToInt(frmMain.Edit40.Text);
+        try StealMultiplier := StrToInt(frmMain.Edit39.Text); except end;
+        try Option_Pet_Capture_Rate := StrToInt(frmMain.Edit40.Text); except end;
 
-        DisableLevelLimit := StrToBool(IntToStr(abs(frmMain.ComboBox16.ItemIndex)));
-        DisableEquipLimit := StrToBool(IntToStr(abs(frmMain.ComboBox9.ItemIndex)));
-        EnablePetSkills := StrToBool(IntToStr(abs(frmMain.ComboBox10.ItemIndex)));
-        Option_PVP := StrToBool(IntToStr(abs(frmMain.ComboBox11.ItemIndex)));
-        Option_PVP_Steal := StrToBool(IntToStr(abs(frmMain.ComboBox12.ItemIndex)));
-        Option_PVP_XPLoss := StrToBool(IntToStr(abs(frmMain.ComboBox13.ItemIndex)));
+        try DisableLevelLimit := StrToBool(IntToStr(abs(frmMain.ComboBox16.ItemIndex))); except end;
+        try DisableEquipLimit := StrToBool(IntToStr(abs(frmMain.ComboBox9.ItemIndex))); except end;
+        try EnablePetSkills := StrToBool(IntToStr(abs(frmMain.ComboBox10.ItemIndex))); except end;
+        try Option_PVP := StrToBool(IntToStr(abs(frmMain.ComboBox11.ItemIndex))); except end;
+        try Option_PVP_Steal := StrToBool(IntToStr(abs(frmMain.ComboBox12.ItemIndex))); except end;
+        try Option_PVP_XPLoss := StrToBool(IntToStr(abs(frmMain.ComboBox13.ItemIndex))); except end;
 
-        DefaultZeny := StrToInt(frmMain.Edit35.Text);
-        DefaultItem1 := StrToInt(frmMain.Edit43.Text);
-        DefaultItem2 := StrToInt(frmMain.Edit44.Text);
-        DefaultMap := frmMain.Edit27.Text;
-        DefaultPoint_X := StrToInt(frmMain.Edit28.Text);
-        DefaultPoint_Y := StrToInt(frmMain.Edit45.Text);
+        try DefaultZeny := StrToInt(frmMain.Edit35.Text); except end;
+        try DefaultItem1 := StrToInt(frmMain.Edit43.Text); except end;
+        try DefaultItem2 := StrToInt(frmMain.Edit44.Text); except end;
+        try DefaultMap := frmMain.Edit27.Text; except end;
+        try DefaultPoint_X := StrToInt(frmMain.Edit28.Text); except end;
+        try DefaultPoint_Y := StrToInt(frmMain.Edit45.Text); except end;
 
-        DeathBaseLoss := StrToInt(frmMain.Edit32.Text);
-        DeathJobLoss := StrToInt(frmMain.Edit33.Text);
-        Option_PartyShare_Level := StrToInt(frmMain.Edit34.Text);
-        DisableSkillLimit := StrToBool(IntToStr(abs(frmMain.ComboBox14.ItemIndex)));
+        try DeathBaseLoss := StrToInt(frmMain.Edit32.Text); except end;
+        try DeathJobLoss := StrToInt(frmMain.Edit33.Text); except end;
+        try Option_PartyShare_Level := StrToInt(frmMain.Edit34.Text); except end;
+        try DisableSkillLimit := StrToBool(IntToStr(abs(frmMain.ComboBox14.ItemIndex))); except end;
 
 		weiss_ini_save();
     end;
