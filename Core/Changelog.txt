@@ -1,6 +1,13 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-23-04: R.E.E.D: Multiple membership in parties fixed. [AlexKreuz]
+- 07-23-04: R.E.E.D: Multiple membership in guilds fixed. [AlexKreuz]
+- 07-23-04: R.E.E.D: Castles with invalid guilds cleared. [AlexKreuz]
+- 07-23-04: R.E.E.D: Invalid Guild members cleared. [AlexKreuz]
+- 07-23-04: R.E.E.D: Invalid Party members cleared. [AlexKreuz]
+- 07-23-04: R.E.E.D: Guild leader reassigned if leader invalid. [AlexKreuz]
+- 07-23-04: R.E.E.D: General error-checking fixes in REED conversion. [AlexKreuz]
 - 07-22-04: R.E.E.D Parties were improperly handled and saved. Multi-Party membership. [AlexKreuz]
 - 07-22-04: R.E.E.D Inventory, Storage, Cart need to be cleared upon reload. [AlexKreuz]
 - 07-22-04: R.E.E.D bug in character reload. [AlexKreuz]

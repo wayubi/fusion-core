@@ -2012,8 +2012,9 @@ uses
             datafile.Add('-------------------------------------------------');
 
             for j := 0 to 11 do begin
-                if not assigned(tpa.Member[j]) then tpa.MemberID[j] := 0;
             	if tpa.MemberID[j] = 0 then Continue;
+                if not assigned(tpa.Member[j]) then Continue;
+                if tpa.Member[j].PartyName <> tpa.Name then Continue;                
 
             	str := ' ';
                 str := str + IntToStr(tpa.MemberID[j]);
@@ -2152,11 +2153,14 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[j]) then Continue;                
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
 
             if not saveflag then Continue;
+
+            tg.Name := trim(tg.Name);
 
             datafile.Clear;
             datafile.Add('NAM : ' + tg.Name);
@@ -2344,6 +2348,7 @@ uses
         str : String;
         len : Integer;
         saveflag : Boolean;
+        masterflag : Boolean;
     begin
     	saveflag := False;
     	datafile := TStringList.Create;
@@ -2355,6 +2360,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[j]) then Continue;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
@@ -2365,12 +2371,20 @@ uses
             datafile.Add(' CID    : PO : EXP        ');
             datafile.Add('--------------------------');
 
+            masterflag := True;
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Continue;
+                if not assigned(tg.Member[j]) then Continue;
+                if tg.Member[j].GuildID <> tg.ID then Continue;
 
                 str := ' ';
                 str := str + IntToStr(tg.MemberID[j]);
                 str := str + ' : ';
+
+                if masterflag then begin
+                    tg.MemberPOS[j] := 0;
+                    masterflag := False;
+                end;
 
                 len := length(IntToStr(tg.MemberPOS[j]));
                 for k := 0 to (2 - len) - 1 do begin
@@ -2517,6 +2531,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[i]) then Break;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
@@ -2685,6 +2700,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[i]) then Break;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
@@ -2849,6 +2865,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[i]) then Break;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
@@ -3028,6 +3045,7 @@ uses
 
             for j := 0 to tg.RegUsers - 1 do begin
             	if tg.MemberID[j] = 0 then Break;
+                if not assigned(tg.Member[i]) then Break;
                 if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
                 Break;
             end;
@@ -3215,6 +3233,8 @@ uses
 
         for i := 0 to CastleList.Count - 1 do begin
             tgc := CastleList.Objects[i] as TCastle;
+
+            if GuildList.IndexOf(tgc.GID) = -1 then Continue;
             tg := GuildList.Objects[GuildList.IndexOf(tgc.GID)] as TGuild;
 
             if (tg = nil) then Continue;
