@@ -627,7 +627,7 @@ begin
 					i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0], true);
 {NPCイベント追加ココまで}
 					//色変更
-					if (i >= 0) and (i <= 77) then begin
+					if (i >= 0) then begin
 						CalcStat(tc);
 						tc.ClothesColor := i;
             UpdateLook(tc.MData, tc, 7, i, 0, true);
@@ -948,7 +948,7 @@ begin
 {NPCイベント追加}
 					i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0], true);
 {NPCイベント追加ココまで}
-					if (i >= 0) and (i <= 8) then begin
+					if (i >= 0) then begin
 						tc.HairColor := i;
             UpdateLook(tc.MData, tc, 6, i, 0, true);
 					end;
@@ -1458,7 +1458,7 @@ begin
       47: //hstyle
 				begin
 					i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0], true);
-					if (i >= 0) and (i <= 19) then begin
+					if (i >= 0) then begin
               j := tc.HairColor;
 						  tc.Hair := i;
 

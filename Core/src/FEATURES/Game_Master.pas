@@ -690,7 +690,7 @@ Called when we're shutting down the server *only*
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 8) then begin
+        if (k = 0) and (i >= 0) then begin
             tc.HairColor := i;
             UpdateLook(tm, tc, 6, i, 0, true);
         end;
@@ -705,7 +705,7 @@ Called when we're shutting down the server *only*
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 77) then begin
+        if (k = 0) and (i >= 0) then begin
             tc.ClothesColor := i;
             UpdateLook(tm, tc, 7, i, 0, true);
         end;
@@ -720,7 +720,7 @@ Called when we're shutting down the server *only*
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         Val(Copy(str, 8, 256), i, k);
-        if (k = 0) and (i >= 0) and (i <= 19) then begin
+        if (k = 0) and (i >= 0) then begin
             tc.Hair := i;
             UpdateLook(tm, tc, 1, i, 0, true);
         end;
