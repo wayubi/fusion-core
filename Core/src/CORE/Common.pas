@@ -2277,9 +2277,22 @@ var
         mi        :MapTbl;
         g         :double;
   JIDFix    :word; // JID correction for upper classes.
+        tg        :tguild;
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
+
+                if (tc.guildid > 0) then begin
+                        tg := tguild.create;
+                        tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
+
+                        tg.SLV := 0;
+                        for i := 0 to (tg.RegUsers - 1) do begin
+                                tg.SLV := tg.SLV + tg.Member[i].BaseLV;
+                        end;
+                end;
+
+
     JIDFix := tc.JID;
     if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
     //DebugOut.Lines.Add(Format('JIDFix %d tc.JID %d',[JIDFix, tc.JID]));
