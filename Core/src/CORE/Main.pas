@@ -9663,7 +9663,7 @@ begin
 								WFIFOL(10, tc1.ID);
 								WFIFOB(14, 1);
 								SendBCmd(tm, tc1.Point, 15);
-                                                                tc1.Crusader := tc;
+                                                                if tc.JID = 14 then tc1.Crusader := tc;
 								//DebugOut.Lines.Add(Format('ID %d casts %d to ID %d', [tc.ID,tc.MSkill,tc1.ID]));
 								tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
 								tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;
@@ -9920,6 +9920,15 @@ begin
                                 tc.isPoisoned := False;
                                 tc.PoisonTick := Tick;
                                 PoisonCharacter(tm, tc, Tick);
+                        end;
+                end;
+
+                {Blind Removal}
+                if tc.isBlind = true then begin
+                        if tc.BlindTick < Tick then begin
+                                tc.isBlind := false;
+                                tc.BlindTick := Tick
+                                BlindCharacter(tm, tc, Tick);
                         end;
                 end;
 

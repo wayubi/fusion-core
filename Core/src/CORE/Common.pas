@@ -796,7 +796,10 @@ type TChara = class
         CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
 
         PoisonTick    :Cardinal;  {Tracks how long a player is Poisoned}
-        isPoisoned    :Boolean;  {Says if player is Poisoned}
+        isPoisoned    :Boolean;   {Says if player is Poisoned}
+
+        isBlind       :Boolean;   {Says if a player is blind}
+        BlindTick     :Cardinal;  {Tracks how long a player is Blind}
 
         intimidateActive:Boolean; {Sets intimidate Active}
         intimidateTick:cardinal;  {Used so you can delay before you intimidate}
@@ -1406,6 +1409,7 @@ Option_AutoSave   :word;
 
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
                 procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
+                procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
@@ -2630,6 +2634,29 @@ begin
         end;
 end;
 //------------------------------------------------------------------------------
+procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
+begin
+        tm := tc.MData;
+        if tc.BlindTick > Tick then begin
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 00);
+                WFIFOW(8, 16);
+                WFIFOW(10, tc.Option);
+                WFIFOB(12, 0); // attack animation
+                tc.Socket.SendBuf(buf, 13)
+        end else begin
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, 0);
+                WFIFOW(10, tc.Option);
+                WFIFOB(12, 0);
+                SendBCmd(tm, tc.Point, 13);
+        end;
+end;
+//------------------------------------------------------------------------------
+
 procedure IntimidateWarp(tm:TMap; tc:TChara);
 var
         i       :integer;
