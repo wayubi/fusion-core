@@ -2732,6 +2732,8 @@ Begin
 							ProcessType := 3;
 							MTick := Tick + 100;
 						end else begin
+                            SendSkillError(tc,6);
+                            tc.MMode := 4;
 							Exit;
 						end;
 					end;
