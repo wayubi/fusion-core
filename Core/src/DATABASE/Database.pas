@@ -1015,7 +1015,7 @@ begin
 			end;
 
 			HIT := LV + Param[4];
-			FLEE := Lv + Param[2];
+			FLEE := LV + Param[1];
 			isDontMove := boolean((Mode and 1) = 0);
 			isActive := boolean(((Mode and 4) <> 0) and not DisableMonsterActive);
 			isLoot := boolean((Mode and 2) <> 0);
