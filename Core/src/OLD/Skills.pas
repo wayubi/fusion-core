@@ -142,12 +142,6 @@ Begin
 	// this, but it should be declared in the skill section, not out here.
 	ProcessType := 99;
 
-    	{ Alex: Holy Shit, here we go. This needs to be
-        called before any tests for target type are made
-        the reason being that one skill function should
-        be used for both types of targets. }
-        parse_skills(tc, Tick);
-
 	if tc.Skill[269].Tick > Tick then begin  //Check if BladeStop is active
 		case tc.Skill[269].Effect1 of
 		1: Exit;
@@ -174,6 +168,13 @@ Begin
     if Mapinfo.IndexOf(tm.Name) <> -1 then
 	  	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl
     else exit;  //safe exit if map isn't found in mapinfo
+
+    	{ Alex: Holy Shit, here we go. This needs to be
+        called before any tests for target type are made
+        the reason being that one skill function should
+        be used for both types of targets.
+        - Placed here after all declarations for safety. }
+        parse_skills(tc, Tick);
 
 		if MTargetType = 0 then begin //Target is a monster
 			ts := tc.AData;
@@ -227,48 +228,6 @@ Begin
 				//June 02, 2004 - Darkhelmet, I'm going to begin cleaning and organizing all these skills,
 				//wish me luck!
 
-
-
-
-				7:  {Magnum Break}
-					begin
-						//Calculate the Damage the Skill Does
-						frmMain.DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
-						//Send the Packet of character attacking
-						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
-						if not frmMain.DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-							frmMain.StatCalc1(tc, ts, Tick);
-						xy := ts.Point;
-						//Find all enemies in range
-						sl.Clear;
-						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-									ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-									//NotTargetMonster
-									if ts = ts1 then
-										Continue;
-									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-										sl.AddObject(IntToStr(ts1.ID),ts1);
-								end;
-							end;
-						end;
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count - 1 do begin
-								ts1 := sl.Objects[k1] as TMob;
-								frmMain.DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-								if dmg[0] < 0 then
-									dmg[0] := 0; //Make sure of no negative damage
-								//Send the Packet of character attacking
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1, 5);
-								//Damage the Monster server side
-								if not frmMain.DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
-									frmMain.StatCalc1(tc, ts1, Tick);
-							end;
-						end;
-					end;
-				{Swordman skills player vs monster end}
 
 				{Mage Skills Player vs Monster Begin}
 				15:     {Frost Driver}
@@ -4757,46 +4716,6 @@ Begin
 							frmMain.StatCalc2(tc, tc1, Tick);
 					end;
 
-
-			7: //MB、アローシャワー、グリム
-				begin
-					//ダメージ算出1
-					frmMain.DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
-					if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
-					//パケ送信
-					SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1, 6);
-					if not frmMain.DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
-						frmMain.StatCalc2(tc, tc1, Tick);
-					xy := tc1.Point;
-					//ダメージ算出2
-					sl.Clear;
-					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-							for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
-								if ((tm.Block[i1][j1].CList.Objects[k1] is TChara) = false) then
-									Continue;
-								tc2 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-								//NotTargetMonster
-								//NotYourGuildMember
-								if (tc1 = tc2) or (tc = tc2) or ((mi.PvPG = true) and (tc.GuildID = tc2.GuildID) and (tc.GuildID <> 0)) then Continue;
-								if (abs(tc2.Point.X - xy.X) <= tl.Range2) and (abs(tc2.Point.Y - xy.Y) <= tl.Range2) then
-									sl.AddObject(IntToStr(tc2.ID),tc2);
-							end;
-						end;
-					end;
-					if sl.Count <> 0 then begin
-						for k1 := 0 to sl.Count - 1 do begin
-							tc2 := sl.Objects[k1] as TChara;
-							frmMain.DamageCalc3(tm, tc, tc2, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
-							if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
-							//パケ送信
-							SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], 1, 5);
-							//ダメージ処理
-							if not frmMain.DamageProcess2(tm, tc, tc2, dmg[0], Tick) then
-{追加}					frmMain.StatCalc2(tc, tc2, Tick);
-							end;
-						end;
-					end;
 			11,13,14,19,20,90,156: //BOLT,NB,SS,ES,HL
 					begin
 						//ダメージ算出
