@@ -1651,7 +1651,7 @@ end;
             if MapInfo.IndexOf(tc.Map) = -1 then continue;
             mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             mi.PvP := true;
-            mi.dbPvP := true;
+            //mi.dbPvP := true;
             for i := 0 to tm.CList.Count - 1 do begin
               tc1 := tm.CList.Objects[j] as TChara;
               {WFIFOW( 0, $0199);
@@ -1680,7 +1680,7 @@ end;
           end else if (Copy(str, 1, 6) = 'pvpoff') and (tid.PVPControl = 1) then begin
             mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             mi.PvP := false;
-            mi.dbPvP := false;
+            //mi.dbPvP := false;
             for i := 0 to tm.CList.Count - 1 do begin
               tc1 := tm.CList.Objects[j] as TChara;
               {WFIFOW( 0, $0199);
@@ -1703,7 +1703,7 @@ end;
             if MapInfo.IndexOf(tc.Map) = -1 then continue;
             mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             mi.PvPG := true;
-            mi.dbPvPG := true;
+            //mi.dbPvPG := true;
             for i := 0 to tm.CList.Count - 1 do begin
               tc1 := tm.CList.Objects[j] as TChara;
               {WFIFOW( 0, $0199);
@@ -1732,7 +1732,7 @@ end;
           end else if (Copy(str, 1, 7) = 'gpvpoff') and (tid.PVPControl = 1) then begin
             mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             mi.PvPG := false;
-            mi.dbPvPG := false;
+            //mi.dbPvPG := false;
             for i := 0 to tm.CList.Count - 1 do begin
               tc1 := tm.CList.Objects[j] as TChara;
               {WFIFOW( 0, $0199);

@@ -1005,9 +1005,6 @@ type MapTbl = class
         PvPG      :Boolean;
         noDay     :Boolean;
 
-        dbPvP     :Boolean;
-        dbPvPG    :Boolean;
-
 end;
 {NPCイベント追加ココまで}
 //------------------------------------------------------------------------------

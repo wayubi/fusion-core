@@ -838,12 +838,9 @@ DebugOut.Lines.Add('Monster AI database loading...');
 				else if (sl[i] = 'noskill') then mi.noSkill := true
 				else if (sl[i] = 'noitem') then mi.noItem := true
 				else if (sl[i] = 'agit') then mi.Agit := true
-                                else if (sl[i] = 'pvp') then mi.dbPvP := true
-                                else if (sl[i] = 'pvpg') then mi.dbPvPG := true
+                                else if (sl[i] = 'pvp') then mi.PvP := true
+                                else if (sl[i] = 'pvpg') then mi.PvPG := true
                                 else if (sl[i] = 'noday') then mi.noday := true;
-
-                                if (mi.dbPvP = true) then mi.PvP := true;
-                                if (mi.dbPvPG = true) then mi.PvPG := true;
 
                                 if (Option_PVP = false) then begin
                                         mi.PvP := false;
