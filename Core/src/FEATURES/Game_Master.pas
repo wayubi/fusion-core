@@ -582,6 +582,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc, GM_SAVE)) ) then error_msg := command_save(tc)
             else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc, GM_RETURN)) ) then error_msg := command_return(tc)
             else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_DIE)) ) then error_msg := command_die(tc)
+            else if ( (copy(str, 1, length('autoloot')) = 'autoloot') and (check_level(tc, GM_AUTOLOOT)) ) then error_msg := command_autoloot(tc)
             else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc, GM_AUTO)) ) then error_msg := command_auto(tc, str)
             else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
             else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
@@ -633,7 +634,6 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
             else if ( (copy(str, 1, length('iscson')) = 'iscson') and (check_level(tc, GM_ISCSON)) ) then error_msg := command_iscson(tc)
             else if ( (copy(str, 1, length('iscsoff')) = 'iscsoff') and (check_level(tc, GM_ISCSOFF)) ) then error_msg := command_iscsoff(tc)
-            else if ( (copy(str, 1, length('autoloot')) = 'autoloot') and (check_level(tc, GM_AUTOLOOT)) ) then error_msg := command_autoloot(tc)
             else if ( (copy(str, 1, length('gstorage')) = 'gstorage') and (check_level(tc, GM_GSTORAGE)) ) then error_msg := command_gstorage(tc)
             else if ( (copy(str, 1, length('rcon')) = 'rcon') and (check_level(tc, GM_RCON)) ) then error_msg := command_rcon(str)
             else if ( (copy(str, 1, length('jail')) = 'jail') and (check_level(tc, GM_JAIL)) ) then error_msg := command_jail(tc, str)
@@ -645,7 +645,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc, GM_ATHENA_SAVE)) ) then error_msg := command_athena_save(tc)
             else if ( (copy(str, 1, length('load')) = 'load') and (check_level(tc, GM_ATHENA_LOAD)) ) then error_msg := command_athena_load(tc)
             else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc, GM_ATHENA_KILL)) ) then error_msg := command_athena_kill(tc, str)
-			else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
+            else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc, GM_ATHENA_DIE)) ) then error_msg := command_athena_die(tc)
             else if ( (copy(str, 1, length('jobchange')) = 'jobchange') and (check_level(tc, GM_ATHENA_JOBCHANGE)) ) then error_msg := command_athena_jobchange(tc, str)
             else if ( (copy(str, 1, length('hide')) = 'hide') and (check_level(tc, GM_ATHENA_HIDE)) ) then error_msg := command_athena_hide(tc)
             else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc, GM_ATHENA_OPTION)) ) then error_msg := command_athena_option(tc, str)
@@ -4667,10 +4667,9 @@ Called when we're shutting down the server *only*
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 6, 256);
-        itemname := sl.Strings[0];
 
         if sl.Count = 2 then begin
-
+            itemname := sl.Strings[0];
             if ItemDBName.IndexOf(itemname) <> -1 then begin
 
                 td := ItemDBName.Objects[ItemDBName.IndexOf(itemname)] as TItemDB;
@@ -4777,10 +4776,9 @@ Called when we're shutting down the server *only*
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 7, 256);
-        itemname := sl.Strings[0];
 
         if sl.Count = 9 then begin
-
+            itemname := sl.Strings[0];
             if ItemDBName.IndexOf(itemname) <> -1 then begin
 
                 td := ItemDBName.Objects[ItemDBName.IndexOf(itemname)] as TItemDB;
@@ -4940,7 +4938,7 @@ Called when we're shutting down the server *only*
         debug : String;
     begin
         Result := 'GM_ATHENA_DOOM Success.';
-        for i := 0 to CharaName.Count do begin
+        for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
                 if tc1.PData.Accesslevel = 0 then begin
@@ -4987,7 +4985,7 @@ Called when we're shutting down the server *only*
     begin
         Result := 'GM_ATHENA_KICKALL Success.';
 
-        for i := 0 to CharaName.Count do begin
+        for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
                 tc1.Socket.Close;
@@ -5002,10 +5000,10 @@ Called when we're shutting down the server *only*
         i : Integer;
     begin
         Result := 'GM_ATHENA_RAISE Success.';
-        for i := 0 to CharaName.Count do begin
+        for i := 0 to CharaName.Count - 1 do begin
             tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
-                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
                 tc1.HP := tc1.MAXHP;
                 tc1.SP := tc1.MAXSP;
                 tc1.Sit := 3;
@@ -5028,7 +5026,7 @@ Called when we're shutting down the server *only*
     begin
         Result := 'GM_ATHENA_RAISEMAP Success.';
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-        for i := 0 to tm.CList.Count do begin
+        for i := 0 to tm.CList.Count - 1 do begin
             tc1 := tm.CList.objects[i] as TChara;
             tc1.HP := tc1.MAXHP;
             tc1.SP := tc1.MAXSP;
