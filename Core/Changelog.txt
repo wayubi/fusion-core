@@ -1,6 +1,12 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-21-03: Fixed Map Point System. Major bug that causes many problems. [AlexKreuz]
+            - Archers can not shoot through walls anymore.
+            - Monsters/Players can not jump cliffs/walls anymore.
+            - Monsters do not spawn in lakes/cliffs/offmap anymore.
+            - Flywings/Teleport do not teleport you to stuck points anymore.
+            - Many other bugs depending on Map Point system.
 - 12-20-03: Fixed Double merchant cart purchase / Double items bug. [AlexKreuz]
 - 12-20-03: Added intelligent error handling. Auto-Resume & Auto-Restart. [AlexKreuz]
 - 12-20-03: Updated interface with cleaner MinToTray Button. [AlexKreuz]

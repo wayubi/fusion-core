@@ -5749,16 +5749,15 @@ begin
         			dat.Read(h[3], 4);
 	        		dat.Read(maptype, 4);
 
-        			if maptype = 5 then maptype := 0;
-	        		if (i = 0) or (j = 0) or (i = tm.Size.X - 1) or (j = tm.Size.Y - 1) then begin
-		        		tm.gat[i][j] := 0;
-        			end else if (maptype and 1) = 0 then begin
-	        			if (h[0] > 3) or (h[1] > 3) or (h[2] > 3) or (h[3] > 3) then
-        					tm.gat[i][j] := 3
-	        			else
+                                if (maptype = 0) then begin
+                                        if (h[0] > 3) or (h[1] > 3) or (h[2] > 3) or (h[3] > 3) then begin
+        					tm.gat[i][j] := 3;
+                                        end else begin
 		        			tm.gat[i][j] := 1;
-                        end else
-                                tm.gat[i][j] := 0;
+                                        end;
+                                end else if (maptype = 5) then begin
+                                        tm.gat[i][j] := 0;
+                                end;
                         end;
                 end;
 	end;
