@@ -486,7 +486,7 @@ uses
         frmMain.Edit53.Text := IntToStr(CharacterItem.SP);
         frmMain.Label98.Caption := IntToStr(CharacterItem.MAXHP);
         frmMain.Label99.Caption := IntToStr(CharacterItem.MAXSP);
-        frmMain.Label102.Caption := IntToStr(CharacterItem.PData.ID);
+        frmMain.Label102.Caption := CharacterItem.PData.Name;
         if CharacterItem.GuildID <> 0 then frmMain.Label105.Caption := CharacterItem.GuildName;
         if CharacterItem.PartyID <> 0 then frmMain.Label103.Caption := CharacterItem.PartyName;
 
