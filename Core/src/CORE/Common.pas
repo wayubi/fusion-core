@@ -6158,7 +6158,6 @@ begin
 				if (GuildM = false) then tc.Socket.SendBuf(buf, w)
 				else SendGuildMCmd(tc, w, AvoidSelf);
 			end;
-
 		3: //ƒMƒ‹ƒhƒXƒLƒ‹
 			begin
 				w := 37 * 5 + 6;
