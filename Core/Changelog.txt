@@ -1,3 +1,4 @@
+- 04-27-04: MobSkills - unallocated array at routine end [ChrstphrR]
 - 04-27-04: Index checks, CloseQuery memory leaks with 10+ global lists fixed [ChrstphrR]
 - 04-26-04: Memory Leak fixes in sv1PacketProcessTo routine. [ChrstphrR]
 - 04-26-04: Cleanup of unused vars in sv1PacketProcess routine. [ChrstphrR]
