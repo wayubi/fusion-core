@@ -566,7 +566,7 @@ begin
   inherited;
   fFileList := TList.create;
   fFileSpecList := TStringList.create;
-  fShowProgress := true;
+  fShowProgress := false;
   fAddOptions := [aoUpdate];      //default to update
   fExtractOptions := [eoUpdate];
   fTempPath := GetTempPath;
