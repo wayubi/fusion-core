@@ -6992,7 +6992,7 @@ begin
           end;
         137:    {Grimtooth}
           begin
-            if (tc.Option = 6) and (Weapon = 16) then begin
+            if (tc.Option and 2 <> 0) and (Weapon = 16) then begin
           	DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
 						//パケ送信
@@ -7541,7 +7541,7 @@ begin
 					end;
     10,24: {Ruwatch, Sight}
         begin
-            Option := Option or 1;
+            if (MSkill = 10) then Option := Option or 1 else Option := Option or $2000;
             WFIFOW(0, $0119);
             WFIFOL(2, ID);
             WFIFOW(6, 0);
@@ -7567,8 +7567,8 @@ begin
             if sl.Count <> 0 then begin
                 for k1 := 0 to sl.Count - 1 do begin
                     tc1 := sl.Objects[k1] as TChara;
-                    if tc1.Option = 6 then begin
-                        tc1.Option := tc1.Optionkeep;
+                    if (tc1.Option and 6 <> 0) then begin
+                        tc1.Option := tc1.Option and $FFF9;
                         tc1.Hidden := false;
                         tc1.SkillTick := tc1.Skill[51].Tick;
                         tc1.SkillTickID := 51;
@@ -7749,8 +7749,14 @@ begin
 					end;
 				51:     {Hiding}
 					begin
-                                                tc1 := tc;
-                                                ProcessType := 1;
+            if (tc.Option and 4 = 0) then begin
+              tc1 := tc;
+              ProcessType := 1;
+            end else begin
+              MMode := 4;
+              exit;
+            end;
+
 					end;
         53:
           begin
@@ -7924,8 +7930,9 @@ begin
 						end;
                   214: //Raid
                   begin
-                  if (tc.Option = 6) then begin
-                  tc.Option := tc.Optionkeep;
+                  // Colus, 20040204: Option change, testing option 2 instead of 4+2
+                  if (tc.Option and 2 <> 0) then begin
+                  tc.Option := tc.Option and $FFFD;
                   tc.Hidden := false;
                   tc.Skill[51].Tick := Tick;
                   tc.SkillTick := Tick;
@@ -7992,7 +7999,7 @@ begin
 					end;
         130:
           begin
-            if (tc.Option = 16) then begin
+            if (tc.Option and 16 <> 0) then begin
             xy := tc.Point;
 						sl.Clear;
             
@@ -8008,8 +8015,8 @@ begin
 						if sl.Count <> 0 then begin
 							for k1 := 0 to sl.Count - 1 do begin
 								tc1 := sl.Objects[k1] as TChara;
-                if tc1.Option = 6 then begin
-  						    tc1.Option := tc1.Optionkeep;
+                if (tc1.Option and 6 <> 0) then begin
+  						    tc1.Option := tc1.Option and $FFF9;
 
                   tc1.SkillTick := tc1.Skill[51].Tick;
                   tc1.SkillTickID := 51;
@@ -8043,8 +8050,9 @@ begin
                                                 for j := - 1 to 1 do begin
                                                         if (tm.gat[xy.X + j, xy.Y] = 1) or (tm.gat[xy.X, xy.Y + j] = 1) then begin
                                                                 tc.isCloaked := true;
-                                                                tc.Optionkeep := tc.Option;
-                                                                tc.Option := 6;
+                                                                //tc.Optionkeep := tc.Option;
+                                                                // Colus, 20040204: Trying option 4 instead of 6 for cloak
+                                                                tc.Option := tc.Option or 4;
                                                                 k := 1;
                                                         end;
                                                 end;
@@ -9239,7 +9247,7 @@ begin
           end;
         57:     {Brandish Spear}
         begin
-                if (tc.Option = 32) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then begin
+                if (tc.Option and 32 <> 0) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then begin
                         DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                         dmg[0] := dmg[0] * 2;
                         j := 1;
@@ -9687,7 +9695,7 @@ begin
           end;
         137:    {Grimtooth}
           begin
-            if (tc.Option = 6) and (Weapon = 16) then begin
+            if (tc.Option and 2 <> 0) and (Weapon = 16) then begin
           	DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
 						//パケ送信
@@ -10055,14 +10063,14 @@ begin
 
                                                 if (tc1.MSkill = 51) then begin {Hiding}
 
-                                                        if tc1.Option = 6 then begin
+                                                        if (tc1.Option and 2 <> 0) then begin
                                                                 tc1.Skill[MSkill].Tick := Tick;
-	    					                tc1.Option := tc1.Optionkeep;
+	    					                tc1.Option := tc1.Option and $FFFD;
                                                                 SkillTick := tc1.Skill[MSkill].Tick;
                                                                 SkillTickID := MSkill;
                                                                 //tc1.SP := tc1.SP + 10;  // Colus 20040118
                                                                 tc1.Hidden := false;
-                                                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                                                                //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
                                                         end else begin
 
                                                                 // Required to place Hide on a timer.
@@ -10073,8 +10081,8 @@ begin
 							                SkillTickID := MSkill;
     					                	end;
 
-                                                                tc1.Optionkeep := tc1.Option;
-                                                                tc1.Option := 6;
+                                                                //tc1.Optionkeep := tc1.Option;
+                                                                tc1.Option := tc1.Option or 2;
                                                                 tc1.Hidden := true;
 
                                                         end;
@@ -10112,14 +10120,15 @@ begin
 						end;
             end;
             if (tc1.MSkill = 114) then begin
-            if tc1.Option = 32 then begin
-						tc1.Option := tc1.Optionkeep;
+            // Colus, 20040204: This needs changing to a Skill[114].Tick method
+            if (tc1.Option and 4096 <> 0) then begin
+						tc1.Option := tc1.Option and $EFFF;
             SkillTick := tc1.Skill[MSkill].Tick;
             SkillTickID := MSkill;
             CalcStat(tc1, Tick);
 						end else begin
-              tc1.Optionkeep := tc1.Option;
-							tc1.Option := 32;
+              //tc1.Optionkeep := tc1.Option;
+							tc1.Option := tc1.Option or 4096;
 						end;
             end;
             if tl.Icon <> 0 then begin
@@ -10443,7 +10452,7 @@ begin
 
                         if k <> 1 then begin
                                 tc.Skill[MSkill].Tick := Tick;
-                                tc.Option := tc.Optionkeep;
+                                tc.Option := tc.Option and $FFF9;
                                 //SkillTick := tc.Skill[MSkill].Tick;
                                 //SkillTickID := MSkill;
                                 tc.Hidden := false;
@@ -11997,8 +12006,10 @@ begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-							if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
-							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
+							if (tc1.HP > 0) and (tc1.Sit <> 1) and (tc1.Option and $46 = 0) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
+							//if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin
+							    //if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) and ((tc1.Sit <> 1) or (tc1.Option < 64)) then begin
+							    if (SearchAttack(ts.path, tm, ts.Point.X, ts.Point.Y, tc1.Point.X, tc1.Point.Y) <> 0) then begin
 								sl.AddObject(IntToStr(tc1.ID), tc1);
 							    end;
 							end;
@@ -13150,7 +13161,8 @@ begin
 						//DebugOut.Lines.Add('Move processing error');
 					end else begin
                                         /// alexkreuz: xxx
-					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
+//					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option <> 6) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
+					if ((tc.MMode = 0) or (tc.Skill[278].Lv > 0)) and ((tm.gat[NextPoint.X][NextPoint.Y] <> 1) and (tm.gat[NextPoint.X][NextPoint.Y] <> 5)) and ((tc.Option and 6 = 0) or (tc.Skill[213].Lv <> 0) or (tc.isCloaked)) and (tc.SongTick < Tick) and (tc.AnkleSnareTick < Tick) then begin
 						//追加移動
 						AMode := 0;
 						k := SearchPath2(tc.path, tm, Point.X, Point.Y, NextPoint.X, NextPoint.Y);
@@ -13199,7 +13211,7 @@ begin
 {U0x003bココまで}
 {修正}
 				if (AMode = 1) or (AMode = 2) then begin
-					if (tc.Sit = 1) or (tc.Option = 6) then begin
+					if (tc.Sit = 1) or (tc.Option and 6 <> 0) then begin
           AMode := 0;
 					end else if ATick + ADelay < Tick then begin
           if (tm.CList.IndexOf(tc.ATarget) <> -1) and ((mi.Pvp = true) or (mi.PvPG = true)) then begin
@@ -13274,7 +13286,7 @@ begin
 								MPoint.X := 0;
 								MPoint.Y := 0;
 						 end;
-            end else if (tc.Option = 6) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
+            end else if (tc.Option and 2 <> 0) and (tc.MSkill <> 51) and (tc.MSkill <> 137) and (tc.MSkill <> 214) and (tc.MSkill <> 212)then begin
               if MMode = 1 then begin
 								MMode := 0;
 								MTarget := 0;
@@ -13294,7 +13306,9 @@ begin
             if Boolean(MMode xor $04) then
               if (tc.ItemSkill = false) then begin
                 // Colus, 20040118: Unhiding should not drain SP...
-                if ((MSkill <> 51) or ((MSkill = 51) and (Option = 6))) then begin
+                // Colus, 20040204: The reason we are testing that we _are_ hidden is b/c we use
+                // the mode set in the skill code previously.  This means you are hiding successfully.
+                if ((MSkill <> 51) or ((MSkill = 51) and (Option and 2 <> 0))) then begin
                   DecSP(tc, MSkill, MUseLV);
                 end;
               end else begin
@@ -13313,9 +13327,9 @@ begin
 				//時間制限スキルが切れたかどうかチェック
 				if SkillTick <= Tick then begin
 					case SkillTickID of
-						10,24: //ルアフ、サイトの解除
+						10,24: // Sight/Ruwach
 							begin
-								Option := Option and $FE;
+								Option := Option and $DFFE;
 								WFIFOW(0, $0119);
 								WFIFOL(2, tc.ID);
 								WFIFOW(6, 0);
@@ -13331,8 +13345,8 @@ begin
 						51,135: //ハイド、クローキング
 							begin
                 // AlexKreuz: Changed to expire Hide Skill
-                if tc.Option = 6 then begin
-	    					  tc.Option := tc.Optionkeep;
+                if (tc.Option and 6 <> 0) then begin
+	    					  tc.Option := tc.Option and $FFF9;
                   SkillTick := tc.Skill[SkillTickID].Tick;
                   //tc.SP := tc.SP + 10;
                   tc.Hidden := false;
@@ -14100,7 +14114,7 @@ begin
                                                                                                                                                                                                         if (strtoint(sl.Strings[7]) >= 0) and (strtoint(sl.Strings[7]) < ta.Size.X) and (strtoint(sl.Strings[8]) >= 0) and (strtoint(sl.Strings[8]) < ta.Size.Y) then begin
                                                                                                                                                                                                                 if tc1.Login = 2 then begin
                                                                                                                                                                                                                         // User is online
-                                                                                                                                                                                                                        if (tc1.Option < 64) then SendCLeave(tc1, 2);
+                                                                                                                                                                                                                        if (tc1.Option and 64 = 0) then SendCLeave(tc1, 2);
                                                                                                                                                                                                                         MapMove(tc1.Socket, sl.Strings[6], Point(strtoint(sl.Strings[7]),strtoint(sl.Strings[8])));
                                                                                                                                                                                                                         tc1.Map := sl.Strings[6];
                                                                                                                                                                                                                         tc1.Point.X := strtoint(sl.Strings[7]);

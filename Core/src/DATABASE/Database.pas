@@ -1721,7 +1721,7 @@ begin
 			Option        := StrToInt(sl.Strings[12]);
 
       // AlexKreuz: Added to reset hide status on load.
-      if Option = 4 then Option := 0;
+      if (Option and 6 <> 0) then Option := Option and $FFF9;
 
 			Karma         := StrToInt(sl.Strings[13]);
 			Manner        := StrToInt(sl.Strings[14]);
@@ -2445,11 +2445,9 @@ begin
 {èCê≥ÉRÉRÇ‹Ç≈}
 
         // AlexKreuz: Added to prevent saving of Hide.
-        if Option = 4 then begin
-          sl.Add('0');
-        end else begin
-          sl.Add(IntToStr(Option));
-        end;
+        // Colus, 20040204: Generalized it further.
+        sl.Add(IntToStr(Option and $FFF9));
+
 
 				sl.Add(IntToStr(Karma));
 				sl.Add(IntToStr(Manner));

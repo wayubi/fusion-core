@@ -2,6 +2,8 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-04-04: Redid all option settings [Colus]
+- 02-04-04: Fixed Ruwach displaying incorrect sprite [Colus]
 - 02-03-04: Updated #job again to clear sprites out as well [Colus]
 - 02-03-04: Corrected Cast Cancel's SP cost, usage [Colus]
 - 02-03-04: Added #newplayer command [Mitch]

@@ -551,17 +551,17 @@ type TeNPC = class
 
 end;
 //------------------------------------------------------------------------------
-//キャラクターデータ
+// Character Data
 type TChara = class
-	//制御変数
+	// Control Variables
 	ID	          :cardinal;
 	Socket        :TCustomWinSocket;
 	PData         :Pointer;
 	IP            :string;
-	Login         :byte; //0=オフライン 1=ロード中 2=オンライン
+	Login         :byte; // 0 = offline; 1 = loading; 2 = online
 
-	//chara.txtよりロード、セーブするデータ
-	//1行目
+	// Data saved and loaded to/from chara.txt
+	// Line 1:
 	CID	          :cardinal;
 	Name          :string;
 	Gender        :byte;
@@ -576,10 +576,32 @@ type TChara = class
   PLv           :word;
   Plag          :word;
 	Zeny          :cardinal;
-	Stat1         :cardinal; //状態１
-	Stat2         :cardinal; //状態２
-	Option        :cardinal;
-    Optionkeep    :cardinal;
+	Stat1         :cardinal; // Status 1
+	Stat2         :cardinal; // Status 2
+  // Colus, 20040204:
+  // Option is a word-length bitmask.  The bits are for the following
+  // character status conditions:
+  //
+  // 01: Sight        02: Hide          04: Cloak         08: Cart 1
+  // 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
+  // 256: Cart 3      512: Cart 4       1024: Cart 5
+  // 8192: Ruwach
+
+  //  0000 | 0000 | 0000 | 0000
+  //    R     CCC   CPPF   CCHS
+  //    w     543   2Hel   1lig
+  //    c            dcc    kdt
+  //    h            eon     e
+  //
+  // OptionKeep is not necessary.  All options should be set up
+  // using ands and ors to change the bitmask.
+  //
+  // Example: Cart check: if (Option and $0788);
+  // Example: Hide check: if (Option and 2);
+  // Example: Set peco on: tc.Option := tc.Option or 32;
+	//Option        :cardinal;
+  //Optionkeep    :cardinal;
+  Option        :word;
   Hidden        :boolean;
   Paradise      :boolean;
 	Karma         :cardinal;
@@ -624,14 +646,14 @@ type TChara = class
 	MemoMap       :array[0..2] of string;
 	MemoPoint     :array[0..2] of TPoint;
 
-	//2行目
+	// Line 2: Skills
 	Skill         :array[0..336] of TSkill;
 
-	//3行目
+	// Line 3: Items
 	Item          :array[1..100] of TItem;
-	//4行目
+	// Line 4: Cart
 	Cart          :TItemList;
-	//5行目
+	// Line 5: Variables
 	Flag          :TStringList;
 
 	//
@@ -1962,7 +1984,10 @@ begin
                         tc.MDEF1 := 90; //tc.MDEF1 +90;
                 end;
                 if Skill[269].Tick > Tick then begin
-                        tc.Option := 6;
+                  // Colus, 20040204: This isn't right, but how to fix it?
+                  // This would make the monk hidden.
+                        //tc.Option := 6;
+                        tc.Option := tc.Option or 6;
                 end;
                 if Skill[280].Tick > Tick then begin
 			WElement[0] := 3;
@@ -2286,7 +2311,7 @@ begin
 			end;
 		end;
 
-		//ぺこ騎乗&槍装備=中型にも100%ダメージ
+		// When on peco and using a spear, damage to medium scale monsters is 100%.
 		if ((Option and 32) <> 0) and ((WeaponType[0] = 4) or (WeaponType[0] = 5)) then begin
 			ATKFix[0][1] := 100;
 		end;
@@ -2348,7 +2373,7 @@ begin
     // Colus, 20031228: Moved this mod from CalcSkill b/c CalcStat
     // won't take its value into account otherwise.
 
-    if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
+    if ((tc.Option and 2 <> 0) and (tc.Skill[213].Lv <> 0)) then begin
        i := (Skill[213].Data.Data2[Skill[213].Lv] * i) div 100;
     end;
 

@@ -81,9 +81,9 @@ begin
 									tc.Skill[k].Tick := 0;
 								end;
 								tc.SkillTick := $FFFFFFFF;
-								tc.Option := tc.Option and $FFFE;
-                                                                if tc.Option = 6 then begin
-                                                                        tc.Option := 0;
+								tc.Option := tc.Option and $DFFE;
+                                                                if (tc.Option and 6 <> 0) then begin
+                                                                        tc.Option := tc.Option and $FFF9;
                                                                         tc.Hidden := false;
                                                                 end;
 								with tc do begin

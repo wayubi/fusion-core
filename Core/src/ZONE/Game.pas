@@ -673,9 +673,12 @@ end;
 				        			tc.TalkNPCID := tn.ID;
 					        		tc.ScriptStep := 0;
 						        	tc.AMode := 3;
-							//オプション初期化
-							if (tc.Option <> 0) then begin
-								tc.Option := 0;
+							// Option Reset
+              // Colus, 20040204: WHY?  You will lose your peco/falcon when
+              // talking/shopping...you want to unhide, perhaps, but not
+              // completely reset your options.
+							if (tc.Option and 6 <> 0) then begin
+								tc.Option := tc.Option and $FFF9;
 								//見た目変更
 								WFIFOW(0, $0119);
 								WFIFOL(2, tc.ID);
@@ -1505,6 +1508,8 @@ end;
 					end else if (Copy(str, 1, 7) = 'option ') and ((DebugCMD and $0400) <> 0) and (tid.ChangeOption = 1) then begin
 						if Copy(str, 8, 5) = 'sight' then begin
 							tc.Option := tc.Option or 1;
+						end else if Copy(str, 8, 6) = 'ruwach' then begin
+							tc.Option := tc.Option or 8192;
 						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18)) and (Copy(str, 8, 4) = 'cart') then begin
 							tc.Option := tc.Option or 8;
 							//カートデータ送信
@@ -2322,7 +2327,7 @@ end;
 								end;
 							2: // Fly Wings - Rewritten by AlexKreuz
 								begin
-                  if ((tc.item[w].Amount <= 0) or (tc.Sit = 1) or (tc.Option = 6)) then exit;
+                  if ((tc.item[w].Amount <= 0) or (tc.Sit = 1) or (tc.Option and 6 <> 0)) then exit;
 									i := MapInfo.IndexOf(tc.Map);
 									j := -1;
 									if (i <> -1) then begin
@@ -4348,7 +4353,7 @@ end;
 				j := -1;
 				if (i <> -1) then begin
 					mi := MapInfo.Objects[i] as MapTbl;
-					if ((mi.noTele = true) or (mi.noPortal = true) or (tc.Option = 6)) then j := 0;
+					if ((mi.noTele = true) or (mi.noPortal = true) or (tc.Option and 6 <> 0)) then j := 0;
 				end;
 				if (tc.MSkill = 26) and (j = 0) then continue;
 {アジト機能追加ココまで}
@@ -4411,7 +4416,7 @@ end;
 
 				if (tc.MSkill = 0) or (tc.MSkill > 336) then continue;
 {アジト機能追加}
-				if ((tc.MSkill = 27) and (mi.noTele or (tc.Option = 6))) then continue;
+				if ((tc.MSkill = 27) and (mi.noTele or (tc.Option and 6 <> 0))) then continue;
 {アジト機能追加ココまで}
 {修正}	if (tc.ver2 = 9) and (tc.MUseLV > 30) then tc.MUseLV := tc.MUseLV - 30;
 				if (tc.Skill[tc.MSkill].Lv >= tc.MUseLV) and (tc.MUseLV > 0) then begin
@@ -6511,11 +6516,11 @@ end;
       if (tid.ChangeOption = 1) then begin
 				tm := tc.MData;
 
-				if (tc.Option < 64) then begin
-					tc.Option := tc.Option + 64;
+				if (tc.Option and 64 = 0) then begin
+					tc.Option := tc.Option or 64;
           tc.Hidden := true;
 				end else begin
-					tc.Option := tc.Option - 64;
+					tc.Option := tc.Option and $FFBF;
           tc.Hidden := false;
 				end;
 
