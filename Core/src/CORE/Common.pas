@@ -3745,11 +3745,12 @@ begin
     1052: {Rocker}
       begin
         //All Stats + 1
-        tc.Bonus[0] := tc.Bonus[5] + 1;
-        tc.Bonus[1] := tc.Bonus[5] + 1;
-        tc.Bonus[2] := tc.Bonus[5] + 1;
-        tc.Bonus[3] := tc.Bonus[5] + 1;
-        tc.Bonus[4] := tc.Bonus[5] + 1;
+        //20040524 You were making everything equal to LUK bonus +1 - KyuubiKitsune
+        tc.Bonus[0] := tc.Bonus[0] + 1;
+        tc.Bonus[1] := tc.Bonus[1] + 1;
+        tc.Bonus[2] := tc.Bonus[2] + 1;
+        tc.Bonus[3] := tc.Bonus[3] + 1;
+        tc.Bonus[4] := tc.Bonus[4] + 1;
         tc.Bonus[5] := tc.Bonus[5] + 1;
       end;
     1063: {Lunatic}

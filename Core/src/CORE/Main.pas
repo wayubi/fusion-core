@@ -10712,7 +10712,8 @@ begin
 						//Damage Calc
 						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * ( MUseLV + 100 ) div 100;
 						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
-						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
+            dmg[0] := dmg[0] - tc1.MDEF2; // Using INT defense rather than INT.
+						//dmg[0] := dmg[0] - tc1.Param[3]; //MDEF- its using only the INT should use MDEF2
 						if dmg[0] < 1 then dmg[0] := 1;
 						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
             // Colus, 20040130: Add effect of garment cards
@@ -10769,7 +10770,7 @@ begin
 						end;
 					end;
 {:119}
-				17: //FB (HD‚Æ‚Ù‚Ú“¯‚¶)
+				17: //FB (HD‚Æ‚Ù‚Ú“¯‚¶) - Fireball
 					begin
 						xy := tc1.Point;
 						sl.Clear;
@@ -10793,7 +10794,7 @@ begin
                 // Colus, 20040130: Add effect of garment cards
                 dmg[0] := dmg[0] * (100 - tc2.DamageFixE[1][tl.Element]) div 100;
 								dmg[0] := dmg[0] * tl.Data2[MUseLV];
-								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+								if dmg[0] < 0 then dmg[0] := 1 ; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘• - Damage Less than 0
                 if (tc2.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 								if (tc1 = tc2) or (tc = tc2)  then k := 0 else k := 5;
 								SendCSkillAtk2(tm, tc, tc2, Tick, dmg[0], tl.Data2[MUseLV], k);
@@ -10814,7 +10815,7 @@ begin
         365:   //Magic Crusher PVP by Eliot
           begin
 					 dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100; // Calculate Attack Power - Eliot
-					 dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; // Calculate Magic Defense - Eliot
+					 dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100 - tc1.MDEF2; // Calculate Magic Defense - Eliot & added INT defence - KyuubiKitsune
 					 dmg[0] := dmg[0] - tc1.Param[3];
 					if dmg[0] < 1 then          // Check for negative damage
            dmg[0] := 1;
