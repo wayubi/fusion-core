@@ -46,6 +46,8 @@ dmg           :array[0..7] of integer;
 
 implementation
 
+uses Main;
+
 
 (*-----------------------------------------------------------------------------*
 Monster's AI
@@ -607,19 +609,6 @@ something in it}
                         SendMSkillAttack(tm, tc, ts, Tick, 3);
                 end;
 
-                173:    {Self Destruction}
-                begin
-                        dmg[0] := ts.HP;
-                        if dmg[0] < 0 then dmg[0] := 0;
-                        SendMSkillAttack(tm, tc, ts, Tick, 1);
-                        ts.HP := 0;
-                        WFIFOW( 0, $0080);
-	                WFIFOL( 2, ts.ID);
-	                WFIFOB( 6, 1);
-	                SendBCmd(tm, ts.Point, 7);
-                        
-                end;
-
                 175:    {Suicide Attack}
                 begin
                         dmg[0] := ts.HP;
@@ -861,7 +850,8 @@ procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
 
 var
     ProcessType     :Byte;
-    j,i1,j1 :integer;
+    tc  :   TChara;
+    j,i1,j1,k1 :integer;
     //mi  :MapTbl;
     xy  :TPoint;
 begin
@@ -981,6 +971,32 @@ with ts do begin
                 end;
                 //if ProcessType = 0 then DebugOut.Lines.Add('Monster is too far from a wall');
             end;
+          173:    {Self Destruction}
+            begin
+                xy.X := ts.Point.X;
+                xy.Y := ts.Point.Y;
+                //Lets find our characters in range first of all
+                // I'll use a range of 4 for now
+                 for j1 := (xy.Y - 4) div 8 to (xy.Y + 4) div 8 do begin
+                    for i1 := (xy.X - 4) div 8 to (xy.X + 4) div 8 do begin
+                        for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
+                            tc := tm.Block[i1][j1].CList.Objects[k1] as TChara;
+                            if tc <> nil then begin
+                                dmg[0] := ts.HP;
+                                if dmg[0] < 0 then dmg[0] := 0;
+                                SendMSkillAttack(tm, tc, ts, Tick, 1);
+                                ts.HP := 0;
+                            end;
+                        end;
+                    end;
+                 end;
+                            frmMain.MonsterDie(tm, tc, ts, Tick);
+                        {WFIFOW( 0, $0080);
+	                WFIFOL( 2, ts.ID);
+	                WFIFOB( 6, 1);
+	                SendBCmd(tm, ts.Point, 7);}
+                        
+                end;
           196:  {Summon Slave}
             begin
               // (ts.isLeader) and ( (MonsterMob) or ((ts.isSummon) and (SummonMonsterMob)) )then begin
@@ -1728,7 +1744,7 @@ begin
         //if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
         j := ts.CastTime;
         ts.MTick := Tick + cardinal(j);
-
+        if ts.MSkill = 173 then ts.MTick := Tick + 3000;  //3 Seconds for self destruct
         if (j > 0) then begin
           if ts.SkillType = 1 then begin // Skill is a target skill, we'll follow the target
                 //Send Packets
