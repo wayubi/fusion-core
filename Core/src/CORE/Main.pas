@@ -3393,6 +3393,9 @@ var
   tl:TSkillDB;
   td:TItemDB;
   found:boolean;
+  tpe:TPet;
+  tn:TNPC;
+  tn1:TNPC;
 begin
 	with tc do begin
 		ts := AData;
@@ -3461,6 +3464,35 @@ begin
 				AMode := 0;
 				Exit;
 			end;
+      // Dokkaebi Hammer Fall: (Intimacy Level/100)*1% chance of using
+      // Hammer Fall on enemy when Master is attacking
+      if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
+        tn := tc.PetNPC;
+        tpe := tc.PetData;
+        if (tpe.JID = 1110) and (tc.AData <> nil) then begin
+          if Random(100) < (tpe.Relation / 100.0) then begin
+            xy.X := ts.Point.X;
+            xy.Y := ts.Point.Y;
+
+            //Create Graphics and Set NPC
+            tn1 := SetSkillUnit(tm, tc.ID, xy, Tick, $6E, 0, 3000, tc);
+
+            tn1.MSkill := 110;
+            tn1.MUseLV := 2;
+
+            //Send Graphic
+            WFIFOW( 0, $0117);
+			      WFIFOW( 2, 110);
+			      WFIFOL( 4, tn.ID);
+			      WFIFOW( 8, 2);
+			      WFIFOW(10, ts.Point.X);
+			      WFIFOW(12, ts.Point.Y);
+			      WFIFOL(14, 1);
+			      SendBCmd(tm, xy, 18);
+
+          end;
+        end;
+      end;
 
 
 			// + Œƒ ‚µ ‚­ Ž© “® ‘é +
@@ -11169,6 +11201,9 @@ var
 	MobData:TMobDB;
 	sl:TStringList;
   Tick:cardinal;
+  //ts:TMob;
+  //tc1:TChara;
+  //xy:TPoint;
 begin
   sl := TStringList.Create;
   tm := tc.MData;
@@ -11264,7 +11299,6 @@ begin
         tc.Socket.SendBuf(buf, 9);
       end;
     end;
-
 
 
     if MobData.isLoot = true then begin
