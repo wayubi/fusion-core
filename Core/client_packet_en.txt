@@ -1390,7 +1390,8 @@ R 011f <dst ID>.l <src ID>.l <X>.w <Y>.w <type>.B <fail>.B
 	b1: Demonstration
 	b2: Pink Warp Portal (active)
 	b3-bf: No resource
-
+	b3: Some cross npc possible PA_Gospel or HP_Ballista?
+	b4: Holy pillar of light possible PA_GOSPEL or HP_Ballista?
 	Ground info request ?.81b is unkhown.	
 
 R 0120 <ID>.l
