@@ -9951,7 +9951,7 @@ begin
           removing the Critical Explosion check while adding the Ashura check.
           Also, it doesn't say anything about recovering HP, so that's not
           changed...for now.}
-        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10300 <= Tick) and (Skill[271].Tick < Tick) then begin
+        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) then begin
 					if (SP <> MAXSP) then begin
 {‹Zp229}   j := (3 + MAXSP * 2 div 1000) * Skill[260].Data.Data2[Skill[260].Lv];
 						if SP + j > MAXSP then j := MAXSP - SP;
