@@ -2321,6 +2321,22 @@ begin
                                 tc.MTick := Tick + 3000;
                         end;
                 end;
+                //Parry
+                if ((miss = False) and (tc.Skill[356].Tick > Tick)) then begin
+                        miss := boolean(Random(100) <= tc.Skill[356].Effect1);
+                        if (miss = True) then begin
+                                tc.MSkill := 356;
+                                WFIFOW( 0, $011a);
+                                WFIFOW( 2, tc.MSkill);
+                                WFIFOW( 4, tc.MUseLV);
+                                WFIFOL( 6, tc.ID);
+                                WFIFOL(10, tc.ID);
+                                WFIFOB(14, 1);
+                                SendBCmd(tm, tc.Point, 15);
+                                SendCSkillAtk1(tm, tc, ts, Tick, 0, 1, 6);
+                                tc.MTick := Tick + 3000;
+                        end;
+                end;
 
                 //Dragonology
                 if (tc.Skill[284].Lv <> 0) and (ts.Data.Race = 9) then begin
@@ -8458,10 +8474,16 @@ begin
 						ProcessType := 3;
 					end;
                                              	356: //Parrying
-					begin
-						tc1 := tc;
-						ProcessType := 3;
-					end;
+                                        begin
+                                                if (tc.Weapon = 3) then begin;
+                                                ProcessType := 3;
+                                                MTick := Tick + 100;
+                                                end else begin
+                                                Exit;
+                                                end;
+                                        end;
+
+
                                          	357: //Concentration
 					begin
 						tc1 := tc;
