@@ -1747,10 +1747,10 @@ Begin
 				250:    {Shield Charge}
 					begin
 						if (tc.Shield = 0) then begin
-            SendSkillError(tc,6);
-            tc.MMode := 4;
-            exit;
-            end else begin
+                            SendSkillError(tc,6);
+                            tc.MMode := 4;
+                            exit;
+                        end else begin
 							{If Wearing Shield}
 							xy.X := ts.Point.X - Point.X;
 							xy.Y := ts.Point.Y - Point.Y;
@@ -4035,7 +4035,12 @@ Begin
 
 				250:    //Shield Charge
 					begin
-						if (tc.Shield <> 0) then begin // 20040324,Eliot: It should check if You have a shield.
+						if (tc.Shield = 0) then begin
+                            SendSkillError(tc,6);
+                            tc.MMode := 4;
+                            exit;
+                        end else begin
+						{if (tc.Shield <> 0) then begin // 20040324,Eliot: It should check if You have a shield.}
 						xy.X := tc1.Point.X - Point.X;
 						xy.Y := tc1.Point.Y - Point.Y;
 						{if abs(xy.X) > abs(xy.Y) * 3 then begin
