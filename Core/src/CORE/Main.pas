@@ -11408,6 +11408,7 @@ end;
 
 procedure TfrmMain.MinimizetoTray2Click(Sender: TObject);
 begin
+    {$IFDEF MSWINDOWS}
     Option_Minimize_Tray := True;
     weiss_ini_save();
 
@@ -11427,6 +11428,10 @@ begin
                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
                 //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
                 // (Don't ToolWindows don't show in taskbar by default)
+    {$ENDIF}
+    {$IFDEF LINUX}
+        ShowMessage('This Option is not available under Linux.');
+    {$ENDIF}
 end;
 
 procedure TfrmMain.PageControl1Change(Sender: TObject);
