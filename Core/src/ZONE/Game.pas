@@ -1235,12 +1235,31 @@ Begin(* Proc sv3PacketProcess() *)
 						WFIFOL(2, tc.ID);
 						WFIFOW(6, 0);
 						WFIFOW(8, 2);
-		        WFIFOW(10, 64);
-		        WFIFOB(12, 0);
-		        SendBCmd(tm, tc.Point, 13);
-		        tc.Stat1 := 0;
-		        tc.Stat2 := 2;
+						WFIFOW(10, 64);
+						WFIFOB(12, 0);
+						SendBCmd(tm, tc.Point, 13);
+						tc.Stat1 := 0;
+						tc.Stat2 := 2;
 						tc.Option := 64;
+					end
+					
+					else if (Copy(str, 1, 8) = 'mothball') then begin
+						if tc.Stat2 = 16 then j := 0
+						else j := 16;
+						
+						for i := 0 to charaname.count - 1 do begin
+							tc1 := charaname.objects[i] as tchara;
+							if (tc1.login = 2) then begin
+								WFIFOW(0, $0119);
+								WFIFOL(2, tc1.ID);
+								WFIFOW(6, 0);
+								WFIFOW(8, j);
+								WFIFOW(10, 0);
+								WFIFOB(12, 0);
+								SendBCmd(tm, tc1.Point, 13);
+								tc.Stat2 := j;
+							end;
+						end;
 					end
 					// NEW GM COMMANDS
 

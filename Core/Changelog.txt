@@ -1,3 +1,4 @@
+- 04-10-04: Added #mothball GM command (Because we need more useless commands). [AlexKreuz]
 - 04-10-04: Added item effects 202-205, see database.pas for documentation. [Darkhelmet]
 - 04-10-04: Added removeEquipment Script command. [Darkhelmet]
 - 04-09-04: Retranslated map load packet, trimmed some useless code/comments. [Colus]
