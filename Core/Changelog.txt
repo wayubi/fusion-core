@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-29-04: Added email validation to -pword command. [Mitch]
 - 01-29-04: Fixed bug #394: Sends "Party already exists" to a novice whose basic skill level isnt 7 yet. [Mitch]
 - 01-29-04: Added new GM Command: #revive playernamehere - Used to revive other players! [Mitch]
 - 01-29-04: Updated message sending for -server and -users to send the correct message length instead of just 256 or 200. [Mitch]

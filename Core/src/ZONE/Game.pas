@@ -1621,7 +1621,11 @@ end;
 
                                         // AlexKreuz: Change Password
                                         if (Copy(str, 1, 5) = 'pword') then begin
-                                                if length(copy(str,7,256)) < 4 then begin
+                                                sl := TStringList.Create;
+                                                sl.DelimitedText := Copy(str, 7, 256);
+                                                if sl.Count <> 2 then continue;
+
+                                                if length(sl.Strings[0]) < 4 then begin
                                                         //DebugOut.Lines.Add('Password Change Failed');
                                                         { Mitch 01-29-2004: Notify user why it failed! }
                                                         str := 'Passwords must be at least 4 characters long!';
@@ -1631,10 +1635,10 @@ end;
                                                         WFIFOS (4, str, w - 4);
                                                         tc.socket.sendbuf(buf, w);
                                                 end
-                                                else if (copy(str,7,1)) = ' ' then begin
+                                                else if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
                                                         //DebugOut.Lines.Add('Password Change Failed');
                                                         { Mitch 01-29-2004: Notify user why it failed! }
-                                                        str := 'You have to enter a new password!';
+                                                        str := 'You have to enter a new password and your email address!';
                                                         w := Length(str) + 4;
                                                         WFIFOW (0, $009a);
                                                         WFIFOW (2, w);
@@ -1652,15 +1656,25 @@ end;
                                                         end;
                                                         }
                                                         //DebugOut.Lines.Add('Old Password: ' + tp1.Pass);
-                                                        tp1.Pass := Copy(str, 7, 256);
-                                                        //DebugOut.Lines.Add('New Password: ' + tp1.Pass);
-                                                        { Mitch 01-29-2004: Notify user that the password is changed! }
-                                                        str := 'Password changed. New Password: ' + tp1.Pass;
-                                                        w := Length(str) + 4;
-                                                        WFIFOW (0, $009a);
-                                                        WFIFOW (2, w);
-                                                        WFIFOS (4, str, w - 4);
-                                                        tc.socket.sendbuf(buf, w);
+                                                        if sl.Strings[1] <> tp1.Mail then begin
+                                                          { Mitch 01-29-2004: Notify user why it failed! }
+                                                          str := 'Your email address didnt match the one you entered!';
+                                                          w := Length(str) + 4;
+                                                          WFIFOW (0, $009a);
+                                                          WFIFOW (2, w);
+                                                          WFIFOS (4, str, w - 4);
+                                                          tc.socket.sendbuf(buf, w);
+                                                        end else begin
+                                                          tp1.Pass := sl.Strings[0];
+                                                          //DebugOut.Lines.Add('New Password: ' + tp1.Pass);
+                                                          { Mitch 01-29-2004: Notify user that the password is changed! }
+                                                          str := 'Password changed. New Password: ' + tp1.Pass;
+                                                          w := Length(str) + 4;
+                                                          WFIFOW (0, $009a);
+                                                          WFIFOW (2, w);
+                                                          WFIFOS (4, str, w - 4);
+                                                          tc.socket.sendbuf(buf, w);
+                                                        end;
                                                 end;                                        
                                         end else
                                         // AlexKreuz: Change Password
