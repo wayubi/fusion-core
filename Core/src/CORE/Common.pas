@@ -1536,7 +1536,6 @@ Option_GraceTime_PvPG :cardinal;
                 procedure  PetSkills(tc: TChara; Tick:cardinal);  //Calculate the Pets Skills
 
                 procedure  Monkdelay(tm:TMap; tc:TChara; Delay:integer);
-                procedure  Tripleblow(tm:TMap; tc:TChara; Delay:word);
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
@@ -2387,7 +2386,7 @@ begin
                                         10: ADelay := ADelay * 40 div 100;
                                 end;
                         end;}
-                     Delay := (2000 - (4 * param[1]) - (2 * param[4]) - 300);
+                     Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
 
     
@@ -4314,14 +4313,6 @@ begin
         WFIFOL( 2, tc.ID);
         WFIFOW( 6, spiritspheres);
         // Colus, 20031222: This packet only has 8 bytes, not 16!
-        SendBCmd(tm, tc.Point, 8);
-end;
-//-----------------------------------------------------------------------------
-procedure Tripleblow(tm:TMap; tc:TChara; Delay:word);
-begin
-        WFIFOW( 0, $01d2);
-        WFIFOL( 2, tc.ID);
-        WFIFOW( 6, Delay);
         SendBCmd(tm, tc.Point, 8);
 end;
 //------------------------------------------------------------------------------

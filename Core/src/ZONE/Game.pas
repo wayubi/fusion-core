@@ -629,13 +629,7 @@ end;
 							if (tc.Option and 6 <> 0) then begin
 								tc.Option := tc.Option and $FFF9;
 								//見た目変更
-								WFIFOW(0, $0119);
-								WFIFOL(2, tc.ID);
-								WFIFOW(6, 0);
-								WFIFOW(8, 0);
-								WFIFOW(10, tc.Option);
-								WFIFOB(12, 0);
-								SendBCmd(tc.MData, tc.Point, 13);
+                UpdateOption(tm, tc);
 							end;
 							        tc.AData := tn;
 					        		NPCScript(tc);
@@ -1420,6 +1414,7 @@ end;
 							WFIFOB(7, i);
 							SendBCmd(tm, tc.Point, 8);
 						end;
+
           end else if (Copy(str, 1, 7) = 'hstyle ') and (tid.ChangeColorStyle = 1) then begin
 						//髪の色変更
 						Val(Copy(str, 8, 256), i, k);
@@ -1515,7 +1510,7 @@ end;
 							tc.Option := tc.Option or 1;
 						end else if Copy(str, 8, 6) = 'ruwach' then begin
 							tc.Option := tc.Option or 8192;
-						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
+						end else if ((tc.JID = 5) or (tc.JID = 10) or (tc.JID = 18) or (tc.JID = 23) or (tc.JID = 4006) or (tc.JID = 4011) or (tc.JID = 4019)) and (Copy(str, 8, 4) = 'cart') then begin
 							tc.Option := tc.Option or 8;
 							//カートデータ送信
 {追加}				SendCart(tc);
@@ -1526,13 +1521,7 @@ end;
 						end else if Copy(str, 8, 3) = 'off' then begin
 							tc.Option := 0;
 						end;
-						WFIFOW(0, $0119);
-						WFIFOL(2, tc.ID);
-						WFIFOW(6, 0);
-						WFIFOW(8, 0);
-						WFIFOW(10, tc.Option);
-						WFIFOB(12, 0);
-						SendBCmd(tm, tc.Point, 13);
+            UpdateOption(tm, tc);
 
 					end else if (Copy(str, 1, 7) = 'refine ') and ((DebugCMD and $0800) <> 0) and (tid.Refine = 1)  then begin
 						//装備中の武器防具を精錬

@@ -1782,7 +1782,7 @@ begin
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
 		dmg[6] := i;
-                Delay := (1500 - (4 * param[1]) - (2 * param[4]) - 300);
+    Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
 		if Arms = 0 then begin
 			crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
@@ -1802,7 +1802,7 @@ begin
 
                         //if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
 
-                        Delay := (2000 - (4 * param[1]) - (2 * param[4]) -300);
+                        Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
                         //if tatk = true then Combodelay := (1000 - (4 * param[4]));
 		end else begin
 			datk := false;
@@ -4146,23 +4146,25 @@ begin
 					end;
 				79:     {Magnus Exorcism}
 					begin
-                                                j := SearchCInventory(tc, 717, false);
+            j := SearchCInventory(tc, 717, false);
 						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
 
-                                                        if NoJamstone = False then UseItem(tc, j); //Function Call to Use item
-                                                        for j1 := 1 to 7 do begin
-							        for i1 := 1 to 7 do begin
-								        if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
-								        xy.X := (MPoint.X) -4 + i1;
-								        xy.Y := (MPoint.Y) -4 + j1;
-								        if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
-								        tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], tl.Data1[MUseLV]);
-                        tn.Tick := Tick + tl.Data1[MUseLV];
-								        tn.CData := tc;
-					                                tn.MSkill := MSkill;
-								        tn.MUseLV := MUseLV;
-							        end;
-						        end;
+              if NoJamstone = False then UseItem(tc, j); //Function Call to Use item
+              for j1 := 1 to 7 do begin
+                for i1 := 1 to 7 do begin
+								  if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
+								  xy.X := (MPoint.X) -4 + i1;
+								  xy.Y := (MPoint.Y) -4 + j1;
+								  if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
+                  tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], (4+MUseLV)*1000);
+                  tn.Tick := Tick + ((4+MUseLV) * 1000); //tl.Data1[MUseLV];
+								  tn.CData := tc;
+					        tn.MSkill := MSkill;
+								  tn.MUseLV := MUseLV;
+                end;
+              end;
+
+              tc.MTick := Tick + 4000;  // Cast delay 4s
 
 						end else begin  //Doesn't have Gemstone
               SendSkillError(tc, 8); //No Blue Gemstone
@@ -5011,21 +5013,21 @@ begin
                                                         end;
                                                 end;
                                         end;
-                                           362:    //Ballista??
+                                           362:    // Basilica
                                         begin
                                                 xy.X := MPoint.X;
                                                 xy.Y := MPoint.Y;
-                                                for j1 := 1 to 9 do begin
+                                                {for j1 := 1 to 9 do begin
                                                         for i1 := 1 to 9 do begin
                                                                 xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
+                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;}
 
                                                                 tn := SetSkillUnit(tm, ID, xy, Tick, $b4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
                                                                 tn.MSkill := MSkill;
                                                                 tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
+                                                {        end;
+                                                end;}
                                         end;
 
                                         286:    {Deluge}
@@ -5888,13 +5890,7 @@ begin
                                     tc.SkillTick := Tick;
                                     tc.SkillTickID := 51;
                                     CalcStat(tc, Tick);
-                                    WFIFOW(0, $0119);
-                                    WFIFOL(2, tc.ID);
-                                    WFIFOW(6, tc.Stat1);
-                                    WFIFOW(8, tc.Stat2);
-                                    WFIFOW(10, tc.Option);
-                                    WFIFOB(12, 0);
-                                    SendBCmd(tm, tc.Point, 13);
+                                    UpdateOption(tm, tc);
                                   end else begin
                                     SendSkillError(tc, 0);
                                     tc.MMode := 4;
@@ -6076,13 +6072,10 @@ begin
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0;
                                                 SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
-                                                WFIFOW(0, $0196);
-                                                WFIFOW(2, $59);
-                                                WFIFOL(4, tc.ID);
-                                                WFIFOB(8, 1);
-                                                Delay := (1500 - (4 * param[1]) - (2 * param[4]) - 300);
+                                                UpdateIcon(tm, tc, $59);
+                                                Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
                                                 //tc.ATick := timeGetTime() + Delay;
-                                                Tripleblow(tm, tc, tc.Delay);
+                                                MonkDelay(tm, tc, tc.Delay);
 
                                                 tc.ATick := timeGetTime() + Delay;
 
@@ -8196,13 +8189,7 @@ begin
     10,24: {Ruwatch, Sight}
         begin
             if (MSkill = 10) then Option := Option or 1 else Option := Option or $2000;
-            WFIFOW(0, $0119);
-            WFIFOL(2, ID);
-            WFIFOW(6, 0);
-            WFIFOW(8, 0);
-            WFIFOW(10, Option);
-            WFIFOB(12, 0);
-            SendBCmd(tm, Point, 13);
+            UpdateOption(tm, tc);
             ProcessType := 2;
 
             xy := tc.Point;
@@ -8228,13 +8215,7 @@ begin
                         tc1.SkillTickID := 51;
                         CalcStat(tc1, Tick);
 
-                        WFIFOW(0, $0119);
-                        WFIFOL(2, tc1.ID);
-                        WFIFOW(6, tc1.Stat1);
-                        WFIFOW(8, tc1.Stat2);
-                        WFIFOW(10, tc1.Option);
-                        WFIFOB(12, 0);
-                        SendBCmd(tm, tc1.Point, 13);
+                        UpdateOption(tm, tc1);
 
                         // Colus, 20031228: Tunnel Drive speed update
                         if (tc1.Skill[213].Lv <> 0) then begin
@@ -8553,7 +8534,7 @@ begin
 					end;
                                         387: // Cart Boost
 					begin
-                                        if (tc.Option = 8) or (tc.Option = 128) or (tc.Option = 256) or (tc.Option = 512) or (tc.Option = 1024) then begin
+                                        if (tc.Option and $0788 <> 0) then begin
 						tc1 := tc;
 						ProcessType := 3;
                                                 end else begin
@@ -8690,13 +8671,7 @@ begin
                   tc.SkillTick := Tick;
                   tc.SkillTickID := 51;
                   CalcStat(tc, Tick);
-                  WFIFOW(0, $0119);
-                  WFIFOL(2, tc.ID);
-                  WFIFOW(6, tc.Stat1);
-                  WFIFOW(8, tc.Stat2);
-                  WFIFOW(10, tc.Option);
-                  WFIFOB(12, 0);
-                  SendBCmd(tm, tc.Point, 13);
+                  UpdateOption(tm, tc);
                   xy := tc.Point;
                   sl.Clear;
                   j := tl.Range2;
@@ -8820,13 +8795,7 @@ begin
                           tc.Option := tc.Option and $FFF9;
                           CalcStat(tc, Tick);
 
-                          WFIFOW(0, $0119);
-                          WFIFOL(2, tc.ID);
-                          WFIFOW(6, tc.Stat1);
-                          WFIFOW(8, tc.Stat2);
-                          WFIFOW(10, tc.Option);
-                          WFIFOB(12, 0);
-                          SendBCmd(tm, tc.Point, 13);
+                          UpdateOption(tm, tc);
                           tc.MMode := 4;
                           exit;
                         end else begin
@@ -8847,13 +8816,7 @@ begin
                                   k := 1;
                                   CalcStat(tc, Tick);
 
-                                  WFIFOW(0, $0119);
-                                  WFIFOL(2, tc.ID);
-                                  WFIFOW(6, tc.Stat1);
-                                  WFIFOW(8, tc.Stat2);
-                                  WFIFOW(10, tc.Option);
-                                  WFIFOB(12, 0);
-                                  SendBCmd(tm, tc.Point, 13);
+                                  UpdateOption(tm, tc);
                                   tc1 := tc;
                                   ProcessType := 1;
                                 end;
@@ -9355,13 +9318,7 @@ begin
                                     tc.SkillTick := Tick;
                                     tc.SkillTickID := 51;
                                     CalcStat(tc, Tick);
-                                    WFIFOW(0, $0119);
-                                    WFIFOL(2, tc.ID);
-                                    WFIFOW(6, tc.Stat1);
-                                    WFIFOW(8, tc.Stat2);
-                                    WFIFOW(10, tc.Option);
-                                    WFIFOB(12, 0);
-                                    SendBCmd(tm, tc.Point, 13);
+                                    UpdateOption(tm, tc);
                                   end else begin
                                     SendSkillError(tc, 0);
                                     tc.MMode := 4;
@@ -11031,13 +10988,7 @@ begin
 
               CalcStat(tc1, Tick);
 
-              WFIFOW(0, $0119);
-    				  WFIFOL(2, tc1.ID);
-    					WFIFOW(6, tc1.Stat1);
-    					WFIFOW(8, tc1.Stat2);
-    					WFIFOW(10, tc1.Option);
-    					WFIFOB(12, 0);
-    					SendBCmd(tm, tc1.Point, 13);
+              UpdateOption(tm, tc1);
 
               // Colus, 20031228: Tunnel Drive speed update
               if (tc1.Skill[213].Lv <> 0) then begin
@@ -11478,13 +11429,7 @@ begin
                                 tc.Hidden := false;
                                 tc.isCloaked := false;
                                 CalcStat(tc, Tick);
-                                WFIFOW(0, $0119);
-                                WFIFOL(2, tc.ID);
-                                WFIFOW(6, tc.Stat1);
-                                WFIFOW(8, tc.Stat2);
-                                WFIFOW(10, tc.Option);
-                                WFIFOB(12, 0);
-                                SendBCmd(tm, tc.Point, 13);
+                                UpdateOption(tm, tc);
                         end;
                 end;
 
@@ -14117,7 +14062,7 @@ begin
 		WFIFOW(10, 0);
 		WFIFOB(12, 0);
 		SendBCmd(tm, ts.Point, 13);
-                UpdateMonsterLocation(tm, ts);
+    UpdateMonsterLocation(tm, ts);
 	end;
 end;
 //------------------------------------------------------------------------------
@@ -14776,14 +14721,8 @@ begin
 						10,24: // Sight/Ruwach
 							begin
 								Option := Option and $DFFE;
-								WFIFOW(0, $0119);
-								WFIFOL(2, tc.ID);
-								WFIFOW(6, 0);
-								WFIFOW(8, 0);
-								WFIFOW(10, tc.Option);
-								WFIFOB(12, 0);
-								SendBCmd(tm, tc.Point, 13);
-                                                                Skill[SkillTickID].Tick := 0;
+                UpdateOption(tm, tc);
+                Skill[SkillTickID].Tick := 0;
 								//Skill[10].Tick := 0;
 								//Skill[24].Tick := 0;
 							end;
@@ -14798,13 +14737,7 @@ begin
                   tc.Hidden := false;
                   if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
                   CalcStat(tc, Tick);
-                  WFIFOW(0, $0119);
-        					WFIFOL(2, tc.ID);
-        					WFIFOW(6, tc.Stat1);
-    		    			WFIFOW(8, tc.Stat2);
-    				    	WFIFOW(10, tc.Option);
-        					WFIFOB(12, 0);
-        					SendBCmd(tm, tc.Point, 13);
+                  UpdateOption(tm, tc);
                   // Colus, 20031228: Tunnel Drive speed update
                   if (tc.Skill[213].Lv <> 0) then begin
         						WFIFOW(0, $00b0);
