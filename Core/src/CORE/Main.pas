@@ -12264,248 +12264,270 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.MobAttack(tm:TMap;ts:TMob;Tick:cardinal);
 var
-	i,j,c:integer;
-	tc1:TChara;
-        tc2:TChara;
-	xy:TPoint;
+	i,j,c:	integer;
+	tc1:	TChara;
+        tc2:	TChara;
+	xy:	TPoint;
 begin
-//反撃モード
 	with ts do begin
-                tc2 := nil;
+		tc2 := nil;
 		tc1 := AData;
-                if tc1.GraceTick > Tick then exit;
-                if tc1.Skill[255].Tick > Tick then begin
-                        tc2 := tc1.Crusader;
-                        if (tc2.Login <> 2) and (tc1 <> tc2) then begin
-                                tc2 := nil;
-                                tc1.Skill[255].Tick := Tick;
-                        end;
-                end;
+		if tc1.GraceTick > Tick then exit;
 
+		if tc1.Skill[255].Tick > Tick then begin
+			tc2 := tc1.Crusader;
+			if (tc2.Login <> 2) and (tc1 <> tc2) then begin
+				tc2 := nil;
+				tc1.Skill[255].Tick := Tick;
+			end;
+		end;
+		
 		if ( (tc1.Sit = 1) or (tc1.Login <> 2) or (tc1.Hidden = true) ) and (ts.isLooting = false) then begin
-		//攻撃対象が死んでいるかログアウトしている
+		{ Stops attack if target is dead, not logged in, or hidden }
 			ATarget := 0;
 			ARangeFlag := false;
-		end else if (abs(ts.Point.X - tc1.Point.X) <= ts.Data.Range1) and (abs(ts.Point.Y - tc1.Point.Y) <= ts.Data.Range1) then begin
-      //DebugOut.Lines.Add(IntToStr(SearchPath2(path, tm, Point.X, Point.Y, tc1.Point.X, tc1.Point.Y)));
-
+		end
+		
+		else if (abs(ts.Point.X - tc1.Point.X) <= ts.Data.Range1) and (abs(ts.Point.Y - tc1.Point.Y) <= ts.Data.Range1) then begin
+		{ Attacks if monster and player are within range of each other }
+			
 			if (ATick + Data.ADelay < Tick) then begin
 				ATick := Tick - Data.ADelay;
 			end;
-			if ATick + Data.ADelay <= Tick then begin
-			//位置ずれ修正
-                        UpdateMonsterLocation(tm, ts);
 			
-			for j := 1 to (Tick - ATick) div Data.ADelay do begin
-				//反撃
-                                if tc1.Skill[255].Tick > Tick then begin
-                                DamageCalc2(tm, tc1, ts, Tick);
-				WFIFOW( 0, $008a);
-				WFIFOL( 2, ID);
-				WFIFOL( 6, tc2.ID);
-				WFIFOL(10, timeGetTime());
-				WFIFOL(14, ts.Data.aMotion);
-				WFIFOL(18, tc2.dMotion);
-				WFIFOW(22, dmg[0]); //ダメージ
-				WFIFOW(24, dmg[4]); //分割数
-				if ((tc2.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;  // 4->9 for Endure damage, allow lucky hit gfx
-				WFIFOB(26, dmg[5]); //0=単攻撃 8=複数
-				WFIFOW(27, 0); //逆手
-				SendBCmd(tm, tc2.Point, 29);
-				if (dmg[0] <> 0) and (tc2.pcnt <> 0) and (tc2.dMotion <> 0) then begin
-					//ダメージを受けると立ち止まる
-					tc2.Sit := 3;
-					tc2.HPTick := Tick;
-					tc2.HPRTick := Tick - 500;
-					tc2.SPRTick := Tick;
-					tc2.pcnt := 0;
-{追加}
-					UpdatePlayerLocation(tm, tc2);
-{追加ココまで}
-
-          // Colus, 20040129: Reset Lex Aeterna here
-          tc2.Skill[78].Tick := 0;
-				end;
-				if ts.Data.MEXP <> 0 then begin
-					for c := 0 to 31 do begin
-						if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc2) then begin
-							ts.MVPDist[c].CData := tc2;
-							Inc(ts.MVPDist[c].Dmg, dmg[0]);
-							break;
+			if ATick + Data.ADelay <= Tick then begin
+				UpdateMonsterLocation(tm, ts);
+				
+				for j := 1 to (Tick - ATick) div Data.ADelay do begin
+					if tc1.Skill[255].Tick > Tick then begin
+						DamageCalc2(tm, tc1, ts, Tick);
+						WFIFOW( 0, $008a);
+						WFIFOL( 2, ID);
+						WFIFOL( 6, tc2.ID);
+						WFIFOL(10, timeGetTime());
+						WFIFOL(14, ts.Data.aMotion);
+						WFIFOL(18, tc2.dMotion);
+						WFIFOW(22, dmg[0]);
+						WFIFOW(24, dmg[4]);
+					
+						// 4->9 for Endure damage, allow lucky hit gfx
+						if ((tc2.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;
+					
+						WFIFOB(26, dmg[5]);
+						WFIFOW(27, 0);
+						SendBCmd(tm, tc2.Point, 29);
+					
+						if (dmg[0] <> 0) and (tc2.pcnt <> 0) and (tc2.dMotion <> 0) then begin
+							tc2.Sit := 3;
+							tc2.HPTick := Tick;
+							tc2.HPRTick := Tick - 500;
+							tc2.SPRTick := Tick;
+							tc2.pcnt := 0;
+							UpdatePlayerLocation(tm, tc2);
+						
+							// Colus, 20040129: Reset Lex Aeterna here
+							tc2.Skill[78].Tick := 0;
 						end;
-					end;
-				end;
-
-				if tc2.HP > dmg[0] then begin
-					tc2.HP := tc2.HP - dmg[0];
-					if dmg[0] <> 0 then begin
-						tc2.DmgTick := Tick + tc2.dMotion div 2;
-					end;
-				end else begin
-					//キャラ死亡
-					tc2.HP := 0;
-					WFIFOW( 0, $0080);
-					WFIFOL( 2, tc2.ID);
-					WFIFOB( 6, 1);
-					SendBCmd(tm, tc2.Point, 7);
-					tc2.Sit := 1;
-
-                                        i := (100 - DeathBaseLoss);
-                                        tc2.BaseEXP := Round(tc2.BaseEXP * (i / 100));
-                                        i := (100 - DeathJobLoss);
-                                        tc2.JobEXP := Round(tc2.JobEXP * (i / 100));
-
-                                        SendCStat1(tc2, 1, $0001, tc2.BaseEXP);
-                                        SendCStat1(tc2, 1, $0002, tc2.JobEXP);
-					//if tc2.Job = 0 then tc2.HP := tc2.MAXHP div 2 else tc2.HP := 1;
-					tc2.pcnt := 0;
-					if (tc2.AMode = 1) or (tc2.AMode = 2) then tc2.AMode := 0;
-						ATarget := 0;
-						ARangeFlag := false;
-					end;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0005);
-					WFIFOL( 4, tc2.HP);
-					tc2.Socket.SendBuf(buf, 8);
-                                        ts.ATick := ts.ATick + abs(ts.Data.ADelay);
-
-
-
-                                end else if tc1.Skill[255].Tick <= Tick then begin
-				DamageCalc2(tm, tc1, ts, Tick);
-                                if dmg[0] <= 0 then dmg[0] := 0;
-				WFIFOW( 0, $008a);
-				WFIFOL( 2, ID);
-				WFIFOL( 6, ATarget);
-				WFIFOL(10, timeGetTime());
-				WFIFOL(14, ts.Data.aMotion);
-				WFIFOL(18, tc1.dMotion);
-				WFIFOW(22, dmg[0]); //ダメージ
-				WFIFOW(24, dmg[4]); //分割数
-				if ((tc1.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;  // 4->9 for Endure damage, allow lucky hit gfx
-				WFIFOB(26, dmg[5]); //0=単攻撃 8=複数
-				WFIFOW(27, 0); //逆手
-				SendBCmd(tm, tc1.Point, 29);
-				if (dmg[0] <> 0) and (tc1.pcnt <> 0) and (tc1.dMotion <> 0) then begin
-					//ダメージを受けると立ち止まる
-					tc1.Sit := 3;
-					tc1.HPTick := Tick;
-					tc1.HPRTick := Tick - 500;
-					tc1.SPRTick := Tick;
-					tc1.pcnt := 0;
-{追加}
-					UpdatePlayerLocation(tm, tc1);
-
-          // Colus, 20040129: Reset Lex Aeterna here
-          tc1.Skill[78].Tick := 0;
-{追加ココまで}
-				end;
-				if ts.Data.MEXP <> 0 then begin
-					for c := 0 to 31 do begin
-						if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc1) then begin
-							ts.MVPDist[c].CData := tc1;
-							Inc(ts.MVPDist[c].Dmg, dmg[0]);
-							break;
+					
+						if ts.Data.MEXP <> 0 then begin
+							for c := 0 to 31 do begin
+								if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc2) then begin
+									ts.MVPDist[c].CData := tc2;
+									Inc(ts.MVPDist[c].Dmg, dmg[0]);
+									break;
+								end;
+							end;
 						end;
+					
+						if tc2.HP > dmg[0] then begin
+							{ Player has more HP than damage done to him or her }
+							tc2.HP := tc2.HP - dmg[0];
+							if dmg[0] <> 0 then begin
+								tc2.DmgTick := Tick + tc2.dMotion div 2;
+							end;
+						end
+					
+						else begin
+							{ Player has run out of HP and dies }
+							tc2.HP := 0;
+							WFIFOW( 0, $0080);
+							WFIFOL( 2, tc2.ID);
+							WFIFOB( 6, 1);
+							SendBCmd(tm, tc2.Point, 7);
+							tc2.Sit := 1;
+						
+							i := (100 - DeathBaseLoss);
+							tc2.BaseEXP := Round(tc2.BaseEXP * (i / 100));
+							i := (100 - DeathJobLoss);
+							tc2.JobEXP := Round(tc2.JobEXP * (i / 100));
+						
+							SendCStat1(tc2, 1, $0001, tc2.BaseEXP);
+							SendCStat1(tc2, 1, $0002, tc2.JobEXP);
+						
+							tc2.pcnt := 0;
+							if (tc2.AMode = 1) or (tc2.AMode = 2) then tc2.AMode := 0;
+							ATarget := 0;
+							ARangeFlag := false;
+						end;
+					
+						WFIFOW( 0, $00b0);
+						WFIFOW( 2, $0005);
+						WFIFOL( 4, tc2.HP);
+						tc2.Socket.SendBuf(buf, 8);
+						ts.ATick := ts.ATick + abs(ts.Data.ADelay);
+					end
+					
+					else if tc1.Skill[255].Tick <= Tick then begin
+						DamageCalc2(tm, tc1, ts, Tick);
+						if dmg[0] <= 0 then dmg[0] := 0;
+						
+						WFIFOW( 0, $008a);
+						WFIFOL( 2, ID);
+						WFIFOL( 6, ATarget);
+						WFIFOL(10, timeGetTime());
+						WFIFOL(14, ts.Data.aMotion);
+						WFIFOL(18, tc1.dMotion);
+						WFIFOW(22, dmg[0]);
+						WFIFOW(24, dmg[4]);
+						
+						// 4->9 for Endure damage, allow lucky hit gfx						
+						if ((tc1.dMotion = 0) and (dmg[5] <> 11)) then dmg[5] := 9;
+						
+						WFIFOB(26, dmg[5]);
+						WFIFOW(27, 0);
+						SendBCmd(tm, tc1.Point, 29);
+						
+						if (dmg[0] <> 0) and (tc1.pcnt <> 0) and (tc1.dMotion <> 0) then begin
+							tc1.Sit := 3;
+							tc1.HPTick := Tick;
+							tc1.HPRTick := Tick - 500;
+							tc1.SPRTick := Tick;
+							tc1.pcnt := 0;
+							UpdatePlayerLocation(tm, tc1);
+							
+							// Colus, 20040129: Reset Lex Aeterna here
+							tc1.Skill[78].Tick := 0;
+						end;
+						
+						if ts.Data.MEXP <> 0 then begin
+							for c := 0 to 31 do begin
+								if (ts.MVPDist[c].CData = nil) or (ts.MVPDist[c].CData = tc1) then begin
+									ts.MVPDist[c].CData := tc1;
+									Inc(ts.MVPDist[c].Dmg, dmg[0]);
+									break;
+								end;
+							end;
+						end;
+						
+						if tc1.HP > dmg[0] then begin
+							tc1.HP := tc1.HP - dmg[0];
+							if dmg[0] <> 0 then begin
+								tc1.DmgTick := Tick + tc1.dMotion div 2;
+								
+								{Colus, 20031216: Cancel casting timer on hit. Also, phen card handling.}
+								
+								if tc1.NoCastInterrupt = False then begin
+									tc1.MMode := 0;
+									tc1.MTick := 0;
+									WFIFOW(0, $01b9);
+									WFIFOL(2, tc1.ID);
+									SendBCmd(tm, tc1.Point, 6);
+								end;
+								
+								{Colus, 20031216: end cast-timer cancel}
+							end;
+						end
+						
+						else begin
+							tc1.HP := 0;
+							WFIFOW( 0, $0080);
+							WFIFOL( 2, tc1.ID);
+							WFIFOB( 6, 1);
+							SendBCmd(tm, tc1.Point, 7);
+							tc1.Sit := 1;
+							
+							i := (100 - DeathBaseLoss);
+							tc1.BaseEXP := Round(tc1.BaseEXP * (i / 100));
+							i := (100 - DeathJobLoss);
+							tc1.JobEXP := Round(tc1.JobEXP * (i / 100));
+							
+							SendCStat1(tc1, 1, $0001, tc1.BaseEXP);
+							SendCStat1(tc1, 1, $0002, tc1.JobEXP);
+							
+							tc1.pcnt := 0;
+							
+							if (tc1.AMode = 1) or (tc1.AMode = 2) then tc1.AMode := 0;
+							ATarget := 0;
+							ARangeFlag := false;
+						end;
+							
+						WFIFOW( 0, $00b0);
+						WFIFOW( 2, $0005);
+						WFIFOL( 4, tc1.HP);
+						tc1.Socket.SendBuf(buf, 8);
+						ATick := ATick + Data.ADelay;
 					end;
-				end;
-				if tc1.HP > dmg[0] then begin
-					tc1.HP := tc1.HP - dmg[0];
-					if dmg[0] <> 0 then begin
-						tc1.DmgTick := Tick + tc1.dMotion div 2;
-{Colus, 20031216: Cancel casting timer on hit.
- Also, phen card handling.}
-            if tc1.NoCastInterrupt = False then begin
-              tc1.MMode := 0;
-              tc1.MTick := 0;
-              WFIFOW(0, $01b9);
-              WFIFOL(2, tc1.ID);
-              SendBCmd(tm, tc1.Point, 6);
-            end;
-{Colus, 20031216: end cast-timer cancel}
-					end;
-
-				end else begin
-					//キャラ死亡
-					tc1.HP := 0;
-					WFIFOW( 0, $0080);
-					WFIFOL( 2, tc1.ID);
-					WFIFOB( 6, 1);
-					SendBCmd(tm, tc1.Point, 7);
-					tc1.Sit := 1;
-
-          i := (100 - DeathBaseLoss);
-          tc1.BaseEXP := Round(tc1.BaseEXP * (i / 100));
-          i := (100 - DeathJobLoss);
-          tc1.JobEXP := Round(tc1.JobEXP * (i / 100));
-
-          SendCStat1(tc1, 1, $0001, tc1.BaseEXP);
-          SendCStat1(tc1, 1, $0002, tc1.JobEXP);
-					//if tc1.Job = 0 then tc1.HP := tc1.MAXHP div 2 else tc1.HP := 1;
-					tc1.pcnt := 0;
-					if (tc1.AMode = 1) or (tc1.AMode = 2) then tc1.AMode := 0;
-						ATarget := 0;
-						ARangeFlag := false;
-					end;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0005);
-					WFIFOL( 4, tc1.HP);
-					tc1.Socket.SendBuf(buf, 8);
-					ATick := ATick + Data.ADelay;
-                                        end;
 				end;
 			end;
-			ARangeFlag := true;
-		end else if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) then begin
-			//視界のそとまで逃げられた
-                        UpdateMonsterLocation(tm, ts);
 			
+			ARangeFlag := true;
+			
+		end else if (abs(ts.Point.X - tc1.Point.X) > 13) or (abs(ts.Point.Y - tc1.Point.Y) > 13) then begin
+		{ Player is outside monster's range }
+			
+			UpdateMonsterLocation(tm, ts);
 			ATarget := 0;
 			if Data.isDontMove then
 				MoveWait := $FFFFFFFF
 			else
-      MoveWait := Tick + 5000;
+				MoveWait := Tick + 5000;
+				
 			ATick := Tick - Data.ADelay;
 			ARangeFlag := false;
-		end else begin //if MoveWait < Tick then begin
+
+		end else begin
+		{ No target }
+			
 			if Data.isDontMove then begin
 				ATick := Tick - Data.ADelay;
-			end else begin
+			end
+				
+			else begin
 				ARangeFlag := false;
 				if (not EnableMonsterKnockBack) or (DmgTick <= Tick) then begin
-					//視界内にいるので追いかける
 					pcnt := 0;
 					j := 0;
+						
 					repeat
 						xy.X := tc1.Point.X + Random(3) - 1;
 						xy.Y := tc1.Point.Y + Random(3) - 1;
-						//if xy.X <= 0 then xy.X := 1;
-						//if xy.X >= tm.Size.X - 1 then xy.X := tm.Size.X - 2;
-						//if xy.Y <= 0 then xy.Y := 1;
-						//if xy.Y >= tm.Size.Y - 1 then xy.Y := tm.Size.Y - 2;
+
+						{if xy.X <= 0 then xy.X := 1;
+						if xy.X >= tm.Size.X - 1 then xy.X := tm.Size.X - 2;
+						if xy.Y <= 0 then xy.Y := 1;
+						if xy.Y >= tm.Size.Y - 1 then xy.Y := tm.Size.Y - 2;}
+							
 						if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then break;
 						Inc(j);
 					until (j = 100);
-					//if j = 100 then DebugOut.Lines.Add('*** TraceError 1');
-					if j <> 100 then begin                                                 // mf (edited)
-                                                pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);   // mf (edited)
-                                                ts.DeadWait := Tick;                                           // mf
-                                        end;                                                                   // mf
+						
+					if j <> 100 then begin
+						pcnt := SearchPath2(path, tm, Point.X, Point.Y, xy.X, xy.Y);
+						ts.DeadWait := Tick;
+					end;
+						
 					if pcnt = 0 then begin
-						//キャラの所まで歩けない=攻撃不能、ターゲット解除
-						//if j <> 100 then //DebugOut.Lines.Add('*** TraceError 2');
-						//ATarget := 0;
 						MoveWait := Tick + 5000;
-					end else begin
-						//キャラの所まで移動開始
+					end
+						
+					else begin
 						ppos := 0;
 						MoveTick := Tick;
 						tgtPoint := xy;
-
+							
 						SendMMove(tc1.Socket, ts, Point, tgtPoint, tc1.ver2);
-                                                if (ts = nil) or (tc1 = nil) then exit;
+						if (ts = nil) or (tc1 = nil) then exit;
 						SendBCmd(tm, ts.Point, 58, tc1, True);
-{修正ココまで}
 					end;
 				end;
 			end;
