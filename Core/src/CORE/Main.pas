@@ -968,7 +968,6 @@ begin
         // AlexKreuz: Random 10053 Bug Fix
         if Assigned(Socket.Data) then begin
         	tc := Socket.Data;
-          tc.setSkillOnBool(False); //set SkillOnBool when character log off
         	SendCLeave(tc, 2);
                 {NPCÉCÉxÉìÉgí«â¡}
         	i := MapInfo.IndexOf(tc.Map);
@@ -1827,6 +1826,10 @@ begin
 						4: dmg[1] := Param[4] * 160 div 100;
 						else dmg[1] := Param[4];
 					end;
+          // Colus, 20040226: I *think* we apply Maximize Power here.
+          // Of course this is bow code and probably will never be called normally.
+          // Leaving this as a TODO.
+          // if (dmg[1] >= ATK[0][1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
 					if dmg[1] >= ATK[0][1] then begin
 						dmg[1] := ATK[0][1] * ATK[0][1] div 100;
 					end else begin
@@ -1851,8 +1854,14 @@ begin
 					end;
 
 					dmg[2] := ATK[Arms][1];
-					if dmg[2] < dmg[1] then dmg[1] := dmg[2]; //DEX>ATKÇÃèÍçáÅAATKóDêÊ
-					dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
+          // Colus, 20040226: I *think* we apply Maximize Power here.
+					//if dmg[2] < dmg[1] then dmg[1] := dmg[2]; //DEX>ATKÇÃèÍçáÅAATKóDêÊ
+					if (dmg[2] < dmg[1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
+            dmg[1] := dmg[2];
+            dmg[0] := dmg[2]; //DEX>ATKÇ then maximum value
+          end else begin
+  					dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
+          end;
 					dmg[0] := ATK[Arms][2] + dmg[0] * ATKFix[Arms][ts.Data.Scale] div 100;
 				end;
 			end;
@@ -2253,6 +2262,11 @@ begin
 			k := k * tc.Skill[33].Effect1 div 100;
 		end;
 
+    // Colus, 20040226: TODO: Use an EffectTick to make monster Maximize Power work!
+    // if (EffectTick[somenumber] >= Tick) then
+    //   dmg[1] := ATK2
+    // else
+    //   dmg[1] := ATK1 + Random(ATK2 - ATK1 + 1);
 		dmg[1] := ATK1 + Random(ATK2 - ATK1 + 1);
 		if (ts.Stat2 and 1) = 1 then dmg[1] := dmg[1] * 75 div 100;
 		//ÉIÅ[Ég_ÉoÅ[ÉTÅ[ÉN
@@ -2521,7 +2535,14 @@ begin
 					end;
 
 					dmg[2] := ATK[Arms][1];
-					if dmg[2] < dmg[1] then dmg[1] := dmg[2]; //DEX>ATKÇÃèÍçáÅAATKóDêÊ
+          // Colus, 20040226: I *think* we apply Maximize Power here.
+					//if dmg[2] < dmg[1] then dmg[1] := dmg[2]; //DEX>ATKÇÃèÍçáÅAATKóDêÊ
+					if (dmg[2] < dmg[1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
+            dmg[1] := dmg[2];
+            dmg[0] := dmg[2]; //DEX>ATKÇ then maximum value
+          end else begin
+  					dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
+          end;
 					dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
 					dmg[0] := ATK[Arms][2] + dmg[0] * ATKFix[Arms][1] div 100;
 				end;
@@ -3356,29 +3377,7 @@ begin
 {í«â¡}
 	Result := False;
 {í«â¡ÉRÉRÇ‹Ç≈}
-        //BS Maximun skill code while character is walking
-        if (tc.Skill[114].Lv <> 0) and (tc.getSkillOnBool) then begin
-            if tc.SP <> 0 then begin
-            //sp drain
-            if tc.Skill[114].Tick+1000<=Tick then begin
-            tc.SP := tc.SP - 1;
-            WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0007);
-						WFIFOL( 4, tc.SP);
-						tc.Socket.SendBuf(buf, 8);
-            tc.Skill[114].Tick := Tick;
-            end;
-            end else begin
-            //when sp reaches 0, reset boolean, icon, and recalculate character status
-            tc.setSkillOnBool(False);
-            tc.Skill[114].Tick := 0;
-            tc.MSkill := 114;
-            tc.SkillTick := tc.Skill[114].Tick;
-            tc.SkillTickID := tc.MSkill;
-            CalcStat(tc);
-            end;
-        end;
-        //end of BS Maximun skill code
+
 end;
 //------------------------------------------------------------------------------
 //ï™äÑÇQ
@@ -4499,6 +4498,7 @@ begin
                                         end;
                                         264:
                                         begin
+
                                          if tc.spiritSpheres <> 0 then begin
                                                 //Cast Point
                                                 xy.X := MPoint.X;
@@ -4511,6 +4511,22 @@ begin
                                                 tc.spiritSpheres := tc.spiritSpheres - 1;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
 
+                                                // Colus, 20040225: This is not done yet.
+                                                // This will move the player to the right spot, but it does not
+                                                // check to make sure the target can be reached.  If you try to jump
+                                                // through a wall/cliff, you will be stuck until you dash to a tile
+                                                // you could move to validly.  HOWEVER, this will correctly update your
+                                                // position now.
+                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+                                                                with tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist do begin
+                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+                                                                        Delete(IndexOf(tc.ID));
+                                                                end;
+                                                                tm.Block[xy.X div 8][xy.Y div 8].Clist.AddObject(tc.ID, tc);
+                                                        end;
+                                                        tc.pcnt := 0;
+                                                tc.Point := xy;
+                                                UpdatePlayerLocation(tm, tc);
                                           end else begin
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
@@ -6526,7 +6542,8 @@ begin
 					end;
 
                                 264:   {Body Relocation}  //New Version Oatmeal style U_U
-
+                                    begin
+                                        // Colus, 20040225: Never called?
                                         if tc.spiritSpheres <> 0 then begin
                                                 //Send Graphics Packet
                                                 WFIFOW( 0, $011a);
@@ -6535,9 +6552,13 @@ begin
                                                 WFIFOL( 6, ts.ID);
                                                 WFIFOL(10, ID);
                                                 WFIFOB(14, 1);
+                                                // Colus, 20040225: Oatmeal, until you send the packet,
+                                                // ANY other packet you send will overwrite what you've
+                                                // already done.  You cannot do the UpdateSpiritSpheres
+                                                // call (which makes a new packet) until you send the old one.
+                                                SendBCmd(tm, ts.Point, 15);
                                                 tc.spiritSpheres := tc.spiritSpheres - 1;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-                                                SendBCmd(tm, ts.Point, 15);
 
                                                 if tc.Skill[264].EffectLV > 1 then begin
                                                         ts.speed := ts.speed - 45;
@@ -6547,7 +6568,7 @@ begin
 
                                                 tc.MTick := Tick + 1000;
                                         end;
-
+                                    end;
                                 47:     {Arrow Shower}
                                         begin
                                                 if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
@@ -7971,13 +7992,13 @@ begin
                                                 end;
 					end;
                                 
-				29: //Agility Up
+				29: // Agility Up
 					begin
 						ProcessType := 3;
 						tc.MTick := Tick + 1000;
 					end;
 
-				31: //ÉAÉNÉA_ÉxÉlÉfÉBÉbÉNÉ^
+				31: // Aqua Benedicta
 					begin
                                                 j := SearchCInventory(tc, 713, false);
 						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
@@ -8030,7 +8051,7 @@ begin
 							Exit;
 						end;
 					end;
-        32:
+        32: // Signum Crucis
 					begin
 						ProcessType := 0;
             xy := tc.Point;
@@ -8063,12 +8084,12 @@ begin
 							end;
 						end;
 					end;
-				33: //ÉGÉìÉWÉFÉâÉX
+				33: // Angelus
 					begin
 						tc1 := tc;
 						ProcessType := 5;
 					end;
-				34: //ÉuÉåÉX
+				34: // Blessing
 					begin
 						ProcessType := 3;
 					end;
@@ -8086,7 +8107,7 @@ begin
             UpdateStatus(tm, tc1, Tick);
 						//ProcessType := 0;
 					end;
-        40:
+        40: // Item Appraisal
           begin
           tc1 := tc;
           //ProcessType := 2;
@@ -8099,7 +8120,7 @@ begin
 											j := j + 2;
 										end;
 									end;
-									if j <> 4 then begin //ñ¢ä”íËÉAÉCÉeÉÄÇ™Ç†ÇÈèÍçá
+									if j <> 4 then begin // Send the list of unidentified items...
 										WFIFOW(2, j);
 										Socket.SendBuf(buf, j);
 										tc.UseItemID := w;
@@ -8110,7 +8131,7 @@ begin
 						      WFIFOB( 6, 0);
 						      Socket.SendBuf(buf, 7);
           end;
-				45: //èWíÜóÕå¸è„
+				45: // Improve Concentration
 					begin
 						tc1 := tc;
 						ProcessType := 3;
@@ -8186,7 +8207,7 @@ begin
 							//Exit;
 						end;
 					end;
-				60: //ÉcÅ[ÉnÉìÉhÉNÉCÉbÉNÉì//Editted By AppleGirl
+				60: // Two-hand Quicken
 					begin
             if (tc.Weapon = 3) then begin
 						tc1 := tc;
@@ -8206,21 +8227,22 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-				66: //ÉCÉÄÉ|ÉVÉeÉBÉI_É}ÉkÉX
+				66: // Imposito Manus
 					begin
 						ProcessType := 3;
 						tc.MTick := Tick + 3000;
 					end;
-				67: //ÉTÉtÉâÉMÉEÉÄ
+				67: // Suffragium
 					begin
+            // Colus, 20040226: Which is it?
 						ProcessType := 3;
 						ProcessType := 2;
 					end;
-				154: //É`ÉFÉìÉWÉJÅ[Ég
+				154: // Change Cart
 					begin
 						tc1 := tc;
 					end;
-				68: //ÉAÉXÉyÉãÉVÉI
+				68: // Aspersio
 					begin
           j := SearchCInventory(tc, 523, false);
 						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
@@ -8234,26 +8256,26 @@ begin
 							Exit;
 						end;
           end;
-				69: //êπëÃç~ó’
+				69: // B.S.S.
 					begin
 						ProcessType := 3;
 					end;
-        71:
+        71: // Slow Poison
           begin
             ProcessType := 2;
           end;
-				73: //ÉLÉäÉG_ÉGÉãÉåÉCÉ\Éì
+				73: // Kyrie Eleison
 					begin
 						tc1 := tc;
 						ProcessType := 5;
 					end;
-				74: //É}ÉjÉsÉJÉbÉg
+				74: // Magnificat
 					begin
 						tc1 := tc;
 						ProcessType := 5;
 					end;
 {í«â¡:119}
-				75: //ÉOÉçÉäÉA
+				75: // Gloria
 					begin
 						tc1 := tc;
 						ProcessType := 5;
@@ -8345,25 +8367,40 @@ begin
             end;
                   end;
 
-				111: //ÉAÉhÉåÉiÉäÉì_ÉâÉbÉV
+				111: // Adrenaline Rush
 					begin
 						tc1 := tc;
 						ProcessType := 5;
 					end;
-				112: //ÉEÉFÉ|ÉìÉpÅ[ÉtÉFÉNÉVÉáÉì
+				112: // Weapon Perfection
 					begin
 						tc1 := tc;
 						ProcessType := 4;
 					end;
-				113: //ÉIÅ[ÉoÅ[ÉgÉâÉXÉg
+				113: // Power Thrust
 					begin
 						tc1 := tc;
 						ProcessType := 5;
 					end;
-				114: //ÉÉLÉVÉÉCÉYÉpÉèÅ[
+				114: // Maximize Power
 					begin
 						tc1 := tc;
-						ProcessType := 1;
+
+            if (tc.Skill[114].EffectLV = 1) then begin
+              // Turn it off
+              tc1.Skill[114].Tick := Tick;
+              tc1.SkillTick := Tick;
+              tc1.SkillTickID := 114;
+              tc1.Skill[114].EffectLV := 0;
+              tc.MMode := 4;
+              Exit; // Why?  Because we don't want the effect.
+            end else begin
+              // Turn it on
+              tc1.Skill[114].EffectLV := 1;
+              tc1.Skill[114].Tick := Tick + (tc1.Skill[114].Data.Data1[tc1.Skill[114].Lv]);
+  						ProcessType := 1;
+            end;
+
 					end;
         130:
           begin
@@ -8393,10 +8430,7 @@ begin
 
                   // Colus, 20031228: Tunnel Drive speed update
                   if (tc1.Skill[213].Lv <> 0) then begin
-         						WFIFOW(0, $00b0);
-        						WFIFOW(2, $0000);
-        						WFIFOL(4, tc1.Speed);
-        						tc1.Socket.SendBuf(buf, 8);
+         				    SendCStat1(tc1, 0, 0, tc1.Speed);
                   end;
                 end;
 							end;
@@ -8406,14 +8440,14 @@ begin
           Exit;
           end;
           end;
-                                135:    {Cloaking}
-                                        begin
-                                                tm := tc.MData;
+      135:    {Cloaking}
+      begin
+        tm := tc.MData;
 
-                                                xy.X := tc.Point.X;
-                                                xy.Y := tc.Point.Y;
+        xy.X := tc.Point.X;
+        xy.Y := tc.Point.Y;
 
-                                                k := 0;
+        k := 0;
 				if (tc.Option and 4 <> 0) then begin
                           // Cloaked, so uncloak
                           tc.isCloaked := false;
@@ -8466,6 +8500,8 @@ begin
 
                                                 if k = 0 then begin
                                                   SendSkillError(tc, 0);
+                                                  // Colus, 20040225: Failed cloaks burn SP
+                                                  DecSP(tc, MSkill, MUseLV);
                                                         //tc.MMode := 4;
                                                         //Exit;
                                                 end;
@@ -8792,6 +8828,8 @@ begin
                                         end;
                                         end;
                                 264:   {Body Relocation}
+                                // Colus, 20040225: This isn't called ever?
+                                begin
                                if tc.spiritSpheres <> 0 then begin
 						//ÉpÉPëóêM
 						WFIFOW( 0, $011a);
@@ -8800,9 +8838,14 @@ begin
 						WFIFOL( 6, ts.ID);
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
+						SendBCmd(tm, ts.Point, 15);
+                                                // Colus, 20040225: Oatmeal, until you send the packet,
+                                                // ANY other packet you send will overwrite what you've
+                                                // already done.  You cannot do the UpdateSpiritSpheres
+                                                // call (which makes a new packet) until you send the old one.
                                                 tc.spiritSpheres := tc.spiritSpheres - 1;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-						SendBCmd(tm, ts.Point, 15);
+
 
 						if tc.Skill[264].EffectLV > 1 then begin
 						    ts.speed := ts.speed - 45;
@@ -8812,6 +8855,7 @@ begin
 
 						tc.MTick := Tick + 1000;
 					end;
+          end;
                                  257: //Defender
 					begin
 						tc1 := tc;
@@ -10498,8 +10542,8 @@ begin
 						WFIFOL(10, ID);
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
-                                        end;
-                                1:
+          end;
+        1:
 					begin
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
@@ -10509,87 +10553,71 @@ begin
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
 
-                                                if (tc1.MSkill = 51) then begin {Hiding}
+            // Hiding
+            if (tc1.MSkill = 51) then begin {Hiding}
 
-                                                        if (tc1.Option and 2 <> 0) then begin
-                                                        tc1.setSkillOnBool(False); //set SkillOnBool for icon update //beita 20040206
-                                                                tc1.Skill[MSkill].Tick := Tick;
-	    					                tc1.Option := tc1.Option and $FFFD;
-                                                                SkillTick := tc1.Skill[MSkill].Tick;
-                                                                SkillTickID := MSkill;
-                                                                //tc1.SP := tc1.SP + 10;  // Colus 20040118
-                                                                tc1.Hidden := false;
-                                                                //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
-                                                        end else begin
-                                                        tc1.setSkillOnBool(True); //set SkillOnBool for icon update //beita 20040206
-                                                                // Required to place Hide on a timer.
-						                tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
+              if (tc1.Option and 2 <> 0) then begin
+                //tc1.setSkillOnBool(False); //set SkillOnBool for icon update //beita 20040206
+                tc1.Skill[MSkill].Tick := Tick;
+	    					tc1.Option := tc1.Option and $FFFD;
+                SkillTick := tc1.Skill[MSkill].Tick;
+                SkillTickID := MSkill;
+                //tc1.SP := tc1.SP + 10;  // Colus 20040118
+                tc1.Hidden := false;
+                //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+              end else begin
+                //tc1.setSkillOnBool(True); //set SkillOnBool for icon update //beita 20040206
+                // Required to place Hide on a timer.
+						    tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
 
-    						                if SkillTick > tc1.Skill[MSkill].Tick then begin
-							                SkillTick := tc1.Skill[MSkill].Tick;
-							                SkillTickID := MSkill;
-    					                	end;
+    						if SkillTick > tc1.Skill[MSkill].Tick then begin
+							    SkillTick := tc1.Skill[MSkill].Tick;
+							    SkillTickID := MSkill;
+    					  end;
 
-                                                                //tc1.Optionkeep := tc1.Option;
-                                                                tc1.Option := tc1.Option or 2;
-                                                                tc1.Hidden := true;
+                //tc1.Optionkeep := tc1.Option;
+                tc1.Option := tc1.Option or 2;
+                tc1.Hidden := true;
+                // Colus, 20040224: Hide also drains SP but at a different rate...
+                tc1.CloakTick := Tick;
+              end;
 
-                                                        end;
+              CalcStat(tc1, Tick);
 
-                                                        CalcStat(tc1, Tick);
+              WFIFOW(0, $0119);
+    				  WFIFOL(2, tc1.ID);
+    					WFIFOW(6, tc1.Stat1);
+    					WFIFOW(8, tc1.Stat2);
+    					WFIFOW(10, tc1.Option);
+    					WFIFOB(12, 0);
+    					SendBCmd(tm, tc1.Point, 13);
 
-                                                        WFIFOW(0, $0119);
-    				        	        WFIFOL(2, tc1.ID);
-    					                WFIFOW(6, tc1.Stat1);
-    					                WFIFOW(8, tc1.Stat2);
-    					                WFIFOW(10, tc1.Option);
-    					                WFIFOB(12, 0);
-    					                SendBCmd(tm, tc1.Point, 13);
+              // Colus, 20031228: Tunnel Drive speed update
+              if (tc1.Skill[213].Lv <> 0) then begin
+                SendCStat1(tc1, 0, 0, tc1.Speed);
+    					end;
 
-                                                        // Colus, 20031228: Tunnel Drive speed update
-                                                        if (tc1.Skill[213].Lv <> 0) then begin
-    						                WFIFOW(0, $00b0);
-    						                WFIFOW(2, $0000);
-    						                WFIFOL(4, tc1.Speed);
-    						                tc1.Socket.SendBuf(buf, 8);
-                                                        end;
+            end;
 
-                                                end;
-
+            // Play Dead
             if (tc1.MSkill = 143) then begin
-                if tc1.Sit = 1 then begin
+              if tc1.Sit = 1 then begin
                 //set SkillOnBool for icon update //beita 20040206
-                tc1.setSkillOnBool(False);
-						tc1.Sit := 3;
-            SkillTick := tc1.Skill[MSkill].Tick;
-            SkillTickID := MSkill;
-            //tc1.SP := tc1.SP + 5; { Alex: Why give 5 SP? }
-            //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
-            CalcStat(tc1, Tick);
-						end else begin
-            //set SkillOnBool for icon update //beita 20040206
-            tc1.setSkillOnBool(True);
-							tc1.Sit := 1;
-						end;
+                //tc1.setSkillOnBool(False);
+  						  tc1.Sit := 3;
+                SkillTick := tc1.Skill[MSkill].Tick;
+                SkillTickID := MSkill;
+                //tc1.SP := tc1.SP + 5; { Alex: Why give 5 SP? }
+                //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+                CalcStat(tc1, Tick);
+  						end else begin
+                //set SkillOnBool for icon update //beita 20040206
+                //tc1.setSkillOnBool(True);
+  							tc1.Sit := 1;
+  						end;
             end;
-            if (tc1.MSkill = 114) then begin
-            if tc1.getSkillOnBool then begin
-            //set boolean to be false when trigger skill again, reset icon and recalculate status.
-            //beita 20040206
-            tc1.setSkillOnBool(False);
-            SkillTick := tc1.Skill[MSkill].Tick;
-            SkillTickID := MSkill;
-            CalcStat(tc1);
-						end else begin
-            //set boolean to be true, calculate character status for maximun effect
-            //set skill[114].tick to be Tick for sp drain according to time.
-            //beita 20040206
-              tc1.setSkillOnBool(True);
-              CalcStat(tc1);
-            tc1.Skill[114].Tick :=Tick;
-						end;
-            end;
-            if (tl.Icon <> 0) and (getSkillOnBool) then begin
+
+            if (tl.Icon <> 0) then begin
 							WFIFOW(0, $0196);
 							WFIFOW(2, tl.Icon);
 							WFIFOL(4, ID);
@@ -10808,32 +10836,6 @@ if Weight * 2 < MaxWeight then begin
 					SPRTick := Tick;
 				end;
 
-        //BS Maximun skill code when character is not walking
-        //beita 20020406
-        if (tc.Skill[114].Lv <> 0) and (tc.getSkillOnBool) then begin
-            if SP <> 0 then begin
-            //sp drain
-            if tc.Skill[114].Tick+1000<=Tick then begin
-            SP := SP - 1;
-            WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0007);
-						WFIFOL( 4, SP);
-						Socket.SendBuf(buf, 8);
-            tc.Skill[114].Tick := Tick;
-            end;
-            end else begin
-            //when sp reaches 0, reset boolean,icon, and recalculate character status
-            tc.setSkillOnBool(False);
-            tc.Skill[114].Tick := 0;
-            tc.MSkill := 114;
-            tc.SkillTick := tc.Skill[114].Tick;
-            tc.SkillTickID := tc.MSkill;
-            CalcStat(tc);
-            end;
-        end;
-        //end of BS Maximun skill code
-
-
 				if (Skill[9].Lv <> 0) and (SPRTick + 10000 <= Tick) and (tc.Sit <> 1 ) and (tc.Option and 6 = 0) then begin
 					if SP <> MAXSP then begin
 {ãZèp229}   j := (3 + MAXSP * 2 div 1000) * Skill[9].Lv;
@@ -10993,7 +10995,7 @@ begin
 
                         if k <> 1 then begin
                                 tc.Skill[MSkill].Tick := Tick;
-								tc.SkillTick := Tick;
+                                tc.SkillTick := Tick;
                                 tc.SkillTickID := 135;
                                 tc.Option := tc.Option and $FFF9;
                                 //SkillTick := tc.Skill[MSkill].Tick;
@@ -11011,8 +11013,8 @@ begin
                         end;
                 end;
 
-                if Skill[135].Lv > 0 then begin
-                  if (tc.isCloaked) and ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
+                if (tc.Option and 4 <> 0) then begin
+                  if ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
                         if tc.SP > 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
@@ -11033,11 +11035,52 @@ begin
                                 WFIFOW(8, tc.Stat2);
                                 WFIFOW(10, tc.Option);
                                 WFIFOB(12, 0);
-                                SendBCmd(tm, tc.Point, 13);                          
+                                SendBCmd(tm, tc.Point, 13);
                         end;
                   end;
                 end;
 
+               // Colus, 20040224: Yeah, Hide drains SP also, but at a different rate.
+               if (tc.Option and 2 <> 0) then begin
+                  if ((tc.CloakTick + (4000 + (tc.Skill[51].Lv * 1000))) < Tick) then begin
+                        if tc.SP > 1 then begin
+                          tc.SP := tc.SP - 1;
+                          CloakTick := Tick;
+                          SendCStat1(tc, 0, 7, SP);
+                          //DebugOut.Lines.Add('Hit cloaktick');
+                        end else begin
+                          // Colus, 20040205: Added unhide when you run out of SP.
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Option := tc.Option and $FFF9;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := 51;
+                                tc.Hidden := false;
+                                tc.isCloaked := false;
+                                CalcStat(tc, Tick);
+                                WFIFOW(0, $0119);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Stat1);
+                                WFIFOW(8, tc.Stat2);
+                                WFIFOW(10, tc.Option);
+                                WFIFOB(12, 0);
+                                SendBCmd(tm, tc.Point, 13);
+                        end;
+                  end;
+                end;
+
+                if (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
+                        if tc.SP > 1 then begin
+                          tc.SP := tc.SP - 1;
+                          tc.Skill[114].Tick := Tick + tc.Skill[114].Data.Data1[tc.Skill[114].Lv];
+                          SendCStat1(tc, 0, 7, SP);
+                          //DebugOut.Lines.Add('Hit maximize tick');
+                        end else begin
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Skill[MSkill].EffectLV := 0;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := MSkill;
+                        end;
+                end;
                 if (tc.isPoisoned = true) then begin
                         if tc.PoisonTick < Tick then begin
                                 tc.isPoisoned := False;

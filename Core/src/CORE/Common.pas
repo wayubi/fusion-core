@@ -859,7 +859,7 @@ type TChara = class
         PassiveAttack :Boolean;   {Used for Skills like Grand Cross and Combo's}
 
         isCloaked     :Boolean;   {Says if Cloaking is Active}
-        CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak}
+        CloakTick     :Cardinal;  {Tracks For SP Usage on Cloak AND Hide}
 
         // Darkhelmet, I used this method so you can theoretically be poisoned
         // and cursed at the same time, even though graphics will only show one.
@@ -894,13 +894,13 @@ type TChara = class
         SongTick      :cardinal;   {Determines if Bard is Casting a Song}
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
 
-        SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
+        //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
 
 	constructor Create;
 	destructor  Destroy; override;
   //procedures to get skilonbool and set skillonbool
-  procedure setSkillOnBool(temp:Boolean);
-  function getSkillOnBool:Boolean;
+  //procedure setSkillOnBool(temp:Boolean);
+  //function getSkillOnBool:Boolean;
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
@@ -2444,7 +2444,8 @@ begin
 			else
 				i := i - 30;
 		end;
-
+    { Colus, 20040224: You didn't listen to how I explained the skill. :/
+      This is so not right it's not even funny.
         //BS Maximun codes
         //beita 20040206
     if (Skill[114].Lv <> 0) then begin
@@ -2454,7 +2455,7 @@ begin
      end;
      end;
     //end of BS Maximun codes
-
+    }
 		if Skill[30].Tick > Tick then begin // AGI down
 			if Skill[30].EffectLV > 5 then
 				i := i + 45
@@ -8349,6 +8350,7 @@ begin
 	Move(bb[0], buf[index], 5);
 end;
 //==============================================================================
+{
 //get boolean procedure for boolean SkillOnBool
 //beita 20040206
 procedure TChara.setSkillOnBool(temp : Boolean);
@@ -8363,7 +8365,7 @@ function TChara.getSkillOnBool : Boolean;
 begin
 Result := SkillOnBool;
 end;
-
+}
 
 
 
