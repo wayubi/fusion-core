@@ -2024,6 +2024,7 @@ end;
 //------------------------------------------------------------------------------
 
 {Player Attacking Monster}
+{ChrstphrR 2004/04/27 - Checked all exits, no chance of Mem Leaks.}
 procedure TFrmMain.DamageCalc1(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; Arms:byte = 0; SkillPer:integer = 0; AElement:byte = 0; HITFix:integer = 0);
 var
 	i,j,m :integer;
@@ -2031,7 +2032,6 @@ var
 	crit  :boolean;
 	datk  :boolean;
 	tatk  :boolean;
-
 	tg    :TGuild;
 begin
 	with tc do begin
@@ -2068,18 +2068,18 @@ begin
 			if Skill[263].Lv > 0 then tatk := true;
 			if Skill[48].Lv > 0 then datk := true;
 			crit := false;
-												if tatk = true then datk := false;
-												 //if tatk = true then tc.ATick := timeGetTime() + Delay;
-												 //if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
-												 //if tatk = true then Monkdelay(tm, tc, Delay);
+			if tatk = true then datk := false;
+			//if tatk = true then tc.ATick := timeGetTime() + Delay;
+			//if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
+			//if tatk = true then Monkdelay(tm, tc, Delay);
 
-                        //if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
+			//if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
 
-                        Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
-                        //if tatk = true then Combodelay := (1000 - (4 * param[4]));
+			Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
+			//if tatk = true then Combodelay := (1000 - (4 * param[4]));
 		end else begin
 			datk := false;
-                        tatk := false;
+			tatk := false;
 		end;
 
 		if not miss then begin
@@ -2101,10 +2101,10 @@ begin
 						4: dmg[1] := Param[4] * 160 div 100;
 						else dmg[1] := Param[4];
 					end;//case
-          // Colus, 20040226: I *think* we apply Maximize Power here.
-          // Of course this is bow code and probably will never be called normally.
-          // Leaving this as a TODO.
-          // if (dmg[1] >= ATK[0][1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
+					// Colus, 20040226: I *think* we apply Maximize Power here.
+					// Of course this is bow code and probably will never be called normally.
+					// Leaving this as a TODO.
+					// if (dmg[1] >= ATK[0][1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
 					if dmg[1] >= ATK[0][1] then begin
 						dmg[1] := ATK[0][1] * ATK[0][1] div 100;
 					end else begin
@@ -2129,14 +2129,14 @@ begin
 					end;//case
 
 					dmg[2] := ATK[Arms][1];
-          // Colus, 20040226: I *think* we apply Maximize Power here.
+					// Colus, 20040226: I *think* we apply Maximize Power here.
 					//if dmg[2] < dmg[1] then dmg[1] := dmg[2]; //DEX>ATKÇÃèÍçáÅAATKóDêÊ
 					if (dmg[2] < dmg[1]) or ((Skill[114].Tick >= Tick) and (Skill[114].EffectLV = 1)) then begin
-            dmg[1] := dmg[2];
-            dmg[0] := dmg[2]; //DEX>ATKÇ then maximum value
-          end else begin
-  					dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
-          end;
+						dmg[1] := dmg[2];
+						dmg[0] := dmg[2]; //DEX>ATKÇ then maximum value
+					end else begin
+						dmg[0] := dmg[1] + Random(dmg[2] - dmg[1] + 1);
+					end;
 					dmg[0] := ATK[Arms][2] + dmg[0] * ATKFix[Arms][ts.Data.Scale] div 100;
 				end;
 			end;
@@ -2151,7 +2151,7 @@ begin
 					dmg[3] := ts.Data.Param[2];
 					m := ts.Data.DEF;
 				end;
-                                if tc.Skill[308].Tick > Tick then m := 0;
+																if tc.Skill[308].Tick > Tick then m := 0;
 				dmg[3] := dmg[3] + Random((dmg[3] div 20) * (dmg[3] div 20)); //Def+DefBonus
 				{ This causes negative damage. Why is this here. Added correct calculations to the bottom?
 				if (AMode <> 8) then begin //AC
@@ -2182,7 +2182,7 @@ begin
 			end;
 			if ts.Stat1 = 2 then i := 21 // Frozen?  Water 1
 			else if ts.Stat1 = 1 then i := 22 // Stone?  Earth 1
-      else i := ts.Element;
+			else i := ts.Element;
 
 			dmg[0] := dmg[0] * ElementTable[AElement][i] div 100; // Elemental damage multiplier
 			if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2; // Lex Aeterna effect
@@ -2190,28 +2190,28 @@ begin
 			//çUåÇÉ~ÉX
 			dmg[0] := 0;
 		end;
-                        if tc.Skill[355].Tick > Tick then begin
-                        dmg[0] := dmg[0] + tc.Skill[355].Data.Data2[tc.Skill[355].Lv];
-                        end;
-			//HP leech effect
-			if (dmg[0] > 0) and (random(100) < DrainPer[0]) then begin
-				HP := HP + (dmg[0] * DrainFix[0] div 100);
-				if HP > MAXHP then HP := MAXHP;
-				SendCStat1(tc, 0, 5, HP);
-			end;
-			//SP leech effect
-			if (dmg[0] > 0) and (random(100) < DrainPer[1]) then begin
-				SP := SP + (dmg[0] * DrainFix[1] div 100);
-				if SP > MAXSP then SP := MAXSP;
-				SendCStat1(tc, 0, 7, SP);
-			end;
+		if tc.Skill[355].Tick > Tick then begin
+			dmg[0] := dmg[0] + tc.Skill[355].Data.Data2[tc.Skill[355].Lv];
+		end;
+		//HP leech effect
+		if (dmg[0] > 0) and (random(100) < DrainPer[0]) then begin
+			HP := HP + (dmg[0] * DrainFix[0] div 100);
+			if HP > MAXHP then HP := MAXHP;
+			SendCStat1(tc, 0, 5, HP);
+		end;
+		//SP leech effect
+		if (dmg[0] > 0) and (random(100) < DrainPer[1]) then begin
+			SP := SP + (dmg[0] * DrainFix[1] div 100);
+			if SP > MAXSP then SP := MAXSP;
+			SendCStat1(tc, 0, 7, SP);
+		end;
 
-      if (tc.Stat1 <> 0) and (dmg[0] > 0) then begin
-        tc.Stat1 := 0;
-        tc.FreezeTick := Tick;
-        tc.isFrozen := false;
-        UpdateStatus(tm, tc, Tick);
-      end;
+		if (tc.Stat1 <> 0) and (dmg[0] > 0) then begin
+			tc.Stat1 := 0;
+			tc.FreezeTick := Tick;
+			tc.isFrozen := false;
+			UpdateStatus(tm, tc, Tick);
+		end;
 
 		//ÉAÉTÉVÉììÒìÅó¨èCê≥
 		if dmg[0] > 0 then begin
@@ -2220,168 +2220,162 @@ begin
 		end;
 		//Ç±Ç±Ç≈êØÇÃÇ©ÇØÇÁå¯â Çì¸ÇÍÇÈ(ñ¢é¿ëï)
 
-                //Dragonology
-                if (tc.Skill[284].Lv <> 0) and (ts.Data.Race = 9) then begin
-                        dmg[0] := dmg[0] + (dmg[0] * tc.Skill[284].Data.Data1[tc.Skill[284].Lv] div 100);
-                end;
-                //Beast Bane
-                if (tc.Skill[126].Lv <> 0) and (ts.Data.Race = 2) then begin
-                 dmg[0] := dmg[0] + ATK[0][5];
-                 ATK[0][5]:= tc.Skill[126].Data.Data1[tc.Skill[126].Lv]
-                 end;
+		//Dragonology
+		if (tc.Skill[284].Lv <> 0) and (ts.Data.Race = 9) then begin
+						dmg[0] := dmg[0] + (dmg[0] * tc.Skill[284].Data.Data1[tc.Skill[284].Lv] div 100);
+		end;
+		//Beast Bane
+		if (tc.Skill[126].Lv <> 0) and (ts.Data.Race = 2) then begin
+			dmg[0] := dmg[0] + ATK[0][5];
+			ATK[0][5]:= tc.Skill[126].Data.Data1[tc.Skill[126].Lv]
+		end;
 
-		if Arms = 1 then exit;
+		if Arms = 1 then Exit;//safe 2004/04/27
 		//É_ÉuÉãÉAÉ^ÉbÉN
 		if datk then begin
 			dmg[0] := dmg[0] * DAFix div 100 * 2;
 			dmg[4] := 2;
 			dmg[5] := 8;
-                end else if (tatk) and (tc.Skill[263].Lv > 0) then begin
-                        dmg[0] := dmg[0] * (tc.Skill[263].Data.Data2[Skill[263].Lv] div 100);
+		end else if (tatk) and (tc.Skill[263].Lv > 0) then begin
+			dmg[0] := dmg[0] * (tc.Skill[263].Data.Data2[Skill[263].Lv] div 100);
 			dmg[4] := 3;
 			dmg[5] := 8;
-                        tc.MTarget := tc.ATarget;
-                        ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-                        if ts = nil then Exit;
-                        if ts.HP = 0 then Exit;
-                        tc.MTargetType := 0;
-                        tc.AData := ts;
-                        tc.MSkill := 263;
-                        tc.MUseLV := Skill[263].Lv;
-                        //DecSP(tc, MSkill, MUseLV);
-                        SkillEffect(tc, Tick);
+			tc.MTarget := tc.ATarget;
+			ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+			if (ts = nil) OR (ts.HP = 0) then Exit;//safe 2004/04/27
+			tc.MTargetType := 0;
+			tc.AData := ts;
+			tc.MSkill := 263;
+			tc.MUseLV := Skill[263].Lv;
+			//DecSP(tc, MSkill, MUseLV);
+			SkillEffect(tc, Tick);
 
-                        tc.Skill[263].Tick := Tick + cardinal(2) * 1000;
+			tc.Skill[263].Tick := Tick + cardinal(2) * 1000;
 		end else begin
 			dmg[4] := 1;
 		end;
 
-                if (tc.Skill[279].Tick > Tick) and (Skill[279].Lv > 0) then begin     {Auto Cast}
-                  if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
-                        Autocastactive := true;
-                    tc.MTarget := tc.ATarget;
-                    ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-                    if ts.HP = 0 then Exit;
-                    tc.MTargetType := 0;
-                    tc.AData := ts;
-                    if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) then begin
+		if (tc.Skill[279].Tick > Tick) and (Skill[279].Lv > 0) then begin     {Auto Cast}
+			if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
+						Autocastactive := true;
+				tc.MTarget := tc.ATarget;
+				ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+				if ts.HP = 0 then Exit;
+				tc.MTargetType := 0;
+				tc.AData := ts;
+				if (ts.ATarget = 0) and Boolean(ts.Data.Mode and $10) then begin
+					ts.ATarget := ID;
+					ts.AData := tc;
+					ts.isLooting := False;
+					ts.ATick := Tick + aMotion;
+				end;
 
-                      ts.ATarget := ID;
-				              ts.AData := tc;
-				              ts.isLooting := False;
-				              ts.ATick := Tick + aMotion;
-                    end;
-
-                    i := tc.Skill[279].Effect1;
-                    if (i > 0) then j := tc.Skill[i].Lv;
-                    // What level can you use?
-                    case i of
-                      11:
-                        begin
-                          m := 3;
-                        end;
-                      14,19,20,13:
-                        begin
-                          m := 3;
-                        end;
-                      17:
-                        begin
-                          m := 2;
-                        end;
-                      15:
-                        begin
-                          m := 1;
-                        end;
+				i := tc.Skill[279].Effect1;
+				if (i > 0) then j := tc.Skill[i].Lv;
+				// What level can you use?
+				case i of
+				11:
+					begin
+						m := 3;
+					end;
+				14,19,20,13:
+					begin
+						m := 3;
+					end;
+				17:
+					begin
+						m := 2;
+					end;
+				15:
+					begin
+						m := 1;
+					end;
 				end;//case
 
-                    if (j > m) then j := m;
-                    tc.MSkill := i;
+				if (j > m) then j := m;
+				tc.MSkill := i;
 
-                    // What level will you be casting at?
-                    // We reuse i and m now...
+				// What level will you be casting at?
+				// We reuse i and m now...
 
-                    m := Random(100);
-                    if (m < 50) then
-                      i := 1
-                    else if (m < 85) then
-                      i := 2
-                    else
-                      i := 3;
+				m := Random(100);
+				if (m < 50) then
+					i := 1
+				else if (m < 85) then
+					i := 2
+				else
+					i := 3;
 
-                    if (j < i) then i := j;
+				if (j < i) then i := j;
 
-                    // Set the final skill level.
-                    tc.MUseLV := i;
+				// Set the final skill level.
+				tc.MUseLV := i;
 
-                    DecSP(tc, MSkill, MUseLV);
-                    SkillEffect(tc, Tick);
-                    //DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
-                  end;
-                end;
+				DecSP(tc, MSkill, MUseLV);
+				SkillEffect(tc, Tick);
+				//DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
+			end;
+		end;
 
 
-                        if (tc.GungnirEquipped) and (25 >= Random(100)) then begin
+		if (tc.GungnirEquipped) and (25 >= Random(100)) then begin
+			tc.MTarget := tc.ATarget;
+			ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
 
-                                tc.MTarget := tc.ATarget;
-                                ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+			tc.MTargetType := 0;
+			tc.AData := ts;
 
-                                tc.MTargetType := 0;
-                                tc.AData := ts;
+			i := Random(4);
+			case i of
+			0:  tc.MSkill := 5;       {Bash}
+			1:  tc.MSkill := 7;       {Magnum Break}
+			2:  tc.MSkill := 56;      {Pierce}
+			3:  tc.MSkill := 59;      {Spear Boomerang}
+			end;//case
 
-                                i := Random(4);
+			tc.MUseLV := Random(10) + 1;
+			SkillEffect(tc, Tick);
+			Exit;//safe 2004/04/27
+		end;
 
-                                case i of
-                                        0:  tc.MSkill := 5;       {Bash}
-                                        1:  tc.MSkill := 7;       {Magnum Break}
-                                        2:  tc.MSkill := 56;      {Pierce}
-                                        3:  tc.MSkill := 59;      {Spear Boomerang}
-                                end;
+		j := SearchCInventory(tc, tc.WeaponID, true);
+		if tc.SkillWeapon then begin
 
-                                tc.MUseLV := Random(10) + 1;
-                                SkillEffect(tc, Tick);
-                                exit;
-                        end;
+			if (j <> 0) and (Random(100) < 30) and (tc.MSkill = 0) then begin
+				tc.MTarget := tc.ATarget;
+				ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
+				tc.MTargetType := 0;
+				tc.AData := ts;
 
-                        j := SearchCInventory(tc, tc.WeaponID, true);
+				tc.MSkill := WeaponSkill;
+				tc.MUseLV := WeaponSkillLv;
 
-                if tc.SkillWeapon = true then begin
+				if tc.WeaponID = 1468 then begin
+					tc.MPoint.X := tc.Point.X;
+					tc.MPoint.Y := tc.Point.Y;
+					CreateField(tc, tick);
+				end else begin
+					SkillEffect(tc, Tick);
+				end;
+				tc.MSkill := 0;
+				tc.MUseLV := 0;
+				Exit;//safe 2004/04/27
+			end;
+			if tc.SageElementEffect then dmg[0] := dmg[0] + (dmg[0] * tc.Skill[285].Data.Data1[Skill[285].EffectLV] div 100);
+		end;
 
-                        if (j <> 0) and (Random(100) < 30) and (tc.MSkill = 0) then begin
-                                tc.MTarget := tc.ATarget;
-                                ts := tm.Mob.IndexOfObject(tc.MTarget) as TMob;
-                                tc.MTargetType := 0;
-                                tc.AData := ts;
+		if (tc.Skill[146].Lv <> 0) and ((tc.HP  / tc.MAXHP) * 100 <= 25) then begin
+			dmg[0] := ((tc.Skill[6].Data.Data1[10] * dmg[0]) div 100);
+		end;
 
-                                tc.MSkill := WeaponSkill;
-                                tc.MUseLV := WeaponSkillLv;
-
-                                if tc.WeaponID = 1468 then begin
-                                        tc.MPoint.X := tc.Point.X;
-                                        tc.MPoint.Y := tc.Point.Y;
-                                        CreateField(tc, tick);
-                                end else begin
-                                        SkillEffect(tc, Tick);
-                                end;
-                                tc.MSkill := 0;
-                                tc.MUseLV := 0;
-                                exit;
-                        end;
-                if tc.SageElementEffect then dmg[0] := dmg[0] + (dmg[0] * tc.Skill[285].Data.Data1[Skill[285].EffectLV] div 100);
-                end;
-
-                if (tc.Skill[146].Lv <> 0) and ((tc.HP  / tc.MAXHP) * 100 <= 25) then begin
-                    dmg[0] := ((tc.Skill[6].Data.Data1[10] * dmg[0]) div 100);
-                end;
-
-        end;
+	end;
 
 	if ts.Stat1 <> 0 then begin
 		ts.BodyTick := Tick + tc.aMotion;
 	end;
 
-
 	//DebugOut.Lines.Add(Format('DMG %d%% %d(%d-%d)', [dmg[6], dmg[0], dmg[1], dmg[2]]));
-end;
+end;//proc TFrmMain.DamageCalc1()
 //------------------------------------------------------------------------------
 
 {Monster Attacking Player}

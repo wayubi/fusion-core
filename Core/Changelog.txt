@@ -1,3 +1,4 @@
+- 04-27-04: Code Review/Comment, and Unused variable cleanup: DamageCalc1 [ChrstphrR]
 - 04-27-04: Memory Leak fixes: MonsterDie [ChrstphrR]
 - 04-27-04: Memory Leak fixes: CharaSplash [ChrstphrR]
 - 04-27-04: Fixed undefined results of DamageProcess1 in some cases. [ChrstphrR]
