@@ -14,7 +14,9 @@ uses
     {Shared}
     Classes, SysUtils, IniFiles,
     {Fusion}
-    Common, REED_Support, REED_Load;
+    Common, REED_Support,
+    REED_LOAD_ACCOUNTS,
+    REED_LOAD_CHARACTERS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -36,7 +38,6 @@ uses
 
 
     { Character Data - Basic Data }
-    procedure PD_Load_Characters(UID : String = '*');
     procedure PD_Save_Characters(forced : Boolean = False);
     procedure PD_Delete_Characters(tc : TChara);
 
@@ -484,133 +485,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Basic Data ------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-        i : Integer;
-    begin
-        tc := nil;
-        tp := nil;
-
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-            if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
-
-        	if Player.IndexOf(StrToInt(searchResult.Name)) <> -1 then begin
-        		tp := Player.Objects[Player.IndexOf(StrToInt(searchResult.Name))] as TPlayer;
-                for i := 0 to 8 do begin
-                	tp.CData[i] := nil;
-                end;
-            end;
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-            	try
-                	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Character.txt') then begin
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Character.txt');
-
-                        if (UID = '*') then begin
-                            tc := TChara.Create;
-                        end else begin
-                            if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then Continue;
-                            tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-                            if (tc.Name <> tp.CName[0]) and (tc.Name <> tp.CName[1]) and (tc.Name <> tp.CName[2])
-                            and (tc.Name <> tp.CName[3]) and (tc.Name <> tp.CName[4]) and (tc.Name <> tp.CName[5])
-                            and (tc.Name <> tp.CName[6]) and (tc.Name <> tp.CName[7]) and (tc.Name <> tp.CName[8]) then begin
-                            	Continue;
-                            end;
-                        end;
-
-                        tc.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-                        tc.ID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
-                        tc.CID := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
-
-                        tc.JID := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
-                        if (tc.JID > LOWER_JOB_END) then tc.JID := tc.JID - LOWER_JOB_END + UPPER_JOB_BEGIN;
-
-                        tc.BaseLV := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
-                        tc.BaseEXP := StrToInt( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
-                        tc.StatusPoint := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-                        tc.JobLV := StrToInt( Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3) );
-                        tc.JobEXP := StrToInt( Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3) );
-                        tc.SkillPoint := StrToInt( Copy(datafile[9], Pos(' : ', datafile[9]) + 3, length(datafile[9]) - Pos(' : ', datafile[9]) + 3) );
-                        tc.Zeny := StrToInt( Copy(datafile[10], Pos(' : ', datafile[10]) + 3, length(datafile[10]) - Pos(' : ', datafile[10]) + 3) );
-                        tc.Stat1 := StrToInt( Copy(datafile[11], Pos(' : ', datafile[11]) + 3, length(datafile[11]) - Pos(' : ', datafile[11]) + 3) );
-                        tc.Stat2 := StrToInt( Copy(datafile[12], Pos(' : ', datafile[12]) + 3, length(datafile[12]) - Pos(' : ', datafile[12]) + 3) );
-                        tc.Option := StrToInt( Copy(datafile[13], Pos(' : ', datafile[13]) + 3, length(datafile[13]) - Pos(' : ', datafile[13]) + 3) );
-                        tc.Karma := StrToInt( Copy(datafile[14], Pos(' : ', datafile[14]) + 3, length(datafile[14]) - Pos(' : ', datafile[14]) + 3) );
-                        tc.Manner := StrToInt( Copy(datafile[15], Pos(' : ', datafile[15]) + 3, length(datafile[15]) - Pos(' : ', datafile[15]) + 3) );
-                        tc.HP := StrToInt( Copy(datafile[16], Pos(' : ', datafile[16]) + 3, length(datafile[16]) - Pos(' : ', datafile[16]) + 3) );
-                        tc.SP := StrToInt( Copy(datafile[17], Pos(' : ', datafile[17]) + 3, length(datafile[17]) - Pos(' : ', datafile[17]) + 3) );
-                        tc.DefaultSpeed := StrToInt( Copy(datafile[18], Pos(' : ', datafile[18]) + 3, length(datafile[18]) - Pos(' : ', datafile[18]) + 3) );
-                        tc.Hair := StrToInt( Copy(datafile[19], Pos(' : ', datafile[19]) + 3, length(datafile[19]) - Pos(' : ', datafile[19]) + 3) );
-                        tc._2 := StrToInt( Copy(datafile[20], Pos(' : ', datafile[20]) + 3, length(datafile[20]) - Pos(' : ', datafile[20]) + 3) );
-                        tc._3 := StrToInt( Copy(datafile[21], Pos(' : ', datafile[21]) + 3, length(datafile[21]) - Pos(' : ', datafile[21]) + 3) );
-                        tc.Weapon := StrToInt( Copy(datafile[22], Pos(' : ', datafile[22]) + 3, length(datafile[22]) - Pos(' : ', datafile[22]) + 3) );
-                        tc.Shield := StrToInt( Copy(datafile[23], Pos(' : ', datafile[23]) + 3, length(datafile[23]) - Pos(' : ', datafile[23]) + 3) );
-                        tc.Head1 := StrToInt( Copy(datafile[24], Pos(' : ', datafile[24]) + 3, length(datafile[24]) - Pos(' : ', datafile[24]) + 3) );
-                        tc.Head2 := StrToInt( Copy(datafile[25], Pos(' : ', datafile[25]) + 3, length(datafile[25]) - Pos(' : ', datafile[25]) + 3) );
-                        tc.Head3 := StrToInt( Copy(datafile[26], Pos(' : ', datafile[26]) + 3, length(datafile[26]) - Pos(' : ', datafile[26]) + 3) );
-                        tc.HairColor := StrToInt( Copy(datafile[27], Pos(' : ', datafile[27]) + 3, length(datafile[27]) - Pos(' : ', datafile[27]) + 3) );
-                        tc.ClothesColor := StrToInt( Copy(datafile[28], Pos(' : ', datafile[28]) + 3, length(datafile[28]) - Pos(' : ', datafile[28]) + 3) );
-                        tc.ParamBase[0] := StrToInt( Copy(datafile[29], Pos(' : ', datafile[29]) + 3, length(datafile[29]) - Pos(' : ', datafile[29]) + 3) );
-                        tc.ParamBase[1] := StrToInt( Copy(datafile[30], Pos(' : ', datafile[30]) + 3, length(datafile[30]) - Pos(' : ', datafile[30]) + 3) );
-                        tc.ParamBase[2] := StrToInt( Copy(datafile[31], Pos(' : ', datafile[31]) + 3, length(datafile[31]) - Pos(' : ', datafile[31]) + 3) );
-                        tc.ParamBase[3] := StrToInt( Copy(datafile[32], Pos(' : ', datafile[32]) + 3, length(datafile[32]) - Pos(' : ', datafile[32]) + 3) );
-                        tc.ParamBase[4] := StrToInt( Copy(datafile[33], Pos(' : ', datafile[33]) + 3, length(datafile[33]) - Pos(' : ', datafile[33]) + 3) );
-                        tc.ParamBase[5] := StrToInt( Copy(datafile[34], Pos(' : ', datafile[34]) + 3, length(datafile[34]) - Pos(' : ', datafile[34]) + 3) );
-                        tc.CharaNumber := StrToInt( Copy(datafile[35], Pos(' : ', datafile[35]) + 3, length(datafile[35]) - Pos(' : ', datafile[35]) + 3) );
-                        tc.Map := ( Copy(datafile[36], Pos(' : ', datafile[36]) + 3, length(datafile[36]) - Pos(' : ', datafile[36]) + 3) );
-                        tc.Point.X := StrToInt( Copy(datafile[37], Pos(' : ', datafile[37]) + 3, length(datafile[37]) - Pos(' : ', datafile[37]) + 3) );
-                        tc.Point.Y := StrToInt( Copy(datafile[38], Pos(' : ', datafile[38]) + 3, length(datafile[38]) - Pos(' : ', datafile[38]) + 3) );
-                        tc.SaveMap := ( Copy(datafile[39], Pos(' : ', datafile[39]) + 3, length(datafile[39]) - Pos(' : ', datafile[39]) + 3) );
-                        tc.SavePoint.X := StrToInt( Copy(datafile[40], Pos(' : ', datafile[40]) + 3, length(datafile[40]) - Pos(' : ', datafile[40]) + 3) );
-                        tc.SavePoint.Y := StrToInt( Copy(datafile[41], Pos(' : ', datafile[41]) + 3, length(datafile[41]) - Pos(' : ', datafile[41]) + 3) );
-                        tc.Plag := StrToInt( Copy(datafile[42], Pos(' : ', datafile[42]) + 3, length(datafile[42]) - Pos(' : ', datafile[42]) + 3) );
-                        tc.PLv := StrToInt( Copy(datafile[43], Pos(' : ', datafile[43]) + 3, length(datafile[43]) - Pos(' : ', datafile[43]) + 3) );
-                        tc.GuildID := StrToInt( Copy(datafile[44], Pos(' : ', datafile[44]) + 3, length(datafile[44]) - Pos(' : ', datafile[44]) + 3) );
-
-                        tc.PData := tp;
-
-                        for i := 0 to 8 do begin
-                        	if (tc.Name = tp.CName[i]) then begin
-            	            	tp.CData[i] := tc;
-    	                        tp.CData[i].CharaNumber := i;
-        	                    tp.CData[i].ID := tp.ID;
-	                            tp.CData[i].Gender := tp.Gender;
-                            end;
-                        end;
-
-                        if tc.CID < 100001 then tc.CID := tc.CID + 100001;
-                        if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
-
-                        if (UID = '*') then begin
-	                        CharaName.AddObject(tc.Name, tc);
-    	                    Chara.AddObject(tc.CID, tc);
-                        end;
-
-                    	//debugout.Lines.Add(tc.Name + ' character data loaded.');
-                	end;
-            	except
-            		DebugOut.Lines.Add('Character data could not be loaded.');
-            	end;
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-    
     procedure PD_Save_Characters(forced : Boolean = False);
     var
     	datafile : TStringList;

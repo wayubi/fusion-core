@@ -18,7 +18,8 @@ uses
   Database in 'DATABASE\Database.pas',
   PlayerData in 'DATABASE\PlayerData.pas',
   REED_Support in 'DATABASE\REED_Support.pas',
-  REED_Load in 'DATABASE\REED_Load.pas',
+  REED_LOAD_ACCOUNTS in 'DATABASE\REED_LOAD_ACCOUNTS.pas',
+  REED_LOAD_CHARACTERS in 'DATABASE\REED_LOAD_CHARACTERS.pas',
   
   FusionSQL in 'SQL\FusionSQL.pas',
   SQLData in 'SQL\SQLData.pas',
