@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-17-04: Included realtime INI server options editing in JCon.[AlexKreuz]
+- 06-17-04: Reimplemented realtime priority changing (the one Harb removed).[AlexKreuz]
+- 06-17-04: Separated JCon from Main. Created JCon.pas.[AlexKreuz]
+- 06-17-04: Separated INI saving from Main. Created WeissINI.pas. [AlexKreuz]
 - 06-16-04: onTimer event crashed server on server close. [AlexKreuz & ChrstphrR]
 - 06-16-04: Fixed Sage Skil Cast Freedom. [Darkhelmet]
 - 06-16-04: Changed Charset from SHIFT_JIS to DEFAULT to fix display problems for some people. [AlexKreuz]

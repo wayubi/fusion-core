@@ -9,7 +9,7 @@ uses
 	ComCtrls,
 	{Fusion Units}
 	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
-	SQLData, FusionSQL, Math, Game_Master, Player_Skills,
+	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon,
 	{3rd Party Units}
 	List32, Zip, Menus;
 
@@ -84,7 +84,53 @@ type
     Button3: TButton;
     Button4: TButton;
     MinimizetoTray1: TMenuItem;
+    PageControl2: TPageControl;
+    TabSheet4: TTabSheet;
+    TabSheet5: TTabSheet;
     Label17: TLabel;
+    Label18: TLabel;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Edit17: TEdit;
+    Edit18: TEdit;
+    Edit19: TEdit;
+    Edit20: TEdit;
+    Edit21: TEdit;
+    Edit22: TEdit;
+    Button5: TButton;
+    Label23: TLabel;
+    Label24: TLabel;
+    Edit23: TEdit;
+    Edit24: TEdit;
+    Label25: TLabel;
+    Edit25: TEdit;
+    Label26: TLabel;
+    Edit26: TEdit;
+    Label27: TLabel;
+    ComboBox1: TComboBox;
+    Label28: TLabel;
+    Label29: TLabel;
+    Label30: TLabel;
+    Label31: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Edit29: TEdit;
+    Edit30: TEdit;
+    Edit31: TEdit;
+    Label34: TLabel;
+    Label35: TLabel;
+    Label36: TLabel;
+    Label37: TLabel;
+    ComboBox2: TComboBox;
+    ComboBox3: TComboBox;
+    ComboBox4: TComboBox;
+    ComboBox5: TComboBox;
+    ComboBox6: TComboBox;
+    ComboBox7: TComboBox;
+    ComboBox8: TComboBox;
+    Label38: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -152,14 +198,15 @@ type
     procedure Start1Click(Sender: TObject);
     procedure Stop1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
+    procedure Save1Click(Sender: TObject);
+    procedure MinimizetoTray1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
-    procedure Save1Click(Sender: TObject);
-    procedure MinimizetoTray1Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
 
-		//procedure cbxPriorityClick(Sender: TObject);
+    procedure PriorityUpdate(prioramount : Integer);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -927,12 +974,12 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
-	ini : TIniFile;
 	sr  : TSearchRec;
 	Idx : Integer; // Loop Iterator for freeing our global lists.
 begin
 
 	save_commands();
+    weiss_ini_save();
 
 	if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
 		repeat
@@ -955,94 +1002,6 @@ begin
 		FormWidth := Width;
 		FormHeight := Height;
 	end;
-
-	ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
-	ini.WriteString('Server', 'IP', inet_ntoa(in_addr(ServerIP)));
-	ini.WriteString('Server', 'Name', ServerName);
-	ini.WriteString('Server', 'NPCID', IntToStr(DefaultNPCID));
-	ini.WriteString('Server', 'sv1port', IntToStr(sv1port));
-	ini.WriteString('Server', 'sv2port', IntToStr(sv2port));
-	ini.WriteString('Server', 'sv3port', IntToStr(sv3port));
-	ini.WriteString('Server', 'WarpDebug', BoolToStr(WarpDebugFlag, true));
-	ini.WriteString('Server', 'BaseExpMultiplier', IntToStr(BaseExpMultiplier));
-	ini.WriteString('Server', 'JobExpMultiplier', IntToStr(JobExpMultiplier));
-	ini.WriteString('Server', 'DisableMonsterActive', BoolToStr(DisableMonsterActive, true));
-	ini.WriteString('Server', 'AutoStart', BoolToStr(AutoStart, true));
-	ini.WriteString('Server', 'DisableLevelLimit', BoolToStr(DisableLevelLimit, true));
-	ini.WriteString('Server', 'EnableMonsterKnockBack', BoolToStr(EnableMonsterKnockBack, true));
-	ini.WriteString('Server', 'DisableEquipLimit', BoolToStr(DisableEquipLimit, true));
-	ini.WriteString('Server', 'ItemDropType', BoolToStr(ItemDropType, true));
-	ini.WriteString('Server', 'ItemDropDenominator', IntToStr(ItemDropDenominator));
-	ini.WriteString('Server', 'ItemDropPer', IntToStr(ItemDropPer));
-	ini.WriteString('Server', 'ItemDropMultiplier', IntToStr(ItemDropMultiplier));
-	ini.WriteString('Server', 'StealMultiplier', IntToStr(StealMultiplier));
-	ini.WriteString('Server', 'DisableFleeDown', BoolToStr(DisableFleeDown, true));
-	ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));
-	ini.WriteString('Server', 'EnableMonsterSkills', BoolToStr(EnableMonsterSkills, true));
-	ini.WriteString('Server', 'EnableLowerClassDyes', BoolToStr(EnableLowerClassDyes, true));
-	ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
-	ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
-	ini.WriteString('Server', 'DefaultMap', DefaultMap);
-	ini.WriteString('Server', 'DefaultPoint_X', IntToStr(DefaultPoint_X));
-	ini.WriteString('Server', 'DefaultPoint_Y', IntToStr(DefaultPoint_Y));
-	ini.WriteString('Server', 'DefaultItem1', IntToStr(DefaultItem1));
-	ini.WriteString('Server', 'DefaultItem2', IntToStr(DefaultItem2));
-	ini.WriteString('Server', 'DeathBaseLoss', IntToStr(DeathBaseLoss));
-	ini.WriteString('Server', 'DeathJobLoss', IntToStr(DeathJobLoss));
-	ini.WriteString('Server', 'MonsterMob', BoolToStr(MonsterMob, true));
-	ini.WriteString('Server', 'SummonMonsterExp', BoolToStr(SummonMonsterExp, true));
-	ini.WriteString('Server', 'SummonMonsterAgo', BoolToStr(SummonMonsterAgo, true));
-	ini.WriteString('Server', 'SummonMonsterName', BoolToStr(SummonMonsterName, true));
-	ini.WriteString('Server', 'SummonMonsterMob', BoolToStr(SummonMonsterMob, true));
-	ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
-	ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
-	ini.WriteString('Server', 'MapGMsg', MapGMsg);
-
-	ini.WriteString('Option', 'Left', IntToStr(FormLeft));
-	ini.WriteString('Option', 'Top', IntToStr(FormTop));
-	ini.WriteString('Option', 'Width', IntToStr(FormWidth));
-	ini.WriteString('Option', 'Height', IntToStr(FormHeight));
-	ini.WriteString('Option', 'Priority', IntToStr(Priority));
-	ini.WriteString('Option', 'Priority', IntToStr(Priority));
-
-	// Fusion INI Lines
-	ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
-    ini.WriteString('Fusion', 'Option_PVP_Steal', BoolToStr(Option_PVP_Steal));
-    ini.WriteString('Fusion', 'Option_PartyShare_Level', IntToStr(Option_PartyShare_Level));
-    ini.WriteString('Fusion', 'Option_PVP_XPLoss', BoolToStr(Option_PVP_XPLoss));
-	ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
-	ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
-	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
-	ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
-	ini.WriteString('Fusion', 'Option_MOTD', BoolToStr(Option_MOTD));
-	ini.WriteString('Fusion', 'Option_MOTD_Athena', BoolToStr(Option_MOTD_Athena));
-	ini.WriteString('Fusion', 'Option_MOTD_File', Option_MOTD_File);
-    ini.WriteString('Fusion', 'Option_GM_Logs', BoolToStr(Option_GM_Logs));
-	ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
-	ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
-	ini.WriteString('Fusion', 'Option_Font_Color', Option_Font_Color);
-	ini.WriteString('Fusion', 'Option_Font_Size', inttostr(Option_Font_Size));
-	ini.WriteString('Fusion', 'Option_Font_Face', Option_Font_Face);
-	ini.WriteString('Fusion', 'Option_Font_Style', Option_Font_Style);
-	ini.WriteString('Fusion', 'Option_Pet_Capture_Rate', InttoStr(Option_Pet_Capture_Rate));
-	// Fusion INI Lines
-
-	// MySQL Server Lines
-	ini.WriteString('MySQL Server', 'Option_MySQL', BoolToStr(UseSQL));
-	ini.WriteString('MySQL Server', 'MySQL_Address', DbHost);
-	ini.WriteString('MySQL Server', 'MySQL_Username', DbUser);
-	ini.WriteString('MySQL Server', 'MySQL_Password', DbPass);
-	ini.WriteString('MySQL Server', 'MySQL_Database', DbName);
-	// MySQL Server Lines
-
-	{ChrstphrR 2004/05/09 - Debug section added to INI file
-	Controls options that allow/supress when errors occur - these features
-	will be useful to Devs in Core/DB/Scripts, and people modifying both
-	Database and Script files for testing.}
-	ini.WriteString('Debug', 'ShowDebugErrors', BoolToStr(ShowDebugErrors));
-
-
-	ini.Free;
 
 	if UseSQL then
 		SQLDataSave
@@ -1252,29 +1211,28 @@ begin
 	StatusBar1.Panels[0].Width := FormWidth - 300;
 	// Keep the timer portion of the panels the same.
 end;
-//------------------------------------------------------------------------------
-//procedure TfrmMain.cbxPriorityClick(Sender: TObject);
-//var
-	//PriorityClass	:cardinal;
-//begin
-	//Priority := cbxPriority.ItemIndex;
-	//case Priority of
-	//0: 		PriorityClass := REALTIME_PRIORITY_CLASS;
-	//1: 		PriorityClass := HIGH_PRIORITY_CLASS;
-	//2: 		PriorityClass := ABOVE_NORMAL_PRIORITY_CLASS;
-	//3: 		PriorityClass := NORMAL_PRIORITY_CLASS;
-	//4: 		PriorityClass := BELOW_NORMAL_PRIORITY_CLASS;
-	//5: 		PriorityClass := IDLE_PRIORITY_CLASS;
-	//else
-		//begin
-			//cbxPriority.ItemIndex := 3;
-			//Priority := 3;
-			//PriorityClass := NORMAL_PRIORITY_CLASS;
-		//end;
-	//end;
 
-	//SetPriorityClass(GetCurrentProcess(), PriorityClass);
-//end;
+//------------------------------------------------------------------------------
+procedure TfrmMain.PriorityUpdate(prioramount : Integer);
+var
+	PriorityClass	:cardinal;
+begin
+	case prioramount of
+	0: 		PriorityClass := REALTIME_PRIORITY_CLASS;
+	1: 		PriorityClass := HIGH_PRIORITY_CLASS;
+	2: 		PriorityClass := ABOVE_NORMAL_PRIORITY_CLASS;
+	3: 		PriorityClass := NORMAL_PRIORITY_CLASS;
+	4: 		PriorityClass := BELOW_NORMAL_PRIORITY_CLASS;
+	5: 		PriorityClass := IDLE_PRIORITY_CLASS;
+	else
+		begin
+			Priority := 3;
+			PriorityClass := NORMAL_PRIORITY_CLASS;
+		end;
+	end;
+
+	SetPriorityClass(GetCurrentProcess(), PriorityClass);
+end;
 //==============================================================================
 
 
@@ -10880,103 +10838,6 @@ begin
 	frmMain.Close;
 end;
 
-procedure TfrmMain.PageControl1Change(Sender: TObject);
-var
-	i : Integer;
-    AccountItem : TPlayer;
-begin
-
-	ListBox1.Clear;
-
-	for i := 0 to (PlayerName.Count - 1) do begin
-		AccountItem := PlayerName.Objects[i] as TPlayer;
-        listbox1.Items.AddObject(PlayerName.Strings[i], AccountItem);
-        listbox1.Sorted := True;
-    end;
-
-end;
-
-procedure TfrmMain.ListBox1Click(Sender: TObject);
-var
-    AccountItem : TPlayer;
-begin
-	AccountItem := listbox1.Items.Objects[listbox1.ItemIndex] as TPlayer;
-    Edit2.Text := IntToStr(AccountItem.ID);
-    Edit3.Text := AccountItem.Name;
-    Edit4.Text := AccountItem.Pass;
-    Edit5.Text := IntToStr(AccountItem.Gender);
-    Edit6.Text := AccountItem.Mail;
-    Edit7.Text := IntToStr(AccountItem.Banned);
-    Edit8.Text := AccountItem.CName[0];
-    Edit9.Text := AccountItem.CName[1];
-    Edit10.Text := AccountItem.CName[2];
-    Edit11.Text := AccountItem.CName[3];
-    Edit12.Text := AccountItem.CName[4];
-    Edit13.Text := AccountItem.CName[5];
-    Edit14.Text := AccountItem.CName[6];
-    Edit15.Text := AccountItem.CName[7];
-    Edit16.Text := AccountItem.CName[8];
-end;
-
-procedure TfrmMain.Button3Click(Sender: TObject);
-begin
-    Edit2.Clear;
-    Edit3.Clear;
-    Edit4.Clear;
-    Edit5.Clear;
-    Edit6.Clear;
-    Edit7.Clear;
-    Edit8.Clear;
-    Edit9.Clear;
-    Edit10.Clear;
-    Edit11.Clear;
-    Edit12.Clear;
-    Edit13.Clear;
-    Edit14.Clear;
-    Edit15.Clear;
-    Edit16.Clear;
-end;
-
-procedure TfrmMain.Button4Click(Sender: TObject);
-var
-    AccountItem : TPlayer;
-    tc : TChara;
-    i : Integer;
-begin
-	if PlayerName.IndexOf(Edit3.Text) <> -1 then begin
-		AccountItem := PlayerName.Objects[PlayerName.IndexOf(Edit3.Text)] as TPlayer;
-
-    	for i := 0 to 8 do begin
-        	tc := AccountItem.CData[i];
-            if assigned(tc) then begin
-	            if assigned(tc.Socket) then begin
-    	        	tc.Socket.Close;
-                    tc.Socket := nil;
-                end;
-            end;
-        end;
-
-	    AccountItem.ID := StrToInt(Edit2.Text);
-        AccountItem.Name := Edit3.Text;
-        AccountItem.Pass := Edit4.Text;
-        AccountItem.Gender := StrToInt(Edit5.Text);
-        AccountItem.Mail := Edit6.Text;
-        AccountItem.Banned := StrToInt(Edit7.Text);
-	    DataSave();
-    end else begin
-    	AccountItem := TPlayer.Create;
-	    AccountItem.ID := PlayerName.Count + 100101;
-        AccountItem.Name := Edit3.Text;
-        AccountItem.Pass := Edit4.Text;
-        AccountItem.Gender := StrToInt(Edit5.Text);
-        AccountItem.Mail := Edit6.Text;
-    	PlayerName.AddObject(AccountItem.Name, AccountItem);
-    	Player.AddObject(AccountItem.ID, AccountItem);
-        DataSave();
-        Button3.Click;
-    end;
-end;
-
 procedure TfrmMain.Save1Click(Sender: TObject);
 begin
     DataSave();
@@ -11001,6 +10862,36 @@ begin
                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW );
                 //Sets Windows Extended Styles WS_EX_TOOLWINDOW to true
                 // (Don't ToolWindows don't show in taskbar by default)
+end;
+
+procedure TfrmMain.PageControl1Change(Sender: TObject);
+begin
+	if (TabSheet1.Showing) then begin
+    end else if (TabSheet3.Showing) then begin
+		JCon_Accounts_Load();
+    end else if (TabSheet4.Showing) then begin
+    	JCon_INI_Server_Load();
+    end;
+end;
+
+procedure TfrmMain.ListBox1Click(Sender: TObject);
+begin
+	JCon_Accounts_Populate();
+end;
+
+procedure TfrmMain.Button3Click(Sender: TObject);
+begin
+	JCon_Accounts_Clear();
+end;
+
+procedure TfrmMain.Button4Click(Sender: TObject);
+begin
+	JCon_Accounts_Save();
+end;
+
+procedure TfrmMain.Button5Click(Sender: TObject);
+begin
+	JCon_INI_Server_Save();
 end;
 
 end.

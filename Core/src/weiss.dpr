@@ -14,7 +14,9 @@ uses
   Game in 'Game.pas',
   Database in 'Database.pas',
   Script in 'Script.pas',
-  Skills in 'Skills.pas';
+  Skills in 'Skills.pas',
+  WeissINI in 'WeissINI.pas',
+  JCon in 'JCon.pas';
 
 {$R *.res}
 

@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 310
-  Top = 147
+  Left = 297
+  Top = 125
   Width = 408
   Height = 518
   Caption = '#33'
@@ -152,12 +152,368 @@ object frmMain: TfrmMain
     object TabSheet2: TTabSheet
       Caption = 'INI Options'
       ImageIndex = 1
+      object PageControl2: TPageControl
+        Left = 0
+        Top = 0
+        Width = 392
+        Height = 412
+        ActivePage = TabSheet4
+        Align = alClient
+        TabIndex = 0
+        TabOrder = 0
+        object TabSheet4: TTabSheet
+          Caption = 'Server Options'
       object Label17: TLabel
-        Left = 160
-        Top = 208
+            Left = 4
+            Top = 8
+            Width = 57
+            Height = 18
+            Caption = 'IP Address'
+          end
+          object Label18: TLabel
+            Left = 132
+            Top = 8
+            Width = 69
+            Height = 18
+            Caption = 'Server Name'
+          end
+          object Label19: TLabel
+            Left = 260
+            Top = 8
+            Width = 36
+            Height = 18
+            Caption = 'NPC ID'
+          end
+          object Label20: TLabel
+            Left = 4
+            Top = 48
+            Width = 57
+            Height = 18
+            Caption = 'Login Port'
+          end
+          object Label21: TLabel
+            Left = 132
+            Top = 48
+            Width = 83
+            Height = 18
+            Caption = 'Character Port'
+          end
+          object Label22: TLabel
+            Left = 260
+            Top = 48
+            Width = 58
+            Height = 18
+            Caption = 'Game Port'
+          end
+          object Label25: TLabel
+            Left = 132
+            Top = 136
+            Width = 92
+            Height = 18
+            Caption = 'MySQL Password'
+          end
+          object Label23: TLabel
+            Left = 132
+            Top = 96
+            Width = 98
+            Height = 18
+            Caption = 'MySQL IP Address'
+          end
+          object Label24: TLabel
+            Left = 4
+            Top = 136
+            Width = 95
+            Height = 18
+            Caption = 'MySQL Username'
+          end
+          object Label26: TLabel
+            Left = 260
+            Top = 96
+            Width = 90
+            Height = 18
+            Caption = 'MySQL Database'
+          end
+          object Label27: TLabel
+            Left = 4
+            Top = 96
+            Width = 61
+            Height = 18
+            Caption = 'Use MySQL'
+          end
+          object Label33: TLabel
+            Left = 260
+            Top = 224
+            Width = 63
+            Height = 18
+            Caption = 'GM Logging'
+          end
+          object Label28: TLabel
+            Left = 132
+            Top = 224
+            Width = 115
+            Height = 18
+            Caption = 'Auto-Backup Interval'
+          end
+          object Label29: TLabel
+            Left = 4
+            Top = 224
+            Width = 99
+            Height = 18
+            Caption = 'Auto-Save Interval'
+          end
+          object Label30: TLabel
+            Left = 260
+            Top = 184
+            Width = 104
+            Height = 18
+            Caption = '_M/_F Registration'
+          end
+          object Label31: TLabel
+            Left = 132
+            Top = 184
+            Width = 84
+            Height = 18
+            Caption = 'Maximum Users'
+          end
+          object Label32: TLabel
+            Left = 4
+            Top = 184
+            Width = 57
+            Height = 18
+            Caption = 'Auto-Start'
+          end
+          object Label36: TLabel
+            Left = 260
+            Top = 272
+            Width = 31
+            Height = 18
+            Caption = 'Timer'
+          end
+          object Label34: TLabel
+            Left = 4
+            Top = 272
+            Width = 103
+            Height = 18
+            Caption = 'Show Script Errors'
+          end
+          object Label35: TLabel
+            Left = 132
+            Top = 272
+            Width = 66
+            Height = 18
+            Caption = 'Warp Debug'
+          end
+          object Label37: TLabel
+            Left = 4
+            Top = 312
+            Width = 41
+            Height = 18
+            Caption = 'Priority'
+          end
+          object Edit17: TEdit
+            Left = 4
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 0
+          end
+          object Edit22: TEdit
+            Left = 260
+            Top = 64
+            Width = 121
+            Height = 26
+            TabOrder = 5
+          end
+          object Edit21: TEdit
+            Left = 132
+            Top = 64
+            Width = 121
+            Height = 26
+            TabOrder = 4
+          end
+          object Edit20: TEdit
+            Left = 4
+            Top = 64
+            Width = 121
+            Height = 26
+            TabOrder = 3
+          end
+          object Edit19: TEdit
+            Left = 260
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 2
+          end
+          object Edit18: TEdit
+            Left = 132
+            Top = 24
+            Width = 121
+            Height = 26
+            TabOrder = 1
+          end
+          object Button5: TButton
+            Left = 260
+            Top = 328
+            Width = 75
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 21
+            OnClick = Button5Click
+          end
+          object Edit23: TEdit
+            Left = 4
+            Top = 152
+            Width = 121
+            Height = 26
+            TabOrder = 9
+          end
+          object Edit24: TEdit
+            Left = 132
+            Top = 112
+            Width = 121
+            Height = 26
+            TabOrder = 7
+          end
+          object Edit25: TEdit
+            Left = 132
+            Top = 152
+            Width = 121
+            Height = 26
+            TabOrder = 11
+          end
+          object Edit26: TEdit
+            Left = 260
+            Top = 112
+            Width = 121
+            Height = 26
+            TabOrder = 8
+          end
+          object ComboBox1: TComboBox
+            Left = 4
+            Top = 112
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 6
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object Edit29: TEdit
+            Left = 132
+            Top = 200
+            Width = 121
+            Height = 26
+            TabOrder = 12
+          end
+          object Edit30: TEdit
+            Left = 132
+            Top = 240
+            Width = 121
+            Height = 26
+            TabOrder = 15
+          end
+          object Edit31: TEdit
+            Left = 4
+            Top = 240
+            Width = 121
+            Height = 26
+            TabOrder = 14
+          end
+          object ComboBox2: TComboBox
+            Left = 4
+            Top = 200
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 10
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox3: TComboBox
+            Left = 260
+            Top = 200
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 13
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox4: TComboBox
+            Left = 260
+            Top = 240
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 16
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox5: TComboBox
+            Left = 5
+            Top = 288
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 17
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox6: TComboBox
+            Left = 132
+            Top = 288
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 18
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox7: TComboBox
+            Left = 260
+            Top = 288
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 19
+            Items.Strings = (
+              'No'
+              'Yes')
+          end
+          object ComboBox8: TComboBox
+            Left = 5
+            Top = 328
+            Width = 121
+            Height = 26
+            ItemHeight = 18
+            TabOrder = 20
+            Items.Strings = (
+              'Real Time'
+              'High'
+              'Above Normal'
+              'Normal'
+              'Below Normal'
+              'Low')
+          end
+        end
+        object TabSheet5: TTabSheet
+          Caption = 'Game Options'
+          ImageIndex = 1
+          object Label38: TLabel
+            Left = 152
+            Top = 176
         Width = 70
         Height = 18
         Caption = 'Coming Soon'
+      end
+    end
       end
     end
     object TabSheet3: TTabSheet
@@ -614,7 +970,7 @@ object frmMain: TfrmMain
     OnClientRead = sv1ClientRead
     OnClientError = sv1ClientError
     Left = 12
-    Top = 248
+    Top = 528
   end
   object sv2: TServerSocket
     Active = False
@@ -625,7 +981,7 @@ object frmMain: TfrmMain
     OnClientRead = sv2ClientRead
     OnClientError = sv2ClientError
     Left = 44
-    Top = 248
+    Top = 528
   end
   object sv3: TServerSocket
     Active = False
@@ -636,7 +992,7 @@ object frmMain: TfrmMain
     OnClientRead = sv3ClientRead
     OnClientError = sv3ClientError
     Left = 76
-    Top = 248
+    Top = 528
   end
   object DBsaveTimer: TTimer
     Enabled = False
