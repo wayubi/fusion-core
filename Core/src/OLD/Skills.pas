@@ -4736,16 +4736,20 @@ Begin
 
 			11,13,14,19,20,90,156: //BOLT,NB,SS,ES,HL
 					begin
-						//ダメージ算出
-						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
-						dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
-						dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
-						if dmg[0] < 1 then dmg[0] := 1;
-						dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
-						// Colus, 20040130: Add effect of garment cards
-						dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
-						dmg[0] := dmg[0] * tl.Data2[MUseLV];
-						if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+                        try
+    						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+	    					dmg[0] := dmg[0] * (100 - tc1.MDEF1) div 100; //MDEF%
+		    				dmg[0] := dmg[0] - tc1.Param[3]; //MDEF-
+			    			if dmg[0] < 1 then dmg[0] := 1;
+				    		dmg[0] := dmg[0] * ElementTable[tl.Element][tc1.ArmorElement] div 100;
+					    	// Colus, 20040130: Add effect of garment cards
+    						dmg[0] := dmg[0] * (100 - tc1.DamageFixE[1][tl.Element]) div 100;
+	    					dmg[0] := dmg[0] * tl.Data2[MUseLV];
+		    				if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+                        except
+                            on EIntOverflow do
+                                dmg[0] := 2147483647;
+                        end;
 
 						if (tc1.Skill[78].Tick > Tick) then dmg[0] := dmg[0] * 2;
 						//パケ送信
