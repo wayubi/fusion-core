@@ -1,3 +1,4 @@
+- 06-05-04: Removed all Athena GM command ports. Will implement into ALBGM later. ALBGM completed. [AlexKreuz]
 - 06-05-04: Switched GM Command, #USERS to ALBGM system. [AlexKreuz]
 - 06-05-04: Switched GM Command, #PWORD to ALBGM system. [AlexKreuz]
 - 06-05-04: Switched GM Command, #NEWPLAYER to ALBGM system. [AlexKreuz]
