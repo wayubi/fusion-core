@@ -4346,6 +4346,12 @@ begin
 		//end;
 
 		//マップから自分のデータを消去
+
+        { Alex: You can not activate calculations that require a CList if you're
+          activating the calculations after you've already deleted the CList.
+          Use common sense. }
+        if mi.PvP then CalcPvPRank(tm);
+
 		tm.CList.Delete(tm.Clist.IndexOf(tc.ID));
 		with tm.Block[tc.Point.X div 8][tc.Point.Y div 8] do begin
             try
@@ -4353,7 +4359,6 @@ begin
             except
             end;
 		end;
-        if mi.PvP then CalcPvPRank(tm);
 		if CharaPID.IndexOf(tc.ID) <> -1 then
 			CharaPID.Delete(CharaPID.IndexOf(tc.ID));
 	end;
@@ -6163,7 +6168,6 @@ var
 begin
     RankOne := 0;
     if not assigned(tm) then Exit;
-    if not assigned(tm.CList) then Exit;
     
     if tm.CList.Count > 0 then begin
         tc1 := tm.CList.Objects[0] as TChara;
