@@ -2,6 +2,10 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 03-11-04: Updated duration/cast delay of ME. [Colus]
+- 03-11-04: Updated option calls to use common function. [Colus]
+- 03-11-04: Super Novices now can use carts. [Colus]
+- 03-11-04: Updated Cart Boost with proper cart check. [Colus]
 - 03-11-04: Updated Basilica to show proper effect. [Colus]
 - 03-11-04: Updated packets for combo delay. [Colus]
 - 03-11-04: Corrected combo delay periods. [Colus]
