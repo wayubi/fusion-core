@@ -307,11 +307,17 @@ begin
 	end;
 	if sl.IndexOfName('BaseExpMultiplier') <> -1 then begin
 		BaseExpMultiplier := StrToInt(sl.Values['BaseExpMultiplier']);
+        	if (BaseExpMultiplier > 999) then begin
+            		BaseExpMultiplier := 999;
+        	end;
 	end else begin
 		BaseExpMultiplier := 1;
 	end;
 	if sl.IndexOfName('JobExpMultiplier') <> -1 then begin
 		JobExpMultiplier := StrToInt(sl.Values['JobExpMultiplier']);
+        	if (JobExpMultiplier > 999) then begin
+            		JobExpMultiplier := 999;
+        	end;
 	end else begin
 		JobExpMultiplier := 1;
 	end;
