@@ -1284,6 +1284,7 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param1=02   Freeze
 	param1=03   Stun
 	param1=04   Sleep
+	param1=06   Blind
 
 	Param2 values are statuses that affect you physically:
 
@@ -1291,7 +1292,7 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param2=02   Curse         (x02)
 	param2=04   Silence       (x04)
 	param2=08   Confusion     (x08)
-	param2=16   Blind         (x10)
+	param2=16   Darkness      (x10)
 
 	Param3 values are visual effects upon the player.
 
@@ -1307,7 +1308,7 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param3=512  Cart (#4)     (x200)
 	param3=1024 Cart (#5)     (x400)
 	param3=2048 Reverse Orcish(x800)
-	param3=4096 ?             (x1000)
+	param3=4096 Wedding Dress (x1000)
 	param3=8192 Ruwach        (x2000)
 	param3=16384Footsteps     (x4000)
 	param3=32768?             (x8000)

@@ -3309,9 +3309,10 @@ begin
       i := (100 - DeathJobLoss);
       tc.JobEXP := Round(tc.JobEXP * (i / 100));
       }
-      
+
         SendCStat1(tc, 1, $0001, tc.BaseEXP);
         SendCStat1(tc, 1, $0002, tc.JobEXP);
+        SendCStat1(tc, 0, $0005, tc.HP);
   end;
 
 
