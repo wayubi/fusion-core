@@ -4217,14 +4217,33 @@ begin
 		WFIFOB(16, tn.SubY);
 		Socket.SendBuf(buf, 17);
 	end else if tn.CType = 4 then begin
-		WFIFOW( 0, $011f);
-		WFIFOL( 2, tn.ID);
-		WFIFOL( 6, 0);
-		WFIFOW(10, tn.Point.X);
-		WFIFOW(12, tn.Point.Y);
-		WFIFOB(14, tn.JID);
-		WFIFOB(15, 1);
-		Socket.SendBuf(buf, 16);
+     if ((tn.JID = $B0) or (tn.JID = $99)) then begin
+
+          WFIFOW(0, $01c9);
+          WFIFOL(2, tn.ID);
+          WFIFOL(6, tn.CData.ID);
+	        WFIFOW(10, tn.Point.X);
+	        WFIFOW(12, tn.Point.Y);
+          WFIFOB(14, tn.JID);
+          WFIFOB(15, 1);
+          if tn.JID = $B0 then
+            WFIFOB(16, 1)
+          else
+            WFIFOB(16, 0);
+          WFIFOS(17, tn.Name, 80);
+          //WFIFOW(95, Length(tn.Name));
+
+ 	        Socket.SendBuf(buf, 97);
+    end else begin
+  		WFIFOW( 0, $011f);
+  		WFIFOL( 2, tn.ID);
+  		WFIFOL( 6, 0);
+  		WFIFOW(10, tn.Point.X);
+	  	WFIFOW(12, tn.Point.Y);
+  		WFIFOB(14, tn.JID);
+  		WFIFOB(15, 1);
+  		Socket.SendBuf(buf, 16);
+    end;
 	end else if tn.JID < 45 then begin
 		ZeroMemory(@buf[0], 53);
 		WFIFOW(0, $0079);
@@ -4327,6 +4346,7 @@ begin
 	tn.Count := SCount;
 	tn.CData := tc;
   tn.MData := ts;
+  tn.Enable := true;  // Enable a skillunit so that it will reappear when you reenter screen
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
@@ -4356,6 +4376,8 @@ begin
             WFIFOB(16, 0);
 
           WFIFOS(17, SText, 80);
+          //WFIFOW(95, Length(SText));
+
  	        SendBCmd(tm, tn.Point, 97);
         end else if tn.JID = $46 then begin
           WFIFOW( 0, $011f);

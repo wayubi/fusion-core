@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-27-04: Fixed Sanctuary healing dead players (yes, this includes Play Dead!) [Colus]
+- 01-27-04: Updated item reqs for Graffiti, Talkie Box, Warp Portal, Venom Dust [Colus]
 - 01-27-04: Added effects for Armor cards, Garment cards coming soon. [Colus]
 - 01-27-04: Updated Lex Aeterna calculations, probably will again. [Colus]
 - 01-27-04: Fixed improper calculation of shield card dmg reductions by race. [Colus]

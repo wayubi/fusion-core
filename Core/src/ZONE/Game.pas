@@ -4200,27 +4200,20 @@ end;
 					end;
 
             j := SearchCInventory(tc, 717, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							Dec(tc.Item[j].Amount, 1);
-							if tc.Item[j].Amount = 0 then tc.Item[j].ID := 0;
-							WFIFOW( 0, $00af);
-							WFIFOW( 2, j);
-							WFIFOW( 4, 1);
-							tc.Socket.SendBuf(buf, 6);
-							tc.Weight := tc.Weight - tc.Item[j].Data.Weight * cardinal(1);
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							tc.Socket.SendBuf(buf, 8);
-          tn := SetSkillUnit(tm, tc.ID, Point(tc.MPoint.X, tc.MPoint.Y), timeGetTime(), $81,
-					tc.Skill[27].Data.Data2[tc.Skill[27].Lv], 2000);
-					tn.WarpMap := ChangeFileExt(str, '');
-					tn.WarpPoint := xy;
-					DecSP(tc, 27, tc.Skill[27].Lv);
-          tc.MMode := 0;
-          tc.MPoint.X := 0;
-          tc.MPoint.Y := 0;
-						end else begin
+						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (tc.NoJamstone = True) then begin
+
+              if tc.NoJamstone = False then UseItem(tc, j);
+
+              tn := SetSkillUnit(tm, tc.ID, Point(tc.MPoint.X, tc.MPoint.Y), timeGetTime(), $81,
+  	  				tc.Skill[27].Data.Data2[tc.Skill[27].Lv], 2000);
+    					tn.WarpMap := ChangeFileExt(str, '');
+    					tn.WarpPoint := xy;
+  	  				DecSP(tc, 27, tc.Skill[27].Lv);
+              tc.MMode := 0;
+              tc.MPoint.X := 0;
+              tc.MPoint.Y := 0;
+  					end else begin
+              SendSkillError(tc, 8); //No Blue Gemstone
 							tc.MMode := 0;
 							tc.MPoint.X := 0;
 							tc.MPoint.Y := 0;
@@ -6017,15 +6010,63 @@ end;
         RFIFOW(8, w3); // Y
 
         s := RFIFOS(10, 80);  // 78 + 2 bytes for length.
+        //RFIFOW(88, e);  // This doesn't seem to get read...
 
         xy.X := w2;
         xy.Y := w3;
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-        if w1 = $DC then
-          SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $B0, 0, 30000, tc, nil, s)
-        else
-          SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
+        if w1 = $DC then begin
+
+           j := SearchCInventory(tc, 716, false);
+					 if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (tc.NoJamstone = True) then begin
+						 if tc.NoJamstone = False then UseItem(tc, j);
+             WFIFOW( 0, $0117);
+             WFIFOW( 2, w1);
+             WFIFOL( 4, tc.ID);
+             WFIFOW( 8, 1);
+             WFIFOW(10, xy.X);
+             WFIFOW(12, xy.Y);
+             WFIFOL(14, timeGetTime());
+             SendBCmd(tm, xy, 18);
+						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $B0, 0, 30000, tc, nil, s);
+	      		 tn.MSkill := tc.MSkill;
+      		   tn.MUseLV := tc.MUseLV;
+
+					 end else begin
+             SendSkillError(tc, 7); //No Red Gemstone
+						 //tc.MMode := 4;
+						 tc.MPoint.X := 0;
+						 tc.MPoint.Y := 0;
+						 Exit;
+					 end;
+
+          //SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $B0, 0, 30000, tc, nil, s);
+        end else begin
+           j := SearchCInventory(tc, 1065, false);
+					 if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
+						 UseItem(tc, j);
+             WFIFOW( 0, $0117);
+             WFIFOW( 2, w1);
+             WFIFOL( 4, tc.ID);
+             WFIFOW( 8, 1);
+             WFIFOW(10, xy.X);
+             WFIFOW(12, xy.Y);
+             WFIFOL(14, timeGetTime());
+             SendBCmd(tm, xy, 18);
+						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
+	      		 tn.MSkill := tc.MSkill;
+      		   tn.MUseLV := tc.MUseLV;
+
+					 end else begin
+             //SendSkillError(tc, 7); //No Red Gemstone
+						 //tc.MMode := 4;
+						 tc.MPoint.X := 0;
+						 tc.MPoint.Y := 0;
+						 Exit;
+					 end;
+          //SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
+        end;
  {
         WFIFOW(0, $01c9);
         WFIFOL(2, 0); // Should be NPC ID of the skillunit...

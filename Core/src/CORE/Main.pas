@@ -61,7 +61,7 @@ type
 		procedure MobAttack(tm:TMap;ts:TMob;Tick:cardinal);
 		procedure StatEffect(tm:TMap; ts:TMob; Tick:Cardinal);
 
-		procedure CreateField(tc:TChara; Tick:Cardinal);
+    procedure CreateField(tc:TChara; Tick:Cardinal);
 		procedure SkillEffect(tc:TChara; Tick:Cardinal);
 
                 {Pet Moving}
@@ -4040,20 +4040,10 @@ begin
         140: //venom dust
          begin
          j := SearchCInventory(tc, 716, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							Dec(tc.Item[j].Amount, 1);
-							if tc.Item[j].Amount = 0 then tc.Item[j].ID := 0;
-							WFIFOW( 0, $00af);
-							WFIFOW( 2, j);
-							WFIFOW( 4, 1);
-							tc.Socket.SendBuf(buf, 6);
-							tc.Weight := tc.Weight - tc.Item[j].Data.Weight * cardinal(1);
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							tc.Socket.SendBuf(buf, 8);
-					  xy.X := (tc.Point.X);
-						xy.Y := (tc.Point.Y) + 1;
+					 if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
+						 if NoJamstone = False then UseItem(tc, j);
+  					 xy.X := (tc.Point.X);
+  					 xy.Y := (tc.Point.Y) + 1;
              WFIFOW( 0, $0117);
              WFIFOW( 2, MSkill);
              WFIFOL( 4, ID);
@@ -4217,7 +4207,7 @@ begin
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
                                                 exit;
-                                        end;
+                                         end;
                                         end;
 
 				115:    {Skid Trap}
@@ -10229,7 +10219,8 @@ begin
 
             {Sanctuary}
                 // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
-                if ((tc.Skill[70].Tick > Tick) and (tc.HPRTick + 1000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP)) then begin
+                //        20030127: No more heals while dead
+                if ((tc.Skill[70].Tick > Tick) and (tc.HPRTick + 1000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP) and (tc.Sit <> 1)) then begin
 
                         j := Skill[70].Effect1;
 
@@ -10501,7 +10492,7 @@ begin
 						DelSkillUnit(tm, tn);
 						Dec(k);
      			end;
-				$81://ポータル発動前->発動後
+				$81:// Warp Portal Opens
 					begin
 						tn.JID := $80;
 						WFIFOW(0, $00c3);
@@ -10511,7 +10502,7 @@ begin
 						SendBCmd(tm, tn.Point, 8);
 						tn.Tick := Tick + 20000;
 					end;
-				$8F://ブラスト発動前
+				$8F:// Blast Mine activated
 					begin
 						tn.JID := $74;
 						WFIFOW(0, $00c3);
@@ -10521,6 +10512,23 @@ begin
 						SendBCmd(tm, tn.Point, 8);
 						tn.Tick := Tick + 2000;
 					end;
+        $99: // Talkie Box Activated
+          begin
+						//tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
+						WFIFOW(0, $00c3);
+						WFIFOL(2, tn.ID);
+						WFIFOB(6, 0);
+						WFIFOB(7, tn.JID);
+						SendBCmd(tm, tn.Point, 8);
+						//tn.Tick := Tick + 60000;
+          end;
+        { $8c: // Talkie Box fires
+          begin
+            WFIFOW(0, $0191);
+            WFIFOL(2, tn.ID);
+            WFIFOS(6, tn.Name, 80);
+            SendBCmd(tm, tn.Point, 86);
+          end;}
 				else
 					begin
 						//スキル効能地撤去
@@ -10556,6 +10564,14 @@ begin
 									Dec(c);
 								end;
 							end;
+            $99: // Talkie Box fires
+            begin
+             DebugOut.Lines.Add('Talkie fire self');
+              WFIFOW(0, $0191);
+              WFIFOL(2, tc1.ID);
+              WFIFOS(6, tn.Name, 80);
+              SendBCmd(tm, tn.Point, 86);
+            end;
 					end;
 				end;
 			end;
@@ -11113,7 +11129,7 @@ begin
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
             $99: {Talkie Box}
-              begin
+              begin //  DebugOut.Lines.Add('Talkie fire pvp');
                 WFIFOW(0, $0191);
                 WFIFOL(2, tc2.ID);
                 WFIFOS(6, tn.Name, 80);
@@ -11352,7 +11368,7 @@ begin
 									ts1.pcnt := 0;
 									//Update Monster Location
                                                                         UpdateMonsterLocation(tm, ts1);
-									
+
 								end;
 								DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								Dec(tn.Count);
@@ -11363,7 +11379,7 @@ begin
 								end;
 							end;
 {追加:119}
-						$84: //マグヌス
+						$84: // Damage of Magnus Exorcism
 							begin
 								if ((ts1.Element mod 20 = 9) or (ts1.Data.Race = 6)) then begin
 									//ダメージ算出
