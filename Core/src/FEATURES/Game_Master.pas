@@ -74,7 +74,9 @@ var
     GM_AUTOLOOT : Byte;
     GM_GSTORAGE : Byte;
     GM_RCON : Byte;
-    
+    GM_JAIL : Byte;
+    GM_UNJAIL : Byte;
+
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
     GM_AEGIS_BB : Byte;
@@ -198,6 +200,8 @@ var
     function command_autoloot(tc : TChara) : String;
     function command_gstorage(tc : TChara) : String;
     function command_rcon(str : String) : String;
+    function command_jail(tc : TChara; str : String) : String;
+    function command_unjail(tc: TChara; str : String) : String;
 
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
@@ -324,6 +328,8 @@ implementation
         GM_AUTOLOOT := StrToIntDef(sl.Values['AUTOLOOT'], 1);
         GM_GSTORAGE := StrToIntDef(sl.Values['GSTORAGE'], 1);
         GM_RCON := StrToIntDef(sl.Values['RCON'], 1);
+        GM_JAIL := StrToIntDef(sl.Values['JAIL'], 1);
+        GM_UNJAIL := StrToIntDef(sl.Values['UNJAIL'], 1);
 
         ini.ReadSectionValues('Aegis GM Commands', sl);
 
@@ -463,6 +469,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'AUTOLOOT', IntToStr(GM_AUTOLOOT));
         ini.WriteString('Fusion GM Commands', 'GSTORAGE', IntToStr(GM_GSTORAGE));
         ini.WriteString('Fusion GM Commands', 'RCON', IntToStr(GM_RCON));
+        ini.WriteString('Fusion GM Commands', 'JAIL', IntToStr(GM_JAIL));
+        ini.WriteString('Fusion GM Commands', 'UNJAIL', IntToStr(GM_UNJAIL));
 
         ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
         ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -604,6 +612,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('autoloot')) = 'autoloot') and (check_level(tc, GM_AUTOLOOT)) ) then error_msg := command_autoloot(tc)
             else if ( (copy(str, 1, length('gstorage')) = 'gstorage') and (check_level(tc, GM_GSTORAGE)) ) then error_msg := command_gstorage(tc)
             else if ( (copy(str, 1, length('rcon')) = 'rcon') and (check_level(tc, GM_RCON)) ) then error_msg := command_rcon(str)
+            else if ( (copy(str, 1, length('jail')) = 'jail') and (check_level(tc, GM_JAIL)) ) then error_msg := command_jail(tc, str)
+            else if ( (copy(str, 1, length('unjail')) = 'unjail') and (check_level(tc, GM_UNJAIL)) ) then error_msg := command_unjail(tc, str)
         end else if gmstyle = '@' then begin
             if ( (copy(str, 1, length('heal')) = 'heal') and (check_level(tc, GM_ATHENA_HEAL)) ) then error_msg := command_athena_heal(tc, str)
             else if ( (copy(str, 1, length('kami')) = 'kami') and (check_level(tc, GM_ATHENA_KAMI)) ) then error_msg := command_athena_kami(tc, str)
@@ -4835,6 +4845,64 @@ function command_athena_doom(tc : Tchara) : String;
                 tc.socket.sendbuf(buf, w);
                 end;
             end;
+        end;
+    end;
+
+function command_jail(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_JAIL Success.';
+
+        s := Copy(str, 6, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            Result := 'GM_JAIL Success. ' + s + ' jailed.';
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+
+            if (tc1.Login = 2) then begin
+                SendCLeave(tc1, 2);
+                tc1.Map := 'sec_pri';
+                tc1.Point := Point(20,80);
+                MapMove(tc1.Socket, tc.Map, tc.Point);
+            end else begin
+                tc1.Map := 'sec_pri';
+                tc1.Point := Point(20,80);
+
+                Result := Result + ' But ' + s + ' is offline.';
+            end;
+
+        end else begin
+            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
+        end;
+    end;
+
+function command_unjail(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_UNJAIL Success.';
+
+        s := Copy(str, 8, 256);
+        if CharaName.Indexof(s) <> -1 then begin
+            Result := 'GM_JAIL Success. ' + s + ' unjailed.';
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+
+            if (tc1.Login = 2) then begin
+                SendCLeave(tc1, 2);
+                tc1.Map := 'prontera';
+                tc1.Point := Point(150,170);
+                MapMove(tc1.Socket, tc.Map, tc.Point);
+            end else begin
+                tc1.Map := 'prontera';
+                tc1.Point := Point(150,170);
+
+                Result := Result + ' But ' + s + ' is offline.';
+            end;
+
+        end else begin
+            Result := 'GM_JAIL Failure. ' + s + ' is an invalid character name.';
         end;
     end;
 end.
