@@ -1404,7 +1404,7 @@ begin
 end;//proc TFrmMain.MonsterSpawn()
 //------------------------------------------------------------------------------
 
-{Spawn Monster}
+{Spawn Slave Monster}
 procedure TFrmMain.MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
 var
 	i, j, k, h, m : Integer;
@@ -14155,7 +14155,7 @@ begin
 			Exit;
 		end;
 
-    if (isLeader) and ( (MonsterMob) or ((isSummon) and (SummonMonsterMob)) )then begin
+    {if (isLeader) and ( (MonsterMob) or ((isSummon) and (SummonMonsterMob)) )then begin
         if SlaveCount = 0 then begin
         if (Random(1000) <= 10) then begin
         WFIFOW( 0, $011a);
@@ -14169,6 +14169,7 @@ begin
         end;
         end;
       end;
+      }
 
 	if Status = 'RUN' then begin
       ts.ATarget := 0;

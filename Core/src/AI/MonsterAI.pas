@@ -212,7 +212,8 @@ var
 
 begin
 
-if (MonsterMob = true) then begin
+//if (MonsterMob = true) then begin
+begin
         k := SlaveDBName.IndexOf(ts.Data.Name);
         if (k <> -1) then begin
                 ts.isLeader := true;
@@ -231,11 +232,11 @@ if (MonsterMob = true) then begin
 					        Inc(NowMobID);
 					        ts1.Name := ts1.Data.JName;
 					        ts1.JID := ts1.Data.ID;
-                                                ts1.LeaderID := ts.ID;
-                                                ts1.Data.isLink := false;
+                  ts1.LeaderID := ts.ID;
+                  ts1.Data.isLink := false;
 					        ts1.Map := ts.Map;
-                                                ts1.Point.X := ts.Point.X;
-					        ts1.Point.Y := ts.Point.Y;
+                  ts1.Point.X := ts.Point.X + Random(10);
+					        ts1.Point.Y := ts.Point.Y + Random(10);
 					        ts1.Dir := ts.Dir;
 					        ts1.HP := ts1.Data.HP;
                                                 if ts.Data.Speed < ts1.Data.Speed then begin
@@ -723,7 +724,7 @@ procedure MobFieldSkills(tm:TMap; ts:TMob; Tick:cardinal);
 var
         //tl  :TSkillDB;
         //sl  :TStringList;
-        tc  :TChara;
+        //tc  :TChara;
         j   :integer;
         AttackData :TChara;
         xy  :TPoint;
@@ -733,11 +734,19 @@ var
 begin
 
         //for i := 0 to 3 do begin
-                tc := ts.AData;
+                if ts.AData <> nil then
+                  AttackData := ts.AData;
+                //else
+                  //AttackData := ts;
+
                 case ts.MSKill of
+                  //18: {Fire Wall}
+                  //  begin
+
+                  //  end;
                         83:     {Meteor}
                         begin
-                                AttackData := ts.AData;
+                                //AttackData := ts.AData;
 
                                 xy.X := AttackData.Point.X;
                                 xy.Y := AttackData.Point.Y;
@@ -749,7 +758,7 @@ begin
                                 tn.MSkill := ts.MSKill;
                                 tn.MUseLV := ts.MSKill;
 
-                                for j := 1 to tc.Skill[83].Data.Data2[ts.MLevel] do begin;
+                                for j := 1 to AttackData.Skill[83].Data.Data2[ts.MLevel] do begin;
                                         WFIFOW( 0, $0117);
                                         WFIFOW( 2, ts.MSKill);
                                         WFIFOL( 4, ts.ID);
@@ -764,7 +773,7 @@ begin
 
                         85:     {Lord of Vermillion}
                           begin
-                                AttackData := ts.AData;
+                                //AttackData := ts.AData;
                                 //Cast Point
                                 xy.X := AttackData.Point.X;
                                 xy.Y := AttackData.Point.Y;
@@ -786,6 +795,32 @@ begin
                                 WFIFOL(14, 1);
                                 SendBCmd(tm, xy, 18);
                           end;
+
+                        {140:   //Venom Dust
+                        begin
+                          // Create Location
+                          xy.X := (AttackData.Point.X);
+					                xy.Y := (AttackData.Point.Y) + 1;
+                          tn := SetSkillUnit(tm, ts.ID, xy, Tick, $92, 0, AttackData.Skill[140].Data.Data1[ts.MLevel] * 1000, nil, ts);
+
+					                xy.X := (AttackData.Point.X) + 1;
+                          xy.Y := (AttackData.Point.Y);
+
+                          tn := SetSkillUnit(tm, ts.ID, xy, Tick, $92, 0, AttackData.Skill[140].Data.Data1[ts.MLevel] * 1000, nil, ts);
+
+					                xy.X := (AttackData.Point.X) - 1;
+					                xy.Y := (AttackData.Point.Y);
+
+					                tn := SetSkillUnit(tm, ts.ID, xy, Tick, $92, 0, AttackData.Skill[140].Data.Data1[ts.MLevel] * 1000, nil, ts);
+
+					                xy.X := (AttackData.Point.X);
+					                xy.Y := (AttackData.Point.Y) - 1;
+
+					                tn := SetSkillUnit(tm, ts.ID, xy, Tick, $92, 0, AttackData.Skill[140].Data.Data1[ts.MLevel] * 1000, nil, ts);
+					                tn.MSkill := ts.MSkill;
+                          tn.MUseLV := ts.MLevel;
+                          Debugout.Lines.Add('Venom Dust')
+                        end; }
 
                         else Debugout.Lines.Add('Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
                 end;  //end case
@@ -892,6 +927,23 @@ with ts do begin
                 begin
                         ProcessType := 1;
                 end;
+          196:  {Summon Slave}
+            begin
+              // (ts.isLeader) and ( (MonsterMob) or ((ts.isSummon) and (SummonMonsterMob)) )then begin
+                if ts.SlaveCount = 0 then begin
+                  // (Random(1000) <= 10) then begin
+                    WFIFOW( 0, $011a);
+                    WFIFOW( 2, 196);
+                    WFIFOW( 4, 1);
+                    WFIFOL( 6, ID);
+                    WFIFOL(10, ID);
+                    WFIFOB(14, 1);
+                    SendBCmd(tm, ts.Point, 15);
+                    MobSpawn(tm,ts,Tick);
+                  //end;
+                end;
+              //end;
+            end;
 
           197:  {NPC Emotion}
                   begin
@@ -1589,6 +1641,7 @@ procedure NewMonsterCastTime(tm:TMap; ts:TMob; Tick:Cardinal);
 var
         tc      :TChara;
         j      :integer;
+
 begin
 
         tc := ts.AData;
@@ -1599,6 +1652,7 @@ begin
         ts.MTick := Tick + cardinal(j);
 
         if (j > 0) then begin
+          if ts.SkillType = 1 then begin
                 //Send Packets
                 WFIFOW( 0, $013e);
                 WFIFOL( 2, ts.ID);
@@ -1609,9 +1663,38 @@ begin
                 WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
                 WFIFOL(20, j);
                 SendBCmd(tm, ts.Point, 24);
-                ts.Mode := 3;
-                ts.MMode := 1;
                 ts.ATick := Tick + cardinal(j);
+                ts.MMode := 1;
+          end else if ts.SkillType = 2 then begin
+            WFIFOW( 0, $013e);
+				    WFIFOL( 2, ts.ID);
+				    WFIFOL( 6, 0);
+				    WFIFOW(10, ts.MPoint.X);
+				    WFIFOW(12, ts.MPoint.Y);
+				    WFIFOW(14, ts.MSkill); //SkillID
+				    WFIFOL(16, ts.Element); //Element
+				    WFIFOL(20, j);
+				    SendBCmd(tm, ts.Point, 24);
+				    ts.MMode := 2;
+				    ts.MTick := Tick + cardinal(j);
+          end else begin
+            WFIFOW( 0, $013e);
+            WFIFOL( 2, ts.ID);
+            WFIFOL( 6, ts.ID);
+            WFIFOW(10, 0);
+            WFIFOW(12, 0);
+            WFIFOW(14, ts.MSKill); //SkillID
+            WFIFOL(16, tc.Skill[ts.MSKill].Data.Element); //Element
+            WFIFOL(20, j);
+            SendBCmd(tm, ts.Point, 24);
+            ts.MMode := 4;
+            ts.MTick := Tick + cardinal(j);
+          end;
+          //Mode 3 is using a Skill
+          ts.Mode := 3;
+
+
+
         end else begin
                 //ârè•Ç»Çµ
                 ts.Mode := 3;
