@@ -776,7 +776,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                                 s := Trim(s);
                                                         end;
 
-                                                        if charaname.IndexOf(s) <> -1 then begin
+                                                        if (charaname.IndexOf(s) <> -1) then begin
                                                                 tc1 := charaname.objects[charaname.indexof(s)] as tchara;
                                                                 str := tc.Name + ' warped ' + tc1.Name + ' to ' + sl.strings[1] + ' ' + inttostr(i) + ' ' + inttostr(j);
 
@@ -809,7 +809,7 @@ Begin(* Proc sv3PacketProcess() *)
                                                 i := strtoint(sl.strings[2]);
                                                 j := strtoint(sl.strings[3]);
 
-                                                if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+                                                if (maplist.IndexOf(sl.Strings[1]) <> -1) then begin
                                                         ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
                                                         if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then continue;
 
@@ -825,14 +825,30 @@ Begin(* Proc sv3PacketProcess() *)
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
-                                                tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
-                                                str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
+                                                if (CharaName.Indexof(sl.strings[1]) <> -1) then begin
+                                                        tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
+                                                        str := tc1.Name + ' located at ' + tc1.map + ' ' + inttostr(tc1.point.x) + ' ' + inttostr(tc1.point.y);
 
-                                                w := Length(str) + 4;
-                                                WFIFOW (0, $009a);
-                                                WFIFOW (2, w);
-                                                WFIFOS (4, str, w - 4);
-                                                tc.socket.sendbuf(buf, w);
+                                                        w := Length(str) + 4;
+                                                        WFIFOW (0, $009a);
+                                                        WFIFOW (2, w);
+                                                        WFIFOS (4, str, w - 4);
+                                                        tc.socket.sendbuf(buf, w);
+                                                end;
+
+                                                sl.Free;
+                                        end
+
+                                        else if (copy(str, 1, 6) = 'jumpto') or (copy(str, 1, 6) = 'warpto') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                if (CharaName.Indexof(sl.strings[1]) <> -1) then begin
+                                                        tc1 := charaname.objects[charaname.indexof(sl.strings[1])] as tchara;
+                                                        tc.tmpmap := tc1.map;
+                                                        tc.point := tc1.point;
+                                                        mapmove (socket, tc1.map, tc1.point);
+                                                end;
 
                                                 sl.Free;
                                         end
