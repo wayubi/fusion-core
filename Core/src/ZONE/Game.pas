@@ -745,8 +745,9 @@ Begin(* Proc sv3PacketProcess() *)
 				str := RFIFOS(4, w - 4);
 
                 // ALBGM - Accesss Level Based GM System. Finally, nice and clean.
-                if (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '#') then begin
-                    parse_commands (tc, str);
+                if (Pos(' : ', str) <> 0) and ( (Copy(str, Pos(' : ', str) + 3, 1) = '#') or (Copy(str, Pos(' : ', str) + 3, 1) = '@') )then begin
+                    str2 := str;
+                    parse_commands (tc, str2);
                     str := '';
                 end;
                 // ALBGM - Accesss Level Based GM System. Finally, nice and clean.
