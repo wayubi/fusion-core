@@ -146,6 +146,9 @@ var
     function command_pvpoff(tc : TChara) : String;
     function command_gpvpon(tc : TChara) : String;
     function command_gpvpoff(tc : TChara) : String;
+    function command_newplayer(str : String) : String;
+    function command_pword(tc : TChara; str : String) : String;
+    function command_users() : String;
 
 implementation
 
@@ -205,8 +208,8 @@ implementation
         GM_GPVPON := StrToIntDef(sl.Values['GPVPON'], 1);
         GM_GPVPOFF := StrToIntDef(sl.Values['GPVPOFF'], 1);
         GM_NEWPLAYER := StrToIntDef(sl.Values['NEWPLAYER'], 1);
-        GM_PWORD := StrToIntDef(sl.Values['PWORD'], 1);
-        GM_USERS := StrToIntDef(sl.Values['USERS'], 1);
+        GM_PWORD := StrToIntDef(sl.Values['PWORD'], 0);
+        GM_USERS := StrToIntDef(sl.Values['USERS'], 0);
 
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
@@ -241,7 +244,6 @@ implementation
 		sl.Free;
 		ini.Free;
 
-		//Moved from Main into here.
 		GM_Access_DB := TIntList32.Create;
 	end;
 
@@ -308,7 +310,6 @@ Called when we're shutting down the server *only*
 		ini.WriteString('Fusion GM Commands', 'NEWPLAYER', IntToStr(GM_NEWPLAYER));
 		ini.WriteString('Fusion GM Commands', 'PWORD', IntToStr(GM_PWORD));
 		ini.WriteString('Fusion GM Commands', 'USERS', IntToStr(GM_USERS));
-		ini.WriteString('Fusion GM Commands', 'SERVER', IntToStr(GM_SERVER));
 
 		ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
 		ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -405,6 +406,9 @@ Called when we're shutting down the server *only*
         else if ( (copy(str, 1, length('pvpoff')) = 'pvpoff') and (check_level(tc.ID, GM_PVPOFF)) ) then error_msg := command_pvpoff(tc)
         else if ( (copy(str, 1, length('gpvpon')) = 'gpvpon') and (check_level(tc.ID, GM_GPVPON)) ) then error_msg := command_gpvpon(tc)
         else if ( (copy(str, 1, length('gpvpoff')) = 'gpvpoff') and (check_level(tc.ID, GM_GPVPOFF)) ) then error_msg := command_gpvpoff(tc)
+        else if ( (copy(str, 1, length('newplayer')) = 'newplayer') and (check_level(tc.ID, GM_NEWPLAYER)) ) then error_msg := command_newplayer(str)
+        else if ( (copy(str, 1, length('pword')) = 'pword') and (check_level(tc.ID, GM_PWORD)) ) then error_msg := command_pword(tc, str)
+        else if ( (copy(str, 1, length('users')) = 'users') and (check_level(tc.ID, GM_USERS)) ) then error_msg := command_users()
 		;
 
 		if (error_msg <> '') then error_message(tc, error_msg);
@@ -1918,6 +1922,98 @@ Called when we're shutting down the server *only*
         end else begin
         	Result := Result + ' Map ' + tc.Map + ' not found.';
         end;
+    end;
+
+    function command_newplayer(str : String) : String;
+    var
+    	sl : TStringList;
+        tp1 : TPlayer;
+    begin
+    	Result := 'GM_NEWPLAYER Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 11, 256);
+
+        if sl.Count = 4 then begin;
+	        if PlayerName.IndexOf(sl.Strings[0]) <> -1 then begin
+            	Result := Result + ' Player name ' + sl.Strings[0] + ' already exists.';
+        	end else if (Length(sl.Strings[0]) < 4) or (Length(sl.strings[1]) < 4) then begin
+            	Result := Result + ' Player name and password must be at least 4 character long.';
+	        end else if (sl.strings[2] <> '1') and (sl.strings[2] <> '0') then begin
+            	Result := Result + ' Gender can only be 1 (Male) or 2 (Female).';
+	        end else begin
+		        tp1 := TPlayer.Create;
+		        tp1.ID := 100100 + PlayerName.Count;
+    		    tp1.Name := sl.Strings[0];
+	        	tp1.Pass := sl.Strings[1];
+		        tp1.Mail := sl.Strings[3];
+    		    tp1.Gender := StrToInt(sl.Strings[2]);
+	        	tp1.Banned := 0;
+		        tp1.ver2 := 9;
+
+	    	    PlayerName.AddObject(tp1.Name, tp1);
+    	    	Player.AddObject(tp1.ID, tp1);
+
+                Result := 'GM_NEWPLAYER Success. ' + tp1.Name + ' has been added successfully.';
+            end;
+        end else begin
+        	Result := Result + ' Incomplete information. Syntax: #newplayer [username] [password] [gender 1|0] [email].';
+        end;
+
+        sl.Free;
+    end;
+
+    function command_pword(tc : TChara; str : String) : String;
+    var
+    	sl : TStringList;
+        tp1 : TPlayer;
+    begin
+    	Result := 'GM_PWORD Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 7, 256);
+        if sl.Count = 2 then begin;
+
+			if length(sl.Strings[0]) < 4 then begin
+                Result := Result + ' Passwords must be at least 4 characters long.';
+			end else if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
+                Result := Result + ' You have to enter a new password and your email address.';
+			end else begin
+                tp1 := Player.IndexOfObject(tc.ID) as TPlayer;
+
+                if sl.Strings[1] <> tp1.Mail then begin
+					Result := Result + ' Your email address didnt match the one you entered.';
+                end else begin
+					tp1.Pass := sl.Strings[0];
+					Result := 'GM_PWORD Success. Password changed. New Password: ' + tp1.Pass + '.';
+                end;
+            end;
+        end else begin
+        	Result := Result + ' Incomplete information. Syntax: #pword [newpass] [email].';
+        end;
+
+        sl.Free;        
+    end;
+
+    function command_users() : String;
+    var
+    	tc1 : TChara;
+        i : Integer;
+    begin
+    	Result := 'Users currently logged in: ';
+
+        for i := 0 to CharaName.Count - 1 do begin
+        	tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                if Result = 'Users currently logged in: ' then begin
+                    Result := Result + tc1.Name;
+                end else begin
+                    Result := Result + ', ' + tc1.Name;
+                end;
+            end;
+        end;
+
+        Result := Result + '.';
     end;
 
 end.

@@ -1,3 +1,6 @@
+- 06-05-04: Switched GM Command, #USERS to ALBGM system. [AlexKreuz]
+- 06-05-04: Switched GM Command, #PWORD to ALBGM system. [AlexKreuz]
+- 06-05-04: Switched GM Command, #NEWPLAYER to ALBGM system. [AlexKreuz]
 - 06-05-04: Switched GM Command, #GPVPOFF to ALBGM system. [AlexKreuz]
 - 06-05-04: Switched GM Command, #GPVPON to ALBGM system. [AlexKreuz]
 - 06-04-04: Fixed ALBGM for general users at access level 0. [AlexKreuz]
