@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-29-04: Character disconnect map access issues. Using different map assign line. [AlexKreuz]
 - 12-29-04: Optimized REED Loading one final time. Fuck REED! Wasted my Life on it! [AlexKreuz]
 - 12-29-04: Cleared up some variables in create_account. [Tsusai]
 - 12-29-04: Added script message variable $joblevel (like $charaname). [Tsusai]

@@ -4258,7 +4258,12 @@ begin
 	tc.pcnt := 0;
 	tc.AMode := 0;
 	tc.MMode := 0;
-	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+    { Bug Note: Is tc.Map blank empty because the user has disconnected, or
+      does that map not exist? And why do we need all this?
+	  Old Line --> tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap; }
+    tm := tc.MData;
+
     //tm.LastAction := TimeGetTime();  //Update on charcter leaving
 	mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 {キューペット}
