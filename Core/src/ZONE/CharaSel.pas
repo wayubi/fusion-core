@@ -437,9 +437,7 @@ begin
                     if (i <> -1) then begin
                         tc := Chara.Objects[i] as TChara;
 
-                        { Alex: this 4 needs to be changed to 8 when 9 Character
-                          Slots become available. }
-                        for k := 0 to 4 do begin
+                        for k := 0 to 8 do begin
                             if tp.CData[k] = tc then begin
                                 tp.CName[k] := '';
                                 tp.CData[k] := nil;
