@@ -5265,6 +5265,13 @@ begin
                                                         tc.MTick := Tick + 1000;
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
+
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
                                                         SendCStat(tc);
                                                 end;
                                         end;
@@ -6749,7 +6756,9 @@ begin
                                                         ProcessType := 3;
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
-                                                 end;
+                                                end else begin
+                                                  exit;  // Colus - This ability must have 5 spheres!
+                                                end;
                                  270:   //Explosion Spirits
 
                                                 if spiritSpheres = 5 then begin
@@ -7823,6 +7832,12 @@ begin
                                                         tc.MTick := Tick + 1000;
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
+                                                        {20031223, Colus: Cancel Explosion Spirits after Ashura
+                                                         Ashura's tick will control SP lockout time}
+                                                        tc.Skill[271].Tick := Tick + 300000;
+                                                        tc.Skill[270].Tick := Tick;
+                                                        tc.SkillTick := Tick;
+                                                        tc.SkillTickID := 270;
                                                         end;
                                                 end;
                                 266:  //Investigate
@@ -9183,7 +9198,8 @@ begin
 	with tc do begin
 		//HPSPâÒïúèàóù
 		if Weight * 2 < MaxWeight then begin
-                if Weight * 2 <> MaxWeight then begin
+      if Weight * 2 <> MaxWeight then begin
+
 			//HPé©ìÆâÒïú
 
                         {SP Usage For Songs}
@@ -9213,8 +9229,15 @@ begin
 					HPRTick := Tick;
 				end;
 
-        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10300 <= Tick) then begin
-					if (SP <> MAXSP) and (Skill[270].Tick < Tick) then begin
+        {Colus, 20031223: Why is the SP part of Spiritual Relaxation here?}
+        {Shouldn't it be in SkillPassive?  Oh, well...}
+        { Anyway, according to kRO site, SP *can* be recovered with this
+          in Critical Explosion mode, but not in normal regen.  So I'm
+          removing the Critical Explosion check while adding the Ashura check.
+          Also, it doesn't say anything about recovering HP, so that's not
+          changed...for now.}
+        if (Sit = 2) and (Skill[260].Lv <> 0) and (SPRTick + 10300 <= Tick) and (Skill[271].Tick < Tick) then begin
+					if (SP <> MAXSP) then begin
 {ãZèp229}   j := (3 + MAXSP * 2 div 1000) * Skill[260].Data.Data2[Skill[260].Lv];
 						if SP + j > MAXSP then j := MAXSP - SP;
 						SP := SP + j;
@@ -9254,12 +9277,13 @@ begin
 			end;
 		end else begin
 			HPTick := Tick;
-                        if Skill[270].Tick < Tick then begin
+      if Skill[270].Tick < Tick then begin
 			        SPTick := Tick;
-			end;
-                        end;
-                        end;
-                        end;
+      end;
+
+    end;
+  end;
+end;
 //------------------------------------------------------------------------------
    procedure TfrmMain.SkillPassive(tc:TChara;Tick:cardinal);
 var
@@ -9273,6 +9297,7 @@ var
 begin
 	with tc do begin
          if Weight * 2 <> MaxWeight then begin
+
             {Sanctuary}
                 if (tc.Skill[70].Tick > Tick) and (tc.HPRTick + 5000 <= Tick) and (tc.InField = true) then begin
 
@@ -9313,8 +9338,8 @@ begin
                         tc.InField := false;
                 end;
 
-
-			if HPTick + HPDelay[3 - Sit] <= Tick then begin
+      {Colus, 20031223: Added check for Ashura recovery period.}
+			if (HPTick + HPDelay[3 - Sit] <= Tick) and (Skill[271].Tick < Tick) then begin
 				if HP <> MAXHP then begin
 					for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
 						Inc(HP);
@@ -9330,7 +9355,8 @@ begin
 				end;
 			end;
 			//SPé©ìÆâÒïú
-			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (tc.noSPRecovery = False) then begin
+      {Colus, 20031223: Added check for Ashura recovery period.}
+			if (SPTick + SPDelay[3 - Sit] <= Tick) and (Skill[270].Tick < Tick) and (Skill[271].Tick < Tick) then begin
 				if SP <> MAXSP then begin
 					for j := 1 to (Tick - SPTick) div SPDelay[3 - Sit] do begin
 						Inc(SP);
@@ -9347,7 +9373,7 @@ begin
 			end;
 			if (Sit >= 2) then begin
 
-        if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) then begin
+        if (Sit = 2) and (Skill[260].Lv <> 0) and (HPRTick + 10000 <= Tick) and (Skill[271].Tick < Tick) then begin
         if HP <> MAXHP then begin
 						j := (5 + MAXHP div 500) * Skill[260].Data.Data1[Skill[260].Lv];
 						if HP + j > MAXHP then j := MAXHP - HP;
