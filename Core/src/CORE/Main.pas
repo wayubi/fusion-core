@@ -12366,9 +12366,11 @@ begin
                                         tc2 := sl2.Objects[c1] as TChara;
                                     if (tc2 <> tn.CData) and (tc2.NoTarget = false) and (tc2.HP > 0) then begin
 
-                                        if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
+                                        // Colus, 20040317: Alex commented this out, beita undid it, I recommented.
+                                        // Caused crashes with parties in PvP maps
+                                        {if (tc2.PartyName <> '') and (tn.CData.Partyname <> '') then begin
                                                 if (tc2.PartyName = tn.CData.Partyname) then break;
-                                        end;
+                                        end;}
                                         
                                         case tn.JID of
                                                 $74://ブラストマイン発動

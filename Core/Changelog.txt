@@ -1,3 +1,4 @@
+- 03-17-04: Readded alex's fix from 2-6 re. PvP parties w/Pneuma/SW. [Colus]
 - 03-16-04: Rearranged object hierarchy slightly. [Colus]
 - 03-16-04: Added Detect effect on monsters. [Colus]
 - 03-16-04: Added some documentation on new options. [Colus]
