@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 07-22-04: R.E.E.D Inventory, Storage, Cart need to be cleared upon reload. [AlexKreuz]
 - 07-22-04: R.E.E.D bug in character reload. [AlexKreuz]
 - 07-22-04: Removed Comprehensive Save from shutdown. Faster. [AlexKreuz]
 - 07-22-04: Character Variables duplicated. Major instability + lag. [AlexKreuz]

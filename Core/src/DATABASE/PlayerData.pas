@@ -375,6 +375,10 @@ uses
                     if (UID = '*') then tp := PlayerName.Objects[PlayerName.IndexOf(searchResult.Name)] as TPlayer
                     else tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
 
+                    for i := 1 to 100 do begin
+                        tp.Kafra.Item[i].ID := 0;
+                    end;
+
                     for i := 2 to datafile.Count - 1 do begin
                     	sl.delimiter := ':';
                         sl.delimitedtext := datafile[i];
@@ -981,6 +985,10 @@ uses
                         if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
                         tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
 
+                        for i := 1 to 100 do begin
+                            tc.Item[i].ID := 0;
+                        end;
+
                         for i := 2 to datafile.Count - 1 do begin
                         	sl.delimiter := ':';
                             sl.delimitedtext := datafile[i];
@@ -1157,6 +1165,10 @@ uses
 
                         if CharaName.IndexOf(searchResult2.Name) = -1 then continue;
                         tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
+
+                        for i := 1 to 100 do begin
+                            tc.Cart.Item[i].ID := 0;
+                        end;
 
                         for i := 2 to datafile.Count - 1 do begin
                         	sl.delimiter := ':';
