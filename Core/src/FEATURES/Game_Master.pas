@@ -132,6 +132,8 @@ var
     GM_ATHENA_ITEM2 : Byte;
     GM_ATHENA_ITEM : Byte;
     GM_ATHENA_DOOM : Byte;
+    GM_ATHENA_KICK : Byte;
+    GM_ATHENA_KICKALL : Byte;
 
     GM_Access_DB : TIntList32;
 
@@ -260,6 +262,8 @@ var
     function command_athena_item2(tc : TChara; str : String) : String;
     function command_athena_item(tc : TChara; str : String) : String;
     function command_athena_doom(tc : TChara) : String;
+    function command_athena_kick(tc : Tchara; str : String) : String;
+    function command_athena_kickall(tc : TChara) : String;
 
 implementation
 
@@ -394,6 +398,8 @@ implementation
         GM_ATHENA_ITEM2 := StrToIntDef(sl.Values['ATHENA_ITEM2'], 1);
         GM_ATHENA_ITEM := StrToIntDef(sl.Values['ATHENA_ITEM'], 1);
         GM_ATHENA_DOOM := StrToIntDef(sl.Values['ATHENA_DOOM'], 1);
+        GM_ATHENA_KICK := StrToIntDef(sl.Values['ATHENA_KICK'], 1);
+        GM_ATHENA_KICKALL := StrToIntDef(sl.Values['ATHENA_KICKALL'], 1);
 
         sl.Free;
         ini.Free;
@@ -533,6 +539,8 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_ITEM2', IntToStr(GM_ATHENA_ITEM2));
         ini.WriteString('Athena GM Commands', 'ATHENA_ITEM', IntToStr(GM_ATHENA_ITEM));
         ini.WriteString('Athena GM Commands', 'ATHENA_DOOM', IntToStr(GM_ATHENA_DOOM));
+        ini.WriteString('Athena GM Commands', 'ATHENA_KICK', IntToStr(GM_ATHENA_KICK));
+        ini.WriteString('Athena GM Commands', 'ATHENA_KICKALL', IntToStr(GM_ATHENA_KICKALL));
 
         ini.Free;
 
@@ -669,6 +677,8 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('item2')) = 'item2') and (check_level(tc, GM_ATHENA_ITEM2)) ) then error_msg := command_athena_item2(tc, str)
             else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_item(tc, str)
             else if ( (copy(str, 1, length('doom')) = 'doom') and (check_level(tc, GM_ATHENA_ITEM)) ) then error_msg := command_athena_doom(tc)
+            else if ( (copy(str, 1, length('kickall')) = 'kickall') and (check_level(tc, GM_ATHENA_KICKALL)) ) then error_msg := command_athena_kickall(tc)
+            else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc, GM_ATHENA_KICK)) ) then error_msg := command_athena_kick(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -2007,7 +2017,7 @@ Called when we're shutting down the server *only*
     function command_kick(str : String) : String;
     var
         s : String;
-        tc1 : TChara;    
+        tc1 : TChara;
     begin
         Result := 'GM_KICK Failure.';
         s := Copy(str, 6, 256);
@@ -4937,4 +4947,43 @@ Called when we're shutting down the server *only*
         end;
     end;
 
+    function command_athena_kick(tc : TChara; str : String) : String;
+    var
+        s : String;
+        tc1 : TChara;
+    begin
+        Result := 'GM_ATHENA_KICK Failure.';
+        s := Copy(str, 6, 256);
+        s := Trim(s);
+
+        if CharaName.Indexof(s) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
+            if tc1.Login = 2 then begin
+                tc1.Socket.Close;
+                Result := 'GM_ATHENA_KICK Success. Character ' + tc1.Name + ' has been kicked.';
+            end else begin
+                Result := Result + ' Character ' + s + ' is not online.';
+            end;
+        end else begin
+            Result := Result + ' Character ' + s + ' does not exist.';
+        end;
+    end;
+
+    function command_athena_kickall(tc : TChara) : String;
+    var
+        tc1 : TChara;
+        tm : TMap;
+        i : Integer;
+    begin
+        Result := 'GM_ATHENA_KICKALL Success.';
+
+        for i := 0 to CharaName.Count do begin
+            tc1 := CharaName.Objects[i] as TChara;
+            if tc1.Login = 2 then begin
+                tc1.Socket.Close;
+                Result := 'Character ' + tc1.Name + ' has been kicked.';
+            end;
+        end;
+    end;
+    
 end.
