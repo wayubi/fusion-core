@@ -6978,7 +6978,7 @@ begin
 							begin
 								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
 									dmg[0] := tc1.MATK1 * (80 + 20 * tl.Data1[tn.MUseLV]) div 400;
-									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
+									dmg[0] := dmg[0] * (100 - (tc2.MDEF1 + tc2.MDEF2)) div 100; //MDEF%
 									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
 									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
