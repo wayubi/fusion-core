@@ -223,14 +223,9 @@ begin
 					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
 					tc.Socket.SendBuf(buf, 6);
 					}
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0005);
-					WFIFOL( 4, tc.HP);
-					tc.Socket.SendBuf(buf, 8);
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0007);
-					WFIFOL( 4, tc.SP);
-					tc.Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, 5, tc.HP);
+					SendCStat1(tc, 0, 7, tc.SP);
+
 					Inc(tc.ScriptStep);
 				end;
 			11: //set
@@ -317,12 +312,9 @@ begin
 							tc.Item[k].Card[2] := 0;
 							tc.Item[k].Card[3] := 0;
 							tc.Item[k].Data := td;
-							//重量追加
+							// Update weight
 							tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							tc.Socket.SendBuf(buf, 8);
+              SendCStat1(tc, 0, $0018, tc.Weight);
 
 							//アイテムゲット通知
 							SendCGetItem(tc, k, j);
@@ -362,12 +354,9 @@ begin
 						WFIFOW( 2, k);
 						WFIFOW( 4, j);
 						tc.Socket.SendBuf(buf, 6);
-						//重量変更
+						// Update weight
 						tc.Weight := tc.Weight - tc.Item[k].Data.Weight * cardinal(j);
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0018);
-						WFIFOL( 4, tc.Weight);
-						tc.Socket.SendBuf(buf, 8);
+            SendCStat1(tc, 0, $0018, tc.Weight);
 					end;
 					Inc(tc.ScriptStep);
 				end;
@@ -614,10 +603,7 @@ begin
 						tc.DefaultSpeed := i;
  
 						CalcStat(tc);
-						WFIFOW(0, $00b0);
-						WFIFOW(2, $0000);
-						WFIFOL(4, tc.Speed);
-						tc.Socket.SendBuf(buf, 8);
+						SendCStat1(tc, 0, 0, tc.Speed);
  
 						Inc(tc.ScriptStep);
 					end;
@@ -801,10 +787,7 @@ begin
 										tc.Socket.SendBuf(buf, 6);
 										//重量変更
 										tc.Weight := tc.Weight - tc.Item[i].Data.Weight * cardinal(1);
-										WFIFOW( 0, $00b0);
-										WFIFOW( 2, $0018);
-										WFIFOL( 4, tc.Weight);
-										tc.Socket.SendBuf(buf, 8);
+										SendCStat1(tc, 0, $0018, tc.Weight);
 									end;
 					  		end;
 						  end;

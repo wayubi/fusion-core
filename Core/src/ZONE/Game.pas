@@ -893,10 +893,7 @@ end;
 						if (k = 0) and (i >= 25) and (i <= 1000) then begin
 							tc.DefaultSpeed := i;
 							CalcStat(tc);
-							WFIFOW(0, $00b0);
-							WFIFOW(2, $0000);
-							WFIFOL(4, tc.Speed);
-							Socket.SendBuf(buf, 8);
+							SendCStat1(tc, 0, 0, tc.Speed);
 						end;
 
       end else if (Copy(str, 1, 5) = 'whois') and ((DebugCMD and $0002) <> 0) and (tid.Whois = 1) then begin
@@ -1093,10 +1090,7 @@ end;
 						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + i <= 999999999) then begin
                                                         if tc.Zeny > 1000000000 then exit;
 							tc.Zeny := tc.Zeny + i;
-							WFIFOW(0, $00b1);
-					    WFIFOW(2, $0014);
-					    WFIFOL(4, tc.Zeny);
-					    Socket.SendBuf(buf, 8);
+              SendCStat1(tc, 1, $0014, tc.Zeny);
 						end;
 
           end else if (Copy(str, 1, 5) = 'goto ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
@@ -1511,10 +1505,7 @@ end;
 									tc.Item[k].Data := td;
 									//重量追加
 									tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
-									WFIFOW( 0, $00b0);
-									WFIFOW( 2, $0018);
-									WFIFOL( 4, tc.Weight);
-									Socket.SendBuf(buf, 8);
+									SendCStat1(tc, 0, $0018, tc.Weight);
 
 									//アイテムゲット通知
 									SendCGetItem(tc, k, j);
@@ -2179,11 +2170,8 @@ end;
 					tc.Item[w1].Amount := tc.Item[w1].Amount - w2;
 					if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
 					tc.Weight := tc.Weight - tc.Item[w1].Data.Weight * w2;
-					//重量変更
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0018);
-					WFIFOL( 4, tc.Weight);
-					Socket.SendBuf(buf, 8);
+					//Update weight
+          SendCStat1(tc, 0, $0018, tc.Weight);
 
 					//周りに通知
 					WFIFOW( 0, $009e);
@@ -2294,10 +2282,7 @@ end;
                      Socket.SendBuf(buf, 6); 
 
    // {Alex: Update Weight Display}
-   WFIFOW( 0, $00b0); 
-   WFIFOW( 2, $0018); 
-   WFIFOL( 4, tc.Weight);
-   Socket.SendBuf(buf, 8);
+   SendCStat1(tc, 0, $0018, tc.Weight);
 
    // {Alex: Displays Effect}
    WFIFOW( 0, $01c8);
@@ -2546,10 +2531,7 @@ end;
 													tc.Item[k].Data := td;
 													//重量追加
 													tc.Weight := tc.Weight + cardinal(td.Weight);
-													WFIFOW( 0, $00b0);
-													WFIFOW( 2, $0018);
-													WFIFOL( 4, tc.Weight);
-													Socket.SendBuf(buf, 8);
+													SendCStat1(tc, 0, $0018, tc.Weight);
 													//アイテムゲット通知
 													SendCGetItem(tc, k, 1);
 													b := 1;
@@ -2671,11 +2653,8 @@ Dec(tc.Item[w].Amount);
 if tc.Item[w].Amount = 0 then tc.Item[w].ID := 0;
 tc.Weight := tc.Weight - tc.Item[w].Data.Weight;
 
-//重量減少
-WFIFOW( 0, $00b0);
-WFIFOW( 2, $0018);
-WFIFOL( 4, tc.Weight);
-Socket.SendBuf(buf, 8);
+//Update weight
+SendCStat1(tc, 0, $0018, tc.Weight);
 
 // アイテム使用パケットを送信
 WFIFOW( 0, $00a8);
@@ -2842,11 +2821,8 @@ end;
                                                         WFIFOW( 4, 1);
                                                         Socket.SendBuf( buf, 6 );
 
-                                                        //重量減少
-                                                        WFIFOW( 0, $00b0);
-                                                        WFIFOW( 2, $0018);
-                                                        WFIFOL( 4, tc.Weight);
-                                                        Socket.SendBuf(buf, 8);
+                                                        //Update weight
+                                                        SendCStat1(tc, 0, $0018, tc.Weight);
 
                                                         if ( tpe.Accessory <> 0 ) and ( ItemDB.IndexOf( tpe.Accessory ) <> -1 ) then begin
                                                                 td := ItemDB.IndexOfObject( tpe.Accessory ) as TItemDB;
@@ -2872,10 +2848,7 @@ end;
 
                                                                                 //重量追加
                                                                                 tc.Weight := tc.Weight + td.Weight;
-                                                                                WFIFOW( 0, $00b0);
-                                                                                WFIFOW( 2, $0018);
-                                                                                WFIFOL( 4, tc.Weight);
-                                                                                Socket.SendBuf(buf, 8);
+                                                                                SendCStat1(tc, 0, $0018, tc.Weight);
                                                                         end else begin
                                                                                 //これ以上もてない
                                                                                 WFIFOW( 0, $00a0);
@@ -3291,15 +3264,9 @@ end;
 		  					SendCGetItem(tc, j, ww[k][0]);
 
       					// Update weight
-      			 		WFIFOW(0, $00b0);
-      					WFIFOW(2, $0018);
-      					WFIFOL(4, tc.Weight);
-      					Socket.SendBuf(buf, 8);
+      			 		SendCStat1(tc, 0, $0018, tc.Weight);
       					// Update zeny
-      					WFIFOW(0, $00b1);
-      					WFIFOW(2, $0014);
-      					WFIFOL(4, tc.Zeny);
-      					Socket.SendBuf(buf, 8);
+      					SendCStat1(tc, 1, $0014, tc.Zeny);
       					// Send buy success message
       					WFIFOW(0, $00ca);
       					WFIFOB(2, 0);
@@ -3350,16 +3317,10 @@ end;
 						if tc.Item[w1].Amount = 0 then tc.Item[w1].ID := 0;
 					end;
 				end;
-				//重量更新
-				WFIFOW(0, $00b0);
-				WFIFOW(2, $0018);
-				WFIFOL(4, tc.Weight);
-				Socket.SendBuf(buf, 8);
-				//所持金更新
-				WFIFOW(0, $00b1);
-				WFIFOW(2, $0014);
-				WFIFOL(4, tc.Zeny);
-				Socket.SendBuf(buf, 8);
+				//Update weight
+        SendCStat1(tc, 0, $0018, tc.Weight);
+				//Update zeny
+        SendCStat1(tc, 1, $0014, tc.Zeny);
 				//取引ができました
 				WFIFOW(0, $00cb);
 				WFIFOB(2, 0);
@@ -3896,28 +3857,17 @@ end;
 				end;
 
 				if (tdl.Zeny[w1] <> 0) or (tdl.Zeny[w2] <> 0) then begin
-					//キャラ１のゼニー変更
+          // Update zeny for trade partners
 					tc.Zeny := tc.Zeny - tdl.Zeny[w1] + tdl.Zeny[w2];
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc.Zeny);
-					tc.Socket.SendBuf(buf, 8);
-					//キャラ２のゼニー変更
+          SendCStat1(tc, 1, $0014, tc.Zeny);
+
 					tc1.Zeny := tc1.Zeny - tdl.Zeny[w2] + tdl.Zeny[w1];
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc1.Zeny);
-					tc1.Socket.SendBuf(buf, 8);
+          SendCStat1(tc1, 1, $0014, tc1.Zeny);
 				end;
 
-				//キャラ１重量更新パケ
-				WFIFOW(0, $00b0);
-				WFIFOW(2, $0018);
-				WFIFOL(4, tc.Weight);
-				tc.Socket.SendBuf(buf, 8);
-				//キャラ２重量更新パケ
-				WFIFOL(4, tc1.Weight);
-				tc1.Socket.SendBuf(buf, 8);
+        // Update players' weights
+        SendCStat1(tc, 0, $0018, tc.Weight);
+        SendCStat1(tc1, 0, $0018, tc1.Weight);
 
 				//取引完了パケ
 				WFIFOW(0, $00f0);
@@ -3991,10 +3941,7 @@ end;
 				//重量変更
 				tc.Weight := tc.Weight - tc.Item[w1].Data.Weight * w2;
         Inc(tp.Kafra.Weight,(tc.Item[w1].Data.Weight * w2));
-				WFIFOW( 0, $00b0);
-				WFIFOW( 2, $0018);
-				WFIFOL( 4, tc.Weight);
-				Socket.SendBuf(buf, 8);
+				SendCStat1(tc, 0, $0018, tc.Weight);
 			end;
 		//--------------------------------------------------------------------------
 		$00f5: //倉庫からアイテム取り出し
@@ -4056,10 +4003,7 @@ end;
 	        			//重量変更
         				tc.Weight := tc.Weight + weight;
                                         Dec(tp.Kafra.Weight,weight);
-			        	WFIFOW( 0, $00b0);
-		        		WFIFOW( 2, $0018);
-	        			WFIFOL( 4, tc.Weight);
-        				Socket.SendBuf(buf, 8);
+			        	SendCStat1(tc, 0, $0018, tc.Weight);
                                 end;
 			end;
 		//--------------------------------------------------------------------------
@@ -4761,10 +4705,7 @@ end;
 
 				//プレイヤーの重量変更
 				tc.Weight := tc.Weight - tc.Item[w1].Data.Weight * w2;
-				WFIFOW( 0, $00b0);
-				WFIFOW( 2, $0018);
-				WFIFOL( 4, tc.Weight);
-				Socket.SendBuf(buf, 8);
+				SendCStat1(tc, 0, $0018, tc.Weight);
 
 				//カート重量、容量データの送信
 				//0121 <num>.w <num limit>.w <weight>.l <weight limit>l
@@ -4866,10 +4807,7 @@ end;
 	
 					//プレイヤーの重量変更
 					tc.Weight := tc.Weight + weight;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0018);
-					WFIFOL( 4, tc.Weight);
-					Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, $0018, tc.Weight);
                                 end;
 			end;
 {カート機能追加ココまで}
@@ -5004,16 +4942,10 @@ end;
 			end;
 {カート機能追加ココまで}
 		//--------------------------------------------------------------------------
-		$012a: //鷹、ペコペコ、カートを外す
+		$012a: // Remove peco/cart/falcon options (clicked 'off').
 			begin
 				tc.Option := tc.Option and $F847;
-				WFIFOW( 0, $0119);
-				WFIFOL( 2, tc.ID);
-				WFIFOW( 6, 0);
-				WFIFOW( 8, 0);
-				WFIFOW(10, tc.Option);
-				WFIFOB(12, 0);
-				SendBCmd(tc.MData, tc.Point, 13);
+        UpdateOption(tm, tc);
 			end;
 		//--------------------------------------------------------------------------
 {露店スキル追加}
@@ -5117,12 +5049,9 @@ end;
 					Dec(tc1.Cart.Item[w2].Amount, w1);
 					//カートの重量変更
 					tc1.Cart.Weight := tc1.Cart.Weight - tv.Weight[k] * w1;
-					//販売側所持金変更
+					// Update zeny
 					tc1.Zeny := tc1.Zeny + tv.Price[k] * w1;
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc1.Zeny);
-					tc1.Socket.SendBuf(buf, 8);
+          SendCStat1(tc1, 1, $0014, tc1.Zeny);
 					//露店リストの数量変更
 					Dec(tv.Amount[k], w1);
 					//販売報告パケ
@@ -5132,12 +5061,9 @@ end;
 					tc1.Socket.SendBuf(buf, 6);
 
 					//---購入側処理---
-					//所持金更新
+					// Update zeny
 					tc.Zeny := tc.Zeny - tv.Price[k] * w1;
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc.Zeny);
-					Socket.SendBuf(buf, 8);
+          SendCStat1(tc, 1, $0014, tc.Zeny);
 					//アイテム追加
 					with tc1.Cart.Item[w2] do begin
 						tc.Item[j].ID := ID;
@@ -5155,10 +5081,7 @@ end;
 					SendCGetItem(tc, j, w1);
 					//重量更新
 					tc.Weight := tc.Weight + tv.Weight[k] * w1;
-					WFIFOW(0, $00b0);
-					WFIFOW(2, $0018);
-					WFIFOL(4, tc.Weight);
-					Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, $0018, tc.Weight);
 
 					//---保留処理消化---
 					//カートの数量変更Part2
@@ -5244,10 +5167,7 @@ end;
 							tc.Item[k].Card[3] := 0;
 							tc.Item[k].Data := td;
 							tc.Weight := tc.Weight + cardinal(td.Weight) * cardinal(j);
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							Socket.SendBuf(buf, 8);
+							SendCStat1(tc, 0, $0018, tc.Weight);
 							SendCGetItem(tc, k, j);
 					end;
 					end else begin
@@ -5682,11 +5602,8 @@ end;
 				WFIFOW( 2, w);
 				WFIFOW( 4, 1);
 				Socket.SendBuf(buf, 6);
-				//重量減少
-				WFIFOW( 0, $00b0);
-				WFIFOW( 2, $0018);
-				WFIFOL( 4, tc.Weight);
-				Socket.SendBuf(buf, 8);
+				// Update weight
+				SendCStat1(tc, 0, $0018, tc.Weight);
 
 				//ギルド作成
 				tg := TGuild.Create;
@@ -5975,11 +5892,8 @@ end;
 				WFIFOW( 0, $00af);
 				WFIFOW( 2, w);
 				WFIFOW( 4, 1);
-				//重量減少
-				WFIFOW( 0, $00b0);
-				WFIFOW( 2, $0018);
-				WFIFOL( 4, tc.Weight);
-				Socket.SendBuf(buf, 8);
+				// Update weight
+				SendCStat1(tc, 0, $0018, tc.Weight);
         end;
 			end;
 		//--------------------------------------------------------------------------
@@ -6070,11 +5984,8 @@ end;
 				WFIFOW( 0, $00af);
 				WFIFOW( 2, w1);
 				WFIFOW( 4, 1);
-				//重量減少
-				WFIFOW( 0, $00b0);
-				WFIFOW( 2, $0018);
-				WFIFOL( 4, tc.Weight);
-				Socket.SendBuf(buf, 8);
+				// Update weight
+				SendCStat1(tc, 0, $0018, tc.Weight);
 
 				//スロット指したアイテムを再入手
 				SendCGetItem(tc, w2, 1);
@@ -6194,11 +6105,8 @@ end;
 							if tc.Item[e].Amount = 0 then tc.Item[e].ID := 0;
 							tc.Weight := tc.Weight - tc.Item[e].Data.Weight * tma.MaterialAmount[j];
 
-							//重量変更
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							Socket.SendBuf(buf, 8);
+							// Update weight
+							SendCStat1(tc, 0, $0018, tc.Weight);
 
 						end else begin
 
@@ -6219,11 +6127,8 @@ end;
 							if tc.Item[e].Amount = 0 then tc.Item[e].ID := 0;
 							tc.Weight := tc.Weight - tc.Item[e].Data.Weight;
 
-							//重量変更
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							Socket.SendBuf(buf, 8);
+							// Update weight
+							SendCStat1(tc, 0, $0018, tc.Weight);
 
 							case m[k] of
 
@@ -6366,12 +6271,9 @@ end;
 								tc.Item[k].Data := td;
 							end;
 
-							//重量追加
+							// Update weight
 							tc.Weight := tc.Weight + cardinal(td.Weight);
-							WFIFOW( 0, $00b0);
-							WFIFOW( 2, $0018);
-							WFIFOL( 4, tc.Weight);
-							Socket.SendBuf(buf, 8);
+							SendCStat1(tc, 0, $0018, tc.Weight);
 
 							//アイテムゲット通知
 							SendCGetItem(tc, k, 1);
@@ -6742,12 +6644,9 @@ end;
 							                                Data := td;
                                                                                 end;
 
-						                                //重量追加
+						                                // Update weight
 						                                tc.Weight := tc.Weight + td.Weight;
-						                                WFIFOW( 0, $00b0);
-						                                WFIFOW( 2, $0018);
-																						WFIFOL( 4, tc.Weight);
-						                                Socket.SendBuf(buf, 8);
+						                                SendCStat1(tc, 0, $0018, tc.Weight);
 
 						                                //アイテムゲット通知
         					                                SendCGetItem(tc, j, 1);
@@ -6822,11 +6721,8 @@ end;
 				                                WFIFOW( 4, 1);
                                                                 Socket.SendBuf( buf, 6 );
 
-				                                //重量減少
-				                                WFIFOW( 0, $00b0);
-				                                WFIFOW( 2, $0018);
-				                                WFIFOL( 4, tc.Weight);
-				                                Socket.SendBuf(buf, 8);
+				                                // Update weight
+				                                SendCStat1(tc, 0, $0018, tc.Weight);
 
 																																if tpe.Fullness < 26  then tpe.Relation := tpe.Relation + tpe.Data.Hungry
                                                                 else if tpe.Fullness >= 76 then  tpe.Relation := tpe.Relation - tpe.Data.Full
@@ -6937,12 +6833,9 @@ end;
                                                                                         //アイテムゲット通知
                                                                                         SendCGetItem(tc, j, 1);
 
-                                                                                        //重量追加
+                                                                                        // Update weight
                                                                                         tc.Weight := tc.Weight + td.Weight;
-                                                                                        WFIFOW( 0, $00b0);
-                                                                                        WFIFOW( 2, $0018);
-                                                                                        WFIFOL( 4, tc.Weight);
-                                                                                        Socket.SendBuf(buf, 8);
+                                                                                        SendCStat1(tc, 0, $0018, tc.Weight);
                                                                                 end else begin
                                                                                         //これ以上もてない
                                                                                         WFIFOW( 0, $00a0);
@@ -7014,11 +6907,8 @@ end;
 				        WFIFOW( 2, tc.UseItemID);
 				        WFIFOW( 4, 1);
 
-				        //重量減少
-				        WFIFOW( 0, $00b0);
-				        WFIFOW( 2, $0018);
-				        WFIFOL( 4, tc.Weight);
-				        Socket.SendBuf(buf, 8);
+				        //Update weight
+				        SendCStat1(tc, 0, $0018, tc.Weight);
 
                                         tc.UseItemID := 0;
 
@@ -7173,12 +7063,9 @@ end;
                   tc.Item[k].Card[2] := 0;
                   tc.Item[k].Card[3] := 0;
                   tc.Item[k].Data := td;
-									//重量追加
+									// Update weight
 									tc.Weight := tc.Weight + cardinal(td.Weight * ma.CNum[i]);
-									WFIFOW( 0, $00b0);
-									WFIFOW( 2, $0018);
-									WFIFOL( 4, tc.Weight);
-									Socket.SendBuf(buf, 8);
+									SendCStat1(tc, 0, $0018, tc.Weight);
 
 									//アイテムゲット通知
 									SendCGetItem(tc, k, ma.CNum[i]);
@@ -7209,10 +7096,7 @@ end;
 								WFIFOW( 2, w1);
 								WFIFOW( 4, 1);
 
-								WFIFOW( 0, $00b0);
-								WFIFOW( 2, $0018);
-								WFIFOL( 4, tc.Weight);
-								Socket.SendBuf(buf, 8);
+								SendCStat1(tc, 0, $0018, tc.Weight);
       end;
 
 		$01af: //カートチェンジ

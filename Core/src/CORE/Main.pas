@@ -3017,10 +3017,7 @@ begin
 					  tc.Item[j].Data := tn.Item.Data;
 					  //重量追加
 					  tc.Weight := tc.Weight + tn.Item.Data.Weight * tn.Item.Amount;
-					  WFIFOW( 0, $00b0);
-					  WFIFOW( 2, $0018);
-					  WFIFOL( 4, tc.Weight);
-					  tc.Socket.SendBuf(buf, 8);
+            SendCStat1(tc, 0, $0018, tc.Weight);
 					  //アイテムゲット通知
 					  SendCGetItem(tc, j, tn.Item.Amount);
           end;
@@ -5860,10 +5857,7 @@ begin
                                                                         ts.ARangeFlag := false;}
 					                        end;
 
-					                        WFIFOW( 0, $00b0);
-					                        WFIFOW( 2, $0005);
-					                        WFIFOL( 4, tc.HP);
-					                        tc.Socket.SendBuf(buf, 8);
+					                        SendCStat1(tc, 0, $0005, tc.HP);
 					                        ATick := ATick + ts.Data.ADelay;
                                                         end;
 
@@ -5949,11 +5943,8 @@ begin
                                         //DebugOut.Lines.Add('Steal zeny success');
                                                 k := ts.Data.LV * 5;
                                                 Inc(Zeny, k);
-						//所持金更新
-						WFIFOW(0, $00b1);
-						WFIFOW(2, $0014);
-						WFIFOL(4, Zeny);
-						Socket.SendBuf(buf, 8);
+						// Update Zeny
+						SendCStat1(tc, 1, $0014, tc.Zeny);
                                         end;
                                 end;
                                 212:    {Back Stab}
@@ -6559,11 +6550,8 @@ begin
             // Should check to see if we have the money!
             if (Zeny >= tl.Data2[MUseLV]) then begin
   						Dec(Zeny, tl.Data2[MUseLV]);
-  						//所持金更新
-  						WFIFOW(0, $00b1);
-  						WFIFOW(2, $0014);
-  						WFIFOL(4, Zeny);
-  						Socket.SendBuf(buf, 8);
+  						// Update zeny
+              SendCStat1(tc, 1, $0014, Zeny);
             end else begin
               SendSkillError(tc, 5);
   						tc.MMode := 4;
@@ -8130,10 +8118,7 @@ begin
 				                tc.MPoint.Y := 0;
                                                 
                                                 //Update SP
-                                                WFIFOW( 0, $00b0);
-	                                        WFIFOW( 2, $0007);
-	                                        WFIFOL( 4, tc.SP);
-	                                        tc.Socket.SendBuf(buf, 8);
+                                                SendCStat1(tc, 0, $0007, tc.SP);
 
                                                 //Cancel Cast Timer
                                                 WFIFOW(0, $01b9);
@@ -8294,10 +8279,7 @@ begin
 
                         // Colus, 20031228: Tunnel Drive speed update
                         if (tc1.Skill[213].Lv <> 0) then begin
-                            WFIFOW(0, $00b0);
-                            WFIFOW(2, $0000);
-                            WFIFOL(4, tc1.Speed);
-                            tc1.Socket.SendBuf(buf, 8);
+                          SendCStat1(tc1, 0, 0, tc1.Speed);
                         end;
                     end;
                 end;
@@ -8363,7 +8345,7 @@ begin
 									WFIFOW( 0, $00b0);
 									WFIFOW( 2, $0018);
 									WFIFOL( 4, tc.Weight);}
-									Socket.SendBuf(buf, 8);
+									//Socket.SendBuf(buf, 8);
 
 									//アイテムゲット通知
 									SendCGetItem(tc, k, 1);
@@ -9038,7 +9020,7 @@ begin
 									WFIFOW( 0, $00b0);
 									WFIFOW( 2, $0018);
 									WFIFOL( 4, tc.Weight);}
-									Socket.SendBuf(buf, 8);
+									//Socket.SendBuf(buf, 8);
 
 									//アイテムゲット通知
 									SendCGetItem(tc, k, 1);
@@ -9401,11 +9383,9 @@ begin
                                                         Dec(tc1.Zeny, k);
                                                      Inc(Zeny, k);
                                                         {if tc1.Zeny < 0 then tc1.Zeny := 0;}
-							//所持金更新
-							WFIFOW(0, $00b1);
-							WFIFOW(2, $0014);
-							WFIFOL(4, Zeny);
-							Socket.SendBuf(buf, 8);
+							// Update zeny
+              SendCStat1(tc, 1, $0014, Zeny);
+
                                                         end;
                                                 end;
                                         end;
@@ -9823,11 +9803,9 @@ begin
               // Should check to see if we have the money!
               if (Zeny >= tl.Data2[MUseLV]) then begin
     						Dec(Zeny, tl.Data2[MUseLV]);
-    						//所持金更新
-    						WFIFOW(0, $00b1);
-    						WFIFOW(2, $0014);
-    						WFIFOL(4, Zeny);
-    						Socket.SendBuf(buf, 8);
+    						// Update Zeny
+                SendCStat1(tc, 1, $0014, Zeny);
+
               end else begin
                 SendSkillError(tc, 5);
     						tc.MMode := 4;
@@ -11245,10 +11223,7 @@ HPTick := HPTick + HPDelay[3 - Sit];
 
 
 if HP > MAXHP then HP := MAXHP;
-WFIFOW( 0, $00b0);
-WFIFOW( 2, $0005);
-WFIFOL( 4, HP);
-Socket.SendBuf(buf, 8);
+SendCStat1(tc, 0, 5, HP);
 end else begin
 HPTick := Tick;
 end;
@@ -11267,10 +11242,7 @@ SP := SP + bonusregen ;
 SPTick := SPTick + SPDelay[3 - Sit];
 
 if SP > MAXSP then SP := MAXSP;
-WFIFOW( 0, $00b0);
-WFIFOW( 2, $0007);
-WFIFOL( 4, SP);
-Socket.SendBuf(buf, 8);
+SendCStat1(tc, 0, 7, SP);
 end else begin
 SPTick := Tick;
 end;
@@ -11300,10 +11272,7 @@ if Weight * 2 < MaxWeight then begin
 						WFIFOW( 2, $0005);
 						WFIFOW( 4, j);
 						Socket.SendBuf(buf, 6);
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0005);
-						WFIFOL( 4, HP);
-						Socket.SendBuf(buf, 8);
+            SendCStat1(tc, 0, 5, HP);
 					end;
 					HPRTick := Tick;
 				end;
@@ -11324,10 +11293,7 @@ if Weight * 2 < MaxWeight then begin
 						WFIFOW( 2, $0007);
 						WFIFOW( 4, j);
 						Socket.SendBuf(buf, 6);
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0007);
-						WFIFOL( 4, SP);
-						Socket.SendBuf(buf, 8);
+						SendCStat1(tc, 0, 7, SP);
 					end;
 					SPRTick := Tick;
 				end;
@@ -11341,10 +11307,7 @@ if Weight * 2 < MaxWeight then begin
 						WFIFOW( 2, $0007);
 						WFIFOW( 4, j);
 						Socket.SendBuf(buf, 6);
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0007);
-						WFIFOL( 4, SP);
-						Socket.SendBuf(buf, 8);
+						SendCStat1(tc, 0, 7, SP);
 					end;
 					SPRTick := Tick;
 				end;
@@ -11402,10 +11365,7 @@ begin
                         //Socket.SendBuf(buf, 6);
                         SendBCmd(tc.MData, tc.Point, 6);}
 
-                        WFIFOW( 0, $00b0);
-                        WFIFOW( 2, $0005);
-                        WFIFOL( 4, HP);
-                        Socket.SendBuf(buf, 8);
+                        SendCStat1(tc, 0, 5, HP);
                         HPRTick := Tick;
                         tc.InField := false;
                   end else begin
@@ -11438,10 +11398,7 @@ begin
                         //Socket.SendBuf(buf, 6);
                         SendBCmd(tc.MData, tc.Point, 6);}
 
-                        WFIFOW( 0, $00b0);
-                        WFIFOW( 2, $0005);
-                        WFIFOL( 4, HP);
-                        Socket.SendBuf(buf, 8);
+                        SendCStat1(tc, 0, 5, HP);
                         HPRTick := Tick;
                         tc.InField := false;
                 end;
@@ -11468,10 +11425,7 @@ begin
                         //Socket.SendBuf(buf, 6);
                         SendBCmd(tc.MData, tc.Point, 6);}
 
-                        WFIFOW( 0, $00b0);
-                        WFIFOW( 2, $0005);
-                        WFIFOL( 4, HP);
-                        Socket.SendBuf(buf, 8);
+                        SendCStat1(tc, 0, 5, HP);
                         HPRTick := Tick;
                         tc.InField := false;
                 end;
@@ -11685,20 +11639,14 @@ begin
 					end;
 					if HP > MAXHP then HP := MAXHP;
                                         if tc.HP < 0 then tc.HP := 0;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0005);
-					WFIFOL( 4, HP);
-					Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, 5, HP);
                                 end else if (tc.isPoisoned = True) then begin
                                         for j := 1 to (Tick - HPTick) div HPDelay[3 - Sit] do begin
 						Dec(HP);
 						HPTick := HPTick + HPDelay[3 - Sit];
 					end;
 					if HP < 1 then HP := 1;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0005);
-					WFIFOL( 4, HP);
-					Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, 5, HP);
 				end else begin
 					HPTick := Tick;
 				end;
@@ -11712,10 +11660,7 @@ begin
 						SPTick := SPTick + SPDelay[3 - Sit];
 					end;
 					if SP > MAXSP then SP := MAXSP;
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0007);
-						WFIFOL( 4, SP);
-						Socket.SendBuf(buf, 8);
+						SendCStat1(tc, 0, 7, SP);
 					end else begin
 						SPTick := Tick;
 				end;
@@ -11732,10 +11677,7 @@ begin
 						WFIFOW( 2, $0005);
 						WFIFOW( 4, j);
 						Socket.SendBuf(buf, 6);
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0005);
-						WFIFOL( 4, HP);
-						Socket.SendBuf(buf, 8);
+						SendCStat1(tc, 0, 5, HP);
 					end;
 					HPRTick := Tick;
 				end;
@@ -11809,7 +11751,8 @@ begin
     if tpe.JID = 1056 then tc.PerfectHide := true;
 
     //Sohee's Heal: When HP is lower than 1/3rd, she heals 400HP/Min until HP is higher than 1/3rd
-    if (tpe.JID = 1170) and (tc.HP < (tc.MAXHP / 3)) then begin
+    // Colus, 20040317: Stop Sohee heals when you are dead :)
+    if (tpe.JID = 1170) and (tc.HP < (tc.MAXHP / 3)) and (tc.Sit <> 1) then begin
       if tpe.SkillTick < _Tick then begin
         tpe.SkillTick := _Tick + 60000;
         tc.HP := tc.HP + 400;
@@ -11824,10 +11767,7 @@ begin
         SendBCmd(tm, tc.Point, 15);
 
         //Send Players HP
-        WFIFOW( 0, $00b0);
-        WFIFOW( 2, $0005);
-        WFIFOL( 4, tc.HP);
-        tc.Socket.SendBuf(buf, 8);
+        SendCStat1(tc, 0, 5, tc.HP);
       end;
     end;
 
@@ -13901,11 +13841,8 @@ begin
                 tc2.SkillTickID := 51;
               end;
 						end;
-					
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0005);
-						WFIFOL( 4, tc2.HP);
-						tc2.Socket.SendBuf(buf, 8);
+
+						SendCStat1(tc2, 0, 5, tc2.HP);
 						ts.ATick := ts.ATick + abs(ts.Data.ADelay);
 					end
 					
@@ -14001,10 +13938,7 @@ if (tc1.Option and 6 <> 0) then begin
 							end;
 							
 						end;
-						WFIFOW( 0, $00b0);
-						WFIFOW( 2, $0005);
-						WFIFOL( 4, tc1.HP);
-						tc1.Socket.SendBuf(buf, 8);
+						SendCStat1(tc1, 0, 5, tc1.HP);
 						ATick := ATick + Data.ADelay;
 					end;
 				end;
@@ -14860,10 +14794,7 @@ begin
                   UpdateOption(tm, tc);
                   // Colus, 20031228: Tunnel Drive speed update
                   if (tc.Skill[213].Lv <> 0) then begin
-        						WFIFOW(0, $00b0);
-        						WFIFOW(2, $0000);
-        						WFIFOL(4, tc.Speed);
-        						tc.Socket.SendBuf(buf, 8);
+        						SendCStat1(tc, 0, 0, tc.Speed);
                   end;
                 end;
 							end;
@@ -15632,10 +15563,7 @@ begin
                                                                                                                                                                                 end;
 
                                                                                                                                                                                 if tc1.Login = 2 then begin
-                                                                                                                                                                                        WFIFOW(0, $00b1);
-	        		                        																WFIFOW(2, $0014);
-                                																			WFIFOL(4, tc1.Zeny);
-			        																	                tc1.Socket.SendBuf(buf, 8);
+                                                                                                                                                                                                      SendCStat1(tc1, 1, $0014, tc1.Zeny);
                                                                                                                                                                                 end;
                                                                                                                                                                         end;
                                                                                                                                			        	end;

@@ -1,3 +1,6 @@
+- 03-17-04: Reactivated peco/falcon/overweight icons without lag. [Colus]
+- 03-17-04: Standardized all status update calls. [Colus]
+- 03-17-04: Sohee pet skill no longer heals you when dead (or playing dead). [Colus]
 - 03-17-04: Readded alex's fix from 2-6 re. PvP parties w/Pneuma/SW. [Colus]
 - 03-16-04: Rearranged object hierarchy slightly. [Colus]
 - 03-16-04: Added Detect effect on monsters. [Colus]

@@ -1690,10 +1690,7 @@ begin
 					tc.Item[j].Data := tn.Item.Data;
 					//重量追加
 					tc.Weight := tc.Weight + tn.Item.Data.Weight * tn.Item.Amount;
-					WFIFOW( 0, $00b0);
-					WFIFOW( 2, $0018);
-					WFIFOL( 4, tc.Weight);
-					Socket.SendBuf(buf, 8);
+					SendCStat1(tc, 0, $18, tc.Weight);
 					//アイテムゲット通知
 					SendCGetItem(tc, j, tn.Item.Amount);
 					//アイテム削除
@@ -2984,7 +2981,6 @@ end;
 procedure UpdateOption(tm:TMap; tc:TChara);
 begin
         tm := tc.MData;
-
   {Here we simply want to change a player option that has been previously set.}
         WFIFOW(0, $0119);
         WFIFOL(2, tc.ID);
@@ -2993,6 +2989,22 @@ begin
         WFIFOW(10, tc.Option);
         WFIFOB(12, 0); // attack animation
         SendBCmd(tm, tc.Point, 13);
+
+  // Do we need to update icons for cart/peco/falcon?
+        {Peco Peco}
+        if (tc.Skill[63].Lv <> 0) and (tc.Option and 32 <> 0) then begin
+          UpdateIcon(tm, tc, tc.Skill[63].Data.Icon, 1);
+        end else begin
+          UpdateIcon(tm, tc, tc.Skill[63].Data.Icon, 0);
+        end;
+
+        {Falcon Icon}
+        if (tc.Skill[127].Lv <> 0) and (tc.Option and 16 <> 0) then begin
+          UpdateIcon(tm, tc, tc.Skill[127].Data.Icon, 1);
+        end else begin
+          UpdateIcon(tm, tc, tc.Skill[127].Data.Icon, 0);
+        end;
+
 end;
 //------------------------------------------------------------------------------
 procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
@@ -3231,28 +3243,14 @@ var
 	i :integer;
 begin
 	//Speed
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0000);
-	WFIFOL(4, tc.Speed);
-	tc.Socket.SendBuf(buf, 8);
-
+  SendCStat1(tc, 0, 0, tc.Speed);
 	//HPSP
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0005);
-	WFIFOL(4, tc.HP);
-	tc.Socket.SendBuf(buf, 8);
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0006);
-	WFIFOL(4, tc.MAXHP);
-	tc.Socket.SendBuf(buf, 8);
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0007);
-	WFIFOL(4, tc.SP);
-	tc.Socket.SendBuf(buf, 8);
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0008);
-	WFIFOL(4, tc.MAXSP);
-	tc.Socket.SendBuf(buf, 8);
+  SendCStat1(tc, 0, 5, tc.HP);
+  SendCStat1(tc, 0, 6, tc.MAXHP);
+
+  SendCStat1(tc, 0, 7, tc.SP);
+  SendCStat1(tc, 0, 8, tc.MAXSP);
+
 	//ステータス
 	WFIFOW( 0, $00bd);
 	WFIFOW( 2, tc.StatusPoint);
@@ -3275,39 +3273,21 @@ begin
 	WFIFOW(40, tc.ASpeed);
 	WFIFOW(42, 0);
 	tc.Socket.SendBuf(buf, 44);
-	//ベース経験値
-	WFIFOW(0, $00b1);
-	WFIFOW(2, $0001);
-	WFIFOL(4, tc.BaseEXP);
-	tc.Socket.SendBuf(buf, 8);
-	WFIFOW(0, $00b1);
-	WFIFOW(2, $0016);
-	WFIFOL(4, tc.BaseNextEXP);
-	tc.Socket.SendBuf(buf, 8);
-	//ジョブ経験値
-	WFIFOW(0, $00b1);
-	WFIFOW(2, $0002);
-	WFIFOL(4, tc.JobEXP);
-	tc.Socket.SendBuf(buf, 8);
-	WFIFOW(0, $00b1);
-	WFIFOW(2, $0017);
-	WFIFOL(4, tc.JobNextEXP);
-	tc.Socket.SendBuf(buf, 8);
-	//所持金更新
-	WFIFOW(0, $00b1);
-	WFIFOW(2, $0014);
-	WFIFOL(4, tc.Zeny);
-	tc.Socket.SendBuf(buf, 8);
-	//重量
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0018);
-	WFIFOL(4, tc.Weight);
-	tc.Socket.SendBuf(buf, 8);
-	//最大重量
-	WFIFOW(0, $00b0);
-	WFIFOW(2, $0019);
-	WFIFOL(4, tc.MaxWeight);
-	tc.Socket.SendBuf(buf, 8);
+	// Update base XP
+  SendCStat1(tc, 1, 1, tc.BaseEXP);
+  SendCStat1(tc, 1, $0016, tc.BaseNextEXP);
+
+	// Update job XP
+  SendCStat1(tc, 1, 2, tc.JobEXP);
+  SendCStat1(tc, 1, $0017, tc.JobNextEXP);
+
+	// Update Zeny
+  SendCStat1(tc, 1, $0014, tc.Zeny);
+
+  // Update weight
+  SendCStat1(tc, 0, $0018, tc.Weight);
+  SendCStat1(tc, 0, $0019, tc.MaxWeight);
+
 	//ボーナス
 	for i := 0 to 5 do begin
 		WFIFOW( 0, $0141);
@@ -3362,6 +3342,8 @@ end;
 end;
 //------------------------------------------------------------------------------
 procedure SendCStat1(tc:TChara; Mode:word; DType:word; Value:cardinal);
+var
+  i     :integer;
 begin
 	WFIFOW(0, $00b0 + Mode);
 	WFIFOW(2, DType);
@@ -3369,13 +3351,31 @@ begin
 	tc.Socket.SendBuf(buf, 8);
 {パーティー機能追加}
 	//ステータスの更新時にHPバーの情報も更新する
-	if tc.PartyName <> '' then begin
+	if (tc.PartyName <> '') and (Mode = 0) and ((DType = 5) or (DType = 6)) then begin
 		WFIFOW( 0, $0106);
 		WFIFOL( 2, tc.ID);
 		WFIFOW( 6, tc.HP);
 		WFIFOW( 8, tc.MAXHP);
 		SendPCmd(tc, 10, true, true);
 	end;
+  // Colus, 20040317: This is the best place to do overweight icons.
+  if (Mode = 0) and ((DType = $0018) or (DType = $0019)) then begin
+    i := tc.Weight * 100 div tc.MaxWeight;
+
+    if (i >= 50) then begin
+      UpdateIcon(tc.MData, tc, 35, 1);
+    end else begin
+      UpdateIcon(tc.MData, tc, 35, 0);
+    end;
+
+    if (i >= 90) then begin
+      UpdateIcon(tc.MData, tc, 36, 1);
+    end else begin
+      UpdateIcon(tc.MData, tc, 36, 0);
+    end;
+
+  end;
+
 {パーティー機能追加ココまで}
 end;
 //------------------------------------------------------------------------------
@@ -3890,11 +3890,8 @@ begin
 	WFIFOW( 2, 4+37*j);
 	tc.Socket.SendBuf(buf, 4+37*j);
 
-	//スキルポイント送信
-	WFIFOW( 0, $00b0);
-	WFIFOW( 2, $000c);
-	WFIFOL( 4, tc.SkillPoint);
-	tc.Socket.SendBuf(buf, 8);
+	// Update number of skillpoints.
+  SendCStat1(tc, 0, $000c, tc.SkillPoint);
 end;
 //------------------------------------------------------------------------------
 {追加} //イグ葉やアンティペインメント等用
@@ -4377,10 +4374,7 @@ begin
         end;}
         tc.SP := tc.SP - SPAmount;
 
-	WFIFOW( 0, $00b0);
-	WFIFOW( 2, $0007);
-	WFIFOL( 4, tc.SP);
-	tc.Socket.SendBuf(buf, 8);
+	SendCStat1(tc, 0, 7, tc.SP);
    end;
 	Result := true;
 end;
@@ -4398,10 +4392,8 @@ begin
         tc.Socket.SendBuf(buf, 6);
         //重量変更
         tc.Weight := tc.Weight - tc.Item[j].Data.Weight;
-        WFIFOW( 0, $00b0);
-        WFIFOW( 2, $0018);
-        WFIFOL( 4, tc.Weight);
-        tc.Socket.SendBuf(buf, 8);
+        SendCStat1(tc, 0, $0018, tc.Weight);
+
 end;
 
 //------------------------------------------------------------------------------
@@ -4421,9 +4413,7 @@ begin
         tc.Item[j].Card[3] := 0;
         tc.Item[j].Data := td;
         tc.Weight := tc.Weight + cardinal(td.Weight);
-        WFIFOW( 0, $00b0);
-        WFIFOW( 2, $0018);
-        WFIFOL( 4, tc.Weight);
+        SendCStat1(tc, 0, $0018, tc.Weight);
 end;
 //------------------------------------------------------------------------------
 
@@ -4443,10 +4433,7 @@ begin
         WFIFOW( 2, w);
         WFIFOW( 4, 1);
 
-        WFIFOW( 0, $00b0);
-        WFIFOW( 2, $0018);
-        WFIFOL( 4, tc.Weight);
-        tc.Socket.SendBuf(buf, 8);
+        SendCStat1(tc, 0, $0018, tc.Weight);
 end;
 
 //------------------------------------------------------------------------------
@@ -4485,10 +4472,7 @@ begin
                                                 tc1.Item[j].Data := td;
                                                 //重量追加
                                                 tc1.Weight := tc1.Weight + td.Weight;
-                                                WFIFOW( 0, $00b0);
-                                                WFIFOW( 2, $0018);
-                                                WFIFOL( 4, tc1.Weight);
-                                                tc1.Socket.SendBuf(buf, 8);
+                                                SendCStat1(tc1, 0, $0018, tc1.Weight);
 
                                                 //アイテムゲット通知
                                                 SendCGetItem(tc1, j, 1);
@@ -5671,11 +5655,8 @@ begin
 					end;
 				end;
 				if (tdl.Zeny[l] <> 0) then begin
-					//ゼニー返還
-					WFIFOW(0, $00b1);
-					WFIFOW(2, $0014);
-					WFIFOL(4, tc.Zeny);
-					tc.Socket.SendBuf(buf, 8);
+					// Update zeny
+          SendCStat1(tc, 1, $0014, tc.Zeny);
 				end;
 				//取引キャンセルパケ
 				WFIFOW(0, $00ee);
