@@ -4512,6 +4512,7 @@ begin
 
                                         254:    {Grand Cross}
                                         begin
+                                                NoCastInterrupt := true;
                                                 tc.MPoint.X := tc.Point.X;
                                                 tc.MPoint.Y := tc.Point.Y;
                                         end;
@@ -4935,6 +4936,7 @@ begin
                                 end;
                                 254:    {Grand Cross}
                                 begin
+                                        NoCastInterrupt := true;
                                         tc.MPoint.X := tc.Point.X;
                                         tc.MPoint.Y := tc.Point.Y;
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
@@ -6832,6 +6834,7 @@ begin
                                         end;
                                 254:  {Grand Cross}
                                         begin
+                                                NoCastInterrupt := true;
                                                 tc.MTargetType := 0;
                                                 SkillEffect(tc, Tick);
                                         end;
@@ -9078,6 +9081,7 @@ begin
           end;
         254:
           begin
+                NoCastInterrupt := true;
                 DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
                 j := 3;
                 if dmg[0] < 0 then dmg[0] := 0; //‘®«UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
