@@ -1963,6 +1963,26 @@ begin
 					Inc(tc.ScriptStep);
 				end;
 
+        75: //inputstr
+				begin
+//					if value = 0 then begin
+//						WFIFOW( 0, $01d4);
+//						WFIFOL( 2, tn.ID);
+//						tc.Socket.SendBuf(buf, 6);
+//						break;
+//					end else begin
+//						//フラグセット
+//{NPCイベント追加}
+//						if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then begin
+//							tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := value;
+//						end else begin
+//							ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := value;
+//						end;
+//{NPCイベント追加ココまで}
+//						Inc(tc.ScriptStep);
+//					end;
+				end;
+
 			end;
     Inc(cnt);
 		end;

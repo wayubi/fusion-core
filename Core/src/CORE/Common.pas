@@ -9795,6 +9795,16 @@ Begin
 							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 							tn.Script[k].Data3[1] := StrToInt(SL1[2]);
 							Inc(k);
+                        end else if str = 'inputstr' then begin //------- 75 inputstr
+							if sl1.Count <> 1 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 75;
+							SetLength(tn.Script[k].Data1, 1);
+							tn.Script[k].Data1[0] := SL1[0];
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
