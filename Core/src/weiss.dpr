@@ -6,12 +6,13 @@ uses
   {$IFDEF MSWINDOWS}
   madExcept,
   Forms,
+  List32 in '..\lib\List32.pas',
   {$ENDIF}
   {$IFDEF LINUX}
   QForms,
+  List32 in '../lib/List32.pas',
   {$ENDIF}
   Main in 'Main.pas' {frmMain},
-  List32 in '..\lib\List32.pas',
   Common in 'Common.pas',
   Path in 'Path.pas',
   Login in 'Login.pas',
