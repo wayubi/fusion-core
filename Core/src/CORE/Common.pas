@@ -18,7 +18,6 @@ const
   UPPER_JOB_BEGIN = 4000;
   MONSTER_ATK_RANGE = 9;
 
-const
 	MAX_PARTY_SIZE = 12;
 
 	//NPC CType Constants
@@ -33,6 +32,35 @@ const
   // callmob and SendNData will look for this.
   NPC_INVISIBLE = 32767;
 
+	//ChrstphrR source: http://www.stud.ntnu.no/~magnusrk/calc/
+	// Race Constants    (DamageFixR)
+	RACE_FORMLESS  = 0;
+	RACE_UNDEAD    = 1;
+	RACE_BRUTE     = 2;
+	RACE_PLANT     = 3;
+	RACE_INSECT    = 4;
+	RACE_FISH      = 5;
+	RACE_DEMON     = 6;
+	RACE_DEMIHUMAN = 7;
+	RACE_ANGEL     = 8;
+	RACE_DRAGON    = 9;
+	
+	// Element Constants (DamageFixE)
+	ELE_NEUTRAL = 0;
+	ELE_WATER   = 1; //Ice is water...
+	ELE_EARTH   = 2;
+	ELE_FIRE    = 3;
+	ELE_WIND    = 4;
+	ELE_POISON  = 5;
+	ELE_HOLY    = 6;
+	ELE_DARK    = 7;
+	ELE_SENSE   = 8;
+	ELE_UNDEAD  = 9;
+
+	// Size Constants    (DamageFixS)
+	SIZE_SML = 0;
+	SIZE_MED = 1;
+	SIZE_LRG = 2;
 
 
 type TLiving = class
