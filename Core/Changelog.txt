@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-12-04: Fixed the problem of non-pvp skills to SKILL_TYPE := 0. [BieL®]
 - 09-11-04: Restructured RCON. [Tsusai]
 - 09-11-04: Started the RCON (Remote/Ragnarok Console) with 4 commands. [Tsusai]
 - 09-10-04: Fixed extremely minor (I'm talking super-trivial here) code redundancy in JCon. [Tiko]
