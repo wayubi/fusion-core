@@ -192,7 +192,7 @@ var
     function command_changes(tc : TChara; str : String) : String;
     function command_iscson(tc : TChara) : String;
     function command_iscsoff(tc : TChara) : String;
-    function command_autoloot(tc : TChata) : String;
+    function command_autoloot(tc : TChara) : String;
 
     function command_aegis_b(str : String) : String;
     function command_aegis_bb(tc : TChara; str : String) : String;
