@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - March 13th, 2004
 --------------------------------------------------------------------------------
+- 03-13-04: FusionSQL -> Fixed Guild Overwriting Bug. [AlexKreuz]
 - 03-13-04: Added StealMultiplier (works as percentage, default 100). [Colus]
 - 03-13-04: Removed saying of Cloaking! when you succeed at it.[Colus]
 - 03-13-04: Corrected minor bug in view packets. [Colus]

@@ -173,6 +173,14 @@ begin
 		Application.ProcessMessages;
 	end;
 
+
+        if (ExecuteSqlCmd('SELECT GDID FROM guild_info ORDER BY GDID DESC LIMIT 1')) then begin
+                while not SQLDataSet.Eof do begin
+                        NowGuildID := SQLDataSet.FieldValues['GDID'];
+                        SQLDataSet.Next;
+                end;
+        end;
+
   {读取工会城资料}
 	DebugOut.Lines.Add('Castle data loading from SQL...');
 	Application.ProcessMessages;
