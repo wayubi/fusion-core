@@ -2913,7 +2913,7 @@ begin
 			sl.Add('0');
 			cnt := 0;
 			for j := 1 to MAX_SKILL_NUMBER do begin
-				if tc.Skill[j].Lv <> 0 then begin
+				if (tc.Skill[j].Lv <> 0) and (not tc.Skill[j].Card) then begin
 					sl.Add(IntToStr(j));
 					sl.Add(IntToStr(tc.Skill[j].Lv));
 					Inc(cnt);

@@ -2515,7 +2515,7 @@ begin
 					end;
 					Skill[i].Lv := 0;
 				end;
-				Skill[i].Card := False;
+				//Skill[i].Card := False;
 			end;
 			if SkillPoint > 714 then SkillPoint := 714; //‚±‚ê‚¾‚¯—L‚ê‚Î\•ª
 		end;
