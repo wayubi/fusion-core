@@ -18,7 +18,8 @@ uses
     REED_LOAD_ACCOUNTS,
     REED_LOAD_CHARACTERS,
     REED_LOAD_PETS,
-    REED_LOAD_PARTIES;
+    REED_LOAD_PARTIES,
+    REED_LOAD_GUILDS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -67,7 +68,6 @@ uses
 
 
     { Guild Data - Basic Data }
-    procedure PD_Load_Guilds(UID : String = '*');
     procedure PD_Save_Guilds(forced : Boolean = False);
     procedure PD_Delete_Guilds(tg : TGuild);
 
@@ -133,7 +133,9 @@ uses
         PD_Load_Parties_Pre_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Guilds ­');
-        PD_Load_Guilds(UID);
+        PD_Load_Guilds_Pre_Parse(UID);
+
+
         PD_Load_Guilds_Members(UID);
         PD_Load_Guilds_Positions(UID);
         PD_Load_Guilds_Skills(UID);
@@ -1211,99 +1213,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Guild Data - Basic Data ----------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tp : TPlayer;
-        tg : TGuild;
-        i : Integer;
-        saveflag : Boolean;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Guilds');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst('*', faDirectory, searchResult) = 0 then repeat
-        	if FileExists(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Guild.txt') then begin
-
-            	try
-                    saveflag := False;
-                    tg := nil;
-                	datafile.LoadFromFile(AppPath + 'gamedata\Guilds\' + searchResult.Name + '\Guild.txt');
-                    sl.delimiter := ':';
-
-                    if (UID <> '*') then begin
-
-                    	if Player.IndexOf(StrToInt(UID)) = -1 then Continue;
-                        tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-                        for i := 0 to 8 do begin
-    	                    if tp.CName[i] = '' then Continue;
-
-                            if tp.CData[i] = nil then Continue;
-
-                            sl.DelimitedText := datafile[1];
-                            if (tp.CData[i].GuildID = StrToint(sl.Strings[1])) then begin
-                            	if GuildList.IndexOf(tp.CData[i].GuildID) = -1 then Continue;
-                                tg := GuildList.Objects[GuildList.IndexOf(tp.CData[i].GuildID)] as TGuild;
-                                Break;
-                            end;
-                        end;
-
-                        if tg = nil then Continue;
-
-                	end else begin
-                    	tg := TGuild.Create;
-                    end;
-
-                    for i := 0 to tg.RegUsers - 1 do begin
-                        if not assigned(tg.Member[i]) then tg.MemberID[i] := 0;
-                    	if tg.MemberID[i] <> 0 then begin
-                        	if tg.Member[i].Login <> 0 then begin
-                            	saveflag := True;
-                                Break;
-                            end;
-                        end;
-                    end;
-
-                    if saveflag then Continue;
-
-                    tg.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-
-                    tg.ID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
-                    if (tg.ID > NowGuildID) then NowGuildID := tg.ID;
-
-                    tg.LV := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
-                    tg.EXP := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
-                    tg.NextEXP := GExpTable[tg.LV];
-                    tg.GSkillPoint := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
-                    tg.Notice[0] := ( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
-                    tg.Notice[1] := ( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-                    tg.Agit := ( Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3) );
-                    tg.Emblem := StrToInt( Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3) );
-                    tg.Present := StrToInt( Copy(datafile[9], Pos(' : ', datafile[9]) + 3, length(datafile[9]) - Pos(' : ', datafile[9]) + 3) );
-                    tg.DisposFV := StrToInt( Copy(datafile[10], Pos(' : ', datafile[10]) + 3, length(datafile[10]) - Pos(' : ', datafile[10]) + 3) );
-                    tg.DisposRW := StrToInt( Copy(datafile[11], Pos(' : ', datafile[11]) + 3, length(datafile[11]) - Pos(' : ', datafile[11]) + 3) );
-
-                    if (UID = '*') then
-                    	GuildList.AddObject(tg.ID, tg);
-
-                    //debugout.Lines.Add(tg.Name + ' guild data loaded.');
-                except
-                	DebugOut.Lines.Add('Guild data could not be loaded.');
-                end;
-            end;
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Guilds(forced : Boolean = False);
     var
     	datafile : TStringList;

@@ -1,4 +1,4 @@
-unit REED_LOAD_PARTIES;
+unit REED_LOAD_GUILDS;
 
 interface
 
@@ -6,21 +6,20 @@ uses
     Common, REED_Support,
     Classes, SysUtils;
 
-    procedure PD_Load_Parties_Pre_Parse(UID : String = '*');
-    procedure PD_Load_Parties_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Guilds_Pre_Parse(UID : String = '*');
+    procedure PD_Load_Guilds_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
 
-    procedure PD_Load_Parties_Settings(tpa : TParty; path : String);
-    procedure PD_Load_Parties_Members(tpa : TParty; path : String);
+    procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
 
-    function select_load_party(UID : String; tp : TPlayer; partyid : Cardinal) : TParty;
-    function party_is_online(tpa : TParty) : Boolean;
+    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
+    function guild_is_online(tg : TGuild) : Boolean;
 
 implementation
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Parties Pre Parse -------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Pre Parse --------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Pre_Parse(UID : String = '*');
+    procedure PD_Load_Guilds_Pre_Parse(UID : String = '*');
     var
         basepath : String;
         pfile : String;
@@ -32,14 +31,14 @@ implementation
         pfile := 'Account.txt';
         accountlist := get_list(basepath, pfile);
 
-        basepath := AppPath + 'gamedata\Parties\';
+        basepath := AppPath + 'gamedata\Guilds\';
 
         for i := 0 to accountlist.Count - 1 do begin
             if Player.IndexOf(reed_convert_type(accountlist[i], 0, -1)) = -1 then Continue;
             tp := Player.Objects[Player.IndexOf(reed_convert_type(accountlist[i], 0, -1))] as TPlayer;
 
-            pfile := 'Settings.txt';
-            PD_Load_Parties_Parse(UID, tp, get_list(basepath, pfile), basepath);
+            pfile := 'Guild.txt';
+            PD_Load_Guilds_Parse(UID, tp, get_list(basepath, pfile), basepath);
 
             if (UID <> '*') then Break;
         end;
@@ -50,37 +49,34 @@ implementation
 
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Parties Parse ------------------------------------------------------ }
+    { - R.E.E.D - Load Guilds Parse ------------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Guilds_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
     var
         i : Integer;
         pfile : String;
         path : String;
-        tpa : TParty;
+        tg : TGuild;
     begin
 
         for i := 0 to resultlist.Count - 1 do begin
+            path := basepath + resultlist[i] + '\';
 
-            tpa := select_load_party(UID, tp, reed_convert_type(resultlist[i], 0, -1));
-            if not assigned(tpa) then Continue;
+            tg := select_load_guild(UID, tp, reed_convert_type(resultlist[i], 0, -1));
+            if not assigned(tg) then Continue;
 
             if (UID <> '*') then
-                if party_is_online(tpa) then Continue;
-            
-            pfile := 'Settings.txt';
-            path := basepath + resultlist[i] + '\' + pfile;
-            PD_Load_Parties_Settings(tpa, path);
+                if guild_is_online(tg) then Continue;
 
-            pfile := 'Members.txt';
-            path := basepath + resultlist[i] + '\' + pfile;
-            PD_Load_Parties_Members(tpa, path);
 
-            NowPartyID := (tpa.ID + 1);
+            pfile := 'Guild.txt';
+            PD_Load_Guilds_Settings(tg, path + pfile);
+
+
+            NowGuildID := (tg.ID + 1);
 
             if (UID = '*') then begin
-                PartyNameList.AddObject(tpa.Name, tpa);
-                PartyList.AddObject(tpa.ID, tpa);
+                GuildList.AddObject(tg.ID, tg);
             end;
 
         end;
@@ -91,12 +87,23 @@ implementation
 
 
     { ------------------------------------------------------------------------------------- }
-    { - R.E.E.D - Load Parties Settings --------------------------------------------------- }
+    { - R.E.E.D - Load Guilds Settings ---------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Settings(tpa : TParty; path : String);
+    procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
     begin
-        tpa.Name := retrieve_data(0, path);
-        tpa.ID := retrieve_data(1, path, 1);
+        tg.Name := retrieve_data(0, path);
+        tg.ID := retrieve_data(1, path, 1);
+        tg.LV := retrieve_data(2, path, 1);
+        tg.EXP := retrieve_data(3, path, 1);
+        tg.NextEXP := GExpTable[tg.LV];
+        tg.GSkillPoint := retrieve_data(4, path, 1);
+        tg.Notice[0] := retrieve_data(5, path);
+        tg.Notice[1] := retrieve_data(6, path);
+        tg.Agit := retrieve_data(7, path);
+        tg.Emblem := retrieve_data(8, path, 1);
+        tg.Present := retrieve_data(9, path, 1);
+        tg.DisposFV := retrieve_data(10, path, 1);
+        tg.DisposRW := retrieve_data(11, path, 1);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -137,61 +144,62 @@ implementation
 
     
     { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - select_load_party                                                           }
+    { R.E.E.D - select_load_guild                                                           }
     { ------------------------------------------------------------------------------------- }
-    { Purpose: To allow party parsing to create or select the proper party for loading.     }
+    { Purpose: To allow guild parsing to create or select the proper guild for loading.     }
     { Parameters:                                                                           }
     {  - UID : String, Represents the account ID to load.                                   }
     {  - tp : TPlayer, Represents the player data.                                          }
-    {  - partyid : Cardinal, Represents the party's ID.                                     }
+    {  - guildid : Cardinal, Represents the guild's ID.                                     }
     { Results:                                                                              }
-    {  - Result : TParty, Represents the selected party.                                    }
+    {  - Result : TParty, Represents the selected guild.                                    }
     { ------------------------------------------------------------------------------------- }
-    function select_load_party(UID : String; tp : TPlayer; partyid : Cardinal) : TParty;
+    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
     var
         i : Integer;
-        tpa : TParty;
+        tg : TGuild;
     begin
 
         if (UID <> '*') then begin
 
             for i := 0 to 8 do begin
                 if tp.CName[i] = '' then Continue;
+                if tp.CData[i] = nil then Continue;
 
-                if (tp.CData[i].PartyID = partyid) then begin
-                    if PartyList.IndexOf(partyid) = -1 then Continue;
-                    tpa := PartyList.Objects[PartyList.IndexOf(partyid)] as TParty;
+                if (tp.CData[i].GuildID = guildid) then begin
+                    if GuildList.IndexOf(guildid) = -1 then Continue;
+                    tg := GuildList.Objects[GuildList.IndexOf(guildid)] as TGuild;
                     Break;
                 end;
             end;
 
         end else begin
-            tpa := TParty.Create;
+            tg := TGuild.Create;
         end;
 
-        Result := tpa;
+        Result := tg;
     end;
     { ------------------------------------------------------------------------------------- }
 
 
     { ------------------------------------------------------------------------------------- }
-    { R.E.E.D - party_is_online                                                             }
+    { R.E.E.D - guild_is_online                                                             }
     { ------------------------------------------------------------------------------------- }
-    { Purpose: To see if any party members are online for loading purposes.                 }
+    { Purpose: To see if any guild members are online for loading purposes.                 }
     { Parameters:                                                                           }
-    {  - tpa : TParty, Represents the party data to check.                                  }
+    {  - tg : TGuild, Represents the party data to check.                                   }
     { Results:                                                                              }
     {  - Result : Boolean, Represents the return value of whether or not onnline.           }
     { ------------------------------------------------------------------------------------- }
-    function party_is_online(tpa : TParty) : Boolean;
+    function guild_is_online(tg : TGuild) : Boolean;
     var
         i : Integer;
     begin
         Result := False;
 
-        for i := 0 to 11 do begin
-            if (tpa.MemberID[i] <> 0) then begin
-                if tpa.Member[i].Login <> 0 then begin
+        for i := 0 to tg.RegUsers - 1 do begin
+            if (tg.MemberID[i] <> 0) then begin
+                if tg.Member[i].Login <> 0 then begin
                     Result := True;
                     Break;
                 end;
