@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+- 03-07-04: Fixed all aspects of Steal.  No, really.  Try it out. [Colus]
+- 03-07-04: Added StealItem function. [Colus]
+- 03-07-04: Added #icon and #unicon commands for testing. [Colus]
+- 03-07-04: Fixed skill tree parsing for upper classes. [Colus]
 - 03-06-04: FusionSQL -> Optimized Guild Preloading Algorithm. [AlexKreuz]
 - 03-06-04: Added Lord Knight Berserk ASPD. [Oatmeal]
 - 03-06-04: Added Lord Knight Fury Aspd. [Oatmeal]
