@@ -1,3 +1,4 @@
+- 06-04-04: Fixed #88 - Cancel trade caused unknown item & crash. [AlexKreuz]
 - 06-04-04: Fixed MVP monsters affected by stat changes bug. [AlexKreuz]
 - 06-04-04: Fixed #916 - Katar of Cold Icicle freezes MVP Monsters. [AlexKreuz]
 - 06-03-04: Skills - Finished organzining player vs monster. [Darkhelmet]

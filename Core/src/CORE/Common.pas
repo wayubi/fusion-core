@@ -6391,8 +6391,10 @@ begin
 					for i := 0 to tdl.Cnt[l] - 1 do begin
 						if (tc.Item[tdl.ItemIdx[l][i]].ID = 0) then break;
 						td := tc.Item[tdl.ItemIdx[l][i]].Data;
-						j := SearchCInventory(tc, td.ID, td.IEquip);
-						SendCGetItem(tc, j, tdl.Amount[l][i]);
+						// {Alex: SearchCInventory was calling the wrong index. }
+						//j := SearchCInventory(tc, td.ID, td.IEquip);
+						//SendCGetItem(tc, j, tdl.Amount[l][i]);
+                        SendCGetItem(tc, tdl.ItemIdx[l][i], tdl.Amount[l][i]);
 					end;
 				end;
 				if (tdl.Zeny[l] <> 0) then begin
