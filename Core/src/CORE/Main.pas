@@ -10501,6 +10501,31 @@ begin
                                                 WFIFOL(2, tc1.ID);
                                                 SendBCmd(tm, tc1.Point, 6);
                                         end;
+                                289:  {Dispell}
+                                  begin
+                                    for i := 1 to 336 do begin
+                                      tc1.Skill[i].Tick := Tick;
+						                          tc1.Skill[i].EffectLV := 0;
+						                          tc1.Skill[i].Effect1 := 0;
+						                          if SkillTick > tc1.Skill[i].Tick then begin
+							                          SkillTick := tc1.Skill[i].Tick;
+							                          SkillTickID := MSkill;
+                                      end;
+						                          //Remove Icons
+			                                if tc1.Skill[i].Data.Icon <> 0 then begin
+							                          //DebugOut.Lines.Add('(Icon Removed)!');
+							                          WFIFOW(0, $0196);
+							                          WFIFOW(2, tc1.Skill[i].Data.Icon);
+						                            WFIFOL(4, tc1.ID);
+							                          WFIFOB(8, 0);
+
+                                        SendBCmd(tm, tc1.Point, 9);
+						                          end;
+                                      CalcStat(tc1, Tick);
+                                      SendCStat(tc1);
+                                    end;
+
+                                  end;
 
            end;
            if tc1.MagicReflect then begin
