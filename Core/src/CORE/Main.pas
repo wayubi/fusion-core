@@ -1227,6 +1227,9 @@ if (ts.isEmperium) then begin
                 end;
         end;
 
+		    {Colus, 20040110: Set territory for the guild}
+        tg.Agit := tm.Name;
+        
         ClaimGuildCastle(tc.GuildID,ts.Map);
         EnableGuildKafra(ts.Map,'Kafra Service',0);
 
@@ -8335,8 +8338,9 @@ begin
                                                         tc.Skill[270].Tick := Tick;
                                                         tc.SkillTick := Tick;
                                                         tc.SkillTickID := 270;
+                                                        SendCStat(tc);                                                        
                                                         end;
-                                                        SendCStat(tc);
+                                                        
                                                 end;
                                 266:  //Investigate
                                                 if spiritSpheres <> 0 then begin
@@ -10021,11 +10025,21 @@ begin
 	end else if (tn.CType = 4) then begin //スキル効能地
 		if tn.Tick <= Tick then begin
 			case tn.JID of
-                                141:
-                                        begin
+        $8D: // Icewall ends
+          begin
 						DelSkillUnit(tm, tn);
 						Dec(k);
-                        			tm.gat[tn.Point.X][tn.Point.Y] := 0;
+
+       			tm.gat[tn.Point.X][tn.Point.Y] := 0;
+
+            {Colus, 20030111: Reverse the 0192 change of terrain}
+            WFIFOW(0, $0192);
+            WFIFOW(2, tn.Point.X);
+            WFIFOW(4, tn.Point.Y);
+            WFIFOW(6, 0);
+            WFIFOS(8, tm.Name, 16);
+   	        SendBCmd(tm, tn.Point, 24);
+
                     			end;
 				$81://ポータル発動前->発動後
 					begin
@@ -10226,7 +10240,8 @@ begin
                                                      end;}
                                                 $8d: {Ice Wall}
 							begin
-								SetLength(bb, 1);
+                {Colus, 20030111: No, we're not going to do this silly bouncing around.}
+								{SetLength(bb, 1);
 								bb[0] := 1;
 								//bb[1] := 0;
                                                                 xy := tc2.Point;
@@ -10242,7 +10257,7 @@ begin
 								end;
 								tc2.pcnt := 0;
 			      					//Update Players Location
-								UpdatePlayerLocation(tm, tc2);
+								UpdatePlayerLocation(tm, tc2);     }
 							end;
                                                 $46:    {Sanctuary}
                                                         begin
@@ -11016,7 +11031,8 @@ begin
 
 						$8d:    {Ice Wall}
 							begin
-								SetLength(bb, 1);
+                {Colus, 20030111: No, we're not going to do this silly bouncing around.}
+								{SetLength(bb, 1);
 								bb[0] := 2;
                                                                 xy := ts1.Point;
 								DirMove(tm, ts1.Point, ts1.Dir, bb);
@@ -11031,7 +11047,7 @@ begin
 								ts1.pcnt := 0;
 
                                                                 UpdateMonsterLocation(tm, ts1);
-                                                        
+                  }
 							end;
 
                                                 $90: //アイスウォール
