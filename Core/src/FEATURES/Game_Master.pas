@@ -105,6 +105,7 @@ var
     GM_ATHENA_JOBLVLUP : Byte;
     GM_ATHENA_JOBLVUP : Byte;
     GM_ATHENA_SKPOINT :  Byte;
+    GM_ATHENA_STPOINT : Byte;
 
 
     GM_Access_DB : TIntList32;
@@ -211,6 +212,7 @@ var
     function command_athena_joblvlup(tc : TChara; str : String) : String;
     function command_athena_joblvup(tc : TChara; str : String) : String;
     function command_athena_skpoint(tc : TChara; str : String) : String;
+    function command_athena_stpoint(tc : Tchara; str : String) : String;
 
 implementation
 
@@ -322,6 +324,7 @@ implementation
         GM_ATHENA_JOBLVLUP := StrToIntDef(sl.Values['ATHENA_JOBLVLUP'], 1);
         GM_ATHENA_JOBLVUP := StrToIntDef(sl.Values['ATHENA_JOBLVUP'], 1);
         GM_ATHENA_SKPOINT := StrToIntDef(sl.Values['ATHENA_SKPOINT'], 1);
+        GM_ATHENA_STPOINT := StrToIntDef(sl.Values['ATHENA_STPOINT'], 1);
 
         sl.Free;
         ini.Free;
@@ -438,6 +441,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVLUP', IntToStr(GM_ATHENA_JOBLVLUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_JOBLVUP', IntToStr(GM_ATHENA_JOBLVUP));
         ini.WriteString('Athena GM Commands', 'ATHENA_SKPOINT', IntToStr(GM_ATHENA_SKPOINT));
+        ini.WriteString('Athena GM Commands', 'ATHENA_STPOINT', IntToStr(GM_ATHENA_STPOINT));
 
         ini.Free;
 
@@ -558,6 +562,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('joblvlup')) = 'joblvlup') and (check_level(tc.ID, GM_ATHENA_JOBLVLUP)) ) then error_msg := command_athena_joblvlup(tc, str)
             else if ( (copy(str, 1, length('joblvup')) = 'joblvup') and (check_level(tc.ID, GM_ATHENA_JOBLVUP)) ) then error_msg := command_athena_joblvup(tc, str)
             else if ( (copy(str, 1, length('skpoint')) = 'skpoint') and (check_level(tc.ID, GM_ATHENA_SKPOINT)) ) then error_msg := command_athena_skpoint(tc, str)
+            else if ( (copy(str, 1, length('stpoint')) = 'stpoint') and (check_level(tc.ID, GM_ATHENA_STPOINT)) ) then error_msg := command_athena_stpoint(tc, str)
         end else if gmstyle = '/' then begin
         	if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) = (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_B)) ) then error_msg := command_aegis_b(str)
             else if ( (aegistype = 'B') and (Copy(str, 1, length(tc.Name) + 2) <> (tc.Name + ': ')) and (not (Copy(str, 1, 4) = 'blue') ) and (check_level(tc. ID, GM_AEGIS_NB)) ) then error_msg := command_aegis_nb(str)
@@ -3985,7 +3990,7 @@ Called when we're shutting down the server *only*
             else begin
                 if (tc.SkillPoint + i <= 1001) then tc.SkillPoint := tc.SkillPoint + i
                 else if (tc.SkillPoint + i > 1001) and (tc.SkillPoint < 1001) then begin
-                    tc.BaseLV := 1001;
+                    tc.SkillPoint := 1001;
                 end else begin
                     Result := Result + ' Maximum number of points is 1001.';
                     Exit;
@@ -3998,6 +4003,46 @@ Called when we're shutting down the server *only*
             else Result := 'GM_ATHENA_SKPOINT Success. ' + IntToStr(oldpoints - tc.SkillPoint) + ' points subtracted.'
         end else begin
             Result := Result + ' Skill Point amount out of range [-1001-1001].';
+        end;
+    end;
+
+    function command_athena_stpoint(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+        oldpoints : Integer;
+    begin
+        Result := 'GM_ATHENA_STPOINT Failure.';
+
+        oldpoints := tc.StatusPoint;
+
+        Val(Copy(str, 9, 256), i, k);
+        if (k = 0) and (i >= -9999) and (i <= 9999) then begin
+            if i < 0 then begin
+                if (tc.StatusPoint + i >= 0) then tc.StatusPoint := tc.StatusPoint + i
+                else if (tc.StatusPoint + i < 0) and (tc.StatusPoint > 0) then begin
+                    tc.StatusPoint := 0;
+                end else begin
+                    Result := Result + ' Minimum number of points is 0.';
+                    Exit;
+                end;
+            end
+
+            else begin
+                if (tc.StatusPoint + i <= 999) then tc.StatusPoint := tc.StatusPoint + i
+                else if (tc.StatusPoint + i > 9999) and (tc.SkillPoint < 9999) then begin
+                    tc.StatusPoint := 9999;
+                end else begin
+                    Result := Result + ' Maximum number of points is 1001.';
+                    Exit;
+                end;
+            end;
+
+            SendCStat1(tc, 0, $0009, tc.StatusPoint);
+
+            if (i > 0) then Result := 'GM_ATHENA_STPOINT Success. ' + IntToStr(tc.StatusPoint - oldpoints) + ' points added.'
+            else Result := 'GM_ATHENA_STPOINT Success. ' + IntToStr(oldpoints - tc.StatusPoint) + ' points subtracted.'
+        end else begin
+            Result := Result + ' Status Point amount out of range [-9999-9999].';
         end;
     end;
 end.
