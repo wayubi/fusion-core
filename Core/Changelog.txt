@@ -1,3 +1,5 @@
+- 04-27-04: Memory Leak fixes: CharaSplash2 [ChrstphrR]
+- 04-27-04: Memory Leak fixes: CreateField [ChrstphrR]
 - 04-27-04: Code Review/Comment, and Unused variable cleanup: DamageCalc1 [ChrstphrR]
 - 04-27-04: Memory Leak fixes: MonsterDie [ChrstphrR]
 - 04-27-04: Memory Leak fixes: CharaSplash [ChrstphrR]

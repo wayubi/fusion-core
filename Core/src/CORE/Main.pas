@@ -2064,11 +2064,11 @@ begin
 		end;
 		miss := boolean((Random(100) >= i) and (not crit));
 		//DAƒ`ƒFƒbƒN
-		if (miss = false) and (Arms = 0) and (SkillPer = 0) and (Random(100) < DAPer) then begin
+		if NOT miss and (Arms = 0) and (SkillPer = 0) and (Random(100) < DAPer) then begin
 			if Skill[263].Lv > 0 then tatk := true;
 			if Skill[48].Lv > 0 then datk := true;
 			crit := false;
-			if tatk = true then datk := false;
+			if tatk then datk := false;
 			//if tatk = true then tc.ATick := timeGetTime() + Delay;
 			//if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
 			//if tatk = true then Monkdelay(tm, tc, Delay);
@@ -2222,7 +2222,7 @@ begin
 
 		//Dragonology
 		if (tc.Skill[284].Lv <> 0) and (ts.Data.Race = 9) then begin
-						dmg[0] := dmg[0] + (dmg[0] * tc.Skill[284].Data.Data1[tc.Skill[284].Lv] div 100);
+			dmg[0] := dmg[0] + (dmg[0] * tc.Skill[284].Data.Data1[tc.Skill[284].Lv] div 100);
 		end;
 		//Beast Bane
 		if (tc.Skill[126].Lv <> 0) and (ts.Data.Race = 2) then begin
@@ -2526,7 +2526,7 @@ begin
 						//DebugOut.Lines.Add('Pneuma OK');
 						dmg[6] := 0;
 					end;
-				end;
+				end;//case
 			end;
 			Inc(i1);
 		end;
@@ -4182,16 +4182,17 @@ begin
 	end;
 end;//proc TfrmMain.CharaSplash()
 //------------------------------------------------------------------------------
+{ChrstphrR 2004/04/27 - Memory Leak fixed - free of leaks.}
 procedure TfrmMain.CharaSplash2(tc:TChara;Tick:cardinal);
 var
 	i1,j1,k1,k:integer;
 	tm:TMap;
 	ts:TMob;
 	ts1:TMob;
-  tc1:TChara;
-  tc2:TChara;
+	tc1:TChara;
+	tc2:TChara;
 	xy:TPoint;
-  sl:TStringList;
+	sl:TStringList;
 begin
 	with tc do begin
 		tc1 := AData;
@@ -4208,7 +4209,7 @@ begin
 				end;
 			end;
 		end;
-		if sl.Count <> 0 then begin
+		if sl.Count > 0 then begin
 			for k1 := 0 to sl.Count -1 do begin
 				tc2 := sl.Objects[k1] as TChara;
 				DamageCalc3(tm, tc, tc2, Tick);
@@ -4241,9 +4242,11 @@ begin
 				StatCalc2(tc, tc2, Tick);
 			end;
 		end;
+		sl.Free; //ChrstphrR - 2004/04/27 Must free created objects
 	end;
-end;                                       
+end;//proc TfrmMain.CharaSplash2()
 //------------------------------------------------------------------------------
+{ChrstphrR 2004/04/27 - Memory leak fixes.}
 {’Ç‰Á}
 procedure TfrmMain.CreateField(tc:TChara; Tick:Cardinal);
 var
@@ -4258,1417 +4261,1404 @@ var
   sl  :TStringList;
 begin
 	sl := TStringList.Create;
-  tm := tc.MData;
+	tm := tc.MData;
 	tl := tc.Skill[tc.MSkill].Data;
-        if tc.Skill[269].Tick > Tick then exit;
-        
-        if tc.isSilenced then begin
-                SilenceCharacter(tm, tc, Tick);
-                Exit;
-        end;
-        
+	if tc.Skill[269].Tick > Tick then exit;
+
+	if tc.isSilenced then begin
+		SilenceCharacter(tm, tc, Tick);
+		sl.Free;
+		Exit;//Safe 2004/04/26
+	end;
+
 	with tc do begin
-			case MSkill of
-				21,91: {Thunder Storm, Heaven Drive}
-					begin
-                                                //Cast on the Point Targeted
+		case MSkill of
+		21,91: {Thunder Storm, Heaven Drive}
+			begin
+				//Cast on the Point Targeted
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+
+				sl.Clear;
+				for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+					for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+						for k1 := 0 to tm.Block[i1][j1].Mob.Count -1 do begin
+							ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+							if (abs(ts1.Point.X - xy.X) > tl.Range2) or (abs(ts1.Point.Y - xy.Y) > tl.Range2) then
+								Continue;
+							sl.AddObject(IntToStr(ts1.ID),ts1)
+						end;//for k1
+					end;//for i1
+				end;//for j1
+
+				//If Monster is in the Area
+				if sl.Count <> 0 then begin
+					for k1 := 0 to sl.Count -1 do begin
+						ts1 := sl.Objects[k1] as TMob;
+
+						//Caculate Damage
+						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
+						dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+						dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+						if dmg[0] < 1 then dmg[0] := 1;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+						dmg[0] := dmg[0] * tl.Data2[MUseLV];
+						if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+						if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+						//Send Attack
+						SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV]);
+						//Send Damage
+						DamageProcess1(tm, tc, ts1, dmg[0], Tick);
+					end;
+				end;
+				tc.MTick := Tick + 1000;
+				if MSkill = 21 then Inc(tc.MTick,1000);
+			end;
+		12:     {Safety Wall}
+			begin
+				j := SearchCInventory(tc, 717, false);
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
+					if NoJamstone = False then UseItem(tc, j);  //Use Item Function
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $7e, tl.Data2[MUseLV], tl.Data1[MUseLV] * 1000);
+					tn.MSkill := MSkill;
+				end else begin
+					SendSkillError(tc, 8); //No Blue Gemstone
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		18:     {Fire Wall}
+			begin
+				xy.X := MPoint.X - Point.X;
+				xy.Y := MPoint.Y - Point.Y;
+				if abs(xy.X) > abs(xy.Y) * 3 then begin
+					//‰¡Œü‚«
+					if xy.X > 0 then b := 6 else b := 2;
+				end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+					//cŒü‚«
+					if xy.Y > 0 then b := 0 else b := 4;
+				end else begin
+					if xy.X > 0 then begin
+						if xy.Y > 0 then b := 7 else b := 5;
+					end else begin
+						if xy.Y > 0 then b := 1 else b := 3;
+					end;
+				end;
+				//DebugOut.Lines.Add(Format('FireWall: (%d,%d) %d', [xy.X, xy.Y, b]));
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+				tn.CData := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				SetLength(bb, 1);
+				bb[0] := 2;
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+				tn.CData := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				bb[0] := 6;
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+				tn.CData := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				{ Colus, 20031219: Removed the stair-step pattern for diagonal FWs
+				if (b mod 2) <> 0 then begin
+
 						xy.X := MPoint.X;
 						xy.Y := MPoint.Y;
+					bb[0] := 3;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					bb[0] := 5;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end;
+				Colus, 20031219: FW update end}
+			end;
+		25:     {Pneuma}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $85, 0, tl.Data1[1] * 1000);
+				tn.MSkill := MSkill;
+			end;
 
-						sl.Clear;
-						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].Mob.Count -1 do begin
-									ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-									if (abs(ts1.Point.X - xy.X) > tl.Range2) or (abs(ts1.Point.Y - xy.Y) > tl.Range2) then
-										Continue;
-									sl.AddObject(IntToStr(ts1.ID),ts1)
-								end;
-							end;
-						end;
+		27:     {Warp Portal}
+			begin
+				ZeroMemory(@buf[0], 68);
+				WFIFOW( 0, $011c);
+				WFIFOW( 2, 27);
+				WFIFOS( 4, SaveMap + '.gat', 16);
+				for j := 0 to tl.Data1[Skill[27].Lv] - 1 do begin
+					if MemoMap[j] <> '' then WFIFOS(20+j*16, MemoMap[j] + '.gat', 16);
+				end;
+				Socket.SendBuf(buf, 68);
+				MMode := 4;
+				sl.Free;
+				Exit;//safe 2004/04/26
+			end;
 
-                                                //If Monster is in the Area
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count -1 do begin
-								ts1 := sl.Objects[k1] as TMob;
+		70:     {Sanctuary}
+			begin
+				j := SearchCInventory(tc, 717, false);
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
 
-								//Caculate Damage
-								dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100 * tl.Data1[MUseLV] div 100;
-								dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-								dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-								if dmg[0] < 1 then dmg[0] := 1;
-								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-								dmg[0] := dmg[0] * tl.Data2[MUseLV];
-                if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
-								if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
-                                                                //Send Attack
-								SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], tl.Data2[MUseLV]);
-								//Send Damage
-								DamageProcess1(tm, tc, ts1, dmg[0], Tick);
-							end;
-						end;
-						tc.MTick := Tick + 1000;
-						if MSkill = 21 then Inc(tc.MTick,1000);
-					end;
-				12:     {Safety Wall}
-					begin
-						j := SearchCInventory(tc, 717, false);
-						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
+					if NoJamstone = False then UseItem(tc, j);
+					// Colus, 20040117: Corrected position of Sanctuary field
+					for j1 := 1 to 5 do begin
+						for i1 := 1 to 5 do begin
+							if ((i1 < 2) or (i1 > 4)) and ((j1 < 2) or (j1 > 4)) then Continue;
+							xy.X := (MPoint.X) -3 + i1;
+							xy.Y := (MPoint.Y) -3 + j1;
 
-                                                        if NoJamstone = False then UseItem(tc, j);  //Use Item Function
-
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							tn := SetSkillUnit(tm, ID, xy, Tick, $7e, tl.Data2[MUseLV], tl.Data1[MUseLV] * 1000);
+							if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
+							tn := SetSkillUnit(tm, ID, xy, Tick, $46, 10, tl.Data1[MUseLV] * 1000);
+							tn.CType  := 4;
+							tn.CData  := tc;
 							tn.MSkill := MSkill;
-
-						end else begin
-              SendSkillError(tc, 8); //No Blue Gemstone
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				18:     {Fire Wall}
-					begin
-						xy.X := MPoint.X - Point.X;
-						xy.Y := MPoint.Y - Point.Y;
-						if abs(xy.X) > abs(xy.Y) * 3 then begin
-							//‰¡Œü‚«
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-							//cŒü‚«
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-						//DebugOut.Lines.Add(Format('FireWall: (%d,%d) %d', [xy.X, xy.Y, b]));
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-						tn.CData := tc;
-            tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-						SetLength(bb, 1);
-						bb[0] := 2;
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-						tn.CData := tc;
-			      tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						bb[0] := 6;
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-						tn.CData := tc;
-			      tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-            { Colus, 20031219: Removed the stair-step pattern for diagonal FWs
-						if (b mod 2) <> 0 then begin
-
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 3;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-							tn.CData := tc;
-				                        tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 5;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $7f, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-							tn.CData := tc;
-				                        tn.MSkill := MSkill;
-							tn.MUseLV := MUseLV;
-						end;
-              Colus, 20031219: FW update end}
-					end;
-				25:     {Pneuma}
-					begin
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $85, 0, tl.Data1[1] * 1000);
-			                        tn.MSkill := MSkill;
-					end;
+						end;//for i1
+					end;//for j1
 
-				27:     {Warp Portal}
-					begin
-                                                ZeroMemory(@buf[0], 68);
-						WFIFOW( 0, $011c);
-						WFIFOW( 2, 27);
-						WFIFOS( 4, SaveMap + '.gat', 16);
-						for j := 0 to tl.Data1[Skill[27].Lv] - 1 do begin
-							if MemoMap[j] <> '' then WFIFOS(20+j*16, MemoMap[j] + '.gat', 16);
-						end;
-						Socket.SendBuf(buf, 68);
-						MMode := 4;
-						Exit;
-					end;
+				end else begin
+					SendSkillError(tc, 8); //No Blue Gemstone
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		79:     {Magnus Exorcism}
+			begin
+				j := SearchCInventory(tc, 717, false);
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
 
-        70:     {Sanctuary}
-					begin
-            j := SearchCInventory(tc, 717, false);
-						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
-
-              if NoJamstone = False then UseItem(tc, j);
-              // Colus, 20040117: Corrected position of Sanctuary field
-              for j1 := 1 to 5 do begin
-							      for i1 := 1 to 5 do begin
-								        if ((i1 < 2) or (i1 > 4)) and ((j1 < 2) or (j1 > 4)) then Continue;
-								        xy.X := (MPoint.X) -3 + i1;
-								        xy.Y := (MPoint.Y) -3 + j1;
-
-								        if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
-								        tn := SetSkillUnit(tm, ID, xy, Tick, $46, 10, tl.Data1[MUseLV] * 1000);
-                        tn.CType := 4;
-								        tn.CData := tc;
-					              tn.MSkill := MSkill;
-								        tn.MUseLV := MUseLV;
-						        	end;
-						        end;
-
-						end else begin
-              SendSkillError(tc, 8); //No Blue Gemstone
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				79:     {Magnus Exorcism}
-					begin
-            j := SearchCInventory(tc, 717, false);
-						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
-
-              if NoJamstone = False then UseItem(tc, j); //Function Call to Use item
-              for j1 := 1 to 7 do begin
-                for i1 := 1 to 7 do begin
-								  if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
-								  xy.X := (MPoint.X) -4 + i1;
-								  xy.Y := (MPoint.Y) -4 + j1;
-								  if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
-                  tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], (4+MUseLV)*1000);
-                  tn.Tick := Tick + ((4+MUseLV) * 1000); //tl.Data1[MUseLV];
-								  tn.CData := tc;
-					        tn.MSkill := MSkill;
-								  tn.MUseLV := MUseLV;
-                end;
-              end;
-
-              tc.MTick := Tick + 4000;  // Cast delay 4s
-
-						end else begin  //Doesn't have Gemstone
-              SendSkillError(tc, 8); //No Blue Gemstone
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				80:     {Fire Pillar}
-					begin
-          	                                j := SearchCInventory(tc, 717, false);
-						if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
-							//Function Call to use item
-                                                        if NoJamstone = False then UseItem(tc, j);
-							xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $87, MUseLV, 30000, tc);
-                                                        tn.MSkill := MSkill;
-                                                        tn.MUseLV := MUseLV;
-						end else begin
-              SendSkillError(tc, 8); //No Blue Gemstone
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-
-                                83:     {Meteor}
-					begin
-                                                //Cast Point
-                                                xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-
-                                                //Place the Effect
-						tn := SetSkillUnit(tm, ID, xy, Tick, $88, 0, 3000, tc);
-
-			                        tn.MSkill := MSkill;
-			                        tn.MUseLV := MUseLV;
-
-                                                for i := 1 to Skill[83].Data.Data2[MUseLV] do begin;
-                                                        WFIFOW( 0, $0117);
-			                                WFIFOW( 2, MSkill);
-			                                WFIFOL( 4, ID);
-			                                WFIFOW( 8, MUseLV);
-			                                WFIFOW(10, (MPoint.X - 4 + Random(12)));
-			                                WFIFOW(12, (MPoint.Y - 4 + Random(12)));
-			                                WFIFOL(14, 1);
-			                                SendBCmd(tm, xy, 18);
-                                                end;
-					end;
-
-                                85:     {Lord of Vermillion}
-					begin
-                                                //Cast Point
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-
-                                                //Create Graphics and Set NPC
-						tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
-
-			                        tn.MSkill := MSkill;
-			                        tn.MUseLV := MUseLV;
-					end;
-
-        404: // Fog Wall
-					begin
-						xy.X := MPoint.X - Point.X;
-						xy.Y := MPoint.Y - Point.Y;
-						if Abs(xy.X) > Abs(xy.Y) * 3 then begin
-
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
-
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-
-						SetLength(bb, 1);
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						bb[0] := 2;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-    				DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						bb[0] := 6;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-					end;
-
-        405: // Spider Web
-					begin
-						xy.X := MPoint.X - Point.X;
-						xy.Y := MPoint.Y - Point.Y;
-						if Abs(xy.X) > Abs(xy.Y) * 3 then begin
-
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
-
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-
-						SetLength(bb, 1);
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						bb[0] := 2;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-    				DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						bb[0] := 6;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-					end;
-          
-				87:     {Ice Wall}
-					begin
-						xy.X := MPoint.X - Point.X;
-						xy.Y := MPoint.Y - Point.Y;
-						if Abs(xy.X) > Abs(xy.Y) * 3 then begin
-
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
-
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-						//DebugOut.Lines.Add(Format('IceWall: (%d,%d) %d', [xy.X, xy.Y, b]));
-            {Colus, 20031219: Extended IW to 5 tiles,
-                              Removed stair-step pattern on diagonal IWs,
-                              Made duration dependent on skill level.
-                              TODO:
-                              1) Why does center tile last 1s longer on level 1 IW?
-                                 - Tested, it's all on same tick--may be client prob?
-                              2) Make IWs damageable (change mode?)
-                                 Durability based on level (floor(500, 200+(level*200)))
-                                 Durability based on time (decay over time, rate = ?)
-                              3) Find push-back and remove it (related to 2?)
-            }
-
-						SetLength(bb, 1);
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-//						SetLength(bb, 1);
-
-						bb[0] := 2;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-    				DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						bb[0] := 6;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-						tn.CData := tc;
-						tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-{           Colus, 20031219: Removed stair-step pattern for diagonal IWs
-						if (b mod 2) <> 0 then begin
-							//ŽÎ‚ßŒü‚«
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 3;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+					if NoJamstone = False then UseItem(tc, j); //Function Call to Use item
+					for j1 := 1 to 7 do begin
+						for i1 := 1 to 7 do begin
+							if ((i1 < 3) or (i1 > 5)) and ((j1 < 3) or (j1 > 5)) then Continue;
+							xy.X := (MPoint.X) -4 + i1;
+							xy.Y := (MPoint.Y) -4 + j1;
+							if (xy.X < 0) or (xy.X >= tm.Size.X) or (xy.Y < 0) or (xy.Y >= tm.Size.Y) then Continue;
+							tn := SetSkillUnit(tm, ID, xy, Tick, $84, tl.Data2[MUseLV], (4+MUseLV)*1000);
+							tn.Tick := Tick + ((4+MUseLV) * 1000); //tl.Data1[MUseLV];
 							tn.CData := tc;
 							tn.MSkill := MSkill;
 							tn.MUseLV := MUseLV;
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 5;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
-							tn.CData := tc;
-							tn.MSkill := MSkill;
-							tn.MUseLV := MUseLV;
-						end;
-            Colus, 20031219: End IW modifications}
+						end;//for i1
+					end;//for j1
+					tc.MTick := Tick + 4000;  // Cast delay 4s
+
+				end else begin  //Doesn't have Gemstone
+					SendSkillError(tc, 8); //No Blue Gemstone
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		80:     {Fire Pillar}
+			begin
+				j := SearchCInventory(tc, 717, False);
+				if ((j <> 0) AND (tc.Item[j].Amount >= 1)) OR (NoJamstone) then begin
+					//Function Call to use item
+					if NOT NoJamstone then UseItem(tc, j);
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $87, MUseLV, 30000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end else begin
+					SendSkillError(tc, 8); //No Blue Gemstone
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		83:     {Meteor}
+			begin
+				//Cast Point
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+
+				//Place the Effect
+				tn := SetSkillUnit(tm, ID, xy, Tick, $88, 0, 3000, tc);
+
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				for i := 1 to Skill[83].Data.Data2[MUseLV] do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (MPoint.X - 4 + Random(12)));
+					WFIFOW(12, (MPoint.Y - 4 + Random(12)));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+			end;
+
+		85:     {Lord of Vermillion}
+			begin
+				//Cast Point
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+
+				//Create Graphics and Set NPC
+				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+			end;
+
+		404: // Fog Wall
+			begin
+				xy.X := MPoint.X - Point.X;
+				xy.Y := MPoint.Y - Point.Y;
+				if Abs(xy.X) > Abs(xy.Y) * 3 then begin
+
+					if xy.X > 0 then b := 6 else b := 2;
+				end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
+					if xy.Y > 0 then b := 0 else b := 4;
+				end else begin
+					if xy.X > 0 then begin
+						if xy.Y > 0 then b := 7 else b := 5;
+					end else begin
+						if xy.Y > 0 then b := 1 else b := 3;
 					end;
+				end;
 
+				SetLength(bb, 1);
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
 
-                                89:     {Storm Gust}
-                                        begin
-					        xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
-			                        tn.MSkill := MSkill;
-			                        tn.MUseLV := MUseLV;
+				bb[0] := 2;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				bb[0] := 6;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b6, tl.Data2[MUseLV], 20000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+			end;
+		405: // Spider Web
+			begin
+				xy.X := MPoint.X - Point.X;
+				xy.Y := MPoint.Y - Point.Y;
+				if Abs(xy.X) > Abs(xy.Y) * 3 then begin
+					if xy.X > 0 then b := 6 else b := 2;
+				end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
+					if xy.Y > 0 then b := 0 else b := 4;
+				end else begin
+					if xy.X > 0 then begin
+						if xy.Y > 0 then b := 7 else b := 5;
+					end else begin
+						if xy.Y > 0 then b := 1 else b := 3;
 					end;
-        140: //venom dust
-         begin
-         j := SearchCInventory(tc, 716, false);
-					 if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
-						 if NoJamstone = False then UseItem(tc, j);
-  					 xy.X := (tc.Point.X);
-  					 xy.Y := (tc.Point.Y) + 1;
-             WFIFOW( 0, $0117);
-             WFIFOW( 2, MSkill);
-             WFIFOL( 4, ID);
-             WFIFOW( 8, MUseLV);
-             WFIFOW(10, xy.X);
-             WFIFOW(12, xy.Y);
-             WFIFOL(14, 1);
-             SendBCmd(tm, xy, 18);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
-	      		tn.MSkill := MSkill;
-      			tn.MUseLV := MUseLV;
-            xy.X := (tc.Point.X) + 1;
-						xy.Y := (tc.Point.Y);
-             WFIFOW( 0, $0117);
-             WFIFOW( 2, MSkill);
-             WFIFOL( 4, ID);
-             WFIFOW( 8, MUseLV);
-             WFIFOW(10, xy.X);
-             WFIFOW(12, xy.Y);
-             WFIFOL(14, 1);
-             SendBCmd(tm, xy, 18);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
-	      		tn.MSkill := MSkill;
-      			tn.MUseLV := MUseLV;
-            xy.X := (tc.Point.X) - 1;
-						xy.Y := (tc.Point.Y);
-             WFIFOW( 0, $0117);
-             WFIFOW( 2, MSkill);
-             WFIFOL( 4, ID);
-             WFIFOW( 8, MUseLV);
-             WFIFOW(10, xy.X);
-             WFIFOW(12, xy.Y);
-             WFIFOL(14, 1);
-             SendBCmd(tm, xy, 18);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
-	      		tn.MSkill := MSkill;
-      			tn.MUseLV := MUseLV;
-            xy.X := (tc.Point.X);
-						xy.Y := (tc.Point.Y) - 1;
-             WFIFOW( 0, $0117);
-             WFIFOW( 2, MSkill);
-             WFIFOL( 4, ID);
-             WFIFOW( 8, MUseLV);
-             WFIFOW(10, xy.X);
-             WFIFOW(12, xy.Y);
-             WFIFOL(14, 1);
-             SendBCmd(tm, xy, 18);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
-	      		tn.MSkill := MSkill;
-      			tn.MUseLV := MUseLV;
-						end else begin
-              SendSkillError(tc, 7); //No Red Gemstone
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-         end;
-            92:     {Quagmire}
-            begin
-					    xy.X := MPoint.X;
-						  xy.Y := MPoint.Y;
-                for i := 0 to 8 do begin;
-                  MPoint.Y := - 4 + MPoint.Y + i;
-                  MPoint.X := - 4 + MPoint.X + i;
-                  tn := SetSkillUnit(tm, ID, xy, Tick, $89, 0, MUseLv*5000,tc);
-                end;
-
-			          tn.MSkill := MSkill;
-			          tn.MUseLV := MUseLV;
-
-                for i := 0 to 4 do begin;
-                  WFIFOW( 0, $0117);
-			            WFIFOW( 2, MSkill);
-			            WFIFOL( 4, ID);
-			            WFIFOW( 8, MUseLV);
-			            WFIFOW(10, (-2 + MPoint.X + i));
-			            WFIFOW(12, (MPoint.Y));
-			            WFIFOL(14, 1);
-			            SendBCmd(tm, xy, 18);
-                end;
-
-                for i := 0 to 4 do begin;
-                  WFIFOW( 0, $0117);
-			            WFIFOW( 2, MSkill);
-			            WFIFOL( 4, ID);
-			            WFIFOW( 8, MUseLV);
-			            WFIFOW(10, (-2 + MPoint.X + i));
-			            WFIFOW(12, (MPoint.Y - 2));
-			            WFIFOL(14, 1);
-			            SendBCmd(tm, xy, 18);
-                end;
-
-                for i := 0 to 4 do begin;
-                  WFIFOW( 0, $0117);
-			            WFIFOW( 2, MSkill);
-			            WFIFOL( 4, ID);
-			            WFIFOW( 8, MUseLV);
-			            WFIFOW(10, (-2 + MPoint.X + i));
-			            WFIFOW(12, (MPoint.Y - 1));
-			            WFIFOL(14, 1);
-			            SendBCmd(tm, xy, 18);
-                 end;
-
-                 for i := 0 to 4 do begin;
-                  WFIFOW( 0, $0117);
-			            WFIFOW( 2, MSkill);
-			            WFIFOL( 4, ID);
-			            WFIFOW( 8, MUseLV);
-			            WFIFOW(10, (-2 + MPoint.X + i));
-			            WFIFOW(12, (MPoint.Y + 1));
-			            WFIFOL(14, 1);
-			            SendBCmd(tm, xy, 18);
-                 end;
-
-                 for i := 0 to 4 do begin;
-                   WFIFOW( 0, $0117);
-			             WFIFOW( 2, MSkill);
-			             WFIFOL( 4, ID);
-			             WFIFOW( 8, MUseLV);
-			             WFIFOW(10, (-2 + MPoint.X + i));
-			             WFIFOW(12, (MPoint.Y + 2));
-			             WFIFOL(14, 1);
-			             SendBCmd(tm, xy, 18);
-                  end;
-                                                
-
-					end;
-
-                                110:    {Hammer Fall}
-                                        if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
-                                                //Cast Point
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-
-                                                //Create Graphics and Set NPC
-                                                tn := SetSkillUnit(tm, ID, xy, Tick, $6E, 0, 3000, tc);
-                                                tn.MSkill := MSkill;
-                                                tn.MUseLV := MUseLV;
-
-                                        end else begin
-                                          SendSkillError(tc, 6); // Wrong weapon
-                                                tc.MMode := 4;
-                                                tc.MPoint.X := 0;
-                                                tc.MPoint.Y := 0;
-                                                exit;
-                                        end;
-                                        264:
-                                        begin
-
-                                         if tc.spiritSpheres <> 0 then begin
-                                                //Cast Point
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-
-                                                tn := SetSkillUnit(tm, ID, xy, Tick, $2E, 0, 3000, tc);
-
-                                                tn.MSkill := MSkill;
-                                                tn.MUseLV := MUseLV;
-                                                tc.spiritSpheres := tc.spiritSpheres - 1;
-                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
-
-                                                // Colus, 20040225: This is not done yet.
-                                                // This will move the player to the right spot, but it does not
-                                                // check to make sure the target can be reached.  If you try to jump
-                                                // through a wall/cliff, you will be stuck until you dash to a tile
-                                                // you could move to validly.  HOWEVER, this will correctly update your
-                                                // position now.
-                                                        if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
-                                                                with tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist do begin
-                                                                        assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
-                                                                        Delete(IndexOf(tc.ID));
-                                                                end;
-                                                                tm.Block[xy.X div 8][xy.Y div 8].Clist.AddObject(tc.ID, tc);
-                                                        end;
-                                                        tc.pcnt := 0;
-                                                tc.Point := xy;
-                                                UpdatePlayerLocation(tm, tc);
-                                          end else begin
-                                                tc.MMode := 4;
-                                                tc.MPoint.X := 0;
-                                                tc.MPoint.Y := 0;
-                                                exit;
-                                         end;
-                                        end;
-
-				115:    {Skid Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                        UseItem(tc, j);  //Use Item Function Call
-
-                                                        //Cast point
-                                                        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-                                                        //Graphical Effects and placing NPC
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $90, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-			                                tn.MSkill := MSkill;
-                                                        tn.MUseLV := MUseLV;
-
-						end else begin
-
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				116:    {Land Mine}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                        UseItem(tc, j); //Use Item Function Call
-
-                                                        //Set Cast point
-                                                        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-                                                        //Graphical Effects and placing NPC
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $93, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-			                                tn.MSkill := MSkill;
-                                                        tn.MUseLV := MUseLV;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				117:    {Ankle Snare Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							UseItem(tc, j); //Use Item Function Call
-
-                                                        //Cast Point
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $91, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-			                                tn.MSkill := MSkill;
-						        tn.MUseLV := MUseLV;
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-
-	                        118:    {Shock Wave Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							UseItem(tc, j); //Use Item Function Call
-
-                                                        //Cast Point
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-                                                        
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $94, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-			                                tn.MSkill := MSkill;
-						        tn.MUseLV := MUseLV;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-
-				119:    {Sandman Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							UseItem(tc, j); //Use Item Function Call
-
-                                                        //Cast Point
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $95, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-						        tn.MSkill := MSkill;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				120:    {Flasher Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $96, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-						        tn.MSkill := MSkill;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-
-
-				121:    {Freezing Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-							UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $97, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-						        tn.MSkill := MSkill;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-				122:    {Blast Mine}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                        UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $8f, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-						        tn.MSkill := MSkill;
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-                               // 264:    {Body Relocation}
-                                 {      begin
-                                                if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
-                                                        WFIFOW( 0, $011a);
-                                                        WFIFOW( 2, tc.MSkill);
-                                                        WFIFOW( 4, dmg[0]);
-                                                        WFIFOL( 6, tc.ID);
-                                                        WFIFOL(10, tc.ID);
-                                                        WFIFOB(14, 1);
-                                                        SendBCmd(tm,tc.Point,15);
-
-                                                        SendCLeave(tc, 2);
-                                                        tc.tmpMap := tc.Map;
-                                                        tc.Point.X := tc.MPoint.X;
-                                                        tc.Point.Y := tc.MPoint.Y;
-                                                        MapMove(Socket, tc.Map, tc.Point);
-                                                        tc.SP := tc.SP - tl.SP[tc.MUseLV];
-                                                        MMode := 4;
-                                                        Exit;
-                                                end else begin
-                                                        tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-                                                end;
-                                        end;}
-
-				123:    {Claymore Trap}
-					begin
-                                                j := SearchCInventory(tc, 1065, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                        UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $98, MUseLV, tl.Data2[MUseLV] * 1000, tc);
-						        tn.MSkill := MSkill;
-
-						end else begin
-							tc.MMode := 4;
-							tc.MPoint.X := 0;
-							tc.MPoint.Y := 0;
-							Exit;
-						end;
-					end;
-        130:
-          begin
-            xy.X := tc.MPoint.X;
-            xy.Y := tc.MPoint.Y;
-            i1 := abs(tc.Point.X - xy.X);
-            j1 := abs(tc.Point.Y - xy.Y);
-            i := (1 + (2 * tc.Skill[130].Lv));
-
-            if (tc.Option and 16 <> 0) and (i1 <= i) and (j1 <= i) then begin
-
-						sl.Clear;
-
-						for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
-							for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
-								for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-									if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue;
-                  ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-									if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
-                    sl.AddObject(IntToStr(ts1.ID),ts1);
-								end;
-							end;
-						end;
-
-						if sl.Count <> 0 then begin
-							for k1 := 0 to sl.Count - 1 do begin
-								ts1 := sl.Objects[k1] as TMob;
-                if (ts1.Hidden = true) then begin
-                  ts1.Hidden := false;
-                  WFIFOW(0, $0119);
-    					    WFIFOL(2, ts1.ID);
-    					    WFIFOW(6, 0);
-    					    WFIFOW(8, 0);
-    					    WFIFOW(10, 0);
-    					    WFIFOB(12, 0);
-    					    SendBCmd(tm, ts1.Point, 13);
-
-                end;
-							end;
-						end;
-          end else begin
-          SendSkillError(tc, 0);
-          tc.MMode := 4;
-          Exit;
-          end;
-          end;
-                                229:    {Demonstration}
-					begin
-                                                j := SearchCInventory(tc, 7135, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-                                                        UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X - Point.X;
-						        xy.Y := MPoint.Y - Point.Y;
-
-						if abs(xy.X) > abs(xy.Y) * 3 then begin
-
-							if xy.X > 0 then b := 6 else b := 2;
-						end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-
-							if xy.Y > 0 then b := 0 else b := 4;
-						end else begin
-							if xy.X > 0 then begin
-								if xy.Y > 0 then b := 7 else b := 5;
-							end else begin
-								if xy.Y > 0 then b := 1 else b := 3;
-							end;
-						end;
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-						tn.CData := tc;
-			                        tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-						SetLength(bb, 1);
-						bb[0] := 2;
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-						tn.CData := tc;
-			                        tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-						xy.X := MPoint.X;
-						xy.Y := MPoint.Y;
-						bb[0] := 6;
-						DirMove(tm, xy, b, bb);
-						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-						tn.CData := tc;
-
-                                                WFIFOW( 0, $011f);
-	                                        WFIFOL( 2, tn.ID);
-	                                        WFIFOL( 6, ID);
-	                                        WFIFOW(10, tn.Point.X);
-	                                        WFIFOW(12, tn.Point.Y);
-	                                        WFIFOB(14, $b1);
-	                                        WFIFOB(15, 1);
-	                                        SendBCmd(tm, tn.Point, 16);
-
-			                        tn.MSkill := MSkill;
-						tn.MUseLV := MUseLV;
-						if (b mod 2) <> 0 then begin
-							//ŽÎ‚ßŒü‚«
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 3;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-							tn.CData := tc;
-				                        tn.MSkill := MSkill;
-							tn.MUseLV := MUseLV;
-							xy.X := MPoint.X;
-							xy.Y := MPoint.Y;
-							bb[0] := 5;
-							DirMove(tm, xy, b, bb);
-							tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-							tn.CData := tc;
-				                        tn.MSkill := 83;
-							tn.MUseLV := MUseLV;
-						end;
-                                                end else begin
-						        tc.MMode := 4;
-						        tc.MPoint.X := 0;
-						        tc.MPoint.Y := 0;
-						        Exit;
-					        end;
-					end;
-
-                                {230:    {Acid Terror}
-				 {	begin
-                                                j := SearchCInventory(tc, 7136, false);
-						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                        UseItem(tc, j); //Use Item Function Call
-
-						        xy.X := MPoint.X - Point.X;
-						        xy.Y := MPoint.Y - Point.Y;
-						        if abs(xy.X) > abs(xy.Y) * 3 then begin
-
-							        if xy.X > 0 then b := 6 else b := 2;
-						        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
-
-							        if xy.Y > 0 then b := 0 else b := 4;
-						        end else begin
-							        if xy.X > 0 then begin
-								        if xy.Y > 0 then b := 7 else b := 5;
-							        end else begin
-								        if xy.Y > 0 then b := 1 else b := 3;
-							        end;
-						        end;
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-						        tn.CData := tc;
-			                                tn.MSkill := MSkill;
-						        tn.MUseLV := MUseLV;
-						        SetLength(bb, 1);
-						        bb[0] := 2;
-						        DirMove(tm, xy, b, bb);
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-						        tn.CData := tc;
-			                                tn.MSkill := MSkill;
-						        tn.MUseLV := MUseLV;
-						        xy.X := MPoint.X;
-						        xy.Y := MPoint.Y;
-						        bb[0] := 6;
-						        DirMove(tm, xy, b, bb);
-						        tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
-						        tn.CData := tc;
-
-                                                        for i := - 2 to 2 do begin
-                                                                WFIFOW( 0, $011f);
-	                                                        WFIFOL( 2, tn.ID);
-	                                                        WFIFOL( 6, ID);
-	                                                        WFIFOW(10, tn.Point.X + i);
-	                                                        WFIFOW(12, tn.Point.Y + i);
-	                                                        WFIFOB(14, $8e);
-	                                                        WFIFOB(15, 1);
-	                                                        SendBCmd(tm, tn.Point, 16);
-                                                        end;
-
-			                                tn.MSkill := MSkill;
-						        tn.MUseLV := MUseLV;
-					        	if (b mod 2) <> 0 then begin
-
-							        xy.X := MPoint.X;
-							        xy.Y := MPoint.Y;
-							        bb[0] := 3;
-							        DirMove(tm, xy, b, bb);
-							        tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-							        tn.CData := tc;
-				                                tn.MSkill := MSkill;
-							        tn.MUseLV := MUseLV;
-							        xy.X := MPoint.X;
-							        xy.Y := MPoint.Y;
-							        bb[0] := 5;
-							        DirMove(tm, xy, b, bb);
-							        tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
-							        tn.CData := tc;
-				                                tn.MSkill := 83;
-							        tn.MUseLV := MUseLV;
-						        end;
-                                                end else begin
-						        tc.MMode := 4;
-						        tc.MPoint.X := 0;
-						        tc.MPoint.Y := 0;
-						        Exit;
-					        end;
-					end;}
-
-                                        233:    {Marine Sphere}
-                                                begin
-                                                        j := SearchCInventory(tc, 7138, false);
-					        	if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                                UseItem(tc, j); //Use Item Function Call
-
-						                xy.X := MPoint.X;
-						                xy.Y := MPoint.Y;
-						                tn := SetSkillUnit(tm, ID, xy, Tick, $E9, MUseLV, tl.Data1[MUseLV] * 1000, tc);
-						                tn.MSkill := MSkill;
-                                                                ts1 := TMob.Create;
-                                                                with ts1 do begin
-                                                                        Point.X := tc.MPoint.X;
-                                                                        Point.Y := tc.MPoint.Y;
-                                                                        ts1.ID := 1142;
-                                                                        Name := 'Marine Sphere';
-                                                                        ts1.JID := 1142;
-						                        Data := MobDB.IndexOfObject(ts1.JID) as TMobDB;
-
-                                                                        ZeroMemory(@buf[0], 41);
-						                        WFIFOW( 0, $007c);
-						                        WFIFOL( 2, ID);
-						                        WFIFOW( 6, 1000);
-						                        WFIFOW( 8, Stat1);
-						                        WFIFOW(10, Stat2);
-						                        WFIFOW(20, JID);
-						                        WFIFOM1(36, Point, Dir);
-						                        SendBCmd(tm,Point,41,nil,true);
-                                                                end;
-						        end else begin
-							        tc.MMode := 4;
-							        tc.MPoint.X := 0;
-							        tc.MPoint.Y := 0;
-							        Exit;
-                                                        end;
-						end;
-                                        232:    {Cannabalize (Flora)}
-                                                begin
-                                                        j := SearchCInventory(tc, 7137, false);
-					        	if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-
-                                                                UseItem(tc, j); //Use Item Function Call
-
-						                xy.X := MPoint.X;
-						                xy.Y := MPoint.Y;
-						                tn := SetSkillUnit(tm, ID, xy, Tick, $F1, MUseLV, tl.Data1[MUseLV] * 1000, tc);
-						                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                                ts1 := TMob.Create;
-                                                                //SetSkillUnit(tm, ID, xy, Tick, 1118, MUseLV, tl.Data1[MUseLV], tc);
-                                                                with ts1 do begin
-                                                                        Point.X := tc.MPoint.X;
-                                                                        Point.Y := tc.MPoint.Y;
-                                                                        ts1.ID := 1118;
-                                                                        Name := 'Flora';
-                                                                        ts1.JID := 1118;
-						                        Data := MobDB.IndexOfObject(ts1.JID) as TMobDB;
-
-                                                                        ZeroMemory(@buf[0], 41);
-						                        WFIFOW( 0, $007c);
-						                        WFIFOL( 2, ID);
-						                        WFIFOW( 6, 1000);
-						                        WFIFOW( 8, Stat1);
-						                        WFIFOW(10, Stat2);
-						                        WFIFOW(20, JID);
-						                        WFIFOM1(36, Point, Dir);
-						                        SendBCmd(tm,Point,41,nil,true);
-                                                                end;
-						        end else begin
-							        tc.MMode := 4;
-							        tc.MPoint.X := 0;
-							        tc.MPoint.Y := 0;
-							        Exit;
-                                                        end;
-						end;
-
-
-                                        285:    {Volcano}
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                        for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $9a, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
-                                        end;
-                                             369:    //gospel
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                for j1 := 1 to 9 do begin
-                                                        for i1 := 1 to 9 do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $b3, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
-                                        end;
-                                           362:    // Basilica
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                {for j1 := 1 to 9 do begin
-                                                        for i1 := 1 to 9 do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;}
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $b4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                {        end;
-                                                end;}
-                                        end;
-
-                                        286:    {Deluge}
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                for j1 := 1 to (tc.Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                        for i1 := 1 to (tc.Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $9b, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
-                                        end;
-
-                                        287:    {Violent Gale}
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                        for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $9c, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
-                                        end;
-
-                                          288:    //Land protector
-                                        begin
-                                                xy.X := MPoint.X;
-                                                xy.Y := MPoint.Y;
-                                                for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                        for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
-                                                                xy.X := (tc.MPoint.X) - 5 + i1;
-                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
-
-                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $9d, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-
-                                                                tn.MSkill := MSkill;
-                                                                tn.MUseLV := MUseLV;
-                                                        end;
-                                                end;
-                                        end;
-                                        306,307,308,309,310,311,312,313,315,316,317,319,320,321,322,325,
-                                                327,328,329,330:
-                                        begin
-                                                xy.X := tc.Point.X;
-                                                xy.Y := tc.Point.Y;
-                                                tc.LastSong := MSkill;
-                                                tc.LastSongLV := MUseLV;
-                                                j1 := 1;
-                                                i1 := 1;
-                                                for j1 := 1 to 9 do begin
-                                                  for i1 := 1 to 9 do begin
-                                                     //if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) or ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
-                                                     if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) and ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
-                                                        //if (j1 = 2 or 4 or 6 or 8) or (i1 = 2 or 4 or 6 or 8) then continue;
-                                                        //if (i1 = 2 or 4 or 6 or 8) then xy.X := (tc.Point.X) - 5 + i1;
-                                                        //if (j1 = 2 or 4 or 6 or 8) then xy.Y := (tc.Point.Y) - 5 + j1;
-                                                        xy.X := (tc.Point.X) - 5 + i1;
-                                                        xy.Y := (tc.Point.Y) - 5 + j1;
-                                                        case MSkill of
-
-                                                                306:	{Lullaby}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $9e, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                307:    {Richman Kim}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $9f, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                308:    {Eternal Chaos}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a0, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                309:    {Drum Battle Field}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a1, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                310:    {Ring of Neblium}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a2, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                311:    {Rock is Well}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a3, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                312:    {Into Abyss}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                313:    {Siegfried}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a5, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                317:    {Dissonance}
-                                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $a6, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                319:    {Whistle}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $a7, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                320:    {Assassain Cross}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $a8, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                321:    {Poem of Bragi}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $a9, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                322:    {Apple of Idun}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $aa, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                325:    {Ugly Dance}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $ab, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                327:    {Humming}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $ac, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                328:    {Don't Forget Me}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $ad, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                329:    {Fortune Kiss}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $ae, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                                330:    {Service for You}
-						                        tn := SetSkillUnit(tm, ID, xy, Tick, $af, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                        end;
-                                                        //tn.CType := 4;
-                                                        //tn.CData := tc;
-                                                        tn.MSkill := MSkill;
-                                                        tn.MUseLV := MUseLV;
-                                                        tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
-                                                        //i1 := i1 + 2;
-                                                        //1 := j1 + 2;
-
-                                                     end;
-                                                  end;
-						                                  end;
-                                              WFIFOW( 0, $011a);
-						                                  WFIFOW( 2, MSkill);
-						                                  WFIFOW( 4, dmg[0]);
-						                                  WFIFOL( 6, tc.ID);
-						                                  WFIFOL(10, ID);
-						                                  WFIFOB(14, 1);
-						                                  SendBCmd(tm, tc.Point, 15);
-
-                                        end;
-
-                                        314:    {Ragnarok}
-                                                begin
-                                                        xy.X := tc.Point.X;
-                                                        xy.Y := tc.Point.Y;
-                                                        tc.LastSong := MSkill;
-                                                        tc.LastSongLV := MUseLV;
-                                                        tn := SetSkillUnit(tm, ID, xy, Tick, $49, 0, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
-                                                        tn.MSkill := MSkill;
-                                                        tn.MUseLV := MUseLV;
-                                                        tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
-                                                end;
-
-
-				else
-
-					begin
-						tc.MMode := 4;
-						tc.MPoint.X := 0;
-						tc.MPoint.Y := 0;
-						Exit;
-					end;
-
+				end;
+				SetLength(bb, 1);
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				bb[0] := 2;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				bb[0] := 6;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b7, tl.Data2[MUseLV], 8000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
 
 			end;
-                        
-			WFIFOW( 0, $0117);
-			WFIFOW( 2, MSkill);
-			WFIFOL( 4, ID);
-			WFIFOW( 8, MUseLV);
-			WFIFOW(10, MPoint.X);
-			WFIFOW(12, MPoint.Y);
-			WFIFOL(14, 1);
-			SendBCmd(tm, xy, 18);
-	end;
+		87:     {Ice Wall}
+			begin
+				xy.X := MPoint.X - Point.X;
+				xy.Y := MPoint.Y - Point.Y;
+				if Abs(xy.X) > Abs(xy.Y) * 3 then begin
+
+					if xy.X > 0 then b := 6 else b := 2;
+				end else if Abs(xy.Y) > Abs(xy.X) * 3 then begin
+
+					if xy.Y > 0 then b := 0 else b := 4;
+				end else begin
+					if xy.X > 0 then begin
+						if xy.Y > 0 then b := 7 else b := 5;
+					end else begin
+						if xy.Y > 0 then b := 1 else b := 3;
+					end;
+				end;
+				//DebugOut.Lines.Add(Format('IceWall: (%d,%d) %d', [xy.X, xy.Y, b]));
+				{Colus, 20031219: Extended IW to 5 tiles,
+				Removed stair-step pattern on diagonal IWs,
+				Made duration dependent on skill level.
+				TODO:
+				1) Why does center tile last 1s longer on level 1 IW?
+					 - Tested, it's all on same tick--may be client prob?
+				2) Make IWs damageable (change mode?)
+					 Durability based on level (floor(500, 200+(level*200)))
+					 Durability based on time (decay over time, rate = ?)
+				3) Find push-back and remove it (related to 2?)
+				}
+
+				SetLength(bb, 1);
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				//SetLength(bb, 1);
+
+				bb[0] := 2;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+				tn.CData  := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				bb[0] := 6;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+				tn.CData := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				DirMove(tm, xy, b, bb);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+				tn.CData := tc;
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				{Colus, 20031219: Removed stair-step pattern for diagonal IWs
+				if (b mod 2) <> 0 then begin
+					//ŽÎ‚ßŒü‚«
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					bb[0] := 3;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					bb[0] := 5;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $8d, tl.Data2[MUseLV], MUseLV * 5000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end;
+				Colus, 20031219: End IW modifications}
+			end;
+
+		89:     {Storm Gust}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+			end;
+		140: //venom dust
+			begin
+				j := SearchCInventory(tc, 716, false);
+				if ((j <> 0) and (tc.Item[j].Amount >= 1)) or (NoJamstone = True) then begin
+					if NoJamstone = False then UseItem(tc, j);
+					xy.X := (tc.Point.X);
+					xy.Y := (tc.Point.Y) + 1;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, xy.X);
+					WFIFOW(12, xy.Y);
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := (tc.Point.X) + 1;
+					xy.Y := (tc.Point.Y);
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, xy.X);
+					WFIFOW(12, xy.Y);
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := (tc.Point.X) - 1;
+					xy.Y := (tc.Point.Y);
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, xy.X);
+					WFIFOW(12, xy.Y);
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := (tc.Point.X);
+					xy.Y := (tc.Point.Y) - 1;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, xy.X);
+					WFIFOW(12, xy.Y);
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $92, 0, tl.Data1[MUseLv] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end else begin
+					SendSkillError(tc, 7); //No Red Gemstone
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		92:     {Quagmire}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for i := 0 to 8 do begin;
+					MPoint.Y := - 4 + MPoint.Y + i;
+					MPoint.X := - 4 + MPoint.X + i;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $89, 0, MUseLv*5000,tc);
+				end;
+
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+
+				for i := 0 to 4 do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (-2 + MPoint.X + i));
+					WFIFOW(12, (MPoint.Y));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+
+				for i := 0 to 4 do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (-2 + MPoint.X + i));
+					WFIFOW(12, (MPoint.Y - 2));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+
+				for i := 0 to 4 do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (-2 + MPoint.X + i));
+					WFIFOW(12, (MPoint.Y - 1));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+
+				for i := 0 to 4 do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (-2 + MPoint.X + i));
+					WFIFOW(12, (MPoint.Y + 1));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+
+				for i := 0 to 4 do begin;
+					WFIFOW( 0, $0117);
+					WFIFOW( 2, MSkill);
+					WFIFOL( 4, ID);
+					WFIFOW( 8, MUseLV);
+					WFIFOW(10, (-2 + MPoint.X + i));
+					WFIFOW(12, (MPoint.Y + 2));
+					WFIFOL(14, 1);
+					SendBCmd(tm, xy, 18);
+				end;
+
+			end;
+
+		110:    {Hammer Fall}
+			if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
+				//Cast Point
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+
+				//Create Graphics and Set NPC
+				tn := SetSkillUnit(tm, ID, xy, Tick, $6E, 0, 3000, tc);
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+			end else begin
+				SendSkillError(tc, 6); // Wrong weapon
+				tc.MMode := 4;
+				tc.MPoint.X := 0;
+				tc.MPoint.Y := 0;
+				sl.Free;
+				Exit;//safe 2004/04/26
+			end;
+		264:
+			begin
+				if tc.spiritSpheres <> 0 then begin
+					//Cast Point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $2E, 0, 3000, tc);
+
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					tc.spiritSpheres := tc.spiritSpheres - 1;
+					UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+
+					// Colus, 20040225: This is not done yet.
+					// This will move the player to the right spot, but it does not
+					// check to make sure the target can be reached.  If you try to jump
+					// through a wall/cliff, you will be stuck until you dash to a tile
+					// you could move to validly.  HOWEVER, this will correctly update your
+					// position now.
+					if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
+						with tm.Block[tc.Point.X div 8][tc.Point.Y div 8].Clist do begin
+							Assert(IndexOf(tc.ID) <> -1, 'Player Delete Error');
+							Delete(IndexOf(tc.ID));
+						end;
+						tm.Block[xy.X div 8][xy.Y div 8].Clist.AddObject(tc.ID, tc);
+					end;
+					tc.pcnt := 0;
+					tc.Point := xy;
+					UpdatePlayerLocation(tm, tc);
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+
+		115:    {Skid Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j);  //Use Item Function Call
+
+					//Cast point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					//Graphical Effects and placing NPC
+					tn := SetSkillUnit(tm, ID, xy, Tick, $90, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end else begin
+
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		116:    {Land Mine}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					//Set Cast point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					//Graphical Effects and placing NPC
+					tn := SetSkillUnit(tm, ID, xy, Tick, $93, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					Exit;
+				end;
+			end;
+		117:    {Ankle Snare Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					//Cast Point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $91, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+
+		118:    {Shock Wave Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					//Cast Point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $94, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+
+		119:    {Sandman Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					//Cast Point
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $95, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					Exit;
+				end;
+			end;
+		120:    {Flasher Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $96, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		121:    {Freezing Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $97, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		122:    {Blast Mine}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+
+					tn := SetSkillUnit(tm, ID, xy, Tick, $8f, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					Exit;
+				end;
+			end;
+		//264:    {Body Relocation}
+			{begin
+				if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
+					WFIFOW( 0, $011a);
+					WFIFOW( 2, tc.MSkill);
+					WFIFOW( 4, dmg[0]);
+					WFIFOL( 6, tc.ID);
+					WFIFOL(10, tc.ID);
+					WFIFOB(14, 1);
+					SendBCmd(tm,tc.Point,15);
+
+					SendCLeave(tc, 2);
+					tc.tmpMap := tc.Map;
+					tc.Point.X := tc.MPoint.X;
+					tc.Point.Y := tc.MPoint.Y;
+					MapMove(Socket, tc.Map, tc.Point);
+					tc.SP := tc.SP - tl.SP[tc.MUseLV];
+					MMode := 4;
+					sl.Free;//CR - added just in case this is uncommented later!
+					Exit;//safe 2004/04/26
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;//CR - added just in case this is uncommented later!
+					Exit;//safe 2004/04/26
+				end;
+			end;}
+
+		123:    {Claymore Trap}
+			begin
+				j := SearchCInventory(tc, 1065, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $98, MUseLV, tl.Data2[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		130:
+			begin
+				xy.X := tc.MPoint.X;
+				xy.Y := tc.MPoint.Y;
+				i1 := abs(tc.Point.X - xy.X);
+				j1 := abs(tc.Point.Y - xy.Y);
+				i := (1 + (2 * tc.Skill[130].Lv));
+
+				if (tc.Option and 16 <> 0) and (i1 <= i) and (j1 <= i) then begin
+
+					sl.Clear;
+
+					for j1 := (xy.Y - tl.Range2) div 8 to (xy.Y + tl.Range2) div 8 do begin
+						for i1 := (xy.X - tl.Range2) div 8 to (xy.X + tl.Range2) div 8 do begin
+							for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+								if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue;
+								ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if (abs(ts1.Point.X - xy.X) <= tl.Range2) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+									sl.AddObject(IntToStr(ts1.ID),ts1);
+							end;
+						end;
+					end;
+
+					if sl.Count <> 0 then begin
+						for k1 := 0 to sl.Count - 1 do begin
+							ts1 := sl.Objects[k1] as TMob;
+							if (ts1.Hidden = true) then begin
+								ts1.Hidden := false;
+								WFIFOW(0, $0119);
+								WFIFOL(2, ts1.ID);
+								WFIFOW(6, 0);
+								WFIFOW(8, 0);
+								WFIFOW(10, 0);
+								WFIFOB(12, 0);
+								SendBCmd(tm, ts1.Point, 13);
+							end;
+						end;
+					end;
+				end else begin
+					SendSkillError(tc, 0);
+					tc.MMode := 4;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		229:    {Demonstration}
+			begin
+				j := SearchCInventory(tc, 7135, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X - Point.X;
+					xy.Y := MPoint.Y - Point.Y;
+
+					if abs(xy.X) > abs(xy.Y) * 3 then begin
+						if xy.X > 0 then b := 6 else b := 2;
+					end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+						if xy.Y > 0 then b := 0 else b := 4;
+					end else begin
+						if xy.X > 0 then begin
+							if xy.Y > 0 then b := 7 else b := 5;
+						end else begin
+							if xy.Y > 0 then b := 1 else b := 3;
+						end;
+					end;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+					tn.CData  := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					SetLength(bb, 1);
+					bb[0] := 2;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+					tn.CData  := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					bb[0] := 6;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+					tn.CData := tc;
+
+					WFIFOW( 0, $011f);
+					WFIFOL( 2, tn.ID);
+					WFIFOL( 6, ID);
+					WFIFOW(10, tn.Point.X);
+					WFIFOW(12, tn.Point.Y);
+					WFIFOB(14, $b1);
+					WFIFOB(15, 1);
+					SendBCmd(tm, tn.Point, 16);
+
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					if (b mod 2) <> 0 then begin
+						//ŽÎ‚ßŒü‚«
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 3;
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 5;
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+						tn.CData := tc;
+															tn.MSkill := 83;
+						tn.MUseLV := MUseLV;
+					end;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+
+		{230:    {Acid Terror}
+			{begin
+				j := SearchCInventory(tc, 7136, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X - Point.X;
+					xy.Y := MPoint.Y - Point.Y;
+					if abs(xy.X) > abs(xy.Y) * 3 then begin
+						if xy.X > 0 then b := 6 else b := 2;
+					end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+						if xy.Y > 0 then b := 0 else b := 4;
+					end else begin
+						if xy.X > 0 then begin
+							if xy.Y > 0 then b := 7 else b := 5;
+						end else begin
+							if xy.Y > 0 then b := 1 else b := 3;
+						end;
+					end;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					SetLength(bb, 1);
+					bb[0] := 2;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+					tn.CData := tc;
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					bb[0] := 6;
+					DirMove(tm, xy, b, bb);
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data2[MUseLV], tl.Data2[MUseLV] * 1000);
+					tn.CData := tc;
+
+					for i := - 2 to 2 do begin
+						WFIFOW( 0, $011f);
+						WFIFOL( 2, tn.ID);
+						WFIFOL( 6, ID);
+						WFIFOW(10, tn.Point.X + i);
+						WFIFOW(12, tn.Point.Y + i);
+						WFIFOB(14, $8e);
+						WFIFOB(15, 1);
+						SendBCmd(tm, tn.Point, 16);
+					end;
+
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					if (b mod 2) <> 0 then begin
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 3;
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+						tn.CData := tc;
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+						xy.X := MPoint.X;
+						xy.Y := MPoint.Y;
+						bb[0] := 5;
+						DirMove(tm, xy, b, bb);
+						tn := SetSkillUnit(tm, ID, xy, Tick, $E5, tl.Data1[MUseLV], tl.Data1[MUseLV] * 1000);
+						tn.CData := tc;
+						tn.MSkill := 83;
+						tn.MUseLV := MUseLV;
+					end;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;//CR - just in case it's uncommented
+					Exit;//safe 2004/04/26
+				end;
+			end;}
+
+		233:    {Marine Sphere}
+			begin
+				j := SearchCInventory(tc, 7138, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $E9, MUseLV, tl.Data1[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					ts1 := TMob.Create;
+					with ts1 do begin
+						Point.X := tc.MPoint.X;
+						Point.Y := tc.MPoint.Y;
+						ts1.ID := 1142;
+						Name := 'Marine Sphere';
+						ts1.JID := 1142;
+						Data := MobDB.IndexOfObject(ts1.JID) as TMobDB;
+
+						ZeroMemory(@buf[0], 41);
+						WFIFOW( 0, $007c);
+						WFIFOL( 2, ID);
+						WFIFOW( 6, 1000);
+						WFIFOW( 8, Stat1);
+						WFIFOW(10, Stat2);
+						WFIFOW(20, JID);
+						WFIFOM1(36, Point, Dir);
+						SendBCmd(tm,Point,41,nil,true);
+					end;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+		232:    {Cannabalize (Flora)}
+			begin
+				j := SearchCInventory(tc, 7137, false);
+				if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+					UseItem(tc, j); //Use Item Function Call
+
+					xy.X := MPoint.X;
+					xy.Y := MPoint.Y;
+					tn := SetSkillUnit(tm, ID, xy, Tick, $F1, MUseLV, tl.Data1[MUseLV] * 1000, tc);
+					tn.MSkill := MSkill;
+					tn.MUseLV := MUseLV;
+					ts1 := TMob.Create;
+					//SetSkillUnit(tm, ID, xy, Tick, 1118, MUseLV, tl.Data1[MUseLV], tc);
+					with ts1 do begin
+						Point.X := tc.MPoint.X;
+						Point.Y := tc.MPoint.Y;
+						ts1.ID := 1118;
+						Name := 'Flora';
+						ts1.JID := 1118;
+						Data := MobDB.IndexOfObject(ts1.JID) as TMobDB;
+
+						ZeroMemory(@buf[0], 41);
+						WFIFOW( 0, $007c);
+						WFIFOL( 2, ID);
+						WFIFOW( 6, 1000);
+						WFIFOW( 8, Stat1);
+						WFIFOW(10, Stat2);
+						WFIFOW(20, JID);
+						WFIFOM1(36, Point, Dir);
+						SendBCmd(tm,Point,41,nil,true);
+					end;
+				end else begin
+					tc.MMode := 4;
+					tc.MPoint.X := 0;
+					tc.MPoint.Y := 0;
+					sl.Free;
+					Exit;//safe 2004/04/26
+				end;
+			end;
+
+		285:    {Volcano}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+					for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+						tn := SetSkillUnit(tm, ID, xy, Tick, $9a, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+					end;
+				end;
+			end;
+		369:    //gospel
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for j1 := 1 to 9 do begin
+					for i1 := 1 to 9 do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+						tn := SetSkillUnit(tm, ID, xy, Tick, $b3, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+					end;
+				end;
+			end;
+		362:    // Basilica
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				{for j1 := 1 to 9 do begin
+					for i1 := 1 to 9 do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;}
+
+				tn := SetSkillUnit(tm, ID, xy, Tick, $b4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				{	end;
+				end;}
+			end;
+
+		286:    {Deluge}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for j1 := 1 to (tc.Skill[288].Data.Data2[MUseLV] - 2) do begin
+					for i1 := 1 to (tc.Skill[288].Data.Data2[MUseLV] - 2) do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+						tn := SetSkillUnit(tm, ID, xy, Tick, $9b, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+					end;
+				end;
+			end;
+
+		287:    {Violent Gale}
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+					for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+						tn := SetSkillUnit(tm, ID, xy, Tick, $9c, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+					end;
+				end;
+			end;
+
+		288:    //Land protector
+			begin
+				xy.X := MPoint.X;
+				xy.Y := MPoint.Y;
+				for j1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+					for i1 := 1 to (Skill[288].Data.Data2[MUseLV] - 2) do begin
+						xy.X := (tc.MPoint.X) - 5 + i1;
+						xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+						tn := SetSkillUnit(tm, ID, xy, Tick, $9d, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+						tn.MSkill := MSkill;
+						tn.MUseLV := MUseLV;
+					end;
+				end;
+			end;
+		306,307,308,309,310,311,312,313,315,316,317,319,320,321,322,325,
+		327,328,329,330:
+			begin
+				xy.X := tc.Point.X;
+				xy.Y := tc.Point.Y;
+				tc.LastSong := MSkill;
+				tc.LastSongLV := MUseLV;
+				j1 := 1;
+				i1 := 1;
+				for j1 := 1 to 9 do begin
+					for i1 := 1 to 9 do begin
+						//if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) or ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
+						if ((i1 = 2) or (i1 = 4) or  (i1 = 6) or (i1 = 8)) and ((j1 = 2) or (j1 = 4) or  (j1 = 6) or (j1 = 8)) then begin
+							//if (j1 = 2 or 4 or 6 or 8) or (i1 = 2 or 4 or 6 or 8) then continue;
+							//if (i1 = 2 or 4 or 6 or 8) then xy.X := (tc.Point.X) - 5 + i1;
+							//if (j1 = 2 or 4 or 6 or 8) then xy.Y := (tc.Point.Y) - 5 + j1;
+							xy.X := (tc.Point.X) - 5 + i1;
+							xy.Y := (tc.Point.Y) - 5 + j1;
+							case MSkill of
+							306:	{Lullaby}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $9e, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							307:    {Richman Kim}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $9f, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							308:    {Eternal Chaos}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a0, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							309:    {Drum Battle Field}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a1, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							310:    {Ring of Neblium}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a2, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							311:    {Rock is Well}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a3, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							312:    {Into Abyss}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							313:    {Siegfried}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a5, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+							317:    {Dissonance}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a6, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+							319:    {Whistle}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a7, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							320:    {Assassain Cross}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a8, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							321:    {Poem of Bragi}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $a9, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							322:    {Apple of Idun}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $aa, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							325:    {Ugly Dance}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $ab, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							327:    {Humming}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $ac, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							328:    {Don't Forget Me}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $ad, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							329:    {Fortune Kiss}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $ae, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							330:    {Service for You}
+								tn := SetSkillUnit(tm, ID, xy, Tick, $af, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+							end;//case
+							//tn.CType := 4;
+							//tn.CData := tc;
+							tn.MSkill := MSkill;
+							tn.MUseLV := MUseLV;
+							tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
+							//i1 := i1 + 2;
+							//1 := j1 + 2;
+
+						 end;
+					end;
+				end;
+				WFIFOW( 0, $011a);
+				WFIFOW( 2, MSkill);
+				WFIFOW( 4, dmg[0]);
+				WFIFOL( 6, tc.ID);
+				WFIFOL(10, ID);
+				WFIFOB(14, 1);
+				SendBCmd(tm, tc.Point, 15);
+
+			end;
+
+		314:    {Ragnarok}
+			begin
+				xy.X := tc.Point.X;
+				xy.Y := tc.Point.Y;
+				tc.LastSong := MSkill;
+				tc.LastSongLV := MUseLV;
+				tn := SetSkillUnit(tm, ID, xy, Tick, $49, 0, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+				tn.MSkill := MSkill;
+				tn.MUseLV := MUseLV;
+				tc.SongTick := Tick + Cardinal(tc.Skill[MSkill].Data.Data1[MUseLV] * 1000);
+			end;
+		else
+			begin
+				tc.MMode  := 4;
+				tc.MPoint.X := 0;
+				tc.MPoint.Y := 0;
+				sl.Free;
+				Exit;//safe 204/04/26
+			end;
+
+		end;//case
+
+		WFIFOW( 0, $0117);
+		WFIFOW( 2, MSkill);
+		WFIFOL( 4, ID);
+		WFIFOW( 8, MUseLV);
+		WFIFOW(10, MPoint.X);
+		WFIFOW(12, MPoint.Y);
+		WFIFOL(14, 1);
+		SendBCmd(tm, xy, 18);
+	end;//with
 	sl.Free;
 	tc.MPoint.X := 0;
 	tc.MPoint.Y := 0;
-end;
+end;//proc TfrmMain.CreateField()
+
+
 //------------------------------------------------------------------------------
 procedure TfrmMain.SkillEffect(tc:TChara; Tick:Cardinal);
 var
 	j,k,m,b         :Integer;
-  l               :integer;
+	l               :integer;
 	i1,j1,k1        :integer;
 	tm              :TMap;
-  mi              :MapTbl;
+	mi              :MapTbl;
 	tc1             :TChara;
-  tc2             :TChara;
+	tc2             :TChara;
 	ts              :TMob;
 	ts1             :TMob;
   td              :TItemDB;
