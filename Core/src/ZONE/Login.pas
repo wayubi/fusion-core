@@ -45,15 +45,19 @@ procedure sv1PacketProcessSub(Socket: TCustomWinSocket;w :word;userid:string;use
 var
     tp: TPlayer;
     count: integer;
+    h: integer;
 begin
     tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
+    h := IDTableDB.IndexOf(tp.ID);
 
-    if (NowUsers >= Option_MaxUsers) then begin
-        ZeroMemory(@buf[0],23);
-        WFIFOW( 0, $006a);
-        WFIFOB( 2, 7);
-        Socket.SendBuf(buf, 23);
-    end else
+    if (h = -1) then begin
+        if (NowUsers >= Option_MaxUsers) then begin
+            ZeroMemory(@buf[0],23);
+            WFIFOW( 0, $006a);
+            WFIFOB( 2, 7);
+            Socket.SendBuf(buf, 23);
+        end else
+    end;
 
     if (tp.Banned = 1) then begin
         ZeroMemory(@buf[0],23);
