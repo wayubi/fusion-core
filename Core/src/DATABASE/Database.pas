@@ -461,49 +461,53 @@ begin
 	debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Map data loading...');
 	Application.ProcessMessages;
 
-	if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
-		repeat
-			CreateDir('map\tmpFiles');
-			afm_compressed := tzip.create(afm_compressed);
-			afm_compressed.Filename := AppPath+'map\'+sr.Name;
-			afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
-			afm_compressed.Extract;
 
-			sr.Name := StringReplace(sr.Name, '.af2', '.out',
-				[rfReplaceAll, rfIgnoreCase]);
+    if FileExists(AppPath + 'UnzDll.dll') then begin
 
-			assignfile(afm,AppPath + 'map\tmpFiles\' + sr.Name);
-			Reset(afm);
+	    if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
+	    	repeat
+    			CreateDir('map\tmpFiles');
+			    afm_compressed := tzip.create(afm_compressed);
+		    	afm_compressed.Filename := AppPath+'map\'+sr.Name;
+	    		afm_compressed.ExtractPath := AppPath+'map\tmpFiles';
+    			afm_compressed.Extract;
 
-			ReadLn(afm,str);
-			if (str <> 'ADVANCED FUSION MAP') then begin
-				MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
-				Application.Terminate;
-				exit;
-			end;
+	    		sr.Name := StringReplace(sr.Name, '.af2', '.out',
+    				[rfReplaceAll, rfIgnoreCase]);
 
-			ReadLn(afm,str);
-			ReadLn(afm,xy.X,xy.Y);
-			CloseFile(afm);
+	    		assignfile(afm,AppPath + 'map\tmpFiles\' + sr.Name);
+    			Reset(afm);
 
-			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
-				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
-				Application.Terminate;
-				exit;
-			end;
-			//txtDebug.Lines.Add(Format('MapData: %s [%dx%d]', [sr.Name, xy.X, xy.Y]));
-			//Application.ProcessMessages;
-			ta := TMapList.Create;
-			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
-			ta.Ext := 'af2';
-			ta.Size := xy;
-			ta.Mode := 0;
-			MapList.AddObject(ta.Name, ta);
+	    		ReadLn(afm,str);
+    			if (str <> 'ADVANCED FUSION MAP') then begin
+			    	MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
+		    		Application.Terminate;
+	    			exit;
+    			end;
 
-		until FindNext(sr) <> 0;
-		FindClose(sr);
-		afm_compressed.Free;
-	end;
+		    	ReadLn(afm,str);
+	    		ReadLn(afm,xy.X,xy.Y);
+    			CloseFile(afm);
+
+    			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
+			    	MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'Fusion', MB_OK or MB_ICONSTOP);
+		    		Application.Terminate;
+	    			exit;
+    			end;
+			    //txtDebug.Lines.Add(Format('MapData: %s [%dx%d]', [sr.Name, xy.X, xy.Y]));
+		    	//Application.ProcessMessages;
+	    		ta := TMapList.Create;
+    			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
+			    ta.Ext := 'af2';
+		    	ta.Size := xy;
+	    		ta.Mode := 0;
+    			MapList.AddObject(ta.Name, ta);
+
+		    until FindNext(sr) <> 0;
+	    	FindClose(sr);
+    		afm_compressed.Free;
+	    end;
+    end;
 
 	if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
 		repeat
