@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 11-26-04: Fixed PVP Disconnect calculation problems. [AlexKreuz]
 - 11-26-04: Re-enabled PVP. Minor cleanup. [AlexKreuz]
 - 11-26-04: Cleaned up JCon Characters tab. [AlexKreuz]
 - 11-22-04: Added reseteventmob. [Tsusai]

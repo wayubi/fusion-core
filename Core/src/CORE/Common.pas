@@ -1738,7 +1738,7 @@ Option_Font_Style : string;
 		procedure CalcLvUP(tc1:TChara; EXP:cardinal; JEXP:cardinal);
 
         {PvP rank calculation}
-        procedure CalcPvPRank(tm:TMap);
+        procedure CalcPvPRank(tm : TMap; tc : TChara = nil);
 
 		procedure SendCGetItem(tc:TChara; Index:word; Amount:word);
 		procedure SendCStat(tc:TChara; View:boolean = false);
@@ -4325,7 +4325,7 @@ begin
         { Alex: You can not activate calculations that require a CList if you're
           activating the calculations after you've already deleted the CList.
           Use common sense. }
-        if mi.PvP then CalcPvPRank(tm);
+        if mi.PvP then CalcPvPRank(tm, tc);
 
 		tm.CList.Delete(tm.Clist.IndexOf(tc.ID));
 		with tm.Block[tc.Point.X div 8][tc.Point.Y div 8] do begin
@@ -6070,7 +6070,7 @@ begin
 	end;
 end;
 
-procedure CalcPvPRank(tm:Tmap);
+procedure CalcPvPRank(tm : Tmap; tc : TChara = nil);
 var
     tc1 : TChara;
     Scores : TStringList;
@@ -6127,6 +6127,9 @@ begin
 
         if not assigned(tm.CList.Objects[i]) then Continue;
         tc1 := tm.CList.Objects[i] as TChara;
+
+        if (tc1 = tc) then Continue;
+
         WFIFOW( 0, $0199);
         WFIFOW( 2, 1);
         tc1.Socket.SendBuf(buf, 4);
