@@ -324,7 +324,9 @@ type TMob = class
   NPCID       :Cardinal; //取り巻き用
 {NPCイベント追加}
 	Event       :cardinal;
-        isCasting   :boolean;
+  isCasting   :boolean;
+  Stolen      :cardinal;
+
 {NPCイベント追加ココまで}
 	constructor Create;
 	destructor Destroy; override;
