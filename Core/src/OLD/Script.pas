@@ -1853,10 +1853,77 @@ begin
                 DebugOut.Lines.Add('Need to call the NPC ' + tn1.Name + ' and goto label ' + tn.Script[tc.ScriptStep].Data1[1]);
                 //tc.ScriptStep := tn1.Script[tc.ScriptStep].Data3[0];
             end;
-            
+
             Inc(tc.ScriptStep);
         end;
+        72: //percentheal
+        {   usage: percentheal HPpercent,SPpercent;
+            the percent of healing is based upon total HP and SP }
+                begin
+                    Inc(tc.HP, tn.Script[tc.ScriptStep].Data3[0]);
+                    //Healing
+                    j := tc.MAXHP * tn.Script[tc.ScriptStep].Data3[0] div 100;
+                    tc.HP := tc.HP + j;
+                    if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
+                    //SP Increasing
+					Inc(tc.SP, tn.Script[tc.ScriptStep].Data3[1]);
+                    i := tc.MAXSP * tn.Script[tc.ScriptStep].Data3[1] div 100;
+                    tc.SP := tc.SP + i;
+					if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+					//パケ送信
+					WFIFOW( 0, $011a);
+					WFIFOW( 2, 28);
+					WFIFOW( 4, j);
+					WFIFOL( 6, tc.ID);
+					WFIFOL(10, tn.ID);
+					WFIFOB(14, 1);
+					SendBCmd(tc.MData, tn.Point, 15);
+					{
+					WFIFOW( 0, $013d);
+					WFIFOW( 2, $0007);
+					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
+					tc.Socket.SendBuf(buf, 6);
+					}
+					SendCStat1(tc, 0, 5, tc.HP);
+					SendCStat1(tc, 0, 7, tc.SP);
 
+					Inc(tc.ScriptStep);
+				end;
+
+        73: //percentheal2
+        {   usage: percentheal2 HPpercent,SPpercent;
+            the percent of healing is based upon
+            the difference of MAX and remaining HP and SP }
+                begin
+                    Inc(tc.HP, tn.Script[tc.ScriptStep].Data3[0]);
+                    //Healing
+                    j := (tc.MAXHP - tc.HP) * tn.Script[tc.ScriptStep].Data3[0] div 100;
+                    tc.HP := tc.HP + j;
+                    if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
+                    //SP Increasing
+					Inc(tc.SP, tn.Script[tc.ScriptStep].Data3[1]);
+                    i := (tc.MAXSP - tc.SP) * tn.Script[tc.ScriptStep].Data3[1] div 100;
+                    tc.SP := tc.SP + i;
+					if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
+					//パケ送信
+					WFIFOW( 0, $011a);
+					WFIFOW( 2, 28);
+					WFIFOW( 4, j);
+					WFIFOL( 6, tc.ID);
+					WFIFOL(10, tn.ID);
+					WFIFOB(14, 1);
+					SendBCmd(tc.MData, tn.Point, 15);
+					{
+					WFIFOW( 0, $013d);
+					WFIFOW( 2, $0007);
+					WFIFOW( 4, tn.Script[tc.ScriptStep].Data3[1]);
+					tc.Socket.SendBuf(buf, 6);
+					}
+					SendCStat1(tc, 0, 5, tc.HP);
+					SendCStat1(tc, 0, 7, tc.SP);
+
+					Inc(tc.ScriptStep);
+				end;
 
 
 			end;
