@@ -174,7 +174,7 @@ Begin
         the reason being that one skill function should
         be used for both types of targets.
         - Placed here after all declarations for safety. }
-        parse_skills(tc, Tick);
+        parse_skills(tc, Tick, 0);
 
 		if MTargetType = 0 then begin //Target is a monster
 			ts := tc.AData;
@@ -3083,11 +3083,6 @@ Begin
 					end;
 				end;
 
-				8: //ƒCƒ“ƒfƒ…ƒA
-					begin
-						tc1 := tc;
-						ProcessType := 2;
-					end;
 				10,24: {Ruwatch, Sight}
 					begin
 						if (MSkill = 10) then Option := Option or 1 else Option := Option or $2000;

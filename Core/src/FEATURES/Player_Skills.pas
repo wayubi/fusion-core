@@ -9,12 +9,12 @@ var
 	SKILL_TYPE : Byte;
     {
     	1: Process Effect
-        2: Process Skill Attack
+        3: Process Skill Attack
     }
 
-    procedure parse_skills(tc : TChara; Tick : Cardinal; passive : boolean = false);
+    procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
 
-    procedure process_effect(tc : TChara; success : Integer);
+    procedure process_effect(tc : TChara; success : Integer; Tick : Cardinal);
     procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
     procedure process_skill_splash_attack(tc : TChara; j : Integer; Tick : Cardinal);
 
@@ -25,7 +25,8 @@ var
     function skill_hp_recovery(tc : TChara; Tick : Cardinal) : Integer;
     function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
 	function skill_provoke(tc : TChara) : Integer;
-    function skill_magnum_break(tc : TChara; Tick : Cardinal) : Integer;
+    function skill_magnum_break() : Integer;
+    function skill_endure() : Integer;
 
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
 
@@ -34,13 +35,13 @@ implementation
 uses
 	Main, Skills;
 
-	procedure parse_skills(tc : TChara; Tick : Cardinal; passive : boolean = false);
+	procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
     var
     	success : Integer;
     begin
     	SKILL_TYPE := 0;
 
-        if (tc.HP <= 0) then passive := False;
+        if ( (effect = 1) and (tc.HP <= 0) ) then effect := -1;
 
         {
         	tc.Skill[x].LV must be used for effect skills that have no target.
@@ -48,13 +49,14 @@ uses
             tc.Skill[x].LV must be used for passive skills. Also, passive must be true.
         }
 
-        { 2} if (tc.Skill[2].Lv <> 0) then success := skill_sword_mastery(tc);
-		{ 3} if (tc.Skill[3].Lv <> 0) then success := skill_two_handed_sword_mastery(tc);
-        { 4} if (tc.Skill[4].Lv <> 0) and (passive) then success := skill_hp_recovery(tc, Tick);
-        { 5} if (tc.MSkill = 5) then success := skill_bash(tc, Tick);
-        { 6} if (tc.MSkill = 6) then success := skill_provoke(tc);
-        { 7} if (tc.MSkill = 7) then success := skill_magnum_break(tc, Tick);
-        {46} if (tc.MSkill = 46) then success := skill_double_strafe(tc, Tick);
+        { 2} if (tc.Skill[2].Lv <> 0) and (effect = 2) then success := skill_sword_mastery(tc);
+		{ 3} if (tc.Skill[3].Lv <> 0) and (effect = 2) then success := skill_two_handed_sword_mastery(tc);
+        { 4} if (tc.Skill[4].Lv <> 0) and (effect = 1) then success := skill_hp_recovery(tc, Tick);
+        { 5} if (tc.MSkill = 5) and (effect = 0) then success := skill_bash(tc, Tick);
+        { 6} if (tc.MSkill = 6) and (effect = 0) then success := skill_provoke(tc);
+        { 7} if (tc.MSkill = 7) and (effect = 0) then success := skill_magnum_break();
+        { 8} if (tc.MSkill = 8) and (effect = 0) then success := skill_endure();
+        {46} if (tc.MSkill = 46) and (effect = 0) then success := skill_double_strafe(tc, Tick);
 
         {
 	        Process_Effect Success Codes:
@@ -72,9 +74,10 @@ uses
         }
 
         case SKILL_TYPE of
-        	1: process_effect(tc, success);
-            2: process_skill_attack(tc, success, Tick);
-            3: process_skill_splash_attack(tc, success, Tick);
+        	1: process_effect(tc, success, Tick);
+            2: process_effect(tc, success, Tick);
+            3: process_skill_attack(tc, success, Tick);
+            4: process_skill_splash_attack(tc, success, Tick);
         end;
 
         if ( (SKILL_TYPE = 1) and (success = -1) ) or (SKILL_TYPE = 2) or (SKILL_TYPE = 3) then begin
@@ -84,13 +87,15 @@ uses
         SKILL_TYPE := 0;
 	end;
 
-	procedure process_effect(tc : TChara; success : Integer);
+	procedure process_effect(tc : TChara; success : Integer; Tick : Cardinal);
     var
     	tm : TMap;
         tc1 : TChara;
         ts : TMob;
+        tl : TSkillDB;
     begin
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        tl := tc.Skill[tc.MSkill].Data;
 
         if (success = -1) then begin
 	    	WFIFOW( 0, $011a);
@@ -114,16 +119,31 @@ uses
             	SKILL_TYPE := 0;
                 Exit;
             end;
-            
         	SendBCmd(tm, ts.Point, 15);
         end else begin
             tc1 := tc.AData;
-            if (ts.HP <= 0) and (success = -1) then begin
+            if (tc1.HP <= 0) and (success = -1) then begin
             	SKILL_TYPE := 0;
             	Exit;
             end;
+            SendBCmd(tm, tc1.Point, 15);
+
+            if (SKILL_TYPE = 2) then begin
+	        	tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 1000;
+    	        tc1.Skill[tc.MSkill].EffectLV := tc.MUseLV;
+        	    tc1.Skill[tc.MSkill].Effect1 := tl.Data2[tc.MUseLV];
+	            if tc.SkillTick > tc1.Skill[tc.MSkill].Tick then begin
+            		tc.SkillTick := tc1.Skill[tc.MSkill].Tick;
+    	            tc.SkillTickID := tc.MSkill;
+        	    end;
+	            if tc.MSkill = 61 then tc1.Skill[tc.MSkill].Tick := Tick + cardinal(tl.Data1[tc.MUseLV]) * 110;
+    	        CalcStat(tc1, Tick);
+        	    //if ProcessType = 3 then SendCStat(tc1);
+            	if (tl.Icon <> 0) and (tl.Icon <> 107) then begin
+	            	UpdateIcon(tm, tc1, tl.Icon, 1);
+    	        end;
+            end;
             
-	        SendBCmd(tm, tc1.Point, 15);
         end;
     end;
 
@@ -328,7 +348,7 @@ uses
         tm : TMap;
         tl : TSkillDB;
     begin
-    	SKILL_TYPE := 2;
+    	SKILL_TYPE := 3;
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tl := tc.Skill[tc.MSkill].Data;
@@ -460,10 +480,24 @@ uses
     { - Skill ID Name: SM_MAGNUM ----------------------- }
     { - Skill ID: 7 ------------------------------------ }
     { -------------------------------------------------- }
-    function skill_magnum_break(tc : TChara; Tick : Cardinal) : Integer;
+    function skill_magnum_break() : Integer;
     begin
-    	SKILL_TYPE := 3;
+    	SKILL_TYPE := 4;
         Result := 1;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Swordsman --------------------------------- }
+    { - Job ID: 1 -------------------------------------- }
+    { - Skill Name: Endure ----------------------------- }
+    { - Skill ID Name: SM_ENDURE ----------------------- }
+    { - Skill ID: 8 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_endure() : Integer;
+    begin
+    	SKILL_TYPE := 2;
+        Result := -1;
     end;
 
 
@@ -481,7 +515,7 @@ uses
         tm : TMap;
         tl : TSkillDB;
     begin
-    	SKILL_TYPE := 2;
+    	SKILL_TYPE := 3;
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         tl := tc.Skill[tc.MSkill].Data;

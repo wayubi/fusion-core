@@ -2183,7 +2183,7 @@ begin
 
 	{ Alex: We need to move passive skills into PSS as well. This will be here
     temporarily to help the migration process. }
-	parse_skills(tc, Tick);
+	parse_skills(tc, Tick, 2);
 
 	with tc do begin
 		//C—û ATK[0][4]

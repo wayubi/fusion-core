@@ -5810,7 +5810,7 @@ begin
 
     	{ Alex: For passsive skills also. We want to
         place all skill effects into one area. }
-        parse_skills(tc, Tick, True);
+        parse_skills(tc, Tick, 1);
 
 	with tc do begin
 		//HPSP‰ñ•œˆ—
