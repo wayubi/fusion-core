@@ -505,6 +505,14 @@ begin
                         end;
                 end;
 
+                136:    {Sonic Blows}
+                begin
+                        MobSkillDamageCalc(tm, tc, ts, tsAI, Tick);
+                        if dmg[0] < 0 then dmg[0] := 0;
+                        dmg[0] := dmg[0] * 8;
+                        SendMSkillAttack(tm, tc, ts, tsAI, Tick, 8, i);
+                end;
+
                 148:    {Charge Arrow}
                 begin
 
@@ -1030,6 +1038,7 @@ end;
 procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
 
 begin
+//R 01de <skill ID>.w <src ID>.l <dst ID>.l <server tick>.l <src speed>.l <dst speed>.l <param1>.l <param2>.w <param3>.w <type>.B
         tc.HP := tc.HP - dmg[0];  //Subtract Damage
         WFIFOW( 0, $01de);
 	WFIFOW( 2, tsAI.Skill[i]);
@@ -1043,7 +1052,7 @@ begin
 	WFIFOL(24, dmg[0]);
 	WFIFOW(28, tsAI.SkillLV[i]);
 	WFIFOW(30, k);
-        WFIFOB(32, 6);
+        WFIFOB(32, 8);
 	//else               WFIFOB(32, 8);
 	//if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
 	SendBCmd(tm, tc.Point, 33);
