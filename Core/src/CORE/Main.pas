@@ -1907,26 +1907,13 @@ begin
 				              ts.isLooting := False;
 				              ts.ATick := Tick + aMotion;
                     end;
+                                        tc.MSkill := tc.Skill[279].Effect1;
 
-                    i := Skill[279].Effect1;
-                    if (i > 0) then j := Skill[i].Lv;
-                    // What level can you use?
-                    {case i of
-                      11:
-                        begin
-                        end;
-                      14,19,20,13:
-                        begin
-                        end;
-                      17:
-                        begin
-                        end;
-                      15:
-                        begin
-                        end;
-                    end;}
+                                        tc.MUseLV := tc.Skill[MSkill].Lv;
+
+                                        //tc.MSkill := tc.Skill[279].Effect1;
                                         {Basing On Level to determine able spells}
-                                        if Skill[279].Lv = 1 then i := 1;
+                                        {if Skill[279].Lv = 1 then i := 1;
                                         if Skill[279].Lv <= 4 then i := 2;
                                         if Skill[279].Lv <= 7 then i := 3;
                                         if Skill[279].Lv <= 9 then i := 4;
@@ -1941,16 +1928,16 @@ begin
                                         if i = 2 then i := Random(2) + 2;
 
                                         case i of
-                                                1:  tc.MSkill := 11;       {Napalm Beat}
-                                                2:  tc.MSkill := 14;       {Coldbolt}
-                                                3:  tc.MSkill := 19;       {Firebolt}
-                                                4:  tc.MSkill := 20;       {Lightning Bolt}
-                                                5:  tc.MSkill := 13;       {Soul Strike}
-                                                6:  tc.MSkill := 17;       {Fire Ball}
-                                                7:  tc.MSkill := 15;       {Frost Driver}
-                                        end;
+                                                1:  tc.MSkill := 11;       {Napalm Beat
+                                                2:  tc.MSkill := 14;       {Coldbolt
+                                                3:  tc.MSkill := 19;       {Firebolt
+                                                4:  tc.MSkill := 20;       {Lightning Bolt
+                                                5:  tc.MSkill := 13;       {Soul Strike
+                                                6:  tc.MSkill := 17;       {Fire Ball
+                                                7:  tc.MSkill := 15;       {Frost Driver
+                                        end;}
 
-                                        tc.MUseLV := Random(3) + 1;
+                                        //tc.MUseLV := tc.Skill[MSkill].Lv;
                                         DecSP(tc, MSkill, MUseLV);
                                         SkillEffect(tc, Tick);
                                         //DamageProcess1(tm, tc, ts, dmg[0] + dmg[1], Tick)
@@ -3541,12 +3528,12 @@ begin
                                 try
                                 if tc.Skill[279].Data.Data2[tc.Skill[279].Lv] >= Random(100) then begin
                                         tc.MTarget := tc.ATarget;
-                                                if tc1.HP = 0 then Exit;
-                                                tc.MTargetType := 0;
-			                        tc.AData := tc1;
-
+                                        if tc1.HP = 0 then Exit;
+                                        tc.MTargetType := 0;
+                                        tc.AData := tc1;
+                                        tc.MSkill := tc.Skill[279].Effect1;
                                         {Basing On Level to determine able spells}
-                                        if Skill[279].Lv = 1 then i := 1;
+                                        {if Skill[279].Lv = 1 then i := 1;
                                         if Skill[279].Lv <= 4 then i := 2;
                                         if Skill[279].Lv <= 7 then i := 3;
                                         if Skill[279].Lv <= 9 then i := 4;
@@ -3561,16 +3548,16 @@ begin
                                         if i = 2 then i := Random(2) + 2;
 
                                         case i of
-                                                1:  tc.MSkill := 11;       {Napalm Beat}
-                                                2:  tc.MSkill := 14;       {Coldbolt}
-                                                3:  tc.MSkill := 19;       {Firebolt}
-                                                4:  tc.MSkill := 20;       {Lightning Bolt}
-                                                5:  tc.MSkill := 13;       {Soul Strike}
-                                                6:  tc.MSkill := 17;       {Fire Ball}
-                                                7:  tc.MSkill := 15;       {Frost Driver}
-                                        end;
+                                                1:  tc.MSkill := 11;       {Napalm Beat
+                                                2:  tc.MSkill := 14;       {Coldbolt
+                                                3:  tc.MSkill := 19;       {Firebolt
+                                                4:  tc.MSkill := 20;       {Lightning Bolt
+                                                5:  tc.MSkill := 13;       {Soul Strike
+                                                6:  tc.MSkill := 17;       {Fire Ball
+                                                7:  tc.MSkill := 15;       {Frost Driver
+                                        end;}
 
-                                        tc.MUseLV := Random(3) + 1;
+                                        tc.MUseLV := tc.Skill[MSkill].Lv;
                                         DecSP(tc, MSkill, MUseLV);
                                         SkillEffect(tc, Tick);
                                 end;
