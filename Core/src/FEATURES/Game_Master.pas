@@ -186,6 +186,7 @@ var
     function command_athena_jumpto(tc : TChara; str : String) : String;
     function command_athena_where(tc : TChara; str : String) : String;
     function command_athena_rura(tc : TChara; str : String) : String;
+    function command_athena_warp(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -510,6 +511,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('jump')) = 'jump') and (check_level(tc.ID, GM_ATHENA_JUMP)) ) then error_msg := command_athena_jump(tc, str)
             else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_ATHENA_WHERE)) ) then error_msg := command_athena_where(tc, str)
             else if ( (copy(str, 1, length('rura')) = 'rura') and (check_level(tc.ID, GM_ATHENA_RURA)) ) then error_msg := command_athena_rura(tc, str)
+            else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -2979,6 +2981,38 @@ Called when we're shutting down the server *only*
         MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(i,j));
 
         Result := 'GM_ATHENA_RURA Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').';
+        sl.Free;
+    end;
+
+    function command_athena_warp(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k : Integer;
+        ta : TMapList;
+    begin
+        Result := 'GM_ATHENA_WARP Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        if sl.Count <> 3 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if k <> 0 then Exit;
+        Val(sl.Strings[2], j, k);
+
+        if k <> 0 then Exit;
+        if MapList.IndexOf(LowerCase(sl.Strings[0])) = -1 then Exit;
+
+        ta := MapList.Objects[MapList.IndexOf(LowerCase(sl.Strings[0]))] as TMapList;
+        if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then Exit;
+
+        if (tc.Hidden = false) then SendCLeave(tc, 2);
+        tc.tmpMap := LowerCase(sl.Strings[0]);
+        tc.Point := Point(i,j);
+        MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(i,j));
+
+        Result := 'GM_ATHENA_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').';
         sl.Free;
     end;
 
