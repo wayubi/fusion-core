@@ -1349,6 +1349,7 @@ begin
     fnl_lists(Map, nil);
     fnl_lists(MapInfo, nil);
     fnl_lists(MapList, nil);
+    fnl_lists(BanList, nil);
 
     FreeAndNil(SummonMobList);
     //---- The rest is the dirty shit commented out in case I need it ----//

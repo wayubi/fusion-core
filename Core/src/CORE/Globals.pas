@@ -177,6 +177,8 @@ uses
 
         Map := TStringList.Create;
         MapList := TStringList.Create;
+
+        BanList := TStringList.Create;
     end;
 
     { ---------------------------------------------------------------------- }

@@ -30,7 +30,7 @@ uses
 //==============================================================================
 // procedure sv1PacketProcessSub(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string);
 // パスワード確認→ログイン成功 処理
-//             
+//
 //==============================================================================
 // function sv1PacketProcessTo(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string):Boolean;
 // ログイン時にToplayer.txtを読み込み、データがあればplayer.txtに追加する、
@@ -41,7 +41,7 @@ uses
 // function sv1PacketProcessAdd(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string):Boolean;
 // ログイン時にaddplayer.txtを読み込み、データがあればplayer.txtに追加する、
 // トランザクションIDは自動でつけられる
-// 再起動は必要ない 
+// 再起動は必要ない
 // (普通のアカウントはこっちで追加)
 //
 
@@ -59,9 +59,13 @@ var{ChrstphrR - 2004/04/25 - removed unused variables}
     loggedIn  : boolean;
 	APlayer   : TPlayer;    //reference
 	PlayerIdx : Integer;
+    IPBanned  : boolean;
 begin
+    IPBanned := false;
 	if PlayerName.IndexOf(userid) > - 1 then begin
 		APlayer := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
+
+        APlayer.IP := Socket.RemoteAddress;
 
 		PlayerIdx := IDTableDB.IndexOf(APlayer.ID);
 
@@ -71,6 +75,16 @@ begin
 			WFIFOB( 2, 7);//Server is full.
 			Socket.SendBuf(buf, 23);
 		end;
+
+        for i := 0 to BanList.Count -1 do begin
+            if APlayer.IP = BanList.Strings[i] then begin
+                ZeroMemory(@buf[0],23);
+                WFIFOW( 0, $006a);
+			    WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
+			    Socket.SendBuf(buf, 23);
+		    end;
+        end;
+
 
 		if (APlayer.Banned = True) then begin
 			ZeroMemory(@buf[0],23);
@@ -97,7 +111,6 @@ begin
         end
 		else if APlayer.Pass = userpass then begin
 
-			APlayer.IP := Socket.RemoteAddress;
 			//APlayer.Login := 1;
 			APlayer.LoginID1 := Random($7FFFFFFF) + 1;
 			if UseSQL then APlayer.LoginID2 := Assign_AccountID()
@@ -155,7 +168,7 @@ var{ChrstphrR - 2004/04/25 - removed unused variables}
 begin
   Result := False;
     //DataSave();
-    tempList := TStringList.Create;  
+    tempList := TStringList.Create;
     tempList2 := TStringList.Create;
     if FileExists(AppPath + 'Toplayer.txt') then begin
            tempList.LoadFromFile(AppPath + 'Toplayer.txt');

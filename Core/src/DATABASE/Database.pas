@@ -1742,7 +1742,7 @@ var
 	i, j : integer;
 	txt : TextFile;
     str : String;
-	statusfile, svarfile  : TStringList;
+	statusfile, svarfile : TStringList;
 begin
 
     if not FileExists(AppPath + 'addplayer.txt') then begin
@@ -1824,7 +1824,6 @@ begin
         if FileExists(AppPath + 'servervariables.txt') then begin
             svarfile := TStringList.Create;
             svarfile.QuoteChar := '"';
-        	svarfile.Delimiter := ',';
             svarfile.Clear;
             svarfile.LoadFromFile(AppPath + 'servervariables.txt');
             for i := 0 to (svarfile.Count -1) do
@@ -1839,11 +1838,26 @@ begin
         //for i := 0 to (ServerFlag.Count -1) do
         //debugout.Lines.Add('Server flag: ' + ServerFlag.Strings[i]);
 
-        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** Total %d Server Variables loaded.', [ServerFlag.Count]));
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** %d Server Variables loaded.', [ServerFlag.Count]));
         Application.ProcessMessages;
     end;
 
     { -- Server Flags -- }
+
+    { -- Banned IPs -- }
+    if FileExists(AppPath + 'gamedata\BannedIPs.txt') then begin
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Loading Banned IP List...');
+        BanList.LoadFromFile(AppPath + 'gamedata\BannedIPs.txt');
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('*** %d Banned IPs Loaded', [BanList.Count]));
+    end else begin
+        debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Creating Banned IP List...');
+		AssignFile(txt, AppPath + 'gamedata\BannedIPs.txt');
+		Rewrite(txt);
+		CloseFile(txt);
+	end;
+
+
+
 
 	Application.ProcessMessages;
 end;
@@ -1874,11 +1888,13 @@ begin
         end;
     end;
     deletefile(AppPath + 'servervariables.txt');
-    datafile.SaveToFile(AppPath + 'gamedata\servervariables.txt');
+    datafile.SaveToFile(AppPath + 'servervariables.txt');
 
     FreeAndNil(datafile);
 
     { -- Server Flags -- }
+
+    BanList.SaveToFile(AppPath + 'gamedata\BannedIPs.txt');
 
 end;
 //------------------------------------------------------------------------------

@@ -1581,6 +1581,7 @@ var
 {NPCイベント追加}
 	ServerFlag :TStringList;
 	MapInfo    :TStringList;
+    BanList    :TStringList;
 {NPCイベント追加ココまで}
 {ギルド機能追加}
 	GuildList     :TIntList32;
