@@ -583,6 +583,9 @@ Begin(* Proc sv3PacketProcess() *)
 				if tc.AMode > 2 then continue;
 				if tc.MMode <> 0 then continue;
 
+                tc.Delay := 0;
+                tc.Skill[272].Tick := 0;
+
 				RFIFOB(6, b);
 				//DebugOut.Lines.Add('Inside Attack Command');
 				if (b = 0) or (b = 7) then begin
