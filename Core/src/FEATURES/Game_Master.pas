@@ -393,7 +393,7 @@ implementation
         GM_ATHENA_SEND := StrToIntDef(sl.Values['ATHENA_SEND'], 1);
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
-        GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_H'], 1);
+        GM_ATHENA_H := StrToIntDef(sl.Values['ATHENA_H'], 1);
         GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_HELP'], 1);
         GM_ATHENA_ZENY := StrToIntDef(sl.Values['ATHENA_ZENY'], 1);
         GM_ATHENA_BASELVLUP := StrToIntDef(sl.Values['ATHENA_BASELVLUP'], 1);
@@ -685,6 +685,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
             else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
             else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
+            else if ( (copy(str, 1, length('h')) = 'h') and (check_level(tc, GM_ATHENA_H)) ) then error_msg := command_athena_h(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc, str)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)

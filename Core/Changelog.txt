@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-30-04: Fixed GM athena commands "h" and "help". [Tsusai]
 - 12-30-04: JCon Character Zeny control now ranged [0-2147483647]. [AlexKreuz]
 - 12-30-04: Uncapped #ccolor. [Tsusai]
 - 12-29-04: Character disconnect map access issues. Using different map assign line. [AlexKreuz]
