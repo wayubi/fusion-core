@@ -1,3 +1,7 @@
+- 06-04-04: Fixed ALBGM for general users at access level 0. [AlexKreuz]
+- 06-04-04: Set default GM_SERVER level to access level 0. [AlexKreuz]
+- 06-04-04: Switched GM Command, #PVPOFF to ALBGM system. [AlexKreuz]
+- 06-04-04: Switched GM Command, #PVPON to ALBGM system. [AlexKreuz]
 - 06-04-04: Added RELEASE_VERSION constant for simplicity. [AlexKreuz]
 - 06-04-04: Switched GM Command, #SERVER to ALBGM system. [AlexKreuz]
 - 06-04-04: Switched GM Command, #UNICON to ALBGM system. [AlexKreuz]

@@ -142,6 +142,9 @@ var
     function command_icon(tc : TChara; str : String) : String;
     function command_unicon(tc : TChara; str : String) : String;
     function command_server() : String;
+    function command_pvpon(tc : TChara) : String;
+    function command_pvpoff(tc : TChara) : String;
+
 
 
 implementation
@@ -196,7 +199,7 @@ implementation
         GM_KICK := StrToIntDef(sl.Values['KICK'], 1);
         GM_ICON := StrToIntDef(sl.Values['ICON'], 1);
         GM_UNICON := StrToIntDef(sl.Values['UNICON'], 1);
-        GM_SERVER := StrToIntDef(sl.Values['SERVER'], 255);
+        GM_SERVER := StrToIntDef(sl.Values['SERVER'], 0);
         GM_PVPON := StrToIntDef(sl.Values['PVPON'], 1);
         GM_PVPOFF := StrToIntDef(sl.Values['PVPOFF'], 1);
         GM_GPVPON := StrToIntDef(sl.Values['GPVPON'], 1);
@@ -398,6 +401,8 @@ Called when we're shutting down the server *only*
         else if ( (copy(str, 1, length('icon')) = 'icon') and (check_level(tc.ID, GM_ICON)) ) then error_msg := command_icon(tc, str)
         else if ( (copy(str, 1, length('unicon')) = 'unicon') and (check_level(tc.ID, GM_UNICON)) ) then error_msg := command_unicon(tc, str)
         else if ( (copy(str, 1, length('server')) = 'server') and (check_level(tc.ID, GM_SERVER)) ) then error_msg := command_server()
+        else if ( (copy(str, 1, length('pvpon')) = 'pvpon') and (check_level(tc.ID, GM_PVPON)) ) then error_msg := command_pvpon(tc)
+        else if ( (copy(str, 1, length('pvpoff')) = 'pvpoff') and (check_level(tc.ID, GM_PVPOFF)) ) then error_msg := command_pvpoff(tc)
 		;
 
 		if (error_msg <> '') then error_message(tc, error_msg);
@@ -415,6 +420,8 @@ Called when we're shutting down the server *only*
         if (idx <> -1) then begin
             tGM := GM_Access_DB.Objects[idx] as TGM_Table;
             if ( (tGM.ID = id) and (tGM.Level >= cmd) ) then Result := True;
+        end else begin
+        	if (cmd = 0) then Result := True;
         end;
     end;
 
@@ -1775,6 +1782,73 @@ Called when we're shutting down the server *only*
     function command_server() : String;
     begin
     	Result := 'Ragnarok Online Server powered by Fusion Server Software - ' + RELEASE_VERSION + '.';
+    end;
+
+    function command_pvpon(tc : TChara) : String;
+    var
+    	mi : MapTbl;
+        tc1 : TChara;
+        i, k : Integer;
+        tm : TMap;
+    begin
+    	Result := ' GM_PVPON Failure.';
+
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin;
+	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            if (mi.PvP = true) then begin
+            	Result := Result + ' PVP already enabled on map ' + tc.Map + '.';
+            end else begin
+		        mi.PvP := true;
+    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+		        for i := 0 to tm.CList.Count - 1 do begin
+			        tc1 := tm.CList.Objects[0] as TChara;
+
+        	        if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+			        tc1.tmpMap := LowerCase(tc1.Map);
+			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+			        MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+	            end;
+
+    	    	Result := 'GM_PVPON Success. PVP enabled on map ' + tc1.Map + '.';
+            end;
+        end else begin
+        	Result := Result + ' Map ' + tc.Map + ' not found.';
+        end;
+    end;
+
+    function command_pvpoff(tc : TChara) : String;
+    var
+    	mi : MapTbl;
+        tc1 : TChara;
+        i, k : Integer;
+        tm : TMap;
+    begin
+    	Result := ' GM_PVPOFF Failure.';
+
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin;
+	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+
+            if (mi.PvP = false) then begin
+            	Result := Result + ' PVP already disabled on map ' + tc.Map + '.';
+            end else begin
+		        mi.PvP := false;
+    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+		        for i := 0 to tm.CList.Count - 1 do begin
+			        tc1 := tm.CList.Objects[0] as TChara;
+
+	                if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+			        tc1.tmpMap := LowerCase(tc1.Map);
+			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+		    	    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+	            end;
+
+        		Result := 'GM_PVPOFF Success. PVP disabled on map ' + tc1.Map + '.';
+            end;
+        end else begin
+        	Result := Result + ' Map ' + tc.Map + ' not found.';
+        end;
     end;
 
 end.
