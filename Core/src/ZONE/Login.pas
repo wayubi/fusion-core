@@ -80,6 +80,7 @@ begin
                 WFIFOW( 0, $006a);
 			    WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
 			    Socket.SendBuf(buf, 23);
+                Exit; //stop the other stuff
 		    end;
         end;
 
