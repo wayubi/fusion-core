@@ -63,6 +63,7 @@ uses
         i : Integer;
     begin
         for i := 0 to length(ISCS_CONNECTION) - 1 do begin
+            if ISCS_CONNECTION[i] = nil then Continue;
             if ISCS_CONNECTION[i].Username = str then begin
                 ISCS_CONNECTION[i].Quit('Powered by the Fusion Inter-Server Communication System.');
                 ISCS_CONNECTION[i] := nil;
