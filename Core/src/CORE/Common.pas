@@ -1989,7 +1989,7 @@ begin
 			for i := 1 to 336 do begin
 				if not Skill[i].Data.Job[JID] then begin
 					if not Skill[i].Card then begin
-						SkillPoint := SkillPoint + Skill[i].Lv;
+						//SkillPoint := SkillPoint + Skill[i].Lv;
 					end;
 					Skill[i].Lv := 0;
 				end;
