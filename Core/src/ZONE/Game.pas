@@ -2874,6 +2874,8 @@ end;
 							k := j;
 							if tc.Skill[37].Lv <> 0 then begin
 								l := l + (tn.ShopItem[j].Price * cardinal(tc.Skill[37].Data.Data1[tc.Skill[37].Lv]) div 100) * w1;
+							end else if tc.Skill[224].Lv <> 0 then begin
+								l := l + (tn.ShopItem[j].Price * cardinal(tc.Skill[224].Data.Data1[tc.Skill[224].Lv]) div 100) * w1;
 							end else begin
 								l := l + tn.ShopItem[j].Price * w1;
 							end;
@@ -2900,6 +2902,8 @@ end;
 								td := tn.ShopItem[j].Data;
 								if tc.Skill[37].Lv <> 0 then begin
 									l := (tn.ShopItem[j].Price * cardinal(tc.Skill[37].Data.Data1[tc.Skill[37].Lv]) div 100);
+								end else if tc.Skill[224].Lv <> 0 then begin
+									l := (tn.ShopItem[j].Price * cardinal(tc.Skill[224].Data.Data1[tc.Skill[224].Lv]) div 100);
 								end else begin
 									l := tn.ShopItem[j].Price;
 								end;
