@@ -551,7 +551,7 @@ uses
                         or (searchResult2.Name = tp.CName[6]) or (searchResult2.Name = tp.CName[7]) or (searchResult2.Name = tp.CName[8]) then begin
                         	tc := CharaName.Objects[CharaName.IndexOf(searchResult2.Name)] as TChara;
                         end else begin
-                        	break;
+                        	Continue;
                         end;
 
                         tc.Name := ( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
