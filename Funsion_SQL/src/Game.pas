@@ -3674,6 +3674,7 @@ end;
 					//DebugOut.Lines.Add(Format('%s Leaves %s', [tc.Name,tpa.Name]));
 
 					if (tpa.MemberID[0] = 0) then begin
+					  if UseSQL then DeleteParty(tpa.Name);
 						PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
 						//DebugOut.Lines.Add(Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
 						tpa.Free;
@@ -3748,6 +3749,7 @@ end;
 						//DebugOut.Lines.Add(Format('%s Leaves %s', [tc.Name,tpa.Name]));
 
 						if (tpa.MemberID[0] = 0) then begin
+						  if UseSQL then DeleteParty(tpa.Name);
 							PartyNameList.Delete(PartyNameList.IndexOf(tpa.Name));
 							//DebugOut.Lines.Add(Format('party(%s) was deleted (%d)', [tpa.Name,PartyNameList.Count]));
 							tpa.Free;
@@ -4971,6 +4973,7 @@ end;
 						tg.MemberPos[i] := tg.MemberPos[i + 1];
 						tg.MemberEXP[i] := tg.MemberEXP[i + 1];
 					end;
+					if UseSQL then DeleteGuildMember(tc.CID,1,nil,0);
 					Dec(tg.RegUsers);
 					tc.GuildID := 0;
 					tc.GuildName := '';
@@ -5011,6 +5014,7 @@ end;
 					tg.MemberPos[i] := tg.MemberPos[i + 1];
 					tg.MemberEXP[i] := tg.MemberEXP[i + 1];
 				end;
+				if UseSQL then DeleteGuildMember(tc1.CID,2,tgb,tg.ID);
 				Dec(tg.RegUsers);
 				tc1.GuildID := 0;
 				tc1.GuildName := '';
@@ -5039,6 +5043,7 @@ end;
 					Socket.SendBuf(buf, 6);
 
 					//ギルド削除処理
+					if UseSQL then DeleteGuildInfo(tc.GuildID);
 					GuildList.Delete(GuildList.IndexOf(tc.GuildID));
 					tc.GuildID := 0;
 					tc.GuildName := '';
@@ -5066,8 +5071,8 @@ end;
 						end;
 						tg.PosEXP[l] := l2;
 						tg.PosName[l] := RFIFOS(i * 40 + 20, 24);
+						if UseSQL then SaveGuildMPosition(tg.ID, tg.PosName[l], tg.PosInvite[l], tg.PosPunish[l], tg.PosEXP[l], l);
 					end;
-					if UseSQL then SaveGuildMPosition(tg);
 					//変更通知
 					WFIFOW( 0, $0174);
 					SendGuildMCmd(tc, w, false);
@@ -5153,6 +5158,7 @@ end;
 							PosPunish[j] := false;
 						end;
 						PosEXP[j] := 0;
+						if UseSQL then SaveGuildMPosition(ID, PosName[j], PosInvite[j], PosPunish[j], PosEXP[j], j);
 					end;
 					for j := 10000 to 10004 do begin
 						if GSkillDB.IndexOf(j) <> -1 then begin
@@ -5164,7 +5170,6 @@ end;
 					tc.ClassName := PosName[0];
 				end;
 				GuildList.AddObject(tg.ID, tg);
-				if UseSQL then SaveGuildMPosition(tg);
 				//DebugOut.Lines.Add(Format('GuildName %s : ID = %d : Name = %s', [tg.Name, tg.MemberID[0], tg.Member[0].Name]));
 
 				//作成成功応答
@@ -5251,6 +5256,7 @@ tc.ClassName := PosName[19];
 WFIFOW( 0, $0169);
 WFIFOB( 2, 2);
 tc.Socket.SendBuf(buf, 3);
+
 //tc1.Socket.SendBuf(buf, 3);
 
 //WFIFOW( 0, $016d);
@@ -5350,10 +5356,12 @@ end;
 					tgl.ID := tg1.ID;
 					tgl.GuildName := tg1.Name;
 					tg.RelAlliance.AddObject(tgl.GuildName, tgl);
+					if UseSQL then SaveGuildAllyInfo(tgl.ID, tgl.GuildName, 1);
 					tgl := TGRel.Create;
 					tgl.ID := tg.ID;
 					tgl.GuildName := tg.Name;
 					tg1.RelAlliance.AddObject(tgl.GuildName, tgl);
+					if UseSQL then SaveGuildAllyInfo(tgl.ID, tgl.GuildName, 1);
 					k := 2;
 				end;
 
@@ -5554,6 +5562,7 @@ end;
 					tgl.ID := tg1.ID;
 					tgl.GuildName := tg1.Name;
 					tg.RelHostility.AddObject(tgl.GuildName, tgl);
+					if UseSQL then SaveGuildAllyInfo(tgl.ID, tgl.GuildName, 2);
 
 					//パケ送信
 					WFIFOW( 0, $0185);
