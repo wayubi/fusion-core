@@ -106,6 +106,10 @@ var
     function command_jlevel(tc : TChara; str : String) : String;
     function command_changestat(tc : TChara; str : String) : String;
     function command_skillpoint(tc : TChara; str : String) : String;
+    function command_skillall(tc : TChara) : String;
+    function command_statall(tc : TChara) : String;
+    function command_zeny(tc : TChara; str : String) : String;
+    function command_changeskill(tc : TChara; str : String) : String;
 
 implementation
 
@@ -138,6 +142,10 @@ implementation
         if sl.IndexOfName('JLEVEL') > -1 then GM_JLEVEL := StrToInt(sl.Values['JLEVEL']) else GM_JLEVEL := 1;
         if sl.IndexOfName('CHANGESTAT') > -1 then GM_CHANGESTAT := StrToInt(sl.Values['CHANGESTAT']) else GM_CHANGESTAT := 1;
         if sl.IndexOfName('SKILLPOINT') > -1 then GM_SKILLPOINT := StrToInt(sl.Values['SKILLPOINT']) else GM_SKILLPOINT := 1;
+        if sl.IndexOfName('SKILLALL') > -1 then GM_SKILLALL := StrToInt(sl.Values['SKILLALL']) else GM_SKILLALL := 1;
+        if sl.IndexOfName('STATALL') > -1 then GM_STATALL := StrToInt(sl.Values['STATALL']) else GM_STATALL := 1;
+        if sl.IndexOfName('ZENY') > -1 then GM_ZENY := StrToInt(sl.Values['ZENY']) else GM_ZENY := 1;
+        if sl.IndexOfName('CHANGESKILL') > -1 then GM_CHANGESKILL := StrToInt(sl.Values['CHANGESKILL']) else GM_CHANGESKILL := 1;
 
         sl.Free;
         ini.Free;
@@ -168,6 +176,10 @@ implementation
         ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
         ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
         ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
+        ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
+        ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
+        ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
+        ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
 
         ini.Free;
     end;
@@ -198,6 +210,10 @@ implementation
         else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
         else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
         else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
+        else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
+        else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
+        else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
+        else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -822,6 +838,120 @@ implementation
         end else begin
             Result := Result + ' Skill Point amount out of range {0-1001}.';
         end;
+    end;
+
+    function command_skillall(tc : TChara) : String;
+    var
+        j, i : Integer;
+    begin
+        Result := 'GM_SKILLALL Failure.';
+
+        j := tc.JID;
+        if (j > UPPER_JOB_BEGIN) then j := j - UPPER_JOB_BEGIN + LOWER_JOB_END;
+        // (RN 4001 - 4000 + 23 = 24)
+
+        for i := 1 to 157 do begin
+            if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
+                tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
+            end;
+        end;
+
+        for i := 210 to MAX_SKILL_NUMBER do begin
+            if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
+                tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
+            end;
+        end;
+
+        tc.SkillPoint := 1000;
+        SendCSkillList(tc);
+        CalcStat(tc);
+        SendCStat(tc);
+
+        Result := 'GM_SKILLALL Success.';
+    end;
+
+    function command_statall(tc : TChara) : String;
+    var
+        i : Integer;
+    begin
+        Result := 'GM_STATALL Failure.';
+
+        for i := 0 to 5 do begin
+            tc.ParamBase[i] := 99;
+        end;
+
+        tc.StatusPoint := 1000;
+        CalcStat(tc);
+        SendCStat(tc);
+        SendCStat1(tc, 0, $0009, tc.StatusPoint);
+
+        Result := 'GM_STATALL Success.';
+    end;
+
+    function command_zeny(tc : TChara; str : String) : String;
+    var
+        i, k : Integer;
+    begin
+        Result := 'GM_ZENY Failure.';
+
+        Val(Copy(str, 6, 256), i, k);
+        if (k = 0) and (i >= -2147483647) and (i <= 2147483647) then begin
+            if (tc.Zeny + i <= 2147483647) and (tc.Zeny + i >= 0) then begin
+                tc.Zeny := tc.Zeny + i;
+                SendCStat1(tc, 1, $0014, tc.Zeny);
+
+                Result := 'GM_ZENY Success. ' + IntToStr(abs(i)) + ' Zeny';
+                if (i = 0) then begin
+                    tc.Zeny := i;
+                    Result := Result + ' set.';
+                end else
+                if (i > 0) then begin
+                    Result := Result + ' added.';
+                end else if (i < 0) then begin
+                    Result := Result + ' subtracted.';
+                end;
+            end else begin
+                Result := Result + ' Zeny on hand amount out of range {0-2147483647).';
+            end;
+        end else begin
+            Result := Result + ' Zeny amount out of range {-2147483647-2147483647).';
+        end;
+    end;
+
+    function command_changeskill(tc : TChara; str : String) : String;
+    var
+        i, j, k : Integer;
+        sl : TStringList;
+    begin
+        Result := 'GM_CHANGESKILL Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 13, 256);
+
+        if (sl.Count = 2) then begin
+            Val(sl.Strings[0], i, k);
+            if k <> 0 then Exit;
+            Val(sl.Strings[1], j, k);
+            if k <> 0 then Exit;
+
+            if ((i >= 1) and (i <= 157)) or ((i >= 210) and (i <= MAX_SKILL_NUMBER)) then begin
+                if (j > tc.Skill[i].Data.MasterLV) then j := tc.Skill[i].Data.MasterLV;
+                tc.Plag := i;
+                tc.PLv := j;
+                tc.Skill[i].Plag := true;
+                SendCSkillList(tc);
+                CalcStat(tc);
+                SendCStat(tc);
+
+                Result := 'GM_CHANGESKILL Success. Skill ' + IntToStr(i) + ' set to ' + IntToStr(j) + '.';
+            end else begin
+                Result := Result + ' Skill selection out of range. {1-157,210-' + IntToStr(MAX_SKILL_NUMBER) + '}.';
+            end;
+        end else begin
+            Result := Result + ' Incomplete information.';
+        end;
+
+        sl.Free;
     end;
 
 end.

@@ -1492,17 +1492,6 @@ Begin(* Proc sv3PacketProcess() *)
 						end;
 					end //GM cmd #monster
 
-					else if (Copy(str, 1, 5) = 'zeny ') AND
-									((DebugCMD and $0008) <> 0) AND (tid.ChangeStatSkill = 1) then
-					begin
-						Val(Copy(str, 6, 256), i, k);
-						// Colus, 20040203: Zeny limit was off by a 0.  Bumped the limit up to 1BZ (it can handle it!)
-						if (k = 0) and (i >= 0) and (i <= 999999999) and (tc.Zeny + cardinal(i) <= 999999999) then begin
-							if tc.Zeny > 1000000000 then exit;
-							tc.Zeny := tc.Zeny + cardinal(i);
-							SendCStat1(tc, 1, $0014, tc.Zeny);
-						end;
-					end //gm cmd #zeny
 
 					else if (Copy(str, 1, 5) = 'where') and (tid.BroadCast = 1) then begin
 						s := Copy(str, 7, 256);
@@ -1759,61 +1748,6 @@ Begin(* Proc sv3PacketProcess() *)
                                         	WFIFOS(4, str2, w - 4);
                                         	tc.Socket.SendBuf(buf, w);
 
-            end else if (Copy(str, 1, 7) = 'statall') and ((DebugCMD and $4000) <> 0) and (tid.ChangeStatSkill = 1) then begin
-
-						  for i := 0 to 5 do begin
-						  tc.ParamBase[i] := 99;
-					    end;
-					    tc.StatusPoint := 1000;
-
-              CalcStat(tc);
-              SendCStat(tc);
-              SendCStat1(tc, 0, $0009, tc.StatusPoint);
-						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DEBUG* Added all stats to ' + tc.Name);
-
-          end else if (Copy(str, 1, 12) = 'changeskill ') and ((DebugCMD and $4000) <> 0) and (tid.ChangeStatSkill = 1) then begin
-
-            sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 13, 256);
-						if sl.Count = 2 then begin
-							Val(sl.Strings[0], i, k);
-							if k <> 0 then continue;
-							Val(sl.Strings[1], j, k);
-							if k <> 0 then continue;
-
-            if ((i >= 0) and (i <= 157)) or ((i >= 210) and (i <= MAX_SKILL_NUMBER)) then begin
-
-            if (j > tc.Skill[i].Data.MasterLV) then j := tc.Skill[i].Data.MasterLV;
-           tc.Plag := i;
-           tc.PLv := j;
-           tc.Skill[i].Plag := true;
-            SendCSkillList(tc);
-            CalcStat(tc);
-            SendCStat(tc);
-            end;
-            sl.Free;
-            end;
-					end else if (Copy(str, 1, 8) = 'skillall') and ((DebugCMD and $4000) <> 0) and (tid.ChangeStatSkill = 1) then begin
-						//ëSÉXÉLÉãèKìæ
-{èCê≥}
-            j := tc.JID;
-            if (j > UPPER_JOB_BEGIN) then j := j - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-						for i := 1 to 157 do begin
-              if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
-							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
-              end;
-            end;
-						for i := 210 to MAX_SKILL_NUMBER do begin //äÿçëç˜à‰êÍóp
-              if (tc.Skill[i].Data.Job1[j]) or (tc.Skill[i].Data.Job2[j]) then begin
-							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
-              end;
-						end;
-{èCê≥ÉRÉRÇ‹Ç≈}
-						tc.SkillPoint := 1000;
-						//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DEBUG* Added all skills to ' + tc.Name);
-						SendCSkillList(tc);
-{í«â¡}      CalcStat(tc);
-            SendCStat(tc);
 
           { MITCH 01-31-04: Added PVP and GPVP GM commands! }
           end else if (Copy(str, 1, 5) = 'pvpon') and (tid.PVPControl = 1) then begin
