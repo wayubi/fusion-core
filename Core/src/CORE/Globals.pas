@@ -14,6 +14,12 @@ uses
     {Fusion}
     Common, SQLData, Zip, List32, PlayerData;
 
+
+
+    procedure init_globals();
+
+    { ---------------------------------------------------------------------- }
+
     function check_attack_lag(tc : TChara) : Boolean;
 
     procedure reset_skill_effects(tc : TChara);
@@ -35,6 +41,122 @@ implementation
 
 uses
 	Main;
+
+
+    procedure init_globals();
+    begin
+        Randomize;
+        timeBeginPeriod(1);
+        timeEndPeriod(1);
+        SetLength(TrueBoolStrs, 4);
+        TrueBoolStrs[0] := '1';
+        TrueBoolStrs[1] := '-1';
+        TrueBoolStrs[2] := 'true';
+        TrueBoolStrs[3] := 'True';
+        SetLength(FalseBoolStrs, 3);
+        FalseBoolStrs[0] := '0';
+        FalseBoolStrs[1] := 'false';
+        FalseBoolStrs[2] := 'False';
+
+        NowUsers := 0;
+        NowLoginID := 0;
+        NowItemID := 10000;
+        NowMobID := 1000000;
+        NowCharaID := 0;
+        NowPetID := 0;
+
+        DebugOut := frmMain.txtDebug;
+
+        ScriptList := TStringList.Create;
+
+        ItemDB := TIntList32.Create;
+        ItemDB.Sorted := true;
+        ItemDBName := TStringList.Create;
+        ItemDBName.CaseSensitive := True;
+
+        MaterialDB := TIntList32.Create;
+        MaterialDB.Sorted := true;
+
+        MobDB := TIntList32.Create;
+        MobDB.Sorted := true;
+
+        MobAIDB := TIntList32.Create;
+        MobAIDB.Sorted := true;
+
+        MobAIDBFusion := TIntList32.Create;
+        MobAIDBFusion.Sorted := true;
+
+        GlobalVars := TStringList.Create;
+
+        MobDBName := TStringList.Create;
+        MobDBName.CaseSensitive := True;
+        SlaveDBName := TStringList.Create;
+        SlaveDBName.CaseSensitive := True;
+
+        MArrowDB := TIntList32.Create;
+        MArrowDB.Sorted := true;
+
+        WarpDatabase := TStringList.Create;
+
+        IDTableDB := TIntList32.Create;
+        IDTableDB.Sorted := true;
+
+        SkillDB := TIntList32.Create;
+        SkillDBName := TStringList.Create;
+
+        PlayerName := TStringList.Create;
+        PlayerName.CaseSensitive := True;
+        PlayerName.Sorted := True;
+        Player := TIntList32.Create;
+        Player.Sorted := True;
+
+        CharaName := TStringList.Create;
+        CharaName.CaseSensitive := True;
+        CharaName.Sorted := True;
+        Chara := TIntList32.Create;
+        Chara.Sorted := True;
+        CharaPID := TIntList32.Create;
+
+        PartyNameList := TStringList.Create;
+        PartyNameList.CaseSensitive := True;
+
+        CastleList := TStringList.Create;
+        CastleList.CaseSensitive := True;
+
+        TerritoryList := TStringList.Create;
+        TerritoryList.CaseSensitive := True;
+
+        EmpList := TStringList.Create;
+        EmpList.CaseSensitive := True;
+
+        ChatRoomList := TIntList32.Create;
+
+        VenderList := TIntList32.Create;
+
+        DealingList := TIntList32.Create;
+
+        PetDB  := TIntList32.Create;
+        PetList := TIntList32.Create;
+
+        SummonMobListMVP := TStringList.Create;
+
+        SummonIOBList  := TStringList.Create;//Changed for lower memory/ease of use
+        SummonIOVList  := TStringList.Create;//Ditto
+        SummonICAList  := TStringList.Create;//
+        SummonIGBList  := TStringList.Create;//
+        SummonIOWBList := TStringList.Create;//
+
+        ServerFlag := TStringList.Create;
+        MapInfo    := TStringList.Create;
+
+        GuildList := TIntList32.Create;
+        GSkillDB := TIntList32.Create;
+
+        Map := TStringList.Create;
+        MapList := TStringList.Create;
+    end;
+
+    { ---------------------------------------------------------------------- }
 
     function check_attack_lag(tc : TChara) : Boolean;
     begin

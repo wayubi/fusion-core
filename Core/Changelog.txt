@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-24-04: Broke apart main globals. [AlexKreuz]
 - 08-23-04: Bad indexing of maps caused crash. [AlexKreuz]
 - 08-23-04: Unassigned guild member caused crash in castle save routine. [AlexKreuz]
 - 08-23-04: Mob Spawn Rate exception added for Emperiums. [AlexKreuz]
