@@ -1523,46 +1523,72 @@ Called when we're shutting down the server *only*
     var
         i, j, k : Integer;
         oldlevel : Integer;
+        s : String;
     begin
         Result := 'GM_JLEVEL Failure.';
 
-        oldlevel := tc.JobLV;
-        Val(Copy(str, 8, 256), i, k);
+        s := Copy(str, 8, 256);
 
-        if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc.JobLV) then begin
-            tc.JobLV := i;
+        if s <> '' then begin
 
-            for i := 1 to MAX_SKILL_NUMBER do begin
-                if not tc.Skill[i].Card then tc.Skill[i].Lv := 0;
+            oldlevel := tc.JobLV;
+            Val(Copy(str, 8, 256), i, k);
+
+            if k = 0 then begin
+                if (i >= 1) and (i <= 32767) then begin
+                    if i <> tc.JobLV then begin
+                        tc.JobLV := i;
+
+                        for i := 1 to MAX_SKILL_NUMBER do begin
+                            if not tc.Skill[i].Card then tc.Skill[i].Lv := 0;
+                        end;
+
+                        if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
+                        else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
+                        else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
+
+                        SendCSkillList(tc);
+
+                        if (tc.JobNextEXP = 0) then tc.JobNextEXP := 999999999;
+                        tc.JobEXP := tc.JobNextEXP - 1;
+
+                        if tc.JID < 13 then begin
+                            j := (tc.JID + 5) div 6 + 1;
+                        end
+
+                        else begin
+                            j := 3;
+                        end;
+
+                        tc.JobNextEXP := ExpTable[j][tc.JobLV];
+
+                        CalcStat(tc);
+
+                        SendCStat(tc);
+                        SendCStat1(tc, 0, $0037, tc.JobLV);
+                        SendCStat1(tc, 0, $000c, tc.SkillPoint);
+                        SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+                        Result := 'GM_JLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
+                    end
+
+                    else begin
+                        Result := Result + ' Supplied level is identical to current.';
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' Supplied level is outwith valid range. <1-32767>.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' Supplied level must be a valid integer.';
             end;
+        end
 
-            if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
-            else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
-            else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
-
-            SendCSkillList(tc);
-
-            if (tc.JobNextEXP = 0) then tc.JobNextEXP := 999999999;
-            tc.JobEXP := tc.JobNextEXP - 1;
-
-            if tc.JID < 13 then begin
-                j := (tc.JID + 5) div 6 + 1;
-            end else begin
-                j := 3;
-            end;
-
-            tc.JobNextEXP := ExpTable[j][tc.JobLV];
-
-            CalcStat(tc);
-            SendCStat(tc);
-            SendCStat1(tc, 0, $0037, tc.JobLV);
-            SendCStat1(tc, 0, $000c, tc.SkillPoint);
-            SendCStat1(tc, 1, $0002, tc.JobEXP);
-
-
-            Result := 'GM_JLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.JobLV) + '.';
-        end else begin
-            Result := Result + ' Incomplete information or level out of range.';
+        else begin
+            Result := Result + ' Insufficient data. Format is <new job level>.';
         end;
     end;
 
