@@ -1209,6 +1209,8 @@ MapTbl = class
 	PvP       :Boolean;
 	PvPG      :Boolean;
 	noDay     :Boolean;
+  //Capture the flag w00t, heh
+  CTF       :Boolean;
 end;
 {NPCイベント追加ココまで}
 //------------------------------------------------------------------------------
@@ -1583,6 +1585,9 @@ var
 	//キャラクター初期データ関連
 	WarpEnabled :boolean;
 	WarpItem    :cardinal;
+  StartDeathDropItem  :cardinal;
+  EndDeathDropItem    :cardinal;
+  TokenDrop       :boolean;
 	GMCheck         :cardinal; // Can the GM commands be used by non-GM's?
 	DebugCMD        :cardinal; // Can use Debug Commands?
 	DeathBaseLoss     :integer;
@@ -1680,6 +1685,9 @@ Option_Font_Style : string;
 
 		procedure CalcSkillTick(tm:TMap; tc:TChara; Tick:cardinal = 0);
 
+    procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
+    procedure ItemDrop(tm:TMap; tc:TChara; j:integer; amount:integer);
+    procedure CreateGroundItem(tm:TMap; itemID:cardinal; XPoint:cardinal; YPoint:cardinal);
                 //procedure PassiveIcons(tm:TMap; tc:TChara);  //Calculate Passive Icons
                 //procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
                 //procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
@@ -1933,7 +1941,9 @@ begin
 		end;
 	end;
 end;
+
 //------------------------------------------------------------------------------
+
 procedure CalcAbility(tc:TChara; td:TItemDB; o:Integer = 0);
 var
 	j :Integer;
@@ -3203,6 +3213,215 @@ begin
         end;
 end;}
 //------------------------------------------------------------------------------
+procedure CharaDie(tm:TMap; tc:TChara; Tick:Cardinal; KilledByP:short = 0);
+// Killed by player triggers for a token to be dropped... one of Krietor's Ideas
+var
+  i : integer;
+  j : integer;
+  mi : MapTbl;
+  item : cardinal;
+  StartI  : cardinal;
+  EndI    : cardinal;
+begin
+  // Set Hit Points to 0
+  tc.HP := 0;
+  // Display the character as dead
+  WFIFOW( 0, $0080);
+  WFIFOL( 2, tc.ID);
+  WFIFOB( 6, 1);
+  SendBCmd(tm, tc.Point, 7);
+  // Sit = 1 lets monsters know the char is dead and the player cannot move
+  tc.Sit := 1;
+
+  // Subtract the Experience loss from the .ini
+  i := (100 - DeathBaseLoss);
+  tc.BaseEXP := Round(tc.BaseEXP * (i / 100));
+  i := (100 - DeathJobLoss);
+  tc.JobEXP := Round(tc.JobEXP * (i / 100));
+
+  // Updates the players experience from the experience loss
+  SendCStat1(tc, 1, $0001, tc.BaseEXP);
+  SendCStat1(tc, 1, $0002, tc.JobEXP);
+
+  tc.pcnt := 0;
+
+  if (tc.AMode = 1) or (tc.AMode = 2) then tc.AMode := 0;
+  if (tc.Option and 2 <> 0) then begin
+    tc.SkillTick := Tick;
+    tc.SkillTickID := 51;
+    tc.Skill[tc.SkillTickID].Tick := Tick;
+  end;
+
+  if (tc.Option and 4 <> 0) then begin
+    tc.SkillTick := Tick;
+    tc.SkillTickID := 135;
+    tc.Skill[tc.SkillTickID].Tick := Tick;
+  end;
+  // Krietor's idea for his server, can be commented out
+  // Drop items - Only when killed by a player
+  // I'll leave this commented out on the CVS
+  {if (StartDeathDropItem <> 0) and (KilledbyP = 1) then begin
+    StartI := StartDeathDropItem;
+    EndI   := EndDeathDropItem;
+    while (StartI <= EndI) do begin
+      j := SearchCInventory(tc, StartI, false);
+      if ((j <> 0) and (tc.Item[j].Amount >= 1)) then begin
+        DebugOut.Lines.Add('Drop Item ' + IntToStr(StartI) + ' At Location ' + IntToStr(j));
+					//UseItem(tc, j);  //Use Item Function
+        ItemDrop(tm, tc, j, 1);
+        break;
+      end;
+      StartI := StartI + 1;
+    end;
+  end;
+  { 11006,PvP_Token,"PvP Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    11007,GvG_Token,"GvG Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    11008,CTF_Token,"CTF Token",3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+  // Token's will drop depending on what kind of map is there
+  // PvP maps drop pvp tokens, and so on
+  if TokenDrop then begin
+    i := MapInfo.IndexOf(tc.Map);
+    if (i <> -1) then
+      mi := MapInfo.Objects[i] as MapTbl
+    else exit;  //Safe exit call
+    if mi.PvP then begin
+      CreateGroundItem(tm, 11006, tc.Point.X + Random(3), tc.Point.Y + Random(3));
+    end;
+    if mi.PvPG then begin
+      CreateGroundItem(tm, 11007, tc.Point.X + Random(3), tc.Point.Y + Random(3));
+    end;
+    if mi.CTF then begin
+      CreateGroundItem(tm, 11008, tc.Point.X + Random(3), tc.Point.Y + Random(3));
+    end;
+  end; }
+
+end;
+
+//------------------------------------------------------------------------------
+
+// Simple Algorithm to create an item dropped by a player
+procedure ItemDrop(tm:TMap; tc:TChara; j:integer; amount:integer);
+var
+  tn:TNPC;
+begin
+  // An NPC Creation which is merely the item, gets it's data from tc
+  tn := TNPC.Create;
+  tn.ID := NowItemID;
+  Inc(NowItemID);
+  tn.Name := 'item';
+  tn.JID := tc.Item[j].ID;
+  tn.Map := tc.Map;
+  tn.Point.X := tc.Point.X - 1 + Random(3);
+  tn.Point.Y := tc.Point.Y - 1 + Random(3);
+  tn.CType := 3;
+  tn.Enable := true;
+  tn.Item := TItem.Create;
+  tn.Item.ID := tc.Item[j].ID;
+  tn.Item.Amount := amount;
+  tn.Item.Identify := tc.Item[j].Identify;
+  tn.Item.Refine := tc.Item[j].Refine;
+  tn.Item.Attr := tc.Item[j].Attr;
+  tn.Item.Card[0] := tc.Item[j].Card[0];
+  tn.Item.Card[1] := tc.Item[j].Card[1];
+  tn.Item.Card[2] := tc.Item[j].Card[2];
+  tn.Item.Card[3] := tc.Item[j].Card[3];
+  tn.Item.Data := tc.Item[j].Data;
+  tn.SubX := Random(8);
+  tn.SubY := Random(8);
+  tn.Tick := timeGetTime() + 60000;
+
+  //Add it to the map
+  tm.NPC.AddObject(tn.ID, tn);
+  tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+
+  //Reduce number of items at index by amount.
+  WFIFOW( 0, $00af);
+  WFIFOW( 2, j);
+  WFIFOW( 4, amount);
+  tc.Socket.SendBuf(buf, 6);
+
+  // Change the player's weight for the server
+  tc.Item[j].Amount := tc.Item[j].Amount - amount;
+  if tc.Item[j].Amount = 0 then tc.Item[j].ID := 0;
+  tc.Weight := tc.Weight - tc.Item[j].Data.Weight * amount;
+  // Update weight on the Client
+  SendCStat1(tc, 0, $0018, tc.Weight);
+
+  //Item Drop on ground Packet
+  WFIFOW( 0, $009e);
+  WFIFOL( 2, tn.ID);
+  WFIFOW( 6, tn.JID);
+  WFIFOB( 8, tn.Item.Identify);
+  WFIFOW( 9, tn.Point.X);
+  WFIFOW(11, tn.Point.Y);
+  WFIFOB(13, tn.SubX);
+  WFIFOB(14, tn.SubY);
+  WFIFOW(15, tn.Item.Amount);
+  SendBCmd(tm, tn.Point, 17);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure CreateGroundItem(tm:TMap; itemID:cardinal; XPoint:cardinal; YPoint:cardinal);
+var
+  tn  :TNPC;
+  td  :TItemDB;
+begin
+  // We're creating this item from scratch so we have to get it based on it's ID
+  // We check if it exist's first to prevent a list index error
+  // Maybe we should have a message on a fail though.
+ if ItemDB.IndexOf(itemID) <> -1 then begin
+  // Define td after we make sure it won't cause an error
+  // We need this value for the item's data
+  td := ItemDB.IndexOfObject(itemID) as TItemDB;
+
+  // Create the item with blank properties since it's new
+  tn := TNPC.Create;
+  tn.ID := NowItemID;
+  Inc(NowItemID);
+  tn.Name := 'item';
+  tn.JID := itemID;
+  tn.Map := tm.Name;
+  tn.Point.X := XPoint;
+  tn.Point.Y := YPoint;
+  tn.CType := 3;
+  tn.Enable := true;
+  tn.Item := TItem.Create;
+  tn.Item.ID := itemID;
+  tn.Item.Amount := 1;
+  tn.Item.Identify := 1;
+  tn.Item.Refine := 0;
+  tn.Item.Attr := 0;
+  tn.Item.Card[0] := 0;
+  tn.Item.Card[1] := 0;
+  tn.Item.Card[2] := 0;
+  tn.Item.Card[3] := 0;
+  tn.Item.Data := td;
+  tn.SubX := Random(8);
+  tn.SubY := Random(8);
+  tn.Tick := timeGetTime() + 60000;
+  // Add the item to the core map
+  tm.NPC.AddObject(tn.ID, tn);
+  tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+
+  //Item Drop on ground Packet
+  WFIFOW( 0, $009e);
+  WFIFOL( 2, tn.ID);
+  WFIFOW( 6, tn.JID);
+  WFIFOB( 8, tn.Item.Identify);
+  WFIFOW( 9, tn.Point.X);
+  WFIFOW(11, tn.Point.Y);
+  WFIFOB(13, tn.SubX);
+  WFIFOB(14, tn.SubY);
+  WFIFOW(15, tn.Item.Amount);
+  SendBCmd(tm, tn.Point, 17);
+ end;
+
+end;
+
+//------------------------------------------------------------------------------
+
 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
 begin
         tm := tc.MData;
@@ -3259,7 +3478,8 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
-
+// Will send a "..." message over the character
+// Used when a silenced character attempts to use a skill
 begin
         tm := tc.MData;
 
@@ -4729,7 +4949,6 @@ begin
         //重量変更
         tc.Weight := tc.Weight - tc.Item[j].Data.Weight;
         SendCStat1(tc, 0, $0018, tc.Weight);
-
 end;
 
 //------------------------------------------------------------------------------

@@ -1128,9 +1128,10 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 				else if (sl[i] = 'noskill') then mi.noSkill := true
 				else if (sl[i] = 'noitem') then mi.noItem := true
 				else if (sl[i] = 'agit') then mi.Agit := true
-                                else if (sl[i] = 'pvp') then mi.PvP := true
-                                else if (sl[i] = 'pvpg') then mi.PvPG := true
-                                else if (sl[i] = 'noday') then mi.noday := true;
+        else if (sl[i] = 'pvp') then mi.PvP := true
+        else if (sl[i] = 'pvpg') then mi.PvPG := true
+        else if (sl[i] = 'noday') then mi.noday := true
+        else if (sl[i] = 'ctf') then mi.ctf := true;
 
                                 if (Option_PVP = false) then begin
                                         mi.PvP := false;

@@ -7,14 +7,14 @@ uses
 
         procedure CalcAI(tm:TMap; ts:TMob; Tick:Cardinal);
         procedure MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);
-        procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
-        procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
+        //procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
+        //procedure MobSkillChance(tm:TMap; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure MobSkills(tm:TMap; ts:TMob; Tick:cardinal);
         procedure MobFieldSkills(tm:TMap; ts:TMob; Tick:cardinal);
         procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal);
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; k:integer);
-        procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
+        //procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
 
         procedure LoadMonsterAIData(tm:TMap; ts:TMob; Tick:cardinal);
         procedure CalculateSkillIf(tm:TMap; ts:TMob; Tick:cardinal);
@@ -302,7 +302,9 @@ begin
 
 end;
 //------------------------------------------------------------------------------
-procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
+// Darkhelmet, Ah, my classic AI, i'll leave it here commented out just because
+// of good times with it
+{procedure MobSkillCalc(tm:TMap;ts:TMob;Tick:cardinal);
 
 var
         tsAI :TMobAIDB;
@@ -351,13 +353,13 @@ begin
                                 {MobSkills(tm, ts, tsAI, Tick, i);
                                 //if tc.Skill[ts.MSKill].Data.SType = 2 then
                                 MobFieldSkills(tm, ts, tsAI, Tick, i);
-                                MobStatSkills(tm, ts, tsAI, Tick, i);}
+                                MobStatSkills(tm, ts, tsAI, Tick, i);
                                 //Break;
                         end;
                         //end else DebugOut.Lines.Add('Fail');
                 end;
         //end;
-end;
+end; }
 
 //------------------------------------------------------------------------------
 
@@ -1364,7 +1366,8 @@ begin
 	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
-procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
+// The Original monster cast time, it has much since evolved
+{procedure MonsterCastTime(tm:Tmap; ts:TMob; Tick:cardinal);
 var
         //tl     :TSkillDB;
         tc      :TChara;
@@ -1400,7 +1403,7 @@ begin
         end;
 
 end;
-
+}
 //------------------------------------------------------------------------------
 procedure LoadMonsterAIData(tm:TMap; ts:TMob; Tick:cardinal);
 var
@@ -1556,6 +1559,7 @@ begin
     i := i - 1;
     j := StrToInt(sl.Strings[i]);
     tsAI2 := MobAIDBFusion.Objects[MobAIDBFusion.IndexOf(j)] as TMobAIDBFusion;
+
     if tsAI2.IfState = 'IF_HP' then begin
       //if ts.Data.DebugFlag = false then begin
         //DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' of the ' + ts.Name + ' has an if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
@@ -1570,9 +1574,9 @@ begin
         end;
 
       //end;
-    end else if tsAI2.IfState = 'IF_HIDING' then begin
+    end else if tsAI2.IfState = 'IF_HIDING' then begin  // If monster is hidden
       if ts.Hidden = true then CheckSkill(tm, ts, tsAI2, Tick);
-		end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin
+		end else if tsAI2.IfState = 'IF_MAGICLOCKED' then begin // If monster is being targeted
     end else if tsAI2.IfState = 'IF_RUDEATTACK' then begin
       if ts.CanFindTarget = false then CheckSkill(tm, ts, tsAI2, Tick);
 		end else if tsAI2.IfState = 'IF_ENEMYCOUNT' then begin
@@ -1622,10 +1626,20 @@ begin
       ts.Status := 'RUN';
     end else if (ts.SkillType = 0) then begin
       //ts.SkillType := 0;
+      // Temp skill is used to get all the data for the skill
       TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
+
+      // Skill type
+      // 1: Target
+      // 2: Area Effect
+      // Anything else is use on self/allies
       ts.SkillType := TempSkill.SType;
+
+      // The skill's level and ID
       ts.MSkill := TempSkill.ID;
       ts.MLevel := tsAI2.SkillLV;
+
+      //We derive the cast time straight from the db
       ts.CastTime := tsAI2.Cast_Time;
       ts.Data.WaitTick := tsAI2.Cool_Time;
       ts.Mode := TempSkill.SType;
@@ -1652,7 +1666,7 @@ begin
         ts.MTick := Tick + cardinal(j);
 
         if (j > 0) then begin
-          if ts.SkillType = 1 then begin
+          if ts.SkillType = 1 then begin // Skill is a target skill, we'll follow the target
                 //Send Packets
                 WFIFOW( 0, $013e);
                 WFIFOL( 2, ts.ID);
@@ -1665,7 +1679,7 @@ begin
                 SendBCmd(tm, ts.Point, 24);
                 ts.ATick := Tick + cardinal(j);
                 ts.MMode := 1;
-          end else if ts.SkillType = 2 then begin
+          end else if ts.SkillType = 2 then begin // Skill is an area effect, we cast at it's MPoint
             WFIFOW( 0, $013e);
 				    WFIFOL( 2, ts.ID);
 				    WFIFOL( 6, 0);
@@ -1677,7 +1691,7 @@ begin
 				    SendBCmd(tm, ts.Point, 24);
 				    ts.MMode := 2;
 				    ts.MTick := Tick + cardinal(j);
-          end else begin
+          end else begin  // Skill is used on the monster
             WFIFOW( 0, $013e);
             WFIFOL( 2, ts.ID);
             WFIFOL( 6, ts.ID);
@@ -1695,7 +1709,7 @@ begin
 
 
 
-        end else begin
+        end else begin  // There is no cast time
                 //‰r¥‚È‚µ
                 ts.Mode := 3;
                 ts.MMode := 1;
@@ -1922,6 +1936,7 @@ begin
 		//end;
 	//end;
 
+  // Monster has positive life
 	if tc1.HP > 0 then begin
 		if EnableMonsterKnockBack then begin
 			tc1.pcnt := 0;
@@ -1949,17 +1964,20 @@ begin
 
 		Result := False;
 	end else begin
-                tc1.Sit := 1;
-                tc1.HP := 0;
-                SendCStat1(tc1, 0, 5, tc1.HP);
-                WFIFOW(0, $0080);
-                WFIFOL(2, tc1.ID);
-                WFIFOB(6, 1);
-                tc1.Socket.SendBuf(buf, 7);
-                WFIFOW( 0, $0080);
-                WFIFOL( 2, tc1.ID);
-                WFIFOB( 6, 1);
-                 SendBCmd(tm, tc1.Point, 7);
+    {tc1.Sit := 1;
+    tc1.HP := 0;
+    SendCStat1(tc1, 0, 5, tc1.HP);
+    WFIFOW(0, $0080);
+    WFIFOL(2, tc1.ID);
+    WFIFOB(6, 1);
+    tc1.Socket.SendBuf(buf, 7);
+    WFIFOW( 0, $0080);
+    WFIFOL( 2, tc1.ID);
+    WFIFOB( 6, 1);
+    SendBCmd(tm, tc1.Point, 7);
+    }
+    //Character dies, so we simply use the new algorithm to implement exp loss as well
+    CharaDie(tm, tc1, Tick);
 		Result := True;
 	end;
 end;
@@ -2046,7 +2064,7 @@ begin
 
 		Result := False;
 	end else begin
-                tc1.Sit := 1;
+                {tc1.Sit := 1;
                 tc1.HP := 0;
                 SendCStat1(tc1, 0, 5, tc1.HP);
                 WFIFOW(0, $0080);
@@ -2056,7 +2074,9 @@ begin
                 WFIFOW( 0, $0080);
                 WFIFOL( 2, tc1.ID);
                 WFIFOB( 6, 1);
-                 SendBCmd(tm, tc1.Point, 7);
+                 SendBCmd(tm, tc1.Point, 7); }
+    // Character has died
+    CharaDie(tm, tc1, Tick);
 		Result := True;
 	end;
 end;

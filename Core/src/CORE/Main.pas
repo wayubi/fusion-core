@@ -695,6 +695,24 @@ begin
 	end else begin
 		WarpItem := 0;
 	end;
+  //Krietor's Request by Darkhelmet
+  //  Designed for pvp, a range of items a character will drop when killed
+  if sl.IndexOfName('DeathdropS') <> - 1 then begin  //Start Range
+    StartDeathDropItem := StrToInt(sl.Values['DeathdropS']);
+  end else begin
+    StartDeathDropItem := 0;
+  end;
+  if sl.IndexOfName('DeathDropE') <> -1 then begin  //End Range
+    EndDeathDropItem := StrToInt(sl.Values['DeathdropE']);
+  end else begin
+    EndDeathDropItem := 0;
+  end;
+  //Krietor's Request, Token Drops by Darkhelmet
+  if sl.IndexOfName('DropToken') <> -1 then begin
+    TokenDrop := StrToBool(sl.Values['DropToken']);
+  end else begin
+    TokenDrop := false;
+  end;
 
 	{ChrstphrR 2004/05/09 - Debug section added to INI file
 	Controls options that allow/supress when errors occur - these features
@@ -1263,6 +1281,7 @@ begin
         	tc := Socket.Data;
         	SendCLeave(tc, 2);
                 {NPCƒCƒxƒ“ƒg’Ç‰Á}
+         if MapInfo.IndexOf(tc.Map) <> -1 then begin
         	i := MapInfo.IndexOf(tc.Map);
         	j := -1;
         	if (i <> -1) then begin
@@ -1279,6 +1298,7 @@ begin
         	tp := tc.PData;
         	tp.Login := 0;
                 if UseSQL then SQLDataSave();
+         end;
         end;
 
         // AlexKreuz: Random 10053 Bug Fix
@@ -3194,7 +3214,9 @@ begin
 
 		Result := False;
 	end else begin
-                tc1.Sit := 1;
+    // Character has died
+    CharaDie(tm, tc1, Tick, 1);
+                {tc1.Sit := 1;
                 tc1.HP := 0;
                 SendCStat1(tc1, 0, 5, tc1.HP);
                 WFIFOW(0, $0080);
@@ -3204,7 +3226,7 @@ begin
                 WFIFOW( 0, $0080);
                 WFIFOL( 2, tc1.ID);
                 WFIFOB( 6, 1);
-                 SendBCmd(tm, tc1.Point, 7);
+                 SendBCmd(tm, tc1.Point, 7); }
 		Result := True;
 	end;
 end;
@@ -14644,7 +14666,12 @@ begin
 
 						else begin
 							{ Player has run out of HP and dies }
-							tc2.HP := 0;
+              //Simplified into a procedure
+              CharaDie(tm, tc2, Tick);
+              ATarget := 0;
+							ARangeFlag := false;
+
+							{tc2.HP := 0;
 							WFIFOW( 0, $0080);
 							WFIFOL( 2, tc2.ID);
 							WFIFOB( 6, 1);
@@ -14672,7 +14699,7 @@ begin
                   tc2.SkillTick := Tick;
                   tc2.SkillTickID := 135;
                   tc2.Skill[tc2.SkillTickID].Tick := Tick;
-                end;
+                end;}
 						end;
 
 						SendCStat1(tc2, 0, 5, tc2.HP);
@@ -14752,6 +14779,10 @@ begin
 						end
 
 						else begin
+              CharaDie(tm, tc1, Tick, 1);
+              ATarget := 0;
+							ARangeFlag := false;
+            {
 							tc1.HP := 0;
 							WFIFOW( 0, $0080);
 							WFIFOL( 2, tc1.ID);
@@ -14782,7 +14813,7 @@ begin
                 				tc1.SkillTickID := 135;
                   tc1.Skill[tc1.SkillTickID].Tick := Tick;
 							end;
-							
+						}
 						end;
 						SendCStat1(tc1, 0, 5, tc1.HP);
 						ATick := ATick + Data.ADelay;
