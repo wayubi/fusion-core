@@ -1,3 +1,6 @@
+- 04-24-04: Got back old Water Ball routines, because new way of doing that didnt work [Eliot]
+- 04-24-04: Soul Strike cast delay changed [Eliot]
+- 04-24-04: LOV and Storm Gust calculations fixed again [Eliot]
 - 04-24-04: AI enabled, most Monster statuses tracked now. *Experimental [Darkhelmet]
 - 04-24-04: Memory Leaks in global list quick-fixed. [ChrstphrR]
 - 04-22-04: Mapload bugfix, & Script errors show proper line number [ChrstphrR]
