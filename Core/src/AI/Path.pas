@@ -90,7 +90,12 @@ begin
 	mm[15][15].cost := 1;
 	mm[15][15].addr := 1;
 
-	while (n <> 0) and ((aa[1].x <> x2) or (aa[1].y <> y2)) do begin
+  {Mitch: The problem with the not being able to attack a monster
+  if you're stuck on it was right here. Since it breaks out of the
+  while when the aa[1].x = x2 and aa[1].y = y2 (where the monster was at!)
+	OLD CODE: while (n <> 0) and ((aa[1].x <> x2) or (aa[1].y <> y2)) do begin
+  I removed the last 2 conditions so hopefully its fixed? }
+  while (n <> 0) do begin
 		rh := aa[1];
 		PopHeap(aa, n);
 
