@@ -1521,7 +1521,7 @@ Called when we're shutting down the server *only*
 
     function command_jlevel(tc : TChara; str : String) : String;
     var
-        i, j, k : Integer;
+        newlevel, i, j, k : Integer;
         oldlevel : Integer;
         s : String;
     begin
@@ -1532,12 +1532,12 @@ Called when we're shutting down the server *only*
         if s <> '' then begin
 
             oldlevel := tc.JobLV;
-            Val(Copy(str, 8, 256), i, k);
+            Val(Copy(str, 8, 256), newlevel, k);
 
             if k = 0 then begin
-                if (i >= 1) and (i <= 32767) then begin
-                    if i <> tc.JobLV then begin
-                        tc.JobLV := i;
+                if (newlevel >= 1) and (newlevel <= 32767) then begin
+                    if newlevel <> tc.JobLV then begin
+                        tc.JobLV := newlevel;
 
                         for i := 1 to MAX_SKILL_NUMBER do begin
                             if not tc.Skill[i].Card then tc.Skill[i].Lv := 0;
@@ -1595,7 +1595,7 @@ Called when we're shutting down the server *only*
     function command_changestat(tc : TChara; str : String) : String;
     var
         sl : TStringList;
-        i, j, k : Integer;
+        stat, value, k : Integer;
     begin
         Result := 'GM_CHANGESTAT Failure.';
 
@@ -1603,26 +1603,56 @@ Called when we're shutting down the server *only*
         sl.DelimitedText := Copy(str, 12, 256);
 
         if (sl.Count = 2) then begin
-            Val(sl[0], i, k);
+            Val(sl[0], stat, k);
 
-            if(i >= 0) and (i <= 5) then begin
-                Val(sl[1], j, k);
+            if k = 0 then begin
 
-                if(j >= 1) and (j <= 32767) then begin
-                    tc.ParamBase[i] := j;
-                    CalcStat(tc);
-                    SendCStat(tc);
-                    SendCStat1(tc, 0, $0009, tc.StatusPoint);
+                if(stat >= 0) and (stat <= 5) then begin
+                    Val(sl[1], value, k);
 
-                    Result := 'GM_CHANGESTAT Success. Stat ' + IntToStr(i) + ' changed to ' + IntToStr(j) + '.';
+                    if k = 0 then begin
+
+                        if(value >= 1) and (value <= 32767) then begin
+                            tc.ParamBase[stat] := value;
+
+                            CalcStat(tc);
+
+                            SendCStat(tc);
+                            SendCStat1(tc, 0, $0009, tc.StatusPoint);
+
+                            Result := 'GM_CHANGESTAT Success. ';
+                            if stat = 0 then Result := Result + 'Strength'
+                            else if stat = 1 then Result := Result + 'Agility'
+                            else if stat = 2 then Result := Result + 'Vitality'
+                            else if stat = 3 then Result := Result + 'Intelligence'
+                            else if stat = 4 then Result := Result + 'Dexterity'
+                            else if stat = 5 then Result := Result + 'Luck ';
+                            Result := Result + ' changed to ' + IntToStr(value) + '.';
+                        end
+
+                        else begin
+                            Result := Result + ' Supplied value is out of valid range. <1-32767>.';
+                        end;
+                    end
+
+                    else begin
+                        Result := Result + ' Supplied value must be a valid integer.';
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' Supplied stat index is out of valid range. <0-5>';
                 end;
-            end else begin
-                Result := Result + ' Incorrect stat index number.';
-            end;
-        end else begin
-            Result := Result + ' Incomplete information.';
-        end;
+            end
 
+            else begin
+                Result := Result + ' Supplied stat index must be a valid integer.';
+            end;
+        end
+
+        else begin
+            Result := Result + ' Insufficient data. Format is <stat index> <new value>.';
+        end;
         sl.Free;
     end;
 
