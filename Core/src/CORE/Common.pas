@@ -4311,12 +4311,16 @@ begin
 		WFIFOB(6, mode);
 		for j := tc.Point.Y div 8 - 2 to tc.Point.Y div 8 + 2 do begin
 			for i := tc.Point.X div 8 - 2 to tc.Point.X div 8 + 2 do begin
-				//周りの人にログアウト通知
-				for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
-					tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
-					if (tc <> tc1) and (abs(tc.Point.X - tc1.Point.X) < 16) and
-					(abs(tc.Point.Y - tc1.Point.Y) < 16) then tc1.Socket.SendBuf(buf, 7);
- 				end;
+                try
+    				for k := 0 to tm.Block[i][j].CList.Count - 1 do begin
+	    				tc1 := tm.Block[i][j].CList.Objects[k] as TChara;
+		    			if (tc <> tc1) and (abs(tc.Point.X - tc1.Point.X) < 16) and
+			    		(abs(tc.Point.Y - tc1.Point.Y) < 16) then tc1.Socket.SendBuf(buf, 7);
+ 				    end;
+                except
+                    on EAccessViolation do
+                        // Error on for k := 0 to tm.Block[i][j].CList.Count - 1 do begin;
+                end;
 			end;
 		end;
 		//if (mi.noPvP = false) then begin
