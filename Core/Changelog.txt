@@ -2,6 +2,7 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-06-04: Fixed Venom Dust Darkhelmet]
 - 01-04-04: Updated Combo skills damage increased by a little -[Oatmeal12345]
 - 01-04-04: Updated Call spirits, calls one spirit per call-[Oatmeal12345]
 - 01-04-04: updated Damage Calculations for Grandcross damage now based on Attk + MATK, instead of just physical-[Oatmeal12345]

@@ -10866,6 +10866,12 @@ begin
 									if c = (sl.Count -1) then tn.Count := 0;
 								end;
 							end;
+                                                $92:    {Venom Dust}
+                                                        begin
+                                                                if not Boolean(ts1.Stat2 and 1) then
+								        ts1.HealthTick[0] := Tick + tn.CData.aMotion
+							        else ts1.HealthTick[0] := ts1.HealthTick[0] + 30000;
+                                                        end;
 
 						$93: //LM
 							begin
