@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-18-04: NPC Set logic fix. [Tsusai]
 - 10-18-04: NPC Set can modify STR, AGI, VIT, etc. [Tsusai]
 - 10-18-04: Reactivated and fixed NPC set option. [Tsusai]
 - 10-18-04: Commented out non working, unused pre variables. [Tsusai]

@@ -288,10 +288,12 @@ begin
                 if (Copy(str, 1, 1) <> '\') then tc.Flag.Values[str] := IntToStr(i)
                 else ServerFlag.Values[str] := IntToStr(i);
 
-                //update character's options after setting
-                UpdateOption(tm, tc);
-                CalcStat(tc);
-                SendCStat(tc);
+                if (str = 'str') or (str = 'agi') or (str = 'dex') or (str = 'vit') or
+                (str = 'int') or (str = 'luk') then begin
+                    CalcStat(tc);
+                    SendCStat(tc);
+                end else if (str = 'option') then UpdateOption(tm, tc);
+
 
                 Inc(tc.ScriptStep);
             end;
