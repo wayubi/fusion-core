@@ -20,6 +20,8 @@ uses
     procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
     function party_is_online(tpa : TParty) : Boolean;
     function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
+    function party_is_current(partyid : Integer) : Boolean;
+    function guild_is_current(guildid : Integer) : Boolean;
 
 implementation
 
@@ -179,6 +181,7 @@ uses
     var
         datafile : TStringList;
         columns : TStringList;
+        strbuf : String;
     begin
         datafile := TStringList.Create;
         columns := TStringList.Create;
@@ -189,9 +192,15 @@ uses
         end;
 
         datafile.LoadFromFile(path);
-        columns.DelimitedText := datafile[row + 2];
 
-        Result := columns.Strings[column];
+        strbuf := StringReplace(datafile[row + 2], ' ', '[FSRCALL]', [rfReplaceAll, rfIgnoreCase]);
+        columns.DelimitedText := strbuf;
+
+        if columns.Count > column then begin
+            Result := Trim(StringReplace(columns.Strings[column], '[FSRCALL]', ' ', [rfReplaceAll, rfIgnoreCase]));
+        end else begin
+            Result := '';
+        end;
 
         FreeAndNil(datafile);
         FreeAndNil(columns);
@@ -509,8 +518,8 @@ uses
     begin
         result_string := '';
 
-        len := length(result_string);
-        for i := 0 to (count - len) - 2 do begin
+        len := length(str);
+        for i := 0 to (count - len) - 1 do begin
             result_string := result_string + ' ';
         end;
         result_string := result_string + str;
@@ -520,5 +529,57 @@ uses
     end;
     { ------------------------------------------------------------------------------------- }
         
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - party_is_current                                                            }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: ensure that the members within the party still exist and are not dupes.      }
+    { Parameters:                                                                           }
+    {  - partyid : Integer, Represents the id of the Party.                                 }
+    { Results:                                                                              }
+    {  - Result : Boolean, Represents the value that determines whether or not to process.  }
+    { ------------------------------------------------------------------------------------- }
+    function party_is_current(partyid : Integer) : Boolean;
+    var
+        tpa : TParty;
+        i : Integer;
+    begin
+        tpa := PartyList.Objects[PartyList.IndexOf(partyid)] as TParty;
+        Result := False;
+
+        for i := 0 to 11 do begin
+            if (tpa.MemberID[i] = 0) or (not (tpa.Member[i].PartyName = tpa.Name)) then Continue;
+            Result := True;
+            Break;
+        end;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - guild_is_current                                                            }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: ensure that the members within the guild still exist and are not dupes.      }
+    { Parameters:                                                                           }
+    {  - guildid : Integer, Represents the id of the Guild.                                 }
+    { Results:                                                                              }
+    {  - Result : Boolean, Represents the value that determines whether or not to process.  }
+    { ------------------------------------------------------------------------------------- }
+    function guild_is_current(guildid : Integer) : Boolean;
+    var
+        tg : TGuild;
+        i : Integer;
+    begin
+        tg := GuildList.Objects[GuildList.IndexOf(guildid)] as TGuild;
+        Result := False;
+
+        for i := 0 to tg.RegUsers - 1 do begin
+            if (tg.MemberID[i] = 0) or (not (tg.Member[i].GuildID = tg.ID)) then Continue;
+            Result := True;
+            Break;
+        end;
+    end;
+    { ------------------------------------------------------------------------------------- }
+
 end.
 

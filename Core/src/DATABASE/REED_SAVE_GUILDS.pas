@@ -34,6 +34,8 @@ implementation
         for i := 0 to GuildList.Count - 1 do begin
             tg := GuildList.Objects[i] as TGuild;
             if (not guild_is_online(tg)) and (not forced) then Continue;
+            if not guild_is_current(tg.ID) then Continue;
+            
             datafile.Clear;
 
             path := AppPath + 'gamedata\Guilds';
@@ -237,19 +239,21 @@ implementation
             str := ' ';
 
             str := str + reed_column_align(IntToStr(tgl.ID), 6);
-            str := str + reed_column_align('A', 0, False);
+            str := str + reed_column_align('A', 1);
+            str := str + reed_column_align(tgl.GuildName, 0, False);
 
             datafile.Add(str);
         end;
 
         for i := 0 to tg.RelHostility.Count - 1 do begin
-            tgl := tg.RelAlliance.Objects[i] as TGRel;
+            tgl := tg.RelHostility.Objects[i] as TGRel;
             if (tgl = nil) then Continue;
 
             str := ' ';
 
-            str := str + reed_column_align(IntToStr(tgl.ID), 6);
-            str := str + reed_column_align('H', 0, False);
+            str := str + reed_column_align(IntToStr(tgl.ID), 5);
+            str := str + reed_column_align('H', 0);
+            str := str + reed_column_align(tgl.GuildName, 0, False);
 
             datafile.Add(str);
         end;

@@ -24,6 +24,10 @@ implementation
         tp : TPlayer;
         tpe : TPet;
         i : Integer;
+        tc : TChara;
+        path : String;
+        pfile : String;
+        charalist : TStringList;
     begin
         if Player.IndexOf(id_key) = -1 then Exit;
         tp := Player.Objects[Player.IndexOf(id_key)] as TPlayer;
@@ -34,10 +38,18 @@ implementation
         { -- Accounts can not be deleted while Chars / Pets Exist -- }
 
         { -- Begin - Delete Characters -- }
-        for i := 0 to 8 do begin
-            if not assigned(tp.CData[i]) then Continue;
-            PD_Delete_Character(tp.CData[i].CID);
+        path := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\';
+        pfile := 'Character.txt';
+        charalist := TStringList.Create;
+        charalist := get_list(path, pfile);
+
+        for i := 0 to charalist.Count - 1 do begin
+            tc := Chara.Objects[Chara.IndexOf(StrToInt(charalist[i]))] as TChara;
+            PD_Delete_Character(tc.CID);
         end;
+
+        charalist.Clear;
+        charalist.Free;
         { -- End - Delete Characters -- }
 
         { -- Begin - Delete Pets -- }

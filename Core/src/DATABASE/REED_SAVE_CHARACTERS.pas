@@ -36,9 +36,10 @@ implementation
             tc := Chara.Objects[i] as TChara;
             tp := tc.PData;
 
-            path := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters';
-
+            if not assigned(tp) then Continue;
             if (tp.Login = 0) and (not forced) then Continue;
+
+            path := AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters';
 
             pfile := 'Character.txt';
             PD_Save_Characters_Basic(tc, datafile);
@@ -168,6 +169,8 @@ implementation
         datafile.Add('----------------------------------');
 
         for i := 1 to MAX_SKILL_NUMBER do begin
+            if tc.Skill[i].Lv = 0 then Continue;
+            
             str := ' ';
 
             len := length(IntToStr(i));

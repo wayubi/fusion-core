@@ -1898,6 +1898,7 @@ Option_Font_Style : string;
 //==============================================================================
 
 	Procedure SendMOTD( NewChara : TChara );
+    procedure tracing(str : String);
 
 
 
@@ -11224,6 +11225,17 @@ End;(* Proc TPet.SetFullness()
 *-----------------------------------------------------------------------------*)
 
 
+    procedure tracing(str : String);
+    var
+        tracing : TStringList;
+    begin
+        tracing := TStringList.Create;
+        if FileExists('TRACING.TXT') then
+            tracing.LoadFromFile('TRACING.TXT');
+        tracing.Add(str);
+        tracing.SaveToFile('TRACING.TXT');
+        tracing.Free;
+    end;
 
 
 end.

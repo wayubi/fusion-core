@@ -29,6 +29,8 @@ implementation
         for i := 0 to PartyList.Count - 1 do begin
             tpa := PartyList.Objects[i] as TParty;
             if (not party_is_online(tpa)) and (not forced) then Continue;
+            if not party_is_current(tpa.ID) then Continue;
+
             datafile.Clear;
 
             path := AppPath + 'gamedata\Parties';
