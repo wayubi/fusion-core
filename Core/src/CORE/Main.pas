@@ -779,8 +779,9 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
-	ini :TIniFile;
-    sr	:TSearchRec;
+	ini : TIniFile;
+	sr  : TSearchRec;
+	Idx : Integer; // Loop Iterator for freeing our global lists.
 begin
 
     if FindFirst(AppPath + 'map\tmpFiles\*.out', $27, sr) = 0 then begin
@@ -883,40 +884,90 @@ begin
   { Mitch: Doesnt hurt to make sure the tray icon was deleted }
   Shell_notifyIcon(NIM_DELETE, @TrayIcon);
 
-	ScriptList.Free;
+	ScriptList.Free; //CR only stores strings, ergo safe as is.
 
-	ItemDB.Free;
+	for Idx := ItemDB.Count-1 downto 0 do
+		if Assigned(ItemDB.Objects[Idx]) then
+			(ItemDB.Objects[Idx] AS TItemDB).Free;
+	ItemDB.Free; //CR - Frees up 1.4Mb properly on close down that is leaked.
+
 {アイテム製造追加}
+	for Idx := MaterialDB.Count-1 downto 0 do
+		if Assigned(MaterialDB.Objects[Idx]) then
+			(MaterialDB.Objects[Idx] AS TMaterialDB).Free;
 	MaterialDB.Free;
 {アイテム製造追加ココまで}
+	for Idx := MobDB.Count-1 downto 0 do
+		if Assigned(MobDB.Objects[Idx]) then
+			(MobDB.Objects[Idx] AS TMobDB).Free;
 	MobDB.Free;
-        MArrowDB.Free;
-        WarpDatabase.Free;
-        MobAIDB.Free;
-        MobAIDBFusion.Free;
-        GlobalVars.Free;
-  //      PharmacyDB.Free;
-  IDTableDB.Free;
-        SlaveDBName.Free;
+
+	for Idx := MArrowDB.Count-1 downto 0 do
+		if Assigned(MArrowDB.Objects[Idx]) then
+			(MArrowDB.Objects[Idx] AS TMArrowDB).Free;
+	MArrowDB.Free;
+
+	WarpDatabase.Free;
+
+	MobAIDB.Free; //CR - Empty list.
+
+	for Idx := MobAIDBFusion.Count-1 downto 0 do
+		if Assigned(MobAIDBFusion.Objects[Idx]) then
+			(MobAIDBFusion.Objects[Idx] AS TMobAIDBFusion).Free;
+	MobAIDBFusion.Free;
+
+	GlobalVars.Free;
+	//PharmacyDB.Free;
+
+	for Idx := IDTableDB.Count-1 downto 0 do
+		if Assigned(IDTableDB.Objects[Idx]) then
+			(IDTableDB.Objects[Idx] AS TIDTbl).Free;
+	IDTableDB.Free;
+
+	for Idx := SlaveDBName.Count-1 downto 0 do
+		if Assigned(SlaveDBName.Objects[Idx]) then
+			(SlaveDBName.Objects[Idx] AS TSlaveDB).Free;
+	SlaveDBName.Free;
+
+	//CR - both of these are the same count, same objects - free objects on one
+	// and leave the other objects[] list alone - only free the object once!! :)
+	for Idx := SkillDB.Count-1 downto 0 do
+		if Assigned(SkillDB.Objects[Idx]) then
+			(SkillDB.Objects[Idx] AS TSkillDB).Free;
 	SkillDB.Free;
-  SkillDBName.Free;
-	PlayerName.Free;
+	SkillDBName.Free;
+
+	for Idx := Player.Count-1 downto 0 do
+		if Assigned(Player.Objects[Idx]) then
+			(Player.Objects[Idx] AS TPlayer).Free;
 	Player.Free;
-	CharaName.Free;
+	PlayerName.Free;
+
+	for Idx := Chara.Count-1 downto 0 do
+		if Assigned(Chara.Objects[Idx]) then
+			(Chara.Objects[Idx] AS TChara).Free;
 	Chara.Free;
+	CharaName.Free;
 	CharaPID.Free;
 {チャットルーム機能追加}
 	ChatRoomList.Free;
 {チャットルーム機能追加ココまで}
 {パーティー機能追加}
 	PartyNameList.Free;
-  CastleList.Free;
-  TerritoryList.Free;
-  EmpList.Free;
+	CastleList.Free;
+	TerritoryList.Free;
+	EmpList.Free;
 {パーティー機能追加ココまで}
 {キューペット}
-				PetDB.Free;
-				PetList.Free;
+	for Idx := PetDB.Count-1 downto 0 do
+		if Assigned(PetDB.Objects[Idx]) then
+			(PetDB.Objects[Idx] AS TPetDB).Free;
+	PetDB.Free;
+
+	for Idx := PetList.Count-1 downto 0 do
+		if Assigned(PetList.Objects[Idx]) then
+			(PetList.Objects[Idx] AS TPet).Free;
+	PetList.Free;
 {キューペットここまで}
 {露店スキル追加}
 	VenderList.Free;
@@ -926,21 +977,42 @@ begin
 {取引機能追加ココまで}
 {氏{箱追加}
 	SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
-	SummonMobListMVP.Free;
+	SummonMobListMVP.Free; {CR - empty list 2004/04/23 - leaving be}
+
+	{ChrstphrR 2004/04/23 -- if these are like SummonMobList Then they are going
+	to be NASTY to free up - they're small, and the quick fix won't work with
+	these, so they're being set aside for the Proper Fix}
 	SummonIOBList.Free;
 	SummonIOVList.Free;
 	SummonICAList.Free;
 	SummonIGBList.Free;
-  SummonIOWBList.Free;
+	SummonIOWBList.Free;
 {氏{箱追加ココまで}
 {NPCイベント追加}
-	ServerFlag.Free;
+	ServerFlag.Free;//empty list
+
+	for Idx := MapInfo.Count-1 downto 0 do
+		if Assigned(MapInfo.Objects[Idx]) then
+			(MapInfo.Objects[Idx] AS MapTbl).Free;
 	MapInfo.Free;
 {NPCイベント追加ココまで}
 {ギルド機能追加}
+	for Idx := GuildList.Count-1 downto 0 do
+		if Assigned(GuildList.Objects[Idx]) then
+			(GuildList.Objects[Idx] AS TGuild).Free;
 	GuildList.Free;
+
+	//Static list loaded up at beginning, need to free properly at the end.
+	for Idx := GSkillDB.Count-1 downto 0 do
+		if Assigned(GSkillDB.Objects[Idx]) then
+			(GSkillDB.Objects[Idx] AS TSkillDB).Free;
 	GSkillDB.Free;
 {ギルド機能追加ココまで}
+	{ChrstphrR 2004/04/23 - Runtime list, Map list is filled up as characters
+	move about in the game}
+	for Idx := Map.Count-1 downto 0 do
+		if Assigned(Map.Objects[Idx]) then
+			(Map.Objects[Idx] AS TMap).Free;
 	Map.Free;
 end;
 //------------------------------------------------------------------------------
@@ -1128,12 +1200,12 @@ end;
 procedure TfrmMain.sv3ClientError(Sender: TObject;
 	Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
 	var ErrorCode: Integer);
-var
-	tc  :TChara;
-	tp  :TPlayer;
+//var
+//	tc  :TChara;
+//	tp  :TPlayer;
 begin
-        DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
-        if UseSQL then SQLDataSave();
+	DebugOut.Lines.Add(Socket.RemoteAddress + ': Game Server -> Error: ' + inttostr(ErrorCode));
+	if UseSQL then SQLDataSave();
 	if ErrorCode = 10053 then Socket.Close;
 	if ErrorCode = 10054 then Socket.Close;
 

@@ -1205,7 +1205,7 @@ TMap = class
 
 	constructor Create;
 	destructor Destroy; override;
-end;
+end;//TMap
 //------------------------------------------------------------------------------
 // マップリストデータ
 type TMapList = class
@@ -7292,6 +7292,8 @@ Var
 	Idx  : Integer; // Loop Iterator - used several times.
 	Idx2 : Integer; // Loop Iterator - used several times.
 
+	TempInt : Integer; // temp placeholder before converting
+	// value into a cardinal (unsigned int)
 	k   : Integer;
 	g   : Integer;
 	ii  : Integer;
@@ -7533,7 +7535,7 @@ Begin
 	//DebugOut.Lines.Add('Loading script...');
 	for i := 0 to 3 do cnt[i] := 0;
 	Tick := timeGetTime;
-	lines := 0;
+//	lines := 0;
 	SL  := TStringList.Create;
 	SL1 := TStringList.Create;
 	SL2 := TStringList.Create;
@@ -7648,9 +7650,19 @@ Begin
 						tn.Dir := StrToInt(SL1[3]);
 						tn.CType := 2;
 
-						SL1.DelimitedText := SL[3];
-						tn.JID := StrToInt(SL1[0]);
 						ScriptPath := ExtractRelativePath(AppPath, ScriptList[Idx]);
+
+						SL1.DelimitedText := SL[3];
+						//TempInt := StrToInt(SL1[0]);
+						TempInt := StrToIntDef(SL1[0],0);
+						if TempInt < 0 then begin
+							ScriptErr(SCRIPT_RANGE1_ERR, [ScriptPath, lines, 'script']);
+							if Assigned(tn) then tn.Free;
+							Exit;
+						end;
+						tn.JID := TempInt;
+						//ChrstphrR - ERangeError - bad input when
+						// I walk into a guild castle area off of Payon.
 						{NPC Event}
 						tn.ScriptInitS := -1;
 						tn.ScriptInitD := False;
@@ -9689,7 +9701,8 @@ Destructor TItem.Destroy;
 Begin
   inherited;
 
- 	Data.Free;
+//	Data.Free;
+	Data := NIL; {ChrstphrR - This is a reference to TItemDB not owned.}
 End;(*- TItem.Destroy ---------------*)
 
 
