@@ -1,3 +1,4 @@
+- 04-07-04: Added 'RUN' Skill, fixed a few checks up and started tracking monster status.  [Darkhelmet]
 - 04-07-04: Tidying up routine in Game unit, translating original Japanese comments in code (No functional code changes) [ChrstphrR]
 - 04-07-04: Added #greaper GM command. (Grim Reaper - For scaring the kiddies). [AlexKreuz]
 - 04-07-04: Fixed Stats and Options reset upon walk request, bug. [AlexKreuz]

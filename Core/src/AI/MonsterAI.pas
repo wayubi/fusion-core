@@ -1418,13 +1418,17 @@ var
 begin
   //if (tsAI2.Percent > Random(1000)) and (lowercase(ts.Status) = lowercase(tsAI2.Status)) then begin
   if (tsAI2.Percent > Random(1000)) and (ts.SkillWaitTick < Tick) then begin
-    TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
-    ts.MSkill := TempSkill.ID;
-    ts.MLevel := tsAI2.SkillLV;
-    ts.CastTime := tsAI2.Cast_Time;
-    ts.Data.WaitTick := tsAI2.Cool_Time;
-    ts.Mode := 3;
-    NewMonsterCastTime(tm, ts, Tick);
+	if tsAI2.SkillID = 'RUN' then begin
+      ts.Status := 'RUN';
+    end else begin
+      TempSkill :=  SkillDBName.Objects[SkillDBName.IndexOf(tsAI2.SkillID)] as TSkillDB;
+      ts.MSkill := TempSkill.ID;
+      ts.MLevel := tsAI2.SkillLV;
+      ts.CastTime := tsAI2.Cast_Time;
+      ts.Data.WaitTick := tsAI2.Cool_Time;
+      ts.Mode := 3;
+      NewMonsterCastTime(tm, ts, Tick);
+    end;
     //MobSkills(tm, ts, Tick);
     //DebugOut.Lines.Add('Percent Passes');
   end;
@@ -1438,7 +1442,7 @@ var
 begin
 
         tc := ts.AData;
-
+	if (tc <> nil) and (ts <> nil) then begin
         //j := tc.Skill[ts.MSKill].Data.CastTime1 + tc.Skill[ts.MSKill].Data.CastTime2 * ts.MSKill;
         //if j < tc.Skill[ts.MSKill].Data.CastTime3  then j := tc.Skill[ts.MSKill].Data.CastTime3;
         j := ts.CastTime;
@@ -1462,6 +1466,7 @@ begin
                 ts.MMode := 1;
                 ts.ATick := Tick;
         end;
+  end;
 
 end;
 

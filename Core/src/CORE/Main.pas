@@ -2767,6 +2767,7 @@ begin
                 WFIFOL(2, ts.ID);
                 SendBCmd(tm, ts.Point, 6);
         end;
+	ts.Status := 'RUSH_ST';
   // Reset Lex Aeterna
 	if (ts.EffectTick[0] > Tick) then begin
     // Dmg := Dmg * 2;  // Done in the DamageCalc functions
@@ -13810,11 +13811,17 @@ begin
         end;
         end;
       end;
+	if Status = 'RUN' then begin
+      ts.ATarget := 0;
+      //ts.isActive := false;
+      ts.tgtPoint.X := ts.Point.X + Random(10);
+      ts.tgtPoint.Y := ts.Point.Y + Random(10);
+    end;
 
 		if (ATarget = 0) then begin
 			//if Data.isActive then begin
 
-			if isActive then begin
+			if (isActive) and (ts.Status <> 'RUN') then begin
 			
 				sl.Clear;
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
