@@ -3603,7 +3603,7 @@ end;
 					WFIFOW( 0, $00fd);
 					WFIFOS( 2, tc1.Name, 24);
 					WFIFOB( 26, 0);
-					tc1.Socket.SendBuf(buf, 27);
+					tc.Socket.SendBuf(buf, 27);
 				end;
 			end;
 		//--------------------------------------------------------------------------

@@ -153,6 +153,7 @@ begin
 
 				RFIFOB(2, b);
 				if b > 4 then exit;
+			  if UseSQL then GetCharaPartyGuild(tp.CID[b]);
 				if tp.CData[b] <> nil then begin
 					tc := tp.CData[b];
 {NPCƒCƒxƒ“ƒg’Ç‰Á}

@@ -14,11 +14,12 @@ uses
     function  ExecuteSqlCmd(sqlcmd: String) : Boolean;
 		procedure SQLDataLoad();
 		procedure SQLDataSave();
-		function  GetPlayerData(userid: String) : Boolean; {取得帐号资料}
+		function  GetPlayerData(userid: String; AID: cardinal = 0) : Boolean; {取得帐号资料}
 		function  GetCharaData(GID: cardinal) : Boolean; {取得人物资料}
 		function  GetAccCharaData(AID: cardinal) : Boolean; {取得帐号的人物资料}
 		function  GetPetData(AID: cardinal) : Boolean; {取得帐号的宠物资料}
 		function  GetCharaGuildData(GID: cardinal) : Boolean; {取得人物的工会资料}
+		function  GetCharaPartyGuild(GID: cardinal) : Boolean; {取得人物的工会、组队，以及所有成员资料}
 		function  DeleteChar(GID: cardinal) : Boolean; {从数据库删除人物}
 		function  DeleteGuildMember(GID: cardinal; mtype: Integer; tgb: TGBan; GDID: cardinal) : Boolean; {从数据库删除工会成员}
 		function  DeleteParty(Name: string) : Boolean; {从数据库删除组队}
@@ -268,6 +269,11 @@ begin
 			  DisposFV := StrToInt(SQLDataSet.FieldValues['DisposFV']);
 			  DisposRW := StrToInt(SQLDataSet.FieldValues['DisposRW']);
 				
+				for i := 0 to 35 do begin
+					MemberID[i] := 0;
+					MemberPos[i] := 0;
+					MemberEXP[i] := 0;
+				end;
 			  for i := 10000 to 10004 do
 				begin
 			  	if GSkillDB.IndexOf(i) <> -1 then
@@ -312,7 +318,7 @@ begin
 			  j := 0;
 			  while not SQLDataSet.Eof do
 				begin
-				  if j > 35 then continue;
+				  if j > 35 then break;
 				  MemberID[j]  := StrToInt(SQLDataSet.FieldValues['GID']);
 				  MemberPos[j] := StrToInt(SQLDataSet.FieldValues['PositionID']);
 				  MemberEXP[j] := StrToInt(SQLDataSet.FieldValues['MemberExp']);
@@ -746,27 +752,41 @@ end;
 //------------------------------------------------------------------------------
 // 取得帐号资料
 //------------------------------------------------------------------------------
-function GetPlayerData(userid : String) : Boolean;
+function GetPlayerData(userid : String; AID: cardinal = 0) : Boolean;
 var
   tp  :TPlayer;
 	i,j,k : Integer;
 begin
   Result := False;
 
-	if assigned(PlayerName) then
-	begin
-	  if PlayerName.IndexOf(userid) <> -1 then
+  if AID = 0 then begin
+		if assigned(PlayerName) then
 		begin
-		  Result := True;
-		  Exit;
+			if PlayerName.IndexOf(userid) <> -1 then begin
+				Result := True;
+				Exit;
+			end;
 		end;
-	end;
+		DebugOut.Lines.Add(format('Load User Data From MySQL: userid = %s', [userid]));
 
-  DebugOut.Lines.Add(format('Load User Data From MySQL: %s', [userid]));
+		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [userid])) then begin
+			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %s', [userid]));
+			Exit;
+		end
+	end else begin
+		if assigned(PlayerName) then
+		begin
+			if Player.IndexOf(AID) <> -1 then begin
+				Result := True;
+				Exit;
+			end;
+		end;
+		DebugOut.Lines.Add(format('Load User Data From MySQL: AID = %d', [AID]));
 
-  if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE ID=''%s'' LIMIT 1', [userid])) then begin
-    DebugOut.Lines.Add(format('Load User Data From MySQL Error: %s', [userid]));
-		Exit;
+		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.AID=''%d'' LIMIT 1', [AID])) then begin
+			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %d', [AID]));
+			Exit;
+		end
 	end;
   SQLDataSet.First;
 
@@ -832,7 +852,6 @@ var
 	tc : TChara;
 	ta : TMapList;
 	tp  :TPlayer;
-	tpa :TParty;
 begin
   Result := False;
 
@@ -901,6 +920,7 @@ begin
 		    SavePoint.Y   := StrToInt(SQLDataSet.FieldValues['SY']);
 		    Plag          := StrToInt(SQLDataSet.FieldValues['Plag']);
 		    PLv           := StrToInt(SQLDataSet.FieldValues['PLv']);
+				PartyName     := '';
 		    ID            := StrToInt(SQLDataSet.FieldValues['AID']);
 
 				{读取MEMO记录点资料}
@@ -1019,40 +1039,17 @@ begin
 					end;
 				end;
       end;
-			
-			tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
-			tp.CName[tc.CharaNumber] := tc.Name;
-			tp.CData[tc.CharaNumber] := tc;
-			tp.CData[tc.CharaNumber].CharaNumber := tc.CharaNumber;
-			tp.CData[tc.CharaNumber].ID := tp.ID;
-			tp.CData[tc.CharaNumber].Gender := tp.Gender;
 
 			CharaName.AddObject(tc.Name, tc);
 		  Chara.AddObject(tc.CID, tc);
+
+      GetPlayerData('', tc.ID);
+
+			tp := Player.Objects[Player.IndexOf(tc.ID)] as TPlayer;
+			tp.CData[tc.CharaNumber] := tc;
+			tp.CData[tc.CharaNumber].Gender := tp.Gender;
 			{读取宠物资料}
 			GetPetData(tc.ID);
-			{读取人物工会资料}
-			GetCharaGuildData(tc.CID);
-			{读取人物组队资料}
-			for i := 0 to PartyNameList.Count - 1 do begin
-				tpa := PartyNameList.Objects[i] as TParty;
-				for j := 0 to 11 do begin
-					if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
-					  tc.PartyName := tpa.Name;
-						tpa.Member[j] := tc;
-						break;
-					end;
-				end;
-			end;
-			if tc.PartyName <> '' then begin
-  			{读取组队中其它队员的资料}
-	  		tpa := PartyNameList.Objects[PartyNameList.IndexOf(tc.PartyName)] as TParty;
-		  	for i := 0 to 11 do begin
-			    if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[i] <> tc.CID) then begin
-			  	  GetCharaData(tpa.MemberID[j]);
-			  	end;
-			  end;
-			end;
 
 //	    SQLDataSet.Next;
 	  end;
@@ -1330,12 +1327,12 @@ begin
 	  exit;
 	end;
 
-  tg := GuildList.Objects[GuildList.IndexOf(SQLDataSet.FieldValues['GDID'])] as TGuild;
+  tg := GuildList.Objects[GuildList.IndexOf(StrToInt(SQLDataSet.FieldValues['GDID']))] as TGuild;
 	with tg do begin
 		for j := 0 to 35 do begin
 			if MemberID[j] = tc.CID then begin
 				tc.GuildName := Name;
-				tc.GuildID := ID;
+				tc.GuildID := StrToInt(SQLDataSet.FieldValues['GDID']);
 				tc.ClassName := PosName[MemberPos[j]];
 				tc.GuildPos := j;
 				Member[j] := tc;
@@ -1481,6 +1478,80 @@ begin
 	    GetCharaData(tp.CID[i]);
 		end;
 	end;
+	Result := True;
+end;
+
+//------------------------------------------------------------------------------
+// 取得人物的工会、组队，以及所有成员资料
+//------------------------------------------------------------------------------
+function  GetCharaPartyGuild(GID: cardinal) : Boolean;
+var
+  i,j,k : Integer;
+	tpa   : TParty;
+	tc,tc1: TChara;
+	tg    : TGuild;
+begin
+  Result := False;
+
+  k := Chara.IndexOf(GID);
+	if k = -1 then exit;
+
+	tc := Chara.Objects[k] as TChara;
+	// 读取人物组队资料
+	for i := 0 to PartyNameList.Count - 1 do begin
+		tpa := PartyNameList.Objects[i] as TParty;
+		for j := 0 to 11 do begin
+			if (tpa.MemberID[j] <> 0) AND (tpa.MemberID[j] = tc.CID) then begin
+			  tc.PartyName := tpa.Name;
+				tpa.Member[j] := tc;
+				break;
+			end;
+		end;
+	end;
+	if tc.PartyName <> '' then begin
+  	// 读取组队中其它队员的资料
+		tpa := PartyNameList.Objects[PartyNameList.IndexOf(tc.PartyName)] as TParty;
+		for i := 0 to 11 do begin
+	    if (tpa.MemberID[i] <> 0) AND (tpa.MemberID[i] <> tc.CID) then begin
+				if Chara.IndexOf(tpa.MemberID[i]) <> -1 then begin
+            tc1 := Chara.Objects[Chara.IndexOf(tpa.MemberID[i])] as TChara;
+						tc1.PartyName := tpa.Name;
+						tpa.Member[i] := tc1;
+				  continue;
+  			end else begin
+			    if GetCharaData(tpa.MemberID[i]) then begin
+            tc1 := Chara.Objects[Chara.IndexOf(tpa.MemberID[i])] as TChara;
+						tc1.PartyName := tpa.Name;
+						tpa.Member[i] := tc1;
+					end;
+				end;
+	  	end;
+	  end;
+	end;
+	// 读取人物工会资料
+	if GetCharaGuildData(tc.CID) then begin
+	  // 读取工会中其它成员的资料
+		tc := Chara.Objects[Chara.IndexOf(GID)] as TChara;
+		k := GuildList.IndexOf(tc.GuildID);
+		if k <> -1 then begin
+	    tg := GuildList.Objects[k] as TGuild;
+  	  for i := 0 to 35 do begin
+		    if (tg.MemberID[i] <> 0) AND (tg.MemberID[i] <> tc.CID) then begin
+				  if Chara.IndexOf(tg.MemberID[i]) <> -1 then begin
+            tc1 := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
+					  GetCharaGuildData(tc1.CID);
+					  continue;
+  				end else begin
+			      if GetCharaData(tg.MemberID[i]) then begin
+              tc1 := Chara.Objects[Chara.IndexOf(tg.MemberID[i])] as TChara;
+					    GetCharaGuildData(tc1.CID);
+						end;;
+					end;
+        end;
+			end;
+		end;
+	end;
+
 	Result := True;
 end;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
-Fusion_SQL 1.0.0.0 - December 29th, 2003
+Fusion_SQL 1.0.0.0 - December 30th, 2003
 --------------------------------------------------------------------------------
+- Fixed reading guild member data error. [Michen]
 - Fixed Party member will auto delete after reboot. [Michen]
 - Modify get chara data by gid not aid. [Michen]
 
