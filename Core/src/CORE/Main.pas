@@ -66,7 +66,7 @@ type
 
     procedure CreateField(tc:TChara; Tick:Cardinal);
 		procedure SkillEffect(tc:TChara; Tick:Cardinal);
-
+      function DamageOverTime(tm: TMap; var tc: TChara; Tick: cardinal; skill: word; useLV: byte; count: integer): boolean;
                 {Pet Moving}
                 procedure PetMoving( tc:TChara; _Tick:cardinal );
 
@@ -7800,11 +7800,32 @@ begin
       end;
     end;}
 
-				86: //ウォーターボール
+				86: // Water Ball
 					begin
+            k := tl.Data2[MUseLV];
+            b := 0;
+            for j1 := (tc.Point.Y - k)  to (tc.Point.Y + k) do begin
+              for i1 := (tc.Point.X - k) to (tc.Point.X + k) do begin
+                if (tm.gat[i1][j1] = 3) then b := 1;
+              end;
+            end;
+
+            if (b = 0) then begin
+              SendSkillError(tc, 0);
+              tc.MMode := 4;
+              tc.MPoint.X := 0;
+              tc.MPoint.Y := 0;
+              exit;
+            end;
+
+            tc.Skill[86].Tick := Tick;
                                                 k := tl.Data1[MUseLV];
-                                                for m := 0 to k - 1 do begin
-                                                if dmg[1] <> 0 then begin
+            tc.Skill[86].EffectLV := k;
+            tc.Skill[86].Effect1 := tc.MUseLV;
+            DamageOverTime(tm, tc, Tick, 86, MUseLV, k);
+
+            //for m := 0 to k - 1 do begin
+            {if dmg[1] <> 0 then begin
                                                         dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
                                                         dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
                                                         dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
@@ -7819,8 +7840,8 @@ begin
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                 				        xy := ts.Point;
 						        sl.Clear;
-						        for j1 := (xy.Y - tl.Data2[MUseLV]) div 8 to (xy.Y + tl.Data2[MUseLV]) div 8 do begin
-							        for i1 := (xy.X - tl.Data2[MUseLV]) div 8 to (xy.X + tl.Data2[MUseLV]) div 8 do begin
+              for j1 := (xy.Y - 1) div 8 to (xy.Y + 1) div 8 do begin
+                for i1 := (xy.X - 1) div 8 to (xy.X + 1) div 8 do begin
 								        for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
 									        if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
 									        if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
@@ -7844,8 +7865,8 @@ begin
                                                                         DamageProcess1(tm, tc, ts1, dmg[0], Tick)
                                                                 end;
                                                         end;
-                                                        end;
-                                                        end;
+              end; }
+            //end;
 					end;
 				93: //モンスター情報
 					begin
@@ -11926,7 +11947,9 @@ var
 begin
 	with tc do begin
          //if Weight * 2 <> MaxWeight then begin
-
+                if (tc.Skill[86].Lv > 0) and (tc.Skill[86].Tick <= Tick) and (tc.Skill[86].EffectLV > 0) then begin
+                  DamageOverTime(tc.MData, tc, Tick, 86, tc.Skill[86].Effect1, tc.Skill[86].EffectLV);
+                end;
             {Sanctuary}
                 // Colus, 20031229: Changed heal period 5000->1000, added check to stop healing when full
                 //        20030127: No more heals while dead
@@ -14980,6 +15003,105 @@ begin
 
 	end;
 end;
+
+
+function TFrmMain.DamageOverTime(tm: TMap; var tc: TChara; Tick: cardinal; skill: word; useLV: byte; count: integer): boolean;
+var
+  tl : TSkillDB;
+  tv : TLiving;
+  ts, ts1 : TMob;
+  i, j, i1, j1, k1: integer;
+  sl : TStringList;
+  offset : integer;
+  xy : TPoint;
+begin
+
+  Result := false;
+  tv := tc.AData;
+  tl := tc.Skill[skill].Data;
+  sl := TStringList.Create;
+
+  if (tv = nil) then exit;
+  
+  case skill of
+
+    86: // Water Ball
+    begin
+      ts := tv as TMob;
+      with tc do begin
+              MSkill := 86;
+              MUseLV := useLV;
+              dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+              dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
+              dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+              dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+              if dmg[0] < 1 then dmg[0] := 1;
+              dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
+              if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+
+              if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+
+              //if (count mod 3 = 1) then begin
+                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+              {end else begin
+                MSkill := 0;
+                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);}
+              //end;
+
+              //ダメージ処理
+              if (dmg[0] >= ts.HP) then begin
+                offset := 0;
+                count := 0;
+              end else begin
+                offset := 150;
+                count := count - 1;
+              end;              
+              DamageProcess1(tm, tc, ts, dmg[0], Tick);
+
+              xy := ts.Point;
+              sl.Clear;
+              for j1 := (xy.Y - 1) div 8 to (xy.Y + 1) div 8 do begin
+                for i1 := (xy.X - 1) div 8 to (xy.X + 1) div 8 do begin
+                  for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                    if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+                    if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
+                    if (abs(ts1.Point.X - xy.X) <= tl.Data2[MUseLV]) and (abs(ts1.Point.Y - xy.Y) <= tl.Data2[MUseLV]) then
+                      sl.AddObject(IntToStr(ts1.ID),ts1);
+                  end;
+                end;
+              end;
+              if sl.Count <> 0 then begin
+                for k1 := 0 to sl.Count - 1 do begin
+                    ts1 := sl.Objects[k1] as TMob;
+                    dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+                    dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
+                    dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+                    dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+                    if dmg[0] < 1 then dmg[0] := 1;
+                    dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+                    if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+                    if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+                    SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+                    //ダメージ処理
+                    DamageProcess1(tm, tc, ts1, dmg[0], Tick)
+                end;
+              end;
+            
+        end;
+        //offset := 150;
+        //count := count - 1;
+        tc.Skill[86].Tick := Tick + offset;
+        tc.Skill[86].EffectLV := count;
+      end;
+
+    end;
+
+  {if (count > 0) then begin
+    DamageOverTime(tm, tc, Tick + offset, skill, count);
+  end;}
+
+end;
+
 {追加ココまで}
 //------------------------------------------------------------------------------
 procedure TfrmMain.cmdStartClick(Sender: TObject);
