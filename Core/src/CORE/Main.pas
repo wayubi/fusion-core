@@ -191,6 +191,7 @@ type
     Button14: TButton;
     Button15: TButton;
     S1: TMenuItem;
+    ConnecttoISCS1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -284,6 +285,7 @@ type
     procedure Button14Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
     procedure S1Click(Sender: TObject);
+    procedure ConnecttoISCS1Click(Sender: TObject);
 		//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -1056,6 +1058,9 @@ begin
         BackupTimer.Enabled := True;
         BackupTimer.Interval := Option_AutoBackup * 1000;
     end;
+
+    frmMain.ConnecttoISCS1Click(self);
+
 {U0x003bÉRÉRÇ‹Ç≈}
 end;
 //------------------------------------------------------------------------------
@@ -1442,10 +1447,13 @@ var
 
 begin
 
+    iscs_console_disconnect(Socket.Data);
     DataSave();
 
         // AlexKreuz: Random 10053 Bug Fix
         if Assigned(Socket.Data) then begin
+
+
 					tc := Socket.Data;
                     tm := tc.MData;
         	SendCLeave(tc, 2);
@@ -1489,6 +1497,7 @@ procedure TfrmMain.sv3ClientError(Sender: TObject;
 //	tp  :TPlayer;
 begin
 
+    iscs_console_disconnect(Socket.Data);
     DataSave();
 
 	if UseSQL then SQLDataSave();
@@ -10292,11 +10301,7 @@ label ExitParse;
 begin
 
         if ISCS_ON then begin
-            if (Edit1.Text = '-ISCSOFF') then begin
-                iscs_console_disconnect();
-            end else begin
-                iscs_console_send(Edit1.Text);
-            end;
+            iscs_console_send(Edit1.Text);
         end else
 
 
@@ -10307,11 +10312,7 @@ begin
 
                 if sl.Count = 0 then goto ExitParse;
 
-                if sl.Strings[0] = 'ISCSON' then begin
-                    iscs_console_connect();
-                end
-
-                else if sl.Strings[0] = 'users' then begin
+                if sl.Strings[0] = 'users' then begin
                 // Displays List of Online Users
                 // Syntax: -users [global]
 
@@ -11163,6 +11164,19 @@ end;
 procedure TfrmMain.Button2Click(Sender: TObject);
 begin
 	JCon_INI_Game_Save();
+end;
+
+procedure TfrmMain.ConnecttoISCS1Click(Sender: TObject);
+begin
+    if not (ISCS_ON) then begin
+        ConnecttoISCS1.Caption := 'Disconnect from ISCS';
+        iscs_console_connect();
+    end
+
+    else begin
+        ConnecttoISCS1.Caption := 'Connect to ISCS';
+        iscs_console_disconnect();
+    end;
 end;
 
 end.

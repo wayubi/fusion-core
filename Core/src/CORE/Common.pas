@@ -20,7 +20,7 @@ uses
 	GlobalLists, List32;
 
 const
-	RELEASE_VERSION = '1.212 F -- I.S.C.S Alpha 1 Release';
+	RELEASE_VERSION = '1.212 G -- I.S.C.S Alpha 2 Release';
 
 	// Colus, 20040304: Let's see if this is truly global scope.
 	MAX_SKILL_NUMBER = 411;

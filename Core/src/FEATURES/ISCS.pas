@@ -41,9 +41,9 @@ uses
     var
         i : Integer;
     begin
-        SetLength(ISCS_CONNECTION, Chara.Count + 2);
+        SetLength(ISCS_CONNECTION, Chara.Count + 1);
 
-        for i := 0 to Chara.Count do begin
+        for i := 0 to length(ISCS_CONNECTION) - 1 do begin
             if ISCS_CONNECTION[i] = nil then break;
         end;
 
@@ -62,7 +62,7 @@ uses
     var
         i : Integer;
     begin
-        for i := 0 to Chara.Count do begin
+        for i := 0 to length(ISCS_CONNECTION) - 1 do begin
             if ISCS_CONNECTION[i].Username = str then begin
                 ISCS_CONNECTION[i].Quit('Powered by the Fusion Inter-Server Communication System.');
                 ISCS_CONNECTION[i] := nil;
@@ -74,17 +74,10 @@ uses
     procedure TfrmISCS.iscs_console_receive(Sender: TObject; AResponse: String);
     var
         i : Integer;
-        array_length : Integer;
         nickname : String;
         body : String;
         tc : TChara;
     begin        
-        for i := 0 to (Chara.Count + 1) do begin
-            if ISCS_CONNECTION[i] = nil then begin
-                array_length := i - 1;
-                Break;
-            end;
-        end;
 
         if AnsiPos('PRIVMSG', AResponse) > 0 then begin
             nickname := Copy(AResponse, 2, AnsiPos('!', AResponse) - 2);
@@ -94,9 +87,14 @@ uses
 
             ISCS_PREVIOUS := AResponse;
 
-            frmMain.txtDebug.Lines.Add('[ISCS] ' + nickname+': '+body);
-            for i := 0 to array_length do begin
+            for i := 0 to length(ISCS_CONNECTION) - 1 do begin
+                if ISCS_CONNECTION[i] = nil then Continue;
+
+                if ISCS_CONNECTION[i].Username = 'Server' then
+                    frmMain.txtDebug.Lines.Add('[ISCS] ' + nickname+': '+body);
+                
                 if CharaName.IndexOf(ISCS_CONNECTION[i].Username) = -1 then Continue;
+
                 tc := CharaName.Objects[CharaName.IndexOf(ISCS_CONNECTION[i].Username)] as TChara;
                 message_green(tc, '[ISCS] ' + nickname+' : '+body);
             end;
@@ -141,11 +139,10 @@ uses
         array_length : Integer;
         nick : String;
     begin
-        for i := 0 to (Chara.Count + 1) do begin
-            if ISCS_CONNECTION[i] = nil then begin
-                array_length := i - 1;
-                Break;
-            end;
+        array_length := -1;
+        for i := 0 to length(ISCS_CONNECTION) - 1 do begin
+            if ISCS_CONNECTION[i] = nil then Continue;
+            Inc(array_length);
         end;
 
         if (tc = nil) then nick := 'Server'
@@ -154,12 +151,13 @@ uses
         if Copy(str, 1, 4) <> 'join' then begin
             if array_length = 0 then begin
                 if (tc = nil) then frmMain.txtDebug.Lines.Add('[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+': '+str)
-                else message_green(tc, '[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+' : '+str);
+                else if tc.PData.Login > 0 then message_green(tc, '[ISCS] ['+ StringReplace(ServerName, ' ', '', [rfReplaceAll, rfIgnoreCase]) +']-'+nick+' : '+str);
             end;
             str := 'PRIVMSG ' + ISCS_CHANNEL + ' :' + str;
         end;
 
-        for i := 0 to Chara.Count do begin
+        for i := 0 to length(ISCS_CONNECTION) - 1 do begin
+            if ISCS_CONNECTION[i] = nil then Continue;
             if ISCS_CONNECTION[i].Username = nick then begin
                 ISCS_CONNECTION[i].Send(str);
                 Break;

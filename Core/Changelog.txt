@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-11-04: I.S.C.S: Removed -ISCSON/-ISCSOFF. Added ISCS menu item. [AlexKreuz]
+- 08-11-04: I.S.C.S: Numerous stability fixes. [AlexKreuz]
 - 08-10-04: R.E.E.D: Character deletion did not remove physical data. [AlexKreuz]
 - 08-10-04: Bug #12: R.E.E.D character deletion caused server crash. [AlexKreuz]
 - 08-10-04: I.S.C.S: Inter-Server Communication System Implemented. [AlexKreuz]

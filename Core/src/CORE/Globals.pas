@@ -262,7 +262,7 @@ uses
         WFIFOW(0, $008e);
         WFIFOW(2, length(str) + 5);
         WFIFOS(4, str, length(str) + 1);
-        tc.Socket.SendBuf(buf, length(str) + 5);
+        if tc.Login <> 0 then tc.Socket.SendBuf(buf, length(str) + 5);
     end;
 
     procedure message_yellow(tc : TChara; str : String);
@@ -270,7 +270,7 @@ uses
         WFIFOW(0, $009a);
         WFIFOW(2, length(str) + 5);
         WFIFOS(4, str, length(str) + 1);
-        tc.Socket.SendBuf(buf, length(str) + 5);
+        if tc.Login <> 0 then tc.Socket.SendBuf(buf, length(str) + 5);
     end;
 
     procedure message_blue(tc : TChara; str : String);
@@ -278,7 +278,7 @@ uses
         WFIFOW(0, $009a);
         WFIFOW(2, length(str) + 9);
         WFIFOS(4, 'blue'+str, length(str) + 4);
-        tc.Socket.SendBuf(buf, length(str) + 9);
+        if tc.Login <> 0 then tc.Socket.SendBuf(buf, length(str) + 9);
     end;
 
     procedure backup_txt_database();

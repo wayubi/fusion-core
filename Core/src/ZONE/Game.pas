@@ -1817,6 +1817,7 @@ end;
 					begin
                     	if not check_attack_lag(tc) then begin
 
+                        iscs_console_disconnect(tc);
                         DataSave();
 
 						SendCLeave(Socket.Data, 2);

@@ -1349,6 +1349,10 @@ object frmMain: TfrmMain
         Caption = 'Minimize to Tray'
         OnClick = MinimizetoTray2Click
       end
+      object ConnecttoISCS1: TMenuItem
+        Caption = 'Connect to ISCS'
+        OnClick = ConnecttoISCS1Click
+      end
     end
   end
 end
