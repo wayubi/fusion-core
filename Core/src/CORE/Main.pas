@@ -2057,7 +2057,13 @@ begin
 		j := GuildList.IndexOf(tc.GuildID);
 		if (j <> -1) then begin
 			tg := GuildList.Objects[j] as TGuild;
-			ge := l * tg.PosEXP[tc1.GuildPos] div 100;
+
+            try
+    			ge := l * tg.PosEXP[tc1.GuildPos] div 100;
+            except
+                ge := 4294967295;
+            end;
+
 			if (ge > l) then ge := l;
 			if (ge > 0) then begin
 				l := l - ge;
