@@ -5282,7 +5282,7 @@ end;
                 end;
             end;
                 //--------------------------------------------------------------------------
-                $01a5: // ペットの名前変更
+                $01a5: // New pet name is decided.
                         begin
                                 if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
 
@@ -5301,26 +5301,26 @@ end;
                                 end;
                         end;
                 //--------------------------------------------------------------------------
-                $01a7: // 卵孵化機使用時 卵選択
-                        begin
-                                // w = 卵の index
-                                RFIFOW( 2, w );
+                $01a7: // Pet egg chosen from the egg list.
+                begin
+                    // Receive the item's index
+                    RFIFOW( 2, w );
 
-                                if( tc.Item[tc.UseItemID].Data.Effect = 121 ) and
-                                ( tc.Item[w].Data.IType = 4 ) and ( tc.Item[w].Data.Loc = 0 ) and
-                                ( tc.Item[w].Data.Effect = 122 ) then begin
+                    if( tc.Item[tc.UseItemID].Data.Effect = 121 ) and
+                     ( tc.Item[w].Data.IType = 4 ) and ( tc.Item[w].Data.Loc = 0 ) and
+                     ( tc.Item[w].Data.Effect = 122 ) then begin
 
-				        Dec(tc.Item[tc.UseItemID].Amount);
+                        Dec(tc.Item[tc.UseItemID].Amount);
 				        WFIFOW( 0, $00a8);
 				        WFIFOW( 2, tc.UseItemID);
-								WFIFOW( 4, tc.Item[tc.UseItemID].Amount);
+                        WFIFOW( 4, tc.Item[tc.UseItemID].Amount);
 				        WFIFOB( 6, 1);
 				        Socket.SendBuf(buf, 7);
 
+                        //Use the item
 				        if tc.Item[tc.UseItemID].Amount = 0 then tc.Item[tc.UseItemID].ID := 0;
 				        tc.Weight := tc.Weight - tc.Item[tc.UseItemID].Data.Weight;
 
-				        //アイテム数減少
 				        WFIFOW( 0, $00af);
 				        WFIFOW( 2, tc.UseItemID);
 				        WFIFOW( 4, 1);
@@ -5328,137 +5328,138 @@ end;
 				        //Update weight
 				        SendCStat1(tc, 0, $0018, tc.Weight);
 
-                                        tc.UseItemID := 0;
+                        tc.UseItemID := 0;
 
-                                        tm := tc.MData;
+                        tm := tc.MData;
 
-                                        k := -1;
-                                        tpd := PetDB.Objects[0] as TPetDB;
-                                        for i := 0 to PetDB.Count - 1 do begin
-                                                tpd := PetDB.Objects[i] as TPetDB;
-                                                if( tpd.EggID = tc.Item[w].ID ) then begin
-                                                        k := tpd.MobID;
+                        k := -1;
+                        tpd := PetDB.Objects[0] as TPetDB;
+                        for i := 0 to PetDB.Count - 1 do begin
+                            tpd := PetDB.Objects[i] as TPetDB;
+                            if( tpd.EggID = tc.Item[w].ID ) then begin
+                                k := tpd.MobID;
 																												break;
-                                                end;
-                                        end;
+                            end;
+                        end;
 
-                                        if ( k <> -1 ) and ( MobDB.IndexOf( k ) <> -1 ) then begin
+                        if ( k <> -1 ) and ( MobDB.IndexOf( k ) <> -1 ) then begin
 
-                                                tmd := MobDB.IndexOfObject( k ) as TMobDB;
-                                                tn := TNPC.Create;
-                                                tn.ID := NowNPCID;
-                                                Inc(NowNPCID);
+                            tmd := MobDB.IndexOfObject( k ) as TMobDB;
+                            tn := TNPC.Create;
+                            tn.ID := NowNPCID;
+                            Inc(NowNPCID);
 
-                                                tpe := nil;
+                            tpe := nil;
 
-                                                if tc.Item[w].Card[0] = $FF00 then begin
-                                                        i := PetList.IndexOf( tc.Item[w].Card[2] + tc.Item[w].Card[3] * $10000 );
-                                                        if (i <> -1) then begin
-                                                                tpe := PetList.Objects[i] as TPet;
-                                                        end;
-                                                end;
+                            if tc.Item[w].Card[0] = $FF00 then begin
+                                i := PetList.IndexOf( tc.Item[w].Card[2] + tc.Item[w].Card[3] * $10000 );
+                                if (i <> -1) then begin
+                                    tpe := PetList.Objects[i] as TPet;
+                                end;
+                            end;
 
-                                                if tpe = nil then begin
-                                                        tpe := TPet.Create;
+                            if tpe = nil then begin
+                                tpe := TPet.Create;
 
-                                                        tpe.PlayerID := tc.ID;
-                                                        tpe.CharaID := tc.CID;
+                                tpe.PlayerID := tc.ID;
+                                tpe.CharaID := tc.CID;
 																												if UseSQL then tpe.PetID := GetNowPetID()
-                                                        else tpe.PetID := NowPetID;
-                                                        tpe.JID := tmd.ID;
-                                                        tpe.Name := tmd.JName;
+                            else tpe.PetID := NowPetID;
+
+                                tpe.JID := tmd.ID;
+                                tpe.Name := tmd.JName;
 																												tpe.Renamed := 0;
-                                                        tpe.LV := tmd.LV;
-                                                        tpe.Relation := 250;
-                                                        tpe.Fullness := 25;
-                                                        tpe.Accessory := 0;
-                                                        tpe.Index := w;
+                                tpe.LV := tmd.LV;
+                                tpe.Relation := 250;
+                                tpe.Fullness := 25;
+                                tpe.Accessory := 0;
+                                tpe.Index := w;
 
 
-                                                        PetList.AddObject( tpe.PetID, tpe );
+                                PetList.AddObject( tpe.PetID, tpe );
 
-                                                        tc.Item[w].Card[0] := $FF00;
-                                                        tc.Item[w].Card[1] := tpe.PetID;
-                                                        tc.Item[w].Card[2] := tpe.PetID mod $10000;
-                                                        tc.Item[w].Card[3] := tpe.PetID div $10000;
+                                tc.Item[w].Card[0] := $FF00;
+                                tc.Item[w].Card[1] := tpe.PetID;
+                                tc.Item[w].Card[2] := tpe.PetID mod $10000;
+                                tc.Item[w].Card[3] := tpe.PetID div $10000;
 
-                                                        if UseSQL then SavePetData(tpe, 0, 1)
+                                if UseSQL then SavePetData(tpe, 0, 1)
 																												else Inc( NowPetID );
-                                                end;
+                            end;
 
-                                                tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
-                                                tn.Name := tpe.Name;
-                                                tn.JID := tpe.JID;
-                                                tn.Map := tc.Map;
+                            tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
+                            tn.Name := tpe.Name;
+                            tn.JID := tpe.JID;
+                            tn.Map := tc.Map;
 
-                                                repeat
-                                                        tn.Point.X := tc.Point.X + Random(5) - 2;
-                                                        tn.Point.Y := tc.Point.Y + Random(5) - 2;
-                                                until ( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y );
+                            repeat
+                                tn.Point.X := tc.Point.X + Random(5) - 2;
+                                tn.Point.Y := tc.Point.Y + Random(5) - 2;
+                            until ( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y );
 
-                                                tn.Dir := Random(8);
-                                                tn.CType := 2;
-                                                tn.HungryTick := timeGettime();
+                            tn.Dir := Random(8);
+                            tn.CType := 2;
+                            tn.HungryTick := timeGettime();
 
-																								tpe.Data := tpd;
-                                                tpe.Incubated := 1;
+                            tpe.Data := tpd;
+                            tpe.Incubated := 1;
 
-                                                tm.NPC.AddObject(tn.ID, tn);
-                                                tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+                            tm.NPC.AddObject(tn.ID, tn);
+                            tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-                                                SendNData(tc.Socket, tn, tc.ver2, tc );
-                                                SendBCmd(tm, tn.Point, 41, tc, False);
+                            SendNData(tc.Socket, tn, tc.ver2, tc );
+                            SendBCmd(tm, tn.Point, 41, tc, False);
 
-                                                tc.PetData := tpe;
-                                                tc.PetNPC := tn;
-                                                tc.Item[w].Attr := 1;
+                            tc.PetData := tpe;
+                            tc.PetNPC := tn;
+                            tc.Item[w].Attr := 1;
 
-                                                WFIFOW( 0, $01a4 );
-                                                WFIFOB( 2, 0 );
-                                                WFIFOL( 3, tn.ID );
-                                                WFIFOL( 7, 0 );
-                                                Socket.SendBuf( buf, 11 );
+                            WFIFOW( 0, $01a4 );
+                            WFIFOB( 2, 0 );
+                            WFIFOL( 3, tn.ID );
+                            WFIFOL( 7, 0 );
+                            Socket.SendBuf( buf, 11 );
 
-                                                if tpe.Accessory <> 0 then begin
-                                                        WFIFOB( 2, 3 );
-                                                        WFIFOL( 7, tpe.Accessory );
-                                                        Socket.SendBuf( buf, 11 );
-                                                end;
+                            if tpe.Accessory <> 0 then begin
+                                WFIFOB( 2, 3 );
+                                WFIFOL( 7, tpe.Accessory );
+                                Socket.SendBuf( buf, 11 );
+                            end;
 
-                                                WFIFOB( 2, 5 );
-                                                WFIFOL( 7, 20 ); // 謎
-                                                Socket.SendBuf( buf, 11 );
+                            WFIFOB( 2, 5 );
+                            WFIFOL( 7, 20 ); // 謎
+                            Socket.SendBuf( buf, 11 );
 
-																								WFIFOW( 0, $01a2 );
-                                                WFIFOS( 2, tpe.Name, 24 );
-																								WFIFOB( 26, tpe.Renamed );
-                                                WFIFOW( 27, tpe.LV );
-                                                WFIFOW( 29, tpe.Fullness );
-																								WFIFOW( 31, tpe.Relation );
-                                                WFIFOW( 33, tpe.Accessory );
-                                                Socket.SendBuf( buf, 35 );
+                            WFIFOW( 0, $01a2 );
+                            WFIFOS( 2, tpe.Name, 24 );
+                            WFIFOB( 26, tpe.Renamed );
+                            WFIFOW( 27, tpe.LV );
+                            WFIFOW( 29, tpe.Fullness );
+                            WFIFOW( 31, tpe.Relation );
+                            WFIFOW( 33, tpe.Accessory );
+                            Socket.SendBuf( buf, 35 );
 
-                                        end;
-                                end;
                         end;
-                $01a9: // エモーション
-                        begin
-                                RFIFOL( 2, l );
+                     end;
+                end;
+                $01a9: // Pet Emotion Sent
+                    begin
+                        RFIFOL( 2, l );
 
-                                tm := tc.MData;
-                                if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
-                                        tn := tc.PetNPC;
+                        tm := tc.MData;
+                        if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
+                            tn := tc.PetNPC;
 
-                                        WFIFOW( 0, $01aa );
-                                        WFIFOL( 2, tn.ID );
-                                        WFIFOL( 6, l );
-                                        SendBCmd( tm, tn.Point, 10 );
-                                end;
+                            WFIFOW( 0, $01aa );
+                            WFIFOL( 2, tn.ID );
+                            WFIFOL( 6, l );
+                            SendBCmd( tm, tn.Point, 10 );
                         end;
-{キューペットここまで}
+                    end;
+
 		//--------------------------------------------------------------------------
-    $01ae:
-      begin
+            $01ae:
+            begin
               RFIFOW(2, w);
               if (w = 65535) or (w < 1) then continue;
 
