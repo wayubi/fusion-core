@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-16-04: Fixed Sage Skil Cast Freedom. [Darkhelmet]
 - 06-16-04: Changed Charset from SHIFT_JIS to DEFAULT to fix display problems for some people. [AlexKreuz]
 - 06-16-04: Updated JCon, character disconnected before update. [AlexKreuz]
 - 06-16-04: Fixed JCon, Accounts ban wan't being updated. [AlexKreuz]

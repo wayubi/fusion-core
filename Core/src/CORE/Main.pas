@@ -9561,6 +9561,7 @@ begin
 
 
 					if Boolean(MMode and $03) and (MTick <= Tick) then begin
+                        if tc.StatRecalc then CalcStat(tc);
 						tl := tc.Skill[tc.MSkill].Data;
 						tk := tc.Skill[tc.MSkill];
 						if (tc.SP < tl.SP[tc.MUseLV]) and

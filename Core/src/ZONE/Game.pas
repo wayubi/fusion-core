@@ -588,8 +588,8 @@ Begin(* Proc sv3PacketProcess() *)
 			begin
         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tc.ID));
         //debugout.lines.add('[' + TimeToStr(Now) + '] ' + IntToStr(tc.AMode));
-				if tc.AMode > 2 then continue;
-				if tc.MMode <> 0 then continue;
+				if (tc.AMode > 2) and (tc.Skill[278].Lv = 0) then continue;
+				if (tc.MMode <> 0) and (tc.Skill[278].Lv = 0) then continue;
 
                 tc.Delay := 0;
                 tc.Skill[272].Tick := 0;

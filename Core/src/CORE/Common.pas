@@ -983,7 +983,7 @@ TChara = class(TLiving)
         InField       :boolean;   {Determine if a player is in a skill field}
         SongTick      :cardinal;   {Determines if Bard is Casting a Song}
         SPSongTick    :cardinal;  {For Decreasing SP when using Songs}
-
+        StatRecalc    :boolean; {Used for the Sage skill free cast}
         //SkillOnBool         :Boolean; //boolean indicate skill duration for skills according to system time.
 
 	constructor Create;
@@ -4693,6 +4693,12 @@ begin
 				WFIFOL(20, i);
 				SendBCmd(tm, tc.Point, 24);
 				tc.MMode := 2;
+                {Free Cast Mods}
+                if tc.Skill[278].Lv <> 0 then begin
+                    tc.Speed := tc.Speed + (tc.Speed * tc.Skill[278].Data.Data1[tc.MUseLV]);
+                    tc.ASpeed := tc.ASpeed + (tc.ASpeed * tc.Skill[278].Data.Data2[tc.MUseLV]);
+                    tc.StatRecalc := true;
+                end;
 				tc.MTick := Tick + cardinal(i);
 			end else begin
 				//ârè•Ç»Çµ
@@ -4828,13 +4834,21 @@ begin
 				WFIFOL(20, i);
 				SendBCmd(tm, tc.Point, 24);
 				tc.MMode := 1;
-				tc.MTick := Tick + cardinal(i);
+                {Free Cast Mods}
+                if tc.Skill[278].Lv <> 0 then begin
+                    tc.Speed := tc.Speed + (tc.Speed * tc.Skill[278].Data.Data1[tc.MUseLV]);
+                    tc.ASpeed := tc.ASpeed + (tc.ASpeed * tc.Skill[278].Data.Data2[tc.MUseLV]);
+                    tc.StatRecalc := true;
+                end;
+                tc.MTick := Tick + cardinal(i);
+
 			end else begin
 				//ârè•Ç»Çµ
 				tc.MMode := 1;
 				tc.MTick := Tick;
 			end;
 		end;
+
 	end;
 	Result := 0;
 end;
