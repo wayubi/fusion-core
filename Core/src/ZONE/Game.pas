@@ -1015,6 +1015,15 @@ Begin(* Proc sv3PacketProcess() *)
                                         if tc.item[w].Amount <= 0 then exit;
           if tc.BaseLV < td.eLV then exit;
                                     case td.IType of
+          			10: // Arrows (added care cuase its a mess sorry)
+                    	begin
+							if tc.Item[w1].Data.IType = 10 then begin
+								//arrow equip
+								WFIFOW(0, $013c);
+								WFIFOW(2, 0);
+								Socket.SendBuf(buf, 4);
+                            end;
+                        end;
 					0: //Recovery item
 						begin
                                                         {Concentration Potion, Awakening Potion, Beserk Potion}
