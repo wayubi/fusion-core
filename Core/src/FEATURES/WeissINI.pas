@@ -65,13 +65,14 @@ uses
         ini.WriteString('Server', 'Timer', BoolToStr(Timer, true));
         ini.WriteString('Server', 'GlobalGMsg', GlobalGMsg);
         ini.WriteString('Server', 'MapGMsg', MapGMsg);
-        
+        ini.WriteString('Server', 'MapUnloadTime', IntToStr(MapUnloadTime));
+
         ini.WriteString('Option', 'Left', IntToStr(FormLeft));
         ini.WriteString('Option', 'Top', IntToStr(FormTop));
         ini.WriteString('Option', 'Width', IntToStr(FormWidth));
         ini.WriteString('Option', 'Height', IntToStr(FormHeight));
         ini.WriteString('Option', 'Priority', IntToStr(Priority));
-        
+
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_PVP_Steal', BoolToStr(Option_PVP_Steal));
@@ -96,7 +97,7 @@ uses
         ini.WriteString('Fusion', 'Option_Minimize_Tray', BoolToStr(Option_Minimize_Tray));
         ini.WriteString('Fusion', 'Option_Enable_WAC', BoolToStr(Option_Enable_WAC));
         // Fusion INI Lines
-        
+
         // MySQL Server Lines
         ini.WriteString('MySQL Server', 'Option_MySQL', BoolToStr(UseSQL));
         ini.WriteString('MySQL Server', 'MySQL_Address', DbHost);
@@ -115,4 +116,3 @@ uses
     end;
 
 end.
- 

@@ -10535,7 +10535,7 @@ begin
 			end;
 
             {Check to unload maps}
-  {      if tm.UnloadTime > 0 then begin
+        if tm.UnloadTime > 0 then begin
             for k := 0 to Map.Count - 1 do begin
                 tm := Map.Objects[k] as TMap;
                 if NOT MapPassive(tm, Tick) then tm.LastAction := Tick;
@@ -10550,7 +10550,7 @@ begin
                     Break;
                 end;
             end;
-        end; }
+        end; 
 
 	{NPCƒCƒxƒ“ƒg’Ç‰Á}
 			for k := 0 to Map.Count - 1 do begin
