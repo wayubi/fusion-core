@@ -378,6 +378,7 @@ type TMob = class(TLiving)
 	Stat2       :Byte; // 1 = Poison, 2 = Curse, 4 = Silence, 8 = Chaos, 16 = Blind
   nStat       :Cardinal;
 	BodyTick    :Cardinal;   // Status change tick1 (for Stat1)
+  BodyCount   :byte; // Colus, 20040505: Counts hits for stat1 effects (current use, SG hitcount)
 	HealthTick  :Array[0..4] of Cardinal;  // Status change tick2 (for Stat2 effects)
 	EffectTick  :Array[0..11] of Cardinal; // Skill ticks (0 = Lex Aet, 1=Quagmire, 2=ME, 3=Sanct currently)
 	isLooting   :boolean;
@@ -1235,7 +1236,7 @@ TMap = class
 	NPCLabel	:TStringList;
 	CList     :TIntList32;
 	Mob       :TIntList32;
-	Mode      :byte; //0=未ロード 1=ロード中 2=ロード済み
+	Mode      :byte; // 0 = not loaded, 1 = loading, 2 = load complete
 {NPCイベント追加}
 	TimerAct  :TIntList32; //動作中タイマー
 	TimerDef  :TIntList32; //定義済タイマー
@@ -1248,9 +1249,9 @@ end;//TMap
 // マップリストデータ
 type TMapList = class
 	Name      :string;
-        Ext       :string;
+  Ext       :string;
 	Size      :TPoint;
-	Mode      :byte; //0=未ロード 1=ロード中 2=ロード済み
+	Mode      :byte; // 0 = not loaded, 1 = loading, 2 = load complete
 end;
 //------------------------------------------------------------------------------
 // 経路探索用構造体

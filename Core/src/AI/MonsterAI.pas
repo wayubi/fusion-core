@@ -778,15 +778,63 @@ procedure MobStatSkills(tm:TMap; ts:TMob; Tick:cardinal);
 
 var
 ProcessType     :Byte;
-j :integer;
-
+i,j :integer;
+mi  :MapTbl;
+xy  :TPoint;
 begin
 with ts do begin
         ProcessType := 0;
         case ts.MSKill of
           26: {Teleport}
                 begin
-                  SendMonsterRelocation(tm, ts);
+                  // Colus, 20040506: Was this even tested?
+                  // When a monster doesn't have a target and tries to do this,
+                  // it crashes.  Every single time.  It's plainly obvious.  As
+                  // long as you don't summon the monster (making you the target)
+                  // it happens almost always.
+                  //
+                  // Going to try to fix it like a flywing, so you see the disappear
+                  // effect and the monster is moved.
+                  //SendMonsterRelocation(tm, ts);
+
+									i := MapInfo.IndexOf(ts.Map);
+									j := -1;
+									if (i <> -1) then begin
+										mi := MapInfo.Objects[i] as MapTbl;
+										if (mi.noTele = true) then j := 0;
+									end;
+									if (j <> 0) then begin
+                    if (Common.Map.IndexOf(ts.Map) <> - 1) then begin
+            				  tm := Common.Map.Objects[Common.Map.IndexOf(ts.Map)] as TMap;
+
+                      j := 0;
+
+  									  repeat
+  										  xy.X := Random(tm.Size.X - 2) + 1;
+  										  xy.Y := Random(tm.Size.Y - 2) + 1;
+  										  Inc(j);
+  									  until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+
+  									  if j <> 100 then begin
+                        ts.ATarget := 0;
+                        ts.AData := nil;
+                        ts.AMode := 0;
+                        ts.Status := 'IDLE_ST';
+                        //ts.pcnt := 0;
+                        UpdateLivingLocation(tm, ts);
+                        SendLivingDisappear(tm, ts, 3);
+                        with tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob do begin
+                  				Assert(IndexOf(ts.ID) <> -1, 'Mob Delete Error');
+                          Delete(IndexOf(ts.ID));
+                        end;
+
+  										  ts.Point := xy;
+                        UpdateLivingLocation(tm, ts);
+                        tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+                      end;
+									  end;
+                  end;
+
                 end;
           28:     {Heal}
                 begin

@@ -4534,9 +4534,10 @@ begin
 				xy.Y := MPoint.Y;
 
 				//Create Graphics and Set NPC
-				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 4000, tc);
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
+        tc.MTick := Tick + 5000;
 			end;
 
 		404: // Fog Wall
@@ -4746,9 +4747,12 @@ begin
 			begin
 				xy.X := MPoint.X;
 				xy.Y := MPoint.Y;
-				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 3000, tc);
+				tn := SetSkillUnit(tm, ID, xy, Tick, $86, 0, 4500, tc);
 				tn.MSkill := MSkill;
 				tn.MUseLV := MUseLV;
+
+        tc.MTick := Tick + 5000;
+
 			end;
 		140: //venom dust
 			begin
@@ -13644,36 +13648,84 @@ begin
 								end;
 							end;
 {追加:119ココまで}
-						$86: //LoV
+            // Colus, 20040505: Look, ALL great magics (SG/LoV/GX) operate HERE.
+            // If you want different calculations for them, CHECK tn.MSkill!
+						$86: // Great Magic damage (Player vs. Monster)
 							begin
-								if (tn.Tick + 1000 * tn.Count) < (Tick + 3000) then begin
-									dmg[0] := tc1.MATK1 * (80 + 20 * tl.Data1[tn.MUseLV]) div 400;
-									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-									if dmg[0] < 1 then dmg[0] := 1;
-									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
-									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $01de);
-									WFIFOW( 2, 85);
-									WFIFOL( 4, tn.ID);
-									WFIFOL( 8, ts1.ID);
-									WFIFOL(12, Tick);
-									WFIFOL(16, tc1.aMotion);
-									WFIFOL(20, ts1.Data.dMotion);
-									WFIFOL(24, dmg[0]);
-									WFIFOW(28, tn.MUseLV);
-									WFIFOW(30, tl.Data2[tn.MUseLV]);
-									WFIFOB(32, 8);
-									if ts1.isEmperium = false then begin
-									  SendBCmd(tm, tn.Point, 33);
-									end;
-									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
-									if c = (sl.Count -1) then begin
-										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 1 then tn.Tick := Tick
-									end;
-								end;
+                if (tn.MSkill = 85) then begin // LoV
+                  if (tn.Tick + 1000 * tn.Count) < (Tick + 4000) then begin
+                    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100;
+  									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+  									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+  									if dmg[0] < 1 then dmg[0] := 1;
+  									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+  									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+	  								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+
+	  								WFIFOW( 0, $01de);
+  									WFIFOW( 2, tn.MSkill);
+  									WFIFOL( 4, tn.ID);
+  									WFIFOL( 8, ts1.ID);
+  									WFIFOL(12, Tick);
+  									WFIFOL(16, tc1.aMotion);
+  									WFIFOL(20, ts1.Data.dMotion);
+  									WFIFOL(24, dmg[0]);
+  									WFIFOW(28, tn.MUseLV);
+  									WFIFOW(30, tl.Data2[tn.MUseLV]);
+  									WFIFOB(32, 8);
+  									if ts1.isEmperium = false then begin
+  									  SendBCmd(tm, tn.Point, 33);
+  									end;
+  									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
+  									if c = (sl.Count -1) then begin
+  										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+  										if tn.Count = 4 then tn.Tick := Tick
+  									end;
+                   end;
+
+                end else if (tn.MSkill = 89) then begin // SG
+                  // Hits every .45 seconds, 10 times.
+  								if (tn.Tick + (450 * tn.Count)) < (Tick + 4500) then begin
+                    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100;
+  									dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+  									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+  									if dmg[0] < 1 then dmg[0] := 1;
+  									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+  									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+  									if (dmg[0] < 0) or (ts1.Stat1 = 2) then dmg[0] := 0;
+                    if (dmg[0] > 0) and (ts1.isEmperium = false) and (ts1.Data.Race <> 1) then begin
+                      ts1.BodyCount := ts1.BodyCount + 1;
+                      if (ts1.BodyCount = 3) then begin
+                        ts1.BodyCount := 0;
+                        ts1.nStat := 2;
+                        ts1.BodyTick := Tick + tc1.aMotion;
+                      end;
+                    end;
+  									WFIFOW( 0, $01de);
+  									WFIFOW( 2, 89);
+  									WFIFOL( 4, tn.ID);
+  									WFIFOL( 8, ts1.ID);
+  									WFIFOL(12, Tick);
+  									WFIFOL(16, tc1.aMotion);
+  									WFIFOL(20, ts1.Data.dMotion);
+  									WFIFOL(24, dmg[0]);
+  									WFIFOW(28, tn.MUseLV);
+  									WFIFOW(30, 1);
+  									WFIFOB(32, 6);
+  									if ts1.isEmperium = false then begin
+  									  SendBCmd(tm, tn.Point, 33);
+  									end;
+  									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
+
+                    if (tn.Count = 10) then ts1.BodyCount := 0;
+
+  									if c = (sl.Count -1) then begin
+  										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
+  										if tn.Count = 10 then tn.Tick := Tick
+  									end;
+  								end;
+                end;
+
 							end;
 						$87: //FP
 							begin
