@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-31-04: FIxed call spirits level determiens how many you have at a time-[Oatmeal]
 - 01-31-04: Fixed bug where people couldnt move. [Mitch]
 - 01-31-04: DataSave now saves mapinfo_db also, to save PvP and GPvP Settings from GMs. [Mitch]
 - 01-31-04: Added GM PvP and GPvP commands. [Mitch]
