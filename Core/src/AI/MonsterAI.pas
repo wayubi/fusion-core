@@ -36,89 +36,95 @@ dmg           :array[0..7] of integer;
 implementation
 
 
-//------------------------------------------------------------------------------
-{Monster's AI}
+(*-----------------------------------------------------------------------------*
+Monster's AI
+
+ChrstphR 2004/04/25 - cleaned up two potential memory leaks
+- Exit; called without freeing the TStringList sl that is created in the code.
+*-----------------------------------------------------------------------------*)
 procedure CalcAI(tm:TMap; ts:TMob; Tick:Cardinal);
 var
-	j,i1,j1,k1:integer;
-	tc1:TChara;
-	ts2:TMob;
-	tn:TNPC;
-	sl:TStringList;
+	j   : Integer;
+	i1  : Integer;
+	j1  : Integer;
+	k1  : Integer;
+	tc1 : TChara; //ref only
+	ts2 : TMob;   //ref only
+	tn  : TNPC;   //ref only
+	sl  : TStringList;
+	//ref list that is reused *shudder* to hold string indexes and object refs
+	//Early exits mean this must be free'd before Exit called.
 begin
-  //if ts.Data.Loaded = false then TempNewAIProcedures(tm, ts, Tick);
+	//if ts.Data.Loaded = false then TempNewAIProcedures(tm, ts, Tick);
 
-	sl := TStringList.Create;
 	with ts do begin
-                //MobSkillCalc(tm,ts,Tick);
+		//MobSkillCalc(tm,ts,Tick);
 
 		if (ts.Stat1 <> 0) and (Data.Range1 > 0) then begin
 			pcnt := 0;
-			Exit;
+			Exit;//ChrstphrR 2004/04/25 - safe
 		end;
 
-                if (isLeader) and ( (MonsterMob) or ((isSummon) and (SummonMonsterMob)) )then begin
-                        if (SlaveCount = 0) and (Random(1000) <= 10) then begin
-                                WFIFOW( 0, $011a);
-                                WFIFOW( 2, 196);
-                                WFIFOW( 4, 1);
-                                WFIFOL( 6, ID);
-                                WFIFOL(10, ID);
-                                WFIFOB(14, 1);
-                                SendBCmd(tm, ts.Point, 15);
-                                MobSpawn(tm,ts,Tick);
-                        end;
-                end;
+		if (isLeader) and ( (MonsterMob) or ((isSummon) and (SummonMonsterMob)) )then begin
+			if (SlaveCount = 0) and (Random(1000) <= 10) then begin
+				WFIFOW( 0, $011a);
+				WFIFOW( 2, 196);
+				WFIFOW( 4, 1);
+				WFIFOL( 6, ID);
+				WFIFOL(10, ID);
+				WFIFOB(14, 1);
+				SendBCmd(tm, ts.Point, 15);
+				MobSpawn(tm,ts,Tick);
+			end;
+		end;//if isLeader...
 
+		sl := TStringList.Create;//ChrstphrR - moved closer to first use..
 		if (ATarget = 0) then begin
 
 			if isActive then begin
-			
-				sl.Clear;
+				//sl.Clear; //First use of SL, it's already empty :)
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
 							tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
 							if (tc1.HP > 0) and (tc1.Hidden = false) and (tc1.Paradise = false) and ((ts.isGuardian <> tc1.GUildID) or (ts.isGuardian = 0)) and (abs(ts.Point.X - tc1.Point.X) <= 10) and (abs(ts.Point.Y - tc1.Point.Y) <= 10) then begin  //edited by The Harbinger -- darkWeiss Version
+								if (tc1.Sit <> 1) or (tc1.Option < 64) then begin
+									sl.AddObject(IntToStr(tc1.ID), tc1);
+								end;
+							end;//if
+						end;//for k1
+					end;//for i1
+				end;//for j1
 
-                                                                if (tc1.Sit <> 1) or (tc1.Option < 64) then begin
-								        sl.AddObject(IntToStr(tc1.ID), tc1);
-                                                                end;
-							end;
-						end;
-					end;
-				end;
-
-				if sl.Count <> 0 then begin
-
+				if sl.Count > 0 then begin
 					j := Random(sl.Count);
 					ATarget := StrToInt(sl.Strings[j]);
 					ARangeFlag := false;
 					AData := sl.Objects[j];
 					ATick := Tick;
 					ARangeFlag := false;
-					Exit;
+
+					sl.Free;// Must Free up open local objects before exiting routine
+					Exit;//ChrstphrR 2004/04/25 - safe
 				end;
 			end;
 
-			if (not isLooting) and Data.isLoot then begin
+			if (NOT isLooting) AND Data.isLoot then begin
 
 				sl.Clear;
-
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
 							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
 							if tn.CType <> 3 then Continue;
 							if (abs(tn.Point.X - Point.X) <= 10) and (abs(tn.Point.Y - Point.Y) <= 10) then begin
-
 								sl.AddObject(IntToStr(tn.ID), tn);
 							end;
 						end;
 					end;
 				end;
 
-				if sl.Count <> 0 then begin
+				if sl.Count > 0 then begin
 					j := Random(sl.Count);
 					tn := sl.Objects[j] as TNPC;
 					j := SearchPath2(path, tm, Point.X, Point.Y, tn.Point.X, tn.Point.Y);
@@ -131,64 +137,68 @@ begin
 						ppos := 0;
 						MoveTick := Tick;
 						tgtPoint := tn.Point;
-						
-					end;
 
-					Exit;
+					end;
+					sl.Free;// Must Free up open local objects before exiting routine
+					Exit;//ChrstphrR 2004/04/25 - safe
 				end;
 			end;
-
-		end else begin
-                        if (isLeader) and (isLooting = false) then begin
+		//if ATarget=0 ...
+		end else begin //ATarget > 0
+			if isLeader AND NOT isLooting then begin
 				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
 					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
 						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-                                                        if (tm.Block[i1][j1].Mob.Objects[k1] is TMob) then begin
-							        ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-                                                                if (ts2 <> nil) or (ts2 <> ts) then begin
-							                if ts2.LeaderID <> ts.ID then continue;
-							                if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
-								                if ts2.ATarget = 0 then begin
-									        ts2.ATarget := ts.ATarget;
-									        ts2.ARangeFlag := false;
-									        ts2.AData := ts.AData;
-									        ts2.ATick := Tick;
-									        ts2.ARangeFlag := false;
-								        end;
-							        end;
-                                                        end;
-                                                end;
-                                        end;
-                                end;
-                        end;
-                end;
-
-                if Data.isLink and (not isLooting) then begin
-                        for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-                                for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
-                                        for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-                                                ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-                                                if (ts2 <> nil) or (ts2 <> ts) then begin
-							if ts2.JID <> ts.JID then continue;
-							if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
-								if ts2.ATarget = 0 then begin
-									ts2.ATarget := ts.ATarget;
-									ts2.ARangeFlag := false;
-									ts2.AData := ts.AData;
-									ts2.ATick := Tick;
-									ts2.ARangeFlag := false;
+							if (tm.Block[i1][j1].Mob.Objects[k1] is TMob) then begin
+								ts2 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+								if (ts2 <> nil) or (ts2 <> ts) then begin
+									if ts2.LeaderID <> ts.ID then continue;
+									if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
+										if ts2.ATarget = 0 then begin
+											ts2.ATarget := ts.ATarget;
+											ts2.ARangeFlag := false;
+											ts2.AData := ts.AData;
+											ts2.ATick := Tick;
+											ts2.ARangeFlag := false;
+										end;
+									end;
 								end;
 							end;
-                                                end;
 						end;
 					end;
 				end;
 			end;
-		end;
 
-	sl.Free;
-	end;
-end;
+			if Data.isLink AND NOT isLooting then begin
+				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+							ts2 := tm.Block[i1][j1].Mob.Objects[k1] AS TMob;
+							if (ts2 <> nil) or (ts2 <> ts) then begin
+								if ts2.JID <> ts.JID then Continue;
+								if (abs(ts.Point.X - ts2.Point.X) <= 10) and (abs(ts.Point.Y - ts2.Point.Y) <= 10) then begin
+									if ts2.ATarget = 0 then begin
+										ts2.ATarget    := ts.ATarget;
+										ts2.ARangeFlag := false;
+										ts2.AData      := ts.AData;
+										ts2.ATick      := Tick;
+										ts2.ARangeFlag := false;
+									end;
+								end;
+							end;
+						end;//for k1
+					end;//for i1
+				end;//for j1
+			end;//if Data.isLink
+		end;//if-else ATarget=0/ATarget>0
+
+		//ChrstphrR - if the 2 early Exit's don't stop the flow, this existing
+		//call will free up the StringList before we leave.
+		sl.Free;
+	end;//with ts
+end;(* proc CalcAI()
+*-----------------------------------------------------------------------------*)
+
 
 //------------------------------------------------------------------------------
 
