@@ -5002,6 +5002,8 @@ begin
 						for k1 := 0 to sl.Count - 1 do begin
 							ts1 := sl.Objects[k1] as TMob;
 							DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
+                                                        dmg[0] := dmg[0];
+                                                        dmg[0] := (MATK2 - MATK1 + 20) * 35 + ATTPOWER + dmg[0];
                                                         j := 3;
                                                         if DamageProcessed = false then begin
                                                                 DamageProcessed := true;
@@ -5054,7 +5056,7 @@ begin
 
                                                         //SendCStat1(tc, 0, 5, tc.HP);
                                                         //SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 3, 6);
-		        				SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], j);
+		        				SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], j - 2);
 							if not DamageProcess1(tm, tc, ts1, dmg[0], Tick) then
                 	       					StatCalc1(tc, ts1, Tick); {í«â¡}
                                                 end;
@@ -5223,52 +5225,40 @@ begin
                                         begin
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data2[MUseLV]);
 						if dmg[0] < 0 then dmg[0] := 0;
-
-                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-                                                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
-                                                        StatCalc1(tc, ts, Tick);
-
-                                                i := MapInfo.IndexOf(tc.Map);
-                                                j := -1;
-
-                                                if (i <> -1) then begin
-                                                        mi := MapInfo.Objects[i] as MapTbl;
-                                                        if (mi.noTele = true) then j := 0;
-                                                end;
-
-                                                if (j <> 0) then begin
-
-                                                        tm := tc.MData;
-                                                        j := 0;
-                                                        repeat
-                                                                xy.X := Random(tm.Size.X - 2) + 1;
-                                                                xy.Y := Random(tm.Size.Y - 2) + 1;
-                                                                Inc(j);
-                                                        until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
-
-                                                if j <> 100 then begin
-
-                                                        SendCLeave(tc, 3);
-                                                        tc.Point := xy;
-                                                        ts.Point := xy;
-                                                        ts.tgtPoint := xy;
-                                                        MapMove(Socket, tc.Map, tc.Point);
-                                                        SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
-                                                        SendBCmd(tm, ts.Point, 58, tc,True);
-                                                end;
-                                        
-                                                //ts.Point.X := tc.Point.X;
-                                                //ts.Point.Y := tc.Point.Y;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							StatCalc1(tc, ts, Tick);
 
 
-                                                {if ts.HP - dmg[0] > 0 then begin
-                                                        SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
-                                                        SendBCmd(tm, ts.Point, 58, tc,True);
-                                                end;}
-                                                //MobMoveL(tm, Tick);
+									i := MapInfo.IndexOf(tc.Map);
+									j := -1;
+									if (i <> -1) then begin
+										mi := MapInfo.Objects[i] as MapTbl;
+										if (mi.noTele = true) then j := 0;
+									end;
+									if (j <> 0) then begin
+
+										tm := tc.MData;
+									j := 0;
+									repeat
+										xy.X := Random(tm.Size.X - 2) + 1;
+										xy.Y := Random(tm.Size.Y - 2) + 1;
+										Inc(j);
+									until ( ((tm.gat[xy.X, xy.Y] <> 1) and (tm.gat[xy.X, xy.Y] <> 5)) or (j = 100) );
+
+									if j <> 100 then begin
+
+										SendCLeave(tc, 3);
+										tc.Point := xy;
+										MapMove(Socket, tc.Map, tc.Point);
+									end;
+                                                                        
+                                                                        ts.Point.X := tc.Point.X;
+                                                                        ts.Point.Y := tc.Point.Y;
+                                                                        if ts.HP > 0 then SendMmove(Socket, ts, ts.Point, tc.Point, ver2);
+                                                        	end;
 
 
-                                                end;
 
                                         end;
                                 //New skills ---- Monk
@@ -5411,18 +5401,20 @@ begin
                                         tc.AData := ts;
                                         PassiveAttack := False;
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                        dmg[0] := dmg[0];
+                                        dmg[0] := dmg[0] + (75 div 100) * 60;
                                         if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
 
                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                         tc.Skill[MSkill].Tick := Tick + 5000;
-                                        
+
                                         //tc.MTick := Tick + 2000;
 
                                 end;
 
                                 273:    {Combo Finish Effect}
-                                        begin
+                                if spiritSpheres <> 0 then begin
                                                 PassiveAttack := False;
                                                 ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                                 if ts = nil then Exit;
@@ -5458,6 +5450,8 @@ begin
 
 						//Damage Calculations
 						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                                dmg[0] := dmg[0];
+                                                dmg[0] := dmg[0] + (14 div 10) * 70;
 						if dmg[0] < 0 then
                                                         dmg[0] := 0; //Negative Damage
 						//Send Attack Packets
@@ -5486,6 +5480,8 @@ begin
 							SendBCmd(tm, ts.Point, 10);
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                                        spiritSpheres := spiritSpheres - 1;
+                                                        UpdateSpiritSpheres(tm, tc, spiritSpheres);
 							StatCalc1(tc, ts, Tick);
 
                                                 tc.MTick := Tick + 2000;
@@ -6926,7 +6922,8 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
-                                                spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
+                                                spiritSpheres := spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
+                                                if spiritSpheres > 5 then spiritSpheres := 5;
                                                 UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                                 {WFIFOW( 0, $01d0);
                                                 WFIFOL( 2, tc.ID);
@@ -10845,12 +10842,13 @@ begin
 								SendBCmd(tm, ts1.Point, 10);
 							end;
 
-							$91:    {Ankle Snare Effect}
+							$91: //AS  - Fixed by Bellium (Crimson)
 							begin
 								if tn.Count <> 0 then begin
                 if not flag then Break; //ì•ÇÒÇ≈Ç»Ç¢
 								//if Random(1000) < tn.CData.Skill[117].Data.Data2[tn.Count] * 10 then begin
 									if (ts1.Stat1 <> 5) then begin
+                                                                                ts1.Data.Mode:= 0;
 										ts1.nStat := 5;
 										ts1.BodyTick := Tick + tc1.aMotion;
 									end;
@@ -11293,16 +11291,13 @@ begin
 			if tm.Block[i][j].MobProcTick < Tick then begin
 				//for a := 0 to Block[i][j].Mob.Count - 1 do begin
 				a := 0;
-                                //if tm.Block[i][j].Mob.Objects[a] as TMob = nil then exit;
 				while (a >= 0) and (a < tm.Block[i][j].Mob.Count) do begin
                                         try
 					        ts := tm.Block[i][j].Mob.Objects[a] as TMob;
-                                                if ts = nil then exit;
                                         except
                                                 exit;
                                         end;
 					with ts do begin
-                                                if ts = nil then exit;
 			if (Data.isDontMove) or (HP = 0) or (ts.Stat1 <> 0) then begin
 							Inc(a);
 							continue;
@@ -12793,7 +12788,6 @@ begin
 			tm := Map.Objects[k] as TMap;
 			with tm do begin
 				if (Mode = 2) and (CList.Count > 0) then begin
-                                        if ts = nil then exit;
 					MobMoveL(tm,Tick);
 					//Spwanèàóù
 					for i := 0 to Mob.Count - 1 do begin

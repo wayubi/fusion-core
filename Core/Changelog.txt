@@ -2,6 +2,9 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-04-04: Updated Combo skills damage increased by a little -[Oatmeal12345]
+- 01-04-04: Updated Call spirits, calls one spirit per call-[Oatmeal12345]
+- 01-04-04: updated Damage Calculations for Grandcross damage now based on Attk + MATK, instead of just physical-[Oatmeal12345]
 - 01-04-04: Updated Intimidate, still not perfect but stopped crash.   [Darkhelmet]
 - 01-03-04: Fixed Crash with Gugnir.   [Darkhelmet]
 - 01-03-04: Modifyed Amount of Packets Bard/Dancer skills use.  Performace Increase [Darkhelmet]
