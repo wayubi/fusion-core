@@ -21,7 +21,8 @@ uses
     REED_LOAD_PARTIES,
     REED_LOAD_GUILDS,
     REED_LOAD_CASTLES,
-    REED_SAVE_ACCOUNTS;
+    REED_SAVE_ACCOUNTS,
+    REED_SAVE_CHARACTERS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -36,17 +37,7 @@ uses
 
 
     { Character Data - Basic Data }
-    procedure PD_Save_Characters(forced : Boolean = False);
     procedure PD_Delete_Characters(tc : TChara);
-
-    { Character Data - Memo Data }
-    procedure PD_Save_Characters_Memos(forced : Boolean = False);
-
-    { Character Data - Skill Data }
-    procedure PD_Save_Characters_Skills(forced : Boolean = False);
-
-    { Character Data - Inventory Data }
-    procedure PD_Save_Characters_Inventory(forced : Boolean = False);
 
     { Character Data - Cart Data }
     procedure PD_Save_Characters_Cart(forced : Boolean = False);
@@ -137,12 +128,8 @@ uses
         if (forced) then debugout.lines.add('Initiating Comprehensive Save .. Please Wait.');
 
         PD_Save_Accounts_Parse(forced);
+        PD_Save_Characters_Parse(forced);
 
-
-        PD_Save_Characters(forced);
-        PD_Save_Characters_Memos(forced);
-        PD_Save_Characters_Skills(forced);
-        PD_Save_Characters_Inventory(forced);
         PD_Save_Characters_Cart(forced);
         PD_Save_Characters_Variables(forced);
         PD_Save_Characters_Pets(forced);
@@ -266,107 +253,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Basic Data ------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then Continue;
-
-                if tc.CID < 100001 then tc.CID := tc.CID + 100001;
-                if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;
-
-                datafile.Add('NAM : ' + tc.Name);
-                datafile.Add('AID : ' + IntToStr(tc.ID));
-                datafile.Add('CID : ' + IntToStr(tc.CID));
-
-                if (tc.JID > UPPER_JOB_BEGIN) then datafile.Add('JID : ' + IntToStr(tc.JID - UPPER_JOB_BEGIN + LOWER_JOB_END))
-                else datafile.Add('JID : ' + IntToStr(tc.JID));
-
-                datafile.Add('BLV : ' + IntToStr(tc.BaseLV));
-                datafile.Add('BXP : ' + IntToStr(tc.BaseEXP));
-                datafile.Add('STP : ' + IntToStr(tc.StatusPoint));
-                datafile.Add('JLV : ' + IntToStr(tc.JobLV));
-                datafile.Add('JXP : ' + IntToStr(tc.JobEXP));
-                datafile.Add('SKP : ' + IntToStr(tc.SkillPoint));
-                datafile.Add('ZEN : ' + IntToStr(tc.Zeny));
-
-                datafile.Add('ST1 : ' + IntToStr(tc.Stat1));
-                datafile.Add('ST2 : ' + IntToStr(tc.Stat2));
-                datafile.Add('OPT : ' + IntToStr(tc.Option and $FFF9));
-                datafile.Add('KAR : ' + IntToStr(tc.Karma));
-                datafile.Add('MAN : ' + IntToStr(tc.Manner));
-
-                if tc.HP < 0 then tc.HP := 0;
-                if tc.SP < 0 then tc.SP := 0;
-
-                datafile.Add('CHP : ' + IntToStr(tc.HP));
-                datafile.Add('CSP : ' + IntToStr(tc.SP));
-                datafile.Add('SPD : ' + IntToStr(tc.DefaultSpeed));
-                datafile.Add('HAR : ' + IntToStr(tc.Hair));
-                datafile.Add('C_2 : ' + IntToStr(tc._2));
-                datafile.Add('C_3 : ' + IntToStr(tc._3));
-                datafile.Add('WPN : ' + IntToStr(tc.Weapon));
-                datafile.Add('SHD : ' + IntToStr(tc.Shield));
-                datafile.Add('HD1 : ' + IntToStr(tc.Head1));
-                datafile.Add('HD2 : ' + IntToStr(tc.Head2));
-                datafile.Add('HD3 : ' + IntToStr(tc.Head3));
-                datafile.Add('HCR : ' + IntToStr(tc.HairColor));
-                datafile.Add('CCR : ' + IntToStr(tc.ClothesColor));
-
-                datafile.Add('STR : ' + IntToStr(tc.ParamBase[0]));
-                datafile.Add('AGI : ' + IntToStr(tc.ParamBase[1]));
-                datafile.Add('VIT : ' + IntToStr(tc.ParamBase[2]));
-                datafile.Add('INT : ' + IntToStr(tc.ParamBase[3]));
-                datafile.Add('DEX : ' + IntToStr(tc.ParamBase[4]));
-                datafile.Add('LUK : ' + IntToStr(tc.ParamBase[5]));
-
-                datafile.Add('CNR : ' + IntToStr(tc.CharaNumber));
-
-                datafile.Add('MAP : ' + tc.Map);
-                datafile.Add('MPX : ' + IntToStr(tc.Point.X));
-                datafile.Add('MPY : ' + IntToStr(tc.Point.Y));
-
-                datafile.Add('MSP : ' + tc.SaveMap);
-                datafile.Add('MSX : ' + IntToStr(tc.SavePoint.X));
-                datafile.Add('MSY : ' + IntToStr(tc.SavePoint.Y));
-
-                datafile.Add('PLG : ' + IntToStr(tc.Plag));
-                datafile.Add('PLV : ' + IntToStr(tc.PLv));
-                
-                datafile.Add('GID : ' + IntToStr(tc.GuildID));
-                datafile.Add('PID : ' + IntToStr(tc.PartyID));
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Character.txt');
-                	//debugout.Lines.Add(tp.Name + ' character data saved.');
-            	except
-            		DebugOut.Lines.Add('Character data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Delete_Characters(tc : TChara);
     var
         tp : TPlayer;
@@ -387,246 +273,6 @@ uses
         RmDir(deldir + IntToStr(tc.CID));
 
         DataSave();
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Memo Data -------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Memos(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j, k : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then Continue;
-
-                for k := 0 to 2 do begin
-                	datafile.Add('M'+IntToStr(k+1)+'N : ' + tc.MemoMap[k]);
-                    datafile.Add('M'+IntToStr(k+1)+'X : ' + IntToStr(tc.MemoPoint[k].X));
-                    datafile.Add('M'+IntToStr(k+1)+'Y : ' + IntToStr(tc.MemoPoint[k].Y));
-				end;
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\ActiveMemos.txt');
-                	//debugout.Lines.Add(tp.Name + ' character memo data saved.');
-            	except
-            		DebugOut.Lines.Add('Character memo data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Skills Data ------------------------------------------------ }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Skills(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j, k, l : Integer;
-        str : String;
-        len : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then continue;
-
-                datafile.Add(' SID : LV : NAME');
-                datafile.Add('----------------------------------');
-
-                for k := 1 to MAX_SKILL_NUMBER do begin
-	            	try
-    	            	if (tc.Skill[k].Lv <> 0) and (not tc.Skill[k].Card) then begin
-
-        	            	str := ' ';
-
-                	    	len := length(IntToStr(k));
-	            		    for l := 0 to (3 - len) - 1 do begin
-            		    		str := str + ' ';
-	        		        end;
-    			            str := str + IntToStr(k);
-			                str := str + ' : ';
-
-	                        len := length(IntToStr(tc.Skill[k].Lv));
-		            	    for l := 0 to (2 - len) - 1 do begin
-        	    		    	str := str + ' ';
-        			        end;
-    		    	        str := str + IntToStr(tc.Skill[k].Lv);
-
-	                        str := str + ' : ' + tc.Skill[k].Data.IDC;
-
-        	                datafile.Add(str);
-						end;
-                	except
-	                	//debugout.lines.add(tc.name + ' skill ' + inttostr(j) + ' failure.');
-    	            end;
-                end;
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Skills.txt');
-                	//debugout.Lines.Add(tp.Name + ' character skills data saved.');
-            	except
-            		DebugOut.Lines.Add('Character skills data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Character Data - Inventory Data --------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Inventory(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tp : TPlayer;
-        tc : TChara;
-    	i, j, k, l : Integer;
-        str : String;
-        len : Integer;
-    begin
-    	datafile := TStringList.Create;
-
-    	for i := 0 to PlayerName.Count - 1 do begin
-			tp := PlayerName.Objects[i] as TPlayer;
-
-            if (tp.Login = 0) and (not forced) then Continue;
-
-            for j := 0 to 8 do begin
-            	datafile.Clear;
-                tc := tp.CData[j];
-
-                if (tc = nil) then continue;
-
-
-                datafile.Add('    ID :   AMT : EQP : I :  R : A : CARD1 : CARD2 : CARD3 : CARD4 : NAME');
-                datafile.Add('---------------------------------------------------------------------------------------------------------');
-
-                for k := 1 to 100 do begin
-        	        if tc.Item[k].ID <> 0 then begin
-    	            	str := ' ';
-    
-    					len := length(IntToStr(tc.Item[k].ID));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Item[k].ID);
-    	                str := str + ' : ';
-
-    	                len := length(IntToStr(tc.Item[k].Amount));
-                    	for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Item[k].Amount);
-    	                str := str + ' : ';
-
-	        	        len := length(IntToStr(tc.Item[k].Equip));
-        	        	for l := 0 to (3 - len) - 1 do begin
-    	        	    	str := str + ' ';
-	        	        end;
-                	    str := str + IntToStr(tc.Item[k].Equip);
-            	        str := str + ' : ';
-
-        	            str := str + IntToStr(tc.Item[k].Identify);
-    	                str := str + ' : ';
-    
-                	    len := length(IntToStr(tc.Item[k].Refine));
-            	        for l := 0 to (2 - len) - 1 do begin
-        	            	str := str + ' ';
-    	                end;
-                	    str := str + IntToStr(tc.Item[k].Refine);
-            	        str := str + ' : ';
-        	            str := str + IntToStr(tc.Item[k].Attr);
-    	                str := str + ' : ';
-    
-        	            len := length(IntToStr(tc.Item[k].Card[0]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Item[k].Card[0]);
-    	                str := str + ' : ';
-    
-        	            len := length(IntToStr(tc.Item[k].Card[1]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Item[k].Card[1]);
-    	                str := str + ' : ';
-
-        	            len := length(IntToStr(tc.Item[k].Card[2]));
-    	                for l := 0 to (5 - len) - 1 do begin
-                	    	str := str + ' ';
-            	        end;
-        	            str := str + IntToStr(tc.Item[k].Card[2]);
-    	                str := str + ' : ';
-    
-            	        len := length(IntToStr(tc.Item[k].Card[3]));
-        	            for l := 0 to (5 - len) - 1 do begin
-    	                	str := str + ' ';
-                    	end;
-                	    str := str + IntToStr(tc.Item[k].Card[3]);
-            	        str := str + ' : ';
-    
-                        str := str + tc.Item[k].Data.Name;
-    
-        	            datafile.Add(str);
-    	            end;
-                end;
-
-
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-
-                try
-	            	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Inventory.txt');
-                	//debugout.Lines.Add(tp.Name + ' character inventory data saved.');
-            	except
-            		DebugOut.Lines.Add('Character inventory data could not be saved.');
-            	end;
-
-			end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
     end;
 
 

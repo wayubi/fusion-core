@@ -372,6 +372,8 @@ begin
 				tp.CName[b] := tc.Name;
 				tp.CData[b] := tc;
 
+                tc.PData := tp;
+
                 // Enable / Disable to save.
                 tp.Login := 1;
                 DataSave();
