@@ -10285,6 +10285,9 @@ begin
 
 	{NPCƒCƒxƒ“ƒg’Ç‰Á}
 			for k := 0 to Map.Count - 1 do begin
+
+                if Map.Objects[k] = nil then Continue;
+
 				tm := Map.Objects[k] as TMap;
 				with tm do begin
 					if (TimerAct.Count > 0) then begin
