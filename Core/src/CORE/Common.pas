@@ -1356,12 +1356,6 @@ type TDealings = class
 end;
 {取引機能追加ココまで}
 //------------------------------------------------------------------------------
-{氏{箱追加}
-type TSummon = class
-	Name      :string;
-end;
-{氏{箱追加ココまで}
-//------------------------------------------------------------------------------
 {ギルド機能追加}
 // ギルドデータ
 type TGuild = class
@@ -1538,13 +1532,12 @@ var
 	{ChrstphrR 2004/04/19 - Changing SummonMobList for size/algorithm
 	improvements}
 	SummonMobList : TSummonMobList;
-	SummonMobListMVP:TIntList32;
-
-	SummonIOBList : TStringList; //Changed for ease of use/cleanup.
-	SummonIOVList : TStringList; //Changed " " " "/"
-	SummonICAList : TStringList; //Changed " " " "/"
-	SummonIGBList : TStringList; //Changed " " " "/"
-	SummonIOWBList : TStringList; //Changed " " " "/"
+	SummonMobListMVP : TStringList; //Changed for ease of use/cleanup.
+	SummonIOBList    : TStringList; //Changed " " " "/"
+	SummonIOVList    : TStringList; //Changed " " " "/"
+	SummonICAList    : TStringList; //Changed " " " "/"
+	SummonIGBList    : TStringList; //Changed " " " "/"
+	SummonIOWBList   : TStringList; //Changed " " " "/"
 
 {NPCイベント追加}
 	ServerFlag :TStringList;

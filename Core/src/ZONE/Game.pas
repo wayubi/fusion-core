@@ -107,10 +107,7 @@ Var
 {キューペット}
   tpd : TPetDB;
   tmd : TMobDB;
-{氏{箱追加}
-	tsmn  : TSummon;
-{氏{箱追加ココまで}
-  tpe             :TPet;
+  tpe :TPet;
 
   i1  : Integer;
   j1  : Integer;
@@ -3025,17 +3022,15 @@ Begin(* Proc sv3PacketProcess() *)
 												ts.ID := NowMobID;
 												Inc(NowMobID);
 											end else begin //MVP list
-												{ChrstphrR - I'm not sure this code is called - its list is empty
-												and the bigger problem is it doesn't CHECK to see if it's empty...
-												I'm leaving it as is, and will fix it after SummonMobList is confirmed}
-
-												l := Random(SummonMobListMVP.Count);
-												tsmn := SummonMobListMVP.Objects[l] as TSummon;
-
-												str := tsmn.Name;
-												ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
-												ts.ID := NowMobID;
-												Inc(NowMobID);
+												{ChrstphrR - Fixed in format of other Summon???Lists}
+												if SummonMobListMVP.Count > 0 then begin
+													L := Random(SummonMobListMVP.Count);
+													str := SummonMobListMVP[L];
+													//Fill Mob Data.
+													ts.Data := MobDBName.Objects[MobDBName.IndexOf(str)] as TMobDB;
+													ts.ID := NowMobID;
+													Inc(NowMobID);
+												end;
 											end;
 
 											if (SummonMonsterName = true) then begin
@@ -3053,62 +3048,60 @@ Begin(* Proc sv3PacketProcess() *)
 											ts.JID := ts.Data.ID;
 											ts.Map := tc.Map;
 
-										j := 0;
-										repeat
-											ts.Point.X := tc.Point.X + Random(11) - 5;
-											ts.Point.Y := tc.Point.Y + Random(11) - 5;
-											Inc(j);
-										until ( ((tm.gat[ts.Point.X, ts.Point.Y] <> 1) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5))  or (j = 10) );
-										if (j = 10) then begin
-											ts.Point.X := tc.Point.X;
-											ts.Point.Y := tc.Point.Y;
-										end;
-
-										ts.Dir := Random(8);
-										ts.HP := ts.Data.HP;
-										ts.Speed := ts.Data.Speed;
-
-										ts.SpawnDelay1 := $7FFFFFFF;
-										ts.SpawnDelay2 := 0;
-
-										ts.SpawnType := 0;
-										ts.SpawnTick := 0;
-										ts.MoveWait := timeGetTime();
-										ts.ATarget := 0;
-										ts.ATKPer := 100;
-										ts.DEFPer := 100;
-										ts.DmgTick := 0;
-										ts.isActive := true;
-
-										ts.Element := ts.Data.Element;
-
-										for j := 0 to 31 do begin
-											ts.EXPDist[j].CData := nil;
-											ts.EXPDist[j].Dmg := 0;
-										end;
-										if ts.Data.MEXP <> 0 then begin
-											for j := 0 to 31 do begin
-												ts.MVPDist[j].CData := nil;
-												ts.MVPDist[j].Dmg := 0;
+											j := 0;
+											repeat
+												ts.Point.X := tc.Point.X + Random(11) - 5;
+												ts.Point.Y := tc.Point.Y + Random(11) - 5;
+												Inc(j);
+											until ( ((tm.gat[ts.Point.X, ts.Point.Y] <> 1) and (tm.gat[ts.Point.X, ts.Point.Y] <> 5))  or (j = 10) );
+											if (j = 10) then begin
+												ts.Point.X := tc.Point.X;
+												ts.Point.Y := tc.Point.Y;
 											end;
-											ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+
+											ts.Dir := Random(8);
+											ts.HP := ts.Data.HP;
+											ts.Speed := ts.Data.Speed;
+
+											ts.SpawnDelay1 := $7FFFFFFF;
+											ts.SpawnDelay2 := 0;
+
+											ts.SpawnType := 0;
+											ts.SpawnTick := 0;
+											ts.MoveWait := timeGetTime();
+											ts.ATarget := 0;
+											ts.ATKPer := 100;
+											ts.DEFPer := 100;
+											ts.DmgTick := 0;
+											ts.isActive := true;
+
+											ts.Element := ts.Data.Element;
+
+											for j := 0 to 31 do begin
+												ts.EXPDist[j].CData := nil;
+												ts.EXPDist[j].Dmg := 0;
+											end;
+											if ts.Data.MEXP <> 0 then begin
+												for j := 0 to 31 do begin
+													ts.MVPDist[j].CData := nil;
+													ts.MVPDist[j].Dmg := 0;
+												end;
+												ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+											end;
+
+											// Link monster to Map it's now on.
+											tm.Mob.AddObject(ts.ID, ts); //Owned here.
+											tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+
+											ts.isSummon := True;
+											ts.EmperiumID := 0;
+
+											SendMData(tc.Socket, ts);
+											//周囲に送信
+											SendBCmd(tm,ts.Point,41,tc,False);
+											b := 1;
 										end;
-
-										// Link monster to Map it's now on.
-										tm.Mob.AddObject(ts.ID, ts); //Owned here.
-										tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-
-										ts.isSummon := True;
-										ts.EmperiumID := 0;
-
-										SendMData(tc.Socket, ts);
-										//周囲に送信
-										SendBCmd(tm,ts.Point,41,tc,False);
-										b := 1;
 									end;
-{アジト機能追加}
-									end;
-{アジト機能追加ココまで}
 								end;
 							11,12,13,14: //青箱、紫箱、カード帖、プレ箱
 								begin
@@ -7149,206 +7142,206 @@ end;
 			end;
 		//--------------------------------------------------------------------------
 {キューペット}
-                $019f: // ペットテイミング スロット停止
-                        begin
-                                if( tc.UseItemID = 0 ) then continue;
-                                
-                                b := 0;
-                                // l = モンスター ID
-                                RFIFOL( 2, l );
-                                tm := tc.Mdata;
-                                if tm.Mob.IndexOf( l ) <> -1 then begin
-                                        ts := tm.Mob.IndexOfObject(l) as TMob;
+		$019f: // ペットテイミング スロット停止
+			begin
+				if( tc.UseItemID = 0 ) then continue;
 
-                                        if PetDB.IndexOf( ts.JID ) <> -1 then begin
-                                                tpd := PetDB.IndexOfObject( ts.JID ) as TPetDB;
+				b := 0;
+				// l = モンスター ID
+				RFIFOL( 2, l );
+				tm := tc.Mdata;
+				if tm.Mob.IndexOf( l ) <> -1 then begin
+					ts := tm.Mob.IndexOfObject(l) as TMob;
 
-                                                if( tc.UseItemID = tpd.ItemID ) then begin
+					if PetDB.IndexOf( ts.JID ) <> -1 then begin
+						tpd := PetDB.IndexOfObject( ts.JID ) as TPetDB;
 
-                                                        // 捕獲率。LUK とかも絡めると楽しいかも。
-                                                        k := tpd.Capture;
+						if( tc.UseItemID = tpd.ItemID ) then begin
 
-                                                        // Pet Capture Multiplier
-                                                        k := ((k * Option_Pet_Capture_Rate) div 100);
+							// 捕獲率。LUK とかも絡めると楽しいかも。
+							k := tpd.Capture;
 
-                                                        //k := 1000;
-                                                        if Random(1000) < k then begin
+							// Pet Capture Multiplier
+							k := ((k * Option_Pet_Capture_Rate) div 100);
 
-                                                                b := 1;
+							//k := 1000;
+							if Random(1000) < k then begin
 
-                                                                // モンス消滅
-                                                                WFIFOW( 0, $0080 );
-                                                                WFIFOL( 2, l );
-                                                                WFIFOB( 6, 0 );
-																																SendBCmd( tm, ts.Point, 7 );
+								b := 1;
 
-                                                                ts.HP := 0;
-                                                                ts.pcnt := 0;
-                                                                ts.Stat1 :=0;
-                                                                ts.Stat2 :=0;
-                                                                ts.Element := ts.Data.Element;
-                                                                ts.BodyTick := 0;
-                                                                for i := 0 to 4 do ts.HealthTick[i] := 0;
-                                                                ts.isLooting := False;
-                                                                ts.LeaderID := 0;
-                                                                ts.SpawnTick := timeGettime();
+								// モンス消滅
+								WFIFOW( 0, $0080 );
+								WFIFOL( 2, l );
+								WFIFOB( 6, 0 );
+								SendBCmd( tm, ts.Point, 7 );
 
-                                                                i := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
-                                                                if i = -1 then continue;
-                                                                tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(i);
+								ts.HP := 0;
+								ts.pcnt := 0;
+								ts.Stat1 :=0;
+								ts.Stat2 :=0;
+								ts.Element := ts.Data.Element;
+								ts.BodyTick := 0;
+								for i := 0 to 4 do ts.HealthTick[i] := 0;
+								ts.isLooting := False;
+								ts.LeaderID := 0;
+								ts.SpawnTick := timeGettime();
 
-                                                                //ターゲット解除
-                                                                for j1 := ts.Point.Y div 8 - 2 to ts.Point.Y div 8 + 2 do begin
-                                                                        for i1 := ts.Point.X div 8 - 2 to ts.Point.X div 8 + 2 do begin
-                                                                                for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
-                                                                                        tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
-                                                                                        if ((tc1.AMode = 1) or (tc1.AMode = 2)) and (tc1.ATarget = ts.ID) then begin
-                                                                                                tc1.AMode := 0;
-                                                                                                tc1.ATarget := 0;
-                                                                                        end;
-                                                                                        if (tc1.MMode <> 0) and (tc1.MTarget = ts.ID) then begin
-                                                                                                tc1.MMode := 0;
-																																																tc1.MTarget := 0;
-                                                                                        end;
-                                                                                end;
-                                                                        end;
-                                                                end;
+								i := tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.IndexOf(ts.ID);
+								if i = -1 then continue;
+								tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.Delete(i);
 
-                                                                // 経験地リセット
-                                                                for i := 0 to 31 do begin
-                                                                        ts.EXPDist[i].CData := nil;
-                                                                        ts.EXPDist[i].Dmg := 0;
-                                                                end;
+								//ターゲット解除
+								for j1 := ts.Point.Y div 8 - 2 to ts.Point.Y div 8 + 2 do begin
+									for i1 := ts.Point.X div 8 - 2 to ts.Point.X div 8 + 2 do begin
+										for k1 := 0 to tm.Block[i1][j1].CList.Count - 1 do begin
+											tc1 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
+											if ((tc1.AMode = 1) or (tc1.AMode = 2)) and (tc1.ATarget = ts.ID) then begin
+												tc1.AMode := 0;
+												tc1.ATarget := 0;
+											end;
+											if (tc1.MMode <> 0) and (tc1.MTarget = ts.ID) then begin
+												tc1.MMode := 0;
+												tc1.MTarget := 0;
+											end;
+										end;
+									end;
+								end;
 
-                                                                // MVP ペットなんていないと思うけど一応リセット
-                                                                if ts.Data.MEXP <> 0 then begin
-		                                                        for j := 0 to 31 do begin
-			                                                        ts.MVPDist[j].CData := nil;
-			                                                        ts.MVPDist[j].Dmg := 0;
-		                                                        end;
-	                                                        end;
+								// 経験地リセット
+								for i := 0 to 31 do begin
+									ts.EXPDist[i].CData := nil;
+									ts.EXPDist[i].Dmg := 0;
+								end;
 
-                                                                //召還モンスは消滅
-                                                                if ts.isSummon then begin
-		                                                        i := tm.Mob.IndexOf(ts.ID);
-		                                                        if i <> -1 then begin
-		                                                                tm.Mob.Delete(i);
-		                                                                ts.Free;
-                                                                        end;
-                                                                end;
+								// MVP ペットなんていないと思うけど一応リセット
+								if ts.Data.MEXP <> 0 then begin
+									for j := 0 to 31 do begin
+										ts.MVPDist[j].CData := nil;
+										ts.MVPDist[j].Dmg := 0;
+									end;
+								end;
 
-                                                                td := ItemDB.IndexOfObject( tpd.EggID ) as TItemDB;
+								//召還モンスは消滅
+								if ts.isSummon then begin
+									i := tm.Mob.IndexOf(ts.ID);
+									if i <> -1 then begin
+										tm.Mob.Delete(i);
+										ts.Free;
+									end;
+								end;
 
-                                                                // 卵獲得プロセス
-                                                                // 重量判定
-                                                                if tc.MaxWeight >= tc.Weight + td.Weight then begin
-                                                                        j := SearchCInventory(tc, td.ID, td.IEquip );
-					                                if j <> 0 then begin
-						                                //アイテム追加
+								td := ItemDB.IndexOfObject( tpd.EggID ) as TItemDB;
 
-						                                with tc.Item[j] do begin
-                                                                                        ID := td.ID;
-                                                                                        Amount := tc.Item[j].Amount + 1;
-							                                Equip := 0;
-							                                Identify := 1;
-							                                Refine := 0;
-							                                Attr := 0;
-							                                Card[0] := 0;
-							                                Card[1] := 0;
-							                                Card[2] := 0;
-							                                Card[3] := 0;
-							                                Data := td;
-                                                                                end;
+								// 卵獲得プロセス
+								// 重量判定
+								if tc.MaxWeight >= tc.Weight + td.Weight then begin
+									j := SearchCInventory(tc, td.ID, td.IEquip );
+									if j <> 0 then begin
+										//アイテム追加
 
-						                                // Update weight
-						                                tc.Weight := tc.Weight + td.Weight;
-						                                SendCStat1(tc, 0, $0018, tc.Weight);
+										with tc.Item[j] do begin
+											ID := td.ID;
+											Amount := tc.Item[j].Amount + 1;
+											Equip := 0;
+											Identify := 1;
+											Refine := 0;
+											Attr := 0;
+											Card[0] := 0;
+											Card[1] := 0;
+											Card[2] := 0;
+											Card[3] := 0;
+											Data := td;
+										end;
 
-						                                //アイテムゲット通知
-        					                                SendCGetItem(tc, j, 1);
-					                                end else begin
-                                                                                //これ以上もてない
-						                                WFIFOW( 0, $00a0);
-						                                WFIFOB(22, 1);
-						                                Socket.SendBuf(buf, 23);
-                                                                        end;
-                                                                end else begin
-					                                //重量オーバー
-					                                WFIFOW( 0, $00a0);
-					                                WFIFOB(22, 2);
-					                                Socket.SendBuf(buf, 23);
-				                                end;
-                                                        end;
-                                                end;
-                                                tc.UseItemID := 0;
-                                        end;
-                                end;
+										// Update weight
+										tc.Weight := tc.Weight + td.Weight;
+										SendCStat1(tc, 0, $0018, tc.Weight);
 
-                                // 成否判定
-                                WFIFOW( 0, $01a0 );
-                                WFIFOB( 2, b );
-                                Socket.SendBuf( buf, 3 );
-                        end;
+										//アイテムゲット通知
+										SendCGetItem(tc, j, 1);
+									end else begin
+										//これ以上もてない
+										WFIFOW( 0, $00a0);
+										WFIFOB(22, 1);
+										Socket.SendBuf(buf, 23);
+									end;
+								end else begin
+									//重量オーバー
+									WFIFOW( 0, $00a0);
+									WFIFOB(22, 2);
+									Socket.SendBuf(buf, 23);
+								end;
+							end;
+						end;
+						tc.UseItemID := 0;
+					end;
+				end;
 
-                //--------------------------------------------------------------------------
-                $01a1: // ペットメニュー
-                        begin
-                                RFIFOB( 2, b );
-                                tm := tc.MData;
+				// 成否判定
+				WFIFOW( 0, $01a0 );
+				WFIFOB( 2, b );
+				Socket.SendBuf( buf, 3 );
+			end;
 
-                                if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
-                                        tpe := tc.PetData;
-                                        tn := tc.PetNPC;
+		//--------------------------------------------------------------------------
+		$01a1: // ペットメニュー
+			begin
+				RFIFOB( 2, b );
+				tm := tc.MData;
 
-                                        case b of
-                                                0: // ペットステータス表示
-                                                begin
-                                                        WFIFOW( 0, $01a2 );
-                                                        WFIFOS( 2, tpe.Name, 24 );
-                                                        WFIFOB( 26, tpe.Renamed );
-                                                        WFIFOW( 27, tpe.LV );
-                                                        WFIFOW( 29, tpe.Fullness );
-                                                        WFIFOW( 31, tpe.Relation );
-                                                        WFIFOW( 33, tpe.Accessory );
-                                                        Socket.SendBuf( buf, 35 );
-                                                end;
-                                                1: // エサをあげる
-                                                begin
-                                                        w := 0;
-                                                        j := 0;
+				if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
+					tpe := tc.PetData;
+					tn := tc.PetNPC;
 
-																												for i := 1 to 100 do begin
-                                                                if( tc.Item[i].ID = tpe.Data.FoodID ) and ( tc.Item[i].Amount > 0 ) then begin
-                                                                        w := i;
-                                                                        break;
-                                                                end;
-                                                        end;
+					case b of
+					0: // ペットステータス表示
+						begin
+							WFIFOW( 0, $01a2 );
+							WFIFOS( 2, tpe.Name, 24 );
+							WFIFOB( 26, tpe.Renamed );
+							WFIFOW( 27, tpe.LV );
+							WFIFOW( 29, tpe.Fullness );
+							WFIFOW( 31, tpe.Relation );
+							WFIFOW( 33, tpe.Accessory );
+							Socket.SendBuf( buf, 35 );
+						end;
+					1: // エサをあげる
+						begin
+							w := 0;
+							j := 0;
 
-                                                        if w > 0 then begin
+							for i := 1 to 100 do begin
+								if( tc.Item[i].ID = tpe.Data.FoodID ) and ( tc.Item[i].Amount > 0 ) then begin
+									w := i;
+									break;
+								end;
+							end;
 
-                                                                // アイテム減少
-                                                                Dec(tc.Item[w].Amount);
-                                                                if tc.Item[w].Amount = 0 then tc.Item[w].ID := 0;
-				                                tc.Weight := tc.Weight - tc.Item[w].Data.Weight;
+							if w > 0 then begin
 
-                                                                //アイテム数減少
-				                                WFIFOW( 0, $00af);
-				                                WFIFOW( 2, w);
-				                                WFIFOW( 4, 1);
-                                                                Socket.SendBuf( buf, 6 );
+								// アイテム減少
+								Dec(tc.Item[w].Amount);
+								if tc.Item[w].Amount = 0 then tc.Item[w].ID := 0;
+								tc.Weight := tc.Weight - tc.Item[w].Data.Weight;
 
-				                                // Update weight
-				                                SendCStat1(tc, 0, $0018, tc.Weight);
+								//アイテム数減少
+								WFIFOW( 0, $00af);
+								WFIFOW( 2, w);
+								WFIFOW( 4, 1);
+								Socket.SendBuf( buf, 6 );
 
-																																if tpe.Fullness < 26  then tpe.Relation := tpe.Relation + tpe.Data.Hungry
-                                                                else if tpe.Fullness >= 76 then  tpe.Relation := tpe.Relation - tpe.Data.Full
-																																else tpe.Relation := tpe.Relation + ( tpe.Data.Hungry div 2 );
+								// Update weight
+								SendCStat1(tc, 0, $0018, tc.Weight);
 
-                                                                if tpe.Relation > 1000 then tpe.Relation := 1000
-                                                                else if tpe.Relation < 0 then tpe.Relation := 0;
+								if tpe.Fullness < 26  then tpe.Relation := tpe.Relation + tpe.Data.Hungry
+								else if tpe.Fullness >= 76 then  tpe.Relation := tpe.Relation - tpe.Data.Full
+								else tpe.Relation := tpe.Relation + ( tpe.Data.Hungry div 2 );
 
-                                                                tpe.Fullness := tpe.Fullness + tpe.Data.Fullness;
-                                                                if tpe.Fullness > 100 then tpe.Fullness := 100;
+								if tpe.Relation > 1000 then tpe.Relation := 1000
+								else if tpe.Relation < 0 then tpe.Relation := 0;
+
+								tpe.Fullness := tpe.Fullness + tpe.Data.Fullness;
+								if tpe.Fullness > 100 then tpe.Fullness := 100;
 
                                                                 WFIFOW( 0, $01a4 );
                                                                 WFIFOB( 2, 1 );
@@ -7370,7 +7363,7 @@ end;
                                                         WFIFOW( 3, tpe.Data.FoodID );
                                                         Socket.SendBuf( buf, 5 );
                                                 end;
-																								2: // パフォーマンス
+												2: // パフォーマンス
                                                 begin
                                                         // 親密度が高いほど、多くのアクションを見せるようにしてみる
                                                         if tpe.Relation <= 100 then i := 0
@@ -7402,7 +7395,7 @@ end;
                                                                           SavePetData(tpe, i, 1);
                                                                         end;
                                                                         //ペット削除
-																																				j := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
+																		j := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
                                                                         if j <> -1 then begin
                                                                                 tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(j);
                                                                         end;

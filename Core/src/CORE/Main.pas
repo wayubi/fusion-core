@@ -262,7 +262,7 @@ begin
 	{Chrstphr 2004/04/19 -- this list is now created/loaded in the
 	DataLoad proc in the Database.pas module }
 	//SummonMobList := TIntList32.Create;
-	SummonMobListMVP := TIntList32.Create;
+	SummonMobListMVP := TStringList.Create;
 
 	SummonIOBList  := TStringList.Create;//Changed for lower memory/ease of use
 	SummonIOVList  := TStringList.Create;//Ditto
@@ -16150,21 +16150,21 @@ begin
                                             end;
                                           end;
 
-                                                // 自動腹減りシステム
-                                                if tpe.Fullness > 0 then begin
-                                                        if ( tn.HungryTick + tpe.Data.HungryDelay ) < Tick then begin
-                                                                Dec( tpe.Fullness );
+					//Auto PetIsHungrier system
+					if tpe.Fullness > 0 then begin
+						if ( tn.HungryTick + tpe.Data.HungryDelay ) < Tick then begin
+							Dec( tpe.Fullness );
 
-                                                                WFIFOW( 0, $01a4 );
-                                                                WFIFOB( 2, 2 );
-                                                                WFIFOL( 3, tn.ID );
-                                                                WFIFOL( 7, tpe.Fullness );
-                                                                tc.Socket.SendBuf( buf, 11 );
+							WFIFOW( 0, $01a4 );
+							WFIFOB( 2, 2 ); // Intimacy Changed
+							WFIFOL( 3, tn.ID );
+							WFIFOL( 7, tpe.Fullness );
+							tc.Socket.SendBuf( buf, 11 );
 
-                                                                tn.HungryTick := Tick;
-                                                        end;
-                                                end;
-                                        end;
+							tn.HungryTick := Tick;
+						end;
+					end;
+				end;
 {キューペットここまで}
 			end;
 			ExitWarpSearch:
@@ -16341,7 +16341,7 @@ begin
                     MobDB.Clear;
                     MobDBName.Clear;
                     SummonMobList.Clear;
-                    SummonMobListMVP.Clear;
+                    SummonMobListMVP.Clear; //Safe 2004/05/23
                     SummonIOBList.Clear;//Safe 2004/04/26
                     SummonIOVList.Clear;//Safe 2004/04/26
                     SummonICAList.Clear;//Safe 2004/04/26
@@ -16957,13 +16957,13 @@ end;
 {ChrstphrR 2004/04/28 - no memory leaks.}
 procedure TfrmMain.KnockBackLiving(tm:TMap; tc:TChara; tv:TLiving; dist:byte; ktype: byte = 0);
 var
-  bb: array of byte;
-  i: integer;
-  b: byte;
-  xy, vpoint: TPoint;
-  dx, dy: integer;
-  tc1: TChara;
-  ts1: TMob;
+	bb: array of byte;
+	i: integer;
+	b: byte;
+	xy, vpoint: TPoint;
+	dx, dy: integer;
+	tc1: TChara;
+	ts1: TMob;
 begin
   SetLength(bb, dist);
   b := tv.Dir;
@@ -16991,7 +16991,7 @@ begin
 //    end;
 
     for i := 0 to (dist-1) do begin
-      bb[i] := 0;
+			bb[i] := 0;
     end;
   end;
 
@@ -17022,7 +17022,7 @@ begin
       //DebugOut.Lines.Add(Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
         SetSkillUnit(tm, tv.ID, tv.Point, timeGetTime(), $2E, 0, 3000, tc);
         UpdateLivingLocation(tm, tv);
-        //SendCData(tc, tc);
+				//SendCData(tc, tc);
         //SendBCmd(tm, tv.Point, 54, tc);
       //end;
 
