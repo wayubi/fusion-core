@@ -9235,10 +9235,11 @@ Begin
 							tn.Script[k].Data3[0] := StrToInt(SL1[1]);
 							Inc(k);
 						end else if str = 'checkstr' then begin //------- 44 checkstr
-							SL[0] := StringReplace(SL[0], '==', '=',	[]);
+							//SL[0] := StringReplace(SL[0], '==', '==',	[]);
 							SL[0] := StringReplace(SL[0], '><', '<>', []);
 							SL[0] := StringReplace(SL[0], '!=', '<>', []);
-							SL[0] := StringReplace(SL[0], '=',	',=,',	[]);
+                            SL[0] := StringReplace(SL[0], ' == ',	',==,',	[]);
+							SL[0] := StringReplace(SL[0], ' = ',	',=,',	[]);
 							SL[0] := StringReplace(SL[0], '<>', ',<>,', []);
 							sl1.DelimitedText := SL[0];
 							if sl1.Count <> 5 then begin
@@ -9255,12 +9256,14 @@ Begin
 							SetLength(tn.Script[k].Data2, 2);
 							SetLength(tn.Script[k].Data3, 3);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
-							tn.Script[k].Data1[1] := LowerCase(SL1[2]);
-							tn.Script[k].Data1[2] := SL1[1];
+							tn.Script[k].Data1[1] := SL1[2];
+							tn.Script[k].Data1[2] := LowerCase(SL1[1]);
 							mathop := SL1[1];
 							j := -1;
 							if mathop = '='	then j := 0
-							else if mathop = '<>' then j := 1;
+							else if mathop = '<>' then j := 1
+                            else if mathop = '==' then j := 2;
+
 							if j = -1 then begin
 								ScriptErr(SCRIPT_RANGE2_ERR, [ScriptPath, lines, str]);
 								Exit; // Safe - 2004/04/21

@@ -17,7 +17,7 @@ uses
 {==============================================================================}
 {   Listed Procedures}
     {Function  ScriptValidated(MapName : string; FileName : string; Tick : Cardinal) : Boolean;}
-    procedure NPCScript(tc:TChara; value:cardinal = 0; mode:byte = 0);
+    procedure NPCScript(tc:TChara; value:cardinal = 0; mode:byte = 0; MsgStr:string = '');
 {==============================================================================}
 
 
@@ -36,11 +36,11 @@ implementation
 {==============================================================================}
 {NPC Script Commands}
 {==============================================================================}
-procedure NPCScript(tc:TChara; value:cardinal = 0; mode:byte = 0);
+procedure NPCScript(tc:TChara; value:cardinal = 0; mode:byte = 0; MsgStr:string = '');
 var
     a               : array [0..2] of integer;
     i,j,k,l,m,cnt   :integer;
-    str             :string;
+    str,str1        :string;
     txt2            :TextFile;
     sl              :TStringList;
     p               :pointer;
@@ -1562,28 +1562,36 @@ begin
             begin
                 j := tn.Script[tc.ScriptStep].Data3[2];
                 str := '';
+                str1 := '';
+                flag := false;
+
                 //Global var check
                 if (Copy(tn.Script[tc.ScriptStep].Data1[1], 1, 1) = '\') then
-                    str := ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[1]]
+                    str1 := ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[1]]
                 else begin
                     i := -1;
                     if (tc.Login = 2) then i := tc.Flag.IndexOfName(tn.Script[tc.ScriptStep].Data1[1]);
-                    if (i <> -1) then str := tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[1]]
-                    else str := tn.Script[tc.ScriptStep].Data1[1];
+                    if (i <> -1) then str1 := tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[1]]
+                    else str1 := tn.Script[tc.ScriptStep].Data1[1];
                 end;
 
-                flag := false;
                 //another global var check
                 if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) = '\') then begin
-                    if (ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] = str) then
-                        flag := true;
+                    str := ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]];
                 end else if (tc.Login = 2) then begin
                     //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('str-check: %s', [tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]]]));
-                    if (tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] = str) then
-                    flag := true;
+                    str := tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]]
                 end;
                 //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('str-check: %s %s %s(%s) = %d', [tn.Script[tc.ScriptStep].Data1[0], tn.Script[tc.ScriptStep].Data1[2], tn.Script[tc.ScriptStep].Data1[1], str, byte(flag)]));
-                if ((j = 0) and (flag = true)) or ((j = 1) and (flag = false)) then
+
+                if j = 0 then begin
+                    str := LowerCase(str);
+                    str1 := LowerCase(str1);
+                end;
+
+                if (str = str1) then flag := true;
+
+                if (((j = 0) or (j = 2))and (flag = true)) or ((j = 1) and (flag = false)) then
                     tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[0]
                 else tc.ScriptStep := tn.Script[tc.ScriptStep].Data3[1];
             end;
@@ -1715,22 +1723,22 @@ begin
                 Inc(tc.ScriptStep);
             end;
         75: //inputstr (not working)
-				begin{
-					if value = 0 then begin
+				begin
+					if MsgStr = '' then begin
 						WFIFOW( 0, $01d4);
 						WFIFOL( 2, tn.ID);
 						tc.Socket.SendBuf(buf, 6);
 						break;
 					end else begin
 						if (Copy(tn.Script[tc.ScriptStep].Data1[0], 1, 1) <> '\') then begin
-							tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := value;
+							tc.Flag.Values[tn.Script[tc.ScriptStep].Data1[0]] := MsgStr;
 						end else begin
-							ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := value;
+							ServerFlag.Values[tn.Script[tc.ScriptStep].Data1[0]] := MsgStr;
 						end;
 
 						Inc(tc.ScriptStep);
 					end;
-				}end;
+				end;
         76: //areawarp <areawarp map,x1,y1,x2,y2,dest_map,dest_x,dest_y;>
             //checks for characters on map of npc, between x/y range and warps.
             begin

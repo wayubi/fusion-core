@@ -150,6 +150,7 @@ Var
   dat             : TMemoryStream;
   h2              :array[0..3] of Single; //CRW What is this for??
   maptype         : Integer;
+  Buffer : array[0..999] of Char;
 
 Begin(* Proc sv3PacketProcess() *)
 
@@ -5649,6 +5650,16 @@ end;
 
         tc.Skill[279].Effect1 := l;
       end;
+//--------------------------------------------------------------------------
+        $01d5: //NPC InputC Character , as per packet info,
+            begin
+                RFIFOL(4,l);  // this is here, to make sure. where it came from
+                if Socket.ReceiveLength > 999 then i := 1000
+                else i := Socket.ReceiveLength;
+                Socket.ReceiveBuf(Buffer,i);
+                str := Trim(Copy(Buffer,1,i));
+                NPCScript(tc,0,0,str);
+            end;
 //--------------------------------------------------------------------------
 		$01e8: // Request to organize a party - 00f9's updated version
 			begin
