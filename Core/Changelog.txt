@@ -3,6 +3,11 @@ Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 - 12-29-03: Added Console Command "-save" for saving DBs. [AlexKreuz]
 - 12-29-03: Added Console Command "-reload" for reloading DBs. [AlexKreuz]
+- 12-28-03: Updated cast time/delay time for Extremity Fist. [Colus]
+- 12-28-03: Added client speed update packets for hide/unhide. [Colus]
+- 12-28-03: Fixed Tunnel Drive speed modification. [Colus]
+- 12-28-03: Fixed ME damage formula. [Colus]
+- 12-28-03: Fixed reading of ele_db.txt. [Colus]
 - 12-28-03: Added cast times for Increase/Decrease AGI (1 second). [Colus]
 - 12-27-03: Fixed code for Tunnel Drive Data. Waiting on Data. [AlexKreuz]
 - 12-27-03: Modified Skill_DB Format for correct Skill Requirements. [AlexKreuz]
