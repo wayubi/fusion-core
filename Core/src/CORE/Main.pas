@@ -2450,9 +2450,9 @@ begin
 			i := Random(4);
 			case i of
 			0:  tc.MSkill := 5;       {Bash}
-			1:  tc.MSkill := 7;       {Magnum Break}
-			2:  tc.MSkill := 56;      {Pierce}
-			3:  tc.MSkill := 59;      {Spear Boomerang}
+			//1:  tc.MSkill := 7;       {Magnum Break}
+			//2:  tc.MSkill := 56;      {Pierce}
+			//3:  tc.MSkill := 59;      {Spear Boomerang}
 			end;//case
 
 			tc.MUseLV := Random(10) + 1;
