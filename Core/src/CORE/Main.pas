@@ -2768,7 +2768,7 @@ begin
 			end;
 			Inc(ppos);
 			//DebugOut.Lines.Add(Format('		Move %d/%d (%d,%d) %d %d %d', [ppos, pcnt, Point.X, Point.Y, Path[ppos-1], spd, Tick]));
-        
+
 			//ブロック処理1
 			for n := xy.Y div 8 - 2 to xy.Y div 8 + 2 do begin
 				for m := xy.X div 8 - 2 to xy.X div 8 + 2 do begin //自分の居るブロックは処理する必要はない(未)
@@ -5248,7 +5248,6 @@ begin
                                                         
                                                         SetLength(bb, 6);
                                                         bb[0] := 6;
-
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
 
@@ -5268,7 +5267,7 @@ begin
                                                         SendBCmd(tm, tc.Point, 10);
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
-                                                        tc.MTick := Tick + 1000;
+                                                        tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
 
@@ -6939,11 +6938,19 @@ begin
 							for k1 := 0 to sl.Count - 1 do begin
 								tc1 := sl.Objects[k1] as TChara;
                 if tc1.Option = 6 then begin
-						    tc1.Option := tc1.Optionkeep;
-                tc1.Hidden := false;
-                tc1.SkillTick := tc1.Skill[51].Tick;
-                tc1.SkillTickID := 51;
-                CalcStat(tc1, Tick);
+  						    tc1.Option := tc1.Optionkeep;
+                  tc1.Hidden := false;
+                  tc1.SkillTick := tc1.Skill[51].Tick;
+                  tc1.SkillTickID := 51;
+                  CalcStat(tc1, Tick);
+
+                  // Colus, 20031228: Tunnel Drive speed update
+                  if (tc1.Skill[213].Lv <> 0) then begin
+        						WFIFOW(0, $00b0);
+        						WFIFOW(2, $0000);
+        						WFIFOL(4, tc1.Speed);
+        						tc1.Socket.SendBuf(buf, 8);
+                  end;
                 end;
 							end;
 						end;
@@ -7283,12 +7290,20 @@ begin
 							for k1 := 0 to sl.Count - 1 do begin
 								tc1 := sl.Objects[k1] as TChara;
                 if tc1.Option = 6 then begin
-						    tc1.Option := tc1.Optionkeep;
+  						    tc1.Option := tc1.Optionkeep;
 
-                tc1.SkillTick := tc1.Skill[51].Tick;
-                tc1.SkillTickID := 51;
-                tc1.Hidden := false;
-                CalcStat(tc1, Tick);
+                  tc1.SkillTick := tc1.Skill[51].Tick;
+                  tc1.SkillTickID := 51;
+                  tc1.Hidden := false;
+                  CalcStat(tc1, Tick);
+
+                  // Colus, 20031228: Tunnel Drive speed update
+                  if (tc1.Skill[213].Lv <> 0) then begin
+         						WFIFOW(0, $00b0);
+        						WFIFOW(2, $0000);
+        						WFIFOL(4, tc1.Speed);
+        						tc1.Socket.SendBuf(buf, 8);
+                  end;
                 end;
 							end;
 						end;
@@ -7343,12 +7358,24 @@ begin
         150:    {Backsliding}
                 begin
                         SetLength(bb, 5);
-                        bb[0] := 1;
+                        {Colus, 20031228: This bb produces behavior equal
+                         to the previous settings w/o turning the char around.
+                         However, it still isn't updating the position of the
+                         character (perhaps because it is not damaging anything?)}
+                        bb[0] := 4;
+                        bb[1] := 4;
+                        bb[2] := 4;
+                        bb[3] := 4;
+                        bb[4] := 4;
+//                        bb[0] := 1;
+
                         //bb[1] := 0;
-                        xy.x := tc.Point.X;
-                        xy.y := tc.Point.Y;
+                        xy := tc.Point;
+                        //xy.x := tc.Point.X;
+                        //xy.y := tc.Point.Y;
 
                         {Turn Character Around}
+{
                         case tc.Dir of
                                 0: tc.Dir := 4;
                                 1: tc.Dir := 5;
@@ -7359,7 +7386,7 @@ begin
                                 6: tc.Dir := 2;
                                 7: tc.Dir := 3;
                         end;
-
+ }
                         DirMove(tm, tc.Point, tc.Dir, bb);
                         //ブロック移動
                         if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
@@ -7378,6 +7405,7 @@ begin
                         SendBCmd(tm, tc.Point, 10);
 
                         {Turn Character Back Around}
+                        {
                         case tc.Dir of
                                 0: tc.Dir := 4;
                                 1: tc.Dir := 5;
@@ -7388,7 +7416,7 @@ begin
                                 6: tc.Dir := 2;
                                 7: tc.Dir := 3;
                         end;
-
+                         }
                 end;
         151:
           begin
@@ -7888,7 +7916,7 @@ begin
                                                         SendBCmd(tm, tc.Point, 10);
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
-                                                        tc.MTick := Tick + 1000;
+                                                        tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
                                                         spiritSpheres := spiritSpheres - 5;
                                                         UpdateSpiritSpheres(tm, tc, spiritSpheres);
                                                         {20031223, Colus: Cancel Explosion Spirits after Ashura
@@ -9086,7 +9114,7 @@ begin
                 tc1.SP := tc1.SP + 10;
                 tc1.Hidden := false;
                 if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
-                CalcStat(tc1, Tick);
+
               end else begin
                 // Required to place Hide on a timer.
 						    tc1.Skill[MSkill].Tick := Tick + cardinal(tl.Data1[MUseLV]) * 1000;
@@ -9099,8 +9127,10 @@ begin
                 tc1.Optionkeep := tc1.Option;
                 tc1.Option := 6;
                 tc1.Hidden := true;
-                calcskill(tc1, tick);
+
               end;
+
+              CalcStat(tc1, Tick);
 
               WFIFOW(0, $0119);
     					WFIFOL(2, tc1.ID);
@@ -9109,6 +9139,15 @@ begin
     					WFIFOW(10, tc1.Option);
     					WFIFOB(12, 0);
     					SendBCmd(tm, tc1.Point, 13);
+
+              // Colus, 20031228: Tunnel Drive speed update
+              if (tc1.Skill[213].Lv <> 0) then begin
+    						WFIFOW(0, $00b0);
+    						WFIFOW(2, $0000);
+    						WFIFOL(4, tc1.Speed);
+    						tc1.Socket.SendBuf(buf, 8);
+              end;
+
             end;
 
             if (tc1.MSkill = 143) then begin
@@ -12089,6 +12128,13 @@ begin
     				    	WFIFOW(10, tc.Option);
         					WFIFOB(12, 0);
         					SendBCmd(tm, tc.Point, 13);
+                  // Colus, 20031228: Tunnel Drive speed update
+                  if (tc.Skill[213].Lv <> 0) then begin
+        						WFIFOW(0, $00b0);
+        						WFIFOW(2, $0000);
+        						WFIFOL(4, tc.Speed);
+        						tc.Socket.SendBuf(buf, 8);
+                  end;
                 end;
 							end;
              261:    {Call Spirits}

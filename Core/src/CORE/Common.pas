@@ -1844,11 +1844,14 @@ begin
 			WElement[0] := 5;
 			WElement[1] := 5;
 		end;
+    { Colus, 20031228: This is getting stomped in CalcStat
+    DebugOut.Lines.Add(Format('Speed: %d', [Speed]));
                 if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
                         Speed := (Skill[213].Data.Data2[Skill[213].Lv] * Speed) div 100;
+    DebugOut.Lines.Add(Format('Tunnel Speed: %d', [Speed]));
                         ASpeed := Round(ASpeed * (Skill[213].Data.Data2[Skill[213].Lv] / 100));
                 end;
-
+     }
                 if Skill[268].Tick > Tick then begin //Steel Body
                         // Colus 20031223: Not +90, = 90.
                         tc.DEF1 := 90; //tc.DEF1 + 90;
@@ -2208,6 +2211,7 @@ begin
 			else
 				i := i - 30;
 		end;
+
 		if Skill[30].Tick > Tick then begin //‘¬“xŒ¸­
 			if Skill[30].EffectLV > 5 then
 				i := i + 45
@@ -2215,15 +2219,23 @@ begin
 				i := i + 30;
 		end;
 
-                if Skill[257].Tick > Tick then begin
-                        i := i + 30;
-                end;
-                 {//Tunnel Drive
-                if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
-                        i := Skill[213].Data.Data1[MUseLV] * i div 100;
-                end;}
+    if Skill[257].Tick > Tick then begin
+      i := i + 30;
+    end;
+
+    //Tunnel Drive
+    // Colus, 20031228: Moved this mod from CalcSkill b/c CalcStat
+    // won't take its value into account otherwise.
+
+    if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
+       i := (Skill[213].Data.Data2[Skill[213].Lv] * i) div 100;
+    end;
+
 		if i < 25 then i := 25;
 		Speed := i;
+
+
+
     //if (Skill[39].Lv <> 0) and (Option = 8) then begin
       //tl := Skill[39].Data;
       //Speed := Round(Speed * (tl.Data2[Skill[39].Lv] / 100));
