@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-23-04: Added feature request #853 - New GM commands. [Trihan]
+	    - #charblevel
+	    - #charjlevel
+	    - #charstatpoint
+	    - #charskillpoint
 - 06-22-04: Fixed [BD_RICHMANKIM] now affects experience gain. Wrong Chara Type. [AlexKreuz]
 - 06-22-04: Fixed Job XP sharing bugged when two people attack same mob. [AlexKreuz]
 - 06-22-04: Fixed MVP Bonus Experience Calculations. [AlexKreuz & Trihan]

@@ -59,6 +59,10 @@ var
     GM_NEWPLAYER : Byte;
     GM_PWORD : Byte;
     GM_USERS : Byte;
+    GM_CHARBLEVEL : Byte;
+    GM_CHARJLEVEL : Byte;
+    GM_CHARSTATPOINT : Byte;
+    GM_CHARSKILLPOINT : Byte;
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
@@ -149,6 +153,10 @@ var
     function command_newplayer(str : String) : String;
     function command_pword(tc : TChara; str : String) : String;
     function command_users() : String;
+    function command_charblevel(tc : TChara; str : String) : String;
+    function command_charjlevel(tc : TChara; str : String) : String;
+    function command_charstatpoint(tc : TChara; str : String) : String;
+    function command_charskillpoint(tc : TChara; str : String) : String;
 
 implementation
 
@@ -210,6 +218,10 @@ implementation
         GM_NEWPLAYER := StrToIntDef(sl.Values['NEWPLAYER'], 1);
         GM_PWORD := StrToIntDef(sl.Values['PWORD'], 0);
         GM_USERS := StrToIntDef(sl.Values['USERS'], 0);
+        GM_CHARBLEVEL := StrToIntDef(sl.Values['CHARBLEVEL'], 1);
+        GM_CHARJLEVEL := StrToIntDef(sl.Values['CHARJLEVEL'], 1);
+        GM_CHARSTATPOINT := StrToIntDef(sl.Values['CHARSTATPOINT'], 1);
+        GM_CHARSKILLPOINT := StrToIntDef(sl.Values['CHARSKILLPOINT'], 1);
 
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
@@ -310,6 +322,10 @@ Called when we're shutting down the server *only*
 		ini.WriteString('Fusion GM Commands', 'NEWPLAYER', IntToStr(GM_NEWPLAYER));
 		ini.WriteString('Fusion GM Commands', 'PWORD', IntToStr(GM_PWORD));
 		ini.WriteString('Fusion GM Commands', 'USERS', IntToStr(GM_USERS));
+        ini.WriteString('Fusion GM Commands', 'CHARBLEVEL', IntToStr(GM_CHARBLEVEL));
+        ini.WriteString('Fusion GM Commands', 'CHARJLEVEL', IntToStr(GM_CHARJLEVEL));
+        ini.WriteString('Fusion GM Commands', 'CHARSTATPOINT', IntToStr(GM_CHARSTATPOINT));
+        ini.WriteString('Fusion GM Commands', 'CHARSKILLPOINT', IntToStr(GM_CHARSKILLPOINT));
 
 		ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
 		ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
@@ -409,6 +425,10 @@ Called when we're shutting down the server *only*
         else if ( (copy(str, 1, length('newplayer')) = 'newplayer') and (check_level(tc.ID, GM_NEWPLAYER)) ) then error_msg := command_newplayer(str)
         else if ( (copy(str, 1, length('pword')) = 'pword') and (check_level(tc.ID, GM_PWORD)) ) then error_msg := command_pword(tc, str)
         else if ( (copy(str, 1, length('users')) = 'users') and (check_level(tc.ID, GM_USERS)) ) then error_msg := command_users()
+        else if ( (copy(str, 1, length('charblevel')) = 'charblevel') and (check_level(tc.ID, GM_CHARBLEVEL)) ) then error_msg := command_charblevel(tc, str)
+        else if ( (copy(str, 1, length('charjlevel')) = 'charjlevel') and (check_level(tc.ID, GM_CHARJLEVEL)) ) then error_msg := command_charjlevel(tc, str)
+        else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
+        else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
 		;
 
 		if (error_msg <> '') then error_message(tc, error_msg);
@@ -1992,7 +2012,7 @@ Called when we're shutting down the server *only*
         	Result := Result + ' Incomplete information. Syntax: #pword [newpass] [email].';
         end;
 
-        sl.Free;        
+        sl.Free;
     end;
 
     function command_users() : String;
@@ -2014,6 +2034,226 @@ Called when we're shutting down the server *only*
         end;
 
         Result := Result + '.';
+    end;
+
+    function command_charblevel(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tc1 : TChara;
+        tm : TMap;
+        oldlevel : Integer;
+        i, k, w3 : Integer;
+    begin
+        Result := 'GM_CHARBLEVEL Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 12, 256);
+
+        if sl.Count <> 2 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if CharaName.Indexof(sl.Strings[0]) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(sl.Strings[0])] as TChara;
+
+            if (tc1.Login = 2) then begin
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+
+                oldlevel := tc1.BaseLV;
+
+                if (k = 0) and (i >= 1) and (i <= 199) and (i <> tc1.BaseLV) then begin
+                    if tc1.BaseLV > i then begin
+                        tc1.BaseLV := i;
+
+                        for i := 0 to 5 do begin
+                            tc1.ParamBase[i] := 1;
+                        end;
+
+                        tc1.StatusPoint := 48;
+
+                        for i := 1 to tc1.BaseLV - 1 do begin
+                            tc1.StatusPoint := tc1.StatusPoint + i div 5 + 3;
+                        end;
+                    end
+
+                    else begin
+                        w3 := tc1.BaseLV;
+                        tc1.BaseLV := i;
+
+                        for i := w3 to tc1.BaseLV - 1 do begin
+                            tc1.StatusPoint := tc1.StatusPoint + i div 5 + 3;
+                        end;
+                    end;
+
+                    tc1.BaseEXP := tc1.BaseNextEXP - 1;
+                    tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
+
+                    CalcStat(tc1);
+                    SendCStat(tc1);
+                    SendCStat1(tc1, 0, $000b, tc1.BaseLV);
+                    SendCStat1(tc1, 0, $0009, tc1.StatusPoint);
+                    SendCStat1(tc1, 1, $0001, tc1.BaseEXP);
+
+                    Result := 'GM_CHARBLEVEL Success, level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.BaseLV) + '.';
+                end else begin
+                    Result := Result + ' Incomplete information or level out of range.';
+                end;
+            end else begin
+                Result := Result + sl.Strings[0] + ' is not logged in.';
+            end;
+        end else begin
+            Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
+        end;
+    sl.Free;
+    end;
+
+    function command_charjlevel(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tc1 : TChara;
+        tm : TMap;
+        oldlevel : Integer;
+        i, k, w3 : Integer;
+    begin
+        Result := 'GM_CHARJLEVEL Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 12, 256);
+
+        if sl.Count <> 2 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if CharaName.Indexof(sl.Strings[0]) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(sl.Strings[0])] as TChara;
+
+            if (tc1.Login = 2) then begin
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+
+                oldlevel := tc1.JobLV;
+
+                if (k = 0) and (i >= 1) and (i <= 99) and (i <> tc1.JobLV) then begin
+                    tc1.JobLV := i;
+
+                    for i := 1 to MAX_SKILL_NUMBER do begin
+                        if not tc1.Skill[i].Card then tc1.Skill[i].Lv := 0;
+                    end;
+
+                    if tc1.JID = 0 then tc1.SkillPoint := tc1.JobLV - 1
+                    else if tc1.JID < 7 then tc1.SkillPoint := tc1.JobLV - 1 + 9
+                    else tc1.SkillPoint := tc1.JobLV - 1 + 49 + 9;
+
+                    SendCSkillList(tc1);
+
+                    tc1.JobEXP := tc1.JobNextEXP - 1;
+
+                    if tc1.JID < 13 then begin
+                        w3 := (tc1.JID + 5) div 6 + 1;
+                    end else begin
+                        w3 := 3;
+                    end;
+
+                    tc1.JobNextEXP := ExpTable[w3][tc1.JobLV];
+
+                    CalcStat(tc1);
+                    SendCStat(tc1);
+                    SendCStat1(tc1, 0, $0037, tc1.JobLV);
+                    SendCStat1(tc1, 0, $000c, tc1.SkillPoint);
+                    SendCStat1(tc1, 1, $0002, tc1.JobEXP);
+
+                    Result := 'GM_CHARJLEVEL Success, level of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc1.JobLV) + '.';
+                end else begin
+                    Result := Result + ' Incomplete information or level out of range.';
+                end;
+            end else begin
+                Result := Result + sl.Strings[0] + ' is not logged in.';
+            end;
+        end else begin
+            Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
+        end;
+    sl.Free;
+    end;
+
+    function command_charstatpoint(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tc1 : TChara;
+        tm : TMap;
+        oldvalue : Integer;
+        i, k, w3 : Integer;
+    begin
+        Result := 'GM_CHARSTATPOINT Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 15, 256);
+
+        if sl.Count <> 2 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if CharaName.Indexof(sl.Strings[0]) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(sl.Strings[0])] as TChara;
+
+            if (tc1.Login = 2) then begin
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+
+                oldvalue := tc1.StatusPoint;
+
+                if (k = 0) and (i >= 1) and (i <= 9999) and (i <> tc1.StatusPoint) then begin
+                    tc1.StatusPoint := i;
+
+                    SendCStat1(tc1, 0, $0009, tc1.StatusPoint);
+
+                    Result := 'GM_CHARSTATPOINT Success, status points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.StatusPoint) + '.';
+                end else begin
+                    Result := Result + ' Incomplete information or value out of range.';
+                end;
+            end else begin
+                Result := Result + sl.Strings[0] + ' is not logged in.';
+            end;
+        end else begin
+            Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
+        end;
+    sl.Free;
+    end;
+
+    function command_charskillpoint(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        tc1 : TChara;
+        tm : TMap;
+        oldvalue : Integer;
+        i, k, w3 : Integer;
+    begin
+        Result := 'GM_CHARSKILLPOINT Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 16, 256);
+
+        if sl.Count <> 2 then Exit;
+        Val(sl.Strings[1], i, k);
+
+        if CharaName.Indexof(sl.Strings[0]) <> -1 then begin
+            tc1 := CharaName.Objects[CharaName.Indexof(sl.Strings[0])] as TChara;
+
+            if (tc1.Login = 2) then begin
+                tm := Map.Objects[Map.IndexOf(tc1.Map)] as TMap;
+
+                oldvalue := tc1.SkillPoint;
+
+                if (k = 0) and (i >= 1) and (i <= 1001) and (i <> tc1.SkillPoint) then begin
+                    tc1.SkillPoint := i;
+
+                    SendCStat1(tc, 0, $000c, tc.SkillPoint);
+
+                    Result := 'GM_CHARSKILLPOINT Success, skill points of ' + sl.Strings[0] + ' changed from ' + IntToStr(oldvalue) + ' to ' + IntToStr(tc1.SkillPoint) + '.';
+                end else begin
+                    Result := Result + ' Incomplete information or value out of range.';
+                end;
+            end else begin
+                Result := Result + sl.Strings[0] + ' is not logged in.';
+            end;
+        end else begin
+            Result := Result + ' Character ' + sl.Strings[0] + ' does not exist.';
+        end;
+    sl.Free;
     end;
 
 end.
