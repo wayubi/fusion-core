@@ -211,6 +211,22 @@ begin
 							//ギルド情報
 							SendGLoginInfo(tg, tc);
 						end;
+
+                        if (Option_WelcomeMsg) then begin
+                            str2 := 'blueWelcome '+tc.Name+', to the '+ServerName+' Ragnarok Online Server - Powered by Fusion Server Technology';
+                            w := 200;
+                            WFIFOW(0, $009a);
+                            WFIFOW(2, w);
+                            WFIFOS(4, str2, w-4);
+                            for i := 0 to CharaName.Count - 1 do begin
+		    		            tc1 := CharaName.Objects[i] as TChara;
+			    	            if tc1.Login = 2 then begin
+                                    tc1.Socket.SendBuf(buf, w);
+                                end;
+                            end;
+                            tc.Socket.SendBuf(buf, w);
+                        end;
+
 {ギルド機能追加ココまで}
 					end else begin
 						WFIFOW(0, $0074); //あってるかな？

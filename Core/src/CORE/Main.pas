@@ -496,6 +496,11 @@ begin
                 end else begin
                         Option_AutoSave := 600;
                 end;
+                if sl.IndexOfName('Option_WelcomeMsg') <> -1 then begin
+                        Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
+                end else begin
+                        Option_WelcomeMsg := True;
+                end;
 
         sl.Clear;
 
@@ -653,6 +658,7 @@ begin
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
+        ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         // Fusion INI Lines
         
 	ini.Free;
@@ -9927,7 +9933,7 @@ begin
                 if tc.isBlind = true then begin
                         if tc.BlindTick < Tick then begin
                                 tc.isBlind := false;
-                                tc.BlindTick := Tick
+                                tc.BlindTick := Tick;
                                 BlindCharacter(tm, tc, Tick);
                         end;
                 end;
@@ -13695,7 +13701,7 @@ begin
                 //RFIFOW(2, w);
         	//str := RFIFOS(4, w - 4);
 
-                w := 87;
+                w := 200;
         	WFIFOW(0, $009a);
 	        WFIFOW(2, w);
 	        WFIFOS(4, str, w);
