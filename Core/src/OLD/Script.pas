@@ -1612,6 +1612,7 @@ begin
                 Inc(tc.ScriptStep);
             end;
         71: //donpcevent <npcname>,<event>;
+            //the event tag is being ignored until this is fixed.
             begin
                 i := -1;
                 for k := 0 to tm.NPC.Count - 1 do begin
@@ -1621,22 +1622,16 @@ begin
                         break;
                     end;
                 end;
-                if (tn1.ScriptInitS <> -1) then begin
-                    //OnInitÉâÉxÉãÇé¿çs
-                    //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('OnInit Event(%d)', [tn1.ID]));
+                if i = 0 then begin
                     tc1 := TChara.Create;
                     tc1.TalkNPCID := tn1.ID;
-                    tc1.ScriptStep := tn1.ScriptInitS;
+                    tc1.ScriptStep := 0;
                     tc1.AMode := 3;
                     tc1.AData := tn1;
                     tc1.Login := 0;
                     NPCScript(tc1,0,1);
-                    tn.ScriptInitD := true;
+                    tn1.ScriptInitD := true;
                     tc1.Free;
-                end;
-                if i = 0 then begin
-                    //DebugOut.Lines.Add('Need to call the NPC ' + tn1.Name + ' and goto label ' + tn.Script[tc.ScriptStep].Data1[1]);
-                    //tc.ScriptStep := tn1.Script[tc.ScriptStep].Data3[0];
                 end;
                 Inc(tc.ScriptStep);
             end;
