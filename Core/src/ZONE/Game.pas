@@ -1158,6 +1158,26 @@ end;
 
 						end;
 
+        { Mitch 01-29-2004: Revive goes under "killdiealive" }
+        end else if (Copy(str, 1, 7) = 'revive ') and ((DebugCMD and $0008) <> 0) and (tid.KillDieAlive = 1) then begin
+            s := Copy(str, 8, 256);
+            try
+              if CharaName.IndexOf(s) <> -1 then begin
+                tc1 := CharaName.Objects[CharaName.IndexOf(s)] as TChara;
+                tc1.HP := tc1.MAXHP;
+                tc1.SP := tc1.MAXSP;
+                tc1.Sit := 3;
+                SendCStat1(tc1,0,5,tc1.HP);
+                SendCStat1(tc1,0,7,tc1.SP);
+						    WFIFOW( 0, $0148);
+						    WFIFOL( 2, tc1.ID);
+						    WFIFOW( 6, 100);
+						    SendBCmd(tm, tc1.Point, 8);
+              end;
+            finally
+
+            end;
+
         end else if (Copy(str, 1, 7) = 'summon ') and ((DebugCMD and $0008) <> 0) and (tid.GotoSummonBanish = 1) then begin
             s := Copy(str, 8, 256);
 						try
@@ -1187,7 +1207,7 @@ end else if (Copy(str, 1, 7) = 'banish ') and ((DebugCMD and $0008) <> 0) and (t
     if MapList.IndexOf(sl.Strings[sl.Count - 3]) <> -1 then begin
       ta := MapList.Objects[MapList.IndexOf(sl.Strings[sl.Count - 3])] as TMapList;
       if (i < 0) or (i >= ta.Size.X) or (j < 0) or (j >= ta.Size.Y) then continue;
-  
+
       for k := 0 to sl.Count - 4 do begin
         s := s + ' ' + sl.Strings[k];
         s := Trim(s);
