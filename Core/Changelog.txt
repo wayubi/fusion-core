@@ -1,6 +1,12 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 03-09-04: Added Paladin Gospel -not done yet(only heals).[Oatmeal]
+- 03-09-04: Added Sniper Wind Walk waiting on data. [Oatmeal]
+- 03-09-04: Fixed Chain Crush. [Oatmeal]
+- 03-09-04: Added Sniper Sight. [Oatmeal]
+- 03-09-04: Added Lord knight Concentration missing reduction in Def. [Oatmeal]
 - 03-08-04: Cleaned up some debugs. [Colus]
 - 03-08-04: Added UpdateOption and UpdateIcon functions. [Colus]
 - 03-08-04: Fixed bug in some skills (Hide/Cloak/MP) draining SP to 0. [Colus]

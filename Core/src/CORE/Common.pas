@@ -1522,8 +1522,6 @@ Option_GraceTime_PvPG :cardinal;
                 //procedure PoisonCharacter(tm:TMap; tc:TChara; Tick:cardinal);  //Poison or Un-poison a character
                 //procedure BlindCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure UpdateStatus(tm:TMap; tc:TChara; Tick:Cardinal);
-                procedure UpdateOption(tm:TMap; tc:TChara);
-                procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
                 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
@@ -1723,7 +1721,7 @@ begin
 	with tc do begin
     JIDFix := tc.JID;
     if (JIDFix > UPPER_JOB_BEGIN) then JIDFix := JIDFix - UPPER_JOB_BEGIN + LOWER_JOB_END; // (RN 4001 - 4000 + 23 = 24
-    
+
 		if td.IType = 6 then begin
 			Inc(ATTPOWER, td.ATK);
 		end;
@@ -1742,7 +1740,7 @@ begin
     // Example: Swordfish card grants a user Water 1, Pasana Fire 1...
     // NB: If you have a carded element armor (Armor of <ele>) with an element card, the
     // card takes precedence!
-    
+
     if (td.Loc = 16) and (td.Element <> 0) then
       ArmorElement := 20 + td.Element;
 
@@ -1963,6 +1961,8 @@ begin
 		end else begin
 			DEF3 := 0;
 		end;
+
+
 		//デーモンベイン ATK[0][5]
 		if Skill[23].Lv <> 0 then ATK[0][5] := Skill[23].Data.Data1[Skill[23].Lv];
 		//速度増加(AGI+)
@@ -1991,6 +1991,17 @@ begin
 			Bonus[3] := Bonus[3] + Skill[34].EffectLV;
 			Bonus[4] := Bonus[4] + Skill[34].EffectLV;
 		end;
+                	if Skill[380].Tick > Tick then begin
+			Bonus[0] := Bonus[0] + 5;
+			Bonus[1] := Bonus[1] + 5;
+			Bonus[2] := Bonus[2] + 5;
+			Bonus[3] := Bonus[3] + 5;
+			Bonus[4] := Bonus[4] + 5;
+                        Bonus[5] := Bonus[5] + 5;
+		end;
+                if Skill[383].Tick > Tick then begin
+                        tc.FLEE1 := tc.FLEE1 + Skill[383].Data.Data2[Skill[383].Lv];
+                        end;
 		//所持限界量増加スキル
 		if Skill[36].Lv <> 0 then begin
 			MaxWeight := MaxWeight + cardinal(Skill[36].Data.Data1[Skill[36].Lv]) * 10;
@@ -2034,8 +2045,8 @@ begin
 			FLEE3 := 0;
                 end;
 
-                        
-            
+
+
 
 		//グロリア(LUK+)
 		if Skill[75].Tick > Tick then begin
@@ -2083,6 +2094,7 @@ begin
                         tc.DEF1 := 90; //tc.DEF1 + 90;
                         tc.MDEF1 := 90; //tc.MDEF1 +90;
                 end;
+           
                 if Skill[269].Tick > Tick then begin
                   // Colus, 20040204: This isn't right, but how to fix it?
                   // This would make the monk hidden.
@@ -2272,6 +2284,14 @@ begin
         MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
     end;
     end;
+       if Skill[360].Tick > Tick then begin
+       tl := Skill[360].Data;
+    if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
+      MAXHP := 65535;
+    end else begin
+        MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
+    end;
+    end;
 
 		MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
                // if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
@@ -2290,6 +2310,9 @@ begin
 
                 if Skill[270].Tick > Tick then begin //Explosion Spirits
                         tc.Critical := word(tc.Critical + (tc.Critical * tc.Skill[270].Effect1 div 1000) + 1);
+                end;
+                if Skill[380].Tick > Tick then begin //Sight
+                        tc.Critical := word(tc.Critical + (tc.Critical * (100 + 1 * Skill[380].Lv) div 1000));
                 end;
 
 		if WeaponType[1] = 0 then begin
@@ -2455,6 +2478,30 @@ begin
 				end;
 			end;
 		end;
+                	if Skill[357].Tick > Tick then begin
+
+			for i := 0 to 1 do begin
+				for j := 0 to 2 do begin
+					ATKFix[i][j] := ATKFix[i][j] * (100 + 5 * Skill[357].Lv) div 100;
+				end;
+			end;
+		end;
+                if Skill[380].Tick > Tick then begin
+
+			for i := 0 to 1 do begin
+				for j := 0 to 2 do begin
+					ATKFix[i][j] := ATKFix[i][j] * (100 + 2 * Skill[380].Lv) div 100;
+				end;
+			end;
+		end;
+                	if Skill[357].Tick > Tick then begin
+					tc.HIT := tc.HIT * (100 + 10 * Skill[357].Lv) div 100;
+				end;
+                        if Skill[380].Tick > Tick then begin
+					tc.HIT := tc.HIT * (100 + 3 * Skill[380].Lv) div 100;
+				end;
+
+
 {:code}
 		//移動速度
 		i := tc.DefaultSpeed;
@@ -2671,6 +2718,14 @@ begin
                                 MAXHP := 65535;
                         end else begin
                                 MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
+                        end;
+                end;
+                  if Skill[360].Tick > Tick then begin
+
+                        if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
+                                MAXHP := 65535;
+                        end else begin
+                                MAXHP := MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv];
                         end;
                 end;
 
@@ -2914,29 +2969,6 @@ begin
         WFIFOW(10, tc.Option);
         WFIFOB(12, 0); // attack animation
         SendBCmd(tm, tc.Point, 13);
-end;
-//------------------------------------------------------------------------------
-procedure UpdateOption(tm:TMap; tc:TChara);
-begin
-        tm := tc.MData;
-
-  {Here we simply want to change a player option that has been previously set.}
-        WFIFOW(0, $0119);
-        WFIFOL(2, tc.ID);
-        WFIFOW(6, tc.Stat1);
-        WFIFOW(8, tc.Stat2);
-        WFIFOW(10, tc.Option);
-        WFIFOB(12, 0); // attack animation
-        SendBCmd(tm, tc.Point, 13);
-end;
-//------------------------------------------------------------------------------
-procedure UpdateIcon(tm:TMap; tc:TChara; icon:word; active:byte = 1);
-begin
-  WFIFOW(0, $0196);
-  WFIFOW(2, icon);
-  WFIFOL(4, tc.ID);
-  WFIFOB(8, active);
-  SendBCmd(tm, tc.Point, 9);
 end;
 //------------------------------------------------------------------------------
 procedure SilenceCharacter(tm:TMap; tc:TChara; Tick:Cardinal);

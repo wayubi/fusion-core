@@ -8,7 +8,7 @@ uses
 	List32, Login, CharaSel, Script, Game, Path, Database, Common,ShellApi, MonsterAI, Buttons, Zip, SQLData, FusionSQL;
 
 const
-	REALTIME_PRIORITY_CLASS = $100;
+	REALTIME_PRIORITY_CLASS = $100;                      
 	HIGH_PRIORITY_CLASS = $80;
 	ABOVE_NORMAL_PRIORITY_CLASS = $8000;
 	NORMAL_PRIORITY_CLASS = $20;
@@ -4475,11 +4475,11 @@ begin
 
                                                 //Create Graphics and Set NPC
                                                 tn := SetSkillUnit(tm, ID, xy, Tick, $6E, 0, 3000, tc);
+
                                                 tn.MSkill := MSkill;
                                                 tn.MUseLV := MUseLV;
 
                                         end else begin
-                                          SendSkillError(tc, 6); // Wrong weapon
                                                 tc.MMode := 4;
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
@@ -4989,6 +4989,38 @@ begin
                                                                 xy.Y := (tc.MPoint.Y) - 5 + j1;
 
                                                                 tn := SetSkillUnit(tm, ID, xy, Tick, $9a, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+                                                                tn.MSkill := MSkill;
+                                                                tn.MUseLV := MUseLV;
+                                                        end;
+                                                end;
+                                        end;
+                                             369:    //gospel
+                                        begin
+                                                xy.X := MPoint.X;
+                                                xy.Y := MPoint.Y;
+                                                for j1 := 1 to 9 do begin
+                                                        for i1 := 1 to 9 do begin
+                                                                xy.X := (tc.MPoint.X) - 5 + i1;
+                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $b3, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
+
+                                                                tn.MSkill := MSkill;
+                                                                tn.MUseLV := MUseLV;
+                                                        end;
+                                                end;
+                                        end;
+                                           362:    //Ballista??
+                                        begin
+                                                xy.X := MPoint.X;
+                                                xy.Y := MPoint.Y;
+                                                for j1 := 1 to 9 do begin
+                                                        for i1 := 1 to 9 do begin
+                                                                xy.X := (tc.MPoint.X) - 5 + i1;
+                                                                xy.Y := (tc.MPoint.Y) - 5 + j1;
+
+                                                                tn := SetSkillUnit(tm, ID, xy, Tick, $b4, 10, tc.Skill[MSkill].Data.Data1[MUseLV] * 1000, tc);
 
                                                                 tn.MSkill := MSkill;
                                                                 tn.MUseLV := MUseLV;
@@ -5655,6 +5687,7 @@ begin
                 end;
 
 
+
                                 254:    {Grand Cross}
                                 begin
                                         PassiveAttack := false;
@@ -6169,7 +6202,7 @@ begin
                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                         tc.Skill[MSkill].Tick := Tick + 5000;
-                                        
+
                                         if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 
                                         StatCalc1(tc, ts, Tick);
@@ -6177,7 +6210,7 @@ begin
 
                                 end;
                                     273:  //Combo finsher
-                                if tc.spiritSpheres <> 0 then begin
+                                if tc.spiritSpheres >= 1 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                         if ts = nil then Exit;
                                         ts.IsEmperium := False;
@@ -6201,7 +6234,7 @@ begin
 
                                 end;
                                     371:  //Tiger Crush
-                                 if tc.spiritSpheres <> 0 then begin
+                                 if tc.spiritSpheres >= 1 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                         if ts = nil then Exit;
                                         ts.IsEmperium := False;
@@ -6225,7 +6258,7 @@ begin
 
                                 end;
                                      372:   //Chain Crush
-                                 if tc.spiritSpheres <> 0 then begin
+                                 if tc.spiritSpheres >= 2 then begin
                                         ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                         if ts = nil then Exit;
                                         ts.IsEmperium := False;
@@ -6240,7 +6273,7 @@ begin
                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                         tc.Skill[MSkill].Tick := Tick + 5000;
-                                        if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+
                                         if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
                                         tc.spiritSpheres := tc.spiritSpheres - 2;
                                         UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
@@ -7882,20 +7915,15 @@ begin
                                                 Exit;
                                                 end;
                                         end;
-                                254:  {Grand Cross}
+                                 254:  {Grand Cross}
                                         begin
                                                 NoCastInterrupt := true;
                                                 PassiveAttack := True;
                                                 tc.MTargetType := 0;
                                                 SkillEffect(tc, Tick);
                                         end;
-                                          364:  {Grand Cross}
-                                        begin
-                                                NoCastInterrupt := true;
-                                                PassiveAttack := True;
-                                                tc.MTargetType := 0;
-                                                SkillEffect(tc, Tick);
-                                        end;
+                                  
+                                    
                                 255:  //Devotion
 					begin
 						tc1 := tc;
@@ -7980,7 +8008,7 @@ begin
 
                                  273:   {Combo Finish Setup}
                                         begin
-                                                if (Skill[272].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                if (Skill[272].Tick > Tick) and (tc.spiritSpheres >= 1) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
                                                         PassiveAttack := True;
                                                         tc.MTargetType := 0;
                                                         SkillEffect(tc, Tick);
@@ -7993,7 +8021,7 @@ begin
                                         end;
                                          371:   {Combo Finish Setup}
                                         begin
-                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres >= 1) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
                                                         PassiveAttack := True;
                                                         tc.MTargetType := 0;
                                                         SkillEffect(tc, Tick);
@@ -8006,7 +8034,7 @@ begin
                                         end;
                                          372:   {Combo Finish Setup}
                                         begin
-                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres >= 2 ) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
                                                         PassiveAttack := True;
                                                         tc.MTargetType := 0;
                                                         SkillEffect(tc, Tick);
@@ -8127,6 +8155,7 @@ begin
                                                 DecSP(tc, MSkill, MUseLV);
                                                 CreateField(tc, Tick);
                                         end;
+
 
 
 
@@ -8533,6 +8562,33 @@ begin
                                                 Exit;
                                                 end
 				end;
+                                       383: //         Windwalk
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+                                          380: // Sight
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+
+                                         384: //  Meltdown   //no effect yet
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+                                          385: //  Create coin             //no effect yet
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+                                          395: //  Create nugget             //no effect yet
+					begin
+						tc1 := tc;
+						ProcessType := 3;
+					end;
+
 				66: // Imposito Manus
 					begin
 						ProcessType := 3;
@@ -11304,6 +11360,34 @@ begin
                         HPRTick := Tick;
                         tc.InField := false;
                 end;
+                      if ((tc.Skill[369].Tick > Tick) and (tc.HPRTick + 2000 <= Tick) and (tc.InField = true) and (tc.HP <> tc.MAXHP) and (tc.Sit <> 1)) then begin
+
+                        j := Random(1000);
+
+                        tc.HP := tc.HP + j;
+                        if tc.HP > tc.MAXHP then tc.HP := tc.MAXHP;
+
+                        // Colus, 20040117: Nobody else sees the heal, use 011a:
+  							        WFIFOW( 0, $011a);
+  							        WFIFOW( 2, 28);  // Cheat with heal
+  							        WFIFOW( 4, j);
+  							        WFIFOL( 6, ID);
+  							        WFIFOL(10, 0); // Not sure what to do about this (NPC's ID?)
+  							        WFIFOB(14, 1);
+  							        SendBCmd(tc.MData, tc.Point, 15);
+{                        WFIFOW( 0, $013d);
+                        WFIFOW( 2, $0005);
+                        WFIFOW( 4, j);
+                        //Socket.SendBuf(buf, 6);
+                        SendBCmd(tc.MData, tc.Point, 6);}
+
+                        WFIFOW( 0, $00b0);
+                        WFIFOW( 2, $0005);
+                        WFIFOL( 4, HP);
+                        Socket.SendBuf(buf, 8);
+                        HPRTick := Tick;
+                        tc.InField := false;
+                end;
 
                 {Apple of Idun}
                 if (tc.Skill[322].Tick > Tick) and (tc.HPRTick + 6000 <= Tick) and (tc.InField = true) then begin
@@ -11406,33 +11490,27 @@ begin
 
                 if (tc.Option and 4 <> 0) then begin
                   if ((tc.CloakTick + tc.Skill[135].Data.Data1[Skill[135].Lv] * 1000) < Tick) then begin
-                        if tc.SP >= 1 then begin
+                        if tc.SP > 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit cloaktick');
                         end else begin
                           // Colus, 20040205: Added uncloak when you run out of SP.
-                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
-                          tm := tc.MData;
-                          tc.SP := 0;
-                          SendCStat1(tc, 0, 7, SP);
-                          tc.Skill[MSkill].Tick := Tick;
-                          tc.Option := tc.Option and $FFF9;
-                          SkillTick := tc.Skill[MSkill].Tick;
-                          SkillTickID := 135;
-                          tc.Hidden := false;
-                          tc.isCloaked := false;
-                          CalcStat(tc, Tick);
-                          UpdateOption(tm, tc);
-                          UpdateIcon(tm, tc, 5, 0);
-                          {WFIFOW(0, $0119);
-                          WFIFOL(2, tc.ID);
-                          WFIFOW(6, tc.Stat1);
-                          WFIFOW(8, tc.Stat2);
-                          WFIFOW(10, tc.Option);
-                          WFIFOB(12, 0);
-                          SendBCmd(tm, tc.Point, 13);}
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Option := tc.Option and $FFF9;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := 135;
+                                tc.Hidden := false;
+                                tc.isCloaked := false;
+                                CalcStat(tc, Tick);
+                                WFIFOW(0, $0119);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Stat1);
+                                WFIFOW(8, tc.Stat2);
+                                WFIFOW(10, tc.Option);
+                                WFIFOB(12, 0);
+                                SendBCmd(tm, tc.Point, 13);
                         end;
                   end;
                 end;
@@ -11440,53 +11518,42 @@ begin
                // Colus, 20040224: Yeah, Hide drains SP also, but at a different rate.
                if (tc.Option and 2 <> 0) then begin
                   if ((tc.CloakTick + (4000 + (tc.Skill[51].Lv * 1000))) < Tick) then begin
-                        if tc.SP >= 1 then begin
+                        if tc.SP > 1 then begin
                           tc.SP := tc.SP - 1;
                           CloakTick := Tick;
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit cloaktick');
                         end else begin
-                          tm := tc.MData;
                           // Colus, 20040205: Added unhide when you run out of SP.
-                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
-                          tm := tc.MData;
-                          tc.SP := 0;
-                          SendCStat1(tc, 0, 7, SP);
-                          tc.Skill[MSkill].Tick := Tick;
-                          tc.Option := tc.Option and $FFF9;
-                          SkillTick := tc.Skill[MSkill].Tick;
-                          SkillTickID := 51;
-                          tc.Hidden := false;
-                          tc.isCloaked := false;
-                          CalcStat(tc, Tick);
-                          UpdateOption(tm, tc);
-                          UpdateIcon(tm, tc, 4, 0);
-                          {WFIFOW(0, $0119);
-                          WFIFOL(2, tc.ID);
-                          WFIFOW(6, tc.Stat1);
-                          WFIFOW(8, tc.Stat2);
-                          WFIFOW(10, tc.Option);
-                          WFIFOB(12, 0);
-                          SendBCmd(tm, tc.Point, 13);}
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Option := tc.Option and $FFF9;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := 51;
+                                tc.Hidden := false;
+                                tc.isCloaked := false;
+                                CalcStat(tc, Tick);
+                                WFIFOW(0, $0119);
+                                WFIFOL(2, tc.ID);
+                                WFIFOW(6, tc.Stat1);
+                                WFIFOW(8, tc.Stat2);
+                                WFIFOW(10, tc.Option);
+                                WFIFOB(12, 0);
+                                SendBCmd(tm, tc.Point, 13);
                         end;
                   end;
                 end;
 
                 if (tc.Skill[114].EffectLV = 1) and (tc.Skill[114].Tick < Tick) then begin
-                        if tc.SP >= 1 then begin
+                        if tc.SP > 1 then begin
                           tc.SP := tc.SP - 1;
                           tc.Skill[114].Tick := Tick + tc.Skill[114].Data.Data1[tc.Skill[114].Lv];
                           SendCStat1(tc, 0, 7, SP);
                           //DebugOut.Lines.Add('Hit maximize tick');
                         end else begin
-                          // Colus, 20040307: Fixed crash bug (map set properly), remove icon, 0 SP.
-                          tm := tc.MData;
-                          tc.SP := 0;
-                          SendCStat1(tc, 0, 7, SP);
-                          tc.Skill[114].Tick := Tick;
-                          tc.Skill[114].EffectLV := 0;
-                          SkillTick := tc.Skill[114].Tick;
-                          SkillTickID := 114; DebugOut.Lines.Add(Format('STID %d', [SkillTickID]));
+                                tc.Skill[MSkill].Tick := Tick;
+                                tc.Skill[MSkill].EffectLV := 0;
+                                SkillTick := tc.Skill[MSkill].Tick;
+                                SkillTickID := MSkill;
                         end;
                 end;
                 if (tc.isPoisoned = true) then begin
@@ -11874,14 +11941,13 @@ begin
 					end;
         $99: // Talkie Box Activated
           begin
-						tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
+						//tn.JID := $8c; DebugOut.Lines.Add('Talkie changed');
 						WFIFOW(0, $00c3);
 						WFIFOL(2, tn.ID);
 						WFIFOB(6, 0);
 						WFIFOB(7, tn.JID);
 						SendBCmd(tm, tn.Point, 8);
-
-						tn.Tick := Tick + 60000;
+						//tn.Tick := Tick + 60000;
           end;
         { $8c: // Talkie Box fires
           begin
@@ -11890,7 +11956,6 @@ begin
             WFIFOS(6, tn.Name, 80);
             SendBCmd(tm, tn.Point, 86);
           end;}
-
 				else
 					begin
 						//スキル効能地撤去
@@ -11931,13 +11996,6 @@ begin
              DebugOut.Lines.Add('Talkie fire self');
               WFIFOW(0, $0191);
               WFIFOL(2, tc1.ID);
-              WFIFOS(6, tn.Name, 80);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
-              SendBCmd(tm, tn.Point, 86);
-            end;
-            $8c: // Talkie Box fires
-            begin
-              WFIFOW(0, $0191);DebugOut.Lines.Add(Format('Name %s', [tn.Name]));
-              WFIFOL(2, tn.ID);
               WFIFOS(6, tn.Name, 80);
               SendBCmd(tm, tn.Point, 86);
             end;
@@ -12106,6 +12164,20 @@ begin
 								UpdatePlayerLocation(tm, tc2);
 							end;
                                                 $46:    {Sanctuary}
+                                                        begin
+                                                                tc2.Skill[tn.MSkill].Tick := tn.Tick;
+
+                                                                //if tc2.Skill[tn.MSkill].Tick < Tick then begin;
+                                                                tc2.Skill[tn.MSkill].EffectLV := tn.MUseLV;
+                                                                tc2.Skill[tn.MSkill].Effect1 := tc2.Skill[tn.MSkill].Data.Data2[tn.MUseLV];
+                                                                if tc2.SkillTick > tc2.Skill[tn.MSkill].Tick then begin
+                                                                        tc2.SkillTick := tc2.Skill[tn.MSkill].Tick;
+                                                                        tc2.SkillTickID := tn.MSkill;
+
+                                                                end;
+                                                                tc2.InField := true;
+                                                        end;
+                                                           $b3:    // Gospel
                                                         begin
                                                                 tc2.Skill[tn.MSkill].Tick := tn.Tick;
 
@@ -12686,8 +12758,12 @@ begin
                   DamageProcess1(tm, tc1, ts1, dmg[0], tick);
                 end;
               end;
+
+            
+
+
 {:119}
-						$74://ブラストマイン発動
+					$74://ブラストマイン発動
 							begin
 								dmg[0] := (tc1.Param[4] + 75) * (100 + tc1.Param[3]) div 100;
 								dmg[0] := dmg[0] * tn.Count;
@@ -13189,9 +13265,9 @@ begin
 
                                                         end;}
 
-					end; //case
+				    	end; //case
 				end;
-			end;
+		      end;
 		end;
 	end;
 	Result := k;
@@ -14665,7 +14741,7 @@ begin
 				end;
 
 				CharaPassive(tc,Tick);
-        SkillPassive(tc,Tick);
+                                SkillPassive(tc,Tick);
 				if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then PetPassive(tc, Tick);
 
 				//時間制限スキルが切れたかどうかチェック
@@ -14681,7 +14757,7 @@ begin
 								WFIFOW(10, tc.Option);
 								WFIFOB(12, 0);
 								SendBCmd(tm, tc.Point, 13);
-                Skill[SkillTickID].Tick := 0;
+                                                                Skill[SkillTickID].Tick := 0;
 								//Skill[10].Tick := 0;
 								//Skill[24].Tick := 0;
 							end;

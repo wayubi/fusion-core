@@ -1521,7 +1521,7 @@ end;
 {’Ç‰Á}				SendCart(tc);
 						end else if (((tc.JID = 11) or (tc.JID = 4012)) and (Copy(str, 8, 6) = 'falcon')) then begin
 							tc.Option := tc.Option or $10;
-						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then begin
+						end else if ((tc.JID = 7) or (tc.JID = 14) or (tc.JID = 4008) or (tc.JID = 4015) or (tc.JID = 4014) or (tc.JID = 4023)) and ((Copy(str, 8, 4) = 'peko') or (Copy(str, 8, 4) = 'peco')) then begin
 							tc.Option := tc.Option or $20;
 						end else if Copy(str, 8, 3) = 'off' then begin
 							tc.Option := 0;
@@ -6454,7 +6454,7 @@ end;
              WFIFOW(12, xy.Y);
              WFIFOL(14, timeGetTime());
              SendBCmd(tm, xy, 18);
-						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 3000, tc, nil, s);
+						 tn := SetSkillUnit(tm, tc.ID, xy, timeGetTime(), $99, 0, 30000, tc, nil, s);
 	      		 tn.MSkill := tc.MSkill;
       		   tn.MUseLV := tc.MUseLV;
 
