@@ -1446,51 +1446,76 @@ Called when we're shutting down the server *only*
 
     function command_blevel(tc : TChara; str : String) : String;
     var
-        i, k, w3 : Integer;
+        newlevel, i, k, w3 : Integer;
         oldlevel : Integer;
+        s : string;
     begin
         Result := 'GM_BLEVEL Failure.';
 
-        oldlevel := tc.BaseLV;
-        Val(Copy(str, 8, 256), i, k);
+        s := Copy(str, 8, 256);
 
-        if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc.BaseLV) then begin
-            if tc.BaseLV > i then begin
-                tc.BaseLV := i;
+        if s <> '' then begin
 
-                for i := 0 to 5 do begin
-                    tc.ParamBase[i] := 1;
-                end;
+            oldlevel := tc.BaseLV;
+            Val(Copy(str, 8, 256), newlevel, k);
 
-                tc.StatusPoint := 48;
+            if k = 0 then begin
+                if newlevel <> tc.BaseLV then begin
+                    if (newlevel >= 1) and (newlevel <= 32767) then begin
+                        if tc.BaseLV > newlevel then begin
+                            tc.BaseLV := newlevel;
 
-                for i := 1 to tc.BaseLV - 1 do begin
-                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                            for i := 0 to 5 do begin
+                                tc.ParamBase[i] := 1;
+                            end;
+
+                            tc.StatusPoint := 48;
+
+                            for i := 1 to tc.BaseLV - 1 do begin
+                                tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                            end;
+                        end
+
+                        else begin
+                            w3 := tc.BaseLV;
+                            tc.BaseLV := newlevel;
+
+                            for i := w3 to tc.BaseLV - 1 do begin
+                                tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
+                            end;
+                        end;
+
+                        if (tc.BaseNextEXP = 0) then tc.BaseNextEXP := 999999999;
+                        tc.BaseEXP := tc.BaseNextEXP - 1;
+                        tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
+
+                        CalcStat(tc);
+
+                        SendCStat(tc);
+                        SendCStat1(tc, 0, $000b, tc.BaseLV);
+                        SendCStat1(tc, 0, $0009, tc.StatusPoint);
+                        SendCStat1(tc, 1, $0001, tc.BaseEXP);
+
+                        Result := 'GM_BLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.BaseLV) + '.';
+                    end
+
+                    else begin
+                        Result := Result + ' Supplied level is outwith valid range. <1-32767>.';
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' Supplied level is identical to current.';
                 end;
             end
 
             else begin
-                w3 := tc.BaseLV;
-                tc.BaseLV := i;
-
-                for i := w3 to tc.BaseLV - 1 do begin
-                    tc.StatusPoint := tc.StatusPoint + i div 5 + 3;
-                end;
+                Result := Result + ' Supplied level must be a valid integer.';
             end;
+        end
 
-            if (tc.BaseNextEXP = 0) then tc.BaseNextEXP := 999999999;
-            tc.BaseEXP := tc.BaseNextEXP - 1;
-            tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
-
-            CalcStat(tc);
-            SendCStat(tc);
-            SendCStat1(tc, 0, $000b, tc.BaseLV);
-            SendCStat1(tc, 0, $0009, tc.StatusPoint);
-            SendCStat1(tc, 1, $0001, tc.BaseEXP);
-
-            Result := 'GM_BLEVEL Success. level changed from ' + IntToStr(oldlevel) + ' to ' + IntToStr(tc.BaseLV) + '.';
-        end else begin
-            Result := Result + ' Incomplete information or level out of range.';
+        else begin
+            Result := Result + ' Insufficient data. Format is <new base level>.';
         end;
     end;
 
