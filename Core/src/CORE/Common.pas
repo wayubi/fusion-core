@@ -5683,9 +5683,13 @@ var
 	tr      :NTimer;
 	ta	:TMapList;
 {NPCイベント追加ココまで}
+
+        afm :textfile;
+        letter :char;
 begin
 	MapName := ChangeFileExt(MapName, '');
 	dat := TMemoryStream.Create; //読み込み用メモリバッファ
+
 
 	if MapList.IndexOf(MapName) = -1 then begin
 		//DebugOut.Lines.Add('Map Not found : ' + MapName);
@@ -5699,69 +5703,104 @@ begin
 
         ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
 
-        if ta.Ext = 'map' then begin
-	        //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.map');
-	        dat.LoadFromFile(AppPath + 'map\' + MapName + '.map');
-	        SetLength(str, 3);
-        	dat.Read(str[1], 3);
-        end else
+        if ta.Ext = 'afm' then begin
+          assignfile(afm,AppPath + 'map/' + MapName + '.afm');
+          Reset(afm);
 
-        if ta.Ext = 'dwm' then begin
-	        //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.dwm');
-	        dat.LoadFromFile(AppPath + 'map\' + MapName + '.dwm');
-	        SetLength(str, 3);
-        	dat.Read(str[1], 3);
-        end else
+          ReadLn(afm,str);
+          if (str <> 'ADVANCED FUSION MAP') then begin
+            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
+            tm.Free;
+            exit;
+          end;
 
-        if ta.Ext = 'gat' then begin
-        	//DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
-        	dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
-        	SetLength(str, 4);
-        	dat.Read(str[1], 4);
-        end;
+          ReadLn(afm,str);
+          if (str <> MapName) then begin
+            DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
+            tm.Free;
+            exit;
+          end;
 
-	if (str <> 'MAP') and (str <> 'DWM') and (str <> 'GRAT') then begin
-		DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
-		tm.Free;
-		exit;
-	end;
+          ReadLn(afm,tm.Size.x,tm.Size.y);
+          ReadLn(afm,str);
 
-	dat.Read(w, 2);
-	dat.Read(tm.Size.X, 4);
-	dat.Read(tm.Size.Y, 4);
+          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+          for j := 0 to tm.Size.Y - 1 do begin
+            for i := 0 to tm.Size.X - 1 do begin
+              Read(afm,letter);
+              tm.gat[i][j] := strtoint(letter);
+            end;
+            ReadLn(afm,str);
+          end;
+          CloseFile(afm);
+        end
 
-	SetLength(tm.gat, tm.Size.X, tm.Size.Y);
-	for j := 0 to tm.Size.Y - 1 do begin
-		for i := 0 to tm.Size.X - 1 do begin
+        else begin
 
-                        if ta.Ext = 'map' then begin
-                                dat.Read(tm.gat[i][j],1);
-                        end else
+          if ta.Ext = 'map' then begin
+            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.map');
+            dat.LoadFromFile(AppPath + 'map\' + MapName + '.map');
+            SetLength(str, 3);
+            dat.Read(str[1], 3);
+          end else
+          
+          if ta.Ext = 'dwm' then begin
+            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.dwm');
+            dat.LoadFromFile(AppPath + 'map\' + MapName + '.dwm');
+            SetLength(str, 3);
+            dat.Read(str[1], 3);
+          end else
+          
+          if ta.Ext = 'gat' then begin
+            //DebugOut.Lines.Add('Loading mapfile... : ' + MapName + '.gat');
+            dat.LoadFromFile(AppPath + 'map\' + MapName + '.gat');
+            SetLength(str, 4);
+            dat.Read(str[1], 4);
+          end;
+          
+          if (str <> 'MAP') and (str <> 'DWM') and (str <> 'GRAT') then begin
+            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
+            tm.Free;
+            exit;
+          end;
 
-                        if ta.Ext = 'dwm' then begin
-                                dat.Read(tm.gat[i][j],1);
-                        end else
-
-                        if ta.Ext = 'gat' then begin
-	        		dat.Read(h[0], 4);
-		        	dat.Read(h[1], 4);
-			        dat.Read(h[2], 4);
-        			dat.Read(h[3], 4);
-	        		dat.Read(maptype, 4);
-
-                                if (maptype = 0) then begin
-                                        if (h[0] > 3) or (h[1] > 3) or (h[2] > 3) or (h[3] > 3) then begin
-        					tm.gat[i][j] := 3;
-                                        end else begin
-		        			tm.gat[i][j] := 1;
-                                        end;
-                                end else if (maptype = 5) then begin
-                                        tm.gat[i][j] := 0;
-                                end;
-                        end;
+          dat.Read(w, 2);
+          dat.Read(tm.Size.X, 4);
+          dat.Read(tm.Size.Y, 4);
+          
+          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+          for j := 0 to tm.Size.Y - 1 do begin
+            for i := 0 to tm.Size.X - 1 do begin
+            
+              if ta.Ext = 'map' then begin
+                dat.Read(tm.gat[i][j],1);
+              end else
+              
+              if ta.Ext = 'dwm' then begin
+                dat.Read(tm.gat[i][j],1);
+              end else
+              
+              if ta.Ext = 'gat' then begin
+                dat.Read(h[0], 4);
+                dat.Read(h[1], 4);
+                dat.Read(h[2], 4);
+                dat.Read(h[3], 4);
+                dat.Read(maptype, 4);
+                
+                if (maptype = 0) then begin
+                  if (h[0] > 3) or (h[1] > 3) or (h[2] > 3) or (h[3] > 3) then begin
+                    tm.gat[i][j] := 3;
+                  end else begin
+                    tm.gat[i][j] := 1;
+                  end;
+                end else if (maptype = 5) then begin
+                  tm.gat[i][j] := 0;
                 end;
-	end;
-	dat.Free;
+              end;
+            end;
+          end;
+          dat.Free;
+        end;
 
 	tm.BlockSize.X := (tm.Size.X + 7) div 8;
 	tm.BlockSize.Y := (tm.Size.Y + 7) div 8;
