@@ -14495,7 +14495,7 @@ begin
                                             // ˆÚ“®
                                             j := 0;
                                             k := SearchPath2( tn.path, tm, tn.Point.X, tn.Point.Y, Point.X, Point.Y );
-                                            if k > 2 then begin
+                                            if (k > 3) and (k < 15) then begin
 
                                               if Sit = 0 then begin
                                                 xy := Point;
@@ -14530,6 +14530,42 @@ begin
                                                   PetMoving( tc, Tick );
                                                 end;
 
+                                              end;
+                                            end else if (k >= 15) or (k = 0) then begin
+
+                                              WFIFOW( 0, $0080 );
+                                              WFIFOL( 2, tn.ID );
+                                              WFIFOB( 6, 0 );
+                                              SendBCmd( tm, tn.Point, 7 ,tc);
+
+                                              //Delete block
+                                              l := tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.IndexOf(tn.ID);
+                                              if l <> -1 then begin
+                                                tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.Delete(l);
+                                              end;
+
+								                              l := tm.NPC.IndexOf( tn.ID );
+								                              if l <> -1 then begin
+												                        tm.NPC.Delete(l);
+								                              end;
+
+								                              tn.Free;
+								                              tc.PetNPC := nil;
+                                              n := 0;
+                                              for m := 1 to 100 do begin
+                                                if ( tc.Item[m].ID <> 0 ) and ( tc.Item[m].Amount > 0 ) and
+                                                  ( tc.Item[m].Card[0] = $FF00 ) and ( tc.Item[m].Attr <> 0 ) then begin
+                                                    n := 1;
+                                                    break;
+                                                end;
+                                              end;
+                                              if n > 0 then begin
+
+                                                l := PetList.IndexOf( tc.Item[n].Card[2] + tc.Item[n].Card[3] * $10000 );
+
+                                                if l <> -1 then begin
+                                                  SendPetRelocation(tm, tc, l);
+                                                end;
                                               end;
                                             end;
                                           end else if tpe.isLooting then begin

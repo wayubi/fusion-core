@@ -398,6 +398,7 @@ type TPet = class
         SkillTick       :cardinal;  //Tracks when to use a skill
         SkillActivate   :boolean;  //Tracks if the skill is ready to be activated
         LastTick        :cardinal;  //Used for tracking a minute
+        Saved           :byte;
 end;
 {キューペットここまで}
 //------------------------------------------------------------------------------
@@ -921,6 +922,7 @@ type TPlayer = class
 	LoginID1      :cardinal;
 	LoginID2      :cardinal;
 	ver2          :word;
+  Saved         :byte;
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1517,6 +1519,7 @@ Option_GraceTime_PvPG :cardinal;
 
                 procedure UpdateMonsterDead(tm:TMap; ts:TMob; k:integer);   //Kills a monster
 				procedure UpdatePetLocation(tm:TMap; tn:TNPC);  //Update the location of a pet
+                procedure SendPetRelocation(tm:TMap; tc:TChara; i:integer); //Move a pet
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
@@ -2950,6 +2953,67 @@ begin
         WFIFOW(6, tn.Point.X);
         WFIFOW(8, tn.Point.Y);
         SendBCmd(tm, tn.Point, 10);
+end;
+//------------------------------------------------------------------------------
+procedure SendPetRelocation(tm:TMap; tc:TChara; i:integer); //Move a pet
+var
+  tpe:TPet;
+  tn:TNPC;
+begin
+  tpe := PetList.Objects[i] as TPet;
+
+  tn := TNPC.Create;
+  tn.ID := NowNPCID;
+
+  Inc(NowNPCID);
+
+  tn.Name := tpe.Name;
+  tn.JID := tpe.JID;
+  tn.Map := tc.Map;
+  tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
+
+  repeat
+    tn.Point.X := tc.Point.X + Random (5);
+    tn.Point.Y := tc.Point.Y + Random (5);
+  until (( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y )) and ((tm.gat[tn.Point.X, tn.Point.Y] <> 1) and (tm.gat[tn.Point.X, tn.Point.Y] <> 5));
+
+  tn.Dir := Random(8);
+  tn.CType := 2;
+  tn.HungryTick := timeGettime();
+
+  tm.NPC.AddObject(tn.ID, tn);
+  tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
+
+  SendNData(tc.Socket, tn, tc.ver2 );
+  SendBCmd(tm, tn.Point, 41, tc, False);
+
+  tc.PetData := tpe;
+  tc.PetNPC := tn;
+
+  WFIFOW( 0, $01a4 );
+  WFIFOB( 2, 0 );
+  WFIFOL( 3, tn.ID );
+  WFIFOL( 7, 0 );
+  tc.Socket.SendBuf( buf, 11 );
+
+  if tpe.Accessory <> 0 then begin
+    WFIFOB( 2, 3 );
+    WFIFOL( 7, tpe.Accessory );
+    tc.Socket.SendBuf( buf, 11 );
+  end;
+
+  WFIFOB( 2, 5 );
+  WFIFOL( 7, 20 ); // 謎
+  tc.Socket.SendBuf( buf, 11 );
+
+  WFIFOW( 0, $01a2 );
+  WFIFOS( 2, tpe.Name, 24 );
+  WFIFOB( 26, tpe.Renamed );
+  WFIFOW( 27, tpe.LV );
+  WFIFOW( 29, tpe.Fullness );
+  WFIFOW( 31, tpe.Relation );
+  WFIFOW( 33, tpe.Accessory );
+  tc.Socket.SendBuf( buf, 35 );
 end;
 //------------------------------------------------------------------------------
 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster

@@ -496,61 +496,8 @@ begin
                                         i := PetList.IndexOf( tc.Item[j].Card[2] + tc.Item[j].Card[3] * $10000 );
 
                                         if i <> -1 then begin
+                                            SendPetRelocation(tm, tc, i);
 
-                                                tpe := PetList.Objects[i] as TPet;
-
-                                                tn := TNPC.Create;
-                                                tn.ID := NowNPCID;
-
-                                                Inc(NowNPCID);
-
-                                                tn.Name := tpe.Name;
-                                                tn.JID := tpe.JID;
-                                                tn.Map := tc.Map;
-                                                tpe.MobData := MobDB.IndexOfObject(tpe.JID) as TMobDB;
-
-                                                repeat
-                                                        tn.Point.X := tc.Point.X + Random(5) - 2;
-                                                        tn.Point.Y := tc.Point.Y + Random(5) - 2;
-                                                until ( tn.Point.X <> tc.Point.X ) or ( tn.Point.Y <> tc.Point.Y );
-
-                                                tn.Dir := Random(8);
-                                                tn.CType := 2;
-                                                tn.HungryTick := timeGettime();
-
-                                                tm.NPC.AddObject(tn.ID, tn);
-                                                tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
-
-                                                SendNData(tc.Socket, tn, tc.ver2 );
-                                                SendBCmd(tm, tn.Point, 41, tc, False);
-
-                                                tc.PetData := tpe;
-                                                tc.PetNPC := tn;
-
-                                                WFIFOW( 0, $01a4 );
-                                                WFIFOB( 2, 0 );
-                                                WFIFOL( 3, tn.ID );
-                                                WFIFOL( 7, 0 );
-                                                Socket.SendBuf( buf, 11 );
-
-                                                if tpe.Accessory <> 0 then begin
-                                                        WFIFOB( 2, 3 );
-                                                        WFIFOL( 7, tpe.Accessory );
-                                                        Socket.SendBuf( buf, 11 );
-                                                end;
-
-                                                WFIFOB( 2, 5 );
-                                                WFIFOL( 7, 20 ); // 謎
-                                                Socket.SendBuf( buf, 11 );
-
-                                                WFIFOW( 0, $01a2 );
-                                                WFIFOS( 2, tpe.Name, 24 );
-                                                WFIFOB( 26, tpe.Renamed );
-                                                WFIFOW( 27, tpe.LV );
-                                                WFIFOW( 29, tpe.Fullness );
-                                                WFIFOW( 31, tpe.Relation );
-                                                WFIFOW( 33, tpe.Accessory );
-                                                Socket.SendBuf( buf, 35 );
                                         end;
                                 end;
 {キューペットここまで}
