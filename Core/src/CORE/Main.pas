@@ -10462,7 +10462,8 @@ begin
 			end;
 
 			end;
-			if (sl.Count <> 0) and (tMonster.isCasting = false) then begin
+			if (sl.Count <> 0)  then begin
+                                if tMonster <> nil then exit;
 				for c := 0 to sl.Count - 1 do begin
 					ts1 := sl.Objects[c] as TMob;
 
