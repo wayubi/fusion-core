@@ -4487,6 +4487,7 @@ begin
 				for k1 := 0 to tm.Block[i1][j1].CList.Count -1 do begin
 					tc2 := tm.Block[i1][j1].CList.Objects[k1] as TChara;
 					if tc2 = tc1 then Continue;
+                    if tc2 = tc then Continue;
 					if (abs(tc2.Point.X - xy.X) <= 1) and (abs(tc2.Point.Y - xy.Y) <= 1) then
 						sl.AddObject(IntToStr(tc2.ID),tc2);
 				end;

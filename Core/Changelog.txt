@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-29-04: Fixed #157 - Baphomet Card vs PVP will hit yourself. [AlexKreuz] 
 - 06-29-04: Fixed Ghetto Harb DeathExp calculations. Now fixed % x multiplier. [AlexKreuz]
 - 06-29-04: Fixed #804 - "Worn Out Scroll" now adds 1% Base EXP. [AlexKreuz]
 - 06-29-04: Fixed #1016 - 90% overweight displayed both 90% and 50% icons. [AlexKreuz]
