@@ -2160,13 +2160,16 @@ begin
 				Point.Y := 189;
 			end;
 			//座標チェック
-			ta := MapList.Objects[MapList.IndexOf(Map)] as TMapList;
-			if (Point.X < 0) or (Point.X >= ta.Size.X) or (Point.Y < 0) or (Point.Y >= ta.Size.Y) then begin
-				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
-				Map := 'prontera';
-				Point.X := 158;
-				Point.Y := 189;
-			end;
+
+            if MapList.IndexOf(Map) <> -1 then begin
+    			ta := MapList.Objects[MapList.IndexOf(Map)] as TMapList;
+	    		if (Point.X < 0) or (Point.X >= ta.Size.X) or (Point.Y < 0) or (Point.Y >= ta.Size.Y) then begin
+		    		//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid Map Point "%s"[%dx%d] (%d,%d)',[Name, Map, ta.Size.X, ta.Size.Y, Point.X, Point.Y]));
+			    	Map := 'prontera';
+				    Point.X := 158;
+    				Point.Y := 189;
+	    		end;
+            end;
 
 			//マップ存在チェック
 			if MapList.IndexOf(SaveMap) = -1 then begin
@@ -2174,15 +2177,16 @@ begin
 				SaveMap := 'prontera';
 				SavePoint.X := 158;
 				SavePoint.Y := 189;
-			end;
-			//座標チェック
-			ta := MapList.Objects[MapList.IndexOf(SaveMap)] as TMapList;
-			if (SavePoint.X < 0) or (SavePoint.X >= ta.Size.X) or (SavePoint.Y < 0) or (SavePoint.Y >= ta.Size.Y) then begin
-				//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
-				SaveMap := 'prontera';
-				SavePoint.X := 158;
-				SavePoint.Y := 189;
-			end;
+
+    			//座標チェック
+	    		ta := MapList.Objects[MapList.IndexOf(SaveMap)] as TMapList;
+		    	if (SavePoint.X < 0) or (SavePoint.X >= ta.Size.X) or (SavePoint.Y < 0) or (SavePoint.Y >= ta.Size.Y) then begin
+			    	//debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('%s : Invalid SaveMap Point "%s"[%dx%d] (%d,%d)', [Name, SaveMap, ta.Size.X, ta.Size.Y, SavePoint.X, SavePoint.Y]));
+				    SaveMap := 'prontera';
+    				SavePoint.X := 158;
+	    			SavePoint.Y := 189;
+		    	end;
+            end;
 
 			for i := 0 to 2 do begin
 				//マップ存在チェック
