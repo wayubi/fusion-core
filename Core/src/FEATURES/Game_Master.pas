@@ -253,11 +253,11 @@ implementation
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
 
-		sl.Free;
-		ini.Free;
+        sl.Free;
+        ini.Free;
 
-		GM_Access_DB := TIntList32.Create;
-	end;
+        GM_Access_DB := TIntList32.Create;
+    end;
 
 
 (*-----------------------------------------------------------------------------*
@@ -267,152 +267,152 @@ Called when we're shutting down the server *only*
 
 2004/06/02 - ChrstphrR - added in List Free-up code so that no memory is leaked.
 *-----------------------------------------------------------------------------*)
-	Procedure save_commands();
-	Var
-		ini : TIniFile;
-		Idx : Integer;
-	Begin
-		ini := TIniFile.Create(AppPath + 'gm_commands.ini');
+    Procedure save_commands();
+    Var
+        ini : TIniFile;
+        Idx : Integer;
+    Begin
+        ini := TIniFile.Create(AppPath + 'gm_commands.ini');
 
-		ini.WriteString('Fusion GM Commands', 'ALIVE', IntToStr(GM_ALIVE));
-		ini.WriteString('Fusion GM Commands', 'ITEM', IntToStr(GM_ITEM));
-		ini.WriteString('Fusion GM Commands', 'SAVE', IntToStr(GM_SAVE));
-		ini.WriteString('Fusion GM Commands', 'RETURN', IntToStr(GM_RETURN));
-		ini.WriteString('Fusion GM Commands', 'DIE', IntToStr(GM_DIE));
-		ini.WriteString('Fusion GM Commands', 'AUTO', IntToStr(GM_AUTO));
-		ini.WriteString('Fusion GM Commands', 'HCOLOR', IntToStr(GM_HCOLOR));
-		ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
-		ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
-		ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
-		ini.WriteString('Fusion GM Commands', 'GOTO', IntToStr(GM_GOTO));
-		ini.WriteString('Fusion GM Commands', 'SUMMON', IntToStr(GM_SUMMON));
-		ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
-		ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
-		ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
-		ini.WriteString('Fusion GM Commands', 'BLEVEL', IntToStr(GM_BLEVEL));
-		ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
-		ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
-		ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
-		ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
-		ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
-		ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
-		ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
-		ini.WriteString('Fusion GM Commands', 'MONSTER', IntToStr(GM_MONSTER));
-		ini.WriteString('Fusion GM Commands', 'SPEED', IntToStr(GM_SPEED));
-		ini.WriteString('Fusion GM Commands', 'WHOIS', IntToStr(GM_WHOIS));
-		ini.WriteString('Fusion GM Commands', 'OPTION', IntToStr(GM_OPTION));
-		ini.WriteString('Fusion GM Commands', 'RAW', IntToStr(GM_RAW));
-		ini.WriteString('Fusion GM Commands', 'UNIT', IntToStr(GM_UNIT));
-		ini.WriteString('Fusion GM Commands', 'STAT', IntToStr(GM_STAT));
-		ini.WriteString('Fusion GM Commands', 'REFINE', IntToStr(GM_REFINE));
-		ini.WriteString('Fusion GM Commands', 'GLEVEL', IntToStr(GM_GLEVEL));
-		ini.WriteString('Fusion GM Commands', 'IRONICAL', IntToStr(GM_IRONICAL));
-		ini.WriteString('Fusion GM Commands', 'MOTHBALL', IntToStr(GM_MOTHBALL));
-		ini.WriteString('Fusion GM Commands', 'WHERE', IntToStr(GM_WHERE));
-		ini.WriteString('Fusion GM Commands', 'REVIVE', IntToStr(GM_REVIVE));
-		ini.WriteString('Fusion GM Commands', 'BAN', IntToStr(GM_BAN));
-		ini.WriteString('Fusion GM Commands', 'KICK', IntToStr(GM_KICK));
-		ini.WriteString('Fusion GM Commands', 'ICON', IntToStr(GM_ICON));
-		ini.WriteString('Fusion GM Commands', 'UNICON', IntToStr(GM_UNICON));
-		ini.WriteString('Fusion GM Commands', 'SERVER', IntToStr(GM_SERVER));
-		ini.WriteString('Fusion GM Commands', 'PVPON', IntToStr(GM_PVPON));
-		ini.WriteString('Fusion GM Commands', 'PVPOFF', IntToStr(GM_PVPOFF));
-		ini.WriteString('Fusion GM Commands', 'GPVPON', IntToStr(GM_GPVPON));
-		ini.WriteString('Fusion GM Commands', 'GPVPOFF', IntToStr(GM_GPVPOFF));
-		ini.WriteString('Fusion GM Commands', 'NEWPLAYER', IntToStr(GM_NEWPLAYER));
-		ini.WriteString('Fusion GM Commands', 'PWORD', IntToStr(GM_PWORD));
-		ini.WriteString('Fusion GM Commands', 'USERS', IntToStr(GM_USERS));
+        ini.WriteString('Fusion GM Commands', 'ALIVE', IntToStr(GM_ALIVE));
+        ini.WriteString('Fusion GM Commands', 'ITEM', IntToStr(GM_ITEM));
+        ini.WriteString('Fusion GM Commands', 'SAVE', IntToStr(GM_SAVE));
+        ini.WriteString('Fusion GM Commands', 'RETURN', IntToStr(GM_RETURN));
+        ini.WriteString('Fusion GM Commands', 'DIE', IntToStr(GM_DIE));
+        ini.WriteString('Fusion GM Commands', 'AUTO', IntToStr(GM_AUTO));
+        ini.WriteString('Fusion GM Commands', 'HCOLOR', IntToStr(GM_HCOLOR));
+        ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
+        ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
+        ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
+        ini.WriteString('Fusion GM Commands', 'GOTO', IntToStr(GM_GOTO));
+        ini.WriteString('Fusion GM Commands', 'SUMMON', IntToStr(GM_SUMMON));
+        ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
+        ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
+        ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
+        ini.WriteString('Fusion GM Commands', 'BLEVEL', IntToStr(GM_BLEVEL));
+        ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
+        ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
+        ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
+        ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
+        ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
+        ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
+        ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
+        ini.WriteString('Fusion GM Commands', 'MONSTER', IntToStr(GM_MONSTER));
+        ini.WriteString('Fusion GM Commands', 'SPEED', IntToStr(GM_SPEED));
+        ini.WriteString('Fusion GM Commands', 'WHOIS', IntToStr(GM_WHOIS));
+        ini.WriteString('Fusion GM Commands', 'OPTION', IntToStr(GM_OPTION));
+        ini.WriteString('Fusion GM Commands', 'RAW', IntToStr(GM_RAW));
+        ini.WriteString('Fusion GM Commands', 'UNIT', IntToStr(GM_UNIT));
+        ini.WriteString('Fusion GM Commands', 'STAT', IntToStr(GM_STAT));
+        ini.WriteString('Fusion GM Commands', 'REFINE', IntToStr(GM_REFINE));
+        ini.WriteString('Fusion GM Commands', 'GLEVEL', IntToStr(GM_GLEVEL));
+        ini.WriteString('Fusion GM Commands', 'IRONICAL', IntToStr(GM_IRONICAL));
+        ini.WriteString('Fusion GM Commands', 'MOTHBALL', IntToStr(GM_MOTHBALL));
+        ini.WriteString('Fusion GM Commands', 'WHERE', IntToStr(GM_WHERE));
+        ini.WriteString('Fusion GM Commands', 'REVIVE', IntToStr(GM_REVIVE));
+        ini.WriteString('Fusion GM Commands', 'BAN', IntToStr(GM_BAN));
+        ini.WriteString('Fusion GM Commands', 'KICK', IntToStr(GM_KICK));
+        ini.WriteString('Fusion GM Commands', 'ICON', IntToStr(GM_ICON));
+        ini.WriteString('Fusion GM Commands', 'UNICON', IntToStr(GM_UNICON));
+        ini.WriteString('Fusion GM Commands', 'SERVER', IntToStr(GM_SERVER));
+        ini.WriteString('Fusion GM Commands', 'PVPON', IntToStr(GM_PVPON));
+        ini.WriteString('Fusion GM Commands', 'PVPOFF', IntToStr(GM_PVPOFF));
+        ini.WriteString('Fusion GM Commands', 'GPVPON', IntToStr(GM_GPVPON));
+        ini.WriteString('Fusion GM Commands', 'GPVPOFF', IntToStr(GM_GPVPOFF));
+        ini.WriteString('Fusion GM Commands', 'NEWPLAYER', IntToStr(GM_NEWPLAYER));
+        ini.WriteString('Fusion GM Commands', 'PWORD', IntToStr(GM_PWORD));
+        ini.WriteString('Fusion GM Commands', 'USERS', IntToStr(GM_USERS));
         ini.WriteString('Fusion GM Commands', 'CHARBLEVEL', IntToStr(GM_CHARBLEVEL));
         ini.WriteString('Fusion GM Commands', 'CHARJLEVEL', IntToStr(GM_CHARJLEVEL));
         ini.WriteString('Fusion GM Commands', 'CHARSTATPOINT', IntToStr(GM_CHARSTATPOINT));
         ini.WriteString('Fusion GM Commands', 'CHARSKILLPOINT', IntToStr(GM_CHARSKILLPOINT));
 
-		ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
-		ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
-		ini.WriteString('Aegis GM Commands', 'AEGIS_BB', IntToStr(GM_AEGIS_BB));
-		ini.WriteString('Aegis GM Commands', 'AEGIS_HIDE', IntToStr(GM_AEGIS_HIDE));
-		ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSTATE', IntToStr(GM_AEGIS_RESETSTATE));
-		ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSKILL', IntToStr(GM_AEGIS_RESETSKILL));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_BB', IntToStr(GM_AEGIS_BB));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_HIDE', IntToStr(GM_AEGIS_HIDE));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSTATE', IntToStr(GM_AEGIS_RESETSTATE));
+        ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSKILL', IntToStr(GM_AEGIS_RESETSKILL));
 
-		ini.WriteString('Athena GM Commands', 'ATHENA_HEAL', IntToStr(GM_ATHENA_HEAL));
-		ini.WriteString('Athena GM Commands', 'ATHENA_KAMI', IntToStr(GM_ATHENA_KAMI));
-		ini.WriteString('Athena GM Commands', 'ATHENA_ALIVE', IntToStr(GM_ATHENA_ALIVE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_KILL', IntToStr(GM_ATHENA_KILL));
-		ini.WriteString('Athena GM Commands', 'ATHENA_DIE', IntToStr(GM_ATHENA_DIE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_JOBCHANGE', IntToStr(GM_ATHENA_JOBCHANGE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_HIDE', IntToStr(GM_ATHENA_HIDE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_OPTION', IntToStr(GM_ATHENA_OPTION));
-		ini.WriteString('Athena GM Commands', 'ATHENA_STORAGE', IntToStr(GM_ATHENA_STORAGE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_SPEED', IntToStr(GM_ATHENA_SPEED));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WHO3', IntToStr(GM_ATHENA_WHO3));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WHO2', IntToStr(GM_ATHENA_WHO2));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WHO', IntToStr(GM_ATHENA_WHO));
-		ini.WriteString('Athena GM Commands', 'ATHENA_JUMP', IntToStr(GM_ATHENA_JUMP));
-		ini.WriteString('Athena GM Commands', 'ATHENA_JUMPTO', IntToStr(GM_ATHENA_JUMPTO));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WHERE', IntToStr(GM_ATHENA_WHERE));
-		ini.WriteString('Athena GM Commands', 'ATHENA_RURA', IntToStr(GM_ATHENA_RURA));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WARP', IntToStr(GM_ATHENA_WARP));
-		ini.WriteString('Athena GM Commands', 'ATHENA_RURAP', IntToStr(GM_ATHENA_RURAP));
-		ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
-		ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
-		ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_HEAL', IntToStr(GM_ATHENA_HEAL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_KAMI', IntToStr(GM_ATHENA_KAMI));
+        ini.WriteString('Athena GM Commands', 'ATHENA_ALIVE', IntToStr(GM_ATHENA_ALIVE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_KILL', IntToStr(GM_ATHENA_KILL));
+        ini.WriteString('Athena GM Commands', 'ATHENA_DIE', IntToStr(GM_ATHENA_DIE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_JOBCHANGE', IntToStr(GM_ATHENA_JOBCHANGE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_HIDE', IntToStr(GM_ATHENA_HIDE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_OPTION', IntToStr(GM_ATHENA_OPTION));
+        ini.WriteString('Athena GM Commands', 'ATHENA_STORAGE', IntToStr(GM_ATHENA_STORAGE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_SPEED', IntToStr(GM_ATHENA_SPEED));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHO3', IntToStr(GM_ATHENA_WHO3));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHO2', IntToStr(GM_ATHENA_WHO2));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHO', IntToStr(GM_ATHENA_WHO));
+        ini.WriteString('Athena GM Commands', 'ATHENA_JUMP', IntToStr(GM_ATHENA_JUMP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_JUMPTO', IntToStr(GM_ATHENA_JUMPTO));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WHERE', IntToStr(GM_ATHENA_WHERE));
+        ini.WriteString('Athena GM Commands', 'ATHENA_RURA', IntToStr(GM_ATHENA_RURA));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WARP', IntToStr(GM_ATHENA_WARP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_RURAP', IntToStr(GM_ATHENA_RURAP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
+        ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
 
-		ini.Free;
+        ini.Free;
 
-		//Free up the GM Command List when program closes down.
-		for Idx := GM_Access_DB.Count-1 downto 0 do begin
-			if Assigned(GM_Access_DB.Objects[Idx]) then begin
-				(GM_Access_DB.Objects[Idx] AS TGM_Table).Free;
-			end;
-		end;
+        //Free up the GM Command List when program closes down.
+        for Idx := GM_Access_DB.Count-1 downto 0 do begin
+            if Assigned(GM_Access_DB.Objects[Idx]) then begin
+                (GM_Access_DB.Objects[Idx] AS TGM_Table).Free;
+            end;
+        end;
 
-	End;(* Proc save_commands()
+    End;(* Proc save_commands()
 *-----------------------------------------------------------------------------*)
 
 
-	procedure parse_commands(tc : TChara; str : String);
-	var
-		error_msg : String;
-	begin
-		str := Copy(str, Pos(' : ', str) + 4, 256);
-		error_msg := '';
+    procedure parse_commands(tc : TChara; str : String);
+    var
+        error_msg : String;
+    begin
+        str := Copy(str, Pos(' : ', str) + 4, 256);
+        error_msg := '';
 
-		if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
-		else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
-		else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc.ID, GM_SAVE)) ) then error_msg := command_save(tc)
-		else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
-		else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
-		else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
-		else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
-		else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
-		else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
-		else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
-		else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
-		else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
-		else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
-		else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
-		else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
-		else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
-		else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
-		else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
-		else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
-		else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
-		else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
-		else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
-		else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
-		else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
-		else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
-		else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
-		else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
-		else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
-		else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
-		else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
-		else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
-		else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
-		else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
-		else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
+        if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
+        else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
+        else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc.ID, GM_SAVE)) ) then error_msg := command_save(tc)
+        else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
+        else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
+        else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
+        else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
+        else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
+        else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
+        else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
+        else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
+        else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
+        else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
+        else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
+        else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
+        else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
+        else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
+        else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
+        else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
+        else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
+        else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
+        else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
+        else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
+        else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
+        else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
+        else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
+        else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
+        else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
+        else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
+        else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
+        else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
+        else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
+        else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
+        else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
         else if ( (copy(str, 1, length('where')) = 'where') and (check_level(tc.ID, GM_WHERE)) ) then error_msg := command_where(tc, str)
-		else if ( (copy(str, 1, length('revive')) = 'revive') and (check_level(tc.ID, GM_REVIVE)) ) then error_msg := command_revive(str)
+        else if ( (copy(str, 1, length('revive')) = 'revive') and (check_level(tc.ID, GM_REVIVE)) ) then error_msg := command_revive(str)
         else if ( (copy(str, 1, length('ban')) = 'ban') and (check_level(tc.ID, GM_BAN)) ) then error_msg := command_ban(str)
         else if ( (copy(str, 1, length('kick')) = 'kick') and (check_level(tc.ID, GM_KICK)) ) then error_msg := command_kick(str)
         else if ( (copy(str, 1, length('icon')) = 'icon') and (check_level(tc.ID, GM_ICON)) ) then error_msg := command_icon(tc, str)
@@ -429,16 +429,16 @@ Called when we're shutting down the server *only*
         else if ( (copy(str, 1, length('charjlevel')) = 'charjlevel') and (check_level(tc.ID, GM_CHARJLEVEL)) ) then error_msg := command_charjlevel(tc, str)
         else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc.ID, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
         else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc.ID, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
-		;
+        ;
 
-		if (error_msg <> '') then error_message(tc, error_msg);
-		if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
-	end;
+        if (error_msg <> '') then error_message(tc, error_msg);
+        if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
+    end;
 
-	function check_level(id : Integer; cmd : Integer) : Boolean;
-	var
-		idx : Integer;
-		tGM : TGM_Table;
+    function check_level(id : Integer; cmd : Integer) : Boolean;
+    var
+        idx : Integer;
+        tGM : TGM_Table;
     begin
         Result := False;
         idx := GM_Access_DB.IndexOf(id);
@@ -447,7 +447,7 @@ Called when we're shutting down the server *only*
             tGM := GM_Access_DB.Objects[idx] as TGM_Table;
             if ( (tGM.ID = id) and (tGM.Level >= cmd) ) then Result := True;
         end else begin
-        	if (cmd = 0) then Result := True;
+            if (cmd = 0) then Result := True;
         end;
     end;
 
@@ -459,43 +459,43 @@ Called when we're shutting down the server *only*
         tc.Socket.SendBuf(buf, length(str) + 4);
     end;
 
-	{
-	save_gm_log()
-	Orig Author: AlexKreuz
-	2004/05/28
+    {
+    save_gm_log()
+    Orig Author: AlexKreuz
+    2004/05/28
 
-	Revisions:
-	2004/05/31 [ChrstphrR] Added exception handling to gracefully handle file
-	errors that might occur. (Notice how try-except doesn't butcher the code :D )
-	}
-	procedure save_gm_log(tc : TChara; str : String);
-	var
-		logfile : TStringList;
-		timestamp : TDateTime;
-		filename : String;
-	begin
-		timestamp := Now;
-		filename := StringReplace(DateToStr(timestamp), '/', '_', [rfReplaceAll, rfIgnoreCase]);
-		logfile := TStringList.Create;
+    Revisions:
+    2004/05/31 [ChrstphrR] Added exception handling to gracefully handle file
+    errors that might occur. (Notice how try-except doesn't butcher the code :D )
+    }
+    procedure save_gm_log(tc : TChara; str : String);
+    var
+        logfile : TStringList;
+        timestamp : TDateTime;
+        filename : String;
+    begin
+        timestamp := Now;
+        filename := StringReplace(DateToStr(timestamp), '/', '_', [rfReplaceAll, rfIgnoreCase]);
+        logfile := TStringList.Create;
 
-		{ChrstphrR 2004/05/30 - try-except to handle nasty situations where
-		we can't open or write to the logfiles -- they won't be showstoppers.
-		Note that the Create and Free methods are outside of this.}
-		try
-			if FileExists(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt') then begin
-				logfile.LoadFromFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
-			end;
+        {ChrstphrR 2004/05/30 - try-except to handle nasty situations where
+        we can't open or write to the logfiles -- they won't be showstoppers.
+        Note that the Create and Free methods are outside of this.}
+        try
+            if FileExists(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt') then begin
+                logfile.LoadFromFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+            end;
 
-			str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
-			logfile.Add(str);
+            str := '[' + DateToStr(timestamp) + '-' + TimeToStr(timestamp) + '] ' + IntToStr(tc.ID) + ': ' + str + ' (' + tc.Name + ')';
+            logfile.Add(str);
 
-			CreateDir('logs');
-			logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
-		except
-			on E : Exception do DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + '*** GM Logfile Error : ' + E.Message);
-		end;
-		logfile.Free;
-	end;
+            CreateDir('logs');
+            logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
+        except
+            on E : Exception do DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + '*** GM Logfile Error : ' + E.Message);
+        end;
+        logfile.Free;
+    end;
 
     function command_alive(tc : TChara) : String;
     var
@@ -1239,7 +1239,7 @@ Called when we're shutting down the server *only*
                         end;
 
                         if (SummonMonsterAgo = true) then ts.isActive := true
-						else ts.isActive := ts.Data.isActive;
+                        else ts.isActive := ts.Data.isActive;
 
                         ts.MoveWait := timeGetTime();
 
@@ -1248,7 +1248,7 @@ Called when we're shutting down the server *only*
                             ts.EXPDist[j].Dmg := 0;
                         end;
 
-						if ts.Data.MEXP <> 0 then begin
+                        if ts.Data.MEXP <> 0 then begin
                             for j := 0 to 31 do begin
                                 ts.MVPDist[j].CData := nil;
                                 ts.MVPDist[j].Dmg := 0;
@@ -1276,7 +1276,7 @@ Called when we're shutting down the server *only*
                                 if sl.Strings[0] = tss.Name then begin
                                     h := tss.TotalSlaves;
                                     ts.SlaveCount := h;
-									repeat
+                                    repeat
                                         for i := 0 to 4 do begin
                                             if (tss.Slaves[i] <> -1) and (h <> 0) then begin
                                                 ts1 := TMob.Create;
@@ -1294,7 +1294,7 @@ Called when we're shutting down the server *only*
                                                 ts1.HP := ts1.Data.HP;
 
                                                 if ts.Data.Speed < ts1.Data.Speed then ts1.Speed := ts.Data.Speed
-												else ts1.Speed := ts1.Data.Speed;
+                                                else ts1.Speed := ts1.Data.Speed;
 
                                                 ts1.SpawnDelay1 := $7FFFFFFF;
                                                 ts1.SpawnDelay2 := 0;
@@ -1335,22 +1335,22 @@ Called when we're shutting down the server *only*
 
                                                 h := h - 1;
                                             end;
-										end;
-									until (h <= 0);
-								end;
-							end;
-						end;
-					end;
-				end else begin
+                                        end;
+                                    until (h <= 0);
+                                end;
+                            end;
+                        end;
+                    end;
+                end else begin
                     Result := Result + ' Quantity out of range [0-20].';
                 end;
-			end;
-		end else begin
+            end;
+        end else begin
             Result := Result + ' Incomplete information.';
         end;
 
         sl.Free;
-	end;
+    end;
 
     function command_speed(tc : TChara; str : String) : String;
     var
@@ -1650,27 +1650,27 @@ Called when we're shutting down the server *only*
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         for i := 0 to charaname.count - 1 do begin
-        	tc1 := charaname.objects[i] as tchara;
-        	if (tc1.login = 2) then begin
-        		WFIFOW(0, $0119);
-        		WFIFOL(2, tc1.ID);
-        		WFIFOW(6, 0);
-        		WFIFOW(8, j);
-        		WFIFOW(10, 0);
-        		WFIFOB(12, 0);
-        		SendBCmd(tm, tc1.Point, 13);
-        		tc.Stat2 := j;
-        	end;
+            tc1 := charaname.objects[i] as tchara;
+            if (tc1.login = 2) then begin
+                WFIFOW(0, $0119);
+                WFIFOL(2, tc1.ID);
+                WFIFOW(6, 0);
+                WFIFOW(8, j);
+                WFIFOW(10, 0);
+                WFIFOB(12, 0);
+                SendBCmd(tm, tc1.Point, 13);
+                tc.Stat2 := j;
+            end;
         end;
 
     end;
 
     function command_where(tc : TChara; str : String) : String;
     var
-    	s : String;
+        s : String;
         tc1 : TChara;
     begin
-    	Result := 'GM_WHERE Failure.';
+        Result := 'GM_WHERE Failure.';
 
         s := Copy(str, 7, 256);
         if s = '' then begin
@@ -1689,11 +1689,11 @@ Called when we're shutting down the server *only*
 
     function command_revive(str : String) : String;
     var
-    	s : String;
+        s : String;
         tc1 : TChara;
         tm : TMap;
     begin
-    	Result := 'GM_REVIVE Failure.';
+        Result := 'GM_REVIVE Failure.';
 
         s := Copy(str, 8, 256);
         s := Trim(s);
@@ -1713,17 +1713,17 @@ Called when we're shutting down the server *only*
 
             Result := 'GM_REVIVE Success. ' + tc1.Name + ' revived.'; 
         end else begin
-        	Result := Result + ' Character ' + s + ' not found.';
-    	end;
+            Result := Result + ' Character ' + s + ' not found.';
+        end;
     end;
 
     function command_ban(str : String) : String;
     var
-    	s : String;
+        s : String;
         tc1 : TChara;
         tp1 : TPlayer;
     begin
-    	Result := 'GM_BAN Success.';
+        Result := 'GM_BAN Success.';
 
         s := Copy(str, 5, 256);
         s := Trim(s);
@@ -1732,252 +1732,252 @@ Called when we're shutting down the server *only*
             tp1 := Player.IndexOfObject(tc1.ID) as TPlayer;
 
             if tp1.Banned = 0 then begin
-            	Result := Result + ' ' + tc1.Name + ' has been banned.';
-    	        tp1.Banned := 1;
+                Result := Result + ' ' + tc1.Name + ' has been banned.';
+                tp1.Banned := 1;
             end else begin
-            	Result := Result + ' ' + tc1.Name + ' has been un-banned.';
-    	        tp1.Banned := 0;
+                Result := Result + ' ' + tc1.Name + ' has been un-banned.';
+                tp1.Banned := 0;
             end;
         end else begin
-        	Result := 'GM_BAN Failure. Character ' + s + ' not found.';
-    	end;
+            Result := 'GM_BAN Failure. Character ' + s + ' not found.';
+        end;
     end;
 
     function command_kick(str : String) : String;
     var
-    	s : String;
-        tc1 : TChara;	
+        s : String;
+        tc1 : TChara;    
     begin
-    	Result := 'GM_KICK Failure.';
+        Result := 'GM_KICK Failure.';
         s := Copy(str, 6, 256);
         s := Trim(s);
 
         if CharaName.Indexof(s) <> -1 then begin
             tc1 := CharaName.Objects[CharaName.Indexof(s)] as TChara;
             if tc1.Login = 2 then begin
-	            tc1.Socket.Close;
+                tc1.Socket.Close;
                 Result := 'GM KICK Success. Character ' + tc1.Name + ' has been kicked.';
             end else begin
-            	Result := Result + ' Character ' + s + ' is not online.';
+                Result := Result + ' Character ' + s + ' is not online.';
             end;
         end else begin
-        	Result := Result + ' Character ' + s + ' does not exist.';
+            Result := Result + ' Character ' + s + ' does not exist.';
         end;
     end;
 
     function command_icon(tc : TChara; str : String) : String;
     var
-    	i, j, k : Integer;
+        i, j, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_ICON Failure.';
+        Result := 'GM_ICON Failure.';
 
         Val(Copy(str, 6, 256), i, k);
         
         if (k = 0) then begin
             for j := i to i do begin
-            	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
                 UpdateIcon(tm, tc, j, 1);
             end;
             Result := 'GM_ICON Success. Icon ' + IntToStr(j-1) + ' set.';
         end else begin
-        	Result := Result + ' Invalid input. Integer input required.';
+            Result := Result + ' Invalid input. Integer input required.';
         end;
     end;
     
     function command_unicon(tc : TChara; str : String) : String;
     var
-    	i, j, k : Integer;
+        i, j, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_UNICON Failure.';
+        Result := 'GM_UNICON Failure.';
 
         Val(Copy(str, 8, 256), i, k);
         
         if (k = 0) then begin
             for j := i to i do begin
-            	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
                 UpdateIcon(tm, tc, j, 0);
             end;
             Result := 'GM_UNICON Success. Icon ' + IntToStr(j-1) + ' unset.';
         end else begin
-        	Result := Result + ' Invalid input. Integer input required.';
+            Result := Result + ' Invalid input. Integer input required.';
         end;
     end;
 
     function command_server() : String;
     begin
-    	Result := 'Ragnarok Online Server powered by Fusion Server Software - ' + RELEASE_VERSION + '.';
+        Result := 'Ragnarok Online Server powered by Fusion Server Software - ' + RELEASE_VERSION + '.';
     end;
 
     function command_pvpon(tc : TChara) : String;
     var
-    	mi : MapTbl;
+        mi : MapTbl;
         tc1 : TChara;
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_PVPON Failure.';
+        Result := 'GM_PVPON Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
-	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             if (mi.PvP = true) then begin
-            	Result := Result + ' PVP already enabled on map ' + tc.Map + '.';
+                Result := Result + ' PVP already enabled on map ' + tc.Map + '.';
             end else begin
-		        mi.PvP := true;
-    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                mi.PvP := true;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-		        for i := 0 to tm.CList.Count - 1 do begin
-			        tc1 := tm.CList.Objects[0] as TChara;
+                for i := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[0] as TChara;
 
-        	        if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-			        tc1.tmpMap := LowerCase(tc1.Map);
-			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-			        MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
-	            end;
+                    if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+                    tc1.tmpMap := LowerCase(tc1.Map);
+                    tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+                    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+                end;
 
-    	    	Result := 'GM_PVPON Success. PVP enabled on map ' + tc1.Map + '.';
+                Result := 'GM_PVPON Success. PVP enabled on map ' + tc1.Map + '.';
             end;
         end else begin
-        	Result := Result + ' Map ' + tc.Map + ' not found.';
+            Result := Result + ' Map ' + tc.Map + ' not found.';
         end;
     end;
 
     function command_pvpoff(tc : TChara) : String;
     var
-    	mi : MapTbl;
+        mi : MapTbl;
         tc1 : TChara;
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_PVPOFF Failure.';
+        Result := 'GM_PVPOFF Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
-	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
 
             if (mi.PvP = false) then begin
-            	Result := Result + ' PVP already disabled on map ' + tc.Map + '.';
+                Result := Result + ' PVP already disabled on map ' + tc.Map + '.';
             end else begin
-		        mi.PvP := false;
-    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                mi.PvP := false;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-		        for i := 0 to tm.CList.Count - 1 do begin
-			        tc1 := tm.CList.Objects[0] as TChara;
+                for i := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[0] as TChara;
 
-	                if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-			        tc1.tmpMap := LowerCase(tc1.Map);
-			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-		    	    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
-	            end;
+                    if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+                    tc1.tmpMap := LowerCase(tc1.Map);
+                    tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+                    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+                end;
 
-        		Result := 'GM_PVPOFF Success. PVP disabled on map ' + tc1.Map + '.';
+                Result := 'GM_PVPOFF Success. PVP disabled on map ' + tc1.Map + '.';
             end;
         end else begin
-        	Result := Result + ' Map ' + tc.Map + ' not found.';
+            Result := Result + ' Map ' + tc.Map + ' not found.';
         end;
     end;
 
     function command_gpvpon(tc : TChara) : String;
     var
-    	mi : MapTbl;
+        mi : MapTbl;
         tc1 : TChara;
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_GPVPON Failure.';
+        Result := 'GM_GPVPON Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
-	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
             if (mi.PvPG = true) then begin
-            	Result := Result + ' PVPG already enabled on map ' + tc.Map + '.';
+                Result := Result + ' PVPG already enabled on map ' + tc.Map + '.';
             end else begin
-		        mi.PvPG := true;
-    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                mi.PvPG := true;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-		        for i := 0 to tm.CList.Count - 1 do begin
-			        tc1 := tm.CList.Objects[0] as TChara;
+                for i := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[0] as TChara;
 
-        	        if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-			        tc1.tmpMap := LowerCase(tc1.Map);
-			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-			        MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
-	            end;
+                    if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+                    tc1.tmpMap := LowerCase(tc1.Map);
+                    tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+                    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+                end;
 
-    	    	Result := 'GM_GPVPON Success. PVPG enabled on map ' + tc1.Map + '.';
+                Result := 'GM_GPVPON Success. PVPG enabled on map ' + tc1.Map + '.';
             end;
         end else begin
-        	Result := Result + ' Map ' + tc.Map + ' not found.';
+            Result := Result + ' Map ' + tc.Map + ' not found.';
         end;
     end;
 
     function command_gpvpoff(tc : TChara) : String;
     var
-    	mi : MapTbl;
+        mi : MapTbl;
         tc1 : TChara;
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := 'GM_GPVPOFF Failure.';
+        Result := 'GM_GPVPOFF Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
-	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
 
             if (mi.PvPG = false) then begin
-            	Result := Result + ' PVPG already disabled on map ' + tc.Map + '.';
+                Result := Result + ' PVPG already disabled on map ' + tc.Map + '.';
             end else begin
-		        mi.PvPG := false;
-    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+                mi.PvPG := false;
+                tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-		        for i := 0 to tm.CList.Count - 1 do begin
-			        tc1 := tm.CList.Objects[0] as TChara;
+                for i := 0 to tm.CList.Count - 1 do begin
+                    tc1 := tm.CList.Objects[0] as TChara;
 
-	                if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-			        tc1.tmpMap := LowerCase(tc1.Map);
-			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-		    	    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
-	            end;
+                    if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+                    tc1.tmpMap := LowerCase(tc1.Map);
+                    tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+                    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+                end;
 
-        		Result := 'GM_GPVPOFF Success. PVPG disabled on map ' + tc1.Map + '.';
+                Result := 'GM_GPVPOFF Success. PVPG disabled on map ' + tc1.Map + '.';
             end;
         end else begin
-        	Result := Result + ' Map ' + tc.Map + ' not found.';
+            Result := Result + ' Map ' + tc.Map + ' not found.';
         end;
     end;
 
     function command_newplayer(str : String) : String;
     var
-    	sl : TStringList;
+        sl : TStringList;
         tp1 : TPlayer;
     begin
-    	Result := 'GM_NEWPLAYER Failure.';
+        Result := 'GM_NEWPLAYER Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 11, 256);
 
         if sl.Count = 4 then begin;
-	        if PlayerName.IndexOf(sl.Strings[0]) <> -1 then begin
-            	Result := Result + ' Player name ' + sl.Strings[0] + ' already exists.';
-        	end else if (Length(sl.Strings[0]) < 4) or (Length(sl.strings[1]) < 4) then begin
-            	Result := Result + ' Player name and password must be at least 4 character long.';
-	        end else if (sl.strings[2] <> '1') and (sl.strings[2] <> '0') then begin
-            	Result := Result + ' Gender can only be 1 (Male) or 2 (Female).';
-	        end else begin
-		        tp1 := TPlayer.Create;
-		        tp1.ID := 100100 + PlayerName.Count;
-    		    tp1.Name := sl.Strings[0];
-	        	tp1.Pass := sl.Strings[1];
-		        tp1.Mail := sl.Strings[3];
-    		    tp1.Gender := StrToInt(sl.Strings[2]);
-	        	tp1.Banned := 0;
-		        tp1.ver2 := 9;
+            if PlayerName.IndexOf(sl.Strings[0]) <> -1 then begin
+                Result := Result + ' Player name ' + sl.Strings[0] + ' already exists.';
+            end else if (Length(sl.Strings[0]) < 4) or (Length(sl.strings[1]) < 4) then begin
+                Result := Result + ' Player name and password must be at least 4 character long.';
+            end else if (sl.strings[2] <> '1') and (sl.strings[2] <> '0') then begin
+                Result := Result + ' Gender can only be 1 (Male) or 2 (Female).';
+            end else begin
+                tp1 := TPlayer.Create;
+                tp1.ID := 100100 + PlayerName.Count;
+                tp1.Name := sl.Strings[0];
+                tp1.Pass := sl.Strings[1];
+                tp1.Mail := sl.Strings[3];
+                tp1.Gender := StrToInt(sl.Strings[2]);
+                tp1.Banned := 0;
+                tp1.ver2 := 9;
 
-	    	    PlayerName.AddObject(tp1.Name, tp1);
-    	    	Player.AddObject(tp1.ID, tp1);
+                PlayerName.AddObject(tp1.Name, tp1);
+                Player.AddObject(tp1.ID, tp1);
 
                 Result := 'GM_NEWPLAYER Success. ' + tp1.Name + ' has been added successfully.';
             end;
         end else begin
-        	Result := Result + ' Incomplete information. Syntax: #newplayer [username] [password] [gender 1|0] [email].';
+            Result := Result + ' Incomplete information. Syntax: #newplayer [username] [password] [gender 1|0] [email].';
         end;
 
         sl.Free;
@@ -1985,31 +1985,31 @@ Called when we're shutting down the server *only*
 
     function command_pword(tc : TChara; str : String) : String;
     var
-    	sl : TStringList;
+        sl : TStringList;
         tp1 : TPlayer;
     begin
-    	Result := 'GM_PWORD Failure.';
+        Result := 'GM_PWORD Failure.';
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(str, 7, 256);
         if sl.Count = 2 then begin;
 
-			if length(sl.Strings[0]) < 4 then begin
+            if length(sl.Strings[0]) < 4 then begin
                 Result := Result + ' Passwords must be at least 4 characters long.';
-			end else if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
+            end else if (sl.Strings[0] = ' ') or (sl.Strings[1] = ' ') then begin
                 Result := Result + ' You have to enter a new password and your email address.';
-			end else begin
+            end else begin
                 tp1 := Player.IndexOfObject(tc.ID) as TPlayer;
 
                 if sl.Strings[1] <> tp1.Mail then begin
-					Result := Result + ' Your email address didnt match the one you entered.';
+                    Result := Result + ' Your email address didnt match the one you entered.';
                 end else begin
-					tp1.Pass := sl.Strings[0];
-					Result := 'GM_PWORD Success. Password changed. New Password: ' + tp1.Pass + '.';
+                    tp1.Pass := sl.Strings[0];
+                    Result := 'GM_PWORD Success. Password changed. New Password: ' + tp1.Pass + '.';
                 end;
             end;
         end else begin
-        	Result := Result + ' Incomplete information. Syntax: #pword [newpass] [email].';
+            Result := Result + ' Incomplete information. Syntax: #pword [newpass] [email].';
         end;
 
         sl.Free;
@@ -2017,13 +2017,13 @@ Called when we're shutting down the server *only*
 
     function command_users() : String;
     var
-    	tc1 : TChara;
+        tc1 : TChara;
         i : Integer;
     begin
-    	Result := 'Users currently logged in: ';
+        Result := 'Users currently logged in: ';
 
         for i := 0 to CharaName.Count - 1 do begin
-        	tc1 := CharaName.Objects[i] as TChara;
+            tc1 := CharaName.Objects[i] as TChara;
             if tc1.Login = 2 then begin
                 if Result = 'Users currently logged in: ' then begin
                     Result := Result + tc1.Name;
