@@ -1407,6 +1407,7 @@ var
 	MobDBName  :TStringList;
         {Monster Skill Database}
         MobAIDB    :TIntList32;
+        //MobAIDBAegis:TStringList;
         MobAIDBAegis:TIntList32;
         PharmacyDB :TIntList32;
   SlaveDBName:TStringList;

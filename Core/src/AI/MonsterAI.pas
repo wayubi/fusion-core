@@ -15,6 +15,8 @@ uses
         procedure MobSkillDamageCalc(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal);
         procedure SendMSkillAttack(tm:TMap; tc:TChara; ts:TMob; tsAI:TMobAIDB; Tick:cardinal; k:integer; i:integer);
         procedure MonsterCastTime(tm:Tmap; ts:TMob; tsAI:TMobAIDB; i:integer; Tick:cardinal);
+        
+        procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
 
         procedure PetAttackSkill(tm:TMap; ts:TMob; tc:TChara);
         procedure PetDamageProcess(tm:TMap; ts:TMob; tc:TChara; Dmg:integer; Tick:cardinal; isBreak:Boolean = True);
@@ -41,6 +43,7 @@ var
 	tn:TNPC;
 	sl:TStringList;
 begin
+  TempNewAIProcedures(tm, ts, Tick);
 	sl := TStringList.Create;
 	with ts do begin
                 MobSkillCalc(tm,ts,Tick);
@@ -1219,6 +1222,64 @@ begin
                 ts.ATick := Tick;
         end;
 
+end;
+
+//------------------------------------------------------------------------------
+procedure TempNewAIProcedures(tm:TMap; ts:TMob; Tick:cardinal);
+var
+  tsAI2 :TMobAIDBAegis;
+  j,k,m     :integer;
+
+begin
+  {
+  Monster Data: RAYDRIC BERSERK_ST NPC_DARKNESSATTACK 3 200 0 7500 0 0 0
+Monster Data: RAYDRIC RUSH_ST NPC_EMOTION 1 15 0 10000 0 0 0
+Monster Data: RAYDRIC BERSERK_ST SM_MAGNUM 6 50 1500 10000 NO_DISPEL 0 0
+Monster Data: RAYDRIC BERSERK_ST SM_MAGNUM 6 1000 1500 10000 NO_DISPEL IF_ENEMYCOUNT 2
+Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 50 1000 40000 0 0 0
+Monster Data: RAYDRIC RUSH_ST BS_MAXIMIZE 1 50 1000 40000 0 0 0
+Monster Data: RAYDRIC BERSERK_ST SM_MAGNUM 6 150 1500 10000 NO_DISPEL IF_HP 30
+Monster Data: RAYDRIC BERSERK_ST BS_MAXIMIZE 1 150 1000 40000 IF_HP 30 0
+}
+  //j := MobAIDBAegis.IndexOf(ts.Number);
+  //k := j;
+  //j := MobAIDBAegis.IndexOf(ts.Name);
+  DebugOut.Lines.Add(ts.Name);
+  for m := 0 to MobAIDBAegis.Count do begin
+    if MobAIDBAegis.IndexOf(m) <> -1 then begin
+    //while (j > 0) do begin
+      //tsAI2 := MobAIDBAegis.IndexOf(j)] as TMobAIDBAegis;
+      tsAI2 := MobAIDBAegis.Objects[MobAIDBAegis.IndexOf(m)] as TMobAIDBAegis;
+      //DebugOut.Lines.Add(IntToStr(j));
+      if (lowercase(ts.Name) = lowercase(tsAI2.Name)) then begin
+
+        //DebugOut.Lines.Add('Monster Data: ' + tsAI2.Name + ' ' + tsAI2.Status + ' ' +  tsAI2.SkillID + ' ' + IntToStr(tsAI2.SkillLV) + ' ' + IntToStr(tsAI2.Percent) + ' ' + IntToStr(tsAI2.Cast_Time) + ' ' + IntToStr(tsAI2.Cool_Time) + ' ' + tsAI2.Dispel + ' ' + tsAI2.IfState + ' ' + tsAI2.IfCond );
+
+        if tsAI2.Dispel = 'NO_DISPEL' then begin
+          DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' cannot be broken when attacked.');
+        end else
+          DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' can be broken when attacked.');
+
+        if tsAI2.IfState = 'IF_HP' then begin
+          DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if HP Argument, needs ' + tsAI2.IfCond + '% of HP');
+        end;
+
+        if tsAI2.IfState = 'IF_ENEMYCOUNT' then
+          begin
+            DebugOut.Lines.Add('Skill ' + tsAI2.SkillID + ' has if Enemy Count Statement, needs ' + tsAI2.IfCond + ' enemies' );
+          end;
+        DebugOut.Lines.Add('Skill Level: ' + IntToStr(tsAI2.SkillLV));
+        DebugOut.Lines.Add('Percent: ' + IntToStr(tsAI2.Percent));
+        DebugOut.Lines.Add('Cast Time: ' + IntToStr(tsAI2.Cast_Time));
+        DebugOut.Lines.Add('Cool Time: ' + IntToStr(tsAI2.Cool_Time));
+        DebugOut.Lines.Add('----Next Skill----');
+        //k := k + 1;
+      end;
+      //j := j -1;
+      //if k = 0 then break;
+    end;
+  end;
+  DebugOut.Lines.Add('Done');
 end;
 
 //------------------------------------------------------------------------------

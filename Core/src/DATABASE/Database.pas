@@ -765,6 +765,7 @@ DebugOut.Lines.Add('Monster AI database loading...');
       tsAI2.IfCond := sl.Strings[9];
       j := j + 1;
       //DebugOut.Lines.Add(Format('%d', [j]));
+
       MobAIDBAegis.AddObject(tsAI2.Number, tsAI2);
       end;
     end;

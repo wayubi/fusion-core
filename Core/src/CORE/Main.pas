@@ -202,7 +202,9 @@ begin
 
         MobAIDB := TIntList32.Create;
         MobAIDB.Sorted := true;
-        
+
+        //MobAIDBAegis:= TStringList.Create;
+        //MobAIDBAegis.CaseSensitive := False;
         MobAIDBAegis:= TIntList32.Create;
         MobAIDBAegis.Sorted := true;
 
