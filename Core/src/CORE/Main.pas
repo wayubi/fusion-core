@@ -11315,22 +11315,27 @@ begin
 
             end;
 
-            // Play Dead
-            if (tc1.MSkill = 143) then begin
-              if tc1.Sit = 1 then begin
-                //set SkillOnBool for icon update //beita 20040206
-                //tc1.setSkillOnBool(False);
-  						  tc1.Sit := 3;
-                SkillTick := tc1.Skill[MSkill].Tick;
-                SkillTickID := MSkill;
-                //tc1.SP := tc1.SP + 5; { Alex: Why give 5 SP? }
-                //if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
-                CalcStat(tc1, Tick);
-  						end else begin
-                //set SkillOnBool for icon update //beita 20040206
-                //tc1.setSkillOnBool(True);
-  							tc1.Sit := 1;
-  						end;
+                // Play Dead
+                if (tc1.MSkill = 143) then begin
+                        if tc1.Sit = 1 then begin
+
+                                //set SkillOnBool for icon update //beita 20040206
+                                //tc1.setSkillOnBool(False);
+
+                                tc1.Sit := 3;
+
+                                SkillTick := tc1.Skill[MSkill].Tick;
+                                SkillTickID := MSkill;
+
+                                tc1.SP := tc1.SP + 5;
+                                if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
+
+                                CalcStat(tc1, Tick);
+                        end else begin
+                                //set SkillOnBool for icon update //beita 20040206
+                                //tc1.setSkillOnBool(True);
+                                tc1.Sit := 1;
+                        end;
             end;
 
             if (tl.Icon <> 0) then begin

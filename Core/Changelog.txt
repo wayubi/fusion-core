@@ -1,3 +1,4 @@
+- 04-02-04: Fixed Play Dead uses 5 SP to cancel effect. Bug #594. [AlexKreuz]
 - 04-01-04: Added to reporting of monster skills/conditions. [Darkhelmet]
 - 04-01-04: Added Debugs of Monster Skill Descriptions per monster (comment out if not wanted). [Darkhelmet]
 - 03-30-04: Fixed Reset Skill Bug #141. Too many Skill Points Given. [AlexKreuz]
