@@ -622,7 +622,7 @@ type TChara = class(TLiving)
   // 01: Sight        02: Hide          04: Cloak         08: Cart 1
   // 16: Falcon       32: Peco          64: GM Hide       128: Cart 2
   // 256: Cart 3      512: Cart 4       1024: Cart 5      2048: Reverse Orcish
-  // 4096: ?          8192: Ruwach      16384: Footsteps  32768: ?
+  // 4096: ?          8192: Ruwach      16384: Footsteps  32768: Cart 6?
 
   //  0000 | 0000 | 0000 | 0000
   //    R    OCCC   CPPF   CCHS
@@ -2417,28 +2417,33 @@ begin
                 if (Skill[60].Tick > Tick) and (tc.Weapon <> 3) then begin
                     Skill[60].Tick := Tick;
                     SkillTick := Tick;
+                    SkillTickID := 60;
                 end;
 
-                
+
                 if (Skill[360].Tick > Tick) and (tc.Weapon <> 3) then begin
                     Skill[360].Tick := Tick;
                     SkillTick := Tick;
+                    SkillTickID := 360;
                 end;
 
-                if (Skill[359].Tick > Tick) and (tc.Weapon <> (4 or 5)) then begin
+                if (Skill[359].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
                     Skill[359].Tick := Tick;
                     SkillTick := Tick;
+                    SkillTickID := 359;
                 end;
 
 
-                if (Skill[111].Tick > Tick) and (tc.Weapon <> (6 or 7)) then begin
+                if (Skill[111].Tick > Tick) and ((tc.Weapon <> 6) and (tc.Weapon <> 7) and (tc.Weapon <> 8)) then begin
                     Skill[111].Tick := Tick;
                     SkillTick := Tick;
+                    SkillTickID := 111;
                 end;
 
-                if (Skill[258].Tick > Tick) and (tc.Weapon <> (4 or 5)) then begin
+                if (Skill[258].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
                     Skill[258].Tick := Tick;
                     SkillTick := Tick;
+                    SkillTickID := 258;                    
                 end;
 
 

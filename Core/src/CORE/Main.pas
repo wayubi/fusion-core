@@ -4492,7 +4492,7 @@ begin
 					end;
 
                                 110:    {Hammer Fall}
-                                        if (tc.Weapon = 6) or (tc.Weapon = 7) then begin
+                                        if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
                                                 //Cast Point
                                                 xy.X := MPoint.X;
                                                 xy.Y := MPoint.Y;
@@ -9135,7 +9135,7 @@ begin
            case tc.MSkill of
                                 //Blacksmith
                                 110:
-                                if (tc.Weapon = 6) or (tc.Weapon = 7) then begin
+                                if (tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8) then begin
                                         if Random(100) < Skill[110].Data.Data1[MUseLV] then begin
                                                                 if (tc1.Stat1 <> 3) then begin
 									//tc1.Stat1 := 3;
@@ -10921,12 +10921,7 @@ begin
 						                          //Remove Icons
 			                                if tc1.Skill[i].Data.Icon <> 0 then begin
 							                          //DebugOut.Lines.Add('(Icon Removed)!');
-							                          WFIFOW(0, $0196);
-							                          WFIFOW(2, tc1.Skill[i].Data.Icon);
-						                            WFIFOL(4, tc1.ID);
-							                          WFIFOB(8, 0);
-
-                                        SendBCmd(tm, tc1.Point, 9);
+                                        UpdateIcon(tm, tc1, tc1.Skill[i].Data.Icon, 0);
 						                          end;
                                       CalcStat(tc1, Tick);
                                       SendCStat(tc1);
@@ -11024,9 +11019,9 @@ begin
            end;
            end;}
 			case ProcessType of
-				0: //対プレイヤー、時間制限無し
+				0: // Player skill, no time limit, no status update, no icon
 					begin
-						//パケ送信
+						// Send effect
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
 						WFIFOW( 4, dmg[0]);
@@ -11035,7 +11030,7 @@ begin
 						WFIFOB(14, 1);
 						SendBCmd(tm, tc1.Point, 15);
           end;
-        1:
+        1: // Player skill, no time limit, with icon change
 					begin
             if (tc1.MSkill <> 135) then begin
   						WFIFOW( 0, $011a);
@@ -11106,16 +11101,12 @@ begin
             end;
 
             if (tl.Icon <> 0) then begin
-							WFIFOW(0, $0196);
-							WFIFOW(2, tl.Icon);
-							WFIFOL(4, ID);
-							WFIFOB(8, 1);
-              SendBCmd(tm, tc1.Point, 9);
+              UpdateIcon(tm, tc, tl.Icon, 1);
 						end;
           end;
-				2, 3: //対プレイヤー、時間制限有りスキル
+				2, 3: // Player-based, time-limited skill (2 = no status update, 3 = status update)
 					begin
-						//パケ送信
+						// Send effect
 						WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
 						WFIFOW( 4, MUseLV);
@@ -11136,16 +11127,11 @@ begin
 						//アイコン表示
 			if (tl.Icon <> 0) and (tl.Icon <> 107) then begin
 							//DebugOut.Lines.Add('(ﾟ∀ﾟ)!');
-							WFIFOW(0, $0196);
-							WFIFOW(2, tl.Icon);
-							WFIFOL(4, tc1.ID);
-							WFIFOB(8, 1);
-							//Socket.SendBuf(buf, 9);
-                                                        SendBCmd(tm, tc1.Point, 9);
+              UpdateIcon(tm, tc1, tl.Icon, 1);
 						end;
 					end;
 
-				4,5: //対パーティ時間制限有りスキル(4はステータス表示が変わらないもの 5はステータス表示に変化を及ぼすもの)
+				4,5: // Party-only time-limited skills (4 means no status change, 5 means status change)
 					begin
 						sl.Clear;
 						if (tc.PartyName = '') then begin
@@ -11187,11 +11173,7 @@ begin
 								if ProcessType = 5 then SendCStat(tc1);
 								//アイコン表示
 								if (tl.Icon <> 0) then begin
-									WFIFOW(0, $0196);
-									WFIFOW(2, tl.Icon);
-									WFIFOL(4, tc1.ID);
-									WFIFOB(8, 1);
-									tc1.Socket.SendBuf(buf, 9);
+                  UpdateIcon(tm, tc1, tl.Icon, 1);
 								end;
 							end;
 						end;
@@ -11809,11 +11791,7 @@ begin
         SendCStat(tc);
 
         //Send Icon
-        WFIFOW(0, $0196);
-        WFIFOW(2, 20);
-        WFIFOL(4, tc.ID);
-        WFIFOB(8, 1);
-        tc.Socket.SendBuf(buf, 9);
+        UpdateIcon(tm, tc, 20, 1);
       end;
     end;
 
@@ -14822,12 +14800,6 @@ begin
             if tc.Skill[tc.SkillTickID].Tick <= Tick then begin
   						//DebugOut.Lines.Add(Format('(Icon remove, skilltickid %d)',[SkillTickID]));
               UpdateIcon(tm, tc, tc.Skill[SkillTickID].Data.Icon, 0);
-	  					{WFIFOW(0, $0196);
-		  				WFIFOW(2, tc.Skill[SkillTickID].Data.Icon);
-			  			WFIFOL(4, tc.ID);
-				  		WFIFOB(8, 0);}
-              //Socket.SendBuf(buf, 9);
-              //SendBCmd(tm, tc.Point, 9);
             end;
 					end;
 

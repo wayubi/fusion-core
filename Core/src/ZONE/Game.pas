@@ -1334,11 +1334,7 @@ end;
                   if tc.Skill[j].Data.Icon <> 0 then begin
                     if tc.Skill[j].Tick >= timeGetTime() then begin
   						        //DebugOut.Lines.Add('(Icon Removed');
-	  					        WFIFOW(0, $0196);
-		  				        WFIFOW(2, tc.Skill[j].Data.Icon);
-			  			        WFIFOL(4, tc.ID);
-				  		        WFIFOB(8, 0);
-                      SendBCmd(tm, tc.Point, 9);
+                      UpdateIcon(tm, tc, tc.Skill[j].Data.Icon, 0);
                     end;
                   end;
                   tc.Skill[j].Tick := timeGetTime();
@@ -1388,11 +1384,7 @@ end;
 
 						if (k = 0) then begin
             for j := i to i do begin
-            WFIFOW(0, $0196);
-            WFIFOW(2, j);
-            WFIFOL(4, tc.ID);
-            WFIFOB(8, 1);
-            tc.Socket.SendBuf(buf, 9);
+            UpdateIcon(tm, tc, j, 1);
             end;
 						end;
 					end else if (Copy(str, 1, 7) = 'unicon ') and ((DebugCMD and $0040) <> 0) then begin
@@ -1401,11 +1393,7 @@ end;
 
 						if (k = 0) then begin
             for j := i to i do begin
-            WFIFOW(0, $0196);
-            WFIFOW(2, j);
-            WFIFOL(4, tc.ID);
-            WFIFOB(8, 0);
-            tc.Socket.SendBuf(buf, 9);
+            UpdateIcon(tm, tc, j, 0);
             end;
 						end;
 {修正ココまで}
@@ -1535,6 +1523,8 @@ end;
 							tc.Option := tc.Option or $20;
 						end else if Copy(str, 8, 3) = 'off' then begin
 							tc.Option := 0;
+						end else begin
+              tc.Option := tc.Option or (StrToInt(Copy(str, 8, 6)));              
 						end;
             UpdateOption(tm, tc);
 
@@ -2718,7 +2708,7 @@ end;
 {精錬NPC機能追加}
 				//装備ロックチェック
 {精錬NPC機能追加ココまで}
-		$00a9: //アイテム装備
+		$00a9: // Equip an item.
 			begin
 				if tc.EqLock = true then continue;
 				RFIFOW(2, w1);
@@ -2771,7 +2761,7 @@ end;
 					WFIFOW(4, w);
 					WFIFOB(6, 1);
 					Socket.SendBuf(buf, 7);
-				end else if (tc.Item[w1].Data.Loc = $2) and (tc.JID = 12) and (w2 = $22) then begin
+				end else if (tc.Item[w1].Data.Loc = $2) and ((tc.JID = 12) or (tc.JID = 4013)) and (w2 = $22) then begin
 					//アサシン二刀流用処理
 					w := $22;
 					j := 0;
@@ -7099,27 +7089,21 @@ end;
 								SendCStat1(tc, 0, $0018, tc.Weight);
       end;
 
-		$01af: //カートチェンジ
+		$01af: // Change your cart.
 			begin
-																tm := tc.MData;
+        tm := tc.MData;
 				RFIFOW(2, w);
 				case w of
-					1: tc.Option := (tc.Option and $F877) or $0008; //カート1
-					2: tc.Option := (tc.Option and $F877) or $0080; //カート2
-					3: tc.Option := (tc.Option and $F877) or $0100; //カート3
-					4: tc.Option := (tc.Option and $F877) or $0200; //カート4
-					5: tc.Option := (tc.Option and $F877) or $0400; //カート5
+					1: tc.Option := (tc.Option and $F877) or $0008; // Cart 1
+					2: tc.Option := (tc.Option and $F877) or $0080; // Cart 2
+					3: tc.Option := (tc.Option and $F877) or $0100; // Cart 3
+					4: tc.Option := (tc.Option and $F877) or $0200; // Cart 4
+					5: tc.Option := (tc.Option and $F877) or $0400; // Cart 5
 				end;
-				//見た目変更
-				WFIFOW(0, $0119);
-				WFIFOL(2, tc.ID);
-				WFIFOW(6, 0);
-				WFIFOW(8, 0);
-				WFIFOW(10, tc.Option);
-				WFIFOB(12, 0);
-				//SendBCmd(tc.MData, tc.Point, 13);
-																SendBCmd(tm, tc.Point, 13);
-					SendCStat(tc);
+				// Send the new option value.
+        UpdateOption(tm, tc);
+
+        SendCStat(tc);
 
                         end;
 		//--------------------------------------------------------------------------
