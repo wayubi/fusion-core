@@ -1665,42 +1665,42 @@ begin
     iscs_console_disconnect(Socket.Data);
     DataSave();
 
-        // AlexKreuz: Random 10053 Bug Fix
-        if Assigned(Socket.Data) then begin
+    if Assigned(Socket.Data) then begin
+        tc := Socket.Data;
+        tm := tc.MData;
+        SendCLeave(tc, 2);
 
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin
+            i := MapInfo.IndexOf(tc.Map);
+            j := -1;
 
-					tc := Socket.Data;
-                    tm := tc.MData;
-        	SendCLeave(tc, 2);
-                {NPCイベント追加}
-         if MapInfo.IndexOf(tc.Map) <> -1 then begin
-        	i := MapInfo.IndexOf(tc.Map);
-        	j := -1;
-        	if (i <> -1) then begin
-        		mi := MapInfo.Objects[i] as MapTbl;
-        		if (mi.noSave = true) then j := 0;
-        	end;
+            if (i <> -1) then begin
+                mi := MapInfo.Objects[i] as MapTbl;
+                if (mi.noSave = true) then j := 0;
+            end;
+
         	if (tc.Sit = 1) or (j = 0) then begin
-                        {NPCイベント追加ココまで}
-        		tc.Map := tc.SaveMap;
-        		tc.Point.X := tc.SavePoint.X;
-        		tc.Point.Y := tc.SavePoint.Y;
-        	end;
-        	tc.Login := 0;
-        	tp := tc.PData;
-        	tp.Login := 0;
-                if UseSQL then SQLDataSave();
-         end;
+                tc.Map := tc.SaveMap;
+                tc.Point.X := tc.SavePoint.X;
+                tc.Point.Y := tc.SavePoint.Y;
+            end;
+
+            tc.Login := 0;
+            tp := tc.PData;
+            tp.Login := 0;
+
+            if UseSQL then SQLDataSave();
         end;
+    end;
 
-        // AlexKreuz: Random 10053 Bug Fix
-        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Socket.RemoteAddress + ': Game Server -> Disconnect');
-        NowUsers := sv3.Socket.ActiveConnections;
-        if NowUsers > 0 then Dec(NowUsers);
-        statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers); // AlexKreuz (Status Bar)
+    NowUsers := sv3.Socket.ActiveConnections;
+    if NowUsers > 0 then Dec(NowUsers);
 
-        //Recalculate PVP ranking
-        if mi.PvP then CalcPvPRank(tm);
+    statusbar1.Panels.Items[0].Text := ' Users Online: ' +inttostr(NowUsers);
+
+    // Already calculated in SendCLeave above.
+    // Can't recalculate because SendCLeave deleted the tm.CList.
+    // if mi.PvP then CalcPvPRank(tm);
 
 end;
 //------------------------------------------------------------------------------

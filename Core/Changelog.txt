@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-05-04: Calculating PVP rank after deleting Map character list caused crash. [AlexKreuz]
 - 09-05-04: #85: Router Fix. LAN connections require LAN ip. WAN requires WAN ip. [AlexKreuz]
 - 09-05-04: REED: Refined Character variable loading procedures. [AlexKreuz]
 - 09-05-04: REED: Two prefixes (JID/JOBID) being used for one value. [AlexKreuz]
