@@ -19,6 +19,7 @@ uses
 	//Files partitioned out of DatabaseLoad
 	Function  DataBaseFilesExist : Boolean;
 	Procedure LoadSummonLists;
+	Procedure LoadPetData;
 
 implementation
 
@@ -231,66 +232,203 @@ Begin
 
 	DebugOut.Lines.Add(Format('-> Total %d Summon Item List loaded.', [Counter]));
 	Application.ProcessMessages;
-End;(* Proc LoadSummonLists (LocalUnitProc)
+End;(* Proc LoadSummonLists
 *-----------------------------------------------------------------------------*)
+
+
+(*-----------------------------------------------------------------------------*
+LoadPetData
+
+This is a Local Procedure to Database unit. Must be declared ahead of the
+DatabaseLoad procedure.
+
+Loads all Pet Lists from the proper database files. Broken out to make the
+original routine more readable -- and to allow future work to safeguard against
+bad data in the pet data files, before they're loaded into the internal lists.
+
+Called by:
+	DatabaseLoad
+
+Pre:
+	DataBaseFilesExist returns True (summmon_*.txt files exist)
+Post:
+	The following lists will have Zero or more entries:
+//	SummonMobList    (summon_mobID.txt)
+
+Revisions:
+--
+2004/05/26 - ChrstphrR - Initial breakout from DatabaseLoad
+2004/05/26 - ChrstphrR - Variable renaming for clarity.
+*-----------------------------------------------------------------------------*)
+Procedure LoadPetData;
+Var
+	ID_Idx    : Integer;
+	LineCount : Integer;
+	PetErrors : Boolean;
+
+	Str       : string; //temp storage for read line.
+	Txt       : TextFile;
+	PDB       : TPetDB;
+	PetDBrow  : TStringList;
+
+Begin
+	DebugOut.Lines.Add( 'Pet database loading...' );
+
+	AssignFile(Txt, AppPath + 'database\pet_db.txt' );
+	Reset(Txt);
+	Readln(Txt, Str);//Read comment line at top of pet_db
+	PetDBRow := TStringList.Create;
+
+	PetErrors := FALSE;
+	LineCount := 1;
+
+	while NOT eof(Txt) do begin
+		PetDBrow.Clear;
+		Readln(txt, Str);
+		Inc(LineCount);
+		PetDBrow.DelimitedText := str;
+
+		//Does the row have 14 entries?
+		//Does the first field have an ID number in it? -1 = invalid ID
+		if (PetDBrow.Count = 14) then
+			ID_Idx := StrToIntDef( PetDBrow[ 0], -1)
+		else
+			ID_IDx := -2;
+
+		//Look up ID found in PetDB - only procede if there's an entry.
+		if MobDB.IndexOf(ID_Idx) > -1 then begin
+		//ChrstphrR 2004/05/26 -- No typechecking done here - unsafe.
+		// -- no dupe entry checks either - first entry in always used.
+			PDB := TPetDB.Create;
+			try
+				with PDB do begin
+					MobID       := StrToInt( PetDBrow[ 0] );
+					ItemID      := StrToInt( PetDBrow[ 1] );
+					EggID       := StrToInt( PetDBrow[ 2] );
+					AcceID      := StrToInt( PetDBrow[ 3] );
+					FoodID      := StrToInt( PetDBrow[ 4] );
+					Fullness    := StrToInt( PetDBrow[ 5] );
+					HungryDelay := StrToInt( PetDBrow[ 6] );
+					Hungry      := StrToInt( PetDBrow[ 7] );
+					Full        := StrToInt( PetDBrow[ 8] );
+					Reserved    := StrToInt( PetDBrow[ 9] );
+					Die         := StrToInt( PetDBrow[10] );
+					Capture     := StrToInt( PetDBrow[11] );
+					// 12th is the Species name - not stored.
+					SkillTime   := StrToInt( PetDBrow[13] );
+				end;
+				PetDB.AddObject( PDB.MobID, PDB );
+			except
+				on EConvertError do begin
+					//No number where a number should be...
+					DebugOut.Lines.Add( Format(
+						'pet_db.txt Error handled : Incorrect/missing field on line %d : %s', [LineCount, Str]
+					) );
+					PetErrors := TRUE;
+					if Assigned(PDB) then
+						PDB.Free;
+				end;
+			end;//try-e
+		end else begin
+			// No match for MobID in mobdb, or line wasn't up to 14 parts.
+			case ID_Idx of
+			-1 : begin
+					DebugOut.Lines.Add( Format(
+						'pet_db.txt Error handled : Invalid MobID on line %d : %s',
+						[LineCount, Str]
+					) );
+					PetErrors := TRUE;
+				end;
+			-2 : begin
+					DebugOut.Lines.Add( Format(
+						'pet_db.txt Error handled : Line %d has less than 14 fields',
+						[LineCount]
+					) );
+					PetErrors := TRUE;
+				end;
+				else begin
+					DebugOut.Lines.Add( Format(
+						'pet_db.txt Error handled : Invalid MobID on line %d : %s',
+						[LineCount, Str]
+					) );
+					PetErrors := TRUE;
+				end;
+			end;//case
+		end;
+	end;
+	CloseFile(txt);
+
+	if PetErrors then begin
+		DebugOut.Lines.Add( Format(
+			'*** Error(s) in %sdatabase\pet_db.txt found.',
+			[AppPath]
+		) );
+		DebugOut.Lines.Add( '	This may affect game play. Please repair this file.' );
+	end;
+	DebugOut.Lines.Add( Format( '-> Total %d pet(s) database loaded.', [PetDB.Count] ) );
+	Application.ProcessMessages;
+
+End;(* Proc LoadPetData
+*-----------------------------------------------------------------------------*)
+
+
 
 
 //==============================================================================
 // データベース読み込み
 procedure DatabaseLoad(Handle:HWND);
 var
-	i,j,k,l :integer;
-	w		:word;
-	xy	:TPoint;
-	str :string;
-	txt :TextFile;
+	i   : Integer;
+	j   : Integer;
+	k   : Integer;
+	l   : Integer;
+	w   : Word;
+	xy  : TPoint;
+	str : string;
+	txt : TextFile;
 	// Variables for creating the new AI list
-  txt2:TextFile;
-  str1:string;
+	txt2: TextFile;
+	str1: string;
 
-	sl  :TStringList;
-	sl1 :TStringList;
-	ta	:TMapList;
-	td  :TItemDB;
+	SL  : TStringList;
+	SL1 : TStringList;
+	ta  : TMapList;
+	td  : TItemDB;
 {追加}
-	wj  :Int64;
+	wj  : Int64;
 {追加ココまで}
 {アイテム製造追加}
-	tma :TMaterialDB;
+	tma : TMaterialDB;
 {アイテム製造追加ココまで}
 {氏{箱追加}
-  tss   :TSlaveDB;
-  tid   :TIDTbl;
-  ma    :TMArrowDB;
+	tss : TSlaveDB;
+	tid : TIDTbl;
+	ma  : TMArrowDB;
 {氏{箱追加ココまで}
 {キューペット}
-        tp      :TPetDB;
+	tp  : TPetDB;
 {キューペットここまで}
 {NPCイベント追加}
-	mi  :MapTbl;
+	mi  : MapTbl;
 {NPCイベント追加ココまで}
-	tb  :TMobDB;
-  ts  :TMobDB;
-	tsAI :TMobAIDB;
-  tsAI2 :TMobAIDBFusion;
-  twp :TWarpDatabase;
-  tGlobal:TGlobalVars;
 
-      //  tPharm  :TPharmacyDB;  {Pharmacy's Database}
-  tt  :TTerritoryDB;
-	tl	:TSkillDB;
-	sr	:TSearchRec;
-	dat :TFileStream;
-	jf	:array[0..MAX_JOB_NUMBER] of boolean;
+	tb   : TMobDB;
+	ts   : TMobDB;
+	tsAI    : TMobAIDB;
+	tsAI2   : TMobAIDBFusion;
+	twp     : TWarpDatabase;
+	tGlobal : TGlobalVars;
 
-	afm_compressed :TZip;
-	afm :textfile;
+	tt  : TTerritoryDB;
+	tl  : TSkillDB;
+	sr  : TSearchRec;
+	dat : TFileStream;
+	jf  : array[0..MAX_JOB_NUMBER] of Boolean;
+
+	afm_compressed : TZip;
+	afm            : Textfile;
 
 begin
-	sl := TStringList.Create;
-	sl1 := TStringList.Create;
-	//sl.QuoteChar := '"';
-	//sl.Delimiter := ',';
 
 	if NOT DataBaseFilesExist then begin
 		MessageBox(
@@ -309,7 +447,6 @@ begin
 
 	if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
 		repeat
-
 			CreateDir('map\tmpFiles');
 			afm_compressed := tzip.create(afm_compressed);
 			afm_compressed.Filename := AppPath+'map\'+sr.Name;
@@ -428,6 +565,10 @@ begin
 	end;
 	DebugOut.Lines.Add(Format('-> Total %d map(s) loaded.', [MapList.Count]));
 	Application.ProcessMessages;
+
+	{ChrstphrR 2004/05/24 -- Moved so that early exits aren't memory leaks too}
+	SL  := TStringList.Create;
+	SL1 := TStringList.Create;
 
 	//アイテムデータロード
 	DebugOut.Lines.Add('Item database loading...');
@@ -999,38 +1140,9 @@ begin
 {氏{箱追加ココまで}
 
 {キューペット}
-	DebugOut.Lines.Add( 'Pet database loading...' );
-	Application.ProcessMessages;
-	AssignFile(txt, AppPath + 'database\pet_db.txt' );
-	Reset(txt);
-	Readln( txt, str );
-	while not eof(txt) do begin
-		sl.Clear;
-		Readln(txt, str);
-		sl.DelimitedText := str;
-
-		tp := TPetDB.Create;
-		with tp do begin
-			MobID := StrToInt( sl.Strings[0] );
-			ItemID := StrToInt( sl.Strings[1] );
-			EggID := StrToInt( sl.Strings[2] );
-			AcceID := StrToInt( sl.Strings[3] );
-			FoodID := StrToInt( sl.Strings[4] );
-			Fullness := StrToInt( sl.Strings[5] );
-			HungryDelay := StrToInt( sl.Strings[6] );
-			Hungry  := StrToInt( sl.Strings[7] );
-			Full := StrToInt( sl.Strings[8] );
-			Reserved := StrToInt( sl.Strings[9] );
-			Die := StrToInt( sl.Strings[10] );
-			Capture := StrToInt( sl.Strings[11] );
-			SkillTime   := StrToInt( sl.Strings[13] );
-		end;
-		PetDB.AddObject( tp.MobID, tp );
-	end;
-	CloseFile(txt);
-	DebugOut.Lines.Add( Format( '-> Total %d pet(s) database loaded.', [PetDB.Count] ) );
-	Application.ProcessMessages;
+	LoadPetData;
 {キューペットここまで}
+
 {NPCイベント追加}
 	//mapinfo_db読み込み
 	DebugOut.Lines.Add('Mapinfo database loading...');
@@ -1372,12 +1484,12 @@ begin
 	DebugOut.Lines.Add('-> Guild EXP database loaded.');
 	Application.ProcessMessages;
 
-	//エンブレム格納ディレクトリ
+	//Check for Emblem directory...
 	if not DirectoryExists(AppPath + 'emblem') then begin
 		if not CreateDir(AppPath + 'emblem') then begin
-			MessageBox(Handle, 'エンブレム格納ディレクトリが作成できません。', 'Weiss', MB_OK or MB_ICONSTOP);
+			MessageBox(Handle, 'The \emblem directory was not found.', 'Weiss', MB_OK or MB_ICONSTOP);
 			Application.Terminate;
-			exit;
+			Exit;
 		end;
 	end;
 {ギルド機能追加ココまで}
@@ -3230,11 +3342,6 @@ begin
 	sl.Free;
 end;
 //------------------------------------------------------------------------------
-
-
-
-
-
 
 
 end.

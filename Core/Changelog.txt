@@ -1,3 +1,7 @@
+- 05-26-04: Database code - segmented pet_db.txt load into LoadPetData [ChrstphrR]
+- 05-26-04: LoadPetData - improved error checking and message output. [ChrstphrR]
+- 05-26-04: DataBaseLoad - fixed potential memory leak. [ChrstphrR]
+- 05-26-04: DataBaseLoad - Translated emblem error message from SJIS to English. [ChrstphrR]
 - 05-26-04: Translation of comments in Login server code into english [ChrstphrR]
 - 05-26-04: Removed obsoleted TSummon class - and fixed TSummonMobListMVP [ChrstphrR]
 - 05-26-04: Added Provoke's ability to raise the target's attack in PVP. [KyuubiKitsune]
