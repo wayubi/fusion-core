@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-12-04: Added NPC command emotion <emotion #>. [Darkhelmet]
 - 06-11-04: Switched skill [MG_SRECOVERY] to PSS system. [AlexKreuz]
 - 06-11-04: Switched skill [SM_ENDURE] to PSS system. [AlexKreuz]
 - 06-11-04: Minor modifications to PSS. [AlexKreuz]

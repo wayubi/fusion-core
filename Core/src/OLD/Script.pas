@@ -1802,6 +1802,17 @@ begin
             SendCStat(tc);
             Inc(tc.ScriptStep);
         end;
+    70:   {NPC Emotions}
+    // emotion <emotion #>;
+      begin
+            i := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
+            tm := tc.MData;
+            WFIFOW(0, $00c0);
+            WFIFOL(2, tn.ID);
+            WFIFOB(6, i);
+            SendBCmd(tm, tn.Point, 7);
+            Inc(tc.ScriptStep);
+      end;
 
 
 {NPCイベント追加ココまで}

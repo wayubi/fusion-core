@@ -9417,7 +9417,16 @@ Begin
 							SetLength(tn.Script[k].Data1, 1);
 							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
 							Inc(k);
-
+                        end else if str = 'emotion' then begin //---- 70 emotion
+                            if sl1.Count <> 1 then begin
+								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
+								Exit; // Safe - 2004/04/21
+							end;
+							SetLength(tn.Script, k + 1);
+							tn.Script[k].ID := 70;
+							SetLength(tn.Script[k].Data1, 1);
+							tn.Script[k].Data1[0] := LowerCase(SL1[0]);
+							Inc(k);
 						end else if str = 'script' then begin //------- 99 script
 							if sl1.Count <> 1 then begin
 								ScriptErr(SCRIPT_FUNCTN_ERR, [ScriptPath, lines, str]);
