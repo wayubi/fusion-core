@@ -259,13 +259,15 @@ begin
 	PetDB  := TIntList32.Create;
         PetList := TIntList32.Create;
 
-	SummonMobList := TIntList32.Create;
-  SummonMobListMVP := TIntList32.Create;
+	{Chrstphr 2004/04/19 -- this list is now created/loaded in the
+	DataLoad proc in the Database.pas module }
+	//SummonMobList := TIntList32.Create;
+	SummonMobListMVP := TIntList32.Create;
 	SummonIOBList := TIntList32.Create;
 	SummonIOVList := TIntList32.Create;
 	SummonICAList := TIntList32.Create;
 	SummonIGBList := TIntList32.Create;
-  SummonIOWBList := TIntList32.Create;
+	SummonIOWBList := TIntList32.Create;
 
 	ServerFlag := TStringList.Create;
 	MapInfo    := TStringList.Create;
@@ -923,8 +925,8 @@ begin
 	DealingList.Free;
 {取引機能追加ココまで}
 {氏{箱追加}
-	SummonMobList.Free;
-  SummonMobListMVP.Free;
+	SummonMobList.Free;  //ChrstphrR - 2004/04/19 - This list is now leak free.
+	SummonMobListMVP.Free;
 	SummonIOBList.Free;
 	SummonIOVList.Free;
 	SummonICAList.Free;

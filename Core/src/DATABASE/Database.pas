@@ -5,7 +5,7 @@ unit Database;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, Zip;
+	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles;
 
 //==============================================================================
 // 関数定義
@@ -25,6 +25,9 @@ uses
 
 
 implementation
+
+uses
+	Common, GlobalLists, Zip;
 //==============================================================================
 // データベース読み込み
 procedure DatabaseLoad(Handle:HWND);
@@ -858,40 +861,47 @@ DebugOut.Lines.Add('Pharmacy database loading...');
 	DebugOut.Lines.Add(Format('-> Total %d Global Variables loaded.', [GlobalVars.Count]));
 	Application.ProcessMessages;
 
-{Summon Monster List}
+	{Summon Monster List}
 	DebugOut.Lines.Add('Summon Monster List loading...');
+	{ChrstphrR 2004/04/19 - New SummonMobList code... created and loaded here}
+
+	//Creates and loads data from the file all in one step
+	SummonMobList := TSummonMobList.Create(AppPath + 'database\summon_mobID.txt');
+	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [SummonMobList.Count]));
+	{ChrstphrR 2004/04/19 - yes, that's all to see here - the rest is in the
+	TSummonMobList code}
+
+	{ChrstphrR 2004/04/19 - editing some of the code here, so it properly loads
+	the old style SummonMobListMVP, and comments out the old SummonMobList calls
+	P.S. -- SummonMobListMVP is always empty, no data is defined... I'm just
+	Covering My Tracks and keeping the code as it was, for now.
+	P.P.S. -- *Every* one of these StrToInt calls are unsafe, if a DB dev or,
+	more likely, a user corrupts the files, a non numeric input into StrToInt
+	will stop the server dead in it's tracks.
+	}
 	Application.ProcessMessages;
 	AssignFile(txt, AppPath + 'database\summon_mob.txt');
 	Reset(txt);
 	j := 0;
-	sl.Clear;
+	SL.Clear;
 	while not eof(txt) do begin
 		Readln(txt, str);
-    sl.Delimiter := ',';
-		sl.DelimitedText := str;
-    if (sl.Strings[0] <> 'MVP') then
-		  k := StrToInt(sl.Strings[1])
-    else if (sl.Strings[0] = 'MVP') then
-      k := StrToInt(sl.Strings[2]);
-		if (MobDBName.IndexOf(sl.Strings[0]) <> -1) and (k > 0)  and (sl.Strings[0] <> 'MVP') then begin
+		SL.Delimiter := ',';
+		SL.DelimitedText := str;
+		if (SL[0] = 'MVP') AND (SL.Count >= 3) then begin
+			k := StrToInt(SL[2]);
 			tsmn := TSummon.Create;
-			tsmn.Name := sl.Strings[0];
-			for i := 1 to k do begin
-				SummonMobList.AddObject(j, tsmn);
-				j := j + 1;
-			end;
-		end else if (sl.Strings[0] = 'MVP') then begin
-      tsmn := TSummon.Create;
 			tsmn.Name := sl.Strings[1];
 			for i := 1 to k do begin
 				SummonMobListMVP.AddObject(j, tsmn);
 				j := j + 1;
 			end;
-    end;
+		end;
 	end;
 	CloseFile(txt);
-	DebugOut.Lines.Add(Format('-> Total %d Summon Monster List loaded.', [j]));
+	DebugOut.Lines.Add(Format('-> Total %d Summon MVP Monster List loaded.', [j]));
 	Application.ProcessMessages;
+	//-- End of SummonMobList / SummonMobListMVP Load
 
 	//箱データベース読み込み
 	DebugOut.Lines.Add('Summon Item List loading...');

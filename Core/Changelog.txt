@@ -1,3 +1,4 @@
+- 04-19-04: Dead Branch summon monster code has smaller RAM footprint, faster on loadup, and it doesn't leak memory when the server shuts down. [ChrstphrR]
 - 04-19-04: Quick Fix for Kyuubi's fix -- please check and adjust if 
 I made the wrong assumption :) [ChrstphrR]
 - 04-08-04: Fixed failure to check for a guild that caused Range Error. [KyuubiKitsune]

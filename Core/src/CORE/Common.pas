@@ -6,7 +6,9 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
-	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32;
+	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp,
+	GlobalLists,
+	List32;
 
 const
   // Colus, 20040304: Let's see if this is truly global scope.
@@ -791,11 +793,11 @@ type TChara = class(TLiving)
 	HIT           :integer;
 	FLEE1         :integer;
 	FLEE2         :integer;
-  FLEE3         :integer;
+	FLEE3         :integer;
 	Critical      :word;
 	Lucky         :word;
 	ASpeed        :word;
-  Delay         :integer;
+	Delay         :integer;
 	ADelay        :word;
 	aMotion       :word;
 	dMotion       :word;
@@ -823,7 +825,7 @@ type TChara = class(TLiving)
   KnockBackSuccess  :boolean;
         WeaponSkill   :integer;
         WeaponSkillLv :integer;
-        WeaponID      :integer;
+		WeaponID      :integer;
 	NoJamstone    :boolean;
         NoTrap        :boolean;
         LessSP        :boolean;
@@ -1433,8 +1435,10 @@ var
 	DealMaxID  :cardinal;
 {取引機能追加ココまで}
 {氏{箱追加}
-	SummonMobList :TIntList32;
-  SummonMobListMVP:TIntList32;
+	{ChrstphrR 2004/04/19 - Changing SummonMobList for size/algorithm
+	improvements}
+	SummonMobList :TSummonMobList;
+	SummonMobListMVP:TIntList32;
 	SummonIOBList :TIntList32;
 	SummonIOVList :TIntList32;
 	SummonICAList :TIntList32;
