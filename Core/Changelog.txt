@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 09-24-04: HP/SP checks in Character JCon Work. [Tsusai]
 - 09-23-04: Disabled HP/SP conversion checks in JCon. [Tsusai]
 - 09-23-04: Character Tab finished, GUI updated. [Tsusai]
 - 09-22-04: Made Minamize to Tray a Windows OS only feature. [Tsusai]
