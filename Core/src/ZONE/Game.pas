@@ -1343,13 +1343,13 @@ Begin(* Proc sv3PacketProcess() *)
 						if (k = 0) and (i >= 1) and (i <= 99) then begin
 							tc.JobLV := i;
 
-							for i := 2 to MAX_SKILL_NUMBER do begin
+							for i := 1 to MAX_SKILL_NUMBER do begin
 							  if not tc.Skill[i].Card then
 									tc.Skill[i].Lv := 0;
 							end;
-							if tc.JID = 0 then begin
-							end else if tc.JID < 7 then tc.SkillPoint := tc.JobLV -1
-							else tc.SkillPoint := tc.JobLV -1 + 49;
+                            if tc.JID = 0 then tc.SkillPoint := tc.JobLV - 1
+							else if tc.JID < 7 then tc.SkillPoint := tc.JobLV - 1 + 9
+							else tc.SkillPoint := tc.JobLV - 1 + 49 + 9;
 							SendCSkillList(tc);
 
 							tc.JobEXP := tc.JobNextEXP - 1;
