@@ -1398,6 +1398,7 @@ R 011f <dst ID>.l <src ID>.l <X>.w <Y>.w <type>.B <fail>.B
 	b2: Pink Warp Portal (active)
 	b3: Small floating cross (Gospel)
 	b4: 5x5 square of light (Basilica)
+	b6: Fog wall
 	b5-bf: No resource
 	Ground info request ?.81b is unkhown.	
 
