@@ -174,7 +174,7 @@ begin
 	DebugOut.Lines.Add('Castle data loading from SQL...');
 	Application.ProcessMessages;
 
-	if ExecuteSqlCmd('SELECT * FROM gcastle') then
+	if ExecuteSqlCmd('SELECT * FROM guild_castle') then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -252,7 +252,7 @@ begin
 	DebugOut.Lines.Add('Guild data loading from SQL...');
 	Application.ProcessMessages;
 
-  if ExecuteSqlCmd('SELECT * FROM guildinfo') then
+  if ExecuteSqlCmd('SELECT * FROM guild_info') then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -316,7 +316,7 @@ begin
 		with tg do
 		begin
 		  {读取工会成员资料}
-		  if ExecuteSqlCmd(Format('SELECT * FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [ID])) then
+		  if ExecuteSqlCmd(Format('SELECT * FROM guild_members WHERE GDID=''%d'' LIMIT 36', [ID])) then
 			begin
 			  j := 0;
 			  while not SQLDataSet.Eof do
@@ -334,7 +334,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会称号资料}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [ID])) then
+			if ExecuteSqlCmd(Format('SELECT * FROM guild_members WHERE GDID=''%d'' LIMIT 20', [ID])) then
 			begin
 			  j := 0;
 				while not SQLDataSet.Eof do
@@ -351,7 +351,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取工会开除成员记录}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildBanishInfo WHERE GDID=''%d''', [ID])) then
+			if ExecuteSqlCmd(Format('SELECT * FROM guild_banish WHERE GDID=''%d''', [ID])) then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -367,7 +367,7 @@ begin
 			Application.ProcessMessages;
 
 			{读取同盟、敌对工会}
-			if ExecuteSqlCmd(Format('SELECT * FROM guildAllyInfo WHERE GDID=''%d''', [ID])) then
+			if ExecuteSqlCmd(Format('SELECT * FROM guild_allies WHERE GDID=''%d''', [ID])) then
 			begin
 			  while not SQLDataSet.Eof do
 				begin
@@ -426,7 +426,7 @@ begin
       tp := PlayerName.Objects[i] as TPlayer;
       with tp do
       begin
-			  if not ExecuteSqlCmd(Format('REPLACE INTO login (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, addslashes(Name), addslashes(Pass), Gender, addslashes(Mail), Banned])) then begin
+			  if not ExecuteSqlCmd(Format('REPLACE INTO accounts (AID,ID,passwd,Gender,Mail,Banned) VALUES (''%d'',''%s'',''%s'',''%d'',''%s'',''%d'')', [ID, addslashes(Name), addslashes(Pass), Gender, addslashes(Mail), Banned])) then begin
           DebugOut.Lines.Add('*** Save Player Account data error.');
 				end;
 
@@ -444,7 +444,7 @@ begin
 					  bindata := bindata + IntToHex(Kafra.Item[j].Card[3],4);
 					end;
 				end;
-		    if not ExecuteSqlCmd(Format('REPLACE INTO storeitem (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) then begin
+		    if not ExecuteSqlCmd(Format('REPLACE INTO storage (AID,storeitem) VALUES (''%d'',''%s'')', [ID, bindata])) then begin
 				  DebugOut.Lines.Add('*** Save Player Kafra data error.');
 				end;
       end;
@@ -505,7 +505,7 @@ begin
         for j := 0 to 7 do begin
 			    bindata := bindata + ' ,' + IntToStr(GuardStatus[j]);
         end;
-				if not ExecuteSqlCmd(Format('REPLACE INTO gcastle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [bindata])) then
+				if not ExecuteSqlCmd(Format('REPLACE INTO guild_castle (Name,GDID,GName,GMName,GKafra,EDegree,ETrigger,DDegree,DTrigger,GuardStatus0,GuardStatus1,GuardStatus2,GuardStatus3,GuardStatus4,GuardStatus5,GuardStatus6,GuardStatus7) VALUES (%s)', [bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Castle data error.');
 				end;
@@ -558,7 +558,7 @@ begin
 					  bindata := bindata + IntToHex(GSkill[j].Lv, 4);
 				  end;
 			  end;
-			  if not ExecuteSqlCmd(Format('REPLACE INTO guildinfo (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, addslashes(Name), LV, EXP, GSkillPoint, addslashes(Notice[0]), addslashes(Notice[1]), addslashes(Agit), Emblem, present, DisposFV, DisposRW, bindata])) then
+			  if not ExecuteSqlCmd(Format('REPLACE INTO guild_info (GDID,Name,LV,EXP,GSkillPoint,Subject,Notice,Agit,Emblem,present,DisposFV,DisposRW,skill) VALUES (''%d'',''%s'',''%d'',''%d'',''%d'',''%s'',''%s'',''%s'',''%d'',''%d'',''%d'',''%d'',''%s'')', [ID, addslashes(Name), LV, EXP, GSkillPoint, addslashes(Notice[0]), addslashes(Notice[1]), addslashes(Agit), Emblem, present, DisposFV, DisposRW, bindata])) then
 				begin
 				  DebugOut.Lines.Add('*** Save Guild data error.');
 				end;
@@ -567,7 +567,7 @@ begin
 			  for j := 0 to 35 do begin
 				  if MemberID[j] <> 0 then
 					begin
-					  if not ExecuteSqlCmd(Format('REPLACE INTO guildMinfo (GDID,GID,MemberExp,PositionID) VALUES (''%d'',''%d'',''%d'',''%d'')', [ID, MemberID[j], MemberEXP[j], MemberPos[j]])) then
+					  if not ExecuteSqlCmd(Format('REPLACE INTO guild_members (GDID,GID,MemberExp,PositionID) VALUES (''%d'',''%d'',''%d'',''%d'')', [ID, MemberID[j], MemberEXP[j], MemberPos[j]])) then
 				    begin
 				      DebugOut.Lines.Add('*** Save Guild Member data error.');
 				    end;
@@ -649,7 +649,7 @@ begin
 		end;
 		DebugOut.Lines.Add(format('Load User Data From MySQL: userid = %s', [userid]));
 
-		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then begin
+		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM accounts AS L LEFT JOIN storage AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then begin
 			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %s', [userid]));
 			Exit;
 		end
@@ -663,7 +663,7 @@ begin
 		end;
 		DebugOut.Lines.Add(format('Load User Data From MySQL: AID = %d', [AID]));
 
-		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.AID=''%d'' LIMIT 1', [AID])) then begin
+		if not ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM accounts AS L LEFT JOIN storage AS I ON I.AID=L.AID WHERE L.AID=''%d'' LIMIT 1', [AID])) then begin
 			DebugOut.Lines.Add(format('Load User Data From MySQL Error: %d', [AID]));
 			Exit;
 		end
@@ -684,7 +684,7 @@ begin
         end;
 	end;
 
-	if ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM login AS L LEFT JOIN storeitem AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then
+	if ExecuteSqlCmd(format('SELECT L.AID,L.ID,L.passwd,L.Gender,L.Mail,L.Banned,I.storeitem,I.money FROM accounts AS L LEFT JOIN storage AS I ON I.AID=L.AID WHERE L.ID=''%s'' LIMIT 1', [addslashes(userid)])) then
 	begin
   SQLDataSet.First;
     if not SQLDataSet.Eof then begin
@@ -764,7 +764,7 @@ begin
 
 	DebugOut.Lines.Add(format('Load Character Data From MySQL: CharaID = %d', [GID]));
 
-	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM Characters AS C ' + format('LEFT JOIN warpInfo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN item AS I ON (I.GID=C.GID) LEFT JOIN cartItem AS T ON (T.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
+	if ExecuteSqlCmd('SELECT C.*, M.*, S.skillInfo, I.equipItem, T.cartitem FROM characters AS C ' + format('LEFT JOIN warpmemo AS M ON (C.GID=M.GID) LEFT JOIN skills AS S ON (C.GID=S.GID) LEFT JOIN inventory AS I ON (I.GID=C.GID) LEFT JOIN cart AS T ON (T.GID=C.GID) WHERE C.GID=''%d'' LIMIT 1', [GID])) then
 	begin
 		SQLDataSet.First;
     if not SQLDataSet.Eof then begin
@@ -999,7 +999,7 @@ begin
 	DebugOut.Lines.Add(format('Delete Character data from MySQL: %d', [GID]));
 
   {删除人物资料}
-	if not ExecuteSqlCmd(format('DELETE FROM Characters WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM characters WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete Character data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
@@ -1009,22 +1009,22 @@ begin
 		Exit;
 	end;
   {删除人物物品资料}
-	if not ExecuteSqlCmd(format('DELETE FROM item WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM inventory WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete Character item data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物手推车资料}
-	if not ExecuteSqlCmd(format('DELETE FROM cartItem WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM cart WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete Character cartItem data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物所在工会成员资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_members WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete guildMinfo data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
   {删除人物MEMO记录点资料}
-	if not ExecuteSqlCmd(format('DELETE FROM warpInfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM warpmemo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
     DebugOut.Lines.Add(format('Delete warpInfo data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
@@ -1039,7 +1039,7 @@ function  CheckUserExist(userid: String) : Boolean;
 begin
   Result := False;
 
-  if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM Characters WHERE Name=''%s'' LIMIT 1', [addslashes(userid)])) then begin
+  if not ExecuteSqlCmd(format('SELECT count(GID) as count FROM characters WHERE Name=''%s'' LIMIT 1', [addslashes(userid)])) then begin
     DebugOut.Lines.Add(format('Get character data from MySQL Error: %s', [userid]));
 		Result := True;
 		Exit;
@@ -1143,7 +1143,7 @@ end;
 function  GetNowLoginID() : cardinal;
 begin
   Result := 100101;
-	if not ExecuteSqlCmd('SELECT AID FROM login ORDER BY AID DESC LIMIT 1') then begin
+	if not ExecuteSqlCmd('SELECT AID FROM accounts ORDER BY AID DESC LIMIT 1') then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1158,7 +1158,7 @@ end;
 function  GetNowCharaID() : cardinal;
 begin
   Result := 100001;
-	if not ExecuteSqlCmd('SELECT GID FROM Characters ORDER BY GID DESC LIMIT 1') then begin
+	if not ExecuteSqlCmd('SELECT GID FROM characters ORDER BY GID DESC LIMIT 1') then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1232,8 +1232,8 @@ begin
   Result := False;
 
   {删除旧资料}
-	ExecuteSqlCmd(Format('DELETE FROM guildMPosition WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
-  if not ExecuteSqlCmd(Format('INSERT INTO guildMPosition (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, addslashes(PosName), BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
+	ExecuteSqlCmd(Format('DELETE FROM guild_positions WHERE GDID=''%d'' AND Grade=''%d'' LIMIT 1', [GDID, Grade]));
+  if not ExecuteSqlCmd(Format('INSERT INTO guild_positions (GDID,Grade,PosName,PosInvite,PosPunish,PosEXP) VALUES (''%d'',''%d'',''%s'',''%s'',''%s'',''%d'')', [GDID, Grade, addslashes(PosName), BoolToStr(PosInvite), BoolToStr(PosPunish), PosEXP])) then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild Position data error.');
 	  Exit;
@@ -1253,7 +1253,7 @@ var
 begin
   Result := False;
 	
-	if not ExecuteSqlCmd(Format('SELECT GDID FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+	if not ExecuteSqlCmd(Format('SELECT GDID FROM guild_members WHERE GID=''%d'' LIMIT 1', [GID])) then begin
 		Exit;
 	end;
   SQLDataSet.First;
@@ -1294,14 +1294,14 @@ begin
   Result := False;
 	
 	if mtype = 2 then begin
-	  if not ExecuteSqlCmd(format('INSERT INTO guildBanishInfo (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, addslashes(tgb.Name), addslashes(tgb.AccName), addslashes(tgb.Reason)])) then begin
-      DebugOut.Lines.Add(format('INSERT guildBanishInfo data to MySQL Error: %d', [GID]));
+	  if not ExecuteSqlCmd(format('INSERT INTO guild_banish (GDID,MemberName,MemberAccount,Reason) VALUES (''%d'',''%s'',''%s'',''%s'')', [GDID, addslashes(tgb.Name), addslashes(tgb.AccName), addslashes(tgb.Reason)])) then begin
+      DebugOut.Lines.Add(format('INSERT guild_banish data to MySQL Error: %d', [GID]));
 //		  Exit;
 	  end;
 	end;
 
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GID=''%d'' LIMIT 1', [GID])) then begin
-    DebugOut.Lines.Add(format('Delete guildMinfo data from MySQL Error: %d', [GID]));
+	if not ExecuteSqlCmd(format('DELETE FROM guild_members WHERE GID=''%d'' LIMIT 1', [GID])) then begin
+    DebugOut.Lines.Add(format('Delete guild_members data from MySQL Error: %d', [GID]));
 		Exit;
 	end;
 
@@ -1330,7 +1330,7 @@ function  SaveGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer) :
 begin
   Result := False;
 
-  if not ExecuteSqlCmd(Format('INSERT INTO guildAllyInfo (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, addslashes(GuildName), mtype])) then
+  if not ExecuteSqlCmd(Format('INSERT INTO guild_allies (GDID,GuildName,Relation) VALUES (''%d'',''%s'',''%d'')', [GDID, addslashes(GuildName), mtype])) then
 	begin
 	  DebugOut.Lines.Add('*** Save Guild AllyInfo data error.');
 		exit;
@@ -1346,8 +1346,8 @@ function  DeleteGuildAllyInfo(GDID: cardinal; GuildName: String; mtype: Integer)
 begin
   Result := False;
 	
-	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, addslashes(GuildName), mtype])) then begin
-    DebugOut.Lines.Add(format('Delete guildAllyInfo data from MySQL Error: %s', [GuildName]));
+	if not ExecuteSqlCmd(format('DELETE FROM guild_allies WHERE GDID=''%d'' AND Name=''%s'' AND Relation=''%d'' LIMIT 1', [GDID, addslashes(GuildName), mtype])) then begin
+    DebugOut.Lines.Add(format('Delete guild_allies data from MySQL Error: %s', [GuildName]));
 		Exit;
 	end;
 
@@ -1364,27 +1364,27 @@ begin
 	DebugOut.Lines.Add(format('Delete Guild data from MySQL: %d', [GDID]));
 
   {删除工会资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildinfo WHERE GDID=''%d'' LIMIT 1', [GDID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_info WHERE GDID=''%d'' LIMIT 1', [GDID])) then begin
     DebugOut.Lines.Add(format('Delete Guild data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会成员资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMinfo WHERE GDID=''%d'' LIMIT 36', [GDID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_members WHERE GDID=''%d'' LIMIT 36', [GDID])) then begin
     DebugOut.Lines.Add(format('Delete Guild Member data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会头衔资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildMPosition WHERE GDID=''%d'' LIMIT 20', [GDID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_positions WHERE GDID=''%d'' LIMIT 20', [GDID])) then begin
     DebugOut.Lines.Add(format('Delete Guild Position data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会开除成员记录资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildBanishInfo WHERE GDID=''%d''', [GDID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_banish WHERE GDID=''%d''', [GDID])) then begin
     DebugOut.Lines.Add(format('Delete Guild BanishInfo data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
   {删除工会同盟、敌对资料}
-	if not ExecuteSqlCmd(format('DELETE FROM guildAllyInfo WHERE GDID=''%d''', [GDID])) then begin
+	if not ExecuteSqlCmd(format('DELETE FROM guild_allies WHERE GDID=''%d''', [GDID])) then begin
     DebugOut.Lines.Add(format('Delete Guild AllyInfo data from MySQL Error: %d', [GDID]));
 		Exit;
 	end;
@@ -1403,7 +1403,7 @@ begin
   Result := False;
 
   tp := Player.Objects[Player.IndexOf(AID)] as TPlayer;
-	if ExecuteSqlCmd(Format('SELECT GID, Name, CharaNumber FROM Characters WHERE AID=''%d'' LIMIT 9', [AID])) then
+	if ExecuteSqlCmd(Format('SELECT GID, Name, CharaNumber FROM characters WHERE AID=''%d'' LIMIT 9', [AID])) then
 	begin
 	  while not SQLDataSet.Eof do
     begin
@@ -1531,7 +1531,7 @@ begin
     bindata := bindata + ' ,' + IntToStr(PLv);
     bindata := bindata + ' ,' + IntToStr(ID);
     bindata := bindata + ')';
-	  if not ExecuteSqlCmd(Format('REPLACE INTO Characters %s', [bindata])) then begin
+	  if not ExecuteSqlCmd(Format('REPLACE INTO characters %s', [bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character data error.');
 			Exit;
 		end;
@@ -1565,7 +1565,7 @@ begin
 			  bindata := bindata + IntToHex(Item[j].Card[3], 4);
 		  end;
 	  end;
-	  if not ExecuteSqlCmd(Format('REPLACE INTO item (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+	  if not ExecuteSqlCmd(Format('REPLACE INTO inventory (GID,equipItem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character Item data error.');
 			Exit;
 		end;
@@ -1586,13 +1586,13 @@ begin
 			  bindata := bindata + IntToHex(Cart.Item[j].Card[3], 4);
 			end;
 		end;
-	  if not ExecuteSqlCmd(Format('REPLACE INTO cartItem (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
+	  if not ExecuteSqlCmd(Format('REPLACE INTO cart (GID,cartitem) VALUES (''%d'',''%s'')', [CID, bindata])) then begin
 		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
 			Exit;
 		end;
 
 		{保存人物MEMO记录点资料}
-		if not ExecuteSqlCmd(Format('REPLACE INTO warpInfo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, addslashes(MemoMap[0]), MemoPoint[0].X, MemoPoint[0].Y, addslashes(MemoMap[1]), MemoPoint[1].X, MemoPoint[1].Y, addslashes(MemoMap[2]), MemoPoint[2].X, MemoPoint[2].Y])) then begin
+		if not ExecuteSqlCmd(Format('REPLACE INTO warpmemo (GID,mapName0,xPos0,yPos0,mapName1,xPos1,yPos1,mapName2,xPos2,yPos2) VALUES (''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'',''%s'',''%d'',''%d'')', [CID, addslashes(MemoMap[0]), MemoPoint[0].X, MemoPoint[0].Y, addslashes(MemoMap[1]), MemoPoint[1].X, MemoPoint[1].Y, addslashes(MemoMap[2]), MemoPoint[2].X, MemoPoint[2].Y])) then begin
 		  DebugOut.Lines.Add('*** Save Character CartItem data error.');
 			Exit;
 		end;
