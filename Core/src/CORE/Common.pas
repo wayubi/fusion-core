@@ -2346,15 +2346,12 @@ end;
 
 
 procedure CalcStat(tc:TChara; Tick:cardinal = 0);
-var
-	i,j,k,o,p :integer;
-	Side      :byte;
-	td        :TItemDB;
-        tl        :TSkillDB;
-        mi        :MapTbl;
-        g         :double;
-  JIDFix    :word; // JID correction for upper classes.
-        tg        :tguild;
+var{ChrstphrR 2004/04/28  Eliminating unused variables.}
+	i,j,k :integer;
+	tl        :TSkillDB;
+//g         :double;//unused - code using it commented out.
+	JIDFix    :word; // JID correction for upper classes.
+	tg        :tguild;
 begin
 	if Tick = 0 then Tick := timeGetTime();
 	with tc do begin
@@ -2365,7 +2362,7 @@ begin
                         tg := GuildList.Objects[GuildList.IndexOf(tc.GuildID)] as TGuild;
 
                         tg.SLV := 0;
-                        for i := 0 to (tg.RegUsers - 1) do begin
+												for i := 0 to (tg.RegUsers - 1) do begin
                                 tg.SLV := tg.SLV + tg.Member[i].BaseLV;
                         end;
                 end;
@@ -2399,7 +2396,7 @@ begin
                 DEF1 := 0;
                 MDEF1 := 0;
                 for i := 0 to 5 do begin //ボーナス値の初期化
-                        Bonus[i] := 0;
+												Bonus[i] := 0;
                         for j := 1 to JobLV do begin
                                 if JobBonusTable[JIDFix][j] = i + 1 then Inc(Bonus[i]);
 			end;
@@ -2450,7 +2447,7 @@ begin
                 FastWalk := false;
 		SplashAttack := false;
 		SpecialAttack := 0;
-                NoJamstone := false;
+								NoJamstone := false;
                 NoCastInterrupt := false;
                 FullRecover := false;
                 UnlimitedEndure := false;
@@ -2501,7 +2498,7 @@ begin
 			Bonus[4] := Bonus[4] + Param[4] * (2 + Skill[45].EffectLV) div 100;
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
-    if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
+		if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
         MAXHP := 65535;
     //end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
       //  MAXHP := 65535;
@@ -2518,7 +2515,7 @@ begin
     end else begin
         MAXHP := MAXHP + tl.Data1[Skill[248].Lv];
     end;
-    end;
+		end;
        if Skill[360].Tick > Tick then begin
        tl := Skill[360].Data;
     if (MAXHP + tc.Skill[360].Data.Data2[tc.Skill[360].Lv] > 65535) then begin
@@ -2620,7 +2617,7 @@ begin
                                         6:  ADelay := ADelay * 35 div 100;
                                         8:  ADelay := ADelay * 40 div 100;
                                         10: ADelay := ADelay * 40 div 100;
-                                end;
+																end;
                         end;}
                      Delay := (1000 - (4 * param[1]) - (2 * param[4]) + 300);
 
@@ -2654,7 +2651,7 @@ begin
                 end;
 
                 if (Skill[359].Tick > Tick) and ((tc.Weapon <> 4) and (tc.Weapon <> 5)) then begin
-                    Skill[359].Tick := Tick;
+										Skill[359].Tick := Tick;
                     SkillTick := Tick;
                     SkillTickID := 359;
                 end;
@@ -2756,7 +2753,7 @@ begin
       if Skill[39].Lv = 0 then begin
         i := i + Skill[39].Data.Data1[1];
       end else begin
-        i := i + Skill[39].Data.Data1[Skill[39].Lv];
+				i := i + Skill[39].Data.Data1[Skill[39].Lv];
       end;
 		end;
 
@@ -2773,7 +2770,7 @@ begin
 				i := i - 45;
 		end;
     { Colus, 20040224: You didn't listen to how I explained the skill. :/
-      This is so not right it's not even funny.
+			This is so not right it's not even funny.
         //BS Maximun codes
         //beita 20040206
     if (Skill[114].Lv <> 0) then begin
@@ -3391,6 +3388,16 @@ begin
   end;
 end;
 //------------------------------------------------------------------------------
+{ChrstphrR 2004/04/28
+If any of the current devs created this routine, it needs a fix...
+
+Compiler warning: Variable "k" might not have been initialized.
+Stuffing "k" without getting a value for it is a Bad Thing
+
+This routine is THANKFULLY not called, because it would assuredly cause
+AV errors, or at best, random, undefined results. It looks like the Character,
+or Character index on the map would have to be passed as a parameter as well.
+}
 procedure SendMonsterRelocation(tm:TMap; ts:tMob);
 var
   l,j,k :integer;
@@ -6490,10 +6497,8 @@ end;
 //------------------------------------------------------------------------------
 procedure EnableGuildKafra(MapName:string;KafraName:string;Mode:integer);
 var
-	i,j,k,l,m,n  :integer;
-  tg           :TGuild;
-  tgc          :TCastle;
-  tm           :TMap;
+	i,j,k,l  :integer;
+	tm           :TMap;
   tm1          :TMap;
   tn1          :TNPC;
   tc1          :TChara;
@@ -6573,46 +6578,34 @@ begin
 				end;
 //------------------------------------------------------------------------------
 function GetGuildKafra(tn:TNPC) : integer;
-var
-  tgc:TCastle;
-  i  :integer;
-	w  :integer;
+var{ChrstphrR 2004/04/28 Eliminated unused variables}
+	Idx : Integer;
 begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  w := tgc.GKafra;
-  end else begin
-  w := 0;
-  end;
-
-	Result := w;
-end;
+	if (Idx > -1) then
+		Result := (CastleList.Objects[Idx] AS TCastle).GKafra;
+end;//func GetGuildKafra()
 //------------------------------------------------------------------------------
 procedure SetGuildKafra(tn:TNPC;mode:integer);
-var
-  tgc:TCastle;
-  i  :integer;
+var{ChrstphrR 2004/04/28 Eliminated unused variables}
+	Idx : Integer;
 begin
-  i := CastleList.IndexOf(tn.Reg);
+	Idx := CastleList.IndexOf(tn.Reg);
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  tgc.GKafra := mode;
-  end;
-
+	if (Idx > -1) then
+		(CastleList.Objects[i] as TCastle).GKafra := mode;
 end;
 //------------------------------------------------------------------------------
 procedure SpawnNPCMob(tn:TNPC;MobName:string;X:integer;Y:integer;SpawnDelay1:cardinal;SpawnDelay2:cardinal);
 var
-  i,j,k :integer;
-  m     :integer;
-  ts    :TMob;
-  tm    :TMap;
-  te    :TEmp;
-  tgc   :TCastle;
+	k   :integer;
+	m   :integer;
+	ts  :TMob;
+	tm  :TMap;
+	te  :TEmp;
+	tgc :TCastle;
 begin
           //DebugOut.Lines.Add(MobName);
           tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
@@ -6720,7 +6713,7 @@ end;
 
 procedure SpawnEventMob(tn:TNPC;MobID:cardinal;MobName:string;X:integer;Y:integer;DropItem:cardinal);
 var
-  i,j,k :integer;
+	j,k :integer;
   m     :integer;
   ts    :TMob;
   tm    :TMap;
@@ -6924,99 +6917,98 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure CallGuildGuard(tn:TNPC;guard:integer);
-var
-  tgc        :TCastle;
-  i,j,k,l,m  :integer;
-  ts         :TMob;
-  tm         :TMap;
-  te         :TEmp;
+var{ChrstphrR 2004/04/28 eliminated unused variables}
+	tgc : TCastle;
+	j   : integer;
+	ts  : TMob;
+	tm  : TMap;
+	te  : TEmp;
 begin
-          //guard := guard - 1;
-          tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
-          j := CastleList.IndexOf(tm.Name);
-          if (j <> - 1) then begin
-          tgc := CastleList.Objects[j] as TCastle;
-          j := EmpList.IndexOf(tm.Name);
-          if (j <> - 1) then te := EmpList.Objects[j] as TEmp;
-          ts := TMob.Create;
-          //if (tgc.GuardStatus[guard] = 1) then begin
-          case guard of
-          0,1,2:
-          begin
-					ts.Data := MobDBName.Objects[MobDBName.IndexOf('SOLDIER_GUARDIAN')] as TMobDB;
-          end;
-          3,4:
-          begin
-          ts.Data := MobDBName.Objects[MobDBName.IndexOf('ARCHER_GUARDIAN')] as TMobDB;
-          end;
-          5,6,7:
-          begin
-          ts.Data := MobDBName.Objects[MobDBName.IndexOf('KNIGHT_GUARDIAN')] as TMobDB;
-          end;
-          end;
-					ts.ID := NowMobID;
-					Inc(NowMobID);
-					ts.Name := ts.Data.JName;
-					ts.JID := ts.Data.ID;
-					ts.Map := tm.Name;
-          ts.Data.isLink :=false;
-          ts.isGuardian := tgc.GID;
+	//guard := guard - 1;
+	tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
+	j := CastleList.IndexOf(tm.Name);
+	if (j <> - 1) then begin
+		tgc := CastleList.Objects[j] as TCastle;
+		te  := nil;
+		j := EmpList.IndexOf(tm.Name);
+		if (j <> - 1) then te := EmpList.Objects[j] as TEmp;
+		ts := TMob.Create;
+		//if (tgc.GuardStatus[guard] = 1) then begin
+		case guard of
+		0,1,2:
+			begin
+				ts.Data := MobDBName.Objects[MobDBName.IndexOf('SOLDIER_GUARDIAN')] as TMobDB;
+			end;
+		3,4:
+			begin
+				ts.Data := MobDBName.Objects[MobDBName.IndexOf('ARCHER_GUARDIAN')] as TMobDB;
+			end;
+		5,6,7:
+			begin
+				ts.Data := MobDBName.Objects[MobDBName.IndexOf('KNIGHT_GUARDIAN')] as TMobDB;
+			end;
+		end;//case
+		ts.ID := NowMobID;
+		Inc(NowMobID);
+		ts.Name := ts.Data.JName;
+		ts.JID := ts.Data.ID;
+		ts.Map := tm.Name;
+		ts.Data.isLink :=false;
+		ts.isGuardian := tgc.GID;
 
-          if (te <> nil) then begin
-          ts.EmperiumID := te.EID;
-          end else begin
-          ts.EmperiumID := 0;
-          end;
+		if (te <> nil) then begin
+			ts.EmperiumID := te.EID;
+		end else begin
+			ts.EmperiumID := 0;
+		end;
 
-          repeat
-					ts.Point1.X := Random(tm.Size.X - 2);
-					ts.Point1.Y := Random(tm.Size.y - 2);
-                    
-          until ( (tm.gat[ts.Point1.X][ts.Point1.Y] <> 1) and (tm.gat[ts.Point1.X][ts.Point1.Y] <> 5) );
+		repeat
+			ts.Point1.X := Random(tm.Size.X - 2);
+			ts.Point1.Y := Random(tm.Size.y - 2);
+		until ( (tm.gat[ts.Point1.X][ts.Point1.Y] <> 1) and (tm.gat[ts.Point1.X][ts.Point1.Y] <> 5) );
 
-          ts.Point := ts.Point1;
+		ts.Point := ts.Point1;
 
-					ts.Dir := Random(8);
-					ts.HP := ts.Data.HP + cardinal(tgc.DTrigger * 2000);
-					ts.Speed := ts.Data.Speed;
-					ts.SpawnDelay1 := $7FFFFFFF;
-					ts.SpawnDelay2 := 0;
-					ts.SpawnType := 0;
-					ts.SpawnTick := 0;
-					if ts.Data.isDontMove then
-						ts.MoveWait := $FFFFFFFF
-					else
-          ts.MoveWait := timeGetTime();
-					ts.ATarget := 0;
-					ts.ATKPer := 100;
-					ts.DEFPer := 100;
-					ts.DmgTick := 0;
-          ts.Element := ts.Data.Element;
-          ts.Name := ts.Data.JName;
-          ts.isActive := ts.Data.isActive;
-					ts.MoveWait := timeGetTime();
-					for j := 0 to 31 do begin
-						ts.EXPDist[j].CData := nil;
-						ts.EXPDist[j].Dmg := 0;
-					end;
-					if ts.Data.MEXP <> 0 then begin
-						for j := 0 to 31 do begin
-							ts.MVPDist[j].CData := nil;
-							ts.MVPDist[j].Dmg := 0;
-						end;
-						ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
-					end;
-          ts.isSummon := True;
-					tm.Mob.AddObject(ts.ID, ts);
-					tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
-          //end;
-          end;
-end;
+		ts.Dir := Random(8);
+		ts.HP := ts.Data.HP + cardinal(tgc.DTrigger * 2000);
+		ts.Speed := ts.Data.Speed;
+		ts.SpawnDelay1 := $7FFFFFFF;
+		ts.SpawnDelay2 := 0;
+		ts.SpawnType := 0;
+		ts.SpawnTick := 0;
+		if ts.Data.isDontMove then
+			ts.MoveWait := $FFFFFFFF
+		else
+			ts.MoveWait := timeGetTime;
+		ts.ATarget := 0;
+		ts.ATKPer := 100;
+		ts.DEFPer := 100;
+		ts.DmgTick := 0;
+		ts.Element := ts.Data.Element;
+		ts.Name := ts.Data.JName;
+		ts.isActive := ts.Data.isActive;
+		ts.MoveWait := timeGetTime();
+		for j := 0 to 31 do begin
+			ts.EXPDist[j].CData := nil;
+			ts.EXPDist[j].Dmg := 0;
+		end;
+		if ts.Data.MEXP <> 0 then begin
+			for j := 0 to 31 do begin
+				ts.MVPDist[j].CData := nil;
+				ts.MVPDist[j].Dmg := 0;
+			end;
+			ts.MVPDist[0].Dmg := ts.Data.HP * 30 div 100; //FAに30%加算
+		end;
+		ts.isSummon := True;
+		tm.Mob.AddObject(ts.ID, ts);
+		tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+	end;
+end;//proc CallGuildGuard()
 //------------------------------------------------------------------------------
 function GetGuildEDegree(tn:TNPC) : cardinal;
 var
-  tgc:TCastle;
-  i  :integer;
+	tgc:TCastle;
+	i  :integer;
 	w  :cardinal;
 begin
 	w := 0;
@@ -7159,9 +7151,8 @@ end;
 procedure KillGuildRelation(tg:TGuild; tg1:TGuild; tc:TChara; tc1:TChara; RelType:byte);
 //同盟・敵対関係を解消する
 var
-	j   :integer;
-	w   :word;
-	tgl :TGRel;
+	j   : Integer;
+	tgl : TGRel;
 begin
 	//解消通知
 	if (RelType = 0) then begin
@@ -9299,13 +9290,8 @@ End;(* Proc MapLoad()
 
 //------------------------------------------------------------------------------
 procedure MapMove(Socket:TCustomWinSocket; MapName:string; Point:TPoint);
-var
-i,j,k :integer;
-tm    :TMap;
-tc1   :TChara;
-
 begin
-  WFIFOW(0, $0091);
+	WFIFOW(0, $0091);
 	WFIFOS(2, MapName + '.rsw', 16);
 	WFIFOW(18, Point.X);
 	WFIFOW(20, Point.Y);
@@ -9314,13 +9300,13 @@ begin
 	//マップロード
 	if Map.IndexOf(MapName) = -1 then MapLoad(MapName);
 
-  //tm := Map.Objects[Map.IndexOf(MapName)] as TMap;
-  //WFIFOW( 0, $0199);
-  //WFIFOW( 2, 1);
-  //Socket.SendBuf(buf, 4);
-  //for j := 0 to tm.CList.Count - 1 do begin
-  //tc1 := tm.CList.Objects[j] as TChara;
-  //k := j + 1;
+	//tm := Map.Objects[Map.IndexOf(MapName)] as TMap;
+	//WFIFOW( 0, $0199);
+	//WFIFOW( 2, 1);
+	//Socket.SendBuf(buf, 4);
+	//for j := 0 to tm.CList.Count - 1 do begin
+	//tc1 := tm.CList.Objects[j] as TChara;
+	//k := j + 1;
   //i := tm.CList.Count;
   //WFIFOW( 0, $019a);
   //WFIFOL( 2, tc1.ID);
@@ -9333,12 +9319,12 @@ end;
 //------------------------------------------------------------------------------
 function StealItem(tc:TChara; ts:TMob) :boolean;
 var
-  i,j,k :integer;
-  mdrop :array[0..7] of integer;
-  td    :TItemDB;
-  modfix:integer;
-  rand  :integer;
-  tm    :TMap;
+	i,k    :integer;
+	mdrop  :array[0..7] of integer;
+	td     :TItemDB;
+	modfix :integer;
+	rand   :integer;
+	tm     :TMap;
 begin
   tm := tc.MData;
 
