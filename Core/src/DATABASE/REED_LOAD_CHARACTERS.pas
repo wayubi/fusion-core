@@ -11,6 +11,8 @@ uses
     procedure PD_Load_Characters(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
     procedure PD_Load_Characters_Memos(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
     procedure PD_Load_Characters_Skills(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
 
 implementation
 
@@ -44,6 +46,11 @@ implementation
             pfile := 'Skills.txt';
             PD_Load_Characters_Skills(UID, tp, get_list(path, pfile), path, pfile);
 
+            pfile := 'Inventory.txt';
+            PD_Load_Characters_Inventory(UID, tp, get_list(path, pfile), path, pfile);
+
+            pfile := 'Cart.txt';
+            PD_Load_Characters_Cart(UID, tp, get_list(path, pfile), path, pfile);
         end;
 
         FreeAndNil(resultlist);
@@ -222,5 +229,54 @@ implementation
 
         FreeAndNil(resultlist);
     end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Characters Inventory ----------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Characters_Inventory(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    var
+        i : Integer;
+        tc : TChara;
+    begin
+        for i := 0 to resultlist.Count - 1 do begin
+
+            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+
+            path := path + resultlist[i] + '\' + pfile;
+
+            retrieve_inventories(path, tc.Item);
+
+        end;
+
+        FreeAndNil(resultlist);
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { - R.E.E.D - Load Characters Cart ---------------------------------------------------- }
+    { ------------------------------------------------------------------------------------- }
+    procedure PD_Load_Characters_Cart(UID : String; tp : TPlayer; resultlist : TStringList; path : String; pfile : String);
+    var
+        i : Integer;
+        tc : TChara;
+    begin
+        for i := 0 to resultlist.Count - 1 do begin
+
+            if Chara.IndexOf(StrToInt(resultlist[i])) = -1 then Continue;
+            tc := Chara.Objects[Chara.IndexOf(StrToInt(resultlist[i]))] as TChara;
+
+            path := path + resultlist[i] + '\' + pfile;
+
+            retrieve_inventories(path, tc.Cart.Item);
+
+        end;
+
+        FreeAndNil(resultlist);
+    end;
+    { ------------------------------------------------------------------------------------- }
 
 end.

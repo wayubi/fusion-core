@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-27-04: Some more partitions in REED character procedures. [AlexKreuz]
 - 08-27-04: Undefined pet in pet_db.txt caused crash. [AlexKreuz]
 - 08-27-04: Using AF2 maps without UnzDll.dll caused crash. [AlexKreuz]
 - 08-27-04: Undefined map in map error checking caused crash. [AlexKreuz]

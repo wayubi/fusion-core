@@ -48,11 +48,9 @@ uses
     procedure PD_Save_Characters_Skills(forced : Boolean = False);
 
     { Character Data - Inventory Data }
-    procedure PD_Load_Characters_Inventory(UID : String = '*');
     procedure PD_Save_Characters_Inventory(forced : Boolean = False);
 
     { Character Data - Cart Data }
-    procedure PD_Load_Characters_Cart(UID : String = '*');
     procedure PD_Save_Characters_Cart(forced : Boolean = False);
 
     { Character Data - Variables Data }
@@ -128,8 +126,6 @@ uses
 
         if UID = '*' then debugout.Lines.add('­ Characters ­');
         PD_Load_Characters_Parse(UID);
-        PD_Load_Characters_Inventory(UID);
-        PD_Load_Characters_Cart(UID);
         PD_Load_Characters_Variables(UID);
 
         if UID = '*' then debugout.Lines.add('­ Pets ­');
@@ -728,68 +724,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Inventory Data --------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Inventory(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-            	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Inventory.txt') then begin
-                	try
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Inventory.txt');
-
-                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
-                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-                        for i := 1 to 100 do begin
-                            tc.Item[i].ID := 0;
-                        end;
-
-                        for i := 2 to datafile.Count - 1 do begin
-                        	sl.delimiter := ':';
-                            sl.delimitedtext := datafile[i];
-
-                            tc.Item[i-1].ID := StrToInt(sl.Strings[0]);
-                            tc.Item[i-1].Amount := StrToInt(sl.Strings[1]);
-                            tc.Item[i-1].Equip := StrToInt(sl.Strings[2]);
-                            tc.Item[i-1].Identify := StrToInt(sl.Strings[3]);
-                            tc.Item[i-1].Refine := StrToInt(sl.Strings[4]);
-                            tc.Item[i-1].Attr := StrToInt(sl.Strings[5]);;
-                            tc.Item[i-1].Card[0] := StrToInt(sl.Strings[6]);
-                            tc.Item[i-1].Card[1] := StrToInt(sl.Strings[7]);
-                            tc.Item[i-1].Card[2] := StrToInt(sl.Strings[8]);
-                            tc.Item[i-1].Card[3] := StrToInt(sl.Strings[9]);
-                            tc.Item[i-1].Data := ItemDB.Objects[ItemDB.IndexOf(tc.Item[i-1].ID)] as TItemDB;
-                        end;
-
-                        //debugout.Lines.Add(tc.Name + ' character inventory data loaded.');
-                    except
-                        DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
-                        DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Inventory.txt');
-                    end;
-                end;
-
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Characters_Inventory(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -909,68 +843,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Cart Data -------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Cart(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-            	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Cart.txt') then begin
-                	try
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Cart.txt');
-
-                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
-                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-                        for i := 1 to 100 do begin
-                            tc.Cart.Item[i].ID := 0;
-                        end;
-
-                        for i := 2 to datafile.Count - 1 do begin
-                        	sl.delimiter := ':';
-                            sl.delimitedtext := datafile[i];
-
-                            tc.Cart.Item[i-1].ID := StrToInt(sl.Strings[0]);
-                            tc.Cart.Item[i-1].Amount := StrToInt(sl.Strings[1]);
-                            tc.Cart.Item[i-1].Equip := StrToInt(sl.Strings[2]);
-                            tc.Cart.Item[i-1].Identify := StrToInt(sl.Strings[3]);
-                            tc.Cart.Item[i-1].Refine := StrToInt(sl.Strings[4]);
-                            tc.Cart.Item[i-1].Attr := StrToInt(sl.Strings[5]);;
-                            tc.Cart.Item[i-1].Card[0] := StrToInt(sl.Strings[6]);
-                            tc.Cart.Item[i-1].Card[1] := StrToInt(sl.Strings[7]);
-                            tc.Cart.Item[i-1].Card[2] := StrToInt(sl.Strings[8]);
-                            tc.Cart.Item[i-1].Card[3] := StrToInt(sl.Strings[9]);
-                            tc.Cart.Item[i-1].Data := ItemDB.Objects[ItemDB.IndexOf(tc.Cart.Item[i-1].ID)] as TItemDB;
-                        end;
-
-                        //debugout.Lines.Add(tc.Name + ' character cart data loaded.');
-                    except
-                        DebugOut.Lines.Add('R.E.E.D Load Error: Data could not be loaded.');
-                        DebugOut.Lines.Add('gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Cart.txt');
-                    end;
-                end;
-
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Characters_Cart(forced : Boolean = False);
     var
     	datafile : TStringList;
