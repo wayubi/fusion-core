@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 11-05-04: Added NPC command "remotenpctimer" for npctimer situations. [Tsusai]
 - 11-04-04: Added NPC command "resetmyareamob" for jobquests. [Tsusai]
 - 11-04-04: Fixed pet hunger updating after feeding. [Darkhelmet]
 - 11-03-04: Added NPC command "getareausers" for Priest quest. [Tsusai]

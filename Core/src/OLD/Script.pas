@@ -1015,8 +1015,8 @@ begin
                 if (i = 0) then begin
                     //OFF
                     if (j <> -1) then begin
-                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
-                        tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn.ID));
+                        debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn.ID,tm.TimerAct.Count-1]));
+                        //tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn.ID));
                     end;
                 end else if (i = 1) then begin
                     //ON
@@ -1905,6 +1905,47 @@ begin
                                 if (m <> -1) then tm1.Mob.Delete(m);
                             end;
                         end;
+                    end;
+                end;
+                Inc(tc.ScriptStep);
+            end;
+        81: //remotenpctimer
+            begin
+                i := tn.Script[tc.ScriptStep].Data3[0];
+                j := -1;
+                for k := 0 to tm.NPC.Count - 1 do begin
+                    tn1 := tm.NPC.Objects[k] as TNPC;
+                    if (tn1.Name = tn.Script[tc.ScriptStep].Data1[0]) then begin
+                        j := 0;
+                        break;
+                    end;
+                end;
+                j := tm.TimerAct.IndexOf(tn1.ID);
+                if (i = 0) then begin
+                    //OFF
+                    if (j <> -1) then begin
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
+                        tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
+                    end;
+                end else if (i = 1) then begin
+                    //ON
+                    if (j = -1) then begin
+                        j := tm.TimerDef.IndexOf(tn1.ID);
+                        if (j <> -1) then begin
+                            tr := tm.TimerDef.Objects[j] as NTimer;
+                            tr.Tick := timeGetTime();
+                            for k := 0 to tr.Cnt - 1 do begin
+                                tr.Done[k] := 0;
+                            end;
+                            tm.TimerAct.AddObject(tn1.ID, tr);
+                            //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was started / Starting Timer(%d)', [tn1.ID,tm.TimerAct.Count]));
+                        end;
+                    end else begin
+                        //Restart
+                        tr := tm.TimerAct.Objects[j] as NTimer;
+                        tr.Tick := timeGetTime();
+                        for k := 0 to tr.Cnt - 1 do tr.Done[k] := 0;
+                        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + Format('NPC Timer(%d) was re-started / Starting Timer(%d)', [tn1.ID,tm.TimerAct.Count]));
                     end;
                 end;
                 Inc(tc.ScriptStep);
