@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 288
-  Top = 430
+  Left = 374
+  Top = 490
   Width = 608
   Height = 366
   Caption = 's'
@@ -1128,7 +1128,7 @@ object frmMain: TfrmMain
         Left = 136
         Top = 24
         Width = 129
-        Height = 169
+        Height = 217
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
@@ -1315,7 +1315,7 @@ object frmMain: TfrmMain
         Left = 272
         Top = 24
         Width = 57
-        Height = 169
+        Height = 217
         ItemHeight = 18
         TabOrder = 19
         OnClick = ListBox9Click
