@@ -42,11 +42,9 @@ uses
     procedure PD_Delete_Characters(tc : TChara);
 
     { Character Data - Memo Data }
-    procedure PD_Load_Characters_Memos(UID : String = '*');
     procedure PD_Save_Characters_Memos(forced : Boolean = False);
 
     { Character Data - Skill Data }
-    procedure PD_Load_Characters_Skills(UID : String = '*');
     procedure PD_Save_Characters_Skills(forced : Boolean = False);
 
     { Character Data - Inventory Data }
@@ -129,9 +127,7 @@ uses
         PD_Load_Accounts_Storage(UID);
 
         if UID = '*' then debugout.Lines.add('­ Characters ­');
-        PD_Load_Characters(UID);
-        PD_Load_Characters_Memos(UID);
-        PD_Load_Characters_Skills(UID);
+        PD_Load_Characters_Parse(UID);
         PD_Load_Characters_Inventory(UID);
         PD_Load_Characters_Cart(UID);
         PD_Load_Characters_Variables(UID);
@@ -611,48 +607,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Memo Data -------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Memos(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        tc : TChara;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-            	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\ActiveMemos.txt') then begin
-                	try
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\ActiveMemos.txt');
-
-                        if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
-                        tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-                        for i := 0 to 2 do begin
-                        	tc.MemoMap[i] := ( Copy(datafile[0+(3*i)], Pos(' : ', datafile[0+(3*i)]) + 3, length(datafile[0+(3*i)]) - Pos(' : ', datafile[0+(3*i)]) + 3) );
-                            tc.MemoPoint[i].X := StrToInt( Copy(datafile[1+(3*i)], Pos(' : ', datafile[1+(3*i)]) + 3, length(datafile[1+(3*i)]) - Pos(' : ', datafile[1+(3*i)]) + 3) );
-                            tc.MemoPoint[i].Y := StrToInt( Copy(datafile[2+(3*i)], Pos(' : ', datafile[2+(3*i)]) + 3, length(datafile[2+(3*i)]) - Pos(' : ', datafile[2+(3*i)]) + 3) );
-                        end;
-
-                    	//debugout.Lines.Add(tc.Name + ' character memos data loaded.');
-                    except
-            			DebugOut.Lines.Add('Character memos data could not be loaded.');
-            		end;
-                end;
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        datafile.Clear;
-        datafile.Free;
-    end;
-    
     procedure PD_Save_Characters_Memos(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -700,70 +654,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Skills Data ------------------------------------------------ }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Skills(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        datafile : TStringList;
-        sl : TStringList;
-        tc : TChara;
-        i : Integer;
-    begin
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-        sl := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-
-                if (searchResult2.Name = '.') or (searchResult2.Name = '..') then Continue; 
-
-            	if Chara.IndexOf(StrToInt(searchResult2.Name)) = -1 then continue;
-            	tc := Chara.Objects[Chara.IndexOf(StrToInt(searchResult2.Name))] as TChara;
-
-            	for i := 0 to MAX_SKILL_NUMBER do begin
-            		if SkillDB.IndexOf(i) <> -1 then begin
-            			tc.Skill[i].Data := SkillDB.IndexOfObject(i) as TSkillDB;
-                        tc.Skill[i].Lv := 0;
-            		end;
-            	end;
-
-        		if (tc.Plag <> 0) then begin
-            		tc.Skill[tc.Plag].Plag := true;
-            	end;
-
-            	try
-                	if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Skills.txt') then begin
-                    	datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Skills.txt');
-
-        	            for i := 2 to datafile.Count - 1 do begin
-    	                	sl.delimiter := ':';
-	                        sl.delimitedtext := datafile[i];
-
-                            if SkillDB.IndexOf(StrToInt(sl.Strings[0])) <> -1 then begin
-                            	tc.Skill[StrToInt(sl.Strings[0])].Lv := StrToInt(sl.Strings[1]);
-                                tc.Skill[StrToInt(sl.Strings[0])].Card := False;
-                                tc.Skill[StrToInt(sl.Strings[0])].Plag := False;
-                            end;
-	                    end;
-
-                    	//debugout.Lines.Add(tc.Name + ' character skill data loaded.');
-                	end;
-            	except
-            		DebugOut.Lines.Add('Character skill data could not be loaded.');
-            	end;
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        sl.Free;
-        datafile.Clear;
-        datafile.Free;
-    end;
-
     procedure PD_Save_Characters_Skills(forced : Boolean = False);
     var
     	datafile : TStringList;

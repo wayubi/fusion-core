@@ -9,6 +9,8 @@ uses
     function retrieve_data(idx : Integer; path : String; rtype : Integer = 0) : Variant;
     function get_list(path : String; pfile : String; UID : String = '*') : TStringList;
     procedure retrieve_inventories(path : String; inventory_item : array of TItem);
+    function retrieve_length(path : String) : Integer;
+    function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
 
 implementation
 
@@ -119,6 +121,54 @@ implementation
     { ------------------------------------------------------------------------------------- }
 
 
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - retrieve_length                                                             }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To retrieve the length of a file for processing and to strip the header.     }
+    { Parameters:                                                                           }
+    {  - path : String, Represents file to load up.                                         }
+    { ------------------------------------------------------------------------------------- }
+    function retrieve_length(path : String) : Integer;
+    var
+        datafile : TStringList;
+    begin
+        datafile := TStringList.Create;
+        datafile.LoadFromFile(path);
 
+        Result := datafile.Count - 3;
+
+        FreeAndNil(datafile);
+    end;
+    { ------------------------------------------------------------------------------------- }
+
+
+    { ------------------------------------------------------------------------------------- }
+    { R.E.E.D - retrieve_value                                                              }
+    { ------------------------------------------------------------------------------------- }
+    { Purpose: To retrieve a value from a REED ':' separated data file.                     }
+    { Parameters:                                                                           }
+    {  - path : String, Represents file to load up.                                         }
+    {  - row : Integer, The row index to look for.                                          }
+    {  - column : Integer, The column index to look for.                                    }
+    { ------------------------------------------------------------------------------------- }
+    function retrieve_value(path : String; row : Integer; column : Integer) : Variant;
+    var
+        datafile : TStringList;
+        columns : TStringList;
+        i : Integer;
+    begin
+        datafile := TStringList.Create;
+        columns := TStringList.Create;
+        columns.Delimiter := ':';
+
+        datafile.LoadFromFile(path);
+        columns.DelimitedText := datafile[row + 2];
+
+        Result := columns.Strings[column];
+
+        FreeAndNil(datafile);
+        FreeAndNil(columns);
+    end;
 
 end.
+

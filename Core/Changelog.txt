@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-25-04: Continued work on REED character load procedures. [AlexKreuz]
 - 08-24-04: Update to spawn slaves fix. [AlexKreuz]
 - 08-24-04: Fixed the problem with Spawn Slaves. [BieL®]
 - 08-24-04: Partitioning R.E.E.D Character loading. [AlexKreuz]
