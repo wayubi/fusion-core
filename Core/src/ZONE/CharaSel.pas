@@ -475,11 +475,12 @@ begin
                             end;
                         end;
 
-                        if UseSQL then DeleteChar(tc.CID);
-
-                        CharaName.Delete(CharaName.IndexOf(tc.Name));
-                        Chara.Delete(i);
-
+                        if UseSQL then begin
+                            DeleteChar(tc.CID);
+                            CharaName.Delete(CharaName.IndexOf(tc.Name));
+                            Chara.Delete(i);
+                        end;
+                        
                         PD_Delete_Character(tc.CID);
 
                         tc.Free;

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 12-31-04: Bug #25: Deleting character did not remove chara gamedata. [AlexKreuz]
 - 12-31-04: PVP Steal could not access target's inventory caused crash. [AlexKreuz]
 - 12-31-04: Memory leak in Thief/Assassin stealing skill. [AlexKreuz]
 - 12-31-04: Read-only gm_commands.ini file caused crash. Added dialog. [AlexKreuz]
@@ -13,7 +14,7 @@
 - 12-29-04: Added script message variable $joblevel (like $charaname). [Tsusai]
 - 12-28-04: Undid boot performance changes. Allowed same character name. [AlexKreuz]
 - 12-25-04: GuildID retrieval w/o guilds caused crash. [AlexKreuz]
-- 12-25-04: But #2: Improper loading of guild ids caused guilds to be out of sync. [AlexKreuz]
+- 12-25-04: Bug #2: Improper loading of guild ids caused guilds to be out of sync. [AlexKreuz]
 - 12-25-04: Guild member outside of party caused Pre-Link crash. [AlexKreuz]
 - 12-25-04: Fixed broadcast handling using the broadcast procedure & scripts. [Tsusai]
 - 12-22-04: Accesslevel field did not clear on JCon Accounts page. [AlexKreuz]
