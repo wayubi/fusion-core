@@ -5710,10 +5710,10 @@ begin
 
         ta := MapList.Objects[MapList.IndexOf(MapName)] as TMapList;
 
-        if ta.Ext = 'afm' then begin
+        if ta.Ext = 'af2' then begin
 
           afm_compressed := tzip.create(afm_compressed);
-          afm_compressed.Filename := AppPath+'map\'+MapName+'.afm';
+          afm_compressed.Filename := AppPath+'map\'+MapName+'.af2';
           afm_compressed.Extract;
           afm_compressed.Free;
 
@@ -5747,6 +5747,39 @@ begin
           end;
           CloseFile(afm);
           deletefile(AppPath+'map\'+MapName+'.out');
+        end
+
+        else if ta.Ext = 'afm' then begin
+
+          assignfile(afm,AppPath + 'map/' + MapName + '.afm');
+          Reset(afm);
+
+          ReadLn(afm,str);
+          if (str <> 'ADVANCED FUSION MAP') then begin
+            DebugOut.Lines.Add('Mapfile error 500 : ' + MapName);
+            tm.Free;
+            exit;
+          end;
+
+          ReadLn(afm,str);
+          if (str <> MapName) then begin
+            DebugOut.Lines.Add('The loaded map was not the memory map : ' + MapName);
+            tm.Free;
+            exit;
+          end;
+
+          ReadLn(afm,tm.Size.x,tm.Size.y);
+          ReadLn(afm,str);
+
+          SetLength(tm.gat, tm.Size.X, tm.Size.Y);
+          for j := 0 to tm.Size.Y - 1 do begin
+            for i := 0 to tm.Size.X - 1 do begin
+              Read(afm,letter);
+              tm.gat[i][j] := strtoint(letter);
+            end;
+            ReadLn(afm,str);
+          end;
+          CloseFile(afm);
         end
 
         else begin

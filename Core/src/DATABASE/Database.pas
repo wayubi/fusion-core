@@ -101,17 +101,55 @@ begin
 	DebugOut.Lines.Add('Map data loading...');
 	Application.ProcessMessages;
 
-        if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
+        if FindFirst(AppPath + 'map\*.af2', $27, sr) = 0 then begin
 		repeat
 
                         afm_compressed := tzip.create(afm_compressed);
                         afm_compressed.Filename := AppPath+'map\'+sr.Name;
                         afm_compressed.Extract;
 
-                        sr.Name := StringReplace(sr.Name, '.afm', '.out',
+                        sr.Name := StringReplace(sr.Name, '.af2', '.out',
                           [rfReplaceAll, rfIgnoreCase]);
 
 			assignfile(afm,AppPath + 'map\' + sr.Name);
+			Reset(afm);
+			
+			ReadLn(afm,str);
+			if (str <> 'ADVANCED FUSION MAP') then begin
+                                MessageBox(Handle, PChar('Map Format Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+                                Application.Terminate;
+                                exit;
+                        end;
+                        
+			ReadLn(afm,str);
+			ReadLn(afm,xy.X,xy.Y);
+			CloseFile(afm);
+
+			if (xy.X < 0) or (xy.X > 511) or (xy.Y < 0) or (xy.Y > 511) then begin
+				MessageBox(Handle, PChar('Map Size Error : ' + sr.Name), 'eWeiss', MB_OK or MB_ICONSTOP);
+				Application.Terminate;
+				exit;
+			end;
+			//txtDebug.Lines.Add(Format('MapData: %s [%dx%d]', [sr.Name, xy.X, xy.Y]));
+			//Application.ProcessMessages;
+			ta := TMapList.Create;
+			ta.Name := LowerCase(ChangeFileExt(sr.Name, ''));
+                        ta.Ext := 'af2';
+			ta.Size := xy;
+			ta.Mode := 0;
+			MapList.AddObject(ta.Name, ta);
+
+                        deletefile(AppPath+'map\'+sr.Name);
+
+		until FindNext(sr) <> 0;
+		FindClose(sr);
+                afm_compressed.Free;
+        end;
+
+        if FindFirst(AppPath + 'map\*.afm', $27, sr) = 0 then begin
+		repeat
+
+                        assignfile(afm,AppPath + 'map\' + sr.Name);
 			Reset(afm);
 			
 			ReadLn(afm,str);
@@ -139,11 +177,8 @@ begin
 			ta.Mode := 0;
 			MapList.AddObject(ta.Name, ta);
 
-                        deletefile(AppPath+'map\'+sr.Name);
-
 		until FindNext(sr) <> 0;
 		FindClose(sr);
-                afm_compressed.Free;
         end;
 
         if FindFirst(AppPath + 'map\*.map', $27, sr) = 0 then begin

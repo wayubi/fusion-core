@@ -529,7 +529,7 @@ begin
 
         DebugOut.Lines.Add('');
 	DebugOut.Lines.Add('Startup Success.');
-        DebugOut.Lines.SaveToFile('StartupLog.txt');
+        //DebugOut.Lines.SaveToFile('StartupLog.txt');
 
         //DebugOut.Lines.LoadFromFile('Fusion.notice');
 
