@@ -1099,6 +1099,7 @@ Begin(* Proc sv3PacketProcess() *)
 							case td.Effect of
                                                                 0:
                                                                 begin
+
                                                                         UseUsableItem(tc, w);
 
                                                                         {Yggasdril Leaf}

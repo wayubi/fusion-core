@@ -4518,6 +4518,9 @@ begin
 	WFIFOB(38, 0);
 	tc.Socket.SendBuf(buf, 39);
 	tc.ItemSkill := True;
+
+    // To make sure that Leaf of Yggdrasil does not use up a blue gemstone.
+    if (tl.ID = 54) then tc.NoJamStone := True;
 end;
 
 //------------------------------------------------------------------------------
