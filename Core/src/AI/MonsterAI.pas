@@ -371,6 +371,8 @@ var
 begin
 
         //for i := 0 to 3 do begin
+{ChrstphrR 2004/04/26 -- tc is NOT passed, it's not created -- it doesn't exist
+the next few lines will -guarantee- an access violation will occur}
 
         if (assigned(ts.AData)) then begin
 
@@ -693,7 +695,9 @@ begin
 
         end;
 
-end;
+	{ChrstphrR - 2004/04/26 ensure that the dyn array is unset}
+	bb := NIL;
+end;//proc MobSkills()
 
 //------------------------------------------------------------------------------
 
