@@ -1,3 +1,4 @@
+- 05-04-04: SG&LOV damage Corrections [Eliot]
 - 05-04-04: Database unit - local unit proc LoadSummonLists [ChrstphrR]
 - 05-04-04: Bug fix #827 - thorough fix for bad data in summon_item.txt [ChrstphrR]
 - 05-04-04: Database unit - local unit function DataBaseFilesExist [ChrstphrR]
