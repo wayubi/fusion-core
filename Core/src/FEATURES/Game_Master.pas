@@ -1811,7 +1811,7 @@ Called when we're shutting down the server *only*
 
     function command_changeskill(tc : TChara; str : String) : String;
     var
-        i, j, k : Integer;
+        skill, level, k : Integer;
         sl : TStringList;
     begin
         Result := 'GM_CHANGESKILL Failure.';
@@ -1820,28 +1820,44 @@ Called when we're shutting down the server *only*
         sl.DelimitedText := Copy(str, 13, 256);
 
         if (sl.Count = 2) then begin
-            Val(sl.Strings[0], i, k);
-            if k <> 0 then Exit;
-            Val(sl.Strings[1], j, k);
-            if k <> 0 then Exit;
+            Val(sl.Strings[0], skill, k);
+            if k = 0 then begin
+                Val(sl.Strings[1], level, k);
+                if k = 0 then begin
 
-            if ((i >= 1) and (i <= 157)) or ((i >= 210) and (i <= MAX_SKILL_NUMBER)) then begin
-                if (j > tc.Skill[i].Data.MasterLV) then j := tc.Skill[i].Data.MasterLV;
-                tc.Plag := i;
-                tc.PLv := j;
-                tc.Skill[i].Plag := true;
-                SendCSkillList(tc);
-                CalcStat(tc);
-                SendCStat(tc);
+                    if ((skill >= 1) and (skill <= 157)) or ((skill >= 210) and (skill <= MAX_SKILL_NUMBER)) then begin
+                        if (level > tc.Skill[skill].Data.MasterLV) then level := tc.Skill[skill].Data.MasterLV;
+                        tc.Plag := skill;
+                        tc.PLv := level;
+                        tc.Skill[skill].Plag := true;
 
-                Result := 'GM_CHANGESKILL Success. Skill ' + IntToStr(i) + ' set to ' + IntToStr(j) + '.';
-            end else begin
-                Result := Result + ' Skill selection out of range [1-157,210-' + IntToStr(MAX_SKILL_NUMBER) + '].';
+                        SendCSkillList(tc);
+
+                        CalcStat(tc);
+
+                        SendCStat(tc);
+
+                        Result := 'GM_CHANGESKILL Success. Skill ' + tc.Skill[skill].Data.Name + ' set to level ' + IntToStr(level) + '.';
+                    end
+
+                    else begin
+                        Result := Result + ' Supplied skill ID is out of valid range <1-157,210-' + IntToStr(MAX_SKILL_NUMBER) + '>.';
+                    end;
+                end
+
+                else begin
+                    Result := Result + ' Supplied level must be a valid integer.';
+                end;
+            end
+
+            else begin
+                Result := Result + ' Supplied skill ID must be a valid integer.';
             end;
-        end else begin
-            Result := Result + ' Incomplete information.';
-        end;
+        end
 
+        else begin
+            Result := Result + ' Insufficient data. Format is <skill ID> <level>.';
+        end;
         sl.Free;
     end;
 
