@@ -2536,7 +2536,14 @@ begin
 			Bonus[4] := Bonus[4] + Param[4] * (2 + Skill[45].EffectLV) div 100;
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
-		if ((MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100) > 65535) then begin
+
+        try
+ 	        i := (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * HPTable[JIDFix] div 100) * (100 + Param[2]) div 100);
+        except
+        	i := 65536
+        end;
+        
+        if (i > 65535) then begin
 				MAXHP := 65535;
 		//end else if (JID = 23) and (MAXHP + (35 + BaseLV * 5 + ((1 + BaseLV) * BaseLV div 2) * 40 div 100) * (100 + Param[2]) div 100 > 65535) then begin
 			//  MAXHP := 65535;
@@ -2568,7 +2575,13 @@ begin
 			end;
 		end;
 
-		MAXSP := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
+        try
+        	i := MAXSP + BaseLV * SPTable[JIDFix] * (100 + Param[3]) div 100;
+        except
+        	i := 65535;
+        end;
+            
+		MAXSP := i;
 		// if JID = 23 then MAXSP := MAXSP + BaseLV * 2 * (100 + Param[3]) div 100;
 		MATK1 := Param[3] + (Param[3] div 7) * (Param[3] div 7);
 		MATK2 := Param[3] + (Param[3] div 5) * (Param[3] div 5);
@@ -2650,7 +2663,7 @@ begin
 			//if (JID = 23) then ADelay := 14*(WeaponASPDTable[0][WeaponType[0]] + WeaponASPDTable[0][WeaponType[1]]);
 		end;
 		i := ( ( ADelay * Param[1] div 500 ) * 2 + ADelay * Param[4] div 1000 );
-		if ADelay < i then ADelay := 200
+		if ADelay < i then ADelay := 10
 		else begin
 			ADelay := ADelay - i;
 			{if (JID = 23) then begin  //Super Novice ASPD
@@ -2675,7 +2688,7 @@ begin
 			if Skill[320].Tick > Tick then ADelay := ADelay * tc.Skill[291].Effect1 div 100;
 			if tc.DoppelgagnerASPD then ADelay := ADelay * 70 div 100;  {Doppelgagner Card}
 			if tc.LVL4WeaponASPD then ADelay := ADelay * 75 div 100;     {Level 4 kro new weapon aspd haste effect}
-			if ADelay < 200 then ADelay := 200;
+			if ADelay < 200 then ADelay := 10;
 		end;
 		ASpeed := ADelay div 2;
 
@@ -5943,8 +5956,9 @@ begin
 
 			//ベースレベルアップ
 			tc1.StatusPoint := tc1.StatusPoint + tc1.BaseLV div 5 + 3;
-			Inc(tc1.BaseLV);
+
 			if DisableLevelLimit or (tc1.BaseLV < 99) then begin
+			Inc(tc1.BaseLV);
 				tc1.BaseEXP := tc1.BaseEXP - tc1.BaseNextEXP;
 				if (tc1.BaseEXP >= tc1.BaseNextEXP) and (not DisableLevelLimit) then begin
 					try
@@ -5956,7 +5970,9 @@ begin
 			end else begin
 				tc1.BaseEXP := 0;
 			end;
-			tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
+
+            if (ExpTable[0][tc1.BaseLV] = 0) then tc1.BaseNextEXP := 999999999
+            else tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
 
 		end;
 		SendCStat1(tc1, 0, $000b, tc1.BaseLV);

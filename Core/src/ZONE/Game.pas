@@ -690,7 +690,7 @@ Begin(* Proc sv3PacketProcess() *)
 							if b = 7 then tc.AMode := 2 else tc.AMode := 1;
 							tc.ATarget := ts.ID;
 							tc.AData := ts;
-							if tc.ATick + tc.ADelay - 200 < timeGetTime() then
+							if tc.ATick + (tc.ADelay - 200) < timeGetTime() then
 								tc.ATick := timeGetTime() - tc.ADelay + 200;
 						end;
 					end else begin

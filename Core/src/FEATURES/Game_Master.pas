@@ -32,6 +32,7 @@ var
     GM_SKILLPOINT : Byte;
     GM_SKILLALL : Byte;
     GM_STATALL : Byte;
+    GM_SUPERSTATS : Byte;
     GM_ZENY : Byte;
     GM_CHANGESKILL : Byte;
     GM_MONSTER : Byte;
@@ -133,6 +134,7 @@ var
     function command_skillpoint(tc : TChara; str : String) : String;
     function command_skillall(tc : TChara) : String;
     function command_statall(tc : TChara) : String;
+    function command_superstats(tc : TChara) : String;
     function command_zeny(tc : TChara; str : String) : String;
     function command_changeskill(tc : TChara; str : String) : String;
     function command_monster(tc : TChara; str : String) : String;
@@ -207,6 +209,7 @@ implementation
         GM_SKILLPOINT := StrToIntDef(sl.Values['SKILLPOINT'], 1);
         GM_SKILLALL := StrToIntDef(sl.Values['SKILLALL'], 1);
         GM_STATALL := StrToIntDef(sl.Values['STATALL'], 1);
+        GM_SUPERSTATS := StrToIntDef(sl.Values['SUPERSTATS'], 1);
         GM_ZENY := StrToIntDef(sl.Values['ZENY'], 1);
         GM_CHANGESKILL := StrToIntDef(sl.Values['CHANGESKILL'], 1);
         GM_MONSTER := StrToIntDef(sl.Values['MONSTER'], 1);
@@ -318,6 +321,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
         ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
         ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
+        ini.WriteString('Fusion GM Commands', 'SUPERSTATS', IntToStr(GM_SUPERSTATS));
         ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
         ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
         ini.WriteString('Fusion GM Commands', 'MONSTER', IntToStr(GM_MONSTER));
@@ -431,6 +435,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
             else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
             else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
+            else if ( (copy(str, 1, length('superstats')) = 'superstats') and (check_level(tc.ID, GM_SUPERSTATS)) ) then error_msg := command_superstats(tc)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
             else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
             else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
@@ -971,7 +976,7 @@ Called when we're shutting down the server *only*
         oldlevel := tc.BaseLV;
         Val(Copy(str, 8, 256), i, k);
 
-        if (k = 0) and (i >= 1) and (i <= 255) and (i <> tc.BaseLV) then begin
+        if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc.BaseLV) then begin
             if tc.BaseLV > i then begin
                 tc.BaseLV := i;
 
@@ -995,6 +1000,7 @@ Called when we're shutting down the server *only*
                 end;
             end;
 
+            if (tc.BaseNextEXP = 0) then tc.BaseNextEXP := 999999999;
             tc.BaseEXP := tc.BaseNextEXP - 1;
             tc.BaseNextEXP := ExpTable[0][tc.BaseLV];
 
@@ -1020,7 +1026,7 @@ Called when we're shutting down the server *only*
         oldlevel := tc.JobLV;
         Val(Copy(str, 8, 256), i, k);
 
-        if (k = 0) and (i >= 1) and (i <= 99) and (i <> tc.JobLV) then begin
+        if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc.JobLV) then begin
             tc.JobLV := i;
 
             for i := 1 to MAX_SKILL_NUMBER do begin
@@ -1033,6 +1039,7 @@ Called when we're shutting down the server *only*
 
             SendCSkillList(tc);
 
+            if (tc.JobNextEXP = 0) then tc.JobNextEXP := 999999999;
             tc.JobEXP := tc.JobNextEXP - 1;
 
             if tc.JID < 13 then begin
@@ -1072,7 +1079,7 @@ Called when we're shutting down the server *only*
             if(i >= 0) and (i <= 5) then begin
                 Val(sl[1], j, k);
 
-                if(j >= 1) and (j <= 99) then begin
+                if(j >= 1) and (j <= 32767) then begin
                     tc.ParamBase[i] := j;
                     CalcStat(tc);
                     SendCStat(tc);
@@ -1152,6 +1159,24 @@ Called when we're shutting down the server *only*
         SendCStat1(tc, 0, $0009, tc.StatusPoint);
 
         Result := 'GM_STATALL Success.';
+    end;
+
+    function command_superstats(tc : TChara) : String;
+    var
+        i : Integer;
+    begin
+        Result := 'GM_SUPERSTATS Failure.';
+
+        for i := 0 to 5 do begin
+            tc.ParamBase[i] := 32767;
+        end;
+
+        tc.StatusPoint := 1000;
+        CalcStat(tc);
+        SendCStat(tc);
+        SendCStat1(tc, 0, $0009, tc.StatusPoint);
+
+        Result := 'GM_SUPERSTATS Success.';
     end;
 
     function command_zeny(tc : TChara; str : String) : String;
@@ -2096,7 +2121,7 @@ Called when we're shutting down the server *only*
 
                 oldlevel := tc1.BaseLV;
 
-                if (k = 0) and (i >= 1) and (i <= 255) and (i <> tc1.BaseLV) then begin
+                if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc1.BaseLV) then begin
                     if tc1.BaseLV > i then begin
                         tc1.BaseLV := i;
 
@@ -2120,6 +2145,7 @@ Called when we're shutting down the server *only*
                         end;
                     end;
 
+                    if (tc1.BaseNextEXP = 0) then tc1.BaseNextEXP := 999999999;
                     tc1.BaseEXP := tc1.BaseNextEXP - 1;
                     tc1.BaseNextEXP := ExpTable[0][tc1.BaseLV];
 
@@ -2166,7 +2192,7 @@ Called when we're shutting down the server *only*
 
                 oldlevel := tc1.JobLV;
 
-                if (k = 0) and (i >= 1) and (i <= 99) and (i <> tc1.JobLV) then begin
+                if (k = 0) and (i >= 1) and (i <= 32767) and (i <> tc1.JobLV) then begin
                     tc1.JobLV := i;
 
                     for i := 1 to MAX_SKILL_NUMBER do begin
@@ -2179,6 +2205,7 @@ Called when we're shutting down the server *only*
 
                     SendCSkillList(tc1);
 
+                    if (tc1.JobNextEXP = 0) then tc1.JobNextEXP := 999999999;
                     tc1.JobEXP := tc1.JobNextEXP - 1;
 
                     if tc1.JID < 13 then begin
@@ -2293,14 +2320,14 @@ Called when we're shutting down the server *only*
     end;
 
     function command_athena_die(tc : TChara) : String;
-      var
-        tm : TMap;
-      begin
-		Result := 'GM_ATHENA_DIE Success.';
+    var
+    	tm : TMap;
+    begin
+    	Result := 'GM_ATHENA_DIE Success.';
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
         CharaDie(tm, tc, 1);
-      end;
+    end;
       
     function command_athena_help(tc : TChara) : String;
     var
