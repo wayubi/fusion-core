@@ -1006,8 +1006,8 @@ type TParty = class
 	Member    :array[0..11] of TChara;//メンバー
 	EXP       :Cardinal; //経験値分配用
 	JEXP      :Cardinal; //経験値分配用
-        PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
-        PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
+  PartyBard :array[0..2] of TChara; {Tracks Who the Party's Bard is}
+  PartyDancer :array[0..2] of TChara; {Tracks Who the Party's Dancer is}
 end;
 {パーティー機能追加ココまで}
 //------------------------------------------------------------------------------
@@ -9159,7 +9159,10 @@ Destructor TItem.Destroy;
 Begin
   inherited;
 
- 	Data.Free;
+// 	Data.Free;
+// CRW - TItem doesn't have responsibility for this class,
+//  treat it only as a reference, it will be freed in ItemDB
+ 	Data := NIL;
 End;(*- TItem.Destroy ---------------*)
 
 
@@ -9180,6 +9183,9 @@ begin
 		Item[i] := TItem.Create;
   isSummon := False;
   isLooting := False;
+
+  //CRW - nil out Pointer for AData
+  AData := NIL;
 end;
 
 destructor TMob.Destroy;
