@@ -9,7 +9,7 @@ var
     SKILL_TYPE : Byte;
 
     { Initialization Procedures }
-    procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
+    procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0; UseSP : Boolean = True);
 
     { Finalization Procedures }
     procedure process_effect(tc : TChara; success : Integer; Tick : Cardinal);
@@ -41,7 +41,7 @@ implementation
 uses
     Main, Skills;
 
-    procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0);
+    procedure parse_skills(tc : TChara; Tick : Cardinal; effect : Integer = 0; UseSP : Boolean = True);
     var
         success : Integer;
         targets : TStringList;
@@ -91,7 +91,7 @@ uses
             4: process_skill_splash_attack(tc, targets, Tick);
         end;
 
-        if ( (SKILL_TYPE = 1) and (success = -1) ) or (SKILL_TYPE = 2) or (SKILL_TYPE = 3) then begin
+        if (UseSP) and ( ( (SKILL_TYPE = 1) and (success = -1) ) or (SKILL_TYPE = 2) or (SKILL_TYPE = 3) ) then begin
             use_sp(tc, tc.MSkill, tc.MUseLV);
         end;
 

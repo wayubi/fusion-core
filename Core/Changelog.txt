@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.212 - June 30th, 2004
 --------------------------------------------------------------------------------
+- 06-24-04: Removed DarkHelmet's "Skill Not Coded" Debugs. Don't confuse people, DH. [AlexKreuz]
+- 06-24-04: Fixed #981 - Gungnir's Bash should not use SP. [AlexKreuz]
 - 06-24-04: Added Monster Skills Cloaking and Grimtooth. [Darkhelmet]
 - 06-24-04: Fixed Monster Damage Calculations for Skills vs Element. [Darkhelmet]
 - 06-24-04: Fixed #983 - Monster FLEE miscalculated. VIT, not AGI, affected FLEE. [AlexKreuz]

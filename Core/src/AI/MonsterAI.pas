@@ -726,7 +726,7 @@ something in it}
                         dmg[0] := dmg[0] * tc.Skill[202].Data.Data1[ts.MLevel] div 100;
                         SendMSkillAttack(tm, tc, ts, Tick, 1);
                 end;
-                else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters');
+                else //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
             end;
         end;
 
@@ -841,7 +841,7 @@ begin
                           debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Venom Dust')
                         end; }
 
-                        else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters')
+                        else //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
                 end;  //end case
         //end;
 end;
@@ -999,7 +999,7 @@ with ts do begin
                     WFIFOB(6, j);
                     SendBCmd(tm, ts.Point, 7);
                   end;
-          else debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'PM Darkhelmet in the IRC to fix Skill ' + IntToStr(ts.MSkill) + ' for monsters')
+          else //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'Skill ' + IntToStr(ts.MSkill) + ' Is not coded')
         end;
 
         case ProcessType of

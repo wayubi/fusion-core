@@ -2513,7 +2513,7 @@ begin
 			end;//case
 
 			tc.MUseLV := Random(10) + 1;
-			SkillEffect(tc, Tick);
+			SkillEffect(tc, Tick, False);
 			Exit;//safe 2004/04/27
 		end;
 
@@ -5840,7 +5840,7 @@ begin
 
     	{ Alex: For passsive skills also. We want to
         place all skill effects into one area. }
-        parse_skills(tc, Tick, 1);
+        parse_skills(tc, Tick, 1, True);
 
 	with tc do begin
 		//HPSP‰ñ•œˆ—

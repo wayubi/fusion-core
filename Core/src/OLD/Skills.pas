@@ -45,7 +45,8 @@ uses
 
 	Procedure SkillEffect(
 			tc   : TChara;
-			Tick : Cardinal
+			Tick : Cardinal;
+            UseSP : Boolean = True
 		);
 
 	Procedure FindTargetsInAttackRange(
@@ -104,7 +105,8 @@ Revisions:
 *-----------------------------------------------------------------------------*)
 Procedure SkillEffect(
 		tc   : TChara;
-		Tick : Cardinal
+		Tick : Cardinal;
+        UseSP : Boolean = True
 	);
 Var
 	j,k,m,b         : Integer;
@@ -174,7 +176,7 @@ Begin
         the reason being that one skill function should
         be used for both types of targets.
         - Placed here after all declarations for safety. }
-        parse_skills(tc, Tick, 0);
+        parse_skills(tc, Tick, 0, UseSP);
 
 		if MTargetType = 0 then begin //Target is a monster
 			ts := tc.AData;
