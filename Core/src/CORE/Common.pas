@@ -1131,11 +1131,11 @@ const
 	 90, 86, 24,  6, 30,102,  8,  4,   8,  4, 14, 10, -1,  6,  2,  6, // 0x0190
 		3,  3, 35,  5, 11, 26, -1,  4,   4,  6, 10, 12,  6, -1,  4,  4, // 0x01a0
 
-// Colus, 20031216: Updated packet lengths
+// Colus, 20031218: Updated packet lengths
    11,  7, -1, 67, 12, 18, 114, 6,   3,  6, 26, 26, 26, 26,  2,  3, // 0x01b0
     2, 14, 10, -1, 22, 22,  4,  2,  13, 97,  0,  9,  9,  0,  0,  0, // 0x01c0
-    8,  0, 10, 35,  6,  8,  4, 11,  54, 53, 60,  2, -1, 47,  0,  0, // 0x01d0
-    0,  8,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0, 33,  0, // 0x01e0
+    8,  0, 10, 35,  6,  8,  4, 11,  54, 53, 60,  2, -1, 47, 33,  0, // 0x01d0
+    0,  8,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0, // 0x01e0
     0,  0,  0,  0,  7,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0, // 0x01f0
 
 // Previous packet lengths
@@ -3389,7 +3389,7 @@ end;
 //------------------------------------------------------------------------------
 procedure SendCSkillAtk1(tm:TMap; tc:TChara; ts:TMob; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
 begin
-	WFIFOW( 0, $0114);
+	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
 	WFIFOL( 8, ts.ID);
@@ -3397,18 +3397,18 @@ begin
 	WFIFOL(16, tc.aMotion);
 	WFIFOL(20, ts.Data.dMotion);
 	WFIFOL(24, dmg);
-	WFIFOW(26, tc.MUseLV);
-	WFIFOW(28, k);
-	if PType <> 0 then WFIFOB(30, PType)
-	else if k = 1 then WFIFOB(30, 6)
-	else               WFIFOB(30, 8);
+	WFIFOW(28, tc.MUseLV);
+	WFIFOW(30, k);
+	if PType <> 0 then WFIFOB(32, PType)
+	else if k = 1 then WFIFOB(32, 6)
+	else               WFIFOB(32, 8);
 	if ts.Stat1 = 5 then dmg := dmg * 2; //レックス_エーテルナ
-	SendBCmd(tm, tc.Point, 31);
+	SendBCmd(tm, tc.Point, 33);
 end;
 //------------------------------------------------------------------------------
 procedure SendCSkillAtk2(tm:TMap; tc:TChara; tc1:TChara; Tick:cardinal; dmg:Integer; k:byte; PType:byte = 0);
 begin
-	WFIFOW( 0, $0114);
+	WFIFOW( 0, $01de);
 	WFIFOW( 2, tc.MSkill);
 	WFIFOL( 4, tc.ID);
 	WFIFOL( 8, tc1.ID);
@@ -3416,13 +3416,13 @@ begin
 	WFIFOL(16, tc.aMotion);
 	WFIFOL(20, tc1.dMotion);
 	WFIFOL(24, dmg);
-	WFIFOW(26, tc.MUseLV);
-	WFIFOW(28, k);
-	if PType <> 0 then WFIFOB(30, PType)
-	else if k = 1 then WFIFOB(30, 6)
-	else               WFIFOB(30, 8);
+	WFIFOW(28, tc.MUseLV);
+	WFIFOW(30, k);
+	if PType <> 0 then WFIFOB(32, PType)
+	else if k = 1 then WFIFOB(32, 6)
+	else               WFIFOB(32, 8);
 	if tc1.Stat1 = 5 then dmg := dmg * 2;
-	SendBCmd(tm, tc.Point, 31);
+	SendBCmd(tm, tc.Point, 33);
 end;
 
 //------------------------------------------------------------------------------

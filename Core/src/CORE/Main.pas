@@ -9516,18 +9516,18 @@ begin
 								dmg[0] := dmg[0] * tn.Count;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, $74);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, tc2.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, tc2.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
 {:119}
@@ -9542,18 +9542,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[18].Data.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								//ダメージパケ送信
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 18);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, tc2.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, 0);
 								WFIFOL(20, tc2.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, 1);
+								WFIFOL(24, dmg[0]);
 								WFIFOW(28, 1);
-								WFIFOB(30, 4);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOW(30, 1);
+								WFIFOB(32, 4);
+								SendBCmd(tm, tn.Point, 33);
 								//ノックバック処理
 								{if (dmg[0] > 0) and (ts1.Data.Race <> 1) then begin
 									SetLength(bb, 2);
@@ -9597,18 +9597,18 @@ begin
 									if dmg[0] < 0 then dmg[0] := 0;
 									tn.Tick := Tick;
 									//ダメージパケ送信
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 79);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, tc2.ID);
 									WFIFOL(12, Tick);
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, tc2.dMotion);
-									WFIFOW(24, dmg[0]);
-									WFIFOW(26, tn.Count);
-									WFIFOW(28, tl.Data2[tn.Count]);
-									WFIFOB(30, 8);
-									SendBCmd(tm, tn.Point, 31);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.Count);
+									WFIFOW(30, tl.Data2[tn.Count]);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tn.Point, 33);
 									DamageProcess2(tm, tn.CData, tc2, dmg[0], Tick);
 							end;}
 {追加:119ココまで}
@@ -9621,7 +9621,7 @@ begin
 									if dmg[0] < 1 then dmg[0] := 1;
 									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 85);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, tc2.ID);
@@ -9629,10 +9629,10 @@ begin
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, tc2.dMotion);
 									WFIFOL(24, dmg[0]);
-									WFIFOW(26, tn.MUseLV);
-									WFIFOW(28, tl.Data2[tn.MUseLV]);
-									WFIFOB(30, 8);
-									SendBCmd(tm, tn.Point, 31);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tn.Point, 33);
 									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
 									if c1 = (sl2.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
@@ -9652,18 +9652,18 @@ begin
 								//無理やりエフェクトを出してみる
 								{SetSkillUnit(tm,tc1.ID,tn.Point,Tick,$88,0,4000);}
 
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, tn.JID);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, tc2.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, tc2.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, tl.Data2[tn.Count]);
-								WFIFOB(30, 8);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, tl.Data2[tn.Count]);
+								WFIFOB(32, 8);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess2(tm,tc1,tc2,dmg[0],Tick);
 							end;
 
@@ -9676,18 +9676,18 @@ begin
 									if dmg[0] < 1 then dmg[0] := 1;
 									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 83);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, tc2.ID);
 									WFIFOL(12, Tick);
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, tc2.dMotion);
-									WFIFOW(24, dmg[0]);
-									WFIFOW(26, tn.MUseLV);
-									WFIFOW(28, tl.Data2[tn.MUseLV]);
-									WFIFOB(30, 8);
-                                                                        SendBCmd(tm, tn.Point, 31);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
 									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
 									if c1 = (sl2.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
@@ -9703,18 +9703,18 @@ begin
                                                                         end else begin
 						                                tc2.Speed := tc2.Speed * 2;
                                                                         end;
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 92);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, ts1.ID);
 									WFIFOL(12, Tick);
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, tc2.dMotion);
-									WFIFOW(24, dmg[0]);
-									WFIFOW(26, tn.MUseLV);
-									WFIFOW(28, tl.Data2[tn.MUseLV]);
-									WFIFOB(30, 8);
-                                                                        SendBCmd(tm, tn.Point, 31);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
 									if c1 = (sl2.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
 										if tn.Count = 3 then tn.Tick := Tick
@@ -9784,18 +9784,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 116);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, tc2.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, tc2.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess2(tm, tc1, tc2, dmg[0], tick);
 							end;
 {:119}
@@ -9881,18 +9881,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 123);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
 							end;}
 {:119}
@@ -9949,18 +9949,18 @@ begin
 								if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
 
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, $46);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
                                                         end;
                                                      end;
@@ -9972,18 +9972,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, $74);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
 							end;
 {:119}
@@ -9998,18 +9998,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tn.CData.Skill[18].Data.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								//ダメージパケ送信
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 18);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, 0);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, 1);
+								WFIFOL(24, dmg[0]);
 								WFIFOW(28, 1);
-								WFIFOB(30, 4);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOW(30, 1);
+								WFIFOB(32, 4);
+								SendBCmd(tm, tn.Point, 33);
 								//ノックバック処理
 								if (dmg[0] > 0) and (ts1.Data.Race <> 1) then begin
 									SetLength(bb, 2);
@@ -10055,18 +10055,18 @@ begin
 									if dmg[0] < 0 then dmg[0] := 0;
 									tn.Tick := Tick;
 									//ダメージパケ送信
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 79);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, ts1.ID);
 									WFIFOL(12, Tick);
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, ts1.Data.dMotion);
-									WFIFOW(24, dmg[0]);
-									WFIFOW(26, tn.Count);
-									WFIFOW(28, tl.Data2[tn.Count]);
-									WFIFOB(30, 8);
-									SendBCmd(tm, tn.Point, 31);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.Count);
+									WFIFOW(30, tl.Data2[tn.Count]);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tn.Point, 33);
 									DamageProcess1(tm, tn.CData, ts1, dmg[0], Tick);
 								end;
 							end;
@@ -10081,7 +10081,7 @@ begin
 									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 85);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, ts1.ID);
@@ -10089,10 +10089,10 @@ begin
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, ts1.Data.dMotion);
 									WFIFOL(24, dmg[0]);
-									WFIFOW(26, tn.MUseLV);
-									WFIFOW(28, tl.Data2[tn.MUseLV]);
-									WFIFOB(30, 8);
-									SendBCmd(tm, tn.Point, 31);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+									SendBCmd(tm, tn.Point, 33);
 									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
 									if c = (sl.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
@@ -10113,18 +10113,18 @@ begin
 								//無理やりエフェクトを出してみる
 								{SetSkillUnit(tm,tc1.ID,tn.Point,Tick,$87,0,4000);}
 
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, tn.JID);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, tl.Data2[tn.Count]);
-								WFIFOB(30, 8);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, tl.Data2[tn.Count]);
+								WFIFOB(32, 8);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm,tc1,ts1,dmg[0],Tick);
 							end;
                                                 $88: //Meteor
@@ -10137,18 +10137,18 @@ begin
 									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-									WFIFOW( 0, $0114);
+									WFIFOW( 0, $01de);
 									WFIFOW( 2, 83);
 									WFIFOL( 4, tn.ID);
 									WFIFOL( 8, ts1.ID);
 									WFIFOL(12, Tick);
 									WFIFOL(16, tc1.aMotion);
 									WFIFOL(20, ts1.Data.dMotion);
-									WFIFOW(24, dmg[0]);
-									WFIFOW(26, tn.MUseLV);
-									WFIFOW(28, tl.Data2[tn.MUseLV]);
-									WFIFOB(30, 8);
-                                                                        SendBCmd(tm, tn.Point, 31);
+									WFIFOL(24, dmg[0]);
+									WFIFOW(28, tn.MUseLV);
+									WFIFOW(30, tl.Data2[tn.MUseLV]);
+									WFIFOB(32, 8);
+                                                                        SendBCmd(tm, tn.Point, 33);
 									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
 									if c = (sl.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
@@ -10252,18 +10252,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 116);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
 							end;
 {:119}
@@ -10349,18 +10349,18 @@ begin
 								dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 123);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
 							end;
                                                 $6E:   {Hammer Fall}
@@ -10377,18 +10377,18 @@ begin
 								DamageCalc1(tm, tn.CData,ts1, Tick, 0, tn.CData.Skill[229].Data.Data2[tn.MUseLV],tl.Element,0);
 								if dmg[0] < 0 then dmg[0] := 0;
 
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 18);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, 0);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, 1);
+								WFIFOL(24, dmg[0]);
 								WFIFOW(28, 1);
-								WFIFOB(30, 4);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOW(30, 1);
+								WFIFOB(32, 4);
+								SendBCmd(tm, tn.Point, 33);
 
 								if (dmg[0] > 0) and (ts1.Data.Race <> 1) then begin
 									SetLength(bb, 2);
@@ -10427,18 +10427,18 @@ begin
 								dmg[0] := dmg[0] * tn.Count;
 								if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 								tn.Tick := Tick;
-								WFIFOW( 0, $0114);
+								WFIFOW( 0, $01de);
 								WFIFOW( 2, 116);
 								WFIFOL( 4, tn.ID);
 								WFIFOL( 8, ts1.ID);
 								WFIFOL(12, Tick);
 								WFIFOL(16, tc1.aMotion);
 								WFIFOL(20, ts1.Data.dMotion);
-								WFIFOW(24, dmg[0]);
-								WFIFOW(26, tn.Count);
-								WFIFOW(28, 1);
-								WFIFOB(30, 5);
-								SendBCmd(tm, tn.Point, 31);
+								WFIFOL(24, dmg[0]);
+								WFIFOW(28, tn.Count);
+								WFIFOW(30, 1);
+								WFIFOB(32, 5);
+								SendBCmd(tm, tn.Point, 33);
 								DamageProcess1(tm, tc1, ts1, dmg[0], tick);
                                                         end;
                                                 $F1:    {Bio Cannabalize}
