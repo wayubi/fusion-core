@@ -1,6 +1,11 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-23-03: Added period of no HP/SP Recovery for 5m after Extremity [Colus]
+- 12-23-03: Added no HP/SP Recovery during Critical Explosion [Colus]
+- 12-23-03: Fixed Steel Body, now DEF/MDEF = 90 instead of +90 [Colus]
+- 12-23-03: Fixed Steel Body, now requires 5 Spheres [Colus]
+- 12-23-03: Added Boolean for NoHPRecovery [Colus]
 - 12-23-03: Added Boolean for NoSPRecovery [Darkhelmet]
 - 12-23-03: Updated Packet Length Table [Colus]
 - 12-23-03: Fixed Extremity Fist, Now Moves Player Back [Darkhelmet]
