@@ -3,7 +3,14 @@ unit Game_Master;
 interface
 
 uses
-    IniFiles, Classes, SysUtils, Common, List32, MMSystem, Globals, PlayerData;
+    {Windows}
+    {$IFDEF MSWINDOWS}
+    MMSystem,
+    {$ENDIF}
+    {Common}
+    IniFiles, Classes, SysUtils,
+    {Fusion}
+    Common, List32, Globals, PlayerData;
 
 var
     GM_ALIVE : Byte;

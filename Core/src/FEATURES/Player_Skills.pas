@@ -3,7 +3,14 @@ unit Player_Skills;
 interface
 
 uses
-    IniFiles, Classes, SysUtils, Common, List32, MMSystem, Math, Path, Windows;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+    Windows, MMSystem,
+    {$ENDIF}
+    {Common}
+    IniFiles, Classes, SysUtils, Math,
+    {Fusion}
+    Common, List32, Path;
 
 var
     SKILL_TYPE : Byte;

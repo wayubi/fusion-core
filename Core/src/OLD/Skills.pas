@@ -36,8 +36,12 @@ v0.1 2004/05/31
 interface
 
 uses
-	{Delphi VCL Units}
-	Windows, Classes,
+	{Windows Delphi VCL Units}
+    {$IFDEF MSWINDOWS}
+	Windows,
+    {$ENDIF}
+    {Common}
+    Classes,
 	{Fusion Units}
 	Common, Skill_Constants, Player_Skills, Globals,
 	{3rd Party Units}

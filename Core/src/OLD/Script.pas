@@ -5,7 +5,14 @@ unit Script;
 interface
 
 uses
-	Windows, Types, SysUtils, Common, MMSystem, Classes, Globals;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows,  MMSystem,
+    {$ENDIF}
+    {Common}
+    Types, SysUtils, Classes,
+    {Fusion}
+    Common, Globals;
 
 //==============================================================================
 // ä÷êîíËã`

@@ -6,9 +6,15 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, ScktComp;
-	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp,
-	GlobalLists,
-	List32;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, StdCtrls,{replace with QStdCtrls soon and place in common}
+    MMSystem, ScktComp,
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils,
+    {Fusion}
+	GlobalLists, List32;
 
 const
 	RELEASE_VERSION = '1.212 E -- R.E.E.D Alpha 5 Release';

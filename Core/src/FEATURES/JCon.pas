@@ -3,7 +3,12 @@ unit JCon;
 interface
 
 uses
-	SysUtils, WinSock,
+    {$IFDEF MSWINDOWS}
+	WinSock,
+    {$ENDIF}
+    {Common}
+    SysUtils,
+    {Fusion}
 	Common, Database, WeissINI, Globals, Game_Master, PlayerData;
 
 	procedure JCon_Accounts_Load();

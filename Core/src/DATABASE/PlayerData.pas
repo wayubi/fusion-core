@@ -3,7 +3,12 @@ unit PlayerData;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+    Windows, MMSystem, Forms, {replace with QForms and move to common}
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils, IniFiles;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');

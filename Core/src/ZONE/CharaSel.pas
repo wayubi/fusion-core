@@ -6,7 +6,12 @@ interface
 
 uses
 //Windows, Forms, Classes, SysUtils, Math, ScktComp, Common;
-	Windows, SysUtils, ScktComp, Common, SQLData, FusionSQL;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, ScktComp,
+    {$ENDIF}
+    {Shared Components}
+    SysUtils, Common, SQLData, FusionSQL;
 
 //==============================================================================
 // ä÷êîíËã`

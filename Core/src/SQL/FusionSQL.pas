@@ -3,7 +3,14 @@ unit FusionSQL;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, MMSystem, Forms,
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr,
+    {Fusion}
+    Common;
 
 	function MySQL_Query(sqlcmd: String) : Boolean;
 	function Assign_AccountID() : cardinal;

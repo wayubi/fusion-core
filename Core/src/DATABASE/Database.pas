@@ -5,7 +5,14 @@ unit Database;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Globals;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, MMSystem, Forms, {Replace with QForms soon and place in common}
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils, IniFiles,
+    {Fusion}
+    Globals;
 
 //==============================================================================
 // ä÷êîíËã`

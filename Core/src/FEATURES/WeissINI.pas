@@ -3,7 +3,14 @@ unit WeissINI;
 interface
 
 uses
-	Common, IniFiles, SysUtils, WinSock;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+    WinSock,
+    {$ENDIF}
+    {Common}
+    IniFiles, SysUtils,
+    {Fusion}
+	Common;
 
 	procedure weiss_ini_save();
 

@@ -3,7 +3,14 @@ unit MonsterAI;
 interface
 
 uses
-	Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp, List32, Common, Path;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, ScktComp, MMSystem, StdCtrls, {Replace with QStdCtrls and place in common soon}
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils,
+    {Fusion}
+    List32, Common, Path;
 
         procedure CalcAI(tm:TMap; ts:TMob; Tick:Cardinal);
         procedure MobSpawn(tm:TMap; ts:TMob; Tick:cardinal);

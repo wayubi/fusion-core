@@ -3,8 +3,13 @@ program Weiss;
 {$R 'manifest.res' 'manifest.rc'}
 
 uses
+  {$IFDEF MSWINDOWS}
   madExcept,
   Forms,
+  {$ENDIF}
+  {$IFDEF LINUX}
+  QForms,
+  {$ENDIF}
   Main in 'Main.pas' {frmMain},
   List32 in '..\lib\List32.pas',
   Common in 'Common.pas',

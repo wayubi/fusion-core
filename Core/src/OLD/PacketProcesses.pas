@@ -2,9 +2,14 @@ unit PacketProcesses;
 
 interface
 uses
-    Windows, StdCtrls, MMSystem, Classes, SysUtils, ScktComp,
-	GlobalLists, Common,
-	List32;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+    Windows, MMSystem, ScktComp, StdCtrls, {replace with QStdCtrls and move to common soon}
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils,
+    {Fusion}
+	GlobalLists, Common, List32;
 
 procedure SendSkillDamage(tm : TMap; skill_ID : integer; src_ID: cardinal; destination_ID : Cardinal; Tick : Cardinal; src_speed:integer; dst_speed:integer; param1:integer; param2:integer; param3:integer; Npc_type:byte; Point: TPoint);
 procedure UpdateGroundEffect(tm : TMap; dst_ID:cardinal; src_ID:cardinal; Point:TPoint; Skill_Type:byte; fail:byte; Socket: TCustomWinSocket = nil);

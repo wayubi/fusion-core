@@ -5,8 +5,14 @@ unit Game;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, Math, SysUtils, ScktComp,
-	Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, MMSystem, ScktComp, Forms, {Replace with QForms soon, and place in common}
+    {$ENDIF}
+    {Common}
+    Classes, Math, SysUtils,
+    {Fusion}
+    Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData;
 
 //==============================================================================
 // ä÷êîíËã`

@@ -3,9 +3,14 @@ unit Globals;
 interface
 
 uses
-    MMSystem, Classes, SysUtils,
-    Common, SQLData,
-    Zip, List32, PlayerData;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+    MMSystem,
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils,
+    {Fusion}
+    Common, SQLData, Zip, List32, PlayerData;
 
     function check_attack_lag(tc : TChara) : Boolean;
 

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-05-04: Finished organizing USES for future linux development. [Tsusai]
 - 08-02-04: Organized Main's USES area for future linux development. [Tsusai]
 - 07-28-04: One area of mapunload is causeing server to restart like mad. Commented out. [Tsusai]
 - 07-28-04: Addition to map unloading [Darkhelmet]

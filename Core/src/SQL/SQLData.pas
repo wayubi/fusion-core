@@ -6,7 +6,14 @@ unit SQLData;
 interface
 
 uses
-	Windows, MMSystem, Forms, Classes, SysUtils, IniFiles, Common, DBXpress, DB, SqlExpr, StrUtils, FusionSQL;
+    {Windows VCL}
+    {$IFDEF MSWINDOWS}
+	Windows, MMSystem, StrUtils, Forms, {Replace with QForms and place in common}
+    {$ENDIF}
+    {Common}
+    Classes, SysUtils, IniFiles, DBXpress, DB, SqlExpr,
+    {Fusion}
+    Common, FusionSQL;
 
 //==============================================================================
 // ¹ý³Ì&º¯Êý
