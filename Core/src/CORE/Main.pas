@@ -5560,6 +5560,8 @@ begin
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 							StatCalc1(tc, ts, Tick);
                                         end;
+
+
                                         
 
       368:    //Sacrafice {temp still need to find out the effects so far it just does damage like bash
@@ -5598,6 +5600,7 @@ begin
            Exit;
            end;
            end;
+
 
         
           394:     {Arrow Shower}
@@ -5644,6 +5647,62 @@ begin
             Exit;
             end;
 
+            /// We can cheat and use Spear stab 
+           370:     //Palm Strike
+                                                 if tc.Skill[270].Tick > Tick then begin
+
+						                xy.X := ts.Point.X - Point.X;
+						                xy.Y := ts.Point.Y - Point.Y;
+						                if abs(xy.X) > abs(xy.Y) * 3 then begin
+							                //Knockback Distance?
+							                if xy.X > 0 then b := 6 else b := 2;
+							        end else if abs(xy.Y) > abs(xy.X) * 3 then begin
+
+								        if xy.Y > 0 then b := 0 else b := 4;
+								end else begin
+									if xy.X > 0 then begin
+									        if xy.Y > 0 then b := 7 else b := 5;
+								        end else begin
+									        if xy.Y > 0 then b := 1 else b := 3;
+							                end;
+						                end;
+
+						                //Calculate Damage
+						                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+						                if dmg[0] < 0 then dmg[0] := 0; //No Negative Damage
+
+						                //Send Attacking Packet
+						                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+
+						                //Begin Knockback
+						                if (dmg[0] > 0) then begin
+							                SetLength(bb, 6);
+							                bb[0] := 6;
+							                xy := ts.Point;
+							                DirMove(tm, ts.Point, b, bb);
+
+							                //Knockback Monster
+							                if (xy.X div 8 <> ts.Point.X div 8) or (xy.Y div 8 <> ts.Point.Y div 8) then begin
+								                with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+									                assert(IndexOf(ts.ID) <> -1, 'MobBlockDelete Error');
+									                Delete(IndexOf(ts.ID));
+								                end;
+								                tm.Block[ts.Point.X div 8][ts.Point.Y div 8].Mob.AddObject(ts.ID, ts);
+							                end;
+							                ts.pcnt := 0;
+
+							                //Update Coordinates of Monster
+							                UpdateMonsterLocation(tm, ts);
+						                end;
+
+						                if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							                StatCalc1(tc, ts, Tick);
+
+                                                        end else begin
+                                                          SendSkillError(tc, 0);
+                                                                MMode := 4;
+                                                                Exit;
+                                                        end;
 
         367: //Pressure
 
@@ -6187,7 +6246,7 @@ begin
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
-                                        
+
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                         dmg[0] := dmg[0];
                                         dmg[0] := dmg[0] + (75 div 100) * 60;
@@ -6196,13 +6255,89 @@ begin
                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                         tc.Skill[MSkill].Tick := Tick + 5000;
+                                        
+                                        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
 
-                                        //tc.MTick := Tick + 2000;
+                                        StatCalc1(tc, ts, Tick);
+                                        tc.MTick := Tick + 500;
+
+                                end;
+                                    273:  //Combo finsher
+                                if tc.spiritSpheres <> 0 then begin
+                                        ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                        if ts = nil then Exit;
+                                        ts.IsEmperium := False;
+                                        tc.AData := ts;
+                                        PassiveAttack := False;
+
+                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                        dmg[0] := dmg[0];
+                                        dmg[0] := dmg[0] + (75 div 100) * 60;
+                                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                        tc.Skill[MSkill].Tick := Tick + 5000;
+                                        if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+                                        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                        tc.spiritSpheres := tc.spiritSpheres - 1;
+                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                        StatCalc1(tc, ts, Tick);
+                                        tc.MTick := Tick + 500;
+
+                                end;
+                                    371:  //Tiger Crush
+                                 if tc.spiritSpheres <> 0 then begin
+                                        ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                        if ts = nil then Exit;
+                                        ts.IsEmperium := False;
+                                        tc.AData := ts;
+                                        PassiveAttack := False;
+
+                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                        dmg[0] := dmg[0];
+                                        dmg[0] := dmg[0] + (75 div 100) * 60;
+                                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                        tc.Skill[MSkill].Tick := Tick + 5000;
+                                        if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+                                        if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+                                        tc.spiritSpheres := tc.spiritSpheres - 1;
+                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                        StatCalc1(tc, ts, Tick);
+                                        tc.MTick := Tick + 500;
+
+                                end;
+                                     372:   //Chain Crush
+                                 if tc.spiritSpheres <> 0 then begin
+                                        ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
+                                        if ts = nil then Exit;
+                                        ts.IsEmperium := False;
+                                        tc.AData := ts;
+                                        PassiveAttack := False;
+
+                                        DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
+                                        dmg[0] := dmg[0];
+                                        dmg[0] := dmg[0] + (75 div 100) * 60;
+                                        if dmg[0] < 0 then dmg[0] := 0; //Negative Damage
+
+                                        SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 4);
+                                        DamageProcess1(tm, tc, ts, dmg[0], Tick);
+                                        tc.Skill[MSkill].Tick := Tick + 5000;
+                                        if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+                                        if tc.spiritSpheres <= 0 then tc.spiritSpheres := 0;
+                                        tc.spiritSpheres := tc.spiritSpheres - 2;
+                                        UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                        StatCalc1(tc, ts, Tick);
+
+                                        tc.MTick := Tick + 500;
 
                                 end;
 
-                                273:    {Combo Finish Effect}
-                                if tc.spiritSpheres <> 0 then begin
+                                {273:    {Combo Finish Effect}
+                                {if tc.spiritSpheres <> 0 then begin
                                                 PassiveAttack := False;
                                                 ts := tm.Mob.IndexOfObject(tc.ATarget) as TMob;
                                                 if ts = nil then Exit;
@@ -6262,7 +6397,7 @@ begin
 							ts.pcnt := 0;
 							//Update Monster Location
                                                         UpdateMonsterLocation(tm, ts);
-							
+
 						end;
 						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                         tc.spiritSpheres := tc.spiritSpheres - 1;
@@ -6270,7 +6405,7 @@ begin
 							StatCalc1(tc, ts, Tick);
 
                                                 tc.MTick := Tick + 2000;
-                                        end;
+                                        end; }
 
                                 266:    {Investigate}
                                 begin
@@ -7931,7 +8066,33 @@ begin
 
                                  273:   {Combo Finish Setup}
                                         begin
-                                                if (Skill[272].Tick > Tick) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                if (Skill[272].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                        PassiveAttack := True;
+                                                        tc.MTargetType := 0;
+                                                        SkillEffect(tc, Tick);
+                                                end else begin
+                                                        SendSkillError(tc, 0);
+                                                        MMode := 4;
+                                                        Exit;
+                                                end;
+
+                                        end;
+                                         371:   {Combo Finish Setup}
+                                        begin
+                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
+                                                        PassiveAttack := True;
+                                                        tc.MTargetType := 0;
+                                                        SkillEffect(tc, Tick);
+                                                end else begin
+                                                        SendSkillError(tc, 0);
+                                                        MMode := 4;
+                                                        Exit;
+                                                end;
+
+                                        end;
+                                         372:   {Combo Finish Setup}
+                                        begin
+                                                if (Skill[273].Tick > Tick) and (tc.spiritSpheres <> 0) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
                                                         PassiveAttack := True;
                                                         tc.MTargetType := 0;
                                                         SkillEffect(tc, Tick);
@@ -7999,8 +8160,9 @@ begin
 						ProcessType := 3;
 					end;
 
+
                                 //Item Skills
-                                
+
                                 291:  {Attack Speed Potions}
 					begin
 						tc1 := tc;
@@ -8334,6 +8496,11 @@ begin
           ProcessType := 0;
           end;
            237:
+          begin
+          tc1 := tc;
+          ProcessType := 0;
+          end;
+          378:
           begin
           tc1 := tc;
           ProcessType := 0;
