@@ -5476,12 +5476,6 @@ begin
 
 			//射程チェック
 			if (abs(tc.Point.X - ts.Point.X) <= tl.Range) and (abs(tc.Point.Y - ts.Point.Y) <= tl.Range) then begin
-			end else begin
-				if tc.MTick + 500 < Tick then begin
-					MMode := 4;
-					Exit;
-				end;
-			end;
 
 			case MSkill of  {Skill Used Against Monster}
 
@@ -8057,7 +8051,14 @@ begin
           end;
           end;
 
+			end else begin
+				if tc.MTick + 500 < Tick then begin
+					MMode := 4;
+					Exit;
+				end;
+			end;
 
+{TC1 BECOMES TARGET}
 
 
 		end else begin //MTargetType = 0
@@ -8073,13 +8074,6 @@ begin
 				Exit;
       end;
 				if (abs(Point.X - tc1.Point.X) <= tl.Range) and (abs(Point.Y - tc1.Point.Y) <= tl.Range) then begin
-				end else begin
-					if MTick + 500 < Tick then begin
-						MMode := 4;
-						Exit;
-					end;
-				end;
-
 
 			case tc.MSkill of
         //Assassin Skills
@@ -11235,7 +11229,18 @@ begin
 
                 end;
 {追加:119ココまで}
+
+
+                        end;
+
+                        
+			end else begin
+				if tc.MTick + 500 < Tick then begin
+					MMode := 4;
+					Exit;
 			end;
+			end;
+
 
            {if (tc1 <> nil) then begin
            if (tc1.Skill[225].Lv <> 0) then begin
