@@ -1651,8 +1651,12 @@ Option_MaxUsers   :word;
 Option_AutoSave   :word;
 Option_AutoBackup   :word;
 Option_WelcomeMsg :boolean;
-Option_MOTD       : Boolean;
-Option_MOTD_File  : string;
+
+Option_MOTD        : Boolean;//Master MOTD option
+Option_MOTD_Athena : Boolean;//Allows Athena-style MOTD message
+Option_MOTD_File   : string; //File for reading MOTD entries
+// If Athena style is chosen, the limit on the text is 1 line vs 4 without.
+
 Option_Pet_Capture_Rate :word;
 Option_GraceTime  :cardinal;
 Option_GraceTime_PvPG :cardinal;
@@ -10689,7 +10693,8 @@ Sends an MOTD (Message of the Day) to a newly joined user.
 Fills requirements for Feature Request #445 on the bugtracker.
 
 N.B. - To prevent massive floods of data, this routine will only send
-a maximum of 5 lines, each of max-length 195 bytes
+a maximum of 4 lines, each of max-length 195 bytes, unless the
+Option_MOTD_Athena flag is true -- in that case only one line is sent.
 
 N.B. - Trickiness - a Broadcast packet won't send more than one message
 unless the packet length is a fixed 200 bytes in size, AND the string
@@ -10702,8 +10707,14 @@ Pre:
 	NewChara must be a valid, non-nil Character
 	Option_MOTD already checked and is True
 	Option_MOTD_File exists.
+
 Post:
 	Server sends the lines from the MOTD file to the newly joined user.
+	If Option_MOTD_Athen is true, a self-message is sent as the MOTD - 1 line
+	if false, up to 4 lines are sent as an announcement to that new player.
+
+Revisions:
+2004/05/27 - Incorperated the Athena MOTD option. [ChrstphrR]
 *-----------------------------------------------------------------------------*)
 Procedure SendMOTD(
 		NewChara : TChara
@@ -10719,22 +10730,53 @@ Begin
 	//--
 	MOTD := TStringList.Create;
 	try
-		MOTD.LoadFromFile( AppPath + Option_MOTD_File );
+		try
+			MOTD.LoadFromFile( AppPath + Option_MOTD_File );
+		except
+			on EFOpenError do begin
+				//Okay, someone's writing to the file,
+				//or they've locked it and we can't read it...
+				//So.. we'll embarass them  :D
+				MOTD.Clear;
+				MOTD.Add('Message of the Day:');
+				MOTD.Add('The MOTD file is not accessible, or the admin has fallen asleep while before saving the file.');
+				MOTD.Add('blue(My theory is the admin has run off with one of the Prontera Kafra employee to Tahiti... *AGAIN*) /gg');
+				MOTD.Add('Contact the server admin, that is, if you can reach him or her in the first place! /pif');
+				//ChrstphrR - I guess we can consider this an "Easter egg".
+			end;
+		end;//try-except
+
 		if MOTD.Count > 0 then begin
 			Idx := MOTD.Count;
 			if Idx > 4 then
 				Idx := 4;
 			J := 0;
-			WFIFOS(4, '', 200);//pre-wipe the buffer used.
-			repeat
+			WFIFOS(4, '', 200);//pre-wipe the buffer used for 200 bytes.
+
+			if Option_MOTD_Athena then begin
+				// Athena style MOTD - self-message floating over user's head
+				MOTD[J] := '<MOTD> ' + MOTD[J];
 				Len := Length(MOTD[J]);
 				if Len > 195 then
 					MOTD[J] := Copy(MOTD[J],1,195);
-				WFIFOW(0, $009a);
+
+				WFIFOW(0, $008e);
+				WFIFOW(2, Len+5);
 				WFIFOS(4, MOTD[J], Len+1);//Len+1 -> adds null termination
-				Inc(J);
-				NewChara.Socket.SendBuf(buf, 200);
-			until (J >= Idx);
+				NewChara.Socket.SendBuf(buf, Len+5);
+			end else begin
+				// Broadcast style MOTD - 4 lines max, 195 char each
+				repeat
+					Len := Length(MOTD[J]);
+					if Len > 195 then
+						MOTD[J] := Copy(MOTD[J],1,195);
+
+					WFIFOW(0, $009a);
+					WFIFOS(4, MOTD[J], Len+1);//Len+1 -> adds null termination
+					Inc(J);
+					NewChara.Socket.SendBuf(buf, 200);
+				until (J >= Idx);
+			end;//if O_MOTD_A
 		end;//if
 	finally
 		MOTD.Free;

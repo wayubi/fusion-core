@@ -571,6 +571,7 @@ begin
 			Option_MOTD_File := '';
 			Option_MOTD := False;
 		end;
+		Option_MOTD_Athena := StrToBoolDef(SL.Values['Option_MOTD_Athena'], False);
 	end;
 
 	if sl.IndexOfName('Option_GraceTime') > -1 then begin
@@ -926,6 +927,7 @@ begin
 	ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
 	ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
 	ini.WriteString('Fusion', 'Option_MOTD', BoolToStr(Option_MOTD));
+	ini.WriteString('Fusion', 'Option_MOTD_Athena', BoolToStr(Option_MOTD_Athena));
 	ini.WriteString('Fusion', 'Option_MOTD_File', Option_MOTD_File);
 	ini.WriteString('Fusion', 'Option_Username_MF', BoolToStr(Option_Username_MF));
 	ini.WriteString('Fusion', 'Option_Back_Color', Option_Back_Color);
