@@ -34,108 +34,99 @@ var{ChrstphrR - 2004/04/25 - removed unused variables}
 	APlayer   : TPlayer;    //reference
 	PlayerIdx : Integer;
 begin
-	if PlayerName.IndexOf(userid) > - 1 then begin
-		APlayer := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
+    APlayer := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
 
-        APlayer.IP := Socket.RemoteAddress;
+    APlayer.IP := Socket.RemoteAddress;
 
-		PlayerIdx := IDTableDB.IndexOf(APlayer.ID);
+    PlayerIdx := IDTableDB.IndexOf(APlayer.ID);
 
-		if (PlayerIdx = -1) AND (NowUsers >= Option_MaxUsers) then begin
-			ZeroMemory(@buf[0],3);
-			WFIFOW( 0, $006a);
-			WFIFOB( 2, 7);//Server is full.
-			Socket.SendBuf(buf, 3);
-		end;
+    if (PlayerIdx = -1) AND (NowUsers >= Option_MaxUsers) then begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 7);//Server is full.
+        Socket.SendBuf(buf, 23);
+    end;
 
-        for i := 0 to BanList.Count -1 do begin
-            if APlayer.IP = BanList.Strings[i] then begin
-                ZeroMemory(@buf[0],3);
-                WFIFOW( 0, $006a);
-			    WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
-			    Socket.SendBuf(buf, 3);
-                Exit; //stop the other stuff
-		    end;
+    for i := 0 to BanList.Count -1 do begin
+        if APlayer.IP = BanList.Strings[i] then begin
+            ZeroMemory(@buf[0],23);
+            WFIFOW( 0, $006a);
+            WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
+            Socket.SendBuf(buf, 23);
+            Exit; //stop the other stuff
+        end;
+    end;
+
+    if (APlayer.Banned = True) then begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
+        Socket.SendBuf(buf, 23);
+    end
+
+    else if (APlayer.Login) then begin  //Check if player is logged in already
+        loggedIn := false;
+        {This way we check that a character of the player is also logged in}
+        for i := 0 to 8 do begin
+            if CharaName.IndexOf(APlayer.CName[i]) = -1 then Continue;
+            tc := CharaName.Objects[CharaName.IndexOf(APlayer.CName[i])] as TChara;
+            if tc.Login = 2 then loggedIn := true;
+            //keep this tc active and not change it.  Used later to KICK off
+            if tc.Login = 2 then break;
         end;
 
-		if (APlayer.Banned = True) then begin
-			ZeroMemory(@buf[0],3);
-			WFIFOW( 0, $006a);
-			WFIFOB( 2, 4); //Blocked ID, or an ID of a locked account
-			Socket.SendBuf(buf, 3);
-		end
-
-        else if (APlayer.Login) then begin  //Check if player is logged in already
-            loggedIn := false;
-            {This way we check that a character of the player is also logged in}
-            for i := 0 to 8 do begin
-                if CharaName.IndexOf(APlayer.CName[i]) = -1 then Continue;
-                tc := CharaName.Objects[CharaName.IndexOf(APlayer.CName[i])] as TChara;
-                if tc.Login = 2 then loggedIn := true;
-                //keep this tc active and not change it.  Used later to KICK off
-                if tc.Login = 2 then break;
-            end;
-
-            if loggedIn then begin
-                ZeroMemory(@buf[0],3);
-			    WFIFOW( 0, $0081);
-			    WFIFOB( 2, 2);//Someone is logged on the same ID
-			    Socket.SendBuf(buf, 3);
-                if assigned(tc) then begin //Kicking online user
-                    if assigned(tc.Socket) then begin
-                        if tc.Login <> 0 then begin
-                            WFIFOW( 0, $0081);
-			                WFIFOB( 2, 2);//Someone is logged on the same ID
-                            tc.Socket.SendBuf(buf, 3);
-                            tc.Socket.Close;
-                            tc.Socket := nil;
-                        end;
-                    end;
+        if loggedIn then begin
+            ZeroMemory(@buf[0],23);
+            WFIFOW( 0, $0081);
+            WFIFOB( 2, 2);//Someone is logged on the same ID
+            Socket.SendBuf(buf, 23);
+            if assigned(tc) then begin //Kicking online user
+                if assigned(tc.Socket) and (tc.Login <> 0) then begin
+                    WFIFOW( 0, $0081);
+                    WFIFOB( 2, 2);//Someone is logged on the same ID
+                    tc.Socket.SendBuf(buf, 23);
+                    tc.Socket.Close;
+                    tc.Socket := nil;
                 end;
-            end else APlayer.Login := false;
-        end
+            end;
+        end else APlayer.Login := false;
+    end
 
-		else if APlayer.Pass = userpass then begin
-			APlayer.LoginID1 := Random($7FFFFFFF) + 1;
-			if UseSQL then APlayer.LoginID2 := Assign_AccountID()
-			else begin
-				APlayer.LoginID2 := NowLoginID;
-				Inc(NowLoginID);
-			end;
-			if NowLoginID >= 2000000000 then NowLoginID := 0;
-			//debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'tp.ver2 = '+inttostr(w));
-			//tp.ver2 := w;
-			APlayer.ver2 := 9;
-			WFIFOW( 0, $0069);
-			WFIFOW( 2, 79);
-			WFIFOL( 4, APlayer.LoginID1);
-			WFIFOL( 8, APlayer.ID);
-			WFIFOL(12, APlayer.LoginID2);
-			WFIFOL(16, 0);
-			WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
-			WFIFOW(44, 0);
-			WFIFOB(46, APlayer.Gender); //sex 0=F 1=M
-            if uselan(APlayer.IP) then WFIFOL(47, LAN_ADDR)
-            else WFIFOL(47, WAN_ADDR);
-			WFIFOW(51, sv2port);
-			WFIFOS(53, ServerName, 20);
-			WFIFOW(73, NowUsers);
-			WFIFOW(75, 0);
-			WFIFOW(77, 0);
-			Socket.SendBuf(buf, 79);
-		end else begin
-			ZeroMemory(@buf[0],3);
-			WFIFOW( 0, $006a);
-			WFIFOB( 2, 1);//Password Incorrect
-			Socket.SendBuf(buf, 3);
-		end;
-    //ID doesn't exist
-	end else begin
-		ZeroMemory(@buf[0],3);
-		WFIFOW( 0, $006a);
-		WFIFOB( 2, 0);//Unregistered ID
-		Socket.SendBuf(buf, 3);
-	end;
+    else if APlayer.Pass = userpass then begin
+        APlayer.LoginID1 := Random($7FFFFFFF) + 1;
+        if UseSQL then APlayer.LoginID2 := Assign_AccountID()
+        else begin
+            APlayer.LoginID2 := NowLoginID;
+            Inc(NowLoginID);
+        end;
+        if NowLoginID >= 2000000000 then NowLoginID := 0;
+        //debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'tp.ver2 = '+inttostr(w));
+        //tp.ver2 := w;
+        APlayer.ver2 := 9;
+        WFIFOW( 0, $0069);
+        WFIFOW( 2, 79);
+        WFIFOL( 4, APlayer.LoginID1);
+        WFIFOL( 8, APlayer.ID);
+        WFIFOL(12, APlayer.LoginID2);
+        WFIFOL(16, 0);
+        WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
+        WFIFOW(44, 0);
+        WFIFOB(46, APlayer.Gender); //sex 0=F 1=M
+        if uselan(APlayer.IP) then WFIFOL(47, LAN_ADDR)
+        else WFIFOL(47, WAN_ADDR);
+        WFIFOW(51, sv2port);
+        WFIFOS(53, ServerName, 20);
+        WFIFOW(73, NowUsers);
+        WFIFOW(75, 0);
+        WFIFOW(77, 0);
+        Socket.SendBuf(buf, 79);
+    end else begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 1);//Password Incorrect
+        Socket.SendBuf(buf, 23);
+    end;
+
 end;
 
 //==============================================================================
@@ -271,10 +262,10 @@ begin
             else begin
                 if not sv1PacketProcessAdd(Socket,w,userid2,userpass) then begin
                     //If the user wasn't added from the above function
-                	ZeroMemory(@buf[0],3);
+                	ZeroMemory(@buf[0],23);
                     WFIFOW( 0, $006a);
                     WFIFOB( 2, 0); //Unregistered ID
-                    Socket.SendBuf(buf, 3);
+                    Socket.SendBuf(buf, 23);
                 end;
             end;
 		end;
