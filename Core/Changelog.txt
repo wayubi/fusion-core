@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-20-04: Added error message for Shield Charge skill [BieL®]
 - 08-20-04: Guild experience integer overflow on load caused crash. [AlexKreuz]
 - 08-20-04: Non-Existant map used by script caused crash. [AlexKreuz]
 - 08-20-04: Accessing undefined ScriptList in database caused crash. [AlexKreuz]

@@ -1,9 +1,9 @@
 object frmMain: TfrmMain
-  Left = 184
-  Top = 173
+  Left = 190
+  Top = 71
   Width = 408
   Height = 518
-  Caption = '#33'
+  Caption = 's'
   Color = clCream
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -45,7 +45,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 400
     Height = 445
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
     Constraints.MinHeight = 445
     Constraints.MinWidth = 400

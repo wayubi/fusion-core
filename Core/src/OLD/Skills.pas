@@ -1746,7 +1746,11 @@ Begin
 				{Crusader Skills Player vs Monster begin}
 				250:    {Shield Charge}
 					begin
-						if (tc.Shield > 0) then begin
+						if (tc.Shield = 0) then begin
+            SendSkillError(tc,6);
+            tc.MMode := 4;
+            exit;
+            end else begin
 							{If Wearing Shield}
 							xy.X := ts.Point.X - Point.X;
 							xy.Y := ts.Point.Y - Point.Y;

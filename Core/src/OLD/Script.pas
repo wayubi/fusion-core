@@ -74,7 +74,7 @@ begin
 			end;
 		end;
 
-        if Map.IndexOf(tn.Map) = -1 then Continue;
+        if Map.IndexOf(tn.Map) = -1 then Exit;
 		tm := Map.Objects[Map.IndexOf(tn.Map)] as TMap;
 		Tick := timeGetTime();
 {NPCイベント追加ココまで}
