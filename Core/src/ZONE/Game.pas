@@ -2288,8 +2288,8 @@ end;
 												if (e2 <> 1) then begin
 
 													WFIFOW(j, tma.ID);
-													WFIFOW(j+2, $1200);
-													WFIFOL(j+4, $00000000);
+													WFIFOW(j+2, 12);
+													WFIFOL(j+4, tc.ID);
 													j := j+8;
 
 												end;
@@ -2316,8 +2316,8 @@ end;
 												if (e2 <> 1) then begin
 
 													WFIFOW(j, tma.ID);
-													WFIFOW(j+2, $1200);
-													WFIFOL(j+4, $00000000);
+													WFIFOW(j+2, 12);
+													WFIFOL(j+4, tc.ID);
 													j := j+8;
 
 												end;
@@ -5807,7 +5807,6 @@ end;
 					end;
 
 					//í«â¡Ç∑ÇÈëÆê´êŒÅAêØÇÃÇ©ÇØÇÁÇÃèàóù
-
 					for k := 0 to 2 do begin
 
 						e := SearchCInventory(tc, m[k], false);
