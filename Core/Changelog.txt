@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-16-04: REED: Optimized Castle/Parties/Guild Loading. [AlexKreuz]
+- 10-16-04: REED: Restructured Castle Saving. [AlexKreuz]
 - 10-16-04: ISCS: Provided option to turn off ISCS on startup. [AlexKreuz]
 - 10-16-04: REED: Restructured Guild saving (2/2). [AlexKreuz]
 - 10-15-04: Cleaned up the structure of #hcolor and #ccolor. [Trihan]

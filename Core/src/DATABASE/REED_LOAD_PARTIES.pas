@@ -7,12 +7,12 @@ uses
     Classes, SysUtils;
 
     procedure PD_Load_Parties_Pre_Parse(UID : String = '*');
-    procedure PD_Load_Parties_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Parties_Parse(UID : String; resultlist : TStringList; basepath : String);
 
     procedure PD_Load_Parties_Settings(tpa : TParty; path : String);
     procedure PD_Load_Parties_Members(tpa : TParty; path : String);
 
-    function select_load_party(UID : String; tp : TPlayer; partyid : Cardinal) : TParty;
+    function select_load_party(UID : String; partyid : Cardinal) : TParty;
 
 implementation
 
@@ -23,27 +23,10 @@ implementation
     var
         basepath : String;
         pfile : String;
-        accountlist : TStringList;
-        i : Integer;
-        tp : TPlayer;
     begin
-        basepath := AppPath + 'gamedata\Accounts\';
-        pfile := 'Account.txt';
-        accountlist := get_list(basepath, pfile);
-
         basepath := AppPath + 'gamedata\Parties\';
-
-        for i := 0 to accountlist.Count - 1 do begin
-            if Player.IndexOf(reed_convert_type(accountlist[i], 0, -1)) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(accountlist[i], 0, -1))] as TPlayer;
-
-            pfile := 'Settings.txt';
-            PD_Load_Parties_Parse(UID, tp, get_list(basepath, pfile), basepath);
-
-            if (UID <> '*') then Break;
-        end;
-
-        FreeAndNil(accountlist);
+        pfile := 'Settings.txt';
+        PD_Load_Parties_Parse(UID, get_list(basepath, pfile), basepath);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -51,7 +34,7 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Parties Parse ------------------------------------------------------ }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Parties_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Parties_Parse(UID : String; resultlist : TStringList; basepath : String);
     var
         i : Integer;
         pfile : String;
@@ -61,7 +44,7 @@ implementation
 
         for i := 0 to resultlist.Count - 1 do begin
 
-            tpa := select_load_party(UID, tp, reed_convert_type(resultlist[i], 0, -1));
+            tpa := select_load_party(UID, reed_convert_type(resultlist[i], 0, -1));
             if not assigned(tpa) then Continue;
 
             if (UID <> '*') then
@@ -146,13 +129,17 @@ implementation
     { Results:                                                                              }
     {  - Result : TParty, Represents the selected party.                                    }
     { ------------------------------------------------------------------------------------- }
-    function select_load_party(UID : String; tp : TPlayer; partyid : Cardinal) : TParty;
+    function select_load_party(UID : String; partyid : Cardinal) : TParty;
     var
         i : Integer;
         tpa : TParty;
+        tp : TPlayer;
     begin
 
         if (UID <> '*') then begin
+
+            if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
             for i := 0 to 8 do begin
                 if tp.CName[i] = '' then Continue;

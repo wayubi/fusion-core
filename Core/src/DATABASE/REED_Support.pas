@@ -14,9 +14,9 @@ uses
     procedure reed_shutdown_server(error_message : String);
     function reed_convert_type(in_value : Variant; ctype : Integer; line : Integer; path : String = '') : Variant;
     function stringlist_load(path : String) : TStringList;
-    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
+    function select_load_guild(UID : String; guildid : Cardinal) : TGuild;
     function guild_is_online(tg : TGuild) : Boolean;
-    procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
+    procedure reed_savefile(folderid : Variant; datafile : TStringList; path : String; pfile : String; vType : Integer = 0);
     procedure compile_inventories(datafile : TStringList; inventory_item : array of TItem);
     function party_is_online(tpa : TParty) : Boolean;
     function reed_column_align(str : String; count : Integer; last : Boolean = True) : String;
@@ -280,13 +280,17 @@ uses
     { Results:                                                                              }
     {  - Result : TParty, Represents the selected guild.                                    }
     { ------------------------------------------------------------------------------------- }
-    function select_load_guild(UID : String; tp : TPlayer; guildid : Cardinal) : TGuild;
+    function select_load_guild(UID : String; guildid : Cardinal) : TGuild;
     var
         i : Integer;
         tg : TGuild;
+        tp : TPlayer;
     begin
 
         if (UID <> '*') then begin
+
+            if Player.IndexOf(reed_convert_type(UID, 0, -1)) = -1 then Exit;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(UID, 0, -1))] as TPlayer;
 
             for i := 0 to 8 do begin
                 if tp.CName[i] = '' then Continue;
@@ -346,11 +350,18 @@ uses
     {  - path : String; Represents the location to save the data.                           }
     {  - pfile : String; Represents the filename of the data.                               }
     { ------------------------------------------------------------------------------------- }
-    procedure reed_savefile(folderid : Integer; datafile : TStringList; path : String; pfile : String);
+    procedure reed_savefile(folderid : Variant; datafile : TStringList; path : String; pfile : String; vType : Integer = 0);
     begin
         CreateDir(path);
+        
+        if (vType = 0) then begin
         CreateDir(path + '\' + reed_convert_type(folderid, 1, -1));
         datafile.SaveToFile(path + '\' + reed_convert_type(folderid, 1, -1) + '\' + pfile);
+        end else if (vType = 1) then begin
+            CreateDir(path + '\' + folderid);
+            datafile.SaveToFile(path + '\' + folderid + '\' + pfile);
+        end;
+
         datafile.Clear;
     end;
     { ------------------------------------------------------------------------------------- }

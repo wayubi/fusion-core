@@ -7,7 +7,7 @@ uses
     Classes, SysUtils;
 
     procedure PD_Load_Guilds_Pre_Parse(UID : String = '*');
-    procedure PD_Load_Guilds_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Guilds_Parse(UID : String; resultlist : TStringList; basepath : String);
 
     procedure PD_Load_Guilds_Settings(tg : TGuild; path : String);
     procedure PD_Load_Guilds_Members(tg : TGuild; path : String);
@@ -26,27 +26,10 @@ implementation
     var
         basepath : String;
         pfile : String;
-        accountlist : TStringList;
-        i : Integer;
-        tp : TPlayer;
     begin
-        basepath := AppPath + 'gamedata\Accounts\';
-        pfile := 'Account.txt';
-        accountlist := get_list(basepath, pfile);
-
         basepath := AppPath + 'gamedata\Guilds\';
-
-        for i := 0 to accountlist.Count - 1 do begin
-            if Player.IndexOf(reed_convert_type(accountlist[i], 0, -1)) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(accountlist[i], 0, -1))] as TPlayer;
-
-            pfile := 'Guild.txt';
-            PD_Load_Guilds_Parse(UID, tp, get_list(basepath, pfile), basepath);
-
-            if (UID <> '*') then Break;
-        end;
-
-        FreeAndNil(accountlist);
+        pfile := 'Guild.txt';
+        PD_Load_Guilds_Parse(UID, get_list(basepath, pfile), basepath);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -54,7 +37,7 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Guilds Parse ------------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Guilds_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Guilds_Parse(UID : String; resultlist : TStringList; basepath : String);
     var
         i : Integer;
         pfile : String;
@@ -65,12 +48,11 @@ implementation
         for i := 0 to resultlist.Count - 1 do begin
             path := basepath + resultlist[i] + '\';
 
-            tg := select_load_guild(UID, tp, reed_convert_type(resultlist[i], 0, -1));
+            tg := select_load_guild(UID, reed_convert_type(resultlist[i], 0, -1));
             if not assigned(tg) then Continue;
 
             if (UID <> '*') then
                 if guild_is_online(tg) then Continue;
-
 
             pfile := 'Guild.txt';
             PD_Load_Guilds_Settings(tg, path + pfile);
@@ -92,7 +74,6 @@ implementation
 
             pfile := 'Storage.txt';
             PD_Load_Guilds_Storage(tg, path + pfile);
-
 
             NowGuildID := (tg.ID + 1);
 

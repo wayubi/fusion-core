@@ -7,7 +7,7 @@ uses
     Classes, SysUtils;
 
     procedure PD_Load_Castles_Pre_Parse(UID : String = '*');
-    procedure PD_Load_Castles_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Castles_Parse(UID : String; resultlist : TStringList; basepath : String);
 
     procedure PD_Load_Castles_Settings(tgc : TCastle; path : String);
 
@@ -20,27 +20,10 @@ implementation
     var
         basepath : String;
         pfile : String;
-        accountlist : TStringList;
-        i : Integer;
-        tp : TPlayer;
     begin
-        basepath := AppPath + 'gamedata\Accounts\';
-        pfile := 'Account.txt';
-        accountlist := get_list(basepath, pfile);
-
         basepath := AppPath + 'gamedata\Castles\';
-
-        for i := 0 to accountlist.Count - 1 do begin
-            if Player.IndexOf(reed_convert_type(accountlist[i], 0, -1)) = -1 then Continue;
-            tp := Player.Objects[Player.IndexOf(reed_convert_type(accountlist[i], 0, -1))] as TPlayer;
-
-            pfile := 'Castle.txt';
-            PD_Load_Castles_Parse(UID, tp, get_list(basepath, pfile), basepath);
-
-            if (UID <> '*') then Break;
-        end;
-
-        FreeAndNil(accountlist);
+        pfile := 'Castle.txt';
+        PD_Load_Castles_Parse(UID, get_list(basepath, pfile), basepath);
     end;
     { ------------------------------------------------------------------------------------- }
 
@@ -48,11 +31,12 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Load Castles Parse ------------------------------------------------------ }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Load_Castles_Parse(UID : String; tp : TPlayer; resultlist : TStringList; basepath : String);
+    procedure PD_Load_Castles_Parse(UID : String; resultlist : TStringList; basepath : String);
     var
         i, GID : Integer;
         pfile : String;
         path : String;
+        tp : TPlayer;
         tg : TGuild;
         tgc : TCastle;
     begin
@@ -63,22 +47,19 @@ implementation
             if (UID <> '*') then begin
 
                 tgc := CastleList.Objects[CastleList.IndexOf(resultlist[i])] as TCastle;
-
                 pfile := 'Castle.txt';
-                GID := retrieve_data(1, path + pfile, 1);
+                tgc.GID := retrieve_data(1, path + pfile, 1);
 
-                if GuildList.IndexOf(GID) = -1 then Continue;
-                tg := GuildList.Objects[GuildList.IndexOf(GID)] as TGuild;
+                tg := select_load_guild(UID, tgc.GID);
+                if not assigned(tg) then Continue;
                 if guild_is_online(tg) then Continue;
 
             end else begin
                 tgc := TCastle.Create;
             end;
 
-
             pfile := 'Castle.txt';
             PD_Load_Castles_Settings(tgc, path + pfile);
-
 
             if (UID = '*') then begin
                 CastleList.AddObject(tgc.Name, tgc);

@@ -25,7 +25,8 @@ uses
     REED_SAVE_CHARACTERS,
     REED_SAVE_PETS,
     REED_SAVE_PARTIES,
-    REED_SAVE_GUILDS;
+    REED_SAVE_GUILDS,
+    REED_SAVE_CASTLES;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -45,10 +46,6 @@ uses
 
     { Guild Data - Basic Data }
     procedure PD_Delete_Guilds(tg : TGuild);
-
-
-    { Castle Data - Basic Data }
-    procedure PD_Save_Castles(forced : Boolean = False);
 
 
 implementation
@@ -104,8 +101,7 @@ uses
         PD_Save_Pets_Parse(forced);
         PD_Save_Parties_Parse(forced);
         PD_Save_Guilds_Parse(forced);
-
-        PD_Save_Castles(forced);
+        PD_Save_Castles_Parse(forced);
 
         if (forced) then debugout.lines.add('Comprehensive Save Completed.');
     end;
@@ -258,72 +254,6 @@ uses
         RmDir(deldir + IntToStr(tg.ID));
 
         DataSave();
-    end;
-
-
-    { -------------------------------------------------------------------------------- }
-    { -- Castle Data - Basic Data ---------------------------------------------------- }
-    { -------------------------------------------------------------------------------- }
-    procedure PD_Save_Castles(forced : Boolean = False);
-    var
-    	datafile : TStringList;
-        tg : TGuild;
-        tgc : TCastle;
-    	i, j : Integer;
-        saveflag : Boolean;
-    begin
-    	saveflag := False;
-    	datafile := TStringList.Create;
-
-        for i := 0 to CastleList.Count - 1 do begin
-            tgc := CastleList.Objects[i] as TCastle;
-
-            if GuildList.IndexOf(tgc.GID) = -1 then Continue;
-            tg := GuildList.Objects[GuildList.IndexOf(tgc.GID)] as TGuild;
-
-            if (tg = nil) then Continue;
-
-            for j := 0 to tg.RegUsers - 1 do begin
-            	if tg.MemberID[j] = 0 then Break;
-                if tg.Member[j] = nil then Continue;
-                if (tg.Member[j].Login <> 0) or (forced) then saveflag := True;
-                Break;
-            end;
-
-            if not saveflag then Continue;
-
-            datafile.Clear;
-            datafile.Add('MAP : ' + tgc.Name);
-            datafile.Add('GID : ' + IntToStr(tgc.GID));
-            datafile.Add('GNM : ' + tgc.GName);
-            datafile.Add('GMA : ' + tgc.GMName);
-            datafile.Add('GKA : ' + IntToStr(tgc.GKafra));
-            datafile.Add('EDE : ' + IntToStr(tgc.EDegree));
-            datafile.Add('ETR : ' + IntToStr(tgc.ETrigger));
-            datafile.Add('DDE : ' + IntToStr(tgc.DDegree));
-            datafile.Add('DTR : ' + IntToStr(tgc.DTrigger));
-            datafile.Add('GS1 : ' + IntToStr(tgc.GuardStatus[0]));
-            datafile.Add('GS2 : ' + IntToStr(tgc.GuardStatus[1]));
-            datafile.Add('GS3 : ' + IntToStr(tgc.GuardStatus[2]));
-            datafile.Add('GS4 : ' + IntToStr(tgc.GuardStatus[3]));
-            datafile.Add('GS5 : ' + IntToStr(tgc.GuardStatus[4]));
-            datafile.Add('GS6 : ' + IntToStr(tgc.GuardStatus[5]));
-            datafile.Add('GS7 : ' + IntToStr(tgc.GuardStatus[6]));
-            datafile.Add('GS8 : ' + IntToStr(tgc.GuardStatus[7]));
-
-            CreateDir(AppPath + 'gamedata\Castles');
-            CreateDir(AppPath + 'gamedata\Castles\' + tgc.Name);
-
-            try
-                datafile.SaveToFile(AppPath + 'gamedata\Castles\' + tgc.Name + '\Castle.txt');
-                //debugout.Lines.Add(tgc.Name + ' castle data saved.');
-            except
-                DebugOut.Lines.Add('Castle data could not be saved.');
-            end;
-        end;
-
-        datafile.Clear;
-        datafile.Free;
     end;
 
 end.
