@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 203
-  Top = 115
+  Left = 201
+  Top = 119
   Width = 408
   Height = 535
   Caption = 's'
@@ -25,41 +25,6 @@ object frmMain: TfrmMain
     Alignment = taRightJustify
     AutoSize = False
     Caption = '('#180'-`)'
-  end
-  object Label85: TLabel
-    Left = 0
-    Top = 56
-    Width = 41
-    Height = 18
-    Caption = 'Label85'
-  end
-  object Label110: TLabel
-    Left = 128
-    Top = 240
-    Width = 48
-    Height = 18
-    Caption = 'M-Map Y'
-  end
-  object Label111: TLabel
-    Left = 72
-    Top = 240
-    Width = 48
-    Height = 18
-    Caption = 'M-Map X'
-  end
-  object Label115: TLabel
-    Left = 80
-    Top = 248
-    Width = 48
-    Height = 18
-    Caption = 'M-Map X'
-  end
-  object Label116: TLabel
-    Left = 136
-    Top = 248
-    Width = 48
-    Height = 18
-    Caption = 'M-Map Y'
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -2047,68 +2012,118 @@ object frmMain: TfrmMain
         object TabSheet10: TTabSheet
           Caption = 'Inventory'
           ImageIndex = 1
-          object Label97: TLabel
-            Left = 296
-            Top = 32
-            Width = 21
-            Height = 18
-            Caption = 'N/A'
-          end
           object Label119: TLabel
-            Left = 208
-            Top = 16
+            Left = 200
+            Top = 0
             Width = 58
             Height = 18
             Caption = 'Item Name'
           end
           object Label120: TLabel
-            Left = 296
-            Top = 16
+            Left = 288
+            Top = 0
             Width = 34
             Height = 18
             Caption = 'ItemID'
           end
           object Label121: TLabel
-            Left = 208
-            Top = 32
+            Left = 200
+            Top = 16
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label122: TLabel
-            Left = 208
-            Top = 80
+            Left = 200
+            Top = 64
             Width = 74
             Height = 18
             Caption = 'Refined Level'
           end
           object Label123: TLabel
-            Left = 296
-            Top = 80
+            Left = 288
+            Top = 64
+            Width = 42
+            Height = 18
+            Caption = 'Amount'
+          end
+          object Label124: TLabel
+            Left = 200
+            Top = 104
+            Width = 49
+            Height = 18
+            Caption = 'Card 1 ID'
+          end
+          object Label125: TLabel
+            Left = 288
+            Top = 104
+            Width = 49
+            Height = 18
+            Caption = 'Card 2 ID'
+          end
+          object Label126: TLabel
+            Left = 200
+            Top = 144
+            Width = 49
+            Height = 18
+            Caption = 'Card 3 ID'
+          end
+          object Label127: TLabel
+            Left = 288
+            Top = 144
+            Width = 49
+            Height = 18
+            Caption = 'Card 4 ID'
+          end
+          object Label97: TLabel
+            Left = 288
+            Top = 40
             Width = 51
             Height = 18
-            Caption = 'Ammount'
+            Caption = 'Equipped'
+            Visible = False
+          end
+          object Label128: TLabel
+            Left = 8
+            Top = 184
+            Width = 138
+            Height = 18
+            Caption = 'Storage Items (view only)'
+          end
+          object Label129: TLabel
+            Left = 200
+            Top = 184
+            Width = 90
+            Height = 18
+            Caption = 'Cart (View Only)'
+          end
+          object Label130: TLabel
+            Left = 8
+            Top = 0
+            Width = 111
+            Height = 18
+            Caption = 'Character Inventory'
           end
           object ListBox4: TListBox
             Left = 8
             Top = 16
-            Width = 193
-            Height = 153
+            Width = 177
+            Height = 169
             ItemHeight = 18
             TabOrder = 0
             OnClick = ListBox4Click
           end
           object CheckBox1: TCheckBox
-            Left = 208
-            Top = 56
+            Left = 200
+            Top = 40
             Width = 81
             Height = 17
             Caption = 'Identified'
             TabOrder = 1
           end
           object ComboBox19: TComboBox
-            Left = 208
-            Top = 96
+            Left = 200
+            Top = 80
             Width = 73
             Height = 26
             ItemHeight = 18
@@ -2127,16 +2142,73 @@ object frmMain: TfrmMain
               '10')
           end
           object Edit58: TEdit
-            Left = 296
-            Top = 96
-            Width = 57
+            Left = 288
+            Top = 80
+            Width = 73
             Height = 26
             TabOrder = 3
           end
-        end
-        object TabSheet13: TTabSheet
-          Caption = 'Cart'
-          ImageIndex = 4
+          object Edit75: TEdit
+            Left = 200
+            Top = 120
+            Width = 73
+            Height = 26
+            TabOrder = 4
+          end
+          object Edit76: TEdit
+            Left = 288
+            Top = 120
+            Width = 73
+            Height = 26
+            TabOrder = 5
+          end
+          object Edit77: TEdit
+            Left = 200
+            Top = 160
+            Width = 73
+            Height = 26
+            TabOrder = 6
+          end
+          object Edit78: TEdit
+            Left = 288
+            Top = 160
+            Width = 73
+            Height = 26
+            TabOrder = 7
+          end
+          object Button22: TButton
+            Left = 312
+            Top = 352
+            Width = 73
+            Height = 25
+            Caption = 'Save'
+            TabOrder = 8
+            Visible = False
+            OnClick = Button22Click
+          end
+          object Edit85: TEdit
+            Left = 288
+            Top = 16
+            Width = 73
+            Height = 26
+            TabOrder = 9
+          end
+          object ListBox5: TListBox
+            Left = 8
+            Top = 200
+            Width = 177
+            Height = 145
+            ItemHeight = 18
+            TabOrder = 10
+          end
+          object ListBox6: TListBox
+            Left = 200
+            Top = 200
+            Width = 169
+            Height = 145
+            ItemHeight = 18
+            TabOrder = 11
+          end
         end
         object TabSheet14: TTabSheet
           Caption = 'Skills'
@@ -2246,5 +2318,11 @@ object frmMain: TfrmMain
         OnClick = EnableWebAccountCreator1Click
       end
     end
+  end
+  object DNSUpdateTimer: TTimer
+    Enabled = False
+    OnTimer = DNSUpdateTimerTimer
+    Left = 112
+    Top = 160
   end
 end

@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 10-12-04: Added a DNS Updater timer. Default is off. [Tsusai]
+- 10-12-04: JCon: Inventory work, can view cart and storage (all read-only). [Tsusai]
 - 10-10-04: REED: Fixed minor problem with REED conversion. [AlexKreuz]
 - 10-07-04: REED: Restructured Characters (2/2) Saving procedures. [AlexKreuz]
 - 10-06-04: More Inventory tab work. [Tsusai]

@@ -80,6 +80,7 @@ uses
         ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         ini.WriteString('Fusion', 'Option_AutoSave', IntToStr(Option_AutoSave));
         ini.WriteString('Fusion', 'Option_AutoBackup', IntToStr(Option_AutoBackup));
+        ini.WriteString('Fusion', 'Option_DNS_Update', IntToStr(Option_DNS_Update));
         ini.WriteString('Fusion', 'Option_WelcomeMsg', BoolToStr(Option_WelcomeMsg));
         ini.WriteString('Fusion', 'Option_MOTD', BoolToStr(Option_MOTD));
         ini.WriteString('Fusion', 'Option_MOTD_Athena', BoolToStr(Option_MOTD_Athena));

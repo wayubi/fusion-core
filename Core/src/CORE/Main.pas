@@ -19,7 +19,7 @@ uses
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
         PacketProcesses, ISCS, WAC,
     {3rd Party Units}
-    	List32, Zip;
+    	List32, Zip, WSocket;
 
 const
     {I know these are windows based, keep away from linux XD}
@@ -195,11 +195,23 @@ type
     EnableWebAccountCreator1: TMenuItem;
     Label60: TLabel;
     Edit5: TEdit;
-    ListBox2: TListBox;
+    TabSheet7: TTabSheet;
+    Edit53: TEdit;
+    Label65: TLabel;
+    DNSUpdateTimer: TTimer;
+    PageControl3: TPageControl;
+    TabSheet6: TTabSheet;
+    Label95: TLabel;
+    Label96: TLabel;
+    ListBox3: TListBox;
+    Button17: TButton;
+    Button18: TButton;
+    Edit8: TEdit;
+    Button19: TButton;
+    Button20: TButton;
+    Button21: TButton;
+    TabSheet9: TTabSheet;
     Label61: TLabel;
-    Edit7: TEdit;
-    Edit9: TEdit;
-    Edit10: TEdit;
     Label63: TLabel;
     Label64: TLabel;
     Label67: TLabel;
@@ -209,77 +221,32 @@ type
     Label69: TLabel;
     Label70: TLabel;
     Label71: TLabel;
-    Edit11: TEdit;
-    Edit12: TEdit;
-    Edit13: TEdit;
-    Edit14: TEdit;
-    Edit15: TEdit;
-    TabSheet7: TTabSheet;
-    Edit16: TEdit;
     Label72: TLabel;
     Label73: TLabel;
     Label74: TLabel;
     Label75: TLabel;
-    Edit36: TEdit;
     Label76: TLabel;
-    Edit41: TEdit;
-    Edit46: TEdit;
-    Edit47: TEdit;
-    Edit48: TEdit;
     Label77: TLabel;
     Label78: TLabel;
     Label79: TLabel;
-    Edit49: TEdit;
-    Edit50: TEdit;
-    Edit51: TEdit;
-    Edit52: TEdit;
-    Edit54: TEdit;
-    Edit55: TEdit;
-    Edit56: TEdit;
-    Edit57: TEdit;
-    Edit59: TEdit;
-    Edit61: TEdit;
-    Edit63: TEdit;
-    Edit64: TEdit;
-    Edit65: TEdit;
-    Edit66: TEdit;
-    Edit67: TEdit;
     Label80: TLabel;
-    Label81: TLabel;
-    Label82: TLabel;
-    Label83: TLabel;
-    Label84: TLabel;
-    Label85: TLabel;
-    Label86: TLabel;
-    Label87: TLabel;
-    Label88: TLabel;
-    Label89: TLabel;
-    Label90: TLabel;
-    Label91: TLabel;
-    Label92: TLabel;
-    Label93: TLabel;
     Label94: TLabel;
-    Button16: TButton;
+    Label93: TLabel;
+    Label92: TLabel;
+    Label91: TLabel;
+    Label90: TLabel;
+    Label89: TLabel;
+    Label88: TLabel;
+    Label87: TLabel;
+    Label86: TLabel;
+    Label84: TLabel;
+    Label83: TLabel;
+    Label82: TLabel;
+    Label81: TLabel;
     Label98: TLabel;
     Label99: TLabel;
-    PageControl3: TPageControl;
-    TabSheet9: TTabSheet;
-    TabSheet10: TTabSheet;
-    TabSheet11: TTabSheet;
-    TabSheet13: TTabSheet;
-    TabSheet14: TTabSheet;
-    TabSheet6: TTabSheet;
-    ListBox3: TListBox;
-    Button17: TButton;
-    Button18: TButton;
-    Label95: TLabel;
-    Label96: TLabel;
-    Edit8: TEdit;
-    Button19: TButton;
-    Button20: TButton;
-    Label101: TLabel;
     Label102: TLabel;
-    ListBox4: TListBox;
+    Label101: TLabel;
     Label100: TLabel;
     Label103: TLabel;
     Label104: TLabel;
@@ -287,37 +254,80 @@ type
     Label106: TLabel;
     Label107: TLabel;
     Label108: TLabel;
+    Label109: TLabel;
+    Label114: TLabel;
+    Label112: TLabel;
+    Label113: TLabel;
+    Label117: TLabel;
+    Label118: TLabel;
+    Edit52: TEdit;
+    Edit15: TEdit;
+    Edit14: TEdit;
+    Edit10: TEdit;
+    Edit7: TEdit;
+    Edit9: TEdit;
+    ListBox2: TListBox;
+    Edit11: TEdit;
+    Edit12: TEdit;
+    Edit13: TEdit;
+    Edit16: TEdit;
+    Edit36: TEdit;
+    Edit41: TEdit;
+    Edit46: TEdit;
+    Edit47: TEdit;
+    Edit48: TEdit;
+    Edit49: TEdit;
+    Edit50: TEdit;
+    Edit51: TEdit;
+    Button16: TButton;
+    Edit67: TEdit;
+    Edit66: TEdit;
+    Edit65: TEdit;
+    Edit64: TEdit;
+    Edit63: TEdit;
+    Edit61: TEdit;
+    Edit59: TEdit;
+    Edit57: TEdit;
+    Edit56: TEdit;
+    Edit55: TEdit;
+    Edit54: TEdit;
     Edit60: TEdit;
     Edit62: TEdit;
     Edit68: TEdit;
-    Label109: TLabel;
     Edit69: TEdit;
     Edit70: TEdit;
     Edit71: TEdit;
     Edit72: TEdit;
     Edit73: TEdit;
     Edit74: TEdit;
-    Label114: TLabel;
-    Label110: TLabel;
-    Label111: TLabel;
-    Label112: TLabel;
-    Label113: TLabel;
-    Label115: TLabel;
-    Label116: TLabel;
-    Label117: TLabel;
-    Label118: TLabel;
-    Button21: TButton;
-    Edit53: TEdit;
-    Label65: TLabel;
-    Label97: TLabel;
+    TabSheet10: TTabSheet;
     Label119: TLabel;
     Label120: TLabel;
     Label121: TLabel;
-    CheckBox1: TCheckBox;
     Label122: TLabel;
-    ComboBox19: TComboBox;
     Label123: TLabel;
+    Label124: TLabel;
+    Label125: TLabel;
+    Label126: TLabel;
+    Label127: TLabel;
+    Label97: TLabel;
+    ListBox4: TListBox;
+    CheckBox1: TCheckBox;
+    ComboBox19: TComboBox;
     Edit58: TEdit;
+    Edit75: TEdit;
+    Edit76: TEdit;
+    Edit77: TEdit;
+    Edit78: TEdit;
+    Button22: TButton;
+    Edit85: TEdit;
+    TabSheet14: TTabSheet;
+    TabSheet11: TTabSheet;
+    ListBox5: TListBox;
+    ListBox6: TListBox;
+    Label128: TLabel;
+    Label129: TLabel;
+    Label130: TLabel;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -424,6 +434,8 @@ type
     procedure Button20Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
     procedure ListBox4Click(Sender: TObject);
+    procedure DNSUpdateTimerTimer(Sender: TObject);
+    procedure Button22Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -809,6 +821,11 @@ begin
 	end else begin
 		Option_AutoBackup := 0;
 	end;
+    if sl.IndexOfName('Option_DNS_Update') > -1 then begin
+		Option_DNS_Update := StrToInt(sl.Values['Option_DNS_Update']);
+	end else begin
+		Option_DNS_Update := 0;
+	end;
 	if sl.IndexOfName('Option_WelcomeMsg') > -1 then begin
 		Option_WelcomeMsg := StrToBool(sl.Values['Option_WelcomeMsg']);
 	end else begin
@@ -1141,6 +1158,15 @@ begin
         BackupTimer.Enabled := True;
         BackupTimer.Interval := Option_AutoBackup * 1000;
     end;
+
+    if (Option_DNS_Update = 0) then begin
+        DNSUpdateTimer.Enabled := False;
+    end
+    else begin
+        DNSUpdateTimer.Enabled := True;
+        DNSUpdateTimer.Interval := Option_DNS_Update * 1000;
+    end;
+
 
     frmMain.ConnecttoISCS1Click(self);
     if (Option_Enable_WAC) then begin
@@ -11456,8 +11482,8 @@ begin
     	JCon_Characters_Load();
     end else if (TabSheet10.Showing) then begin
         JCon_Chara_Inv_Load();
-    end else if (TabSheet13.Showing) then begin
-        ShowMessage('Under Development, This section does not work.');
+        JCon_Chara_Cart_Load();
+        JCon_Chara_Store_Load();
     end else if (TabSheet11.Showing) then begin
         ShowMessage('Under Development, This section does not work.');
     end;
@@ -11510,6 +11536,19 @@ end;
 procedure TfrmMain.ListBox4Click(Sender: TObject);
 begin
     JCon_Chara_Inv_Populate();
+end;
+
+procedure TfrmMain.DNSUpdateTimerTimer(Sender: TObject);
+begin
+    WAN_ADDR := cardinal(wsocket_inet_addr(PChar(WAN_IP)));
+    //WAN_ADDR := cardinal(inet_addr(PChar(WAN_IP)));
+    weiss_ini_save();
+    debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DNS Update Complete.');
+end;
+
+procedure TfrmMain.Button22Click(Sender: TObject);
+begin
+    JCon_Chara_Inv_Save();
 end;
 
 end.

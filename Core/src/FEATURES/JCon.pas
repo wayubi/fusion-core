@@ -29,6 +29,9 @@ uses
     procedure JCon_Chara_Online_PM();
     procedure JCon_Chara_Inv_Load();
     procedure JCon_Chara_Inv_Populate();
+    procedure JCon_Chara_Inv_Save();
+    procedure JCon_Chara_Cart_Load();
+    procedure JCon_Chara_Store_Load();
 
 
     procedure JCon_INI_Server_Load();
@@ -674,12 +677,10 @@ uses
         if (frmMain.listbox2.ItemIndex = -1) then Exit;
         tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
         for j := 1 to 100 do begin
-            Item := tc.Item[j].Data;
-            if tc.Item[j].ID <> 0 then
-                ShowItem := Item.Name + ' : ' + IntToStr(tc.Item[j].ID)
-            else ShowItem := '[Empty]';
-
-            frmMain.ListBox4.Items.Add(ShowItem);
+            if tc.Item[j].ID <> 0 then begin
+                Item := tc.Item[j].Data as TItemDB;
+                ShowItem := Item.Name + ' : ' + IntToStr(tc.Item[j].ID);
+                frmMain.ListBox4.Items.Add(ShowItem); end;
         end;
     end;
 
@@ -687,25 +688,111 @@ uses
     var
         j : integer;
         tc : TChara;
+        Item : TItemDB;
 
     begin
         if (frmMain.listbox2.ItemIndex = -1) then Exit;
     		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
         if (frmMain.listbox4.ItemIndex = -1) then Exit;
-        j := (frmMain.Listbox4.ItemIndex + 1);
-        if (tc.Item[j].ID <> 0) then begin
-            frmMain.Label97.Caption := IntToStr(tc.Item[j].ID);
-            frmMain.Label121.Caption := tc.Item[j].Data.Name;
+            j := (frmMain.Listbox4.ItemIndex + 1);
+            Item := tc.Item[j].Data;
+            frmMain.Label121.Caption := Item.Name;
+            frmMain.Edit85.Text := IntToStr(tc.Item[j].ID);
             frmMain.CheckBox1.Checked := StrToBool(IntToStr(tc.Item[j].Identify));
-        {    tc.Item[j]
-            tc.Item[j].Card[0]
-            tc.Item[j].Card[1]
-            tc.Item[j].Card[2]
-            tc.Item[j].Card[3]}
-        end else begin
-            //empty items population
+
+            if tc.Item[j].Equip <> 0 then frmMain.Label97.Visible := True
+            else frmMain.Label97.Visible := false;
+
+            frmMain.Edit58.Text := IntToStr(tc.Item[j].Amount);
+            frmMain.Edit75.Text := IntToStr(tc.Item[j].Card[0]);
+            frmMain.Edit76.Text := IntToStr(tc.Item[j].Card[1]);
+            frmMain.Edit77.Text := IntToStr(tc.Item[j].Card[2]);
+            frmMain.Edit78.Text := IntToStr(tc.Item[j].Card[3]);
+    end;
+
+    procedure JCon_Chara_Inv_Save();
+    var
+        tc : TChara;
+        j : Integer;
+        Item : TItemList;
+    begin //Still don't know how to pull this off without REED biting me.
+{        //if frmMain.Edit84.Text = '' then Exit;
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+    		tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+
+        if assigned(tc) then begin
+            if assigned(tc.Socket) then begin
+                if tc.Login <> 0 then tc.Socket.Close;
+                    tc.Socket := nil;
+            end;
         end;
 
+        if (frmMain.listbox4.ItemIndex = -1) then Exit;
+        j := (frmMain.Listbox4.ItemIndex + 1);
+        //Item Removal
+        if StrToInt(frmMain.Edit85.Text) = 0 then
+            tc.Item[j].ID := 0
+        else begin
+            if StrToInt(frmMain.Edit85.Text) <> tc.Item[j].ID then Exit {begin
+            //Disabling new/overwrite item usage.  REED doesn't like me
+                tc.Item[j].ID := StrToInt(frmMain.Edit85.Text);
+                tc.Item[j].Equip := 0;
+                tc.Item[j].Attr := 0;
+                tc.Item[j].Amount := 1;
+                tc.Item[j].Card[0] := 0;
+                tc.Item[j].Card[1] := 0;
+                tc.Item[j].Card[2] := 0;
+                tc.Item[j].Card[3] := 0;
+                tc.Item[j].Refine := 0;
+            end else begin
+                tc.Item[j].Amount := StrToInt(frmMain.Edit58.Text);
+                tc.Item[j].Card[0] := 0;
+                tc.Item[j].Card[1] := 0;
+                tc.Item[j].Card[2] := 0;
+                tc.Item[j].Card[3] := 0;
+            end;
+        end;
+        DataSave(True);}
+        JCon_Chara_Inv_Load();
+    end;
+
+
+    procedure JCon_Chara_Cart_Load();
+    var
+		j : Integer;
+    	tc : TChara;
+        Item : TItemDB;
+
+	begin
+        frmMain.ListBox6.Clear;
+
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        for j := 1 to 100 do begin
+            if tc.Cart.Item[j].ID <> 0 then begin
+                Item := tc.Cart.Item[j].Data as TItemDB;
+                frmMain.ListBox6.Items.Add(Item.Name + ' : ' + IntToStr(tc.Cart.Item[j].ID));
+            end;
+        end;
+    end;
+
+    procedure JCon_Chara_Store_Load();
+    var
+		j : Integer;
+    	tc : TChara;
+        Item : TItemDB;
+
+	begin
+        frmMain.ListBox5.Clear;
+
+        if (frmMain.listbox2.ItemIndex = -1) then Exit;
+        tc := frmMain.listbox2.Items.Objects[frmMain.listbox2.ItemIndex] as TChara;
+        for j := 1 to 100 do begin
+            if tc.PData.Kafra.Item[j].ID <> 0 then begin
+                Item := tc.PData.Kafra.Item[j].Data as TItemDB;
+                frmMain.ListBox5.Items.Add(Item.Name + ' : ' + IntToStr(tc.PData.Kafra.Item[j].ID));
+            end;
+        end;
     end;
 
 
