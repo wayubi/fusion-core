@@ -40,7 +40,7 @@ implementation
             pfile := 'ActiveChars.txt';
             PD_Load_Accounts_ActiveCharacters(resultlist[i], path + pfile);
 
-            { Bug Tracing (01/06/05) }
+            { Bug Tracing: (01/06/05) }
                 // This one is really getting on my nerves. Apparently, Fusion
                 // has a stringlist error in the line below me.  However, that
                 // is not a string list, and quite frankly I have never heard

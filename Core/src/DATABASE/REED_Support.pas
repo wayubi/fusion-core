@@ -127,6 +127,17 @@ uses
             inventory_item[i-2].ID := reed_convert_type(columns.Strings[0], 0, i, path);
             inventory_item[i-2].Amount := reed_convert_type(columns.Strings[1], 0, i, path);
             inventory_item[i-2].Equip := reed_convert_type(columns.Strings[2], 0, i, path);
+
+            { Bug Tracing: 01/06/05 }
+                // Apparently the line below me has a "list index out of bounds (3)"
+                // type error.  From what I understand, the lines above read the data
+                // so its not a indexing error, but mere a "data does not exist" error.
+                // This is why it can read the first 3 columns but fails on the 4th.
+                // Why does it fail on the fourth? That's a good question.  Most likely,
+                // the guy on who it crashed had corrupted/missing gamedata.  Why?
+                // Don't know. He either messed with it, or there is an even bigger problem
+                // at hand.
+                // - AlexKreuz (01/06/05)
             inventory_item[i-2].Identify := reed_convert_type(columns.Strings[3], 0, i, path);
             inventory_item[i-2].Refine := reed_convert_type(columns.Strings[4], 0, i, path);
             inventory_item[i-2].Attr := reed_convert_type(columns.Strings[5], 0, i, path);
