@@ -1,3 +1,4 @@
+- 04-24-04: Memory Leaks in global list quick-fixed. [ChrstphrR]
 - 04-22-04: Mapload bugfix, & Script errors show proper line number [ChrstphrR]
 - 04-20-04: Small memory leaks plugged in map load routines. [ChrstphrR]
 - 04-20-04: Dead Branch summon monster code improvments. [ChrstphrR]
