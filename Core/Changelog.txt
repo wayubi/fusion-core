@@ -1,3 +1,4 @@
+- 04-07-04: Added Athena GM Commands - @rura, @warp. [AlexKreuz]
 - 04-07-04: Added Athena GM Commands - @rura+, @send, @warp+, @charwarp. [AlexKreuz]
 - 04-07-04: Renamed #greaper to #ironical. [AlexKreuz]
 - 04-07-04: Had to re-fix some set-math logic in Game - mea culpa :o [ChrstphrR]

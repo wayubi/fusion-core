@@ -760,7 +760,7 @@ Begin(* Proc sv3PacketProcess() *)
                                 if (h <> - 1) and (Pos(' : ', str) <> 0) and (Copy(str, Pos(' : ', str) + 3, 1) = '@') then begin
                                         str := Copy(str, Pos(' : ', str) + 4, 256);
 
-                                        if (copy(str, 1, 5) = 'rura+') or (copy(str, 1, 4) = 'send') or (copy(str, 1, 4) = 'warp') or (copy(str, 1, 8) = 'charwarp') then begin
+                                        if (copy(str, 1, 5) = 'rura+') or (copy(str, 1, 4) = 'send') or (copy(str, 1, 5) = 'warp+') or (copy(str, 1, 8) = 'charwarp') then begin
                                                 sl := tstringlist.Create;
                                                 sl.DelimitedText := str;
 
@@ -798,6 +798,25 @@ Begin(* Proc sv3PacketProcess() *)
                                                                         tc1.Point := point(i, j);
                                                                 end;
                                                         end;
+                                                end;
+                                                sl.Free;
+                                        end
+
+                                        else if (copy(str, 1, 4) = 'rura') or (copy(str, 1, 4) = 'warp') then begin
+                                                sl := tstringlist.Create;
+                                                sl.DelimitedText := str;
+
+                                                i := strtoint(sl.strings[2]);
+                                                j := strtoint(sl.strings[3]);
+
+                                                if maplist.IndexOf(sl.Strings[1]) <> -1 then begin
+                                                        ta := maplist.objects[maplist.indexof(sl.strings[1])] as tmaplist;
+                                                        if (i < 0) or (i >= ta.size.x) or (j < 0) or (j >= ta.size.y) then continue;
+
+                                                        sendcleave(tc, 2);
+                                                        tc.tmpMap := sl.Strings[1];
+                                                        tc.Point := point(i, j);
+                                                        mapmove(tc.Socket, tc.tmpMap, tc.Point);
                                                 end;
                                                 sl.Free;
                                         end
