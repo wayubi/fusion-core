@@ -16,7 +16,8 @@ uses
     {Fusion}
     Common, REED_Support,
     REED_LOAD_ACCOUNTS,
-    REED_LOAD_CHARACTERS;
+    REED_LOAD_CHARACTERS,
+    REED_LOAD_PETS;
 
     { Parsers }
     procedure PD_PlayerData_Load(UID : String = '*');
@@ -57,7 +58,6 @@ uses
     procedure PD_Save_Characters_Variables(forced : Boolean = False);
 
     { Character Data - Pets Data }
-    procedure PD_Load_Characters_Pets(UID : String = '*');
     procedure PD_Save_Characters_Pets(forced : Boolean = False);
 
 
@@ -127,7 +127,7 @@ uses
         PD_Load_Characters_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Pets ­');
-        PD_Load_Characters_Pets(UID);
+        PD_Load_Pets_Parse(UID);
 
         if UID = '*' then debugout.Lines.add('­ Parties ­');
         PD_Load_Parties_Members(UID);
@@ -1008,218 +1008,6 @@ uses
     { -------------------------------------------------------------------------------- }
     { -- Character Data - Pets Data -------------------------------------------------- }
     { -------------------------------------------------------------------------------- }
-    procedure PD_Load_Characters_Pets(UID : String = '*');
-    var
-    	searchResult : TSearchRec;
-        searchResult2 : TSearchRec;
-        searchPetResult : TSearchRec;
-        datafile : TStringList;
-        tp : TPlayer;
-        tpe : TPet;
-        tpd : TPetDB;
-        tmd : TMobDB;
-        tc : TChara;
-        i, j, k : Integer;
-    begin
-        tc := nil;
-        tp := nil;
-
-    	SetCurrentDir(AppPath+'gamedata\Accounts');
-        datafile := TStringList.Create;
-
-    	if FindFirst(UID, faDirectory, searchResult) = 0 then repeat
-            if (searchResult.Name = '.') or (searchResult.Name = '..') then Continue;
-
-            if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\*.txt', faAnyFile, searchPetResult) = 0 then repeat
-                if (searchPetResult.Name = '.') or (searchPetResult.Name = '..') then Continue;
-
-                try
-                    if FileExists(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\' + searchPetResult.Name) then begin
-                        datafile.LoadFromFile(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Pets\' + searchPetResult.Name);
-
-                        if (UID = '*') then begin
-                            tpe := TPet.Create;
-                        end else begin
-                            for i := 0 to PetList.Count - 1 do begin
-                                if PetList.IndexOf(i) = -1 then Continue;
-                                tpe := PetList.IndexOfObject(i) as TPet;
-                                if IntToStr(tpe.PetID)+'.txt' = searchPetResult.Name then begin
-                                    Break;
-                                end else begin
-                                    tpe := nil;
-                                end;
-                            end;
-                        end;
-
-                        tpe.PlayerID := StrToInt( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-                        tpe.CharaID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
-                        tpe.Cart := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
-                        tpe.Index := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
-                        tpe.Incubated := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
-                        tpe.PetID := StrToInt( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
-                        tpe.JID := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-                        tpe.Name := ( Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3) );
-                        tpe.Renamed := StrToInt( Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3) );
-                        tpe.LV := StrToInt( Copy(datafile[9], Pos(' : ', datafile[9]) + 3, length(datafile[9]) - Pos(' : ', datafile[9]) + 3) );
-                        tpe.Relation := StrToInt( Copy(datafile[10], Pos(' : ', datafile[10]) + 3, length(datafile[10]) - Pos(' : ', datafile[10]) + 3) );
-                        tpe.Fullness := StrToInt( Copy(datafile[11], Pos(' : ', datafile[11]) + 3, length(datafile[11]) - Pos(' : ', datafile[11]) + 3) );
-                        tpe.Accessory := StrToInt( Copy(datafile[12], Pos(' : ', datafile[12]) + 3, length(datafile[12]) - Pos(' : ', datafile[12]) + 3) );
-
-                        if (UID = '*') then begin
-                            PetList.AddObject(tpe.PetID, tpe);
-                        end;
-
-                    	//debugout.Lines.Add(tpe.Name + ' pet data loaded.');
-                    end;
-            	except
-            		DebugOut.Lines.Add('Pet data could not be loaded.');
-                end;
-            until FindNext(searchPetResult) <> 0;
-            FindClose(searchPetResult);
-
-        	if FindFirst(AppPath+'gamedata\Accounts\' + searchResult.Name + '\Characters\*', faDirectory, searchResult2) = 0 then repeat
-                if (searchResult2.Name = '.') or (searchResult2.Name = '..') then Continue;
-
-                if FindFirst(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Pets\*.txt', faAnyFile, searchPetResult) = 0 then repeat
-                    if (searchPetResult.Name = '.') or (searchPetResult.Name = '..') then Continue;
-
-                    try
-                        if FileExists(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Pets\' + searchPetResult.Name) then begin
-                            datafile.LoadFromFile(AppPath + 'gamedata\Accounts\' + searchResult.Name + '\Characters\' + searchResult2.Name + '\Pets\' + searchPetResult.Name);
-
-                            if (UID = '*') then begin
-                                tpe := TPet.Create;
-                            end else begin
-                                for i := 0 to PetList.Count - 1 do begin
-                                    if PetList.IndexOf(i) = -1 then Continue;
-                                    tpe := PetList.IndexOfObject(i) as TPet;
-                                    if IntToStr(tpe.PetID)+'.txt' = searchPetResult.Name then begin
-                                        Break;
-                                    end else begin
-                                        tpe := nil;
-                                    end;
-                                end;
-                            end;
-
-                            tpe.PlayerID := StrToInt( Copy(datafile[0], Pos(' : ', datafile[0]) + 3, length(datafile[0]) - Pos(' : ', datafile[0]) + 3) );
-                            tpe.CharaID := StrToInt( Copy(datafile[1], Pos(' : ', datafile[1]) + 3, length(datafile[1]) - Pos(' : ', datafile[1]) + 3) );
-                            tpe.Cart := StrToInt( Copy(datafile[2], Pos(' : ', datafile[2]) + 3, length(datafile[2]) - Pos(' : ', datafile[2]) + 3) );
-                            tpe.Index := StrToInt( Copy(datafile[3], Pos(' : ', datafile[3]) + 3, length(datafile[3]) - Pos(' : ', datafile[3]) + 3) );
-                            tpe.Incubated := StrToInt( Copy(datafile[4], Pos(' : ', datafile[4]) + 3, length(datafile[4]) - Pos(' : ', datafile[4]) + 3) );
-                            tpe.PetID := StrToInt( Copy(datafile[5], Pos(' : ', datafile[5]) + 3, length(datafile[5]) - Pos(' : ', datafile[5]) + 3) );
-                            tpe.JID := StrToInt( Copy(datafile[6], Pos(' : ', datafile[6]) + 3, length(datafile[6]) - Pos(' : ', datafile[6]) + 3) );
-                            tpe.Name := ( Copy(datafile[7], Pos(' : ', datafile[7]) + 3, length(datafile[7]) - Pos(' : ', datafile[7]) + 3) );
-                            tpe.Renamed := StrToInt( Copy(datafile[8], Pos(' : ', datafile[8]) + 3, length(datafile[8]) - Pos(' : ', datafile[8]) + 3) );
-                            tpe.LV := StrToInt( Copy(datafile[9], Pos(' : ', datafile[9]) + 3, length(datafile[9]) - Pos(' : ', datafile[9]) + 3) );
-                            tpe.Relation := StrToInt( Copy(datafile[10], Pos(' : ', datafile[10]) + 3, length(datafile[10]) - Pos(' : ', datafile[10]) + 3) );
-                            tpe.Fullness := StrToInt( Copy(datafile[11], Pos(' : ', datafile[11]) + 3, length(datafile[11]) - Pos(' : ', datafile[11]) + 3) );
-                            tpe.Accessory := StrToInt( Copy(datafile[12], Pos(' : ', datafile[12]) + 3, length(datafile[12]) - Pos(' : ', datafile[12]) + 3) );
-
-                            if (UID = '*') then begin
-                                PetList.AddObject(tpe.PetID, tpe);
-                            end;
-
-                            //debugout.Lines.Add(tpe.Name + ' pet data loaded.');
-                        end;
-                    except
-                        DebugOut.Lines.Add('Pet data could not be loaded.');
-                    end;
-
-                until FindNext(searchPetResult) <> 0;
-                FindClose(searchPetResult);
-
-            until FindNext(searchResult2) <> 0;
-            FindClose(searchResult2);
-
-        until FindNext(searchResult) <> 0;
-        FindClose(searchResult);
-
-        datafile.Clear;
-        datafile.Free;
-
-
-	    for i := 0 to PetList.Count - 1 do begin
-
-    		tpe := PetList.Objects[i] as TPet;
-
-            if (tpe.Index < 1) or (tpe.Index > 100) then Continue;
-	    	if tpe.PlayerID = 0 then continue;
-
-    		if tpe.CharaID = 0 then begin
-	    		tp := Player.IndexofObject( tpe.PlayerID ) as TPlayer;
-		    	with tp.Kafra.Item[ tpe.Index ] do begin
-    				Attr    := 0;
-	    			Card[0] := $FF00;
-		    		Card[2] := tpe.PetID mod $10000;
-			    	Card[3] := tpe.PetID div $10000;
-
-                    for j := 0 to PetDB.Count - 1 do begin
-                        tpd := PetDB.Objects[j] as TPetDB;
-                        if tpd.EggID = ID then begin
-                            tpe.JID := tpd.MobID;
-                            k := MobDB.IndexOf( tpd.MobID );
-                            if k <> -1 then begin
-                                tmd := MobDB.Objects[k] as TMobDB;
-                                tpe.LV := tmd.LV;
-                            end;
-                            tpe.Data := tpd;
-                            break;
-                        end;
-                    end;
-
-		    	end;
-    		end else begin
-	    		tc := Chara.IndexOfObject( tpe.CharaID ) as TChara;
-		    	if tpe.Cart = 0 then begin
-			    	with tc.Item[ tpe.Index ] do begin
-    					Attr    := tpe.Incubated;
-	    				Card[0] := $FF00;
-		    			Card[2] := tpe.PetID mod $10000;
-			    		Card[3] := tpe.PetID div $10000;
-
-                        for j := 0 to PetDB.Count - 1 do begin
-                            tpd := PetDB.Objects[j] as TPetDB;
-                            if tpd.EggID = ID then begin
-                                tpe.JID := tpd.MobID;
-                                k := MobDB.IndexOf( tpd.MobID );
-                                if k <> -1 then begin
-                                    tmd := MobDB.Objects[k] as TMobDB;
-                                    tpe.LV := tmd.LV;
-                                end;
-                                tpe.Data := tpd;
-                                break;
-                            end;
-                        end;
-    				end;
-	    		end else begin
-		    		with tc.Cart.Item[ tpe.Index ] do begin
-			    		Attr    := 0;
-				    	Card[0] := $FF00;
-					    Card[2] := tpe.PetID mod $10000;
-    					Card[3] := tpe.PetID div $10000;
-
-                        for j := 0 to PetDB.Count - 1 do begin
-                            tpd := PetDB.Objects[j] as TPetDB;
-                            if tpd.EggID = ID then begin
-                                tpe.JID := tpd.MobID;
-                                k := MobDB.IndexOf( tpd.MobID );
-                                if k <> -1 then begin
-                                    tmd := MobDB.Objects[k] as TMobDB;
-                                    tpe.LV := tmd.LV;
-                                end;
-                                tpe.Data := tpd;
-                                break;
-                            end;
-                        end;
-	    			end;
-		    	end;
-    		end;
-
-    		if NowPetID <= tpe.PetID then NowPetID := tpe.PetID + 1;
-	    end;
-
-    end;
-    
     procedure PD_Save_Characters_Pets(forced : Boolean = False);
     var
     	datafile : TStringList;
@@ -1230,6 +1018,7 @@ uses
         tc : TChara;
     	i, j, k, l : Integer;
     begin
+
     	datafile := TStringList.Create;
 
         for i := 0 to PetList.Count - 1 do begin
@@ -1240,200 +1029,88 @@ uses
         for i := 0 to PlayerName.Count - 1 do begin
             tp := PlayerName.Objects[i] as TPlayer;
 
-            // Delete Junk Pets
-            SetCurrentDir(AppPath+'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\');
-            if FindFirst('*.txt', faAnyFile,searchResult) = 0 then repeat
-
-                petdelete := True;
-
-                for k := 0 to PetList.Count - 1 do begin
-                    if PetList.IndexOf(k) = -1 then Continue;
-                    tpe := PetList.IndexOfObject(k) as TPet;
-                    if IntToStr(tpe.PetID)+'.txt' = searchResult.Name then begin
-                        petdelete := False;
-                        Break;
-                    end;
-                end;
-
-                if petdelete then begin
-                    DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + searchResult.Name);
-                    //RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
-                end;
-
-            until FindNext(searchResult) <> 0;
-            FindClose(searchResult);
-            // Delete Junk Pets           
-
             if (tp.Login = 0) and (not forced) then Continue;
 
-    		for j := 1 to 100 do begin
-    			with tp.Kafra.Item[j] do begin
-                    if (ID <> 0) and (Amount > 0) and (Card[0] = $FF00) then begin
-                        for k := 0 to PetList.Count - 1 do begin
-                            if (PetList.IndexOf(k) <> -1)  then begin
-                                tpe := PetList.IndexOfObject( k ) as TPet;
-                                if tpe.Saved = 0 then begin
-
-                                    if tpe.PlayerID <> tp.ID then Continue;
-
-                                    datafile.Clear;
-                                    datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
-                                    datafile.Add('CID : ' + IntToStr(tpe.CharaID));
-                                    datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-                                    datafile.Add('IDX : ' + IntToStr(tpe.Index));
-                                    datafile.Add('INC : ' + IntToStr(tpe.Incubated));
-                                    datafile.Add('PID : ' + IntToStr(tpe.PetID));
-                                    datafile.Add('JID : ' + IntToStr(tpe.JID));
-                                    datafile.Add('NAM : ' + tpe.Name);
-                                    datafile.Add('REN : ' + IntToStr(tpe.Renamed));
-                                    datafile.Add('PLV : ' + IntToStr(tpe.LV));
-                                    datafile.Add('REL : ' + IntToStr(tpe.Relation));
-                                    datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
-                                    datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
-
-                                    CreateDir(AppPath + 'gamedata\Accounts');
-                                    CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
-                                    CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
-
-                                    try
-                                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
-                                        //debugout.Lines.Add(tpe.Name + ' player pets data saved.');
-                                    except
-                                        DebugOut.Lines.Add('Player pets data could not be saved.');
-                                    end;
-
-                                    tpe.Saved := 1;
-    							end;
-    						end;
-    					end;
-    				end;
-    			end;
-    		end;
-
-            for j := 0 to 8 do begin
-                tc := tp.CData[j];
-
-                if (tc = nil) then continue;
-
-                // Delete Junk Pets
-                if FindFirst(AppPath+'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\*.txt', faAnyFile,searchResult) = 0 then repeat
-
-                    petdelete := True;
-
+            for j := 1 to 100 do begin
+                if (tp.Kafra.Item[j].ID <> 0) and (tp.Kafra.Item[j].Amount > 0) and (tp.Kafra.Item[j].Card[0] = $FF00) then begin
                     for k := 0 to PetList.Count - 1 do begin
                         tpe := PetList.IndexOfObject(k) as TPet;
 
-                        if tpe.Saved = 1 then Continue;
+                        if tp.Kafra.Item[j].Card[1] <> tpe.PetID then Continue;
+                        if tpe.PlayerID <> tp.ID then Continue;
+                        if tpe.Saved <> 0 then Continue;
 
-                        if IntToStr(tpe.PetID)+'.txt' = searchResult.Name then begin
-                            petdelete := False;
-                            Break;
-                        end;
-                    end;
+                        tpe.Incubated := 0;
+                        tpe.CharaID := 0;
+                        tpe.Index := 0;
 
-                    if petdelete then begin
-                        DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + searchResult.Name);
-                        //RmDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
-                    end;
-                    
-                until FindNext(searchResult) <> 0;
-                FindClose(searchResult);
-                // Delete Junk Pets
+                        datafile.Clear;
+                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
+                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
+                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
+                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
+                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
+                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
+                        datafile.Add('JID : ' + IntToStr(tpe.JID));
+                        datafile.Add('NAM : ' + tpe.Name);
+                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
+                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
+                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
+                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
+                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
 
-                if PetList.Count = 0 then Continue;
+                        CreateDir(AppPath + 'gamedata\Accounts');
+                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
+                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
+                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID));
 
-                for k := 1 to 100 do begin
-                    with tc.Item[k] do begin
-                        if (ID <> 0) and (Amount > 0) and (Card[0] = $FF00) then begin
-                            for l := 0 to PetList.Count - 1 do begin
-                                if (PetList.IndexOf(l) <> -1) then begin
-                                    tpe := PetList.IndexOfObject(l) as TPet;
-                                    if tpe.Saved = 0 then begin
+                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '\Pet.txt');
 
-                                        if tpe.CharaID <> tc.CID then Continue;
-
-                                        datafile.Clear;
-                                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
-                                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
-                                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-                                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
-                                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
-                                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
-                                        datafile.Add('JID : ' + IntToStr(tpe.JID));
-                                        datafile.Add('NAM : ' + tpe.Name);
-                                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
-                                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
-                                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
-                                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
-                                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
-
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
-
-                                        try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
-                                        	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
-                                    	except
-                                	    	DebugOut.Lines.Add('Character pets data could not be saved.');
-                                    	end;
-
-                                        tpe.Saved := 1;
-
-                                    end;
-                                end;
-                            end;
-                        end;
-                    end;
-
-                    with tc.Cart.Item[k] do begin
-                        if (ID <> 0) and (Amount > 0) and (Card[0] = $FF00) then begin
-                            for l := 0 to PetList.Count - 1 do begin
-                                if (PetList.IndexOf(l) <> -1) then begin
-                                    tpe := PetList.IndexOfObject(l) as TPet;
-                                    if tpe.Saved = 0 then begin
-
-                                        if tpe.CharaID <> tc.CID then Continue;
-
-                                        datafile.Clear;
-                                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
-                                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
-                                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
-                                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
-                                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
-                                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
-                                        datafile.Add('JID : ' + IntToStr(tpe.JID));
-                                        datafile.Add('NAM : ' + tpe.Name);
-                                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
-                                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
-                                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
-                                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
-                                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
-
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters');
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID));
-                                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets');
-
-                                        try
-                    	                	datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Characters\' + IntToStr(tc.CID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
-                                            if FindFirst(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt', faAnyFile,searchResult) = 0 then
-                                                DeleteFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '.txt');
-                                        	//debugout.Lines.Add(tpe.Name + ' character pets data saved.');
-                                    	except
-                                	    	DebugOut.Lines.Add('Character pets data could not be saved.');
-                                    	end;
-
-                                        tpe.Saved := 1;
-
-                                    end;
-                                end;
-                            end;
-                        end;
+                        tpe.Saved := 1;
                     end;
                 end;
+            end;
 
+            for l := 0 to 8 do begin
+                tc := tp.CData[l];
+
+                if (tc = nil) then Continue;
+
+	            for j := 1 to 100 do begin
+	                if (tc.Item[j].ID <> 0) and (tc.Item[j].Amount > 0) and (tc.Item[j].Card[0] = $FF00) then begin
+	                    for k := 0 to PetList.Count - 1 do begin
+	                        tpe := PetList.IndexOfObject(k) as TPet;
+	
+	                        if tc.Item[j].Card[1] <> tpe.PetID then Continue;
+	                        if tpe.CharaID <> tc.CID then Continue;
+	                        if tpe.Saved <> 0 then Continue;
+
+	                        datafile.Clear;
+	                        datafile.Add('AID : ' + IntToStr(tpe.PlayerID));
+	                        datafile.Add('CID : ' + IntToStr(tpe.CharaID));
+	                        datafile.Add('CRT : ' + IntToStr(tpe.Cart));
+	                        datafile.Add('IDX : ' + IntToStr(tpe.Index));
+	                        datafile.Add('INC : ' + IntToStr(tpe.Incubated));
+	                        datafile.Add('PID : ' + IntToStr(tpe.PetID));
+	                        datafile.Add('JID : ' + IntToStr(tpe.JID));
+	                        datafile.Add('NAM : ' + tpe.Name);
+	                        datafile.Add('REN : ' + IntToStr(tpe.Renamed));
+	                        datafile.Add('PLV : ' + IntToStr(tpe.LV));
+	                        datafile.Add('REL : ' + IntToStr(tpe.Relation));
+	                        datafile.Add('FUL : ' + IntToStr(tpe.Fullness));
+	                        datafile.Add('ACC : ' + IntToStr(tpe.Accessory));
+
+	                        CreateDir(AppPath + 'gamedata\Accounts');
+	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID));
+	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets');
+	                        CreateDir(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID));
+
+	                        datafile.SaveToFile(AppPath + 'gamedata\Accounts\' + IntToStr(tp.ID) + '\Pets\' + IntToStr(tpe.PetID) + '\Pet.txt');
+
+	                        tpe.Saved := 1;
+	                    end;
+	                end;
+	            end;
             end;
 
         end;

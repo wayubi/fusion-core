@@ -1813,7 +1813,7 @@ end;
                     	if not check_attack_lag(tc) then begin
 
                         iscs_console_disconnect(tc);
-                        DataSave();
+                        //DataSave();
 
 						SendCLeave(Socket.Data, 2);
 
@@ -2813,6 +2813,13 @@ end;
                                         Dec(tp.Kafra.Weight,weight);
 			        	SendCStat1(tc, 0, $0018, tc.Weight);
                                 end;
+
+                if (tc.Item[j].Card[0] = $FF00) then begin
+                    if PetList.IndexOf(tc.Item[j].Card[1]) = -1 then Continue;
+                    tpe := PetList.Objects[PetList.IndexOf(tc.Item[j].Card[1])] as TPet;
+                    tpe.Index := j;
+                    tpe.CharaID := tc.CID;
+                end;
 			end;
 		//--------------------------------------------------------------------------
 		$00f7: //‘qŒÉ•Â‚¶
@@ -5402,6 +5409,7 @@ end;
                                                         PetList.AddObject( tpe.PetID, tpe );
 
                                                         tc.Item[w].Card[0] := $FF00;
+                                                        tc.Item[w].Card[1] := tpe.PetID;
                                                         tc.Item[w].Card[2] := tpe.PetID mod $10000;
                                                         tc.Item[w].Card[3] := tpe.PetID div $10000;
 
