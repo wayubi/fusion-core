@@ -1153,229 +1153,44 @@ begin
 
 
     //---- We need to clear this memory in a CLEAN way once and for all ----//
-    if ScriptList.Count > 0 then ScriptList.Free;
+    fnl_lists(ScriptList, nil);
+    fnl_lists(ItemDBName, ItemDB);
+    fnl_lists(nil, MaterialDB);
+    fnl_lists(MobDBName, MobDB);
+    fnl_lists(nil, MArrowDB);
+    fnl_lists(WarpDatabase, nil);
+    fnl_lists(nil, MobAIDB);
+    fnl_lists(nil, MobAIDBFusion);
+    fnl_lists(GlobalVars, nil);
+    fnl_lists(nil, IDTableDB);
+    fnl_lists(SlaveDBName, nil);
+    fnl_lists(SkillDBName, SkillDB);
+    fnl_lists(PlayerName, Player);
+    fnl_lists(CharaName, Chara);
+    fnl_lists(nil, CharaPID);
+    fnl_lists(nil, ChatRoomList);
+    fnl_lists(PartyNameList, PartyList);
+    fnl_lists(CastleList, nil);
+    fnl_lists(TerritoryList, nil);
+    fnl_lists(EmpList, nil);
+    fnl_lists(nil, PetDB);
+    fnl_lists(nil, PetList);
+    fnl_lists(nil, VenderList);
+    fnl_lists(nil, DealingList);
+    fnl_lists(SummonMobListMVP, nil);
+    fnl_lists(SummonIOBList, nil);
+    fnl_lists(SummonIOVList, nil);
+    fnl_lists(SummonICAList, nil);
+    fnl_lists(SummonIGBList, nil);
+    fnl_lists(SUmmonIOWBList, nil);
+    fnl_lists(ServerFlag, nil);
+    fnl_lists(nil, GuildList);
+    fnl_lists(nil, GSkillDB);
+    fnl_lists(Map, nil);
+    fnl_lists(MapInfo, nil);
+    fnl_lists(MapList, nil);
 
-    if ItemDB.Count > 0 then begin
-        for Idx := 0 to ItemDB.Count - 1 do begin
-            if assigned(ItemDB.Objects[Idx]) then
-                ItemDB.Objects[Idx].Free;
-        end;
-        ItemDB.Free;
-    end;
-    if ItemDBName.Count > 0 then ItemDBName.Free;
-
-    if MaterialDB.Count > 0 then begin
-        for Idx := 0 to MaterialDB.Count - 1 do begin
-            if assigned(MaterialDB.Objects[Idx]) then
-                MaterialDB.Objects[Idx].Free;
-        end;
-        MaterialDB.Free;
-    end;
-
-    if MobDB.Count > 0 then begin
-        for Idx := 0 to MobDB.Count - 1 do begin
-            if assigned(MobDB.Objects[Idx]) then
-                MobDB.Objects[Idx].Free;
-        end;
-        MobDB.Free;
-    end;
-    if MobDBName.Count > 0 then MobDBName.Free;
-
-    if MArrowDB.Count > 0 then begin
-        for Idx := 0 to MArrowDB.Count - 1 do begin
-            if assigned(MArrowDB.Objects[Idx]) then
-                MArrowDB.Objects[Idx].Free;
-        end;
-        MArrowDB.Free;
-    end;
-
-    if WarpDatabase.Count > 0 then begin
-        for Idx := 0 to WarpDatabase.Count - 1 do begin
-            if assigned(WarpDatabase.Objects[Idx]) then
-                WarpDatabase.Objects[Idx].Free;
-        end;
-        WarpDatabase.Free;
-    end;
-
-    if MobAIDB.Count > 0 then MobAIDB.Free;
-
-    if MobAIDBFusion.Count > 0 then begin
-        for Idx := 0 to MobAIDBFusion.Count - 1 do begin
-            if assigned(MobAIDBFusion.Objects[Idx]) then
-                MobAIDBFusion.Objects[Idx].Free;
-        end;
-        MobAIDBFusion.Free;
-    end;
-
-    if GlobalVars.Count > 0 then GlobalVars.Free;
-
-    if IDTableDB.Count > 0 then begin
-        for Idx := 0 to IDTableDB.Count - 1 do begin
-            if assigned(IDTableDB.Objects[Idx]) then
-                IDTableDB.Objects[Idx].Free;
-        end;
-        IDTableDB.Free;
-    end;
-
-    if SlaveDBName.Count > 0 then begin
-        for Idx := 0 to SlaveDBName.Count - 1 do begin
-            if assigned(SlaveDBName.Objects[Idx]) then
-                SlaveDBName.Objects[Idx].Free;
-        end;
-        SlaveDBName.Free;
-    end;
-
-    if SkillDB.Count > 0 then begin
-        for Idx := 0 to SkillDB.Count - 1 do begin
-            if assigned(SkillDB.Objects[Idx]) then
-                SkillDB.Objects[Idx].Free;
-        end;
-        SkillDB.Free;
-    end;
-    if SkillDBName.Count > 0 then SkillDBName.Free;
-
-    if Player.Count > 0 then begin
-        for Idx := 0 to Player.Count - 1 do begin
-            if assigned(Player.Objects[Idx]) then
-                Player.Objects[Idx].Free;
-        end;
-        Player.Free;
-    end;
-    if PlayerName.Count > 0 then PlayerName.Free;
-
-    if Chara.Count > 0 then begin
-        for Idx := 0 to Chara.Count - 1 do begin
-            if assigned(Chara.Objects[Idx]) then
-                Chara.Objects[Idx].Free;
-        end;
-        Chara.Free;
-    end;
-    if CharaName.Count > 0 then CharaName.Free;
-    if CharaPID.Count > 0 then CharaPID.Free;
-
-    if ChatRoomList.Count > 0 then begin
-        for Idx := 0 to ChatRoomList.Count - 1 do begin
-            if assigned(ChatRoomList.Objects[Idx]) then
-                ChatRoomList.Objects[Idx].Free;
-        end;
-        ChatRoomList.Free;
-    end;
-
-    if PartyNameList.Count > 0 then begin
-        for Idx := 0 to PartyNameList.Count - 1 do begin
-            if assigned(PartyNameList.Objects[Idx]) then
-                PartyNameList.Objects[Idx].Free;
-        end;
-        PartyNameList.Free;
-    end;
-    if PartyList.Count > 0 then PartyList.Free;
-
-    if CastleList.Count > 0 then begin
-        for Idx := 0 to CastleList.Count - 1 do begin
-            if assigned(CastleList.Objects[Idx]) then
-                CastleList.Objects[Idx].Free;
-        end;
-        CastleList.Free;
-    end;
-
-    if TerritoryList.Count > 0 then begin
-        for Idx := 0 to TerritoryList.Count - 1 do begin
-            if assigned(TerritoryList.Objects[Idx]) then
-                TerritoryList.Objects[Idx].Free;
-        end;
-        TerritoryList.Free;
-    end;
-
-    if EmpList.Count > 0 then begin
-        for Idx := 0 to EmpList.Count - 1 do begin
-            if assigned(EmpList.Objects[Idx]) then
-                EmpList.Objects[Idx].Free;
-        end;
-        EmpList.Free;
-    end;
-
-    if PetDB.Count > 0 then begin
-        for Idx := 0 to PetDB.Count - 1 do begin
-            if assigned(PetDB.Objects[Idx]) then
-                PetDB.Objects[Idx].Free;
-        end;
-        PetDB.Free;
-    end;
-
-    if PetList.Count > 0 then begin
-        for Idx := 0 to PetList.Count - 1 do begin
-            if assigned(PetList.Objects[Idx]) then
-                PetList.Objects[Idx].Free;
-        end;
-        PetList.Free;
-    end;
-
-    if VenderList.Count > 0 then begin
-        for Idx := 0 to VenderList.Count - 1 do begin
-            if assigned(VenderList.Objects[Idx]) then
-                VenderList.Objects[Idx].Free;
-        end;
-        VenderList.Free;
-    end;
-
-    if DealingList.Count > 0 then begin
-        for Idx := 0 to DealingList.Count - 1 do begin
-            if assigned(DealingList.Objects[Idx]) then
-                DealingList.Objects[Idx].Free;
-        end;
-        DealingList.Free;
-    end;
-
-    if SummonMobList.Count > 0 then SummonMobList.Free;
-    if SummonMobListMVP.Count > 0 then SummonMobListMVP.Free;
-
-    if SummonIOBList.Count > 0 then SummonIOBList.Free;
-    if SummonIOVList.Count > 0 then SummonIOVList.Free;
-    if SummonICAList.Count > 0 then SummonICAList.Free;
-    if SummonIGBList.Count > 0 then SummonIGBList.Free;
-    if SUmmonIOWBList.Count > 0 then SummonIOWBList.Free;
-
-    if ServerFlag.Count > 0 then ServerFlag.Free;
-
-    if GuildList.Count > 0 then begin
-        for Idx := 0 to GuildList.Count - 1 do begin
-            if assigned(GuildList.Objects[Idx]) then
-                GuildList.Objects[Idx].Free;
-        end;
-        GuildList.Free;
-    end;
-
-    if GSkillDB.Count > 0 then begin
-        for Idx := 0 to GSkillDB.Count - 1 do begin
-            if assigned(GSkillDB.Objects[Idx]) then
-                GSkillDB.Objects[Idx].Free;
-        end;
-        GSkillDB.Free;
-    end;
-
-    if Map.Count > 0 then begin
-        for Idx := 0 to Map.Count - 1 do begin
-            if assigned(Map.Objects[Idx]) then
-                Map.Objects[Idx].Free;
-        end;
-        Map.Free;
-    end;
-
-    if MapInfo.Count > 0 then begin
-        for Idx := 0 to MapInfo.Count - 1 do begin
-            if assigned(MapInfo.Objects[Idx]) then
-                MapInfo.Objects[Idx].Free;
-        end;
-        MapInfo.Free;
-    end;
-
-    if MapList.Count > 0 then begin
-        for Idx := 0 to MapList.Count - 1 do begin
-            if assigned(MapList.Objects[Idx]) then
-                MapList.Objects[Idx].Free;
-        end;
-        MapList.Free;
-    end;
+    FreeAndNil(SummonMobList);
     //---- The rest is the dirty shit commented out in case I need it ----//
 
 

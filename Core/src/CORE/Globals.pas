@@ -43,6 +43,8 @@ uses
     function addto_storage(tc : TChara; storage_items : array of TItem; amt, w1, w2: Integer) : Integer;
     function takefrom_storage(tc : TChara; storage_items : array of TItem; cnt, l, w1, w2 : Integer) : Integer;
 
+    procedure fnl_lists(stringlist : TStringList; intlist : TIntList32);
+
 implementation
 
 uses
@@ -704,6 +706,39 @@ uses
             tpe := PetList.Objects[PetList.IndexOf(tc.Item[j].Card[1])] as TPet;
             tpe.Index := j;
             tpe.CharaID := tc.CID;
+        end;
+
+    end;
+
+
+    procedure fnl_lists(stringlist : TStringList; intlist : TIntList32);
+    var
+        idx : Integer;
+        dual : Boolean;
+    begin
+
+        dual := False;
+        if assigned(stringlist) and assigned(intlist) then dual := True;
+
+        if assigned(stringlist) then begin
+            if stringlist.Count > 0 then begin
+                for idx := 0 to stringlist.Count - 1 do begin
+                    if assigned(stringlist.Objects[idx]) then
+                        stringlist.Objects[idx].Free;
+                        stringlist.Objects[idx] := nil;
+                end;
+            end;
+            FreeAndNil(stringlist);
+        end;
+
+        if assigned(intlist) then begin
+            if (intlist.Count > 0) and not (dual) then begin
+                for idx := 0 to intlist.Count - 1 do begin
+                    if assigned(intlist.Objects[idx]) then
+                        intlist.Objects[idx].Free;
+                end;
+            end;
+            FreeAndNil(intlist);
         end;
 
     end;
