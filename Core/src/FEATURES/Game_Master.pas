@@ -1395,7 +1395,7 @@ Called when we're shutting down the server *only*
                         if (job > LOWER_JOB_END) then begin
                             l := job - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
                             if (DisableAdv2ndDye) and (job > 30) then
-                                tc.ClothesColor := 0
+                                tc.ClothesColor := 0;
                         end
 
                         else begin
