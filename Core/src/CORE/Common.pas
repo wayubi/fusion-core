@@ -4127,12 +4127,18 @@ begin
 	tm.NPC.AddObject(tn.ID, tn);
 	tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC.AddObject(tn.ID, tn);
 
-        if tn.JID = 141 then begin
-          tm.gat[tn.Point.X][tn.Point.Y] := 1;
+        if tn.JID = $8D then begin  // Icewall:
+          tm.gat[tn.Point.X][tn.Point.Y] := 5;  // 1-> 5, so you can snipe through?
+          WFIFOW(0, $0192);
+          WFIFOW(2, tn.Point.X);
+          WFIFOW(4, tn.Point.Y);
+          WFIFOW(6, 5);
+          WFIFOS(8, tm.Name, 16);
+ 	        SendBCmd(tm, tn.Point, 24);
         end;
 
         if tn.JID = $46 then begin
-                WFIFOW( 0, $011f);
+          WFIFOW( 0, $011f);
 	        WFIFOL( 2, tn.ID);
 	        WFIFOL( 6, ID);
 	        WFIFOW(10, tn.Point.X);
@@ -7106,7 +7112,8 @@ begin
 								tn.Script[k].DataCnt := 2;
 								Inc(k);
 {アジト機能追加}
-							end else if str = 'getagit' then begin //------- 44a getagit
+							{Colus, 20040110: Updated guild territory command codes}
+							end else if str = 'getagit' then begin //------- 58 getagit
 								if (sl1.Count <> 3) then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [getagit] function error', [ScriptPath, lines]));
 									exit;
@@ -7120,14 +7127,14 @@ begin
 									exit;
 								end;
 								SetLength(tn.Script, k + 1);
-								tn.Script[k].ID := 45;
+								tn.Script[k].ID := 58;
 								SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data2, 2);
 								tn.Script[k].Data1[0] := sl1.Strings[0];
 								tn.Script[k].Data2[0] := LowerCase(sl1.Strings[1]);
 								tn.Script[k].Data2[1] := LowerCase(sl1.Strings[2]);
 								Inc(k);
-							end else if str = 'getmyguild' then begin //------- 44b getguild
+							end else if str = 'getmyguild' then begin //------- 59 getguild
 								if (sl1.Count <> 1) then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [getmyguild] function error', [ScriptPath, lines]));
 									exit;
@@ -7137,19 +7144,19 @@ begin
 									exit;
 								end;
 								SetLength(tn.Script, k + 1);
-								tn.Script[k].ID := 46;
+								tn.Script[k].ID := 59;
 								SetLength(tn.Script[k].Data1, 1);
 								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
 								Inc(k);
 
 
-							end else if str = 'agitregist' then begin //------- 44c agitregist
+							end else if str = 'agitregist' then begin //------- 60 agitregist
 								if (sl1.Count <> 1) then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [agitregist] function error', [ScriptPath, lines]));
 									exit;
 								end;
 								SetLength(tn.Script, k + 1);
-								tn.Script[k].ID := 47;
+								tn.Script[k].ID := 60;
 								SetLength(tn.Script[k].Data1, 1);
 								tn.Script[k].Data1[0] := sl1.Strings[0];
 								Inc(k);
@@ -7325,13 +7332,13 @@ begin
 								SetLength(tn.Script, k + 1);
 								tn.Script[k].ID := 56;
 								Inc(k);
-              {end else if str = 'movenpc' then begin //------- 60 Move NPC
+              {end else if str = 'movenpc' then begin //------- 61 Move NPC
                                                                 if sl1.Count <> 0 then begin
 									DebugOut.Lines.Add(Format('%s %.4d: [guilddinvest] function error', [ScriptPath, lines]));
 									exit;
 								end;
 								SetLength(tn.Script, k + 1);
-								tn.Script[k].ID := 60;
+								tn.Script[k].ID := 61;
                                                                 SetLength(tn.Script[k].Data1, 1);
 								SetLength(tn.Script[k].Data3, 1);
 								tn.Script[k].Data1[0] := LowerCase(sl1.Strings[0]);
