@@ -5890,8 +5890,13 @@ end;
 									i := 0;
 								end;
 							else begin//•Ší»‘¢(¬Œ÷—¦‚ÍjobLv * 0.3 + DEX * 0.1 + LUK * 0.1 + ƒXƒLƒ‹•â³ + 15 ‚Æ‰¼’è)
-									if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100) + 150 + (tc.Skill[107].Lv * 10) + anvil - (w2 + (tma.ItemLV -1) * 100)) then i := 0;
-								end;
+                // Colus 20040118: Adding Pharamacy check here
+                if (tma.RequireSkill = 228) then begin
+                  if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100)) then i := 0;
+                end else begin
+                  if (Random(1000) < (tc.JobLV * 3 + tc.Param[4] + tc.Param[5]) + (tc.Skill[tma.RequireSkill].Lv * 100) + 150 + (tc.Skill[107].Lv * 10) + anvil - (w2 + (tma.ItemLV -1) * 100)) then i := 0;
+                end;
+              end;
 						end;
 
 					end;
@@ -5961,7 +5966,12 @@ end;
           // flag = 02 is success of Pharmacy
           // flag = 03 is failure of Pharmacy
 					WFIFOW(0, $018f);
-					WFIFOW(2, i);
+          if (tma.RequireSkill = 228) then begin
+            WFIFOW(2, i+2);
+          end else begin
+					  WFIFOW(2, i);
+          end;
+          
 					WFIFOW(4, m1);
           Socket.SendBuf(buf, 6);
 
@@ -5976,9 +5986,17 @@ end;
           WFIFOW(0, $019b);
           WFIFOL(2, tc.ID);
           if (i = 0) then begin
-            WFIFOL(6, 3);
+            if (tma.RequireSkill = 228) then begin
+              WFIFOL(6, 5);
+            end else begin
+              WFIFOL(6, 3);
+            end;
           end else begin
-            WFIFOL(6, 2);          
+            if (tma.RequireSkill = 228) then begin
+              WFIFOL(6, 6);
+            end else begin
+              WFIFOL(6, 2);
+            end;
           end;
 
 					SendBCmd(tm, tc.Point, 10);

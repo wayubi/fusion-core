@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.209 - January ??, 2004
 --------------------------------------------------------------------------------
+- 01-18-04: Updated Pharmacy [Colus]
+- 01-18-04: Fixed unhide consuming SP [Colus]
 - 01-18-04: Fixed monster looting more than 10 items bug. Items disappear. [AlexKreuz]
 - 01-18-04: Updated Sanctuary/Apple of Idun effects [Colus]
 - 01-18-04: Updated item creation packets for forging/Pharmacy [Colus]

@@ -4772,6 +4772,7 @@ var
 	tpa             :TParty;
 	sl              :TStringList;
   ma              :TMArrowDB;
+  tma             :TMaterialDB;
   ProcessType     :Byte;
   DamageProcessed :boolean;
 
@@ -7607,7 +7608,7 @@ begin
 					begin
           j := SearchCInventory(tc, 523, false);
 						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
-							
+
 							UseItem(tc, j);
             ProcessType := 3;
 						end else begin
@@ -7919,29 +7920,65 @@ begin
 						tc1 := tc;
 						ProcessType := 3;
 					end;
-                                228:    {Pharmacy}
-                                        begin
-                                                WFIFOW(0, $01ad);
-                                                j := 4;
-                                                for i := 1 to 100 do begin
-                                                        k := PharmacyDB.IndexOf(tc.Item[i].ID);
-                                                        if (tc.Item[i].ID <> 0) and (tc.Item[i].Amount > 0) and (k <> -1) then begin
-                                                                l := tc.Item[i].ID;
-                                                                WFIFOW(j, l);
-                                                                j := j + 2;
-                                                        end;
-                                                end;
-                                                if j <> 4 then begin
-                                                        WFIFOW(2, j);
-                                                        Socket.SendBuf(buf, j);
-                                                        tc.UseItemID := w;
-                                                end;
-                                                WFIFOW( 0, $00a8);
-                                                WFIFOW( 2, w);
-                                                WFIFOW( 4, 0);
-                                                WFIFOB( 6, 0);
-                                                Socket.SendBuf(buf, 7);
-                                        end;
+        228:    {Pharmacy}
+          begin
+            // Every Pharmacy use consumes a Medicine Bowl.
+            j := SearchCInventory(tc, 7134, false);
+						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+              UseItem(tc, j);
+              j := 4; // Initial length of packet being sent out
+							for k := 0 to MaterialDB.Count-1 do begin
+                m := 0;  // Do we add this to the list or not?
+
+								tma := MaterialDB.Objects[k] as TMaterialDB;
+                // In the material DB, ItemLV is the book we need.
+                // Cheesy, I know, but they all have IDs in the 7000s, so
+                // this check _should_ always work.
+                if (tma.ItemLV > MSkill) then begin
+                  i1 := SearchCInventory(tc, tma.ItemLV, false);
+
+                  if (i1 = 0) then begin
+                    m := 1;
+                    continue;
+                  end;
+
+									for l := 0 to 2 do begin
+										//if (tma.ItemLV > tc.Skill[tma.RequireSkill].Lv) or (tc.Item[w].ID <> 612) then begin
+										//  m := 1;
+										//	continue;
+										//end;
+
+                    if tma.MaterialID[l] = 0 then continue;
+
+										i1 := SearchCInventory(tc, tma.MaterialID[l], false);
+
+										if (i1 = 0) or (tc.Item[i1].Amount < tma.MaterialAmount[l]) then begin
+										  m := 1;
+                    end;
+									end;
+
+									if (m <> 1) then begin
+
+										WFIFOW(j, tma.ID);
+										WFIFOW(j+2, 12);
+										WFIFOL(j+4, tc.ID);
+										j := j+8;
+
+									end;
+								end;
+              end;
+
+              // Send the list.
+							WFIFOW(0, $018d);
+							WFIFOW(2, j);
+							Socket.SendBuf(buf, j);
+            end else begin
+              tc.MMode := 4;
+  						Exit;
+
+						end;
+					end;
+
         258:
           begin
             // AlexKreuz: Fixed Spear Quicken - Set type to Spear [4 & 5]
@@ -9654,7 +9691,7 @@ begin
 	    					                tc1.Option := tc1.Optionkeep;
                                                                 SkillTick := tc1.Skill[MSkill].Tick;
                                                                 SkillTickID := MSkill;
-                                                                tc1.SP := tc1.SP + 10;
+                                                                //tc1.SP := tc1.SP + 10;  // Colus 20040118
                                                                 tc1.Hidden := false;
                                                                 if tc1.SP > tc1.MAXSP then tc1.SP := tc1.MAXSP;
                                                         end else begin
@@ -12810,7 +12847,10 @@ begin
 							end;
             if Boolean(MMode xor $04) then
               if (tc.ItemSkill = false) then begin
-              DecSP(tc, MSkill, MUseLV);
+                // Colus, 20040118: Unhiding should not drain SP...
+                if ((MSkill <> 51) or ((MSkill = 51) and (Option = 6))) then begin
+                  DecSP(tc, MSkill, MUseLV);
+                end;
               end else begin
               tc.ItemSkill := false;
               end;
@@ -12848,7 +12888,7 @@ begin
                 if tc.Option = 6 then begin
 	    					  tc.Option := tc.Optionkeep;
                   SkillTick := tc.Skill[SkillTickID].Tick;
-                  tc.SP := tc.SP + 10;
+                  //tc.SP := tc.SP + 10;
                   tc.Hidden := false;
                   if tc.SP > tc.MAXSP then tc.SP := tc.MAXSP;
                   CalcStat(tc, Tick);
