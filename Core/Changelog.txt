@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion 1.2.0.8 - December 25th, 2003
 --------------------------------------------------------------------------------
+- 12-19-03: Bonus STR will now count towards MaxWeight. (#65) [AlexKreuz]
 - 12-19-03: Updated Fire Wall, now covers only 3 tiles regardless of orientation [Colus]
 - 12-19-03: Updated Icewall, now extends for 5 tiles instead of 3 [Colus]
 - 12-19-03: Updated Icewall, now covers only 5 tiles regardless of orientation [Colus]
