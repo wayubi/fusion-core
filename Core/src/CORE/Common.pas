@@ -369,11 +369,10 @@ type TSkillDB = class
 	Data2      :array[1..10] of integer;
 	Range2     :byte;
 	Icon       :word;
-	Job        :array[0..23] of boolean;
-	ReqJID1      :byte;
+	Job1        :array[0..23] of boolean;
 	ReqSkill1   :array[0..9] of word;
 	ReqLV1      :array[0..9] of word;
-	ReqJID2      :byte;
+	Job2        :array[0..23] of boolean;
 	ReqSkill2   :array[0..9] of word;
 	ReqLV2      :array[0..9] of word;
 end;
@@ -1606,7 +1605,7 @@ begin
 
 		for j :=1 to 336 do begin //スキル追加
 			if td.AddSkill[j] <> 0 then begin
-				if (not Skill[j].Data.Job[JID]) and (not DisableSkillLimit) then begin
+				if (not Skill[j].Data.Job1[JID]) and (not Skill[j].Data.Job2[JID]) and (not DisableSkillLimit) then begin
 					Skill[j].Lv := td.AddSkill[j];
 					Skill[j].Card := True;
 				end;
@@ -1987,7 +1986,7 @@ begin
 
 		if not DisableSkillLimit then begin //スキルツリーの再構築
 			for i := 1 to 336 do begin
-				if not Skill[i].Data.Job[JID] then begin
+				if (not Skill[i].Data.Job1[JID]) and (not Skill[i].Data.Job2[JID]) then begin
 					if not Skill[i].Card then begin
 						//SkillPoint := SkillPoint + Skill[i].Lv;
 					end;
@@ -3128,7 +3127,7 @@ begin
 	j := 0;
 	for i := 1 to 336 do begin
 		//if (not tc.Skill[i].Data.Job[tc.JID]) and (not DisableSkillLimit) then continue;
-		if (not (tc.Skill[i].Data.Job[tc.JID]) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
+		if ((not (tc.Skill[i].Data.Job1[tc.JID])) and (not (tc.Skill[i].Data.Job2[tc.JID])) and (not tc.Skill[i].Card) and (not tc.Skill[i].Plag) and (not DisableSkillLimit)) then continue;
                 if tc.Skill[i].Plag then tc.Skill[i].Lv := tc.PLv;
 
 		WFIFOW( 0+37*j+4, i);
@@ -3152,14 +3151,14 @@ begin
 		end else if (tc.Skill[i].Data.MasterLV <> 0) then begin
 			b := 1;
 			for k := 0 to 4 do begin
-                if ((tc.Skill[i].Data.ReqJID1 = 99) or (tc.Skill[i].Data.ReqJID1 = tc.JID)) and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
+                if tc.Skill[i].Data.Job1[tc.JID] and (tc.Skill[i].Data.ReqSkill1[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill1[k]].Lv < tc.Skill[i].Data.ReqLV1[k]) then begin
 					b := 0;
 					continue;
 				end;
 			end;
       if (b <> 0) then begin
         for k := 0 to 4 do begin
-                    if ((tc.Skill[i].Data.ReqJID2 = 99) or (tc.Skill[i].Data.ReqJID2 = tc.JID)) and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
+                if tc.Skill[i].Data.Job2[tc.JID] and (tc.Skill[i].Data.ReqSkill2[k] <> 0) and (tc.Skill[tc.Skill[i].Data.ReqSkill2[k]].Lv < tc.Skill[i].Data.ReqLV2[k]) then begin
 					b := 0;
 					continue;
 				end;

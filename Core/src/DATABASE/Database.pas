@@ -828,21 +828,23 @@ begin
 				Data2[i+1] := StrToInt(sl.Strings[32+i]);
 			Range2 := StrToInt(sl.Strings[42]);
 			Icon := StrToInt(sl.Strings[43]);
+
 			wj := StrToInt64(sl.Strings[44]);
-
 			for i := 0 to 23 do begin
-				Job[i] := boolean((wj and (1 shl i)) <> 0);
+				Job1[i] := boolean((wj and (1 shl i)) <> 0);
+			end;
+			for i := 0 to 4 do begin
+				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);
+				ReqLV1[i] := StrToInt(sl.Strings[46+i*2]);
 			end;
 
-            ReqJID1 := StrToInt(sl.Strings[45]);
-			for i := 0 to 4 do begin
-				ReqSkill1[i] := StrToInt(sl.Strings[46+i*2]);
-				ReqLV1[i] := StrToInt(sl.Strings[47+i*2]);
+			wj := StrToInt64(sl.Strings[55]);
+			for i := 0 to 23 do begin
+				Job2[i] := boolean((wj and (1 shl i)) <> 0);
 			end;
-            ReqJID2 := StrToInt(sl.Strings[56]);
-            for i := 0 to 4 do begin
-				ReqSkill2[i] := StrToInt(sl.Strings[57+i*2]);
-				ReqLV2[i] := StrToInt(sl.Strings[58+i*2]);
+			for i := 0 to 4 do begin
+				ReqSkill2[i] := StrToInt(sl.Strings[56+i*2]);
+				ReqLV2[i] := StrToInt(sl.Strings[57+i*2]);
 			end;
 		end;
 		SkillDB.AddObject(tl.ID, tl);
@@ -891,7 +893,7 @@ begin
 			Icon := StrToInt(sl.Strings[43]);
 			wj := StrToInt64(sl.Strings[44]);
 			for i := 0 to 23 do begin
-				Job[i] := boolean((wj and (1 shl i)) <> 0);
+				Job1[i] := boolean((wj and (1 shl i)) <> 0);
 			end;
 			for i := 0 to 9 do begin
 				ReqSkill1[i] := StrToInt(sl.Strings[45+i*2]);

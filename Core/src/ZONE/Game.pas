@@ -1500,12 +1500,12 @@ end;
 						//全スキル習得
 {修正}
 						for i := 1 to 157 do begin
-              if (tc.Skill[i].Data.Job[tc.JID]) then begin
+              if (tc.Skill[i].Data.Job1[tc.JID]) or (tc.Skill[i].Data.Job2[tc.JID]) then begin
 							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
               end;
             end;
 						for i := 210 to 336 do begin //韓国桜井専用
-              if (tc.Skill[i].Data.Job[tc.JID]) then begin
+              if (tc.Skill[i].Data.Job1[tc.JID]) or (tc.Skill[i].Data.Job2[tc.JID]) then begin
 							tc.Skill[i].Lv := tc.Skill[i].Data.MasterLV;
               end;
 						end;
