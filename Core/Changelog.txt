@@ -2,6 +2,7 @@
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
 
+- 02-05-04: Fixed many aspects of Hiding and Cloaking. [Colus]
 - 02-05-04: Monsters now cancel casting when damaged (not sure if done correct to official standards) [Darkhelmet]
 - 02-05-04: Cast system for monsters now working correctly [Darkhelmet]
 - 02-04-04: Updated Backstab, monster and player must be facing the same direction before use [Oatmeal]
