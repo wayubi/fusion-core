@@ -14910,7 +14910,7 @@ begin
 				ATarget := 0;
 				AData := nil;
 			end;
-		end;
+		end;//if ((ATarget...
 		if MMode <> 0 then Exit; //詠唱中は行動できない
 		if ((auto and $02) = $02) and (A_Skill <> 0) and (SP > Skill[A_Skill].Data.SP[A_Lv]) then begin
 			tl := Skill[A_Skill].Data;
@@ -14920,7 +14920,7 @@ begin
 				WFIFOL(2, tc.ID);
 				WFIFOB(26, 2);
 				SendBCmd(tm, Point, 29);
-				Exit;
+				Exit;//safe 2004/04/27
 			end;
 			if (MMode = 0) and (MPoint.X = 0) and (MPoint.Y = 0) then begin
 				sl := TStringList.Create;
@@ -14935,9 +14935,9 @@ begin
 							end;
 						end;
 					end;
-					end;
+				end;
 				ts := nil;
-				if sl.Count <> 0 then begin
+				if sl.Count > 0 then begin
 					j := 20;
 					for i := 0 to sl.Count -1 do begin
 						ts1 := sl.Objects[i] as TMob;
@@ -14945,17 +14945,17 @@ begin
 						Y := abs(ts1.Point.Y - Point.Y);
 						if (X + Y) < Cardinal(j) then begin //距離が一番近い
 //2
-                                                        { Alex: Currently Unexplored - Type 1 for safety }
-                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
+							{ Alex: Currently Unexplored - Type 1 for safety }
+							k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
 							//辿り着けず射程外なら無視
 							if (k = 0) and ((X > tl.Range) or (Y > tl.Range)) then Continue;
 							j := X + Y;
 							ts := ts1;
 						end;
 					end;
-				end;
-				sl.Free;
-			end;
+				end;//if sl.Count...
+				sl.Free;//safe 2004/04/27
+			end;//if (MMod=0...
 
 			if ts = nil then begin
 				//見つからなかった
@@ -14964,7 +14964,6 @@ begin
 				MPoint.X := 0;
 				MPoint.Y := 0;
 			end else begin
-
 				if (abs(Point.X - ts.Point.X) > tl.Range) or (abs(Point.Y - ts.Point.Y) > tl.Range) then begin
 					NextFlag := True;
 					NextPoint := ts.Point;
@@ -14998,9 +14997,9 @@ begin
 						Auto := Auto xor 2;
 					end;
 					ActTick := MTick + ADelay; //スキルディレイがいまいち解らないので
-					Exit;
-				end;
-			end;
+					Exit;//safe 2004/04/27
+				end;//if-else
+			end;//if-else ts=nil...
 		end else if (auto and $01) = $01 then begin
 
 			if (AMode = 0) and (ATarget = 0) then begin
@@ -15015,27 +15014,27 @@ begin
 								//視界内にいて死んでない
 								sl.AddObject(IntToStr(ts.ID), ts);
 							end;
-						end;
-					end;
-				end;
+						end;//for k1
+					end;//for i1
+				end;//for j1
 				ts := nil;
-				if sl.Count <> 0 then begin
+				if sl.Count > 0 then begin
 					Z := 20;
 					for i := 0 to sl.Count -1 do begin
 						ts1 := sl.Objects[i] as TMob;
 						X := abs(ts1.Point.X - Point.X);
 						Y := abs(ts1.Point.Y - Point.Y);
 						if (X + Y) < Z then begin //距離が一番近い
-                                                        { Alex: Currently Unexplored - Type 1 for safety }
-                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
+							{ Alex: Currently Unexplored - Type 1 for safety }
+							k := Path_Finding(tc.path, tm, Point.X, Point.Y, ts1.Point.X, ts1.Point.Y, 1);
 							//辿り着けず射程外なら無視
 							if (k = 0) and ((X > Range) or (Y > Range)) then Continue;
-						 	Z := X + Y;
+							Z := X + Y;
 							ts := ts1;
 						end;
 					end;
 				end;
-				sl.Free;
+				sl.Free;//safe 2004/04/27
 			end;
 
 			if ts = nil then begin
@@ -15070,50 +15069,49 @@ begin
 							ATick := Tick - ADelay + 200;
 					end;
 					ActTick := Tick + 200 - ADelay + aMotion;
-					Exit;
+					Exit;//safe 2004/04/27
 				end;
 			end;
 		end;
 		if ((Auto and $04) = $04) and (ATarget = 0) and (MMode = 0) then begin //ルート
-				//アイテム探し
-				sl := TStringList.Create;
-				for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
-					for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
-						for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
-							tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
-							if tn.CType <> 3 then Continue;
-							if (abs(tn.Point.X - Point.X) <= 15) and (abs(tn.Point.Y - Point.Y) <= 15) then begin
-								//候補に追加
-								sl.AddObject(IntToStr(tn.ID), tn);
-							end;
+			//アイテム探し
+			sl := TStringList.Create;
+			for j1 := Point.Y div 8 - 3 to Point.Y div 8 + 3 do begin
+				for i1 := Point.X div 8 - 3 to Point.X div 8 + 3 do begin
+					for k1 := 0 to tm.Block[i1][j1].NPC.Count - 1 do begin
+						tn := tm.Block[i1][j1].NPC.Objects[k1] as TNPC;
+						if tn.CType <> 3 then Continue;
+						if (abs(tn.Point.X - Point.X) <= 15) and (abs(tn.Point.Y - Point.Y) <= 15) then begin
+							//候補に追加
+							sl.AddObject(IntToStr(tn.ID), tn);
 						end;
 					end;
 				end;
-				tn := nil;
-				if sl.Count <> 0 then begin
-					//一番近いものを
-					j := 20;
-					for i := 0 to sl.Count -1 do begin
-						tn1 := sl.Objects[i] as TNPC;
-						X := abs(tn1.Point.X - Point.X);
-						Y := abs(tn1.Point.Y - Point.Y);
-						if (X + Y) < Cardinal(j) then begin
-                                                        { Alex: Currently Unexplored - Type 1 for safety }
-                                                        k := Path_Finding(tc.path, tm, Point.X, Point.Y, tn1.Point.X, tn1.Point.Y, 1);
-							if (k = 0) and ((X > 1) or (Y > 1)) then Continue;
-							j := X + Y;
-							tn := tn1;
-						end;
+			end;
+			tn := nil;
+			if sl.Count <> 0 then begin
+				//一番近いものを
+				j := 20;
+				for i := 0 to sl.Count -1 do begin
+					tn1 := sl.Objects[i] as TNPC;
+					X := abs(tn1.Point.X - Point.X);
+					Y := abs(tn1.Point.Y - Point.Y);
+					if (X + Y) < Cardinal(j) then begin
+						{ Alex: Currently Unexplored - Type 1 for safety }
+						k := Path_Finding(tc.path, tm, Point.X, Point.Y, tn1.Point.X, tn1.Point.Y, 1);
+						if (k = 0) and ((X > 1) or (Y > 1)) then Continue;
+						j := X + Y;
+						tn := tn1;
 					end;
 				end;
-				sl.Free;
-
+			end;
+			sl.Free;//safe
 			if tn = nil then begin
 				//周りに何も無し
 			end else begin
 				if (abs(Point.X - tn.Point.X) > 1) or (abs(Point.Y - tn.Point.Y) > 1) then begin
-				NextFlag := True;
-				NextPoint := tn.Point;
+					NextFlag := True;
+					NextPoint := tn.Point;
 				end else begin
 					if ATick < Tick then begin
 						UpdatePlayerLocation(tm, tc);
@@ -15121,7 +15119,7 @@ begin
 						ActTick := Tick + 200;
 					end;
 				end;
-				Exit;
+				Exit;//safe 2004/04/27
 			end;
 		end;
 		if ((auto and $10) = $10) and (Sit = 3) and (ATarget = 0) and (MMode = 0) then begin
@@ -15141,10 +15139,16 @@ begin
 					break;
 				end;
 				//---
-				if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then
+				if ( (tm.gat[xy.X][xy.Y] <> 1) and (tm.gat[xy.X][xy.Y] <> 5) ) then begin
 					//pcnt := SearchPath(path, tm, Point, xy);
-                                        { Alex: Currently Unexplored - Type 1 for safety }
-                                        i := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
+					{ Alex: Currently Unexplored - Type 1 for safety }
+					i := Path_Finding(path, tm, Point.X, Point.Y, xy.X, xy.Y, 1);
+				end;
+				{ChrstphrR 2004/04/27 with that pcnt := ... line commented out, the code
+				looked confusing, so I encluded the begin-end pair to show what it IS
+				branching and executing -- only needs correction if this branch is
+				unintended.}
+
 				Inc(j);
 			until (i <> 0) or (j = 100);
 			if j <> 100 then begin
@@ -15154,107 +15158,116 @@ begin
 				ActTick := Tick + Cardinal(Random(1000)) + Speed * Cardinal(i);
 			end;
 		end;
-
 	end;
-end;
+end;//proc AutoAction()
 
 
 function TFrmMain.DamageOverTime(tm: TMap; var tc: TChara; Tick: cardinal; skill: word; useLV: byte; count: integer): boolean;
 var
-  tl : TSkillDB;
-  tv : TLiving;
-  ts, ts1 : TMob;
-  i, j, i1, j1, k1: integer;
-  sl : TStringList;
-  offset : integer;
-  xy : TPoint;
+	tl  : TSkillDB;
+	tv  : TLiving;
+	ts	: TMob;
+	ts1 : TMob;
+	i, j, i1, j1, k1: integer;
+	sl  : TStringList;
+	{ChrstphrR 2004/04/27 - Okay, new game plan with StringLists...
+	UNLESS you need them end to end in a routine, you create them when needed,
+	and free them up inside that block after it's use is over with.
+	i.e. in a Case branch, between that branch's begin-end, you will
+
+	begin//Skillname here
+		sl := TStringList.Create;
+		//Do stuff here, some involving the sl...
+		...
+		sl.Free;
+	end;//Skillname here
+	}
+
+	offset : Integer;
+	xy     : TPoint;
 begin
+	Result := false;
+	tv := tc.AData;
+	tl := tc.Skill[skill].Data;
 
-  Result := false;
-  tv := tc.AData;
-  tl := tc.Skill[skill].Data;
-  sl := TStringList.Create;
+	if (tv = nil) then Exit;//safe 2004/04/27
 
-  if (tv = nil) then exit;
-  
-  case skill of
-
+	case skill of
 	86: // Water Ball
-    begin
-      ts := tv as TMob;
-      with tc do begin
-              MSkill := 86;
-              MUseLV := useLV;
-              dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
-              dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
-              dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
-              dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
-              if dmg[0] < 1 then dmg[0] := 1;
-              dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
-              if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+		begin
+			ts := tv as TMob;
+			with tc do begin
+				MSkill := 86;
+				MUseLV := useLV;
+				dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+				dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
+				dmg[0] := dmg[0] * (100 - ts.Data.MDEF) div 100; //MDEF%
+				dmg[0] := dmg[0] - ts.Data.Param[3]; //MDEF-
+				if dmg[0] < 1 then dmg[0] := 1;
+				dmg[0] := dmg[0] * ElementTable[tl.Element][ts.Element] div 100;
+				if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 
-              if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+				if (ts.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
 
-              //if (count mod 3 = 1) then begin
-                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
-              {end else begin
-                MSkill := 0;
-                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);}
-              //end;
+				//if (count mod 3 = 1) then begin
+				SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
+				{end else begin
+					MSkill := 0;
+					SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);}
+				//end;
 
-              //ダメージ処理
-              if (dmg[0] >= ts.HP) then begin
-                offset := 0;
-                count := 0;
-              end else begin
-                offset := 150;
-                count := count - 1;
-              end;              
-              DamageProcess1(tm, tc, ts, dmg[0], Tick);
+				//ダメージ処理
+				if (dmg[0] >= ts.HP) then begin
+					offset := 0;
+					count := 0;
+				end else begin
+					offset := 150;
+					count := count - 1;
+				end;
+				DamageProcess1(tm, tc, ts, dmg[0], Tick);
 
-              xy := ts.Point;
-              sl.Clear;
-              for j1 := (xy.Y - 1) div 8 to (xy.Y + 1) div 8 do begin
-                for i1 := (xy.X - 1) div 8 to (xy.X + 1) div 8 do begin
-                  for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
-                    if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
-                    if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
-                    if (abs(ts1.Point.X - xy.X) <= tl.Data2[MUseLV]) and (abs(ts1.Point.Y - xy.Y) <= tl.Data2[MUseLV]) then
-                      sl.AddObject(IntToStr(ts1.ID),ts1);
-                  end;
-                end;
-              end;
-              if sl.Count <> 0 then begin
-                for k1 := 0 to sl.Count - 1 do begin
-                    ts1 := sl.Objects[k1] as TMob;
-                    dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
-                    dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
-                    dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
-                    dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-                    if dmg[0] < 1 then dmg[0] := 1;
-                    dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-                    if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
-                    if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
-                    SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
-                    //ダメージ処理
-                    DamageProcess1(tm, tc, ts1, dmg[0], Tick)
-                end;
-              end;
-            
-        end;
-        //offset := 150;
-        //count := count - 1;
-        tc.Skill[86].Tick := Tick + offset;
-        tc.Skill[86].EffectLV := count;
-      end;
+				xy := ts.Point;
 
-    end;
+				sl := TStringList.Create;//remember this must be free'd afterward!
+				for j1 := (xy.Y - 1) div 8 to (xy.Y + 1) div 8 do begin
+					for i1 := (xy.X - 1) div 8 to (xy.X + 1) div 8 do begin
+						for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+							if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then Continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+							if (ts = ts1) or ((tc.GuildID <> 0) and (ts1.isGuardian = tc.GuildID)) or ((tc.GuildID <> 0) and (ts1.GID = tc.GuildID)) then Continue;
+							if (abs(ts1.Point.X - xy.X) <= tl.Data2[MUseLV]) and (abs(ts1.Point.Y - xy.Y) <= tl.Data2[MUseLV]) then
+								sl.AddObject(IntToStr(ts1.ID),ts1);
+						end;
+					end;
+				end;
+				if sl.Count <> 0 then begin
+					for k1 := 0 to sl.Count - 1 do begin
+						ts1 := sl.Objects[k1] as TMob;
+						dmg[0] := MATK1 + Random(MATK2 - MATK1 + 1) * MATKFix div 100;
+						dmg[0] := dmg[0] * (100 + (30 * MUseLV)) div 100; // Added skill fix
+						dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+						dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+						if dmg[0] < 1 then dmg[0] := 1;
+						dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+						if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
+						if (ts1.EffectTick[0] > Tick) then dmg[0] := dmg[0] * 2;
+						SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+						//ダメージ処理
+						DamageProcess1(tm, tc, ts1, dmg[0], Tick)
+					end;
+				end;
+			sl.Free;//safe 2004/04/27
+			end;//with
+			//offset := 150;
+			//count := count - 1;
+			tc.Skill[86].Tick := Tick + offset;
+			tc.Skill[86].EffectLV := count;
+		end;
+	end;//case
 
-  {if (count > 0) then begin
-    DamageOverTime(tm, tc, Tick + offset, skill, count);
-  end;}
-
-end;
+	{if (count > 0) then begin
+		DamageOverTime(tm, tc, Tick + offset, skill, count);
+	end;}
+end;//func TFrmMain.DamageOverTime()
 
 {追加ココまで}
 //------------------------------------------------------------------------------

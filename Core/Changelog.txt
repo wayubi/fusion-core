@@ -1,3 +1,5 @@
+- 04-28-04: Memory Leak fixes: AutoAction [ChrstphrR]
+- 04-28-04: Memory Leak fixes: DamageOverTime [ChrstphrR]
 - 04-27-04: Memory Leak fixes: SkillEffect [ChrstphrR]
 - 04-27-04: MORE Memory Leak fixes: CreateField (Hey, it's a long routine!) [ChrstphrR]
 - 04-27-04: Memory Leak fixes: CharaSplash2 [ChrstphrR]
