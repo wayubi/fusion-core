@@ -874,13 +874,13 @@ begin
 	if sl.IndexOfName('Width') <> -1 then begin
 		FormWidth := StrToInt(sl.Values['Width']);
 	end else begin
-		FormWidth := 500;
+		FormWidth := frmMain.Width;
 	end;
 	Width := FormWidth;
 	if sl.IndexOfName('Height') <> -1 then begin
 		FormHeight := StrToInt(sl.Values['Height']);
 	end else begin
-		FormHeight := 460;
+		FormHeight := frmMain.Height;
 	end;
 	Height := FormHeight;
 	if sl.IndexOfName('Priority') <> -1 then begin
@@ -7577,13 +7577,22 @@ begin
 							begin
                 if (tn.MSkill = 85) then begin // LoV
                   if (tn.Tick + 1000 * tn.Count) < (Tick + 4000) then begin
-                    dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * (tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100);
-  									dmg[0] := (dmg[0] div 100) * (100 - ts1.Data.MDEF); //MDEF%
-  									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
-  									if dmg[0] < 1 then dmg[0] := 1;
-  									dmg[0] := (dmg[0] div 100) * ElementTable[tl.Element][ts1.Element];
-  									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
-	  								if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+
+                  	{ Alex: math laws which should be working aren't. Go figure }
+                    { If dmg[0] breaks which only happens with integer overflow conditions, }
+                    { then set dmg[0] to its maximum. }
+                    try
+                    	dmg[0] := (tc1.MATK1 + Random(tc1.MATK2 - tc1.MATK1 + 1)) * tl.Data1[tn.MUseLV] div 100 * tc1.MATKFix div 100;
+                        dmg[0] := dmg[0] * (100 - ts1.Data.MDEF) div 100; //MDEF%
+                        dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
+                        if dmg[0] < 1 then dmg[0] := 1;
+                        dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
+                        //dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+                        if dmg[0] < 0 then dmg[0] := 0; //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
+                    except
+                    	dmg[0] := 2147483647;
+                    end;
+
 
 	  								WFIFOW( 0, $01de);
   									WFIFOW( 2, tn.MSkill);
