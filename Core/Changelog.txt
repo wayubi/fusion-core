@@ -1,3 +1,5 @@
+- 06-05-04: Switched GM Command, #GPVPOFF to ALBGM system. [AlexKreuz]
+- 06-05-04: Switched GM Command, #GPVPON to ALBGM system. [AlexKreuz]
 - 06-04-04: Fixed ALBGM for general users at access level 0. [AlexKreuz]
 - 06-04-04: Set default GM_SERVER level to access level 0. [AlexKreuz]
 - 06-04-04: Switched GM Command, #PVPOFF to ALBGM system. [AlexKreuz]

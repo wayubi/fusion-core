@@ -144,8 +144,8 @@ var
     function command_server() : String;
     function command_pvpon(tc : TChara) : String;
     function command_pvpoff(tc : TChara) : String;
-
-
+    function command_gpvpon(tc : TChara) : String;
+    function command_gpvpoff(tc : TChara) : String;
 
 implementation
 
@@ -403,6 +403,8 @@ Called when we're shutting down the server *only*
         else if ( (copy(str, 1, length('server')) = 'server') and (check_level(tc.ID, GM_SERVER)) ) then error_msg := command_server()
         else if ( (copy(str, 1, length('pvpon')) = 'pvpon') and (check_level(tc.ID, GM_PVPON)) ) then error_msg := command_pvpon(tc)
         else if ( (copy(str, 1, length('pvpoff')) = 'pvpoff') and (check_level(tc.ID, GM_PVPOFF)) ) then error_msg := command_pvpoff(tc)
+        else if ( (copy(str, 1, length('gpvpon')) = 'gpvpon') and (check_level(tc.ID, GM_GPVPON)) ) then error_msg := command_gpvpon(tc)
+        else if ( (copy(str, 1, length('gpvpoff')) = 'gpvpoff') and (check_level(tc.ID, GM_GPVPOFF)) ) then error_msg := command_gpvpoff(tc)
 		;
 
 		if (error_msg <> '') then error_message(tc, error_msg);
@@ -1791,7 +1793,7 @@ Called when we're shutting down the server *only*
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := ' GM_PVPON Failure.';
+    	Result := 'GM_PVPON Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
 	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
@@ -1824,7 +1826,7 @@ Called when we're shutting down the server *only*
         i, k : Integer;
         tm : TMap;
     begin
-    	Result := ' GM_PVPOFF Failure.';
+    	Result := 'GM_PVPOFF Failure.';
 
         if MapInfo.IndexOf(tc.Map) <> -1 then begin;
 	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
@@ -1845,6 +1847,73 @@ Called when we're shutting down the server *only*
 	            end;
 
         		Result := 'GM_PVPOFF Success. PVP disabled on map ' + tc1.Map + '.';
+            end;
+        end else begin
+        	Result := Result + ' Map ' + tc.Map + ' not found.';
+        end;
+    end;
+
+    function command_gpvpon(tc : TChara) : String;
+    var
+    	mi : MapTbl;
+        tc1 : TChara;
+        i, k : Integer;
+        tm : TMap;
+    begin
+    	Result := 'GM_GPVPON Failure.';
+
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin;
+	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+            if (mi.PvPG = true) then begin
+            	Result := Result + ' PVPG already enabled on map ' + tc.Map + '.';
+            end else begin
+		        mi.PvPG := true;
+    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+		        for i := 0 to tm.CList.Count - 1 do begin
+			        tc1 := tm.CList.Objects[0] as TChara;
+
+        	        if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+			        tc1.tmpMap := LowerCase(tc1.Map);
+			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+			        MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+	            end;
+
+    	    	Result := 'GM_GPVPON Success. PVPG enabled on map ' + tc1.Map + '.';
+            end;
+        end else begin
+        	Result := Result + ' Map ' + tc.Map + ' not found.';
+        end;
+    end;
+
+    function command_gpvpoff(tc : TChara) : String;
+    var
+    	mi : MapTbl;
+        tc1 : TChara;
+        i, k : Integer;
+        tm : TMap;
+    begin
+    	Result := 'GM_GPVPOFF Failure.';
+
+        if MapInfo.IndexOf(tc.Map) <> -1 then begin;
+	        mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
+
+            if (mi.PvPG = false) then begin
+            	Result := Result + ' PVPG already disabled on map ' + tc.Map + '.';
+            end else begin
+		        mi.PvPG := false;
+    	        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+		        for i := 0 to tm.CList.Count - 1 do begin
+			        tc1 := tm.CList.Objects[0] as TChara;
+
+	                if (tc1.Hidden = false) then SendCLeave(tc1, 2);
+			        tc1.tmpMap := LowerCase(tc1.Map);
+			        tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
+		    	    MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
+	            end;
+
+        		Result := 'GM_GPVPOFF Success. PVPG disabled on map ' + tc1.Map + '.';
             end;
         end else begin
         	Result := Result + ' Map ' + tc.Map + ' not found.';

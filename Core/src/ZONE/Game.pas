@@ -1228,60 +1228,7 @@ Begin(* Proc sv3PacketProcess() *)
 					//#で始まるコマンド(主にでばぐ用)
 					tid := IDTableDB.Objects[h] as TIDTbl;
 
-if (Copy(str, 1, 6) = 'gpvpon') and (tid.PVPControl = 1) then begin
-            if MapInfo.IndexOf(tc.Map) = -1 then continue;
-            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
-            mi.PvPG := true;
-            //mi.dbPvPG := true;
-            for i := 0 to tm.CList.Count - 1 do begin
-              tc1 := tm.CList.Objects[j] as TChara;
-              {WFIFOW( 0, $0199);
-							WFIFOW( 2, 1);
-							tc1.Socket.SendBuf(buf, 4);
-              k := i + 1;
-              j := tm.CList.Count;
-              WFIFOW( 0, $019a);
-              WFIFOL( 2, tc1.ID);
-              WFIFOL( 6, k);
-              WFIFOL( 10, j);
-              tc1.Socket.SendBuf(buf, 14);  }
-
-							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tc1.Map);
-							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tc1.Map), Point(tc1.Point.X, tc1.Point.Y));
-
-              str := 'Guild PVP has been enabled!';
-              w := Length(str) + 4;
-              WFIFOW (0, $009a);
-              WFIFOW (2, w);
-              WFIFOS (4, str, w - 4);
-              tc1.socket.sendbuf(buf, w);
-            end;
-          end else if (Copy(str, 1, 7) = 'gpvpoff') and (tid.PVPControl = 1) then begin
-            mi := MapInfo.Objects[MapInfo.IndexOf(tc.Map)] as MapTbl;
-            mi.PvPG := false;
-            //mi.dbPvPG := false;
-            for i := 0 to tm.CList.Count - 1 do begin
-              tc1 := tm.CList.Objects[j] as TChara;
-              {WFIFOW( 0, $0199);
-							WFIFOW( 2, 0);
-							tc1.Socket.SendBuf(buf, 4);   }
-
-							if (tc1.Hidden = false) then SendCLeave(tc1, 2);
-							tc1.tmpMap := LowerCase(tm.Name);
-							tc1.Point := Point(tc1.Point.X, tc1.Point.Y);
-							MapMove(tc1.Socket, LowerCase(tm.Name), Point(tc1.Point.X, tc1.Point.Y));
-
-              str := 'Guild PvP has been disabled!';
-              w := Length(str) + 4;
-              WFIFOW (0, $009a);
-              WFIFOW (2, w);
-              WFIFOS (4, str, w - 4);
-              tc1.socket.sendbuf(buf, w);
-            end;
-          { Mitch 02-03-04 <== NEAT! : User Controls added for GMs (CreateUser) }
-          end else if (Copy(str, 1, 10) = 'newplayer ') and (tid.UserControl = 1) then begin
+if (Copy(str, 1, 10) = 'newplayer ') and (tid.UserControl = 1) then begin
             //Syntax: #newplayer user pass [1|0] email
             //Gender: 1 = male // 0 = female (same as players.txt)
             sl := TStringList.Create;
