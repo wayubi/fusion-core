@@ -2,7 +2,6 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
-- 12-31-03: Fixed Call Spirits, when used it'll only call out one instead of 5 -[Oatmeal12345]
 - 12-31-03: Added Graphics For Monster Skill Meteor (No Damage) [Darkhelmet]
 - 12-30-03: Fixed Bug You can no longer regain HP/SP when dead [Darkhelmet]
 - 12-30-03: Added Monster Skill Double Strafing [Darkhelmet]
