@@ -1,3 +1,4 @@
+- 05-26-04: Added Provoke's ability to raise the target's attack in PVP. [KyuubiKitsune]
 - 05-26-04: "Objectizing" TParty in preparation for SQL improvements [ChrstphrR]
 - 05-26-04: Commented / clarified variables in SendPartyList [ChrstphrR]
 - 05-26-04: Added TParty methods GetName/SetName [ChrstphrR]

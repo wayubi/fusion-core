@@ -10654,7 +10654,7 @@ begin
 						WFIFOL( 6, MTarget);
 						WFIFOL(10, ID);
             WFIFOB(14, 0);
-            //tc1.ATK[1][2] := word(tl.Data1[MUseLV]) * tc1.ATK[1][2] div 100;  // Unimplemented ATK increase.
+            tc1.DamageFixS[1] := word(tl.Data1[MUseLV]); // ATK Increase upon the medium size to ease the pain.
             tc1.DEF1 := word(tl.Data2[MUseLV]) * tc1.DEF1 div 100;
 						SendBCmd(tm, tc1.Point, 15);
 					end;
