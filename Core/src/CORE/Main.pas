@@ -4097,6 +4097,27 @@ begin
                                                 tc.MPoint.Y := 0;
                                                 exit;
                                         end;
+                                        264:
+                                        begin
+                                         if spiritSpheres <> 0 then begin
+                                                //Cast Point
+                                                xy.X := MPoint.X;
+                                                xy.Y := MPoint.Y;
+
+                                                tn := SetSkillUnit(tm, ID, xy, Tick, $2E, 0, 3000, tc);
+
+                                                tn.MSkill := MSkill;
+                                                tn.MUseLV := MUseLV;
+                                                spiritSpheres := spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+
+                                          end else begin
+                                                tc.MMode := 4;
+                                                tc.MPoint.X := 0;
+                                                tc.MPoint.Y := 0;
+                                                exit;
+                                        end;
+                                        end;
 
 				115:    {Skid Trap}
 					begin
@@ -4267,8 +4288,8 @@ begin
 							Exit;
 						end;
 					end;
-                                264:    {Body Relocation}
-                                        begin
+                               // 264:    {Body Relocation}
+                                 {      begin
                                                 if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                         WFIFOW( 0, $011a);
                                                         WFIFOW( 2, tc.MSkill);
@@ -4292,7 +4313,8 @@ begin
 							tc.MPoint.Y := 0;
 							Exit;
                                                 end;
-                                        end;
+                                        end;}
+
 				123:    {Claymore Trap}
 					begin
                                                 j := SearchCInventory(tc, 1065, false);
@@ -4392,8 +4414,8 @@ begin
 					        end;
 					end;
 
-                                230:    {Acid Terror}
-					begin
+                                {230:    {Acid Terror}
+				 {	begin
                                                 j := SearchCInventory(tc, 7136, false);
 						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
 
@@ -4472,7 +4494,7 @@ begin
 						        tc.MPoint.Y := 0;
 						        Exit;
 					        end;
-					end;
+					end;}
 
                                         233:    {Marine Sphere}
                                                 begin
@@ -5063,6 +5085,24 @@ begin
                                                 Exit;
                                         end;
                                 end;
+                                230:  //acid terror
+                                         begin
+                                                j := SearchCInventory(tc, 7136, false);
+						if (j <> 0) and (tc.Item[j].Amount >= 1) then begin
+                                                        UseItem(tc, j); //Use Item Function Call
+                                                DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+						if dmg[0] < 0 then
+                                                        dmg[0] := 0;
+						SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1, 6);
+						if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
+							StatCalc1(tc, ts, Tick);
+                                        end else begin
+                                                tc.MMode := 4;
+                                                tc.MPoint.X := 0;
+                                                tc.MPoint.Y := 0;
+                                                Exit;
+                                        end;
+                                end;
                                 254:    {Grand Cross}
                                 begin
                                         PassiveAttack := false;
@@ -5235,8 +5275,8 @@ begin
                                     DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                     tc.MTick := Tick + 500;
                                 end;
-                                214:    {Raid}
-                                begin
+                                {214:    {Raid}
+                                {begin
                                         if (tc.Option = 6) then begin
 						DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 						if dmg[0] < 0 then
@@ -5276,7 +5316,8 @@ begin
                                                 tc.MPoint.Y := 0;
                                                 Exit;
                                         end;
-				end;
+				end;}
+
                                 215,216,217,218:
                                 { 215: Strip Weapon
                                   216: Strip Shield
@@ -5399,8 +5440,8 @@ begin
                                         end;
                                 end;
 
-                                264:   {Body Relocation}
-                                begin
+                                {264:   {Body Relocation}
+                                {begin
                                         if ((tc.Point.X <> tc.MPoint.X) and (tc.Point.Y = tc.MPoint.Y)) or ((tc.Point.X = tc.MPoint.X) and (tc.Point.Y <> tc.MPoint.Y)) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 1) and (tm.gat[tc.MPoint.X, tc.MPoint.Y] <> 5) then begin
                                                 WFIFOW( 0, $011a);
                                                 WFIFOW( 2, tc.MSkill);
@@ -5423,8 +5464,9 @@ begin
                                                 tc.MPoint.X := 0;
 						tc.MPoint.Y := 0;
 						Exit;
-                                        end;
-                                end;
+                                        end;}
+                                //end;
+
                                 {268:    Steel Body
                                 begin
                                         if spiritSpheres = 5 then begin
@@ -5442,6 +5484,7 @@ begin
                                                 spiritSpheres := spiritSpheres - 5;
                                         end;
                                 end;}
+
                                 271:    {Extremity Fist}
                                 begin
                                         if tc.Skill[270].Tick > Tick then begin
@@ -5455,7 +5498,7 @@ begin
                                                                 dmg[0] := 0;
                                                                 //魔法攻撃での回復は未実装
                                                         end;
-                                                        
+
                                                         SetLength(bb, 4);
                                                         bb[0] := 4;
                                                         xy := tc.Point;
@@ -5946,7 +5989,28 @@ begin
 
 						tc.MTick := Tick + 1000;
 					end;
-          
+
+                                         264:   {Body Relocation}  //New Version Oatmeal style U_U
+                               if spiritSpheres <> 0 then begin
+						//パケ送信
+						WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, ts.ID);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+                                                spiritSpheres := spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+						SendBCmd(tm, ts.Point, 15);
+
+						if tc.Skill[264].EffectLV > 1 then begin
+						    ts.speed := ts.speed - 45;
+						end else begin
+						    ts.speed := ts.speed - 30;
+						end;
+
+						tc.MTick := Tick + 1000;
+					end;
         47:
           begin
           if (Arrow = 0) or (Item[Arrow].Amount < 9) then begin
@@ -7503,6 +7567,33 @@ begin
 							tc.MPoint.Y := 0;
 							Exit;
 						end;
+                  214: //Raid
+                  begin
+                  xy := tc.Point;
+                  sl.Clear;
+                  j := tl.Range2;
+                  for j1 := (xy.Y - j) div 8 to (xy.Y + j) div 8 do begin
+                  for i1 := (xy.X - j) div 8 to (xy.X + j) div 8 do begin
+                  for k1 := 0 to tm.Block[i1][j1].Mob.Count - 1 do begin
+                  if ((tm.Block[i1][j1].Mob.Objects[k1] is TMob) = false) then continue; ts1 := tm.Block[i1][j1].Mob.Objects[k1] as TMob;
+                  if (abs(ts1.Point.X - xy.X) <= j) and (abs(ts1.Point.Y - xy.Y) <= tl.Range2) then
+                  sl.AddObject(IntToStr(ts1.ID),ts1);
+                  end;
+                  end;
+                  end;
+                  if sl.Count <> 0 then begin
+                  for k1 := 0 to sl.Count - 1 do begin
+                  ts1 := sl.Objects[k1] as TMob;
+                  DamageCalc1(tm, tc, ts1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
+                  if dmg[0] < 1 then dmg[0] := 1;
+                  if dmg[0] < 0 then dmg[0] := 0;
+                  k := 1;
+                  SendCSkillAtk1(tm, tc, ts1, Tick, dmg[0], 1);
+                  DamageProcess1(tm, tc, ts1, dmg[0], Tick);
+                  end;
+                  end;
+                  end;
+
 				111: //アドレナリン_ラッシ
 					begin
 						tc1 := tc;
@@ -7900,6 +7991,27 @@ begin
 					    	end;
                                         end;
                                         end;
+                                264:   {Body Relocation}
+                               if spiritSpheres <> 0 then begin
+						//パケ送信
+						WFIFOW( 0, $011a);
+						WFIFOW( 2, MSkill);
+						WFIFOW( 4, MUseLV);
+						WFIFOL( 6, ts.ID);
+						WFIFOL(10, ID);
+						WFIFOB(14, 1);
+                                                spiritSpheres := spiritSpheres - 1;
+                                                UpdateSpiritSpheres(tm, tc, spiritSpheres);
+						SendBCmd(tm, ts.Point, 15);
+
+						if tc.Skill[264].EffectLV > 1 then begin
+						    ts.speed := ts.speed - 45;
+						end else begin
+						    ts.speed := ts.speed - 30;
+						end;
+
+						tc.MTick := Tick + 1000;
+					end;
                                  257: //Defender
 					begin
 						tc1 := tc;
@@ -7994,7 +8106,7 @@ begin
                                                         end;
                                                 end;
                                         end;
-                                214:
+                                {214:
                                         if (tc.Option = 6) then begin
                                                 DamageCalc3(tm, tc, tc1, Tick, 0, tl.Data1[MUseLV], tl.Element, tl.Data1[MUseLV]);
 						if dmg[0] < 0 then dmg[0] := 0; //属性攻撃での回復は未実装
@@ -8032,7 +8144,7 @@ begin
                                                 tc.MPoint.X := 0;
                                                 tc.MPoint.Y := 0;
                                                 Exit;
-                                                end;
+                                                end;}
                                 215:
                                 begin
                                 if tc1.Skill[234].Tick > Tick then begin
@@ -11099,6 +11211,7 @@ begin
                                                                         ts1.BodyTick := ts1.BodyTick + 30000;
                                                                 end;
                                                         end;
+
                                                 $E5:    {Demonstration Damage and Acid Terror Damage}
                                                         begin
 								DamageCalc1(tm, tn.CData,ts1, Tick, 0, tn.CData.Skill[229].Data.Data2[tn.MUseLV],tl.Element,0);
