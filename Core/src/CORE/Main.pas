@@ -8,14 +8,15 @@ uses
         Windows, Messages, MMSystem, Forms, ShellApi, Graphics, Controls, Dialogs,
         Menus, ScktComp, StdCtrls, ExtCtrls, WinSock, ComCtrls,
         {$ENDIF}
-    {Kylix Delphi units}
-        {$IFDEF LINUX} //Saying to load this if Linux
-        Xlib,  //Linux Version of "Windows & Messages"?
-        {$ENDIF}
     {Delphi / Kylix Delphi Compatable units}
-        SysUtils, Variants, Classes, IniFiles,
+        SysUtils, Variants, Classes, IniFiles, Types,
     {Possible replacement for some VCL units; crossplatform conpatable but things still need fixing}
-    {QGraphics, QControls, QDialogs, QMenus, QStdCtrls, QExtCtrls, QComCtrls,}
+    {QExtCtrls, QComCtrls, QGraphics, QControls, QDialogs, QMenus,}
+        {$IFDEF LINUX}
+        QStdCtrls, Types,
+        //TMemo and TPoint are in these, StdCtrls needs to be replaced by this
+        //These components are cross platform compatable
+        {$ENDIF}
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
