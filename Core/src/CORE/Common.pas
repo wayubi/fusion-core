@@ -634,6 +634,7 @@ type TChara = class
 	HIT           :integer;
 	FLEE1         :integer;
 	FLEE2         :integer;
+        FLEE3         :integer;
 	Critical      :word;
 	Lucky         :word;
 	ASpeed        :word;
@@ -1787,6 +1788,15 @@ begin
 			FLEE2 := 0;
 		end;
 
+                // Colus, 20031212: Changed Monk's flee skill bonus to be like Thief's
+                // Darkhelmet 12/21/03 Colus's Fix was breaking thief Skill
+                if Skill[265].Lv <> 0 then begin //Dodge
+                        FLEE3 := Skill[265].Data.Data1[Skill[265].Lv];
+                end else begin
+			FLEE3 := 0;
+                end;
+
+
 		//ƒOƒƒŠƒA(LUK+)
 		if Skill[75].Tick > Tick then begin
 			Bonus[5] := Bonus[5] + 30;
@@ -1823,13 +1833,6 @@ begin
                 if ((tc.Option = 6) and (tc.Skill[213].Lv <> 0)) then begin
                         Speed := (Skill[213].Data.Data2[Skill[213].Lv] * Speed) div 100;
                         ASpeed := Round(ASpeed * (Skill[213].Data.Data2[Skill[213].Lv] / 100));
-                end;
-
-                // Colus, 20031212: Changed Monk's flee skill bonus to be like Thief's
-                if Skill[265].Lv <> 0 then begin //Dodge
-                        FLEE2 := Skill[265].Data.Data1[Skill[265].Lv];
-                        end else begin
-			FLEE2 := 0;
                 end;
 
                 if Skill[268].Tick > Tick then begin //Steel Body
@@ -1924,6 +1927,7 @@ begin
 		Lucky := 1;
 		Critical := 1;
                 FLEE1 := 1;
+                FLEE2 := 0;
 		MaxWeight := 20000;
 		DEF1 := 0;
 		for i:=0 to 1 do begin
@@ -2021,7 +2025,7 @@ begin
 
 		DEF2 := Param[2];
 		MDEF2 := Param[3];
-		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2;
+		FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
 
 
                 if Skill[270].Tick > Tick then begin //Explosion Spirits
@@ -2313,6 +2317,7 @@ begin
                 {Initialize to 0}
                 DEF1 := 0;
                 FLEE1 := 1;
+
                 MAXHP := 0;
                 for i := 0 to 1 do
                         for j := 0 to 5 do
@@ -2372,7 +2377,7 @@ begin
 			Param[4] := Param[4] * (102 + Skill[45].Lv) div 100;
 		end;
 
-                FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2;
+                FLEE1 := FLEE1 + Param[1] + BaseLV + FLEE2 + FLEE3;
 
                 if Skill[66].Tick > Tick then begin
 			ATK[0][3] := ATK[0][3] + 5 * Skill[66].EffectLV;
