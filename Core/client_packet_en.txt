@@ -25,6 +25,8 @@ Version History:
 2004/01/17: Added more info on some packets for item creation and
             equipment graphics (to accomodate Pharmacy).
 
+2004/01/23: Added 012a, corrected some 0119 values.
+
 Credits:
 
 - The Japanese Athena dev team, for providing the original list.
@@ -1247,15 +1249,24 @@ R 0119 <ID>.l <param1>.w <param2>.w <param3>.w ?.B
 	param3=0f ペコペコ乗り
 
 	Change how you look (based on status).
+	(NOTE: The Japanese info is out of date.  I am correcting param3 values below:)
+
 	param1=02 Frost Driver?
+
 	param2=01 Poison?
 	param2=20 Angelus condition?
-	param3=01 Sight or Ruwach?
-	param3=0b Hiding?
-	param3=0b Cloaking?
-	param3=0d Cart
-	param3=0e Falcon
-	param3=0f Peco-Peco
+
+	param3=01   Sight/Ruwach  (x01)
+	param3=02   Hidden        (x02)
+	param3=04   Cloaked       (x04)
+	param3=08   Cart (#1)     (x08)
+	param3=16   Falcon        (x10)
+	param3=32   Peco-Peco     (x20)
+	param3=64   Perfect Hide  (x40)
+	param3=128  Cart (#2)     (x80)
+	param3=256  Cart (#3)     (x100)
+	param3=512  Cart (#4)     (x200)
+	param3=1024 Cart (#5)     (x400)
 
 R 011a <skill ID>.w <val>.w <dst ID>.l <src ID>.l <fail>.B
 	非ダメージ系スキル表示。ヒールの場合valは回復量
@@ -1411,6 +1422,9 @@ S 0129 <index>.w <amount>.l
 	カートからカプラさんへアイテムを移す
 
 	Move an item from cart to Kapra storage.
+
+S 012A
+	Request to remove falcon/cart/peco options from this character.
 
 R 012c <fail>.B
 	fail=00 「重量オーバーです。」
