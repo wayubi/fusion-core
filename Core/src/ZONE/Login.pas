@@ -74,11 +74,11 @@ begin
         tp.IP := Socket.RemoteAddress;
         tp.Login := 1;
         tp.LoginID1 := Random($7FFFFFFF) + 1;
-					if UseSQL then tp.LoginID2 := GetNowLoginID()
-					else begin
-        tp.LoginID2 := NowLoginID;
-        Inc(NowLoginID);
-					end;
+        if UseSQL then tp.LoginID2 := Assign_AccountID()
+        else begin
+                tp.LoginID2 := NowLoginID;
+                Inc(NowLoginID);
+        end;
         if NowLoginID >= 2000000000 then NowLoginID := 0;
 
         //DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
