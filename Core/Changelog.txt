@@ -1,9 +1,13 @@
 --------------------------------------------------------------------------------
-Fusion 1.209 - January ??, 2004
+Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
-
 - 02-01-04: Added Sage Skill Spell Breaker. [Darkhelmet]
 - 02-01-04: Added Sage Skill Cast Cancel. [Darkhelmet]
+- 02-01-04: Fixed Double-Login causes server crash & Freezes. [AlexKreuz]
+
+--------------------------------------------------------------------------------
+Fusion 1.209 - January 31st, 2004
+--------------------------------------------------------------------------------
 - 02-01-04: Fixed #where command where it doesnt send you the location of the other player. [Mitch]
 - 01-31-04: Fixed Raid, to be used when hidden as well as Backstab. Added Skill error -[Oatmeal]
 - 01-31-04: FIxed call spirits level determiens how many you have at a time-[Oatmeal]
