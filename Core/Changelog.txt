@@ -1,6 +1,15 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
+
+- 02-03-04: Corrected spirit sphere update process [Colus]
+- 02-03-04: Updated Inhale Spirits to recover proper SP amount. [Colus]
+- 02-03-04: Updated Call Spirit to rely more on DB for sphere count. [Colus]
+- 02-03-04: Updated Raid to properly update status/speed upon usage [Colus]
+- 02-03-04: Updated #job to remove equipment upon job change [Colus]
+- 02-03-04: Updated #zeny to allow up to 1 billion Z [Colus]
+- 02-03-04: Re-added Oatmeal/Mitch fixes from 1-31-2004 [Colus]
+  * NOTE: Last warning!  We should never lose fixes because you forgot to update!
 - 02-03-04: Fixed bug #353: "yggdrasil leafs take up sp when used" [Mitch]
 - 02-01-04: Added Sage Skill Spell Breaker. [Darkhelmet]
 - 02-01-04: Added Sage Skill Cast Cancel. [Darkhelmet]
