@@ -1,11 +1,11 @@
 object frmMain: TfrmMain
-  Left = 265
-  Top = 182
+  Left = 250
+  Top = 187
   Width = 608
-  Height = 366
+  Height = 368
   Caption = 's'
   Color = clCream
-  Constraints.MaxHeight = 366
+  Constraints.MaxHeight = 368
   Constraints.MaxWidth = 608
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -49,6 +49,8 @@ object frmMain: TfrmMain
     Height = 300
     ActivePage = TabSheet1
     Align = alClient
+    Constraints.MaxHeight = 300
+    Constraints.MaxWidth = 600
     Constraints.MinHeight = 300
     Constraints.MinWidth = 600
     Font.Charset = DEFAULT_CHARSET
@@ -70,7 +72,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 0
         Width = 592
-        Height = 262
+        Height = 261
         Anchors = [akLeft, akTop, akRight, akBottom]
         Color = 14071432
         Font.Charset = DEFAULT_CHARSET
@@ -85,7 +87,7 @@ object frmMain: TfrmMain
       end
       object Edit1: TEdit
         Left = 0
-        Top = 264
+        Top = 263
         Width = 486
         Height = 26
         Anchors = [akLeft, akRight, akBottom]
@@ -152,9 +154,10 @@ object frmMain: TfrmMain
       end
       object Combo_ISCS: TComboBox
         Left = 488
-        Top = 264
+        Top = 263
         Width = 104
         Height = 26
+        Anchors = [akLeft, akRight, akBottom]
         ItemHeight = 18
         TabOrder = 5
         Items.Strings = (
@@ -1345,9 +1348,10 @@ object frmMain: TfrmMain
       object PageControl3: TPageControl
         Left = 0
         Top = 0
-        Width = 393
-        Height = 433
+        Width = 592
+        Height = 290
         ActivePage = TabSheet6
+        Align = alClient
         TabOrder = 0
         OnChange = PageControl3Change
         object TabSheet6: TTabSheet
@@ -1361,24 +1365,31 @@ object frmMain: TfrmMain
             Visible = False
           end
           object Label96: TLabel
-            Left = 8
-            Top = 184
+            Left = 256
+            Top = 8
             Width = 128
             Height = 18
             Caption = 'Message the Character'
           end
-          object ListBox3: TListBox
+          object Label138: TLabel
             Left = 8
             Top = 8
+            Width = 78
+            Height = 18
+            Caption = 'Character List'
+          end
+          object ListBox3: TListBox
+            Left = 8
+            Top = 24
             Width = 233
-            Height = 177
+            Height = 217
             ItemHeight = 18
             TabOrder = 0
             OnClick = ListBox3Click
           end
           object Button17: TButton
-            Left = 264
-            Top = 8
+            Left = 256
+            Top = 112
             Width = 97
             Height = 25
             Caption = 'Refresh'
@@ -1386,8 +1397,8 @@ object frmMain: TfrmMain
             OnClick = Button17Click
           end
           object Button18: TButton
-            Left = 264
-            Top = 40
+            Left = 256
+            Top = 184
             Width = 97
             Height = 25
             Caption = 'Kick'
@@ -1395,26 +1406,26 @@ object frmMain: TfrmMain
             OnClick = Button18Click
           end
           object Edit8: TEdit
-            Left = 8
-            Top = 200
-            Width = 369
+            Left = 256
+            Top = 24
+            Width = 313
             Height = 26
             TabOrder = 5
             OnKeyPress = Edit8KeyPress
           end
           object Button19: TButton
-            Left = 8
-            Top = 352
-            Width = 105
-            Height = 17
+            Left = 472
+            Top = 56
+            Width = 97
+            Height = 25
             Caption = 'Send'
             TabOrder = 6
             Visible = False
             OnClick = Button19Click
           end
           object Button20: TButton
-            Left = 264
-            Top = 72
+            Left = 256
+            Top = 216
             Width = 97
             Height = 25
             Caption = 'Kick / Ban'
@@ -1422,8 +1433,8 @@ object frmMain: TfrmMain
             OnClick = Button20Click
           end
           object Button21: TButton
-            Left = 264
-            Top = 104
+            Left = 256
+            Top = 152
             Width = 97
             Height = 25
             Caption = 'Rescue'
@@ -1539,71 +1550,71 @@ object frmMain: TfrmMain
             Caption = 'Cloths Color'
           end
           object Label77: TLabel
-            Left = 16
-            Top = 160
+            Left = 384
+            Top = 40
             Width = 58
             Height = 18
             Caption = 'Saved Map'
           end
           object Label78: TLabel
-            Left = 88
-            Top = 160
+            Left = 456
+            Top = 40
             Width = 48
             Height = 18
             Caption = 'S. Map X'
           end
           object Label79: TLabel
-            Left = 144
-            Top = 160
+            Left = 512
+            Top = 40
             Width = 44
             Height = 18
             Caption = 'S.Map Y'
           end
           object Label80: TLabel
-            Left = 16
-            Top = 200
+            Left = 384
+            Top = 80
             Width = 70
             Height = 18
             Caption = 'Current Map'
           end
           object Label94: TLabel
-            Left = 312
-            Top = 280
+            Left = 128
+            Top = 160
             Width = 21
             Height = 18
             Caption = 'LUK'
           end
           object Label93: TLabel
-            Left = 256
-            Top = 280
+            Left = 72
+            Top = 160
             Width = 20
             Height = 18
             Caption = 'DEX'
           end
           object Label92: TLabel
-            Left = 200
-            Top = 280
+            Left = 16
+            Top = 160
             Width = 18
             Height = 18
             Caption = 'INT'
           end
           object Label91: TLabel
-            Left = 312
-            Top = 240
+            Left = 128
+            Top = 120
             Width = 17
             Height = 18
             Caption = 'VIT'
           end
           object Label90: TLabel
-            Left = 256
-            Top = 240
+            Left = 72
+            Top = 120
             Width = 18
             Height = 18
             Caption = 'AGI'
           end
           object Label89: TLabel
-            Left = 200
-            Top = 240
+            Left = 16
+            Top = 120
             Width = 20
             Height = 18
             Caption = 'STR'
@@ -1630,148 +1641,148 @@ object frmMain: TfrmMain
             Caption = 'Option'
           end
           object Label84: TLabel
-            Left = 256
-            Top = 320
+            Left = 384
+            Top = 0
             Width = 17
             Height = 18
             Caption = 'SP:'
           end
           object Label83: TLabel
-            Left = 200
-            Top = 320
+            Left = 328
+            Top = 0
             Width = 19
             Height = 18
             Caption = 'HP:'
           end
           object Label82: TLabel
-            Left = 144
-            Top = 200
+            Left = 512
+            Top = 80
             Width = 45
             Height = 18
             Caption = 'C-Map Y'
           end
           object Label81: TLabel
-            Left = 88
-            Top = 200
+            Left = 456
+            Top = 80
             Width = 45
             Height = 18
             Caption = 'C-Map X'
           end
           object Label98: TLabel
-            Left = 200
-            Top = 336
+            Left = 328
+            Top = 16
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label99: TLabel
-            Left = 256
-            Top = 336
+            Left = 384
+            Top = 16
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label102: TLabel
-            Left = 312
-            Top = 336
+            Left = 440
+            Top = 16
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label101: TLabel
-            Left = 312
-            Top = 320
+            Left = 440
+            Top = 0
             Width = 51
             Height = 18
             Caption = 'Account:'
           end
           object Label100: TLabel
-            Left = 16
-            Top = 376
+            Left = 96
+            Top = 224
             Width = 67
             Height = 18
             Caption = 'Party Name:'
           end
           object Label103: TLabel
-            Left = 88
-            Top = 376
+            Left = 168
+            Top = 224
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label104: TLabel
-            Left = 16
-            Top = 360
+            Left = 96
+            Top = 208
             Width = 32
             Height = 18
             Caption = 'Guild:'
           end
           object Label105: TLabel
-            Left = 56
-            Top = 360
+            Left = 136
+            Top = 208
             Width = 21
             Height = 18
             Caption = 'N/A'
           end
           object Label106: TLabel
-            Left = 16
-            Top = 240
+            Left = 384
+            Top = 120
             Width = 66
             Height = 18
             Caption = 'Memo Map1'
           end
           object Label107: TLabel
-            Left = 88
-            Top = 240
+            Left = 456
+            Top = 120
             Width = 48
             Height = 18
             Caption = 'M-Map X'
           end
           object Label108: TLabel
-            Left = 144
-            Top = 240
+            Left = 512
+            Top = 120
             Width = 48
             Height = 18
             Caption = 'M-Map Y'
           end
           object Label109: TLabel
-            Left = 16
-            Top = 280
+            Left = 384
+            Top = 160
             Width = 66
             Height = 18
             Caption = 'Memo Map2'
           end
           object Label114: TLabel
-            Left = 16
-            Top = 320
+            Left = 384
+            Top = 200
             Width = 66
             Height = 18
             Caption = 'Memo Map3'
           end
           object Label112: TLabel
-            Left = 88
-            Top = 280
+            Left = 456
+            Top = 160
             Width = 48
             Height = 18
             Caption = 'M-Map X'
           end
           object Label113: TLabel
-            Left = 144
-            Top = 280
+            Left = 512
+            Top = 160
             Width = 48
             Height = 18
             Caption = 'M-Map Y'
           end
           object Label117: TLabel
-            Left = 88
-            Top = 320
+            Left = 456
+            Top = 200
             Width = 48
             Height = 18
             Caption = 'M-Map X'
           end
           object Label118: TLabel
-            Left = 144
-            Top = 320
+            Left = 512
+            Top = 200
             Width = 48
             Height = 18
             Caption = 'M-Map Y'
@@ -1791,8 +1802,8 @@ object frmMain: TfrmMain
             Caption = 'N/A'
           end
           object Edit52: TEdit
-            Left = 16
-            Top = 216
+            Left = 384
+            Top = 96
             Width = 65
             Height = 26
             TabOrder = 16
@@ -1822,7 +1833,7 @@ object frmMain: TfrmMain
             Left = 16
             Top = 16
             Width = 177
-            Height = 145
+            Height = 105
             ItemHeight = 18
             TabOrder = 0
             OnClick = ListBox2Click
@@ -1891,29 +1902,29 @@ object frmMain: TfrmMain
             TabOrder = 15
           end
           object Edit49: TEdit
-            Left = 16
-            Top = 176
+            Left = 384
+            Top = 56
             Width = 65
             Height = 26
             TabOrder = 10
           end
           object Edit50: TEdit
-            Left = 88
-            Top = 176
+            Left = 456
+            Top = 56
             Width = 49
             Height = 26
             TabOrder = 11
           end
           object Edit51: TEdit
-            Left = 144
-            Top = 176
+            Left = 512
+            Top = 56
             Width = 49
             Height = 26
             TabOrder = 12
           end
           object Button16: TButton
-            Left = 240
-            Top = 360
+            Left = 16
+            Top = 216
             Width = 73
             Height = 25
             Caption = 'Save'
@@ -1921,57 +1932,57 @@ object frmMain: TfrmMain
             OnClick = Button16Click
           end
           object Edit67: TEdit
-            Left = 200
-            Top = 256
+            Left = 16
+            Top = 136
             Width = 49
             Height = 26
             TabOrder = 25
           end
           object Edit66: TEdit
-            Left = 256
-            Top = 256
+            Left = 72
+            Top = 136
             Width = 49
             Height = 26
             TabOrder = 26
           end
           object Edit65: TEdit
-            Left = 312
-            Top = 256
+            Left = 128
+            Top = 136
             Width = 49
             Height = 26
             TabOrder = 27
           end
           object Edit64: TEdit
-            Left = 256
-            Top = 294
+            Left = 72
+            Top = 174
             Width = 49
             Height = 26
             TabOrder = 32
           end
           object Edit63: TEdit
-            Left = 200
-            Top = 296
+            Left = 16
+            Top = 176
             Width = 49
             Height = 26
             TabOrder = 31
           end
           object Edit61: TEdit
-            Left = 312
-            Top = 294
+            Left = 128
+            Top = 174
             Width = 49
             Height = 26
             TabOrder = 33
           end
           object Edit59: TEdit
-            Left = 144
-            Top = 216
+            Left = 512
+            Top = 96
             Width = 49
             Height = 26
             TabOrder = 18
           end
           object Edit57: TEdit
-            Left = 88
-            Top = 216
+            Left = 456
+            Top = 96
             Width = 49
             Height = 26
             TabOrder = 17
@@ -1998,64 +2009,64 @@ object frmMain: TfrmMain
             TabOrder = 21
           end
           object Edit60: TEdit
-            Left = 144
-            Top = 256
+            Left = 512
+            Top = 136
             Width = 49
             Height = 26
             TabOrder = 24
           end
           object Edit62: TEdit
-            Left = 88
-            Top = 256
+            Left = 456
+            Top = 136
             Width = 49
             Height = 26
             TabOrder = 23
           end
           object Edit68: TEdit
-            Left = 16
-            Top = 256
+            Left = 384
+            Top = 136
             Width = 65
             Height = 26
             TabOrder = 22
           end
           object Edit69: TEdit
-            Left = 16
-            Top = 296
+            Left = 384
+            Top = 176
             Width = 65
             Height = 26
             TabOrder = 28
           end
           object Edit70: TEdit
-            Left = 88
-            Top = 296
+            Left = 456
+            Top = 176
             Width = 49
             Height = 26
             TabOrder = 29
           end
           object Edit71: TEdit
-            Left = 144
-            Top = 296
+            Left = 512
+            Top = 176
             Width = 49
             Height = 26
             TabOrder = 30
           end
           object Edit72: TEdit
-            Left = 144
-            Top = 336
+            Left = 512
+            Top = 216
             Width = 49
             Height = 26
             TabOrder = 36
           end
           object Edit73: TEdit
-            Left = 88
-            Top = 336
+            Left = 456
+            Top = 216
             Width = 49
             Height = 26
             TabOrder = 35
           end
           object Edit74: TEdit
-            Left = 16
-            Top = 336
+            Left = 384
+            Top = 216
             Width = 65
             Height = 26
             TabOrder = 34
@@ -2136,15 +2147,15 @@ object frmMain: TfrmMain
             Visible = False
           end
           object Label128: TLabel
-            Left = 8
-            Top = 184
+            Left = 384
+            Top = 128
             Width = 138
             Height = 18
             Caption = 'Storage Items (view only)'
           end
           object Label129: TLabel
-            Left = 200
-            Top = 184
+            Left = 384
+            Top = 0
             Width = 90
             Height = 18
             Caption = 'Cart (View Only)'
@@ -2157,8 +2168,8 @@ object frmMain: TfrmMain
             Caption = 'Character Inventory'
           end
           object Label85: TLabel
-            Left = 104
-            Top = 352
+            Left = 192
+            Top = 192
             Width = 186
             Height = 18
             Caption = 'The ability to save is not available'
@@ -2167,7 +2178,7 @@ object frmMain: TfrmMain
             Left = 8
             Top = 16
             Width = 177
-            Height = 169
+            Height = 233
             ItemHeight = 18
             TabOrder = 0
             OnClick = ListBox4Click
@@ -2236,8 +2247,8 @@ object frmMain: TfrmMain
             TabOrder = 8
           end
           object Button22: TButton
-            Left = 312
-            Top = 352
+            Left = 288
+            Top = 224
             Width = 73
             Height = 25
             Caption = 'Save'
@@ -2253,18 +2264,18 @@ object frmMain: TfrmMain
             TabOrder = 3
           end
           object ListBox5: TListBox
-            Left = 8
-            Top = 200
+            Left = 384
+            Top = 144
             Width = 177
-            Height = 145
+            Height = 105
             ItemHeight = 18
             TabOrder = 9
           end
           object ListBox6: TListBox
-            Left = 200
-            Top = 200
-            Width = 169
-            Height = 145
+            Left = 384
+            Top = 16
+            Width = 177
+            Height = 105
             ItemHeight = 18
             TabOrder = 10
           end
@@ -2273,8 +2284,8 @@ object frmMain: TfrmMain
           Caption = 'Skills / Flags'
           ImageIndex = 5
           object Label110: TLabel
-            Left = 8
-            Top = 184
+            Left = 312
+            Top = 0
             Width = 85
             Height = 18
             Caption = 'Flags (variables)'
@@ -2308,15 +2319,15 @@ object frmMain: TfrmMain
             Caption = 'Skill ID:'
           end
           object Label132: TLabel
-            Left = 192
-            Top = 200
+            Left = 456
+            Top = 0
             Width = 78
             Height = 18
             Caption = 'Variable Name'
           end
           object Label133: TLabel
-            Left = 192
-            Top = 240
+            Left = 456
+            Top = 40
             Width = 30
             Height = 18
             Caption = 'Value'
@@ -2325,23 +2336,23 @@ object frmMain: TfrmMain
             Left = 8
             Top = 16
             Width = 177
-            Height = 169
+            Height = 233
             ItemHeight = 18
             TabOrder = 0
             OnClick = ListBox7Click
           end
           object ListBox8: TListBox
-            Left = 8
-            Top = 200
-            Width = 177
-            Height = 169
+            Left = 320
+            Top = 16
+            Width = 129
+            Height = 233
             ItemHeight = 18
             TabOrder = 1
             OnClick = ListBox8Click
           end
           object Button23: TButton
-            Left = 296
-            Top = 160
+            Left = 192
+            Top = 224
             Width = 75
             Height = 25
             Caption = 'Save'
@@ -2349,8 +2360,8 @@ object frmMain: TfrmMain
             OnClick = Button23Click
           end
           object Button24: TButton
-            Left = 296
-            Top = 352
+            Left = 456
+            Top = 224
             Width = 75
             Height = 25
             Caption = 'Save'
@@ -2368,15 +2379,15 @@ object frmMain: TfrmMain
           object CheckBox2: TCheckBox
             Left = 192
             Top = 144
-            Width = 137
+            Width = 121
             Height = 17
             Caption = 'Hide Unused Skills'
             TabOrder = 5
             OnClick = CheckBox2Click
           end
           object Button25: TButton
-            Left = 296
-            Top = 328
+            Left = 456
+            Top = 192
             Width = 75
             Height = 25
             Caption = 'Delete'
@@ -2384,15 +2395,15 @@ object frmMain: TfrmMain
             OnClick = Button25Click
           end
           object Edit79: TEdit
-            Left = 192
-            Top = 216
+            Left = 456
+            Top = 16
             Width = 121
             Height = 26
             TabOrder = 7
           end
           object Edit80: TEdit
-            Left = 192
-            Top = 256
+            Left = 456
+            Top = 56
             Width = 121
             Height = 26
             TabOrder = 8

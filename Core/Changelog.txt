@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 11-26-04: Cleaned up JCon Characters tab. [AlexKreuz]
 - 11-22-04: Added reseteventmob. [Tsusai]
 - 11-22-04: Removed an unused unit 'jpeg'. [Tsusai]
 - 11-18-04: Added a universal warp procedure. [Tsusai]
