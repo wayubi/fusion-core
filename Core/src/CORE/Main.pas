@@ -10721,7 +10721,7 @@ begin
 									dmg[0] := dmg[0] * (100 - tc2.MDEF1 + tc2.MDEF2) div 100; //MDEF%
 									dmg[0] := dmg[0] - tc2.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
-									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 									WFIFOW( 0, $01de);
 									WFIFOW( 2, 85);
@@ -10738,7 +10738,7 @@ begin
 									DamageProcess2(tm,tc1,tc2,dmg[0],tick);
 									if c1 = (sl2.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 3 then tn.Tick := Tick
+										if tn.Count = 1 then tn.Tick := Tick
 									end;
 								end;
 							end;
@@ -11184,7 +11184,7 @@ begin
 									dmg[0] := dmg[0] - ts1.Data.Param[3]; //MDEF-
 									if dmg[0] < 1 then dmg[0] := 1;
 									dmg[0] := dmg[0] * ElementTable[tl.Element][ts1.Element] div 100;
-									dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
+									//dmg[0] := dmg[0] * tl.Data2[tn.MUseLV];
 									if dmg[0] < 0 then dmg[0] := 0; //魔法攻撃での回復は未実装
 									WFIFOW( 0, $01de);
 									WFIFOW( 2, 85);
@@ -11203,7 +11203,7 @@ begin
 									DamageProcess1(tm,tc1,ts1,dmg[0],tick);
 									if c = (sl.Count -1) then begin
 										Inc(tn.Count);	//Countを発動発数とSkillLVに使用
-										if tn.Count = 3 then tn.Tick := Tick
+										if tn.Count = 1 then tn.Tick := Tick
 									end;
 								end;
 							end;
