@@ -361,6 +361,9 @@ var
 begin
 
         //for i := 0 to 3 do begin
+
+        if assigned(ts.AData) then begin
+
         tc := ts.AData;
         if tc <> nil then begin
     		  if tc.Stat1 = 2 then j := 21 // Frozen?  Water 1
@@ -701,7 +704,7 @@ begin
                 end;
         end;
 
-        //end;
+        end;
 
 end;
 
