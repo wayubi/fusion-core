@@ -1,6 +1,11 @@
 Fusion 1.2.0.8 - December ????, 2003
 - 12-18-03: Set up CVS Server. Follow this Log Format. [AlexKreuz]
-
+- 12-17-03: Updated Packet Length Table [Colus]
+- 12-17-03: Added Cast Timer disappearing on non-phen hit [Colus]
+- 12-17-03: Added effects for cast time effect cards [Colus]
+- 12-17-03: Added Phen Card [Colus]
+- 12-16-03: Fixed Monk's Falling Pearl Petals (bug #94) [Colus]
+- 12-16-03: Fixed ItemDropDenominator variable type -> integer (bug #69) [Colus]
 
 -----------------------------------------------------------------
 OLD FORMAT
@@ -9,6 +14,7 @@ OLD FORMAT
 RESERVED FOR 1.2.0.7
 
 -----------------------------------------------------------------
+
 Fusion 1.2.0.6 - November 12th, 2003
 - Fixed: Cart -> User Overweight Bug. [AlexKreuz]
 - Fixed: Merchant Shop -> Fatal Crash. [AlexKreuz]
