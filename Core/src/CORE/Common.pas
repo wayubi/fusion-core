@@ -707,6 +707,7 @@ type TChara = class
 	Critical      :word;
 	Lucky         :word;
 	ASpeed        :word;
+        Delay         :integer;
 	ADelay        :word;
 	aMotion       :word;
 	dMotion       :word;
@@ -1508,6 +1509,8 @@ Option_GraceTime_PvPG :cardinal;
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
+                function  Monkdelay(tm:TMap; tc:TChara; Delay:integer) :boolean;
+                function  Tripleblow(tm:TMap; tc:TChara; Delay:word) :boolean;
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
                 function  UseItem(tc:TChara; j:integer): boolean;
@@ -1999,6 +2002,8 @@ begin
 			FLEE3 := 0;
                 end;
 
+                        
+            
 
 		//グロリア(LUK+)
 		if Skill[75].Tick > Tick then begin
@@ -2323,7 +2328,10 @@ begin
                                         10: ADelay := ADelay * 40 div 100;
                                 end;
                         end;}
+                     Delay := (2000 - (4 * param[1]) - (2 * param[4]) - 300);
 
+
+    
 			if (Skill[60].Tick > Tick) and (tc.Weapon = 3) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
 			if (Skill[111].Tick > Tick) and ((tc.Weapon = 6) or (tc.Weapon = 7) or (tc.Weapon = 8))then ADelay := ADelay * 70 div 100; //Adrenaline Rush
 {Editted By AppleGirl}  if (Skill[258].Tick > Tick) and ((tc.Weapon = 4) or (tc.Weapon = 5)) then ADelay := ADelay * 70 div 100; //ツーハンドクイックン
@@ -4036,6 +4044,23 @@ begin
         // Colus, 20031222: This packet only has 8 bytes, not 16!
         SendBCmd(tm, tc.Point, 8);
 end;
+//-----------------------------------------------------------------------------
+function Tripleblow(tm:TMap; tc:TChara; Delay:word) :boolean;
+begin
+        WFIFOW( 0, $01d2);
+        WFIFOL( 2, tc.ID);
+        WFIFOW( 6, Delay);
+        // Colus, 20031222: This packet only has 8 bytes, not 16!
+        SendBCmd(tm, tc.Point, 8);
+end;
+//------------------------------------------------------------------------------
+function Monkdelay(tm:TMap; tc:TChara; Delay:integer) :boolean;
+begin
+        WFIFOW( 0, $01d2);
+        WFIFOL( 2, tc.ID);
+        WFIFOL( 6, Delay);
+        SendBCmd(tm, tc.Point, 10);
+end;
 //------------------------------------------------------------------------------
 function DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
 //var
@@ -5412,7 +5437,6 @@ procedure SendGuildInfo(tc:TChara; Tab:Byte; GuildM:boolean = false; AvoidSelf:b
 var
 	i   :integer;
 	j   :integer;
-  b   :integer;
 	k   :integer;
 	w   :word;
 	tc1 :TChara;
@@ -5523,7 +5547,6 @@ begin
 			begin
 				w := 37 * 5 + 6;
 				j := 0;
-        b := 0;
 				WFIFOW( 0, $0162);
 				WFIFOW( 2, w);
 				WFIFOW( 4, GSkillPoint);
@@ -5535,11 +5558,7 @@ begin
 					WFIFOW(14 + 37 * j, 0);
 					WFIFOW(16 + 37 * j, 0);
 					WFIFOS(18 + 37 * j, GSkill[i].Data.IDC, 24);
-          if (tg.GSkill[i].Lv < tg.GSkill[i].Data.MasterLV) and (tg.GSkillPoint > 0) then
-          b := 1
-          else
-          b := 0;
-          WFIFOB(42 + 37 * j, b);
+                                        WFIFOB(42 + 37 * j, 1);
 					Inc(j);
 				end;
 				if (GuildM = false) then tc.Socket.SendBuf(buf, w)

@@ -1780,8 +1780,8 @@ begin
 		if i < 5 then i := 5;
 		if i > 100 then i := 100;
 		dmg[6] := i;
-                Delay := (2000 - (4 * param[1]) - (2 * param[4]) - 300);
-                if Skill[263].Lv <> 0 then Monkdelay(tm, tc, Delay);
+                Delay := (1500 - (4 * param[1]) - (2 * param[4]) - 300);
+
 		if Arms = 0 then begin
 			crit := boolean((SkillPer = 0) and (Random(100) < Critical - ts.Data.LUK * 0.2));
 		end else begin //“ñ“—¬‰EŽè
@@ -1794,7 +1794,10 @@ begin
 			if Skill[48].Lv <> 0 then datk := true;
 			crit := false;
                         if tatk = true then datk := false;
-                         if tatk = true then Monkdelay(tm, tc, Delay);
+                         //if tatk = true then tc.ATick := timeGetTime() + Delay;
+                         //if tatk = true then tc.ATick := timeGetTime() + 200 + Delay;
+                         //if tatk = true then Monkdelay(tm, tc, Delay);
+
                         //if tatk = true then ADelay := (1000 - (4 * param[1]) - (2 * param[4]) - 300);
 
                         Delay := (2000 - (4 * param[1]) - (2 * param[4]) -300);
@@ -5774,10 +5777,19 @@ begin
                                 begin
 
                                         if (tc.Weapon = 12) or (tc.Weapon = 0) then begin
+
                                                 DamageCalc1(tm, tc, ts, Tick, 0, tl.Data2[MUseLV], tl.Element, 0);
                                                 if dmg[0] < 0 then dmg[0] := 0;
-                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 3);
-                                                Monkdelay(tm, tc, Delay);
+                                                SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 2);
+                                                WFIFOW(0, $0196);
+                                                WFIFOW(2, $59);
+                                                WFIFOL(4, tc.ID);
+                                                WFIFOB(8, 1);
+                                                Delay := (1500 - (4 * param[1]) - (2 * param[4]) - 300);
+                                                //tc.ATick := timeGetTime() + Delay;
+                                                Tripleblow(tm, tc, tc.Delay);
+
+                                                tc.ATick := timeGetTime() + Delay;
 
                                                 if not DamageProcess1(tm, tc, ts, dmg[0], Tick) then
                                                 StatCalc1(tc, ts, Tick);
@@ -5886,6 +5898,7 @@ begin
                                         ts.IsEmperium := False;
                                         tc.AData := ts;
                                         PassiveAttack := False;
+                                        
                                         DamageCalc1(tm, tc, ts, Tick, 0, tl.Data1[MUseLV], tl.Element, 0);
                                         dmg[0] := dmg[0];
                                         dmg[0] := dmg[0] + (75 div 100) * 60;
@@ -6872,7 +6885,7 @@ begin
 							ts.BodyTick := Tick + tc.aMotion;
 						end else if (ts.Stat1 = 5) then ts.BodyTick := ts.BodyTick + 30000;}
           end;
-                                              141:  //venom splasher 
+                                              141:  //venom splasher
                                                 begin
                                                 WFIFOW( 0, $011a);
 						WFIFOW( 2, MSkill);
@@ -7592,8 +7605,11 @@ begin
                                                 if (Skill[263].Tick > Tick) and (Skill[272].Tick < Tick) and ((tc.Weapon = 12) or (tc.Weapon = 0)) then begin
                                                         PassiveAttack := True;
                                                         tc.MTargetType := 0;
+                                                        Monkdelay(tm, tc, Delay);
                                                         SkillEffect(tc, Tick);
+
                                                 end else begin
+                                                        SendSkillError(tc, 0);
                                                         MMode := 4;
                                                         Exit;
                                                 end;
@@ -7606,6 +7622,7 @@ begin
                                                         tc.MTargetType := 0;
                                                         SkillEffect(tc, Tick);
                                                 end else begin
+                                                        SendSkillError(tc, 0);
                                                         MMode := 4;
                                                         Exit;
                                                 end;
