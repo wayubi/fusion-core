@@ -47,10 +47,10 @@ begin
     if (x1 < 0) or (y1 < 0) or (x1 >= tm.Size.X) or (y1 >= tm.Size.Y) then exit;
 
     b1 := tm.gat[x0][y0];
-    if (b1 = 1) then exit;
+    if (b1 = 1) or (b1 = 5) then exit;
 
     b2 := tm.gat[x1][y1];
-    if (b2 = 1) then exit;
+    if (b2 = 1) or (b2 = 5) then exit;
 
     if (x0 = x1) or (y0 = y1) then begin
         Result := true;
@@ -60,7 +60,7 @@ begin
     b1 := tm.gat[x0][y1];
     b2 := tm.gat[x1][y0];
 
-    if (b1 = 1) or (b2 = 1) then exit;
+    if (b1 = 1) or (b1 = 5) or (b2 = 1) or (b2 = 5) then exit;
 
     Result := true;
 
@@ -105,7 +105,97 @@ begin
 		rh := aa[1];
 		PopHeap(aa, n);
 
-    // AlexKreuz new searchpath logic -> Less Calculations = Better performance.
+        // AlexKreuz SearchPath v.2.0
+        if (x2 > rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x, rh.y-1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end;
+            end else if (y2 = rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y-1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end;
+            end;
+        end else if (x2 < rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y) or CanAttack (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end;
+            end else if (y2 = rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end;
+            end;
+        end else if (x2 = rh.x) then begin
+            if (y2 > rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, 1, 0, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y+1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y+1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 1, 1, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 1, 7, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end;
+            end else if (y2 < rh.y) then begin
+                if CanAttack (tm, rh.x, rh.y, rh.x, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 0, -1, 4, 10);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y-1) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y-1) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, -1, 3, 14);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, -1, 5, 14);
+                end else if CanAttack (tm, rh.x, rh.y, rh.x-1, rh.y) or CanAttack (tm, rh.x, rh.y, rh.x+1, rh.y) then begin
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, -1, 0, 2, 10);
+                    AddPath2 (aa, n, rh, x1, y1, x2, y2, 1, 0, 6, 10);
+                end;
+            end;
+        end;
+        // AlexKreuz SearchPath v.2.0
+
+    {// AlexKreuz new searchpath logic -> Less Calculations = Better performance.
     if (x2 > x1) then begin
       if (y2 > y1) then begin
     		if CanAttack(tm, rh.x, rh.y, rh.x+1, rh.y  ) then
@@ -168,7 +258,7 @@ begin
     		if CanAttack(tm, rh.x, rh.y, rh.x  , rh.y-1) then
     			AddPath2(aa, n, rh, x1, y1, x2, y2,  0, -1, 4, 10);
       end;
-    end;
+    end;}
 
 	end;
 	if n = 0 then begin

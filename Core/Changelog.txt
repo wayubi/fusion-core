@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
 Fusion 1.210 - February 28th, 2004
 --------------------------------------------------------------------------------
-.
+- 02-09-04: Fixed Bug #440, Monsters can jump over cliffs / through walls. [AlexKreuz]
+- 02-09-04: Applied Pathfinding Algorithm v2.0 to Monsters' Target Finding procedures. [AlexKreuz]
 - 02-09-04: Updated Poison Effect PvP, just needs to reduce HP now. [Darkhelmet]
 - 02-09-04: Updated Venom Dust PvP. [Darkhelmet]
 - 02-08-04: Fixed Bug #455, MDEF can now stack from items. [Darkhelmet]
