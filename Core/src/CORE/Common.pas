@@ -3240,9 +3240,11 @@ begin
 
                         SendCLeave(tc, 3);
                         tc.Point := xy;
-                        ts.Point.X := tc.Point.X;
-                        ts.Point.Y := tc.Point.Y;
-                        if ts.HP > 0 then SendMmove(tc.Socket, ts, ts.Point, tc.Point, tc.ver2);
+                        if ( (ts.HP > 0) and (ts.Data.MEXP = 0) ) then begin
+                            ts.Point.X := tc.Point.X;
+                            ts.Point.Y := tc.Point.Y;
+                            SendMmove(tc.Socket, ts, ts.Point, tc.Point, tc.ver2);
+                        end;
                         MapMove(tc.Socket, tc.Map, tc.Point);
                 end;
 
