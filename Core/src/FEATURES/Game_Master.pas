@@ -18,7 +18,7 @@ var
     GM_DIE : Byte;
     GM_AUTO : Byte;
     GM_HCOLOR : Byte;
-    GM_CCOLOR : Byte;
+		GM_CCOLOR : Byte;
     GM_HSTYLE : Byte;
     GM_KILL : Byte;
     GM_GOTO : Byte;
@@ -28,7 +28,7 @@ var
     GM_JOB : Byte;
     GM_BLEVEL : Byte;
     GM_JLEVEL : Byte;
-    GM_CHANGESTAT : Byte;
+		GM_CHANGESTAT : Byte;
     GM_SKILLPOINT : Byte;
     GM_SKILLALL : Byte;
     GM_STATALL : Byte;
@@ -48,7 +48,7 @@ var
     
     GM_AEGIS_B : Byte;
     GM_AEGIS_NB : Byte;
-    GM_AEGIS_BB : Byte;
+		GM_AEGIS_BB : Byte;
     GM_AEGIS_HIDE : Byte;
     GM_AEGIS_RESETSTATE : Byte;
     GM_AEGIS_RESETSKILL : Byte;
@@ -58,7 +58,7 @@ var
     GM_ATHENA_ALIVE : Byte;
     GM_ATHENA_KILL : Byte;
     GM_ATHENA_DIE : Byte;
-    GM_ATHENA_JOBCHANGE : Byte;
+		GM_ATHENA_JOBCHANGE : Byte;
     GM_ATHENA_HIDE : Byte;
     GM_ATHENA_OPTION : Byte;
     GM_ATHENA_STORAGE : Byte;
@@ -80,7 +80,7 @@ var
     GM_Access_DB : TIntList32;
 
     procedure load_commands();
-    procedure save_commands();
+		procedure save_commands();
 
     procedure parse_commands(tc : TChara; str : String);
     function check_level(id : Integer; cmd : Integer) : Boolean;
@@ -88,7 +88,7 @@ var
     procedure save_gm_log(tc : TChara; str : String);
 
     function command_alive(tc : TChara) : String;
-    function command_item(tc : TChara; str : String) : String;
+		function command_item(tc : TChara; str : String) : String;
     function command_save(tc : TChara) : String;
     function command_return(tc : TChara) : String;
     function command_die(tc : TChara) : String;
@@ -108,7 +108,7 @@ var
     function command_skillpoint(tc : TChara; str : String) : String;
     function command_skillall(tc : TChara) : String;
     function command_statall(tc : TChara) : String;
-    function command_zeny(tc : TChara; str : String) : String;
+		function command_zeny(tc : TChara; str : String) : String;
     function command_changeskill(tc : TChara; str : String) : String;
     function command_monster(tc : TChara; str : String) : String;
     function command_speed(tc : TChara; str : String) : String;
@@ -118,7 +118,7 @@ var
     function command_unit(tc : TChara; str : String) : String;
     function command_stat(tc : TChara; str : String) : String;
     function command_refine(tc : TChara; str : String) : String;
-    function command_glevel(tc : TChara; str : String) : String;
+		function command_glevel(tc : TChara; str : String) : String;
     function command_ironical(tc : TChara) : String;
     function command_mothball(tc : TChara) : String;
 
@@ -138,7 +138,7 @@ implementation
         GM_ITEM := StrToIntDef(sl.Values['ITEM'], 1);
         GM_SAVE := StrToIntDef(sl.Values['SAVE'], 1);
         GM_RETURN := StrToIntDef(sl.Values['RETURN'], 1);
-        GM_DIE := StrToIntDef(sl.Values['DIE'], 1);
+				GM_DIE := StrToIntDef(sl.Values['DIE'], 1);
         GM_AUTO := StrToIntDef(sl.Values['AUTO'], 1);
         GM_HCOLOR := StrToIntDef(sl.Values['HCOLOR'], 1);
         GM_CCOLOR := StrToIntDef(sl.Values['CCOLOR'], 1);
@@ -148,7 +148,7 @@ implementation
         GM_SUMMON := StrToIntDef(sl.Values['SUMMON'], 1);
         GM_WARP := StrToIntDef(sl.Values['WARP'], 1);
         GM_BANISH := StrToIntDef(sl.Values['BANISH'], 1);
-        GM_JOB := StrToIntDef(sl.Values['JOB'], 1);
+				GM_JOB := StrToIntDef(sl.Values['JOB'], 1);
         GM_BLEVEL := StrToIntDef(sl.Values['BLEVEL'], 1);
         GM_JLEVEL := StrToIntDef(sl.Values['JLEVEL'], 1);
         GM_CHANGESTAT := StrToIntDef(sl.Values['CHANGESTAT'], 1);
@@ -168,7 +168,7 @@ implementation
         GM_GLEVEL := StrToIntDef(sl.Values['GLEVEL'], 1);
         GM_IRONICAL := StrToIntDef(sl.Values['IRONICAL'], 1);
         GM_MOTHBALL := StrToIntDef(sl.Values['MOTHBALL'], 1);
-        
+
         GM_AEGIS_B := StrToIntDef(sl.Values['AEGIS_B'], 1);
         GM_AEGIS_NB := StrToIntDef(sl.Values['AEGIS_NB'], 1);
         GM_AEGIS_BB := StrToIntDef(sl.Values['AEGIS_BB'], 1);
@@ -178,7 +178,7 @@ implementation
         
         GM_ATHENA_HEAL := StrToIntDef(sl.Values['ATHENA_HEAL'], 1);
         GM_ATHENA_KAMI := StrToIntDef(sl.Values['ATHENA_KAMI'], 1);
-        GM_ATHENA_ALIVE := StrToIntDef(sl.Values['ATHENA_ALIVE'], 1);
+				GM_ATHENA_ALIVE := StrToIntDef(sl.Values['ATHENA_ALIVE'], 1);
         GM_ATHENA_KILL := StrToIntDef(sl.Values['ATHENA_KILL'], 1);
         GM_ATHENA_DIE := StrToIntDef(sl.Values['ATHENA_DIE'], 1);
         GM_ATHENA_JOBCHANGE := StrToIntDef(sl.Values['ATHENA_JOBCHANGE'], 1);
@@ -199,135 +199,157 @@ implementation
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
 
-        sl.Free;
-        ini.Free;
-    end;
+		sl.Free;
+		ini.Free;
 
-    procedure save_commands();
-    var
+		//Moved from Main into here.
+		GM_Access_DB := TIntList32.Create;
+	end;
+
+
+(*-----------------------------------------------------------------------------*
+Called when we're shutting down the server *only*
+- Writes settings to GM_Commands.ini
+- Also Frees up GM_AccessDB list.
+
+2004/06/02 - ChrstphrR - added in List Free-up code so that no memory is leaked.
+*-----------------------------------------------------------------------------*)
+	Procedure save_commands();
+	Var
 		ini : TIniFile;
-    begin
-        ini := TIniFile.Create(AppPath + 'gm_commands.ini');
+		Idx : Integer;
+	Begin
+		ini := TIniFile.Create(AppPath + 'gm_commands.ini');
 
-        ini.WriteString('Fusion GM Commands', 'ALIVE', IntToStr(GM_ALIVE));
-        ini.WriteString('Fusion GM Commands', 'ITEM', IntToStr(GM_ITEM));
-        ini.WriteString('Fusion GM Commands', 'SAVE', IntToStr(GM_SAVE));
-        ini.WriteString('Fusion GM Commands', 'RETURN', IntToStr(GM_RETURN));
-        ini.WriteString('Fusion GM Commands', 'DIE', IntToStr(GM_DIE));
-        ini.WriteString('Fusion GM Commands', 'AUTO', IntToStr(GM_AUTO));
-        ini.WriteString('Fusion GM Commands', 'HCOLOR', IntToStr(GM_HCOLOR));
-        ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
-        ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
-        ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
-        ini.WriteString('Fusion GM Commands', 'GOTO', IntToStr(GM_GOTO));
-        ini.WriteString('Fusion GM Commands', 'SUMMON', IntToStr(GM_SUMMON));
-        ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
-        ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
-        ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
-        ini.WriteString('Fusion GM Commands', 'BLEVEL', IntToStr(GM_BLEVEL));
-        ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
-        ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
-        ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
-        ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
-        ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
-        ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
-        ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
-        ini.WriteString('Fusion GM Commands', 'MONSTER', IntToStr(GM_MONSTER));
-        ini.WriteString('Fusion GM Commands', 'SPEED', IntToStr(GM_SPEED));
-        ini.WriteString('Fusion GM Commands', 'WHOIS', IntToStr(GM_WHOIS));
-        ini.WriteString('Fusion GM Commands', 'OPTION', IntToStr(GM_OPTION));
-        ini.WriteString('Fusion GM Commands', 'RAW', IntToStr(GM_RAW));
-        ini.WriteString('Fusion GM Commands', 'UNIT', IntToStr(GM_UNIT));
-        ini.WriteString('Fusion GM Commands', 'STAT', IntToStr(GM_STAT));
-        ini.WriteString('Fusion GM Commands', 'REFINE', IntToStr(GM_REFINE));
-        ini.WriteString('Fusion GM Commands', 'GLEVEL', IntToStr(GM_GLEVEL));
-        ini.WriteString('Fusion GM Commands', 'IRONICAL', IntToStr(GM_IRONICAL));
-        ini.WriteString('Fusion GM Commands', 'MOTHBALL', IntToStr(GM_MOTHBALL));
-        
-        ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
-        ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
-        ini.WriteString('Aegis GM Commands', 'AEGIS_BB', IntToStr(GM_AEGIS_BB));
-        ini.WriteString('Aegis GM Commands', 'AEGIS_HIDE', IntToStr(GM_AEGIS_HIDE));
-        ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSTATE', IntToStr(GM_AEGIS_RESETSTATE));
-        ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSKILL', IntToStr(GM_AEGIS_RESETSKILL));
-        
-        ini.WriteString('Athena GM Commands', 'ATHENA_HEAL', IntToStr(GM_ATHENA_HEAL));
-        ini.WriteString('Athena GM Commands', 'ATHENA_KAMI', IntToStr(GM_ATHENA_KAMI));
-        ini.WriteString('Athena GM Commands', 'ATHENA_ALIVE', IntToStr(GM_ATHENA_ALIVE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_KILL', IntToStr(GM_ATHENA_KILL));
-        ini.WriteString('Athena GM Commands', 'ATHENA_DIE', IntToStr(GM_ATHENA_DIE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_JOBCHANGE', IntToStr(GM_ATHENA_JOBCHANGE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_HIDE', IntToStr(GM_ATHENA_HIDE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_OPTION', IntToStr(GM_ATHENA_OPTION));
-        ini.WriteString('Athena GM Commands', 'ATHENA_STORAGE', IntToStr(GM_ATHENA_STORAGE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_SPEED', IntToStr(GM_ATHENA_SPEED));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WHO3', IntToStr(GM_ATHENA_WHO3));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WHO2', IntToStr(GM_ATHENA_WHO2));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WHO', IntToStr(GM_ATHENA_WHO));
-        ini.WriteString('Athena GM Commands', 'ATHENA_JUMP', IntToStr(GM_ATHENA_JUMP));
-        ini.WriteString('Athena GM Commands', 'ATHENA_JUMPTO', IntToStr(GM_ATHENA_JUMPTO));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WHERE', IntToStr(GM_ATHENA_WHERE));
-        ini.WriteString('Athena GM Commands', 'ATHENA_RURA', IntToStr(GM_ATHENA_RURA));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WARP', IntToStr(GM_ATHENA_WARP));
-        ini.WriteString('Athena GM Commands', 'ATHENA_RURAP', IntToStr(GM_ATHENA_RURAP));
-        ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
-        ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
-        ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
+		ini.WriteString('Fusion GM Commands', 'ALIVE', IntToStr(GM_ALIVE));
+		ini.WriteString('Fusion GM Commands', 'ITEM', IntToStr(GM_ITEM));
+		ini.WriteString('Fusion GM Commands', 'SAVE', IntToStr(GM_SAVE));
+		ini.WriteString('Fusion GM Commands', 'RETURN', IntToStr(GM_RETURN));
+		ini.WriteString('Fusion GM Commands', 'DIE', IntToStr(GM_DIE));
+		ini.WriteString('Fusion GM Commands', 'AUTO', IntToStr(GM_AUTO));
+		ini.WriteString('Fusion GM Commands', 'HCOLOR', IntToStr(GM_HCOLOR));
+		ini.WriteString('Fusion GM Commands', 'CCOLOR', IntToStr(GM_CCOLOR));
+		ini.WriteString('Fusion GM Commands', 'HSTYLE', IntToStr(GM_HSTYLE));
+		ini.WriteString('Fusion GM Commands', 'KILL', IntToStr(GM_KILL));
+		ini.WriteString('Fusion GM Commands', 'GOTO', IntToStr(GM_GOTO));
+		ini.WriteString('Fusion GM Commands', 'SUMMON', IntToStr(GM_SUMMON));
+		ini.WriteString('Fusion GM Commands', 'WARP', IntToStr(GM_WARP));
+		ini.WriteString('Fusion GM Commands', 'BANISH', IntToStr(GM_BANISH));
+		ini.WriteString('Fusion GM Commands', 'JOB', IntToStr(GM_JOB));
+		ini.WriteString('Fusion GM Commands', 'BLEVEL', IntToStr(GM_BLEVEL));
+		ini.WriteString('Fusion GM Commands', 'JLEVEL', IntToStr(GM_JLEVEL));
+		ini.WriteString('Fusion GM Commands', 'CHANGESTAT', IntToStr(GM_CHANGESTAT));
+		ini.WriteString('Fusion GM Commands', 'SKILLPOINT', IntToStr(GM_SKILLPOINT));
+		ini.WriteString('Fusion GM Commands', 'SKILLALL', IntToStr(GM_SKILLALL));
+		ini.WriteString('Fusion GM Commands', 'STATALL', IntToStr(GM_STATALL));
+		ini.WriteString('Fusion GM Commands', 'ZENY', IntToStr(GM_ZENY));
+		ini.WriteString('Fusion GM Commands', 'CHANGESKILL', IntToStr(GM_CHANGESKILL));
+		ini.WriteString('Fusion GM Commands', 'MONSTER', IntToStr(GM_MONSTER));
+		ini.WriteString('Fusion GM Commands', 'SPEED', IntToStr(GM_SPEED));
+		ini.WriteString('Fusion GM Commands', 'WHOIS', IntToStr(GM_WHOIS));
+		ini.WriteString('Fusion GM Commands', 'OPTION', IntToStr(GM_OPTION));
+		ini.WriteString('Fusion GM Commands', 'RAW', IntToStr(GM_RAW));
+		ini.WriteString('Fusion GM Commands', 'UNIT', IntToStr(GM_UNIT));
+		ini.WriteString('Fusion GM Commands', 'STAT', IntToStr(GM_STAT));
+		ini.WriteString('Fusion GM Commands', 'REFINE', IntToStr(GM_REFINE));
+		ini.WriteString('Fusion GM Commands', 'GLEVEL', IntToStr(GM_GLEVEL));
+		ini.WriteString('Fusion GM Commands', 'IRONICAL', IntToStr(GM_IRONICAL));
+		ini.WriteString('Fusion GM Commands', 'MOTHBALL', IntToStr(GM_MOTHBALL));
 
-        ini.Free;
-    end;
+		ini.WriteString('Aegis GM Commands', 'AEGIS_B', IntToStr(GM_AEGIS_B));
+		ini.WriteString('Aegis GM Commands', 'AEGIS_NB', IntToStr(GM_AEGIS_NB));
+		ini.WriteString('Aegis GM Commands', 'AEGIS_BB', IntToStr(GM_AEGIS_BB));
+		ini.WriteString('Aegis GM Commands', 'AEGIS_HIDE', IntToStr(GM_AEGIS_HIDE));
+		ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSTATE', IntToStr(GM_AEGIS_RESETSTATE));
+		ini.WriteString('Aegis GM Commands', 'AEGIS_RESETSKILL', IntToStr(GM_AEGIS_RESETSKILL));
 
-    procedure parse_commands(tc : TChara; str : String);
-    var
-        error_msg : String;
-    begin
-        str := Copy(str, Pos(' : ', str) + 4, 256);
-        error_msg := '';
+		ini.WriteString('Athena GM Commands', 'ATHENA_HEAL', IntToStr(GM_ATHENA_HEAL));
+		ini.WriteString('Athena GM Commands', 'ATHENA_KAMI', IntToStr(GM_ATHENA_KAMI));
+		ini.WriteString('Athena GM Commands', 'ATHENA_ALIVE', IntToStr(GM_ATHENA_ALIVE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_KILL', IntToStr(GM_ATHENA_KILL));
+		ini.WriteString('Athena GM Commands', 'ATHENA_DIE', IntToStr(GM_ATHENA_DIE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_JOBCHANGE', IntToStr(GM_ATHENA_JOBCHANGE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_HIDE', IntToStr(GM_ATHENA_HIDE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_OPTION', IntToStr(GM_ATHENA_OPTION));
+		ini.WriteString('Athena GM Commands', 'ATHENA_STORAGE', IntToStr(GM_ATHENA_STORAGE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_SPEED', IntToStr(GM_ATHENA_SPEED));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WHO3', IntToStr(GM_ATHENA_WHO3));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WHO2', IntToStr(GM_ATHENA_WHO2));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WHO', IntToStr(GM_ATHENA_WHO));
+		ini.WriteString('Athena GM Commands', 'ATHENA_JUMP', IntToStr(GM_ATHENA_JUMP));
+		ini.WriteString('Athena GM Commands', 'ATHENA_JUMPTO', IntToStr(GM_ATHENA_JUMPTO));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WHERE', IntToStr(GM_ATHENA_WHERE));
+		ini.WriteString('Athena GM Commands', 'ATHENA_RURA', IntToStr(GM_ATHENA_RURA));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WARP', IntToStr(GM_ATHENA_WARP));
+		ini.WriteString('Athena GM Commands', 'ATHENA_RURAP', IntToStr(GM_ATHENA_RURAP));
+		ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
+		ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
+		ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
 
-        if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
-        else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
-        else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc.ID, GM_SAVE)) ) then error_msg := command_save(tc)
-        else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
-        else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
-        else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
-        else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
-        else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
-        else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
-        else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
-        else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
-        else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
-        else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
-        else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
-        else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
-        else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
-        else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
-        else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
-        else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
-        else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
-        else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
-        else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
-        else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
-        else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
-        else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
-        else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
-        else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
-        else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
-        else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
-        else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
-        else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
-        else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
-        else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
-        else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
-        ;
+		ini.Free;
 
-        if (error_msg <> '') then error_message(tc, error_msg);
-        if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
-    end;
+		//Free up the GM Command List when program closes down.
+		for Idx := GM_Access_DB.Count-1 downto 0 do begin
+			if Assigned(GM_Access_DB.Objects[Idx]) then begin
+				(GM_Access_DB.Objects[Idx] AS TGM_Table).Free;
+			end;
+		end;
 
-    function check_level(id : Integer; cmd : Integer) : Boolean;
-    var
-        idx : Integer;
-        tGM : TGM_Table;
+	End;(* Proc save_commands()
+*-----------------------------------------------------------------------------*)
+
+
+	procedure parse_commands(tc : TChara; str : String);
+	var
+		error_msg : String;
+	begin
+		str := Copy(str, Pos(' : ', str) + 4, 256);
+		error_msg := '';
+
+		if ( (copy(str, 1, length('alive')) = 'alive') and (check_level(tc.ID, GM_ALIVE)) ) then error_msg := command_alive(tc)
+		else if ( (copy(str, 1, length('item')) = 'item') and (check_level(tc.ID, GM_ITEM)) ) then error_msg := command_item(tc, str)
+		else if ( (copy(str, 1, length('save')) = 'save') and (check_level(tc.ID, GM_SAVE)) ) then error_msg := command_save(tc)
+		else if ( (copy(str, 1, length('return')) = 'return') and (check_level(tc.ID, GM_RETURN)) ) then error_msg := command_return(tc)
+		else if ( (copy(str, 1, length('die')) = 'die') and (check_level(tc.ID, GM_DIE)) ) then error_msg := command_die(tc)
+		else if ( (copy(str, 1, length('auto')) = 'auto') and (check_level(tc.ID, GM_AUTO)) ) then error_msg := command_auto(tc, str)
+		else if ( (copy(str, 1, length('hcolor')) = 'hcolor') and (check_level(tc.ID, GM_HCOLOR)) ) then error_msg := command_hcolor(tc, str)
+		else if ( (copy(str, 1, length('ccolor')) = 'ccolor') and (check_level(tc.ID, GM_CCOLOR)) ) then error_msg := command_ccolor(tc, str)
+		else if ( (copy(str, 1, length('hstyle')) = 'hstyle') and (check_level(tc.ID, GM_HSTYLE)) ) then error_msg := command_hstyle(tc, str)
+		else if ( (copy(str, 1, length('kill')) = 'kill') and (check_level(tc.ID, GM_KILL)) ) then error_msg := command_kill(str)
+		else if ( (copy(str, 1, length('goto')) = 'goto') and (check_level(tc.ID, GM_GOTO)) ) then error_msg := command_goto(tc, str)
+		else if ( (copy(str, 1, length('summon')) = 'summon') and (check_level(tc.ID, GM_SUMMON)) ) then error_msg := command_summon(tc, str)
+		else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_WARP)) ) then error_msg := command_warp(tc, str)
+		else if ( (copy(str, 1, length('banish')) = 'banish') and (check_level(tc.ID, GM_BANISH)) ) then error_msg := command_banish(str)
+		else if ( (copy(str, 1, length('job')) = 'job') and (check_level(tc.ID, GM_JOB)) ) then error_msg := command_job(tc, str)
+		else if ( (copy(str, 1, length('blevel')) = 'blevel') and (check_level(tc.ID, GM_BLEVEL)) ) then error_msg := command_blevel(tc, str)
+		else if ( (copy(str, 1, length('jlevel')) = 'jlevel') and (check_level(tc.ID, GM_JLEVEL)) ) then error_msg := command_jlevel(tc, str)
+		else if ( (copy(str, 1, length('changestat')) = 'changestat') and (check_level(tc.ID, GM_CHANGESTAT)) ) then error_msg := command_changestat(tc, str)
+		else if ( (copy(str, 1, length('skillpoint')) = 'skillpoint') and (check_level(tc.ID, GM_SKILLPOINT)) ) then error_msg := command_skillpoint(tc, str)
+		else if ( (copy(str, 1, length('skillall')) = 'skillall') and (check_level(tc.ID, GM_SKILLALL)) ) then error_msg := command_skillall(tc)
+		else if ( (copy(str, 1, length('statall')) = 'statall') and (check_level(tc.ID, GM_STATALL)) ) then error_msg := command_statall(tc)
+		else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ZENY)) ) then error_msg := command_zeny(tc, str)
+		else if ( (copy(str, 1, length('changeskill')) = 'changeskill') and (check_level(tc.ID, GM_CHANGESKILL)) ) then error_msg := command_changeskill(tc, str)
+		else if ( (copy(str, 1, length('monster')) = 'monster') and (check_level(tc.ID, GM_MONSTER)) ) then error_msg := command_monster(tc, str)
+		else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
+		else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
+		else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
+		else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
+		else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
+		else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
+		else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
+		else if ( (copy(str, 1, length('glevel')) = 'glevel') and (check_level(tc.ID, GM_GLEVEL)) ) then error_msg := command_glevel(tc, str)
+		else if ( (copy(str, 1, length('ironical')) = 'ironical') and (check_level(tc.ID, GM_IRONICAL)) ) then error_msg := command_ironical(tc)
+		else if ( (copy(str, 1, length('mothball')) = 'mothball') and (check_level(tc.ID, GM_MOTHBALL)) ) then error_msg := command_mothball(tc)
+		;
+
+		if (error_msg <> '') then error_message(tc, error_msg);
+		if ( (Option_GM_Logs) and (error_msg <> '') ) then save_gm_log(tc, error_msg);
+	end;
+
+	function check_level(id : Integer; cmd : Integer) : Boolean;
+	var
+		idx : Integer;
+		tGM : TGM_Table;
     begin
         Result := False;
         idx := GM_Access_DB.IndexOf(id);
