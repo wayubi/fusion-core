@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
 Fusion_SQL 1.0.0.0 - 
 --------------------------------------------------------------------------------
+- 01-14-04: Prevent Saving of Negative HP. Fixed Crash. [Michen]
 - 01-02-04: Fixed Create Chara and Delete Chara Bug. [Michen]
 - 01-01-04: Fixed Chara name has special char bug. [Michen]
 - 12-30-03: Fixed reading guild member data error. [Michen]
