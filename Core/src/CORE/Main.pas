@@ -691,6 +691,9 @@ begin
 
 	DataSave();
 
+  { Mitch: Doesnt hurt to make sure the tray icon was deleted }
+  Shell_notifyIcon(NIM_DELETE, @TrayIcon);
+
 	ScriptList.Free;
 
 	ItemDB.Free;
@@ -14182,9 +14185,7 @@ begin
         Application.BringToFront;
         ShowWindow(Application.Handle, SW_SHOWNORMAL);
         SetWindowLong(Application.Handle, GWL_EXSTYLE,WS_EX_APPWINDOW);
-        //Unhide and return to previous state
-        //Shell_NotifyIcon(NIM_DELETE, @TrayIcon);
-        //Delete Icon from Tray
+        Shell_notifyIcon(NIM_DELETE, @TrayIcon);
   end;
 end;
 
