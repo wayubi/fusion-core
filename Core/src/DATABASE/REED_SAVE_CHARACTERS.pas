@@ -6,7 +6,7 @@ uses
     Common, REED_Support,
     Classes, SysUtils;
 
-    procedure PD_Save_Characters_Parse(forced : Boolean = False);
+    procedure PD_Save_Characters_Parse(forced : Boolean = False; chara_id : Integer = 0);
 
     procedure PD_Save_Characters_Basic(tc : TChara; datafile : TStringList);
     procedure PD_Save_Characters_Memos(tc : TChara; datafile : TStringList);
@@ -20,7 +20,7 @@ implementation
     { ------------------------------------------------------------------------------------- }
     { - R.E.E.D - Save Characters Parse --------------------------------------------------- }
     { ------------------------------------------------------------------------------------- }
-    procedure PD_Save_Characters_Parse(forced : Boolean = False);
+    procedure PD_Save_Characters_Parse(forced : Boolean = False; chara_id : Integer = 0);
     var
         datafile : TStringList;
         i : Integer;
@@ -33,7 +33,12 @@ implementation
 
         for i := 0 to Chara.Count - 1 do begin
             datafile.Clear;
-            tc := Chara.Objects[i] as TChara;
+
+            if not (chara_id = 0) then
+                tc := Chara.Objects[Chara.IndexOf(chara_id)] as TChara
+            else
+                tc := Chara.Objects[i] as TChara;
+            
             tp := tc.PData;
 
             if not assigned(tp) then Continue;
@@ -64,6 +69,8 @@ implementation
             pfile := 'Variables.txt';
             PD_Save_Characters_Variables(tc, datafile);
             reed_savefile(tc.CID, datafile, path, pfile);
+
+            if not (chara_id = 0) then Break;
         end;
 
         FreeAndNil(datafile);

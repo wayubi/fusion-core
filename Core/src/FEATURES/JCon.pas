@@ -10,7 +10,7 @@ uses
     {Shared}
     SysUtils, StrUtils,
     {Fusion}
-	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE, REED_SAVE_ACCOUNTS;
+	Common, Database, WeissINI, Globals, Game_Master, PlayerData, WAC, REED_DELETE, REED_SAVE_ACCOUNTS, REED_SAVE_CHARACTERS;
 
 	procedure JCon_Accounts_Load();
     procedure JCon_Accounts_Populate(aType : Integer);
@@ -574,7 +574,7 @@ uses
         tc.MemoPoint[2].X := StrToInt(frmMain.Edit73.Text);
         tc.MemoPoint[2].Y := StrToInt(frmMain.Edit72.Text);
 
-        DataSave(true);
+        PD_Save_Characters_Parse(true, tc.CID);
         JCon_Characters_Load();
     end;
 
