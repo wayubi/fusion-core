@@ -609,12 +609,16 @@ begin
 	end else begin
 		ServerName := 'weiss';
 	end;
-	if sl.IndexOfName('NPCID') > -1 then begin
+	{if sl.IndexOfName('NPCID') > -1 then begin
 		DefaultNPCID := StrToInt(sl.Values['NPCID']);
 	end else begin
 		DefaultNPCID := 50000;
-	end;
-	NowNPCID := DefaultNPCID;
+	end;}
+    
+    //Tsusai : NPC ID's start with this number, so why is it needed for user modification?
+    //50000 is a nice static start point for npc id's
+	NowNPCID := 50000;
+
 	if sl.IndexOfName('sv1port') > -1 then begin
 		sv1port := StrToInt(sl.Values['sv1port']);
 	end else begin

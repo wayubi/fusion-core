@@ -27,7 +27,10 @@ uses
         ini.WriteString('Version', 'VER', '1.212 S - R.E.E.D Beta 4 Release');
         ini.WriteString('Server', 'WAN_IP', WAN_IP);
         ini.WriteString('Server', 'Name', ServerName);
-        ini.WriteString('Server', 'NPCID', IntToStr(DefaultNPCID));
+
+        //This is the start of npc id's. commented out because it's not necessary to mod
+        //ini.WriteString('Server', 'NPCID', IntToStr(DefaultNPCID));
+
         ini.WriteString('Server', 'sv1port', IntToStr(sv1port));
         ini.WriteString('Server', 'sv2port', IntToStr(sv2port));
         ini.WriteString('Server', 'sv3port', IntToStr(sv3port));

@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 01-14-05: Removed weiss.ini's DefaultNPCID after research. [Tsusai]
 - 01-14-05: Empty lines in inventory.txt caused crash. [AlexKreuz]
 - 01-13-05: Option to uncap Firewall & Icewall (Set to 0). [AlexKreuz]
 - 01-10-05: Fixed global npc broadcasting of plain blue messages. [Tsusai]
