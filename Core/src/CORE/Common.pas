@@ -2875,12 +2875,19 @@ if View then begin
       WFIFOB(6, 4);
       WFIFOB(7, tc.Head1);
       tc.Socket.SendBuf(buf, 8);
-                                          WFIFOB(6, 5);
+      WFIFOB(6, 5);
       WFIFOB(7, tc.Head2);
       tc.Socket.SendBuf(buf, 8);
-                        WFIFOB(6, 8);
+      WFIFOB(6, 8);
       WFIFOB(7, tc.Shield);
       tc.Socket.SendBuf(buf, 8); // patket change for view Shield
+     { New weapon sprite display packet?  Not working for us yet.
+      WFIFOW(0, $01d7);
+      WFIFOL(2, tc.ID);
+      WFIFOB(6, 2);
+      WFIFOW(7, tc.Weapon);
+      WFIFOW(9, tc.Shield);
+      tc.Socket.SendBuf(buf, 11);}
 end;
 // Tumy
 
@@ -4220,10 +4227,25 @@ begin
 	WFIFOL(2, tn.ID);
 	SendBCmd(tm, tn.Point, 6);
 	//スキル効能地削除
+
+  // Icewall terrain change
+
+  if (tn.JID = $8D) then begin
+    tm.gat[tn.Point.X][tn.Point.Y] := 0;
+
+    WFIFOW(0, $0192);
+    WFIFOW(2, tn.Point.X);
+    WFIFOW(4, tn.Point.Y);
+    WFIFOW(6, 0);
+    WFIFOS(8, tm.Name, 16);
+    SendBCmd(tm, tn.Point, 24);
+  end;
+  
 	tm.NPC.Delete(tm.NPC.IndexOf(tn.ID));
 	with tm.Block[tn.Point.X div 8][tn.Point.Y div 8].NPC do
 		Delete(IndexOf(tn.ID));
 	tn.Free;
+
 end;
 //==============================================================================
 
