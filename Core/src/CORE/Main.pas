@@ -9812,7 +9812,8 @@ begin
 				end;
 			end;
 			end;
-                        if tMonster.isCasting then begin
+                        if tMonster <> nil then begin
+                            if tMonster.isCasting then begin
                                 if sl2.Count <> 0 then begin
                                         for c1 := 0 to sl2.Count - 1 do begin
                                                 tc2 := sl2.Objects[c1] as TChara;
@@ -9894,6 +9895,7 @@ begin
                                         //Exit;
                                         end;
                                 end;
+                            end;
                         end;
 
                         if sl2.Count <> 0 then begin
