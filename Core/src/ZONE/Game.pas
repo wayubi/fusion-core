@@ -5242,6 +5242,7 @@ SLV := SLV + tc.BaseLV;
 RegUsers := RegUsers + 1;
 tc.GuildID := ID;
 tc.GuildName := Name;
+tc.GuildPos := k;
 tc.ClassName := PosName[19];
 WFIFOW( 0, $0169);
 WFIFOB( 2, 2);
