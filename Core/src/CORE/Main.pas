@@ -479,6 +479,11 @@ begin
                 end else begin
                         Option_PVP := false;
                 end;
+                if sl.IndexOfName('Option_MaxUsers') <> -1 then begin
+                        Option_MaxUsers := StrToInt(sl.Values['Option_MaxUsers']);
+                end else begin
+                        Option_MaxUsers := 100;
+                end;
         sl.Clear;
 
 	ini.ReadSectionValues('Option', sl);
@@ -632,6 +637,7 @@ begin
 
         // Fusion INI Lines
         ini.WriteString('Fusion', 'Option_PVP', BoolToStr(Option_PVP));
+        ini.WriteString('Fusion', 'Option_MaxUsers', IntToStr(Option_MaxUsers));
         // Fusion INI Lines
         
 	ini.Free;

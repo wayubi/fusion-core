@@ -40,71 +40,74 @@ uses
 
 implementation
 //==============================================================================
-// ログインサーバーパケット処理
 
-//ログイン成功
 procedure sv1PacketProcessSub(Socket: TCustomWinSocket;w :word;userid:string;userpass  :string);
 var
-        tp: TPlayer;
-        count: integer;
+    tp: TPlayer;
+    count: integer;
 begin
-        tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
-	if tp.Pass = userpass then begin
+    tp := PlayerName.Objects[PlayerName.IndexOf(userid)] as TPlayer;
 
-        {2重ログインチェック}
-        //DebugOut.Lines.Add('TP Login: '+inttostr(tp.Login));
+    if (NowUsers >= Option_MaxUsers) then begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 7);
+        Socket.SendBuf(buf, 23);
+    end else
+
+    if tp.Pass = userpass then begin
+
         if tp.Login = 1 then begin
-                count := 0;
+            count := 0;
 
-                while count < 8 do begin
-                        if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
-                                //2重ログイン
-			        WFIFOW( 0, $0081);
-                                WFIFOB( 2, 08);
-                                Socket.SendBuf(buf, 3); // AlexKreuz: Fix Double Login Crash
-                                //DebugOut.Lines.Add('Double Login.');
-                                tp.Login := 0; // AlexKreuz
-                                tp.CData[count].Login := 0; // AlexKreuz
-                                tp.CData[count] := nil;
-                        end;
-                        inc(count);
+            while count < 8 do begin
+                if (tp.CData[count] <> nil)and(tp.CData[count].Login <> 0) then begin
+                    WFIFOW( 0, $0081);
+                    WFIFOB( 2, 08);
+                    Socket.SendBuf(buf, 3); // AlexKreuz: Fix Double Login Crash
+                    //DebugOut.Lines.Add('Double Login.');
+                    tp.Login := 0; // AlexKreuz
+                    tp.CData[count].Login := 0; // AlexKreuz
+                    tp.CData[count] := nil;
                 end;
+                inc(count);
+            end;
         end;
 
-        {2重ログインチェック　ここまで}
+        tp.IP := Socket.RemoteAddress;
+        tp.Login := 1;
+        tp.LoginID1 := Random($7FFFFFFF) + 1;
+        tp.LoginID2 := NowLoginID;
+        Inc(NowLoginID);
 
-					tp.IP := Socket.RemoteAddress;
-					tp.Login := 1;
-					tp.LoginID1 := Random($7FFFFFFF) + 1;
-					tp.LoginID2 := NowLoginID;
-					Inc(NowLoginID);
-					if NowLoginID >= 2000000000 then NowLoginID := 0;     
-					//DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
-					//tp.ver2 := w;
-					tp.ver2 := 9;
+        if NowLoginID >= 2000000000 then NowLoginID := 0;
 
-					WFIFOW( 0, $0069);
-					WFIFOW( 2, 79);
-					WFIFOL( 4, tp.LoginID1);
-					WFIFOL( 8, tp.ID);
-					WFIFOL(12, tp.LoginID2);
-					WFIFOL(16, 0);
-					WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
-					WFIFOW(44, 0);
-					WFIFOB(46, tp.Gender); //sex 0=F 1=M
-					WFIFOL(47, ServerIP);
-					WFIFOW(51, sv2port);
-					WFIFOS(53, ServerName, 20);
-					WFIFOW(73, NowUsers);
-					WFIFOW(75, 0);
-					WFIFOW(77, 0);
-					Socket.SendBuf(buf, 79);
-				end else begin
-					ZeroMemory(@buf[0],23);
-					WFIFOW( 0, $006a);
-					WFIFOB( 2, 1);
-					Socket.SendBuf(buf, 23);
-				end;
+        //DebugOut.Lines.Add('tp.ver2 = '+inttostr(w));
+        //tp.ver2 := w;
+        tp.ver2 := 9;
+
+        WFIFOW( 0, $0069);
+        WFIFOW( 2, 79);
+        WFIFOL( 4, tp.LoginID1);
+        WFIFOL( 8, tp.ID);
+        WFIFOL(12, tp.LoginID2);
+        WFIFOL(16, 0);
+        WFIFOS(20, PChar(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)), 24);
+        WFIFOW(44, 0);
+        WFIFOB(46, tp.Gender); //sex 0=F 1=M
+        WFIFOL(47, ServerIP);
+        WFIFOW(51, sv2port);
+        WFIFOS(53, ServerName, 20);
+        WFIFOW(73, NowUsers);
+        WFIFOW(75, 0);
+        WFIFOW(77, 0);
+        Socket.SendBuf(buf, 79);
+    end else begin
+        ZeroMemory(@buf[0],23);
+        WFIFOW( 0, $006a);
+        WFIFOB( 2, 1);
+        Socket.SendBuf(buf, 23);
+    end;
 end;
 
 

@@ -1307,6 +1307,7 @@ MapGMsg           :string;
 
 // Fusion INI Declarations
 Option_PVP        :boolean;
+Option_MaxUsers   :word;
 // Fusion INI Declarations
 
 
