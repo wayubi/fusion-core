@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
+- 08-28-04: Added message to Grand Cross Skill, when you don't stay near a monster. [BieL®]
 - 08-27-04: Characters didnt save if created then canceled without logging in. [AlexKreuz]
 - 08-27-04: REED path errors. [AlexKreuz]
 - 08-27-04: #63 - Logging in to char select, cancel and login again broke account. [AlexKreuz]

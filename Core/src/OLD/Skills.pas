@@ -1874,6 +1874,11 @@ Begin
 								end;//for k1
 							end;//for i1
 						end;//for j1
+                        if (k1 = 0) then begin
+                        SendSkillError(tc,0);
+                        tc.MMode := 4;
+                        exit;
+                        end else begin
 						if sl.Count > 0 then begin
 							for k1 := 0 to sl.Count - 1 do begin
 								ts1 := sl.Objects[k1] as TMob;
@@ -1957,6 +1962,7 @@ Begin
 									frmMain.StatCalc1(tc, ts1, Tick); {’Ç‰Á}
 							end;
 						end;
+                        end;
 					end;
 
 			// CODE-ERROR - Darkhelmet, Defender should be used on a players self only,
