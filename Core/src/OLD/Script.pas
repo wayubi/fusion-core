@@ -712,23 +712,23 @@ begin
 				end; //S144 addend
 {追加:スクリプト144ココまで}
 {精錬NPC機能追加}
-			29: //refinery
+			29: //refinery <-- Turned a few jap comments to what they should mean [Tsusai]
 				begin
 {NPCイベント追加}
 					j := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[0]);
 					k := ConvFlagValue(tc, tn.Script[tc.ScriptStep].Data1[1]);
 {NPCイベント追加ココまで}
 					case j of
-						1:  l := $100; //頭上段
-						2:  l := $10;  //鎧
-						3:  l := $20;  //左手
-						4:  l := $2;   //右手
-						5:  l := $4;   //肩
-						6:  l := $40;  //靴
-						7:  l := $8;   //アクセ1
-						8:  l := $80;  //アクセ2
-						9:  l := $200; //頭上段
-						10: l := $1;   //頭下段
+						1:  l := $100; //Head
+						2:  l := $10;  //Body
+						3:  l := $20;  //Left Hand
+						4:  l := $2;   //Right Hand
+						5:  l := $4;   //Robe
+						6:  l := $40;  //Foot
+						7:  l := $8;   //Acc1
+						8:  l := $80;  //Acc2
+						9:  l := $200; //Head2
+						10: l := $1;   //Head
 						else l := 0;
 					end;
 {NPCイベント追加}
@@ -745,7 +745,7 @@ begin
 								WFIFOW(4, tc.Item[i].Equip);
 								WFIFOB(6, 1);
            			tc.Socket.SendBuf(buf, 7);
-								//精錬成功
+								//Refine sucess
 								if k = 0 then begin
 									tc.Item[i].Refine := j;
 									//エフェクト
@@ -760,7 +760,7 @@ begin
 									WFIFOW(4, tc.Item[i].Equip);
 									WFIFOB(6, 1);
 									tc.Socket.SendBuf(buf, 7);
-								//精錬失敗
+								//Refine failure, kiss weapon goodbye
 								end else begin
 									tc.Item[i].Refine := 0;
 									tc.Item[i].Equip := 0;
@@ -1633,8 +1633,11 @@ begin
           end;
           tc.BaseLV := 1;
           tc.BaseEXP := 0;
+          CalcStat(tc);
           SendCStat(tc);
-
+          SendCStat1(tc, 0, $000b, tc.BaseLV);
+          SendCStat1(tc, 0, $0009, tc.StatusPoint);
+          SendCStat1(tc, 1, $0001, tc.BaseEXP);
           Inc(tc.ScriptStep);
         end;
       65: //Global Variable
