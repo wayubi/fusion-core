@@ -40,6 +40,17 @@ implementation
             pfile := 'ActiveChars.txt';
             PD_Load_Accounts_ActiveCharacters(resultlist[i], path + pfile);
 
+            { Bug Tracing (01/06/05) }
+                // This one is really getting on my nerves. Apparently, Fusion
+                // has a stringlist error in the line below me.  However, that
+                // is not a string list, and quite frankly I have never heard
+                // of any error on a single string type assignment. I have a
+                // feeling it is in the line above me in the "resultlist[i]"
+                // retrieval, though I don't know why because Fusion says the
+                // error is in the line below me.  This could easily be fixed
+                // if the people who have this error send me their gamedata, but
+                // of course, they're morons.
+                // - AlexKreuz (01/06/05)
             pfile := 'Storage.txt';
             PD_Load_Accounts_Storage(resultlist[i], path + pfile);
 
