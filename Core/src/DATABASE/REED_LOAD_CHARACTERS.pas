@@ -31,24 +31,15 @@ implementation
         dirlist : TStringList;
     begin
         basepath := AppPath+'gamedata\Accounts\';
-        //pfile := 'Account.txt';
-        //resultlist := get_list(basepath, pfile);
+        pfile := 'Account.txt';
+        resultlist := get_list(basepath, pfile);
         dirlist := TStringList.Create;
 
-        //for i := 0 to resultlist.Count - 1 do begin
-            //if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
-            //tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
+        for i := 0 to resultlist.Count - 1 do begin
+            if Player.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
+            tp := Player.Objects[Player.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TPlayer;
 
-            //if not (tp.ID
-
-            if Player.IndexOf(StrToInt(UID)) = -1 then begin
-                dirlist.Free;
-                Exit;
-            end;
-
-            tp := Player.Objects[Player.IndexOf(StrToInt(UID))] as TPlayer;
-
-            if (UID = '*') then path := basepath + UID + '\Characters\'
+            if (UID = '*') then path := basepath + resultlist[i] + '\Characters\'
             else path := basepath + UID + '\Characters\';
 
             pfile := 'Character.txt';
@@ -72,11 +63,11 @@ implementation
             pfile := 'Variables.txt';
             PD_Load_Characters_Variables(UID, tp, dirlist, path, pfile);
 
-            //if (UID <> '*') then Break;
-        //end;
+            if (UID <> '*') then Break;
+        end;
 
         FreeAndNil(dirlist);
-        //FreeAndNil(resultlist);
+        FreeAndNil(resultlist);
     end;
     { ------------------------------------------------------------------------------------- }
     
@@ -100,9 +91,10 @@ implementation
             datafile.Clear;
             datafile.LoadFromFile(path);
     
-            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
+            if (UID = '*') then begin
                 tc := TChara.Create;
             end else begin
+                if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then Continue;
                 tc := Chara.Objects[Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1))] as TChara;
 
                 if (tc.Name <> tp.CName[0]) and (tc.Name <> tp.CName[1]) and (tc.Name <> tp.CName[2])
@@ -166,12 +158,10 @@ implementation
             tc.PData := tp;
             { -- End - Retrieve and assign values to character. -- }
 
-            //if (UID = '*') then begin
-            if Chara.IndexOf(reed_convert_type(resultlist[i], 0, -1)) = -1 then begin
+            if (UID = '*') then begin
                 CharaName.AddObject(tc.Name, tc);
                 Chara.AddObject(tc.CID, tc);
             end;
-            //end;
 
             if tc.CID < 100001 then tc.CID := tc.CID + 100001;
             if tc.CID >= NowCharaID then NowCharaID := tc.CID + 1;

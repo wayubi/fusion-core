@@ -58,39 +58,24 @@ uses
         end;
 
         if UID = '*' then debugout.Lines.add('­ Accounts ­');
-
-
-        if (UID = '*') then load_guild_members();
-
-
     	PD_Load_Accounts(UID);
         PD_Load_Accounts_ActiveCharacters(UID);
+        PD_Load_Accounts_Storage(UID);
+
+        if UID = '*' then debugout.Lines.add('­ Characters ­');
+        PD_Load_Characters_Parse(UID);
+
+        if UID = '*' then debugout.Lines.add('­ Pets ­');
+        PD_Load_Pets_Parse(UID);
+
+        if UID = '*' then debugout.Lines.add('­ Parties ­');
+        PD_Load_Parties_Pre_Parse(UID);
+
+        if UID = '*' then debugout.Lines.add('­ Guilds ­');
+        PD_Load_Guilds_Pre_Parse(UID);
+
+        if UID = '*' then debugout.Lines.add('­ Castles ­');
         PD_Load_Castles_Pre_Parse(UID);
-
-
-        if not (UID = '*') then begin
-
-
-            PD_Load_Accounts_Storage(UID);
-
-            //if UID = '*' then debugout.Lines.add('­ Characters ­');
-            PD_Load_Characters_Parse(UID);
-
-            //if UID = '*' then debugout.Lines.add('­ Guilds ­');
-            PD_Load_Guilds_Pre_Parse(UID);
-
-            //if UID = '*' then debugout.Lines.add('­ Parties ­');
-            PD_Load_Parties_Pre_Parse(UID);
-
-            PD_Load_Pets_Parse(UID)
-
-            {if UID = '*' then debugout.Lines.add('­ Pets ­');
-            ;
-
-            if UID = '*' then debugout.Lines.add('­ Castles ­');
-            }
-        end;
-
     end;
 
     procedure PD_PlayerData_Save(forced : Boolean = False);
