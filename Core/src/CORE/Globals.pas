@@ -50,6 +50,8 @@ uses
 
     procedure create_upnp(port : Integer; name : String);
     procedure destroy_upnp(port : Integer);
+    procedure warp_handle(tc : TChara; destination : string; x,y : integer);
+    procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);
 
 implementation
 
@@ -833,6 +835,102 @@ uses
             ports := nat.StaticPortMappingCollection;
             ports.Remove(port, 'TCP');
         end;
+    end;
+
+    procedure warp_handle(tc : TChara; destination : string; x,y : integer);
+    begin
+        SendCLeave(tc, 2);
+        tc.tmpMap := destination;
+        tc.Point := Point(x,y);
+        MapMove(tc.Socket, tc.tmpMap, tc.Point);
+    end;
+
+    procedure broadcast_handle(tc,tc1 : TChara; str : string; NPCReferal : boolean; MessageMod : integer; NPC : TNPC = nil);
+    (*--------------------------------------------------------------------------------
+    Broadcast handler. -Tsusai
+    This is the all-in-one form of broadcast designed to work with calls from
+    NPC's as well as anything else.
+    tc & tc1 -> tc is the sender, tc1 is the reciever(s)
+    str -> Broadcast string
+    NPCReferal -> If using a npc to make the call, converts MessageMod to compatable BroadcastType
+    MessageMod -> changes the type of modification like blue color, Charaname pre-addon, etc
+      after being properly converted to to BroadcastType
+        BroadcastType = 1 is just the string sent
+        BroadcastType = 2 is charaname + string
+        BroadcastType = 3 is 2 but blue
+        BroadcastType = 5 is blue color string
+        BroadcastType = 0 is NPC Name + string
+        BroadcastType = 4 is 0 but blue
+    NPC -> refering npc, OPTIONAL because GM commands don't have a refering npc (thanks Chris)
+    --------------------------------------------------------------------------------*)
+    var
+        i : integer;
+        j : integer;
+        k : integer;
+        w : integer;
+        BroadcastType : byte;
+    begin
+        str := str + chr(0);
+        i := AnsiPos('$[', str);
+        while i <> 0 do begin
+            j := AnsiPos(']', Copy(str, i + 2, 256));
+            if j <= 1 then break;
+            //grabbing variables
+            if (Copy(str, i + 2, 1) = '$') then
+                str := Copy(str, 1, i - 1) + tc.Flag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+            else if (Copy(str, i + 2, 2) = '\$') then
+                str := Copy(str, 1, i - 1) + ServerFlag.Values[Copy(str, i + 2, j - 1)]  + Copy(str, i + j + 2, 256)
+            else begin
+                k := ConvFlagValue(tc, Copy(str, i + 2, j - 1), true);
+                if k <> -1 then str := Copy(str, 1, i - 1) + IntToStr(k) + Copy(str, i + j + 2, 256)
+            else str := Copy(str, 1, i - 1) + Copy(str, i + j + 2, 256);
+            end;
+        i := AnsiPos('$[', str);
+        end;
+        //predetermined variable string replacement
+        str := StringReplace(str, '$codeversion', CodeVersion, [rfReplaceAll]);
+        str := StringReplace(str, '$charaname', tc.Name, [rfReplaceAll]);
+        str := StringReplace(str, '$$', '$', [rfReplaceAll]);
+        str := StringReplace(str, '\\', '\', [rfReplaceAll]);
+        if ((NPCReferal) and (Assigned(NPC))) then begin
+            str := StringReplace(str, '$guildname', GetGuildName(NPC), [rfReplaceAll]);
+            str := StringReplace(str, '$guildmaster', GetGuildMName(NPC), [rfReplaceAll]);
+            str := StringReplace(str, '$edegree', IntToStr(GetGuildEDegree(NPC)), [rfReplaceAll]);
+            str := StringReplace(str, '$etrigger', IntToStr(GetGuildETrigger(NPC)), [rfReplaceAll]);
+            str := StringReplace(str, '$ddegree', IntToStr(GetGuildDDegree(NPC)), [rfReplaceAll]);
+            str := StringReplace(str, '$dtrigger', IntToStr(GetGuildDTrigger(NPC)), [rfReplaceAll]);
+        end;
+
+
+        if NPCReferal then begin
+            if ((MessageMod = 0) or (MessageMod = 200)) then BroadcastType := 0
+            else if ((MessageMod = 20) or (MessageMod = 220)) then BroadcastType := 2
+            else if ((MessageMod = 30) or (MessageMod = 230)) then BroadcastType := 3
+            else if ((MessageMod = 40) or (MessageMod = 240)) then BroadcastType := 4
+            else if ((MessageMod = 100) or (MessageMod = 300)) then BroadcastType := 5
+            else BroadcastType := 1;
+        end else begin
+            if (MessageMod > 5) then
+                BroadcastType := 1
+            else BroadcastType := MessageMod;
+        end;
+
+        if BroadcastType > 5 then BroadcastType := 1;
+
+        // BroadcastType = 1 is just the string sent
+        if BroadcastType = 2 then str := tc.Name + ' : ' + str; // displays characters name with it
+        if BroadcastType = 3 then str := 'blue' + tc.Name + ' : ' +str; //displays character name and in blue
+        if BroadcastType = 5 then str := 'blue' + str;        //  Blue String Broadcast
+        if ((NPCReferal) and (Assigned(NPC))) then begin
+            if BroadcastType = 4 then str := 'blue' + NPC.Name + ' : ' +str; //displays npc name and in blue
+            if BroadcastType = 0 then str := NPC.Name + ' : ' + str; // Null (0): displays npc name with it
+        end;
+
+        w := Length(str) + 4;
+        WFIFOW(0, $009a);
+        WFIFOW(2, w);
+        WFIFOS(4, str, w - 4);
+        tc1.Socket.SendBuf(buf, w);
     end;
 
 end.

@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - November 12th, 2004
 --------------------------------------------------------------------------------
+- 11-18-04: Added a universal warp procedure. [Tsusai]
+- 11-18-04: Added a possible universal broadcast procedure. [Tsusai]
 - 11-17-04: Fixed areabroadcast's area component. [Tsusai]
 - 11-16-04: Added some error processing for UPnP. [Tsusai]
 - 11-14-04: Fixed Bug with PSS, map was not defined.  [Darkhelmet]
