@@ -469,6 +469,14 @@ begin
                     tc.ClothesColor := 1; // Use 'default' upper job clothes color
                 end else tc.ClothesColor := 0; // Default color for regular jobs
 
+                if (j > LOWER_JOB_END) then begin
+                    j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                    if (DisableAdv2ndDye) and (j > 4007) then
+                        tc.ClothesColor := 0
+                    else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+                end else tc.ClothesColor := 0;
+
+
                 tc.JID := j;
                 tc.JobEXP := 0;
                 tc.JobLV := 1;
@@ -480,6 +488,7 @@ begin
                 SendCSkillList(tc);
                 // Colus, 20040304: New view packet for jobchange
                 UpdateLook(tc.MData, tc, 0, tc.JID);
+                UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
                 Inc(tc.ScriptStep);
             end;
         18: //viewpoint

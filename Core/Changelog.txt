@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
  Fusion 1.213 - August 29th, 2004
 --------------------------------------------------------------------------------
-- 10-25-05: JCon: Can save and add new character variables. [Tsusai]
+- 10-26-04: Added ini option to turn off auto-dye of Adv 2nd classes for those using sprites. [Tsusai]
+- 10-25-04: JCon: Can save and add new character variables. [Tsusai]
 - 10-25-04: JCon: Can view and delete Character variables. [Tsusai]
 - 10-25-04: JCon: Restarts WAC if WAC is on to make port change work. [Tsusai]
 - 10-25-04: WAC: Fixed account submission %40 instead of @ problem for non-IE browsers. [Tsusai]

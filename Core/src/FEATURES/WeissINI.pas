@@ -48,6 +48,7 @@ uses
         ini.WriteString('Server', 'EnablePetSkills', BoolToStr(EnablePetSkills, true));
         ini.WriteString('Server', 'EnableMonsterSkills', BoolToStr(EnableMonsterSkills, true));
         ini.WriteString('Server', 'EnableLowerClassDyes', BoolToStr(EnableLowerClassDyes, true));
+        ini.WriteString('Server', 'DisableAdv2ndDye', BoolToStr(DisableAdv2ndDye, true));
         ini.WriteString('Server', 'DisableSkillLimit', BoolToStr(DisableSkillLimit, true));
         ini.WriteString('Server', 'DefaultZeny', IntToStr(DefaultZeny));
         ini.WriteString('Server', 'DefaultMap', DefaultMap);

@@ -712,6 +712,11 @@ begin
 	end else begin
 		EnableLowerClassDyes := false;
 	end;
+    if sl.IndexOfName('DisableAdv2ndDye') > -1 then begin
+		DisableAdv2ndDye := StrToBool(sl.Values['DisableAdv2ndDye']);
+	end else begin
+		DisableAdv2ndDye := false;
+    end;
 	if sl.IndexOfName('DisableFleeDown') > -1 then begin
 		DisableFleeDown := StrToBool(sl.Values['DisableFleeDown']);
 	end else begin
@@ -814,6 +819,7 @@ begin
 	end else begin
 		Timer := true;
 	end;
+
 {U0x008a_fix_end}
 	sl.Clear;
 

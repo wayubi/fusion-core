@@ -1508,9 +1508,11 @@ var
   EnablePetSkills        :boolean;
   EnableMonsterSkills    :boolean;
   EnableLowerClassDyes   :boolean;
+  DisableAdv2ndDye  :boolean;
 	DisableFleeDown        :boolean;
 	DisableSkillLimit      :boolean;
   Timer                  :boolean;
+
 
 	FormLeft:integer;
 	FormTop:integer;

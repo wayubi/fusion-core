@@ -85,7 +85,7 @@ var
     GM_AEGIS_HIDE : Byte;
     GM_AEGIS_RESETSTATE : Byte;
     GM_AEGIS_RESETSKILL : Byte;
-    
+
     GM_ATHENA_HEAL : Byte;
     GM_ATHENA_KAMI : Byte;
     GM_ATHENA_ALIVE : Byte;
@@ -1342,7 +1342,9 @@ Called when we're shutting down the server *only*
 
                 if (i > LOWER_JOB_END) then begin
                     l := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-                    tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+                    if (DisableAdv2ndDye) and (i > 30) then
+                        tc.ClothesColor := 0
+                    else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
                 end else begin
                     l := i;
                     tc.ClothesColor := 0;
@@ -1367,6 +1369,7 @@ Called when we're shutting down the server *only*
 
                 // Colus, 20040303: Using newer packet to allow upper job changes
                 UpdateLook(tm, tc, 0, l);
+                UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
 
                 Result := 'GM_JOB Success. New Job ID is ' + IntToStr(i) + '.';
             end else begin
@@ -3486,12 +3489,12 @@ Called when we're shutting down the server *only*
                 tc.Skill[j].Effect1 := 0;
             end;
 
-            if (i > LOWER_JOB_END) then begin
-                i := i - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
-                tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
-            end else begin
-                tc.ClothesColor := 0; // Reset the clothes color to the default value.
-            end;
+            if (j > LOWER_JOB_END) then begin
+                j := j - LOWER_JOB_END + UPPER_JOB_BEGIN; // 24 - 23 + 4000 = 4001, remort novice
+                if (DisableAdv2ndDye) and (j > 4007) then
+                    tc.ClothesColor := 0
+                else tc.ClothesColor := 1; // This is the default clothes palette color for upper classes
+            end else tc.ClothesColor := 0;
 
             tc.JID := i; // Set the JID to the corrected value.
 
@@ -3512,6 +3515,7 @@ Called when we're shutting down the server *only*
 
             // Colus, 20040303: Using newer packet to allow upper job changes
             UpdateLook(tm, tc, 0, i);
+            UpdateLook(tm, tc, 7, tc.ClothesColor, 0, true);
 
             Result := 'GM_ATHENA_JOBCHANGE Success.';
 
