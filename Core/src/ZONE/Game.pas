@@ -383,8 +383,12 @@ begin
 				Socket.SendBuf(buf, 4+37*j);
 				}
 
-                                WFIFOW( 2, 4+37*j); 
+        {Colus, 20040113: This buffer makes no sense.  Why is it here?
+         It causes items to screw up, rather badly.}
+         {
+                                WFIFOW( 2, 4+37*j);
                                 Socket.SendBuf(buf, 4+37*j);
+         }
 				//ƒpƒ‰ƒ[ƒ^
 				CalcStat(tc);
 				SendCStat(tc);
