@@ -8282,7 +8282,7 @@ Begin
 				// Colus, 20040122: Added parsing for hidden warps.
 				if (SL[1] = 'warp') OR (SL[1] = 'hiddenwarp') then begin
 
-					if SL1.Count <> 3 then begin
+					if SL1.Count <> 4 then begin
 		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
 		                            Exit;
 					end;
@@ -8328,7 +8328,7 @@ Begin
 	// NPC Shop ------------------------------------------------------------------
 				end else if SL[1] = 'shop' then begin
 
-					if SL1.Count <> 3 then begin
+					if SL1.Count <> 4 then begin
 		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
 		                            Exit;
 					end;
@@ -8391,7 +8391,7 @@ Begin
                     or http://kalen.s79.xrea.com/npc/npc.shtml
                     *)
 
-					if SL1.Count <> 3 then begin
+					if SL1.Count <> 4 then begin
 		                            ScriptErr(SCRIPT_SYNTAX_ERR, [ScriptPath, Lines]);
 		                            Exit;
 					end;
