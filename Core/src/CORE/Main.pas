@@ -7360,6 +7360,12 @@ begin
                                         begin
                                                 tc1 := tc;
                                                 ProcessType := 2;
+                                                tc.spiritSpheres := tc.spiritSpheres + 1;
+                                                if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
+                                                if tc.spiritSpheres > Skill[261].Data.Data2[Skill[261].Lv] then tc.spiritSpheres := Skill[261].Data.Data2[Skill[261].Lv];
+                                                UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
+                                               { tc1 := tc;
+                                                ProcessType := 2;
                                                 tc.spiritSpheres := tc.spiritSpheres + Skill[261].Data.Data2[Skill[261].Lv];
                                                 if tc.spiritSpheres > 5 then tc.spiritSpheres := 5;
                                                 UpdateSpiritSpheres(tm, tc, tc.spiritSpheres);
