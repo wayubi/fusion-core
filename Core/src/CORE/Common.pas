@@ -9939,7 +9939,10 @@ Begin
 					ts0.SpawnType   := StrToInt(SL1[4]);
 
                     { Alex: Mob Rate }
-                    mcnt := mcnt * Option_Mob_Spawn_Rate div 100; 
+                    { 08-23-04: Added exception for Emperium. }
+                    if (ts0.JID <> 1288) then begin
+                        mcnt := mcnt * Option_Mob_Spawn_Rate div 100;
+                    end;
 
 					if MobDB.IndexOf(ts0.JID) = -1 then continue;
 					ts0.Data := MobDB.IndexOfObject(ts0.JID) as TMobDB;
