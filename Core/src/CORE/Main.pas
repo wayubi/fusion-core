@@ -3,18 +3,29 @@ unit Main;
 interface
 
 uses
-	{Delphi VCL units}
-	Windows, MMSystem, Messages, SysUtils, Variants, Classes, Graphics, Controls,
-	Forms, ShellApi, Dialogs, ScktComp, StdCtrls, ExtCtrls, IniFiles, WinSock,
-	ComCtrls,
+    {Delphi VCL units (Windows Only)}
+        {$IFDEF MSWINDOWS} //Saying to load this if WINDOWS
+        Windows, Messages, MMSystem, Forms, ShellApi, Graphics, Controls, Dialogs,
+        Menus, ScktComp, StdCtrls, ExtCtrls, WinSock, ComCtrls,
+        {$ENDIF}
+    {Kylix Delphi units}
+        {$IFDEF LINUX} //Saying to load this if Linux
+        Xlib,  //Linux Version of "Windows & Messages"?
+        {$ENDIF}
+    {Delphi / Kylix Delphi Compatable units}
+        SysUtils, Variants, Classes, IniFiles,
+    {Possible replacement for some VCL units; crossplatform conpatable but things still need fixing}
+    {QGraphics, QControls, QDialogs, QMenus, QStdCtrls, QExtCtrls, QComCtrls,}
 	{Fusion Units}
-	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
-	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
-    PacketProcesses,
-	{3rd Party Units}
-	List32, Zip, Menus;
+    	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
+    	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
+        PacketProcesses,
+    {3rd Party Units}
+    	List32, Zip;
 
 const
+    {I know these are windows based, keep away from linux XD}
+    {$IFDEF MSWINDOWS}
 	REALTIME_PRIORITY_CLASS = $100;
 	HIGH_PRIORITY_CLASS = $80;
 	ABOVE_NORMAL_PRIORITY_CLASS = $8000;
@@ -23,6 +34,7 @@ const
 	IDLE_PRIORITY_CLASS = $40;
 	WM_NOTIFYICON  = WM_USER+333;
 	htTitleBtn = htSizeLast + 1;
+    {$ENDIF}
 
 
 type
