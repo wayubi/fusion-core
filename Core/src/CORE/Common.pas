@@ -25,6 +25,7 @@ type TLiving = class
 	  ppos    :integer;
   	pcnt    :integer;
   	path    :array[0..999] of byte;
+    Dir     :byte;
 end;
 //==============================================================================
 // word型座標構造体(TPointはcardinal型座標)
@@ -348,7 +349,7 @@ type TMob = class(TLiving)
 	//Point       :TPoint;
 	tgtPoint    :TPoint;
   NextPoint   :TPoint;
-	Dir         :byte;
+	//Dir         :byte;
 	Point1      :TPoint;
 	Point2      :TPoint;
 	Speed       :word;
@@ -894,7 +895,7 @@ type TChara = class(TLiving)
 	GuildPos      :byte; //ギルド職位インデックス
 {ギルド機能追加ココまで}
 
-	Dir           :byte;
+	//Dir           :byte;
 	HeadDir       :word;
 	Sit           :byte; // 0: moving 1: dead 2: sitting 3: standing
 	AMode         :byte;
@@ -1074,7 +1075,7 @@ type TNPC = class(TLiving)
 	//Map         :string;
   Reg         :string;
 	//Point       :TPoint;
-	Dir         :byte;
+	//Dir         :byte;
 	CType       :byte; //0=warp 1=shop 2=script 3=item 4=skill
 	//warp
 	WarpSize    :TPoint;
@@ -1629,6 +1630,7 @@ Option_Font_Style : string;
                 procedure SendMonsterRelocation(tm:TMap; ts:tMob; tc:TChara); //Move a monster
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
                 procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
+                procedure UpdateLivingLocation(tm:TMap; tv:TLiving);  //Update the location of a Player
 
                 procedure  PetSkills(tc: TChara; Tick:cardinal);  //Calculate the Pets Skills
 
@@ -1641,6 +1643,8 @@ Option_Font_Style : string;
                 function  UpdateWeight(tc:TChara; j:integer; td:TItemDB)  :boolean;
                 function  GetMVPItem(tc1:TChara; ts:TMob; mvpitem:boolean) :boolean;
                 function  StealItem(tc:TChara; ts:TMob) :boolean;
+
+    procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0); // Make a Living disappear
 
 		function  SearchCInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
 		function  SearchPInventory(tc:TChara; ItemID:word; IEquip:boolean):word;
@@ -1758,6 +1762,14 @@ Option_Font_Style : string;
 implementation
 
 uses SQLData, FusionSQL;
+
+procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0);
+begin
+  WFIFOW(0, $0080);
+  WFIFOL(2, tv.ID);
+  WFIFOB(6, mode); // 0: Disappear 1: Died 2: Logout 3: Teleport
+  SendBCmd(tm, tv.Point, 7);
+end;
 
 procedure UpdateLook(tm:TMap; tv:TLiving; option:byte; val1: word; val2: word; use00c3: boolean);
 begin
@@ -3385,6 +3397,18 @@ begin
         WFIFOW(6, tc.Point.X);
         WFIFOW(8, tc.Point.Y);
         SendBCmd(tm, tc.Point, 10);
+end;
+
+//------------------------------------------------------------------------------
+
+procedure UpdateLivingLocation(tm:TMap; tv:TLiving);  //Update the location of a Living
+
+begin
+        WFIFOW(0, $0088);
+        WFIFOL(2, tv.ID);
+        WFIFOW(6, tv.Point.X);
+        WFIFOW(8, tv.Point.Y);
+        SendBCmd(tm, tv.Point, 10);
 end;
 
 //------------------------------------------------------------------------------

@@ -1,3 +1,6 @@
+- 04-13-04: Added SendLivingDisappear function (in testing phase). [Colus]
+- 04-13-04: Added KnockBackLiving function (in testing phase). [Colus]
+- 04-13-04: Added UpdateLivingLocation function (in testing phase). [Colus]
 - 04-12-04: Numerous Pet fixes... should all work now. [Darkhelmet]
 - 04-12-04: Added loading of Fusion's AI database. [Darkhelmet]
 - 04-12-04: Added warping monster algorithm and skill support. [Darkhelmet]

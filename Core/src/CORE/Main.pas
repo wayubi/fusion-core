@@ -77,7 +77,8 @@ type
 
                 {Damage Processes}
 		function  DamageProcess1(tm:TMap; tc:TChara; ts:TMob; Dmg:integer; Tick:cardinal;isBreak:Boolean = True) : Boolean;
-                function  DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal;isBreak:Boolean = True) : Boolean;
+    function  DamageProcess2(tm:TMap; tc:TChara; tc1:TChara; Dmg:integer; Tick:cardinal;isBreak:Boolean = True) : Boolean;
+    procedure KnockBackLiving(tm:TMap; tc:TChara; tv:TLiving; dist:byte; ktype: byte = 0);
 
 		procedure sv1ClientConnect(Sender: TObject; Socket: TCustomWinSocket);
 		procedure sv1ClientDisconnect(Sender: TObject; Socket: TCustomWinSocket);
@@ -6454,8 +6455,8 @@ begin
                                                                 dmg[0] := 0;
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
-                                                        SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        {SetLength(bb, 6);
+                                                        //bb[0] := 6;
 
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
@@ -6469,7 +6470,8 @@ begin
                                                         end;
                                                         tc.pcnt := 0;
 
-                                                        UpdatePlayerLocation(tm, tc);
+                                                        UpdatePlayerLocation(tm, tc);  }
+                                                        KnockBackLiving(tm, tc, ts, 6, 2);
 
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
@@ -6501,8 +6503,8 @@ begin
                                                                 dmg[0] := 0;
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
-                                                        SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        {SetLength(bb, 6);
+                                                        //bb[0] := 6;
 
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
@@ -6516,8 +6518,8 @@ begin
                                                         end;
                                                         tc.pcnt := 0;
 
-                                                        UpdatePlayerLocation(tm, tc);
-
+                                                        UpdatePlayerLocation(tm, tc);   }
+                                                        KnockBackLiving(tm, tc, ts, 6, 2);
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                         tc.MTick := Tick + Cardinal(3500 + (tl.CastTime2 * MUseLV));
@@ -8470,7 +8472,7 @@ begin
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
                                                         SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        //bb[0] := 6;
 
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
@@ -10138,7 +10140,7 @@ begin
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
                                                         SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        //bb[0] := 6;
 
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
@@ -10183,7 +10185,7 @@ begin
                                                                 //–‚–@UŒ‚‚Å‚Ì‰ñ•œ‚Í–¢ŽÀ‘•
                                                         end;
                                                         SetLength(bb, 6);
-                                                        bb[0] := 6;
+                                                        //bb[0] := 6;
 
                                                         xy := tc.Point;
                                                         DirMove(tm, tc.Point, tc.Dir, bb);
@@ -16470,5 +16472,110 @@ begin
     fileslist.Free;
 
 end;
+
+// Knockback situations:
+// 1) Knock self back (tc.Dir, bb[] 4
+// 2) Knock monster away (ddir, bb[] 0
+// 3) Knock self forward (Ashura), ddir, bb[]0
+//    has to be tv is ts, so get dir, then orig is tc.point and you act on it
+procedure TfrmMain.KnockBackLiving(tm:TMap; tc:TChara; tv:TLiving; dist:byte; ktype: byte = 0);
+var
+  bb: array of byte;
+  i: integer;
+  b: byte;
+  xy, vpoint: TPoint;
+  dx, dy: integer;
+  tc1: TChara;
+  ts1: TMob;
+begin
+  SetLength(bb, dist);
+  b := tv.Dir;
+
+  if (ktype and 1 = 0) then begin
+    for i := 0 to (dist-1) do begin
+      bb[i] := 4;
+    end;
+  end else begin
+//    if (ktype and 2 = 0) then begin
+      dx := tv.Point.X - tc.Point.X;
+      dy := tv.Point.Y - tc.Point.Y;
+      if abs(dx) > abs(dy) * 3 then begin
+        if dx > 0 then b := 6 else b := 2;
+      end else if abs(dy) > abs(dx) * 3 then begin
+  		  if dy > 0 then b := 0 else b := 4;
+      end else begin
+        if dx > 0 then begin
+          if dy > 0 then b := 7 else b := 5;
+        end else begin
+          if dy > 0 then b := 1 else b := 3;
+        end;
+      end;
+
+//    end;
+
+    for i := 0 to (dist-1) do begin
+      bb[i] := 0;
+    end;
+  end;
+
+  // Stop them first.
+  //UpdateLivingLocation(tm, tv);
+
+  if (ktype and 2 <> 0) then begin
+    xy := tc.Point;
+    tv := tc;
+  end;
+
+  // Do the point shift.  The default behavior is to push backwards.
+  DirMove(tm, tv.Point, b, bb);
+  if (xy.X div 8 <> tv.Point.X div 8) or (xy.Y div 8 <> tv.Point.Y div 8) then begin
+    if (tv is TChara) then begin
+      with tm.Block[xy.X div 8][xy.Y div 8].CList do begin
+        assert(IndexOf(tv.ID) <> -1, 'Player Delete Error');
+        Delete(IndexOf(tv.ID));
+      end;
+      tm.Block[tv.Point.X div 8][tv.Point.Y div 8].Clist.AddObject(tv.ID, tv);
+
+
+
+      //if (tv.pcnt <> 0) then begin DebugOut.Lines.Add('Move');
+        tv.pcnt := 0;
+        //UpdateLivingLocation(tm, tv);
+        //SendCMove(tc.Socket, (tv as TChara), xy, tv.Point);
+        //SendBCmd(tm, tv.Point, 60, tc);
+      //end else begin DebugOut.Lines.Add('Stat');
+      DebugOut.Lines.Add(Format('xy %d %d tv %d %d',[xy.X, xy.Y, tv.Point.X, tv.Point.Y]));
+        SetSkillUnit(tm, tv.ID, tv.Point, timeGetTime(), $2E, 0, 3000, tc);
+        UpdateLivingLocation(tm, tv);
+        //SendCData(tc, tc);
+        //SendBCmd(tm, tv.Point, 54, tc);
+      //end;
+
+    end else if (tv is TMob) then begin
+      with tm.Block[xy.X div 8][xy.Y div 8].Mob do begin
+        assert(IndexOf(tv.ID) <> -1, 'Mob Delete Error');
+        Delete(IndexOf(tv.ID));
+      end;
+      tm.Block[tv.Point.X div 8][tv.Point.Y div 8].Mob.AddObject(tv.ID, tv);
+
+
+      if (tv.pcnt <> 0) then begin
+        tv.pcnt := 0;
+        //UpdateLivingLocation(tm, tv);
+        SendMMove(tc.Socket, (tv as TMob), xy, tv.Point, 9);
+        SendBCmd(tm, tv.Point, 60, tc);
+      end else begin
+        SendMData(tc.Socket, (tv as TMob), false);
+        SendBCmd(tm, tv.Point, 58);
+      end;
+    end;
+
+    tv.pcnt := 0;
+
+    //UpdateLivingLocation(tm, tv);
+
+  end;
+end;
+
 
 end.
