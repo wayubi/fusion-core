@@ -114,6 +114,10 @@ var
     function command_speed(tc : TChara; str : String) : String;
     function command_whois(tc : TChara) : String;
     function command_option(tc : TChara; str : String) : String;
+    function command_raw(tc : TChara; str : String) : String;
+    function command_unit(tc : TChara; str : String) : String;
+    function command_stat(tc : TChara; str : String) : String;
+    function command_refine(tc : TChara; str : String) : String;
 
 implementation
 
@@ -304,6 +308,10 @@ implementation
         else if ( (copy(str, 1, length('speed')) = 'speed') and (check_level(tc.ID, GM_SPEED)) ) then error_msg := command_speed(tc, str)
         else if ( (copy(str, 1, length('whois')) = 'whois') and (check_level(tc.ID, GM_WHOIS)) ) then error_msg := command_whois(tc)
         else if ( (copy(str, 1, length('option')) = 'option') and (check_level(tc.ID, GM_OPTION)) ) then error_msg := command_option(tc, str)
+        else if ( (copy(str, 1, length('raw')) = 'raw') and (check_level(tc.ID, GM_RAW)) ) then error_msg := command_raw(tc, str)
+        else if ( (copy(str, 1, length('unit')) = 'unit') and (check_level(tc.ID, GM_UNIT)) ) then error_msg := command_unit(tc, str)
+        else if ( (copy(str, 1, length('stat')) = 'stat') and (check_level(tc.ID, GM_STAT)) ) then error_msg := command_stat(tc, str)
+        else if ( (copy(str, 1, length('refine')) = 'refine') and (check_level(tc.ID, GM_REFINE)) ) then error_msg := command_refine(tc, str)
         ;
 
         if (error_msg <> '') then error_message(tc, error_msg);
@@ -365,7 +373,7 @@ implementation
 			CreateDir('logs');
 			logfile.SaveToFile(AppPath + 'logs\GM_COMMANDS-' + filename + '.txt');
 		except
-			on E : Exception do DebugOut.Lines.Add('*** GM Logfile Error : ' + E.Message);
+			on E : Exception do DebugOut.Lines.Add('[' + TimeToStr(Now) + '] ' + '*** GM Logfile Error : ' + E.Message);
 		end;
 		logfile.Free;
 	end;
@@ -445,7 +453,7 @@ implementation
             end;
         end;
 
-        sl.Free();
+        sl.Free;
     end;
 
     function command_save(tc : TChara) : String;
@@ -663,8 +671,8 @@ implementation
         tc.Point := Point(i,j);
         MapMove(tc.Socket, LowerCase(sl.Strings[0]), Point(i,j));
 
+        Result := 'GM_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').';
         sl.Free;
-        Result := 'GM_WARP Success. Warp to ' + tc.tmpMap + ' (' + IntToStr(i) + ',' + IntToStr(j) + ').'; 
     end;
 
     function command_banish(str : String) : String;
@@ -1277,8 +1285,6 @@ implementation
 
     function command_option(tc : TChara; str : String) : String;
     var
-        //sl : TStringList;
-        //i, j, k, ii : Integer;
         tm : TMap;
     begin
         Result := 'GM_OPTION Success.';
@@ -1309,21 +1315,71 @@ implementation
         end;
         UpdateOption(tm, tc);
 
-        {
+    end;
 
-        Athena Option Command
+    function command_raw(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i : Integer;
+    begin
+        Result := 'GM_RAW Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 5, 256);
+
+        if (sl.Count > 0) then begin;
+
+            for i := 0 to sl.Count - 1 do begin
+                // I really doubt this is right, but oh well.
+                // This command doesn't seem to work.
+                WFIFOB(i, StrToInt('$' + sl.Strings[i]));
+            end;
+            tc.socket.SendBuf(buf, i);
+
+            Result := 'GM_RAW Success. Packet string, ' + str + ' sent.';
+        end else begin
+            Result := Result + ' Incomplete information.';
+        end;
+
+        sl.Free;
+    end;
+
+    function command_unit(tc : TChara; str : String) : String;
+    var
+        j, k : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_UNIT Failure. Incomplete information or out of range [0-999].';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+        Val(Copy(str, 6, 256), j, k);
+        if (k <> 0) or (j < 0) or (j > 999) then Exit;
+        SetSkillUnit(tm, tc.ID, Point(tc.Point.X + 1, tc.Point.Y - 1), timeGetTime(), j, 1, 10000);
+
+        Result := 'GM_UNIT Success.';
+    end;
+
+    function command_stat(tc : TChara; str : String) : String;
+    var
+        sl : TStringList;
+        i, j, k, l, ii : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_STAT Failure.';
 
         sl := tstringlist.Create;
         sl.DelimitedText := str;
 
         tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
 
-        if (sl.count = 4) then begin
+        if (sl.count = 5) then begin
             val(sl.Strings[1], i, ii);
             if ii <> 0 then Exit;
             val(sl.Strings[2], j, ii);
             if ii <> 0 then Exit;
             val(sl.Strings[3], k, ii);
+            if ii <> 0 then Exit;
+            val(sl.Strings[4], l, ii);
             if ii <> 0 then Exit;
     
             WFIFOW(0, $0119);
@@ -1331,18 +1387,69 @@ implementation
             WFIFOW(6, i);
             WFIFOW(8, j);
             WFIFOW(10, k);
-            WFIFOB(12, 0);
+            WFIFOB(12, l);
             SendBCmd(tm, tc.Point, 13);
             tc.Stat1 := i;
             tc.Stat2 := j;
             tc.Option := k;
 
-            Result := 'GM_OPTION Success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k);
+            Result := 'GM_STAT Success. Options set to ' + inttostr(i) + ' ' + inttostr(j) + ' ' + inttostr(k) + ' ' + inttostr(l);
         end else begin
             Result := Result + ' Incomplete information.';
-        end;}
+        end;
 
-        //sl.Free;
+        sl.Free;
+    end;
+
+    function command_refine(tc : TChara; str : String) : String;
+    var
+        i, j, k : Integer;
+        tm : TMap;
+    begin
+        Result := 'GM_REFINE Failure.';
+
+        tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
+
+        Val(Copy(str, 8, 256), j, k);
+        if (k <> 0) or (j < 0) or (j > 10) then begin
+            Result := Result + ' Incomplete information or out of range [0-10].';
+            Exit;
+        end;
+
+        for i := 1 to 100 do begin
+            with tc.Item[i] do begin
+                if (ID <> 0) AND (Amount <> 0) AND Data.IEquip AND (Equip <> 0) then begin
+
+                    tc.Item[i].Refine := Byte(j);
+                    WFIFOW(0, $00ac);
+                    WFIFOW(2, i);
+                    WFIFOW(4, tc.Item[i].Equip);
+                    WFIFOB(6, 1);
+                    tc.Socket.SendBuf(buf, 7);
+
+                    WFIFOW(0, $0188);
+                    WFIFOW(2, 0);
+                    WFIFOW(4, i);
+                    WFIFOW(6, word(j));
+                    tc.Socket.SendBuf(buf, 8);
+
+                    WFIFOW(0, $00aa);
+                    WFIFOW(2, i);
+                    WFIFOW(4, tc.Item[i].Equip);
+                    WFIFOB(6, 1);
+                    tc.Socket.SendBuf(buf, 7);
+                end;
+            end;
+        end;
+        
+        WFIFOW(0, $019b);
+        WFIFOL(2, tc.ID);
+        WFIFOL(6, 3);
+        SendBCmd(tm, tc.Point, 10, tc);
+        CalcStat(tc);
+        SendCStat(tc);
+
+        Result := 'GM_REFINE Success. Equipment refined to level ' + IntToStr(j) + '.';
     end;
 
 end.

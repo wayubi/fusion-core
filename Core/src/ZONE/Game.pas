@@ -1443,77 +1443,9 @@ Begin(* Proc sv3PacketProcess() *)
 {修正ココまで} {Lit. "To correction coconut"}
       end //GM cmd #unicon
 
-else if (Copy(str, 1, 7) = 'refine ') and ((DebugCMD and $0800) <> 0) and (tid.Refine = 1)  then begin
-        //装備中の武器防具を精錬
-        Val(Copy(str, 8, 256), j, k);
-        if (k <> 0) or (j < 0) or (j > 10) then continue;
-        for i := 1 to 100 do begin
-          with tc.Item[i] do begin
-	          if (ID <> 0) AND (Amount <> 0) AND Data.IEquip AND (Equip <> 0) then
-            begin
-          	  tc.Item[i].Refine := Byte(j);
-        	    WFIFOW(0, $0188);
-      	      WFIFOW(2, 0);
-    	        WFIFOW(4, i);
-  	          WFIFOW(6, word(j));
-	            Socket.SendBuf(buf, 8);
-            end;
-          end;
-        end;//for
-        WFIFOW(0, $019b);
-        WFIFOL(2, tc.ID);
-        WFIFOL(6, 3);
-        SendBCmd(tm, tc.Point, 10, tc);
-        CalcStat(tc);
-        SendCStat(tc);
-      end else if (Copy(str, 1, 5) = 'unit ') and ((DebugCMD and $1000) <> 0) and (tid.AutoRawUnit = 1) then begin
-        //スキル効能地表示テスト
-        Val(Copy(str, 6, 256), j, k);
-        if (k <> 0) or (j < 0) or (j > 999) then continue;
-        SetSkillUnit(tm, tc.ID, Point(tc.Point.X + 1, tc.Point.Y - 1), timeGetTime(), j, 1, 10000);
 
-      end else if (Copy(str, 1, 5) = 'stat ') and ((DebugCMD and $2000) <> 0) and (tid.ChangeOption = 1) then begin
-        //0x0119パケテスト
-        SL := TStringList.Create;
-        SL.DelimitedText := Copy(str, 6, 256);
-        try
-          if SL.Count <> 4 then continue;
-          Val(SL[0], i, ii);
-          if ii <> 0 then continue;
-          Val(SL[1], j, ii);
-          if ii <> 0 then continue;
-          Val(SL[2], k, ii);
-          if ii <> 0 then continue;
-          Val(SL[3], l, ii);
-          if ii <> 0 then continue;
-          WFIFOW(0, $0119);
-          WFIFOL(2, tc.ID);
-          WFIFOW(6, i);
-          WFIFOW(8, j);
-          WFIFOW(10, k);
-          WFIFOB(12, l);
-          SendBCmd(tm, tc.Point, 13);
-          tc.Stat1 := i;
-          tc.Stat2 := j;
-          tc.Option := k;
-        finally
-          SL.Free;
-        end;
-					end else if (Copy(str, 1, 4) = 'raw ') and ((DebugCMD and $2000) <> 0) and (tid.AutoRawUnit = 1) then begin
-						//任意パケテスト
-						sl := TStringList.Create;
-						sl.DelimitedText := Copy(str, 5, 256);
-						try
-							if (sl.Count = 0) then continue;
-							for i := 0 to sl.Count - 1 do begin
-								WFIFOB(i, StrToInt('$' + sl.Strings[i]));
-							end;
-							Socket.SendBuf(buf, i);
-						finally
-							sl.Free();
-						end;
 
-                                        end else if (Copy(str, 1, 6) = 'server') then begin
+                                       else if (Copy(str, 1, 6) = 'server') then begin
                                         	str2 := 'Powered by Fusion Server Technology - http://fusion.cobax.net/';
                                         	debugout.lines.add('[' + TimeToStr(Now) + '] ' + str2);
                                         	w := 200;
@@ -1861,8 +1793,9 @@ else if (Copy(str, 1, 7) = 'refine ') and ((DebugCMD and $0800) <> 0) and (tid.R
 
 {チャットルーム機能追加ココまで}
                                 end;
+end;
 
-			end;
+
 		//--------------------------------------------------------------------------
 		$0090: //NPCに話しかける
 			begin

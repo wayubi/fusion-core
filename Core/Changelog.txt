@@ -1,3 +1,8 @@
+- 05-31-04: Fixed weapon sprites not updated after #refine bug. [AlexKreuz]
+- 05-31-04: Switched GM Command, #REFINE to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #STAT to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #UNIT to ALBGM system. [AlexKreuz]
+- 05-31-04: Switched GM Command, #RAW to ALBGM system. [AlexKreuz]
 - 05-31-04: Added Option_PVP_XPLoss - INI option to turn off XP loss in PVP. [AlexKreuz]
 - 05-31-04: Switched GM Command, #option to ALBGM system. [AlexKreuz]
 - 05-31-04: Switched GM Command, #whois to ALBGM system. [AlexKreuz]
