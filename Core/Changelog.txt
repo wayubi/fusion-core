@@ -1,3 +1,6 @@
+- 05-11-04: GetGuildEDegree - Asserts for Preconditons, unused var elimination. [ChrstphrR]
+- 05-11-04: GetGuildID - Asserts for Preconditons, index fix. [ChrstphrR]
+- 05-11-04: CheckGuildMaster - Asserts for Preconditons, index fix. [ChrstphrR]
 - 05-09-04: Corrected interim CVS build title to denote post 1.2.1.1 [ChrstphrR]
 - 05-09-04: Bug Fix #852 (prev 5 entries + Ini option ShowDebugErrors) [ChrstphrR]
 - 05-09-04: Main unit - MapLoad changed - no more char freezes. [ChrstphrR]

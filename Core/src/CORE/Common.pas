@@ -5409,23 +5409,10 @@ begin
 			Card[3]   := AnItem.Card[3];
 
       Data := AnItem.Data;
-      //
-      //CRW - Wrong! You need to Assign() Data or copy EVERYTHING
-      // field by field..  pointing Data to Data means the original
-      // AList.Item[Idx].Data 's TItenDB is freefloating, unreferenced...
-      //
-      // This is a memory leak, using := improperly.
-      //
-      // CRW -- Made the Assign() method now for TItemDB, so people won't
-      // perpetuate this mistake.  It and other goodies in
-      // TitemDB, TItem, TItemList are pending :)
-      //
-      // Right way:
-			//Data.Assign( AnItem.Data );
 
-  		end;
+		end;
 		Weight := Weight + (AnItem.Data.Weight * Quant);
-  	end;//w AList
+	end;//w AList
 end;(* Func GetItemStore() : Integer ===========*)
 
 
@@ -5460,21 +5447,21 @@ Begin
 	Result := -1;
 	if 100 < index then Exit; //範囲外
 	with AList.Item[Index] do
-    begin
+		begin
 		if ID = 0 then Exit;       //所持していない
 		if Amount > Quant then
-      begin //所有個数以下
+			begin //所有個数以下
 			Amount := Amount - Quant;
 			AList.Weight := AList.Weight  - (Data.Weight * Quant);
-  		end
-    else
-      begin
+			end
+		else
+			begin
 			ID := 0;
 			AList.Weight := AList.Weight - (Data.Weight * Amount);
 			Amount := 0;
 			Dec(AList.Count);
-  		end;//if-else
-  	end;//with AList.Item{Index]
+			end;//if-else
+		end;//with AList.Item{Index]
 	Result := 0;
 end;(* Func GetItemStore() : Integer ===========*)
 
@@ -5496,7 +5483,7 @@ Weight and iten mode Count.
 Procedure CalcInventory( AList : TItemList );
 Var
 	ItmIdx    : Integer;
-  NewCount  : Integer;
+	NewCount  : Integer;
 Begin
 	AList.Weight := 0;
 	NewCount := 0;
@@ -6511,83 +6498,83 @@ procedure EnableGuildKafra(MapName:string;KafraName:string;Mode:integer);
 var
 	i,j,k,l  :integer;
 	tm           :TMap;
-  tm1          :TMap;
-  tn1          :TNPC;
-  tc1          :TChara;
+	tm1          :TMap;
+	tn1          :TNPC;
+	tc1          :TChara;
 begin
-					if Map.IndexOf(MapName) = -1 then
-						MapLoad(MapName);
-					tm1 := Map.Objects[Map.IndexOf(MapName)] as TMap;
-          tm := Map.Objects[Map.IndexOf(MapName)] as TMap;
-					if (Mode = 1) then begin
-						//enable
-						i := -1;
-						for k := 0 to tm1.NPC.Count - 1 do begin
-							tn1 := tm1.NPC.Objects[k] as TNPC;
-							if (tn1.Name = KafraName) then begin
-								i := 0;
-								break;
-							end;
-						end;
-						//if (tn1.ScriptInitS <> -1) then begin
-							//OnInitラベルを実行
-							//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn1.ID]));
-							//tc1 := TChara.Create;
-							//tc1.TalkNPCID := tn1.ID;
-							//tc1.ScriptStep := tn1.ScriptInitS;
-							//tc1.AMode := 3;
-							//tc1.AData := tn1;
-							//tc1.Login := 0;
-							//NPCScript(tc1,0,1);
-							//tn.ScriptInitD := true;
-							//tc1.Free;
-						//end;
-						if (i = 0) and (tn1.Enable = false) then begin
-							tn1.Enable := true;
-							for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
-								for i := tn1.Point.X div 8 - 2 to tn1.Point.X div 8 + 2 do begin
-									for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
-										tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
-										if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
-											SendNData(tc1.Socket, tn1, tc1.ver2);
-										end;
-									end;
-								end;
-							end;
-						end;
-					end else begin
-						//disable
-						i := -1;
-						for k := 0 to tm1.NPC.Count - 1 do begin
-							tn1 := tm1.NPC.Objects[k] as TNPC;
-							if (tn1.Name = KafraName) then begin
-								i := 0;
-								break;
-							end;
-						end;
-						if (i = 0) and (tn1.Enable = true) then begin
-							tn1.Enable := false;
-							l := tm.TimerAct.IndexOf(tn1.ID);
-							if (l <> -1) then begin
-								//DebugOut.Lines.Add(Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
-								tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
-							end;
-							for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
-								for i := tn1.Point.X div 8 - 2 to tn1.Point.X div 8 + 2 do begin
-									for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
-										tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
-										if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
-											WFIFOW(0, $0080);
-											WFIFOL(2, tn1.ID);
-											WFIFOB(6, 0);
-											tc1.Socket.SendBuf(buf, 7);
-										end;
-									end;
-								end;
-							end;
+	if Map.IndexOf(MapName) = -1 then
+		MapLoad(MapName);
+	tm1 := Map.Objects[Map.IndexOf(MapName)] as TMap;
+	tm := Map.Objects[Map.IndexOf(MapName)] as TMap;
+	if (Mode = 1) then begin
+		//enable
+		i := -1;
+		for k := 0 to tm1.NPC.Count - 1 do begin
+			tn1 := tm1.NPC.Objects[k] as TNPC;
+			if (tn1.Name = KafraName) then begin
+				i := 0;
+				break;
+			end;
+		end;
+		//if (tn1.ScriptInitS <> -1) then begin
+			//OnInitラベルを実行
+			//DebugOut.Lines.Add(Format('OnInit Event(%d)', [tn1.ID]));
+			//tc1 := TChara.Create;
+			//tc1.TalkNPCID := tn1.ID;
+			//tc1.ScriptStep := tn1.ScriptInitS;
+			//tc1.AMode := 3;
+			//tc1.AData := tn1;
+			//tc1.Login := 0;
+			//NPCScript(tc1,0,1);
+			//tn.ScriptInitD := true;
+			//tc1.Free;
+		//end;
+		if (i = 0) and (tn1.Enable = false) then begin
+			tn1.Enable := true;
+			for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
+				for i := tn1.Point.X div 8 - 2 to tn1.Point.X div 8 + 2 do begin
+					for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
+						tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
+						if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
+							SendNData(tc1.Socket, tn1, tc1.ver2);
 						end;
 					end;
 				end;
+			end;
+		end;
+	end else begin
+		//disable
+		i := -1;
+		for k := 0 to tm1.NPC.Count - 1 do begin
+			tn1 := tm1.NPC.Objects[k] as TNPC;
+			if (tn1.Name = KafraName) then begin
+				i := 0;
+				break;
+			end;
+		end;
+		if (i = 0) and (tn1.Enable = true) then begin
+			tn1.Enable := false;
+			l := tm.TimerAct.IndexOf(tn1.ID);
+			if (l <> -1) then begin
+				//DebugOut.Lines.Add(Format('NPC Timer(%d) was deleted / Remaining Timer(%d)', [tn1.ID,tm.TimerAct.Count-1]));
+				tm.TimerAct.Delete(tm.TimerAct.IndexOf(tn1.ID));
+			end;
+			for j := tn1.Point.Y div 8 - 2 to tn1.Point.Y div 8 + 2 do begin
+				for i := tn1.Point.X div 8 - 2 to tn1.Point.X div 8 + 2 do begin
+					for k := 0 to tm1.Block[i][j].CList.Count - 1 do begin
+						tc1 := tm1.Block[i][j].Clist.Objects[k] as TChara;
+						if (abs(tc1.Point.X - tn1.Point.X) < 16) and (abs(tc1.Point.Y - tn1.Point.Y) < 16) then begin
+							WFIFOW(0, $0080);
+							WFIFOL(2, tn1.ID);
+							WFIFOB(6, 0);
+							tc1.Socket.SendBuf(buf, 7);
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+end;
 //------------------------------------------------------------------------------
 function GetGuildKafra(tn:TNPC) : integer;
 var{ChrstphrR 2004/04/28 Eliminated unused variables}
@@ -6874,17 +6861,20 @@ Post:
 	1 is returned, else 0.
 *-----------------------------------------------------------------------------*)
 Function  CheckGuildMaster(
-          	tn : TNPC;
-          	tc : TChara
-          ) : Word;
+		tn : TNPC;
+		tc : TChara
+	) : Word;
 Var{ChrstphrR 2004/04/28 Eliminated unused variables}
-	tgc:TCastle;
 	Idx :integer;
 Begin
+	//Check Preconditions
+	Assert(tn <> NIL, 'CheckGuildMaster() - NPC passed is invalid');
+	Assert(tc <> NIL, 'CheckGuildMaster() - Character passed is invalid');
+	//--
 	Result := 0;
 	Idx := CastleList.IndexOf(tn.Reg);
 
-	if (Idx > - 1) AND ((CastleList.Objects[i] AS TCastle).GMName = tc.Name) then
+	if (Idx > - 1) AND ((CastleList.Objects[Idx] AS TCastle).GMName = tc.Name) then
 		Result := 1;
 End;(* Func CheckGuildMaster()
 *-----------------------------------------------------------------------------*)
@@ -6899,16 +6889,19 @@ Post:
 	If tn is associated with a guild, returns the Guild ID, else returns 0
 *-----------------------------------------------------------------------------*)
 Function  GetGuildID(
-          	tn : TNPC
-          ) : Word;
+		tn : TNPC
+	) : Word;
 Var{ChrstphrR 2004/04/28 Eliminated unused variables}
 	Idx : Integer;
 Begin
+	//Check Preconditions
+	Assert(tn <> NIL, 'GetGuildId() - NPC passed is invalid');
+	//--
 	Result := 0;
 	Idx := CastleList.IndexOf(tn.Reg);
 
 	if (Idx > - 1) then
-		Result := (CastleList.Objects[i] AS TCastle).GID;
+		Result := (CastleList.Objects[Idx] AS TCastle).GID;
 End;(* Func GetGuildID()
 *-----------------------------------------------------------------------------*)
 
@@ -7028,24 +7021,36 @@ begin
 	end;
 end;//proc CallGuildGuard()
 //------------------------------------------------------------------------------
-function GetGuildEDegree(tn:TNPC) : cardinal;
-var
-	tgc:TCastle;
-	i  :integer;
-	w  :cardinal;
-begin
-	w := 0;
-  i := CastleList.IndexOf(tn.Reg);
 
-  if (i <> - 1) then begin
-  tgc := CastleList.Objects[i] as TCastle;
-  w := tgc.EDegree;
-  end else begin
-  w := 0;
-  end;
 
-	Result := w;
-end;
+(*-----------------------------------------------------------------------------*
+GetGuildEDegree()
+
+Pre:
+	tn is a valid, non-nil TNPC
+	(In other words, this function's not responsible for bad input)
+Post:
+	If the NPC is linked to a Guild the EDegree property value is returned,
+	else 0.
+*-----------------------------------------------------------------------------*)
+Function  GetGuildEDegree(
+		tn : TNPC
+	) : Cardinal;
+Var
+	Idx : Integer;
+Begin
+	//Check Preconditions
+	Assert(tn <> NIL, 'GetGuildEDegree() - NPC passed is invalid');
+	//--
+	Result := 0;
+	Idx := CastleList.IndexOf(tn.Reg);
+
+	if (Idx > -1) then
+		Result := (CastleList.Objects[Idx] AS TCastle).EDegree;
+End;(* Func GetGuildEDegree()
+*-----------------------------------------------------------------------------*)
+
+
 //------------------------------------------------------------------------------
 function GetGuildETrigger(tn:TNPC) : word;
 var
@@ -7058,7 +7063,7 @@ begin
 
   if (i <> - 1) then begin
   tgc := CastleList.Objects[i] as TCastle;
-  w := tgc.ETrigger;
+	w := tgc.ETrigger;
   end else begin
   w := 0;
   end;
@@ -7244,7 +7249,7 @@ begin
 	end;
         if (l = 0) then begin
         Result := 0;
-        end else begin
+				end else begin
           embpt := embdt;
           WFIFOW( 0, $0152);
           WFIFOW( 2, l + 12);
