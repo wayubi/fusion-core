@@ -296,37 +296,43 @@ uses
     	LongTimeFormat    := 'hh:mm:ss';
 
 	    filename := datetostr(date) + ' - ' +timetostr(time);
+    	CreateDir(AppPath+'backup');
 
-    	CreateDir('backup');
-	    zfile := tzip.create(frmMain);
-    	zfile.Filename := AppPath + 'backup\' + filename + '.zip';
+        try
+    	    zfile := tzip.create(frmMain);
+        	zfile.Filename := AppPath + 'backup\' + filename + '.zip';
 
-	    fileslist := tstringlist.Create;
-//    	fileslist.Add(AppPath + 'chara.txt');
-//	    fileslist.Add(AppPath + 'gcastle.txt');
-//    	fileslist.Add(AppPath + 'guild.txt');
-//	    fileslist.Add(AppPath + 'party.txt');
-//    	fileslist.Add(AppPath + 'pet.txt');
-//	    fileslist.Add(AppPath + 'player.txt');
-        fileslist.Add(AppPath + 'status.txt');
+    	    fileslist := tstringlist.Create;
+            // fileslist.Add(AppPath + 'chara.txt');
+            // fileslist.Add(AppPath + 'gcastle.txt');
+            // fileslist.Add(AppPath + 'guild.txt');
+            // fileslist.Add(AppPath + 'party.txt');
+            // fileslist.Add(AppPath + 'pet.txt');
+            // fileslist.Add(AppPath + 'player.txt');
+            fileslist.Add(AppPath + 'status.txt');
 
-	    zfile.FileSpecList := fileslist;
-    	zfile.Add;
+            zfile.FileSpecList := fileslist;
+            zfile.Add;
 
-        //R.E.E.D
-        gamefolder := AppPath + 'gamedata';
-        zfile.AddPath := gamefolder;
-	    gamedatalist := tstringlist.Create;
-        gamedatalist.Add('*.txt');
-        zfile.AddOptions := [aoRecursive, aoFolderEntries, aoUpdate]; //include all subfolders too.
+            //R.E.E.D
+            gamefolder := AppPath + 'gamedata';
+            zfile.AddPath := gamefolder;
+            gamedatalist := tstringlist.Create;
+            gamedatalist.Add('*.txt');
+            zfile.AddOptions := [aoRecursive, aoFolderEntries, aoUpdate]; //include all subfolders too.
 
-	    zfile.FileSpecList := gamedatalist;
-        zfile.Add;
+            zfile.FileSpecList := gamedatalist;
+            zfile.Add;
 
-	    zfile.Free;
+            zfile.Free;
 
-    	fileslist.Free;
-        gamedatalist.Free;
+            fileslist.Free;
+            gamedatalist.Free;
+        except
+            on ZipException do begin
+                debugout.Lines.Add('Unable to create backup file. Check your folder.');
+            end;
+        end;
     end;
 
 end.
