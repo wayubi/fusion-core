@@ -17,6 +17,8 @@ var
     procedure process_effect(tc : TChara; success : Integer);
     procedure process_skill_attack(tc : TChara; j : Integer; Tick : Cardinal);
 
+    function skill_sword_mastery(tc : TChara) : Integer;
+	function skill_two_handed_sword_mastery(tc : TChara) : Integer;
     function skill_bash(tc : TChara; Tick : Cardinal) : Integer;
 	function skill_provoke(tc : TChara) : Integer;
     function skill_double_strafe(tc : TChara; Tick : Cardinal) : Integer;
@@ -30,11 +32,13 @@ uses
     var
     	success : Integer;
     begin
-    	case tc.MSkill of
-        	5: success := skill_bash(tc, Tick);
-        	6: success := skill_provoke(tc);
-            46: success := skill_double_strafe(tc, Tick);
-        end;
+    	SKILL_TYPE := 0;
+
+        { 2} if (tc.Skill[2].Lv <> 0) then success := skill_sword_mastery(tc);
+		{ 3} if (tc.Skill[3].Lv <> 0) then success := skill_two_handed_sword_mastery(tc);
+        { 5} if (tc.MSkill = 5) then success := skill_bash(tc, Tick);
+        { 6} if (tc.MSkill = 6) then success := skill_provoke(tc);
+        {46} if (tc.MSkill = 46) then success := skill_double_strafe(tc, Tick);
 
         {
 	        Success Codes:
@@ -112,6 +116,36 @@ uses
     end;
 
 
+    { -------------------------------------------------- }
+    { - Job: Swordsman --------------------------------- }
+    { - Job ID: 1 -------------------------------------- }
+    { - Skill Name: Sword Mastery ---------------------- }
+    { - Skill ID Name: SM_SWORD ------------------------ }
+    { - Skill ID: 2 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_sword_mastery(tc : TChara) : Integer;
+    begin
+    	if ( (tc.WeaponType[0] = 1) or (tc.WeaponType[0] = 2) ) then begin
+        	tc.ATK[0][4] := tc.Skill[2].Data.Data1[tc.Skill[2].Lv];
+		end;
+    end;
+
+
+    { -------------------------------------------------- }
+    { - Job: Swordsman --------------------------------- }
+    { - Job ID: 1 -------------------------------------- }
+    { - Skill Name: Two-Handed Sword Mastery ----------- }
+    { - Skill ID Name: SM_TWOHAND ---------------------- }
+    { - Skill ID: 3 ------------------------------------ }
+    { -------------------------------------------------- }
+    function skill_two_handed_sword_mastery(tc : TChara) : Integer;
+    begin
+    	if (tc.WeaponType[0] = 3) then begin
+        	tc.ATK[0][4] := tc.Skill[3].Data.Data1[tc.Skill[3].Lv];
+		end;
+    end;
+    
+    
     { -------------------------------------------------- }
     { - Job: Swordsman --------------------------------- }
     { - Job ID: 1 -------------------------------------- }

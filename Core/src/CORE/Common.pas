@@ -1846,7 +1846,7 @@ Option_Font_Style : string;
 
 implementation
 
-uses SQLData, FusionSQL;
+uses SQLData, FusionSQL, Player_Skills;
 
 procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0);
 begin
@@ -2180,13 +2180,14 @@ var
 	i :Integer;
 //	j :Integer;//unused.
 begin
+
+	{ Alex: We need to move passive skills into PSS as well. This will be here
+    temporarily to help the migration process. }
+	parse_skills(tc, Tick);
+
 	with tc do begin
 		//C—û ATK[0][4]
-		if (Skill[2].Lv <> 0) and ((WeaponType[0] = 1) or (WeaponType[0] = 2)) then begin //’ZŒ•AŒ•
-			ATK[0][4] := Skill[2].Data.Data1[Skill[2].Lv];
-		end else if (Skill[3].Lv <> 0) and (WeaponType[0] = 3) then begin //—¼èŒ•
-			ATK[0][4] := Skill[3].Data.Data1[Skill[3].Lv];
-		end else if (Skill[55].Lv <> 0) and ((WeaponType[0] = 4) or (WeaponType[0] = 5)) then begin //‘„
+        if (Skill[55].Lv <> 0) and ((WeaponType[0] = 4) or (WeaponType[0] = 5)) then begin //‘„
 			if (Option and 32) = 0 then begin
 				ATK[0][4] := Skill[55].Data.Data1[Skill[55].Lv];
 			end else begin

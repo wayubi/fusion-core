@@ -1,3 +1,5 @@
+- 06-07-04: Switched skill [SM_TWOHAND] to PSS system. [AlexKreuz]
+- 06-07-04: Switched skill [SM_SWORD] to PSS system. [AlexKreuz]
 - 06-07-04: Removed memory leaks from Player_Skills.pas. [AlexKreuz]
 - 06-05-04: Created 'process_skill_attack' procedure for PSS system. [AlexKreuz]
 - 06-05-04: Switched skill [SM_BASH] to PSS system. [AlexKreuz]
