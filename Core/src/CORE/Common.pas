@@ -1420,6 +1420,7 @@ Option_WelcomeMsg :boolean;
                 procedure IntimidateWarp(tm:TMap; tc:TChara);
 
                 procedure UpdateMonsterLocation(tm:TMap; ts:TMob);  //Update the location of a monster
+                procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
 
                 function  UpdateSpiritSpheres(tm:TMap; tc:TChara; spiritSpheres:integer) :boolean;
 		function  DecSP(tc:TChara; SkillID:word; LV:byte) :boolean;
@@ -2441,7 +2442,7 @@ begin
                 end;
 
                 if Skill[322].Tick > Tick then begin
-                        tl := Skill[322].Data;
+                        //tl := Skill[322].Data;
                         if (MAXHP + tc.Skill[322].Effect1 > 65535) then begin
                                 MAXHP := 65535;
                         end else begin
@@ -2733,6 +2734,19 @@ begin
         SendBCmd(tm, ts.Point, 10);
 end;
 //------------------------------------------------------------------------------
+
+procedure UpdatePlayerLocation(tm:TMap; tc:TChara);  //Update the location of a Player
+
+begin
+        WFIFOW(0, $0088);
+        WFIFOL(2, tc.ID);
+        WFIFOW(6, tc.Point.X);
+        WFIFOW(8, tc.Point.Y);
+        SendBCmd(tm, tc.Point, 10);
+end;
+
+
+//------------------------------------------------------------------------------
 procedure SendCStat(tc:TChara; View:boolean = false);
 var
 	i :integer;
@@ -2968,7 +2982,7 @@ var
 	j   :integer;
 	w   :word;
 	tg  :TGuild;
-        Tick :cardinal;
+        //Tick :cardinal;
 {ギルド機能追加ココまで}
 begin
 	//DebugOut.Lines.Add(Format('S 007b %s (%d,%d)-(%d,%d)', [tc.Name, before.X, before.Y, after.X, after.Y]));
@@ -3050,7 +3064,7 @@ begin
 	tc.AMode := 0;
 	tc.MMode := 0;
 	tm := Map.Objects[Map.IndexOf(tc.Map)] as TMap;
-  mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
+        mi := MapInfo.Objects[MapInfo.IndexOf(tm.Name)] as MapTbl;
 {キューペット}
         if ( tc.PetData <> nil ) and ( tc.PetNPC <> nil ) then begin
                 tn := tc.PetNPC;

@@ -2,6 +2,8 @@
 Fusion 1.209 - January ??. 20003
 --------------------------------------------------------------------------------
 
+- 01-11-04: Backsliding Now works properly [Darkhelmet]
+- 01-11-04: Added procedure UpdatePlayerLocation to simplify packet sending [Darkhelmet]
 - 01-11-04: Began Resolving warnings in main.pas [Darkhelmet]
 - 01-11-04: Added procedure UpdateMonsterLocation to simplify packet sending [Darkhelmet]
 - 01-11-04: Began Cleaning up Japanese Comments [Darkhelmet]

@@ -2525,11 +2525,7 @@ begin
 
 	if (tc1.Stat1 <> 0) then tc1.BodyTick := Tick + tc.aMotion;
 
-	WFIFOW(0, $0088);
-	WFIFOL(2, tc1.ID);
-	WFIFOW(6, tc1.Point.X);
-	WFIFOW(8, tc1.Point.Y);
-	SendBCmd(tm, tc1.Point, 10);
+        UpdatePlayerLocation(tm, tc1);
 
 	tc1.HP := tc1.HP - Dmg;
         SendCStat1(tc1, 0, 5, tc1.HP);
@@ -3273,11 +3269,8 @@ begin
 			HPRTick := timeGetTime() - 500;
 			SPRTick := timeGetTime();
 			pcnt := 0;
-			WFIFOW(0, $0088);
-			WFIFOL(2, ID);
-			WFIFOW(6, Point.X);
-			WFIFOW(8, Point.Y);
-			SendBCmd(tm, Point, 10);
+                        UpdatePlayerLocation(tm, tc);
+			
 			if ATick + ADelay - 200 < Tick then ATick := Tick - ADelay + 200;
 		end;
 		if (abs(Point.X - tc1.Point.X) <= Range) and (abs(Point.Y - tc1.Point.Y) <= Range) then begin
@@ -5553,11 +5546,8 @@ begin
                                                         end;
                                                         tc.pcnt := 0;
 
-                                                        WFIFOW(0, $0088);
-                                                        WFIFOL(2, tc.ID);
-                                                        WFIFOW(6, tc.Point.X);
-                                                        WFIFOW(8, tc.Point.Y);
-                                                        SendBCmd(tm, tc.Point, 10);
+                                                        UpdatePlayerLocation(tm, tc);
+
                                                         SendCSkillAtk1(tm, tc, ts, Tick, dmg[0], 1);
                                                         DamageProcess1(tm, tc, ts, dmg[0], Tick);
                                                         tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
@@ -7769,7 +7759,9 @@ begin
                         {Colus, 20031228: This bb produces behavior equal
                          to the previous settings w/o turning the char around.
                          However, it still isn't updating the position of the
-                         character (perhaps because it is not damaging anything?)}
+                         character (perhaps because it is not damaging anything?)
+
+                         Darkhelmet, hows that now?}
                         bb[0] := 4;
                         bb[1] := 4;
                         bb[2] := 4;
@@ -7779,22 +7771,7 @@ begin
 
                         //bb[1] := 0;
                         xy := tc.Point;
-                        //xy.x := tc.Point.X;
-                        //xy.y := tc.Point.Y;
 
-                        {Turn Character Around}
-{
-                        case tc.Dir of
-                                0: tc.Dir := 4;
-                                1: tc.Dir := 5;
-                                2: tc.Dir := 6;
-                                3: tc.Dir := 7;
-                                4: tc.Dir := 0;
-                                5: tc.Dir := 1;
-                                6: tc.Dir := 2;
-                                7: tc.Dir := 3;
-                        end;
- }
                         DirMove(tm, tc.Point, tc.Dir, bb);
                         //ブロック移動
                         if (xy.X div 8 <> tc.Point.X div 8) or (xy.Y div 8 <> tc.Point.Y div 8) then begin
@@ -7806,25 +7783,9 @@ begin
                         end;
                         tc.pcnt := 0;
 
-                        WFIFOW(0, $0088);
-                        WFIFOL(2, tc.ID);
-                        WFIFOW(6, tc.Point.X);
-                        WFIFOW(8, tc.Point.Y);
-                        SendBCmd(tm, tc.Point, 10);
+                        UpdatePlayerLocation(tm, tc);
 
-                        {Turn Character Back Around}
-                        {
-                        case tc.Dir of
-                                0: tc.Dir := 4;
-                                1: tc.Dir := 5;
-                                2: tc.Dir := 6;
-                                3: tc.Dir := 7;
-                                4: tc.Dir := 0;
-                                5: tc.Dir := 1;
-                                6: tc.Dir := 2;
-                                7: tc.Dir := 3;
-                        end;
-                         }
+
                 end;
         151:
           begin
@@ -8361,11 +8322,8 @@ begin
                                                         end;
                                                         tc.pcnt := 0;
 
-                                                        WFIFOW(0, $0088);
-                                                        WFIFOL(2, tc.ID);
-                                                        WFIFOW(6, tc.Point.X);
-                                                        WFIFOW(8, tc.Point.Y);
-                                                        SendBCmd(tm, tc.Point, 10);
+                                                        UpdatePlayerLocation(tm, tc);
+                                                        
                                                         SendCSkillAtk2(tm, tc, tc1, Tick, dmg[0], 1);
                                                         DamageProcess2(tm, tc, tc1, dmg[0], Tick);
                                                         tc.MTick := Tick + (3500 + (tl.CastTime2 * MUseLV));
@@ -8862,12 +8820,8 @@ begin
 								tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].CList.AddObject(tc1.ID, tc1);
 							end;
 							tc1.pcnt := 0;
-							//パケ送信
-							WFIFOW(0, $0088);
-							WFIFOL(2, tc1.ID);
-							WFIFOW(6, tc1.Point.X);
-							WFIFOW(8, tc1.Point.Y);
-							SendBCmd(tm, tc1.Point, 10);
+							//Update Player's Location
+							UpdatePlayerLocation(tm, tc1);
 						end;
 						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
 							StatCalc2(tc, tc1, Tick);
@@ -8932,12 +8886,8 @@ begin
 								tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].CList.AddObject(tc1.ID, tc1);
 							end;
 							tc1.pcnt := 0;
-							//パケ送信
-							WFIFOW(0, $0088);
-							WFIFOL(2, tc1.ID);
-							WFIFOW(6, tc1.Point.X);
-							WFIFOW(8, tc1.Point.Y);
-							SendBCmd(tm, tc1.Point, 10);
+							//Update Players Location
+							UpdatePlayerLocation(tm, tc1);
 							xy := tc1.Point;
 							//巻きこみ範囲攻撃
 							sl.Clear;
@@ -9067,12 +9017,8 @@ begin
 								tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].CList.AddObject(tc1.ID, tc1);
 							end;
 							tc1.pcnt := 0;
-						//パケ送信
-						WFIFOW(0, $0088);
-						WFIFOL(2, tc1.ID);
-						WFIFOW(6, tc1.Point.X);
-						WFIFOW(8, tc1.Point.Y);
-						SendBCmd(tm, tc1.Point, 10);
+						//Update Players Location
+						UpdatePlayerLocation(tm, tc1);
 						end;
 						DamageProcess2(tm, tc, tc1, dmg[0], Tick);
 					end;
@@ -9297,12 +9243,8 @@ begin
 								tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].CList.AddObject(tc1.ID, tc1);
 							end;
 							tc1.pcnt := 0;
-							//パケ送信
-							WFIFOW(0, $0088);
-							WFIFOL(2, tc1.ID);
-							WFIFOW(6, tc1.Point.X);
-							WFIFOW(8, tc1.Point.Y);
-							SendBCmd(tm, tc1.Point, 10);
+							//Update Players Location
+							UpdatePlayerLocation(tm, tc1);
 						end;
 						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
 							StatCalc2(tc, tc1, Tick);
@@ -9379,12 +9321,8 @@ begin
 								tm.Block[tc1.Point.X div 8][tc1.Point.Y div 8].CList.AddObject(tc1.ID, tc1);
 							end;
 							tc1.pcnt := 0;
-							//パケ送信
-							WFIFOW(0, $0088);
-							WFIFOL(2, tc1.ID);
-							WFIFOW(6, tc1.Point.X);
-							WFIFOW(8, tc1.Point.Y);
-							SendBCmd(tm, tc1.Point, 10);
+							//Update Players Location
+							UpdatePlayerLocation(tm, tc1);
 						end;
 						if not DamageProcess2(tm, tc, tc1, dmg[0], Tick) then
             StatCalc2(tc, tc1, Tick);
@@ -9440,12 +9378,8 @@ begin
 								tm.Block[tc2.Point.X div 8][tc2.Point.Y div 8].CList.AddObject(tc2.ID, tc2);
 							end;
 							tc2.pcnt := 0;
-							//パケ送信
-							WFIFOW(0, $0088);
-							WFIFOL(2, tc2.ID);
-							WFIFOW(6, tc2.Point.X);
-							WFIFOW(8, tc2.Point.Y);
-							SendBCmd(tm, tc2.Point, 10);
+							//Update Players Location
+							UpdatePlayerLocation(tm, tc2);
 						end;
 								if not DamageProcess2(tm, tc, tc2, dmg[0], Tick) then
     						StatCalc2(tc, tc2, Tick);
@@ -10306,12 +10240,8 @@ begin
 									tm.Block[tc2.Point.X div 8][tc2.Point.Y div 8].Clist.AddObject(tc2.ID, tc2);
 								end;
 								tc2.pcnt := 0;
-			      					//パケ送信
-								WFIFOW(0, $0088);
-								WFIFOL(2, tc2.ID);
-								WFIFOW(6, tc2.Point.X);
-								WFIFOW(8, tc2.Point.Y);
-								SendBCmd(tm, tc2.Point, 10);
+			      					//Update Players Location
+								UpdatePlayerLocation(tm, tc2);
 							end;
                                                 $46:    {Sanctuary}
                                                         begin
@@ -11853,11 +11783,7 @@ begin
 					tc2.SPRTick := Tick;
 					tc2.pcnt := 0;
 {追加}
-					WFIFOW(0, $0088);
-					WFIFOL(2, tc2.ID);
-					WFIFOW(6, tc2.Point.X);
-					WFIFOW(8, tc2.Point.Y);
-					SendBCmd(tm, tc2.Point, 10);
+					UpdatePlayerLocation(tm, tc2);
 {追加ココまで}
 				end;
 				if ts.Data.MEXP <> 0 then begin
@@ -11925,11 +11851,7 @@ begin
 					tc1.SPRTick := Tick;
 					tc1.pcnt := 0;
 {追加}
-					WFIFOW(0, $0088);
-					WFIFOL(2, tc1.ID);
-					WFIFOW(6, tc1.Point.X);
-					WFIFOW(8, tc1.Point.Y);
-					SendBCmd(tm, tc1.Point, 10);
+					UpdatePlayerLocation(tm, tc1);
 {追加ココまで}
 				end;
 				if ts.Data.MEXP <> 0 then begin
@@ -12244,11 +12166,7 @@ begin
 					NextFlag := False;
 					Sit := 3;
 					pcnt := 0;
-					WFIFOW(0, $0088);
-					WFIFOL(2, ID);
-					WFIFOW(6, Point.X);
-					WFIFOW(8, Point.Y);
-					SendBCmd(tm, Point, 10);
+					UpdatePlayerLocation(tm, tc);
 					MUseLV := A_Lv;
 					MSkill := A_Skill;
 					k := 0;
@@ -12389,11 +12307,7 @@ begin
 				NextPoint := tn.Point;
 				end else begin
 					if ATick < Tick then begin
-						WFIFOW(0, $0088);
-						WFIFOL(2, ID);
-						WFIFOW(6, Point.X);
-						WFIFOW(8, Point.Y);
-						SendBCmd(tm, Point, 10);
+						UpdatePlayerLocation(tm, tc);
 						PickUpItem(tc,tn.ID);
 						ActTick := Tick + 200;
 					end;
