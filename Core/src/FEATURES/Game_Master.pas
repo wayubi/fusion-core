@@ -97,6 +97,7 @@ var
     GM_ATHENA_SEND : Byte;
     GM_ATHENA_WARPP : Byte;
     GM_ATHENA_CHARWARP : Byte;
+    GM_ATHENA_H : Byte;
     GM_ATHENA_HELP : Byte;
     GM_ATHENA_ZENY : Byte;
     GM_ATHENA_BASELVLUP : Byte;
@@ -202,6 +203,7 @@ var
     function command_athena_send(tc : TChara; str : String) : String;
     function command_athena_warpp(tc : TChara; str : String) : String;
     function command_athena_charwarp(tc : TChara; str : String) : String;
+    function command_athena_h(tc : TChara; str : String) : String;
     function command_athena_help(tc : TChara; str : String) : String;
     function command_athena_zeny(tc : TChara; str : String) : String;
     function command_athena_baselvlup(tc : TChara; str : String) : String;
@@ -312,6 +314,7 @@ implementation
         GM_ATHENA_SEND := StrToIntDef(sl.Values['ATHENA_SEND'], 1);
         GM_ATHENA_WARPP := StrToIntDef(sl.Values['ATHENA_WARPP'], 1);
         GM_ATHENA_CHARWARP := StrToIntDef(sl.Values['ATHENA_CHARWARP'], 1);
+        GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_H'], 1);
         GM_ATHENA_HELP := StrToIntDef(sl.Values['ATHENA_HELP'], 1);
         GM_ATHENA_ZENY := StrToIntDef(sl.Values['ATHENA_ZENY'], 1);
         GM_ATHENA_BASELVLUP := StrToIntDef(sl.Values['ATHENA_BASELVLUP'], 1);
@@ -427,6 +430,7 @@ Called when we're shutting down the server *only*
         ini.WriteString('Athena GM Commands', 'ATHENA_SEND', IntToStr(GM_ATHENA_SEND));
         ini.WriteString('Athena GM Commands', 'ATHENA_WARPP', IntToStr(GM_ATHENA_WARPP));
         ini.WriteString('Athena GM Commands', 'ATHENA_CHARWARP', IntToStr(GM_ATHENA_CHARWARP));
+        ini.WriteString('Athena GM Commands', 'ATHENA_H', IntToStr(GM_ATHENA_H));
         ini.WriteString('Athena GM Commands', 'ATHENA_HELP', IntToStr(GM_ATHENA_HELP));
         ini.WriteString('Athena GM Commands', 'ATHENA_ZENY', IntToStr(GM_ATHENA_ZENY));
         ini.WriteString('Athena GM Commands', 'ATHENA_BASELVLUP', IntToStr(GM_ATHENA_BASELVLUP));
@@ -546,6 +550,7 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('warp')) = 'warp') and (check_level(tc.ID, GM_ATHENA_WARP)) ) then error_msg := command_athena_warp(tc, str)
             else if ( (copy(str, 1, length('send')) = 'send') and (check_level(tc.ID, GM_ATHENA_SEND)) ) then error_msg := command_athena_send(tc, str)
             else if ( (copy(str, 1, length('charwarp')) = 'charwarp') and (check_level(tc.ID, GM_ATHENA_CHARWARP)) ) then error_msg := command_athena_charwarp(tc, str)
+            else if ( (copy(str, 1, length('h')) = 'h') and (check_level(tc.ID, GM_ATHENA_H)) ) then error_msg := command_athena_h(tc, str)
             else if ( (copy(str, 1, length('help')) = 'help') and (check_level(tc.ID, GM_ATHENA_HELP)) ) then error_msg := command_athena_help(tc, str)
             else if ( (copy(str, 1, length('zeny')) = 'zeny') and (check_level(tc.ID, GM_ATHENA_ZENY)) ) then error_msg := command_athena_zeny(tc, str)
 			else if ( (copy(str, 1, length('baselvlup')) = 'baselvlup') and (check_level(tc.ID, GM_ATHENA_BASELVLUP)) ) then error_msg := command_athena_baselvlup(tc, str)
@@ -3592,6 +3597,40 @@ Called when we're shutting down the server *only*
             end;
         end;
         sl.Free;
+    end;
+
+    function command_athena_h(tc : TChara; str : String) : String;
+    var
+    	helpfile : TStringList;
+        sl : TStringList;
+        length : Integer;
+        i : Integer;
+    begin
+        Result := 'GM_ATHENA_H Failure.';
+
+        sl := TStringList.Create;
+        sl.DelimitedText := Copy(str, 6, 256);
+
+        helpfile := TStringList.Create;
+        try
+            helpfile.LoadFromFile(AppPath + 'documents\help.txt');
+        except
+            on EFOpenError do begin
+                message_green(tc, 'File not accessible. Contact your server admin.');
+                Result := Result + ' File not accessible.';
+                helpfile.Free;
+                Exit;
+            end;
+        end;
+
+        if helpfile.Count > 150 then length := 150 else length := helpfile.Count;
+        for i := 0 to length do begin
+            message_green(tc, helpfile[i]);
+        end;
+
+        sl.Free;
+        helpfile.Free;
+        Result := 'GM_ATHENA_H Success.';
     end;
 
     function command_athena_help(tc : TChara; str : String) : String;
