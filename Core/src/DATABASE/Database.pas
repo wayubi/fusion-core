@@ -1591,6 +1591,10 @@ begin
 			Stat2         := StrToInt(sl.Strings[11]);
 {èCê≥ÉRÉRÇ‹Ç≈}
 			Option        := StrToInt(sl.Strings[12]);
+
+      // AlexKreuz: Added to reset hide status on load.
+      if Option = 4 then Option := 0;
+
 			Karma         := StrToInt(sl.Strings[13]);
 			Manner        := StrToInt(sl.Strings[14]);
 
@@ -2304,7 +2308,14 @@ begin
 				sl.Add(IntToStr(Stat1));
 				sl.Add(IntToStr(Stat2));
 {èCê≥ÉRÉRÇ‹Ç≈}
-				sl.Add(IntToStr(Option));
+
+        // AlexKreuz: Added to prevent saving of Hide.
+        if Option = 4 then begin
+          sl.Add('0');
+        end else begin
+          sl.Add(IntToStr(Option));
+        end;
+
 				sl.Add(IntToStr(Karma));
 				sl.Add(IntToStr(Manner));
 
