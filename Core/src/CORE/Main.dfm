@@ -1,14 +1,14 @@
 object frmMain: TfrmMain
-  Left = 364
-  Top = 132
+  Left = 310
+  Top = 147
   Width = 408
-  Height = 537
+  Height = 518
   Caption = '#33'
   Color = clCream
-  Font.Charset = SHIFTJIS_CHARSET
+  Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'MS P????'
+  Font.Name = 'Trebuchet MS'
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
@@ -16,7 +16,7 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 16
+  TextHeight = 18
   object lbl00: TLabel
     Left = 189
     Top = 9
@@ -28,7 +28,7 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 464
+    Top = 445
     Width = 400
     Height = 19
     Color = clCream
@@ -45,11 +45,17 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 400
-    Height = 464
+    Height = 445
     ActivePage = TabSheet1
     Align = alClient
     Constraints.MinHeight = 445
     Constraints.MinWidth = 400
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Trebuchet MS'
+    Font.Style = []
+    ParentFont = False
     TabIndex = 0
     TabOrder = 1
     OnChange = PageControl1Change
@@ -57,12 +63,12 @@ object frmMain: TfrmMain
       Caption = 'Server Console'
       DesignSize = (
         392
-        433)
+        412)
   object txtDebug: TMemo
     Left = 0
         Top = 0
         Width = 392
-        Height = 404
+        Height = 383
         Anchors = [akLeft, akTop, akRight, akBottom]
     Color = 14071432
     Font.Charset = DEFAULT_CHARSET
@@ -77,7 +83,7 @@ object frmMain: TfrmMain
   end
       object Edit1: TEdit
     Left = 0
-        Top = 406
+        Top = 385
         Width = 392
         Height = 26
         Anchors = [akLeft, akRight, akBottom]
@@ -149,8 +155,8 @@ object frmMain: TfrmMain
       object Label17: TLabel
         Left = 160
         Top = 208
-        Width = 74
-        Height = 16
+        Width = 70
+        Height = 18
         Caption = 'Coming Soon'
       end
     end
@@ -161,64 +167,64 @@ object frmMain: TfrmMain
         Left = 264
         Top = 8
         Width = 65
-        Height = 16
+        Height = 18
         Caption = 'Account ID:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label2: TLabel
         Left = 264
         Top = 48
-        Width = 87
-        Height = 16
+        Width = 85
+        Height = 18
         Caption = 'Account Name:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
     end
       object Label3: TLabel
         Left = 264
         Top = 88
-      Width = 108
-        Height = 16
+        Width = 106
+        Height = 18
         Caption = 'Account Password:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label4: TLabel
         Left = 264
         Top = 128
-        Width = 73
-        Height = 16
+        Width = 74
+        Height = 18
         Caption = 'Account Sex:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label5: TLabel
         Left = 264
         Top = 168
-        Width = 84
-        Height = 16
+        Width = 82
+        Height = 18
         Caption = 'Account Email:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
@@ -226,142 +232,142 @@ object frmMain: TfrmMain
         Left = 264
         Top = 208
         Width = 96
-        Height = 16
+        Height = 18
         Caption = 'Account Banned:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label7: TLabel
         Left = 8
         Top = 248
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 1:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label8: TLabel
         Left = 136
         Top = 248
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 2:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label9: TLabel
         Left = 264
         Top = 248
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 3:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label10: TLabel
         Left = 8
         Top = 288
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 4:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label11: TLabel
         Left = 136
         Top = 288
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 5:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label12: TLabel
         Left = 264
         Top = 288
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 6:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label13: TLabel
         Left = 8
         Top = 328
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 7:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label14: TLabel
         Left = 136
         Top = 328
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 8:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
         Font.Style = []
         ParentFont = False
       end
       object Label15: TLabel
         Left = 264
         Top = 328
-        Width = 72
-        Height = 16
+        Width = 69
+        Height = 18
         Caption = 'Character 9:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
       Font.Style = []
       ParentFont = False
     end
       object Label16: TLabel
         Left = 8
         Top = 8
-        Width = 72
-        Height = 16
+        Width = 74
+        Height = 18
         Caption = 'Account List:'
-        Font.Charset = SHIFTJIS_CHARSET
+        Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
-        Font.Name = 'MS P????'
+        Font.Name = 'Trebuchet MS'
       Font.Style = []
       ParentFont = False
       end
@@ -370,7 +376,13 @@ object frmMain: TfrmMain
         Top = 24
         Width = 249
         Height = 225
-        ItemHeight = 16
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ItemHeight = 18
+        ParentFont = False
         TabOrder = 0
         OnClick = ListBox1Click
       end
@@ -378,109 +390,199 @@ object frmMain: TfrmMain
         Left = 264
         Top = 24
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
       TabOrder = 1
       end
       object Edit3: TEdit
         Left = 264
         Top = 64
         Width = 121
-        Height = 24
+        Height = 26
         Color = 12582911
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 2
       end
       object Edit4: TEdit
         Left = 264
         Top = 104
         Width = 121
-        Height = 24
+        Height = 26
         Color = 12582911
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 3
       end
       object Edit5: TEdit
         Left = 264
         Top = 144
         Width = 121
-        Height = 24
+        Height = 26
         Color = 12582911
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 4
       end
       object Edit6: TEdit
         Left = 264
         Top = 184
         Width = 121
-        Height = 24
+        Height = 26
         Color = 12582911
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 5
       end
       object Edit7: TEdit
         Left = 264
         Top = 224
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 6
       end
       object Edit8: TEdit
         Left = 8
         Top = 264
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 7
       end
       object Edit9: TEdit
         Left = 136
         Top = 264
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 8
       end
       object Edit10: TEdit
         Left = 264
         Top = 264
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 9
       end
       object Edit11: TEdit
         Left = 8
         Top = 304
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 10
       end
       object Edit12: TEdit
         Left = 136
         Top = 304
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 11
       end
       object Edit13: TEdit
         Left = 264
         Top = 304
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 12
       end
       object Edit14: TEdit
         Left = 8
         Top = 344
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 13
       end
       object Edit15: TEdit
         Left = 136
         Top = 344
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 14
       end
       object Edit16: TEdit
         Left = 264
         Top = 344
         Width = 121
-        Height = 24
+        Height = 26
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Trebuchet MS'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 15
       end
       object Button3: TButton
