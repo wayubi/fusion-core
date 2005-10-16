@@ -16,8 +16,8 @@ uses
         SysUtils, Variants, Classes, IniFiles, Types,
 	{Fusion Units}
     	Login, CharaSel, Script, Game, Path, Database, Common, MonsterAI, Buttons,
-    	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, JCon, Globals,
-        PacketProcesses, ISCS, WAC, Game2,
+    	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, Globals,
+        PacketProcesses, WAC, Game2,
     {3rd Party Units}
     	List32, Zip, WSocket;
 
@@ -49,313 +49,20 @@ type
 		Button1: TButton;
 		StatusBar1: TStatusBar;
 		BackupTimer: TTimer;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     Exit1: TMenuItem;
     Server1: TMenuItem;
     Start1: TMenuItem;
     Stop1: TMenuItem;
-    TabSheet3: TTabSheet;
-    ListBox1: TListBox;
-    Label2: TLabel;
-    Edit3: TEdit;
-    Label3: TLabel;
-    Edit4: TEdit;
-    Label4: TLabel;
-    Label5: TLabel;
-    Edit6: TEdit;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
-    Label10: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
-    Label14: TLabel;
-    Label15: TLabel;
-    Label16: TLabel;
-    Button3: TButton;
-    Button4: TButton;
-    PageControl2: TPageControl;
-    TabSheet4: TTabSheet;
-    TabSheet5: TTabSheet;
-    Label17: TLabel;
-    Label18: TLabel;
-    Label19: TLabel;
-    Label20: TLabel;
-    Label21: TLabel;
-    Label22: TLabel;
-    Edit17: TEdit;
-    Edit18: TEdit;
-    Edit19: TEdit;
-    Edit20: TEdit;
-    Edit21: TEdit;
-    Edit22: TEdit;
-    Button5: TButton;
-    Label23: TLabel;
-    Label24: TLabel;
-    Edit23: TEdit;
-    Edit24: TEdit;
-    Label25: TLabel;
-    Edit25: TEdit;
-    Label26: TLabel;
-    Edit26: TEdit;
-    Label27: TLabel;
-    ComboBox1: TComboBox;
-    Label28: TLabel;
-    Label29: TLabel;
-    Label30: TLabel;
-    Label31: TLabel;
-    Label32: TLabel;
-    Label33: TLabel;
-    Edit29: TEdit;
-    Edit30: TEdit;
-    Edit31: TEdit;
-    Label34: TLabel;
-    Label35: TLabel;
-    Label36: TLabel;
-    Label37: TLabel;
-    ComboBox2: TComboBox;
-    ComboBox3: TComboBox;
-    ComboBox4: TComboBox;
-    ComboBox5: TComboBox;
-    ComboBox6: TComboBox;
-    ComboBox7: TComboBox;
-    ComboBox8: TComboBox;
-    ComboBox16: TComboBox;
-    Button2: TButton;
-    Edit37: TEdit;
-    Edit38: TEdit;
-    Edit39: TEdit;
-    Edit40: TEdit;
-    Edit42: TEdit;
-    Label43: TLabel;
-    Label44: TLabel;
-    Label45: TLabel;
-    Label49: TLabel;
-    Label50: TLabel;
-    Label51: TLabel;
-    Label52: TLabel;
-    Label53: TLabel;
-    Label55: TLabel;
-    Label56: TLabel;
-    Label57: TLabel;
-    Label58: TLabel;
-    Label59: TLabel;
-    ComboBox17: TComboBox;
-    Label38: TLabel;
-    Label54: TLabel;
-    Label39: TLabel;
-    Edit27: TEdit;
-    Label40: TLabel;
-    Edit28: TEdit;
-    Label41: TLabel;
-    Edit43: TEdit;
-    Label42: TLabel;
-    Label46: TLabel;
-    Edit44: TEdit;
-    Label47: TLabel;
-    Edit45: TEdit;
-    Edit32: TEdit;
-    Edit33: TEdit;
-    Edit34: TEdit;
-    Edit35: TEdit;
-    ComboBox9: TComboBox;
-    ComboBox10: TComboBox;
-    ComboBox11: TComboBox;
-    ComboBox12: TComboBox;
-    ComboBox13: TComboBox;
     Control1: TMenuItem;
     MinimizetoTray2: TMenuItem;
-    Label48: TLabel;
-    ComboBox14: TComboBox;
     Database1: TMenuItem;
     Save1: TMenuItem;
     Backup1: TMenuItem;
-    Button6: TButton;
-    ComboBox15: TComboBox;
-    ComboBox18: TComboBox;
-    Button7: TButton;
-    Button8: TButton;
-    Button9: TButton;
-    Button10: TButton;
-    Button11: TButton;
-    Button12: TButton;
-    Button13: TButton;
-    Button14: TButton;
-    Button15: TButton;
     S1: TMenuItem;
-    ConnecttoISCS1: TMenuItem;
     EnableWebAccountCreator1: TMenuItem;
-    Label60: TLabel;
-    Edit5: TEdit;
-    TabSheet7: TTabSheet;
-    Edit53: TEdit;
-    Label65: TLabel;
     DNSUpdateTimer: TTimer;
-    PageControl3: TPageControl;
-    TabSheet6: TTabSheet;
-    Label95: TLabel;
-    Label96: TLabel;
-    ListBox3: TListBox;
-    Button17: TButton;
-    Button18: TButton;
-    Edit8: TEdit;
-    Button19: TButton;
-    Button20: TButton;
-    Button21: TButton;
-    TabSheet9: TTabSheet;
-    Label61: TLabel;
-    Label63: TLabel;
-    Label64: TLabel;
-    Label67: TLabel;
-    Label62: TLabel;
-    Label66: TLabel;
-    Label68: TLabel;
-    Label69: TLabel;
-    Label70: TLabel;
-    Label71: TLabel;
-    Label72: TLabel;
-    Label73: TLabel;
-    Label74: TLabel;
-    Label75: TLabel;
-    Label76: TLabel;
-    Label77: TLabel;
-    Label78: TLabel;
-    Label79: TLabel;
-    Label80: TLabel;
-    Label94: TLabel;
-    Label93: TLabel;
-    Label92: TLabel;
-    Label91: TLabel;
-    Label90: TLabel;
-    Label89: TLabel;
-    Label88: TLabel;
-    Label87: TLabel;
-    Label86: TLabel;
-    Label84: TLabel;
-    Label83: TLabel;
-    Label82: TLabel;
-    Label81: TLabel;
-    Label98: TLabel;
-    Label99: TLabel;
-    Label102: TLabel;
-    Label101: TLabel;
-    Label100: TLabel;
-    Label103: TLabel;
-    Label104: TLabel;
-    Label105: TLabel;
-    Label106: TLabel;
-    Label107: TLabel;
-    Label108: TLabel;
-    Label109: TLabel;
-    Label114: TLabel;
-    Label112: TLabel;
-    Label113: TLabel;
-    Label117: TLabel;
-    Label118: TLabel;
-    Edit52: TEdit;
-    Edit15: TEdit;
-    Edit14: TEdit;
-    Edit10: TEdit;
-    ListBox2: TListBox;
-    Edit11: TEdit;
-    Edit12: TEdit;
-    Edit13: TEdit;
-    Edit16: TEdit;
-    Edit36: TEdit;
-    Edit41: TEdit;
-    Edit46: TEdit;
-    Edit47: TEdit;
-    Edit48: TEdit;
-    Edit49: TEdit;
-    Edit50: TEdit;
-    Edit51: TEdit;
-    Button16: TButton;
-    Edit67: TEdit;
-    Edit66: TEdit;
-    Edit65: TEdit;
-    Edit64: TEdit;
-    Edit63: TEdit;
-    Edit61: TEdit;
-    Edit59: TEdit;
-    Edit57: TEdit;
-    Edit56: TEdit;
-    Edit55: TEdit;
-    Edit54: TEdit;
-    Edit60: TEdit;
-    Edit62: TEdit;
-    Edit68: TEdit;
-    Edit69: TEdit;
-    Edit70: TEdit;
-    Edit71: TEdit;
-    Edit72: TEdit;
-    Edit73: TEdit;
-    Edit74: TEdit;
-    TabSheet10: TTabSheet;
-    Label119: TLabel;
-    Label120: TLabel;
-    Label121: TLabel;
-    Label122: TLabel;
-    Label123: TLabel;
-    Label124: TLabel;
-    Label125: TLabel;
-    Label126: TLabel;
-    Label127: TLabel;
-    Label97: TLabel;
-    ListBox4: TListBox;
-    CheckBox1: TCheckBox;
-    ComboBox19: TComboBox;
-    Edit58: TEdit;
-    Edit75: TEdit;
-    Edit76: TEdit;
-    Edit77: TEdit;
-    Edit78: TEdit;
-    Button22: TButton;
-    Edit85: TEdit;
-    TabSheet14: TTabSheet;
-    ListBox5: TListBox;
-    ListBox6: TListBox;
-    Label128: TLabel;
-    Label129: TLabel;
-    Label130: TLabel;
-    Label85: TLabel;
-    ListBox7: TListBox;
-    ListBox8: TListBox;
-    Label110: TLabel;
-    Label111: TLabel;
-    Button23: TButton;
-    Button24: TButton;
-    ComboBox20: TComboBox;
-    Label115: TLabel;
-    CheckBox2: TCheckBox;
-    Label116: TLabel;
-    Label131: TLabel;
-    Button25: TButton;
-    Edit79: TEdit;
-    Edit80: TEdit;
-    Label132: TLabel;
-    Label133: TLabel;
-    Label134: TLabel;
-    Label135: TLabel;
-    Menu1: TMenuItem;
-    Console1: TMenuItem;
-    Options1: TMenuItem;
-    Administration1: TMenuItem;
-    Accounts1: TMenuItem;
-    Characters1: TMenuItem;
-    Label1: TLabel;
-    Combo_ISCS: TComboBox;
-    Label136: TLabel;
-    ListBox9: TListBox;
-    Label137: TLabel;
-    ComboBox21: TComboBox;
-    Label139: TLabel;
-    ComboBox22: TComboBox;
     Help1: TMenuItem;
     Bugtracker1: TMenuItem;
     FusionHomepage1: TMenuItem;
@@ -429,55 +136,19 @@ type
     procedure Start1Click(Sender: TObject);
     procedure Stop1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
-    procedure PageControl1Change(Sender: TObject);
-    procedure ListBox1Click(Sender: TObject);
-    procedure ListBox9Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
 
     procedure PriorityUpdate(prioramount : Integer);
-    procedure PageControl2Change(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
     procedure MinimizetoTray2Click(Sender: TObject);
     procedure Save1Click(Sender: TObject);
     procedure Backup1Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Clic(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
-    procedure Button11Click(Sender: TObject);
-    procedure Button12Click(Sender: TObject);
-    procedure Button13Click(Sender: TObject);
-    procedure Button14Click(Sender: TObject);
-    procedure Button15Click(Sender: TObject);
     procedure S1Click(Sender: TObject);
-    procedure ConnecttoISCS1Click(Sender: TObject);
     procedure EnableWebAccountCreator1Click(Sender: TObject);
-    procedure Button16Click(Sender: TObject);
-    procedure ListBox2Click(Sender: TObject);
-    procedure PageControl3Change(Sender: TObject);
-    procedure Button17Click(Sender: TObject);
-    procedure Button18Click(Sender: TObject);
-    procedure ListBox3Click(Sender: TObject);
-    procedure Edit8KeyPress(Sender: TObject; var Key: Char);
-    procedure Button19Click(Sender: TObject);
-    procedure Button20Click(Sender: TObject);
-    procedure Button21Click(Sender: TObject);
-    procedure ListBox4Click(Sender: TObject);
+
+
+
     procedure DNSUpdateTimerTimer(Sender: TObject);
-    procedure Button22Click(Sender: TObject);
-    procedure CheckBox2Click(Sender: TObject);
-    procedure ListBox7Click(Sender: TObject);
-    procedure Button23Click(Sender: TObject);
-    procedure Button25Click(Sender: TObject);
-    procedure Button24Click(Sender: TObject);
-    procedure ListBox8Click(Sender: TObject);
-    procedure Options1Click(Sender: TObject);
-    procedure Console1Click(Sender: TObject);
-    procedure Accounts1Click(Sender: TObject);
-    procedure Characters1Click(Sender: TObject);
+
+
     procedure Bugtracker1Click(Sender: TObject);
     procedure FusionHomepage1Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
@@ -552,7 +223,6 @@ begin
 	AppPath := ExtractFilePath(ParamStr(0));
     Caption := ' Fusion Server Software - ' + RELEASE_VERSION;
 
-    Combo_ISCS.ItemIndex := 0;
 
 	//Alex' new GM command initialization
 	load_commands();
@@ -1216,7 +886,7 @@ begin
 	SetPriorityClass(GetCurrentProcess(), PriorityClass);
 
 
-
+                 {
         a := strtoint(floattostr(hextoint(copy(Option_Back_Color, 1, 2))));
         b := strtoint(floattostr(hextoint(copy(Option_Back_Color, 3, 2))));
         c := strtoint(floattostr(hextoint(copy(Option_Back_Color, 5, 2))));
@@ -1243,7 +913,7 @@ begin
                 end;
         end;
 
-
+            }
 	ini.Free;
 	SL.Free;
 
@@ -1295,8 +965,6 @@ begin
         DNSUpdateTimer.Interval := Option_DNS_Update * 1000;
     end;
 
-
-    if (Option_Enable_ISCS) then frmMain.ConnecttoISCS1Click(self);
 
 
 {U0x003bÉRÉRÇ‹Ç≈}
@@ -1785,7 +1453,6 @@ var
 
 begin
 
-    iscs_console_disconnect(Socket.Data);
     DataSave();
 
     if Assigned(Socket.Data) then begin
@@ -1834,7 +1501,6 @@ procedure TfrmMain.sv3ClientError(Sender: TObject;
 	var ErrorCode: Integer);
 begin
 
-    iscs_console_disconnect(Socket.Data);
     DataSave();
 
 	if UseSQL then SQLDataSave();
@@ -10728,9 +10394,7 @@ var
 label ExitParse;
 begin
 
-    if (Combo_ISCS.ItemIndex = 1) and (ISCS_ON) then begin
-        iscs_console_send(Edit1.Text);
-    end else if Copy(Edit1.Text, 1, 1) = '-' then begin
+    if Copy(Edit1.Text, 1, 1) = '-' then begin
 
         sl := TStringList.Create;
         sl.DelimitedText := Copy(Edit1.Text, 2, 256);
@@ -10976,7 +10640,6 @@ end;
 
 procedure TfrmMain.Exit1Click(Sender: TObject);
 begin
-    if (ISCS_ON) then iscs_console_disconnect();
 	frmMain.Close;
 end;
 
@@ -11026,128 +10689,8 @@ begin
     {$ENDIF}
 end;
 
-procedure TfrmMain.PageControl1Change(Sender: TObject);
-begin
-	if (TabSheet1.Showing) then begin
-    end else if (TabSheet3.Showing) then begin
-		JCon_Accounts_Load();
-    end else if (TabSheet4.Showing) then begin
-    	JCon_INI_Server_Load();
-    end else if (TabSheet6.Showing) then begin
-        JCon_Characters_Online();
-        //ShowMessage('Under Development, This section does not work.');
-    end;
 
 
-end;
-
-procedure TfrmMain.ListBox1Click(Sender: TObject);
-begin
-	JCon_Accounts_Populate(0);
-end;
-
-procedure TfrmMain.ListBox9Click(Sender: TObject);
-begin
-    JCon_Accounts_Populate(1);
-end;
-
-procedure TfrmMain.Button3Click(Sender: TObject);
-begin
-	JCon_Accounts_Clear();
-end;
-
-procedure TfrmMain.Button4Click(Sender: TObject);
-begin
-	JCon_Accounts_Save();
-end;
-
-procedure TfrmMain.Button6Click(Sender: TObject);
-begin
-	JCon_Accounts_Delete();
-end;
-
-procedure TfrmMain.Button7Clic(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button7.Caption);
-end;
-
-procedure TfrmMain.Button8Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button8.Caption);
-end;
-
-procedure TfrmMain.Button9Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button9.Caption);
-end;
-
-procedure TfrmMain.Button10Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button10.Caption);
-end;
-
-procedure TfrmMain.Button11Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button11.Caption);
-end;
-
-procedure TfrmMain.Button12Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button12.Caption);
-end;
-
-procedure TfrmMain.Button13Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button13.Caption);
-end;
-
-procedure TfrmMain.Button14Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button14.Caption);
-end;
-
-procedure TfrmMain.Button15Click(Sender: TObject);
-begin
-	JCon_Accounts_Chara_Delete(frmMain.Button15.Caption);
-end;
-
-procedure TfrmMain.Button5Click(Sender: TObject);
-begin
-	JCon_INI_Server_Save();
-end;
-
-procedure TfrmMain.PageControl2Change(Sender: TObject);
-begin
-	if (TabSheet4.Showing) then begin
-    	JCon_INI_Server_Load();
-    end else if (TabSheet5.Showing) then begin
-    	JCon_INI_Game_Load();
-    end;
-end;
-
-procedure TfrmMain.Button2Click(Sender: TObject);
-begin
-	JCon_INI_Game_Save();
-end;
-
-procedure TfrmMain.ConnecttoISCS1Click(Sender: TObject);
-begin
-    if not (ISCS_ON) then begin
-        ConnecttoISCS1.Caption := 'Disconnect from ISCS';
-        Option_Enable_ISCS := True;
-        iscs_console_connect();
-        debugout.Lines.Add('- Inter-Server Communication System Activated -');
-        Combo_ISCS.ItemIndex := 1;
-    end
-
-    else begin
-        ConnecttoISCS1.Caption := 'Connect to ISCS';
-        Option_Enable_ISCS := False;
-        iscs_console_disconnect();
-        debugout.Lines.Add('- Inter-Server Communication System Deactivated -');
-        Combo_ISCS.ItemIndex := 0;
-    end;
-end;
 
 procedure TfrmMain.EnableWebAccountCreator1Click(Sender: TObject);
 begin
@@ -11164,82 +10707,6 @@ begin
     end;
 end;
 
-procedure TfrmMain.ListBox2Click(Sender: TObject);
-begin
-    JCon_Characters_Populate();
-end;
-
-procedure TfrmMain.Button16Click(Sender: TObject);
-begin
-    JCon_Characters_Save();
-end;
-
-//character tabs
-procedure TfrmMain.PageControl3Change(Sender: TObject);
-begin
-	if (TabSheet6.Showing) then begin
-    	JCon_Characters_Online();
-    end else if (TabSheet9.Showing) then begin
-    	JCon_Characters_Load();
-    end else if (TabSheet10.Showing) then begin
-        JCon_Chara_Inv_Load();
-        JCon_Chara_Cart_Load();
-        JCon_Chara_Store_Load();
-    end else if (TabSheet14.Showing) then begin
-        JCon_Chara_Flag_Load();
-        frmMain.CheckBox2.Checked := True;  //this controls skill load
-    end;
-end;
-
-//online refresh
-procedure TfrmMain.Button17Click(Sender: TObject);
-begin
-    JCon_Characters_Online();
-end;
-
-//online list kick
-procedure TfrmMain.Button18Click(Sender: TObject);
-begin
-    JCon_Chara_KickProcess;
-end;
-
-//Kick Ban
-procedure TfrmMain.Button20Click(Sender: TObject);
-begin
-    JCon_Chara_KickProcess(True);
-end;
-
-//setting a temp name for the online list
-procedure TfrmMain.ListBox3Click(Sender: TObject);
-begin
-    JCon_Chara_Online_Populate();
-end;
-
-//Hitting enter for CharaPM
-procedure TfrmMain.Edit8KeyPress(Sender: TObject; var Key: Char);
-begin
-    if Key = #13 then begin
-        JCon_Chara_Online_PM();
-    end;
-end;
-
-//charaPM
-procedure TfrmMain.Button19Click(Sender: TObject);
-begin
-    JCon_Chara_Online_PM();
-end;
-
-//Move a stuck character to last saved location (ex. out of a wall, or isolated area)
-procedure TfrmMain.Button21Click(Sender: TObject);
-begin
-    JCon_Chara_Online_Rescue();
-end;
-
-procedure TfrmMain.ListBox4Click(Sender: TObject);
-begin
-    JCon_Chara_Inv_Populate();
-end;
-
 procedure TfrmMain.DNSUpdateTimerTimer(Sender: TObject);
 begin
     WAN_ADDR := cardinal(wsocket_inet_addr(PChar(WAN_IP)));
@@ -11248,65 +10715,7 @@ begin
     debugout.lines.add('[' + TimeToStr(Now) + '] ' + 'DNS Update Complete.');
 end;
 
-procedure TfrmMain.Button22Click(Sender: TObject);
-begin
-    JCon_Chara_Inv_Save();
-end;
 
-procedure TfrmMain.CheckBox2Click(Sender: TObject);
-begin
-    if frmMain.CheckBox2.Checked = true then
-        JCon_Chara_Skill_Load(true)
-    else JCon_Chara_Skill_Load(false);
-end;
-
-procedure TfrmMain.ListBox7Click(Sender: TObject);
-begin
-    JCon_Chara_Skill_Populate();
-end;
-
-procedure TfrmMain.Button23Click(Sender: TObject);
-begin
-    JCon_Chara_Skill_Save();
-end;
-
-procedure TfrmMain.Button25Click(Sender: TObject);
-begin
-    JCon_Chara_Flag_Delete();
-end;
-
-procedure TfrmMain.Button24Click(Sender: TObject);
-begin
-    JCon_Chara_Flag_Save();
-end;
-
-procedure TfrmMain.ListBox8Click(Sender: TObject);
-begin
-    JCon_Chara_Flag_Populate();
-end;
-
-procedure TfrmMain.Options1Click(Sender: TObject);
-begin
-    JCon_INI_Server_Load();
-    TabSheet2.Show;
-end;
-
-procedure TfrmMain.Console1Click(Sender: TObject);
-begin
-    TabSheet1.Show;
-end;
-
-procedure TfrmMain.Accounts1Click(Sender: TObject);
-begin
-    JCon_Accounts_Load();
-    TabSheet3.Show;
-end;
-
-procedure TfrmMain.Characters1Click(Sender: TObject);
-begin
-    JCon_Characters_Online();
-    TabSheet7.Show;
-end;
 
 procedure TfrmMain.Bugtracker1Click(Sender: TObject);
 begin

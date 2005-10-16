@@ -16,7 +16,7 @@ uses
     {Shared}
     Classes, Math, SysUtils, StrUtils,
     {Fusion}
-    Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData, ISCS,
+    Path, Script, Common, Zip, SQLData, FusionSQL, Game_Master, Globals, Database, PlayerData,
     REED_SAVE_PARTIES,
     REED_SAVE_GUILDS,
     REED_DELETE,
@@ -698,11 +698,7 @@ Begin(* Proc sv3PacketProcess() *)
                 end;
                 // ALBGM - Accesss Level Based GM System. Finally, nice and clean.
 
-                if (tc.ISCS) then begin
-                    iscs_console_send(AnsiRightStr(str, length(str) - AnsiPos(' : ', str) - length(' : ') + 1 ), tc );
-                end
-
-                else if (length(str) > 0) then begin
+                if (length(str) > 0) then begin
                 	tm := tc.MData;
 
 					WFIFOW(0, $008e);
@@ -1654,7 +1650,6 @@ Begin(* Proc sv3PacketProcess() *)
 					begin
                     	if not check_attack_lag(tc) then begin
 
-                        iscs_console_disconnect(tc);
                         //DataSave();
 
 						SendCLeave(Socket.Data, 2);

@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------------
+ Fusion 2.000 - November 30th, 2005
+--------------------------------------------------------------------------------
+- Removed all ISCS components and functionality. [AlexKreuz]
+- Removed all JCon components and functionality. [AlexKreuz]
+- Cleaned up ghetto ass gui. [AlexKreuz]
+- Removed all sorts of form objects and clutter. [AlexKreuz]
+
+--------------------------------------------------------------------------------
  Fusion 1.214 - Sometime before we die
 --------------------------------------------------------------------------------
 - 02-18-05: Packet_db packet process framework complete. [Tsusai]

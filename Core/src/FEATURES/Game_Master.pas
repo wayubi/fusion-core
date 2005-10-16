@@ -12,7 +12,7 @@ uses
     {Shared}
     IniFiles, Classes, SysUtils, StrUtils, Dialogs,
     {Fusion}
-    Common, List32, Globals, PlayerData, WeissINI, ISCS, MonsterAI;
+    Common, List32, Globals, PlayerData, WeissINI, MonsterAI;
 
 var
     GM_ALIVE : Byte;
@@ -207,8 +207,6 @@ var
     function command_charstatpoint(tc : TChara; str : String) : String;
     function command_charskillpoint(tc : TChara; str : String) : String;
     function command_changes(tc : TChara; str : String) : String;
-    function command_iscson(tc : TChara) : String;
-    function command_iscsoff(tc : TChara) : String;
     function command_autoloot(tc : TChara) : String;
     function command_gstorage(tc : TChara) : String;
     function command_rcon(str : String) : String;
@@ -660,8 +658,6 @@ Called when we're shutting down the server *only*
             else if ( (copy(str, 1, length('charstatpoint')) = 'charstatpoint') and (check_level(tc, GM_CHARSTATPOINT)) ) then error_msg := command_charstatpoint(tc, str)
             else if ( (copy(str, 1, length('charskillpoint')) = 'charskillpoint') and (check_level(tc, GM_CHARSKILLPOINT)) ) then error_msg := command_charskillpoint(tc, str)
             else if ( (copy(str, 1, length('changes')) = 'changes') and (check_level(tc, GM_CHANGES)) ) then error_msg := command_changes(tc, str)
-            else if ( (copy(str, 1, length('iscson')) = 'iscson') and (check_level(tc, GM_ISCSON)) ) then error_msg := command_iscson(tc)
-            else if ( (copy(str, 1, length('iscsoff')) = 'iscsoff') and (check_level(tc, GM_ISCSOFF)) ) then error_msg := command_iscsoff(tc)
             else if ( (copy(str, 1, length('gstorage')) = 'gstorage') and (check_level(tc, GM_GSTORAGE)) ) then error_msg := command_gstorage(tc)
             else if ( (copy(str, 1, length('rcon')) = 'rcon') and (check_level(tc, GM_RCON)) ) then error_msg := command_rcon(str)
             else if ( (copy(str, 1, length('jail')) = 'jail') and (check_level(tc, GM_JAIL)) ) then error_msg := command_jail(tc, str)
@@ -2987,20 +2983,6 @@ Called when we're shutting down the server *only*
         sl.Free;
         changefile.Free;
         Result := 'GM_CHANGES Success.';
-    end;
-
-    function command_iscson(tc : TChara) : String;
-    begin
-        tc.ISCS := True;
-        iscs_console_connect(tc);
-        Result := 'GM_ISCSON Success.';
-    end;
-
-    function command_iscsoff(tc : TChara) : String;
-    begin
-        tc.ISCS := False;
-        iscs_console_disconnect(tc);
-        Result := 'GM_ISCSOFF Success.';
     end;
 
     function command_autoloot(tc : TChara) : String;
