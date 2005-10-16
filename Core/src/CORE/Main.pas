@@ -19,7 +19,7 @@ uses
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, Globals,
         PacketProcesses, WAC, Game2,
     {3rd Party Units}
-    	List32, Zip, WSocket;
+    	List32, Zip, WSocket, OleCtrls, SHDocVw;
 
 const
     {I know these are windows based, keep away from linux XD}
@@ -66,6 +66,9 @@ type
     Help1: TMenuItem;
     Bugtracker1: TMenuItem;
     FusionHomepage1: TMenuItem;
+    WebBrowser1: TWebBrowser;
+    IRCChatroom1: TMenuItem;
+    WikiDocumentation1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -151,6 +154,8 @@ type
 
     procedure Bugtracker1Click(Sender: TObject);
     procedure FusionHomepage1Click(Sender: TObject);
+    procedure WikiDocumentation1Click(Sender: TObject);
+    procedure IRCChatroom1Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -219,6 +224,8 @@ var
     IP : String;
 
 begin
+
+  WebBrowser1.Navigate('http://fusion.cobax.net');
 
 	AppPath := ExtractFilePath(ParamStr(0));
     Caption := ' Fusion Server Software - ' + RELEASE_VERSION;
@@ -8896,7 +8903,7 @@ begin
 					if pcnt = 0 then begin
 						MoveWait := Tick + 5000;
 					end
-						
+
 					else begin
 						ppos := 0;
 						MoveTick := Tick;
@@ -9486,6 +9493,8 @@ begin
 	sl := TStringList.Create;
 	try
 		cmdStart.Enabled := false;
+
+
 
         try
     		sv1.Active := true;
@@ -10719,12 +10728,24 @@ end;
 
 procedure TfrmMain.Bugtracker1Click(Sender: TObject);
 begin
-    ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net/bugtracker',nil,nil, SW_SHOWNORMAL);
+    //ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net/bugtracker',nil,nil, SW_SHOWNORMAL);
+    WebBrowser1.Navigate('http://mantis.cobax.net');
 end;
 
 procedure TfrmMain.FusionHomepage1Click(Sender: TObject);
 begin
-    ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net',nil,nil, SW_SHOWNORMAL);
+    //ShellExecute(self.WindowHandle,'open','http://fusion.cobax.net',nil,nil, SW_SHOWNORMAL);
+    WebBrowser1.Navigate('http://fusion.cobax.net');
+end;
+
+procedure TfrmMain.WikiDocumentation1Click(Sender: TObject);
+begin
+  WebBrowser1.Navigate('http://fusion.cobax.net/wiki');
+end;
+
+procedure TfrmMain.IRCChatroom1Click(Sender: TObject);
+begin
+  WebBrowser1.Navigate('http://fusion.cobax.net/irc/index.php?servername='+ServerName);
 end;
 
 end.

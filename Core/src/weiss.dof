@@ -96,7 +96,7 @@ PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=..\
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls;VCLXPCtrls;dbrtl;bdertl;Rave50CLX;Rave50VCL;vcldb;dclOfficeXP;teeui;teedb;tee;websnap;inetdb;inet;dsnap;visualclx;visualdbclx;adortl;vclactnband;dss
-Conditionals=
+Conditionals=madExcept
 DebugSourceDirs=
 UsePackages=0
 [Parameters]

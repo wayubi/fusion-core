@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 138
-  Top = 285
-  Width = 784
-  Height = 467
+  Left = 199
+  Top = 54
+  Width = 828
+  Height = 491
   Caption = 's'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,8 +16,8 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnResize = FormResize
   DesignSize = (
-    776
-    421)
+    820
+    445)
   PixelsPerInch = 96
   TextHeight = 18
   object lbl00: TLabel
@@ -32,8 +32,8 @@ object frmMain: TfrmMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 402
-    Width = 776
+    Top = 426
+    Width = 820
     Height = 19
     Panels = <
       item
@@ -44,11 +44,11 @@ object frmMain: TfrmMain
       end>
   end
   object txtDebug: TMemo
-    Left = 0
-    Top = 24
-    Width = 775
-    Height = 377
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Left = 13
+    Top = 147
+    Width = 287
+    Height = 223
+    Anchors = []
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -58,9 +58,10 @@ object frmMain: TfrmMain
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
+    Visible = False
   end
   object Button1: TButton
-    Left = 37
+    Left = 81
     Top = 109
     Width = 108
     Height = 24
@@ -113,7 +114,7 @@ object frmMain: TfrmMain
   object Edit1: TEdit
     Left = 0
     Top = 0
-    Width = 775
+    Width = 819
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
@@ -125,6 +126,20 @@ object frmMain: TfrmMain
     ParentFont = False
     TabOrder = 5
     OnKeyPress = Edit1KeyPress
+  end
+  object WebBrowser1: TWebBrowser
+    Left = 0
+    Top = 0
+    Width = 820
+    Height = 426
+    Align = alClient
+    TabOrder = 6
+    ControlData = {
+      4C000000C0540000072C00000000000000000000000000000000000000000000
+      000000004C000000000000000000000001000000E0D057007335CF11AE690800
+      2B2E126208000000000000004C0000000114020000000000C000000000000046
+      8000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000100000000000000000000000000000000000000}
   end
   object sv1: TServerSocket
     Active = False
@@ -221,13 +236,21 @@ object frmMain: TfrmMain
     end
     object Help1: TMenuItem
       Caption = '&Help'
-      object Bugtracker1: TMenuItem
-        Caption = 'Report &Bugs'
-        OnClick = Bugtracker1Click
-      end
       object FusionHomepage1: TMenuItem
-        Caption = '&Fusion Homepage'
+        Caption = 'Fusion Home Page'
         OnClick = FusionHomepage1Click
+      end
+      object WikiDocumentation1: TMenuItem
+        Caption = 'Documentation'
+        OnClick = WikiDocumentation1Click
+      end
+      object IRCChatroom1: TMenuItem
+        Caption = 'IRC Chatroom'
+        OnClick = IRCChatroom1Click
+      end
+      object Bugtracker1: TMenuItem
+        Caption = 'Report Bugs'
+        OnClick = Bugtracker1Click
       end
     end
   end

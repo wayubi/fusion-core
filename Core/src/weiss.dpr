@@ -3,6 +3,10 @@ program Weiss;
 {$R 'manifest.res' 'manifest.rc'}
 
 uses
+  madExcept,
+  madListHardware,
+  madListProcesses,
+  madListModules,
 
   Forms,
   Main in 'CORE\Main.pas' {frmMain},
