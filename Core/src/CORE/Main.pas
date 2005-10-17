@@ -19,7 +19,7 @@ uses
     	SQLData, FusionSQL, Math, Game_Master, Player_Skills, WeissINI, Globals,
         PacketProcesses, WAC, Game2,
     {3rd Party Units}
-    	List32, Zip, WSocket, OleCtrls, SHDocVw;
+    	List32, Zip, WSocket, OleCtrls, SHDocVw, DB, ADODB;
 
 const
     {I know these are windows based, keep away from linux XD}
@@ -69,6 +69,7 @@ type
     WebBrowser1: TWebBrowser;
     IRCChatroom1: TMenuItem;
     WikiDocumentation1: TMenuItem;
+    ADODataSet1: TADODataSet;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);

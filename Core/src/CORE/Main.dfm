@@ -260,4 +260,10 @@ object frmMain: TfrmMain
     Left = 128
     Top = 480
   end
+  object ADODataSet1: TADODataSet
+    ConnectionString = 'FILE NAME=C:\Program Files\The Fusion Project\mysql.udl'
+    Parameters = <>
+    Left = 144
+    Top = 32
+  end
 end

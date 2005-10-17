@@ -7,7 +7,6 @@ uses
   madListHardware,
   madListProcesses,
   madListModules,
-
   Forms,
   Main in 'CORE\Main.pas' {frmMain},
   Common in 'CORE\Common.pas',
@@ -18,7 +17,7 @@ uses
   Database in 'DATABASE\Database.pas',
   PlayerData in 'DATABASE\PlayerData.pas',
   REED_Support in 'DATABASE\REED_Support.pas',
-  REED_LOAD_ACCOUNTS in 'DATABASE\REED_LOAD_ACCOUNTS.pas',
+  ADODB_LOAD_ACCOUNTS in 'DATABASE\ADODB_LOAD_ACCOUNTS.pas',
   REED_LOAD_CHARACTERS in 'DATABASE\REED_LOAD_CHARACTERS.pas',
   REED_LOAD_PETS in 'DATABASE\REED_LOAD_PETS.pas',
   REED_LOAD_PARTIES in 'DATABASE\REED_LOAD_PARTIES.pas',
@@ -55,7 +54,8 @@ uses
   WSockBuf in '3RDPARTY\WSockBuf.pas',
   BRSHttpSrv in '3RDPARTY\BRSHttpSrv.pas',
   Game2 in 'ZONE\Game2.pas',
-  GameProcesses in 'ZONE\GameProcesses.pas';
+  GameProcesses in 'ZONE\GameProcesses.pas',
+  REED_LOAD_ACCOUNTS in 'DATABASE\REED_LOAD_ACCOUNTS.pas';
 
 {$R *.res}
 

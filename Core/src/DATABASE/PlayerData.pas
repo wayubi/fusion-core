@@ -16,6 +16,7 @@ uses
     {Fusion}
     Common, REED_Support,
     REED_LOAD_ACCOUNTS,
+    ADODB_LOAD_ACCOUNTS,
     REED_LOAD_CHARACTERS,
     REED_LOAD_PETS,
     REED_LOAD_PARTIES,
@@ -49,6 +50,24 @@ uses
     var
         tp : TPlayer;
     begin
+
+      if (UID <> '*') then begin
+        if (PlayerName.IndexOf(UID) = -1) then Exit;
+        tp := PlayerName.Objects[PlayerName.IndexOf(UID)] as TPlayer;
+        UID := IntToStr(tp.ID);
+      end;
+
+      adodb_load_account(UID);
+
+     // ADODB_Load_Accounts(UID);
+
+
+        {
+
+
+      REED DATA OBSOLETE --- BYPASS TO SQL
+
+
         PD_Create_Structure();
 
         if UID <> '*' then begin
@@ -74,6 +93,9 @@ uses
 
         if UID = '*' then debugout.Lines.add('­ Castles ­');
         PD_Load_Castles_Pre_Parse(UID);
+
+        }
+
     end;
 
     procedure PD_PlayerData_Save(forced : Boolean = False);
