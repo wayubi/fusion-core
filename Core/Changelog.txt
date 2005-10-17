@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
  Fusion 2.000 - November 30th, 2005
 ------------------------------------------------------------------------------------------------------------------------
+- 10-17-05: ADODB account data loading completed. [AlexKreuz]
 - 10-16-05: Removed all ISCS components and functionality. [AlexKreuz]
 - 10-16-05: Removed all JCon components and functionality. [AlexKreuz]
 - 10-16-05: Cleaned up ghetto ass gui. [AlexKreuz]
