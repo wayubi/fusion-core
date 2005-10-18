@@ -9490,8 +9490,30 @@ var
 
     x, y : Integer;
 
+    proc_mysql : PROCESS_INFORMATION;
+    proc_apache : PROCESS_INFORMATION;
+    start : STARTUPINFO;
+
 label ExitWarpSearch;
 begin
+
+  // Initialize the STARTUPINFO structure
+  start.cb := sizeof(start);
+  start.lpReserved := nil;
+  start.lpDesktop := nil;
+  start.lpTitle := nil;
+  start.cbReserved2 := 0;
+  start.lpReserved2 := nil;
+  start.wShowWindow := SW_HIDE;
+  start.dwFlags := STARTF_USESHOWWINDOW;
+
+  // Kill Processes
+  KillTask('Apache.exe');
+  KillTask('mysqld.exe');
+
+  // Run Processes
+  CreateProcess(nil, '"C:\Program Files\The Fusion Project\MobileServer\bin\mysqld.exe" --skip-innodb', nil, nil, false, NORMAL_PRIORITY_CLASS, nil, 'c:\', start, proc_mysql);
+  CreateProcess(nil, 'c:\progra~1\thefus~1\mobile~1\bin\apache.exe', nil, nil, false, NORMAL_PRIORITY_CLASS, nil, 'c:\progra~1\thefus~1\mobile~1\bin\', start, proc_apache);
 
 	sl := TStringList.Create;
 	try
@@ -10378,6 +10400,10 @@ procedure TfrmMain.cmdStopClick(Sender: TObject);
 begin
 	CancelFlag := true;
 	cmdStop.Enabled := false;
+
+  KillTask('Apache.exe');
+  KillTask('mysqld.exe');
+  
 end;
 //------------------------------------------------------------------------------
 {U0x003b}

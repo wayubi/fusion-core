@@ -84,7 +84,7 @@ uses
 
       frmMain.ADODataSet1.Close;
 
-      Result := tp.ID;
+      //Result := tp.ID;
     end;
 
     // -------------------------------------------------------------------------

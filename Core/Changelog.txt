@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------------------------------------------------------
  Fusion 2.000 - November 30th, 2005
 ------------------------------------------------------------------------------------------------------------------------
+- 10-18-05: Creating Apache & MySQL Processes on Start. Shutting down on Stop. [AlexKreuz]
 - 10-17-05: ADODB chara table loading completed. [AlexKreuz]
 - 10-17-05: Added menuitem for Fusion Control Panel. [AlexKreuz]
 - 10-17-05: ADODB login table loading completed. [AlexKreuz]
