@@ -248,6 +248,10 @@ object frmMain: TfrmMain
         Caption = 'IRC Chatroom'
         OnClick = IRCChatroom1Click
       end
+      object FusionControlPanel1: TMenuItem
+        Caption = 'Fusion Control Panel'
+        OnClick = FusionControlPanel1Click
+      end
       object Bugtracker1: TMenuItem
         Caption = 'Report Bugs'
         OnClick = Bugtracker1Click

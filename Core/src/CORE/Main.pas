@@ -70,6 +70,7 @@ type
     IRCChatroom1: TMenuItem;
     WikiDocumentation1: TMenuItem;
     ADODataSet1: TADODataSet;
+    FusionControlPanel1: TMenuItem;
 
 		procedure FormResize(Sender: TObject); overload;
 		procedure DBsaveTimerTimer(Sender: TObject);
@@ -157,6 +158,7 @@ type
     procedure FusionHomepage1Click(Sender: TObject);
     procedure WikiDocumentation1Click(Sender: TObject);
     procedure IRCChatroom1Click(Sender: TObject);
+    procedure FusionControlPanel1Click(Sender: TObject);
     	//procedure cbxPriorityChange(Sender: TObject);
 
 
@@ -10747,6 +10749,11 @@ end;
 procedure TfrmMain.IRCChatroom1Click(Sender: TObject);
 begin
   WebBrowser1.Navigate('http://fusion.cobax.net/irc/index.php?servername='+ServerName);
+end;
+
+procedure TfrmMain.FusionControlPanel1Click(Sender: TObject);
+begin
+  WebBrowser1.Navigate('http://localhost/CP_4.3.4/');
 end;
 
 end.
