@@ -55,7 +55,8 @@ uses
   BRSHttpSrv in '3RDPARTY\BRSHttpSrv.pas',
   Game2 in 'ZONE\Game2.pas',
   GameProcesses in 'ZONE\GameProcesses.pas',
-  REED_LOAD_ACCOUNTS in 'DATABASE\REED_LOAD_ACCOUNTS.pas';
+  REED_LOAD_ACCOUNTS in 'DATABASE\REED_LOAD_ACCOUNTS.pas',
+  Functions in 'CORE\Functions.pas';
 
 {$R *.res}
 

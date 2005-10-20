@@ -1,6 +1,17 @@
 ------------------------------------------------------------------------------------------------------------------------
  Fusion 2.000 - November 30th, 2005
 ------------------------------------------------------------------------------------------------------------------------
+- 10-19-05: Wrote TItemList.AddItem for later usage when TChara.Item is converted to TChara.Inventory.Item. [AlexKreuz]
+- 10-19-05: Wrote TChara.AddInventoryItem for adding items to inventory. [AlexKreuz]
+- 10-19-05: Wrote TChara.AddCartItem for adding items to cart. [AlexKreuz]
+- 10-19-05: Wrote TPlayer.AddStorageItem for adding items to storage. [AlexKreuz]
+- 10-19-05: Added Functions.pas for a place to write new clean 2.0 functions. [AlexKreuz]
+- 10-19-05: Modified code to startup MySQL, Apache processes on startup and kill processes on shutdown. [AlexKreuz]
+- 10-19-05: Added adodb_load_storage for loading player storage from SQL. [AlexKreuz]
+- 10-19-05: Added adodb_load_memo for loading warp memo points from SQL. [AlexKreuz]
+- 10-19-05: Added adodb_load_skill for loading character skills from SQL. [AlexKreuz]
+- 10-19-05: Added adodb_load_inventory for loading caracter inventory from SQL. [AlexKreuz]
+- 10-19-05: Added adodb_load_cart for loading character merchant cart inventory from SQL. [AlexKreuz]
 - 10-18-05: Creating Apache & MySQL Processes on Start. Shutting down on Stop. [AlexKreuz]
 - 10-17-05: ADODB chara table loading completed. [AlexKreuz]
 - 10-17-05: Added menuitem for Fusion Control Panel. [AlexKreuz]

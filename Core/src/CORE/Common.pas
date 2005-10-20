@@ -240,6 +240,8 @@ type TItemList = class
 
 	Constructor Create;
 	Destructor  Destroy; OverRide;
+
+  Procedure AddItem (ItemIndex : Integer; Item : TItem);
 end;//TItemList
 {追加ココまで}
 //------------------------------------------------------------------------------
@@ -1040,6 +1042,9 @@ TChara = class(TLiving)
     mercenaryIDName   :String;    {Your Mercenaries Monster Name}
     mercenaryCustomName : PChar;  {Your Mercenaries Custom Name}
 
+    procedure AddInventoryItem (tc : TChara; Item : TItem);
+    procedure AddCartItem (tc : TChara; Item : TItem);
+
 	constructor Create;
 	destructor  Destroy; override;
   //procedures to get skilonbool and set skillonbool
@@ -1052,6 +1057,7 @@ TChara = class(TLiving)
     property IceWallCount : Byte
     read fIceWallCount
     write SetIceWallCount;
+
 end;
 //------------------------------------------------------------------------------
 // プレイヤーデータ
@@ -1078,6 +1084,8 @@ TPlayer = class
 	Saved         :byte;
 
     AccessLevel   :byte;
+
+  procedure AddStorageItem (tp : TPlayer; Item : TItem);
 
 	constructor Create;
 	destructor  Destroy; override;
@@ -1952,7 +1960,7 @@ Option_Packet_Out : Boolean;
 
 implementation
 
-uses SQLData, FusionSQL, Player_Skills, Globals, PacketProcesses;
+uses SQLData, FusionSQL, Player_Skills, Globals, PacketProcesses, Functions;
 
 procedure SendLivingDisappear(tm:TMap; tv:TLiving; mode: byte = 0);
 begin
@@ -10911,6 +10919,43 @@ End;(* Proc TItem.ZeroItem
 {=======================}
 
 
+
+
+
+
+
+
+
+
+
+  // *==========================================================================
+  // *-- Purpose: Adds an item into the itemlist.
+  // *-- Requires:
+  // *-- ItemIndex where to add the item
+  // *---- Item to add
+  // *==========================================================================
+  Procedure TItemList.AddItem (ItemIndex : Integer; Item : TItem);
+  Begin
+  (*
+    Item[ItemIndex].ItemID := Item.ID;
+    Item[ItemIndex].Equip := Item.Equip;
+    Item[ItemIndex].Identify := Item.Identify;
+    Item[ItemIndex].Refine := Item.Refine;
+    Item[ItemIndex].Attr := Item.Attr;
+    Item[ItemIndex].Card[0] := Item.Card[0];
+    Item[ItemIndex].Card[1] := Item.Card[1];
+    Item[ItemIndex].Card[2] := Item.Card[2];
+    Item[ItemIndex].Card[3] := Item.Card[3];
+    Item[ItemIndex].Data := Item.Data;
+    Item[ItemIndex].Stolen := 0;
+  *)
+  End;
+  // *==========================================================================
+
+
+
+
+
 //==============================================================================
 // コンストラクタ、デストラクタ
 {追加}
@@ -11014,6 +11059,43 @@ begin
         fIceWallCount := (Option_IceWall_Cap * 5)
     else
         fIceWallCount := Value;
+end;
+
+procedure TChara.AddInventoryItem (tc : TChara; Item : TItem);
+var
+  loopCounter : Integer;
+begin
+  for loopCounter := Low(tc.Item) to High(tc.Item) do begin
+    if (GetInventoryIndex(tc.Item[loopCounter].ID, Item.ID, Item.Equip) = True) then begin
+      AddItem(tc.Item, loopCounter, Item);
+      break;
+    end;
+  end;
+  
+end;
+
+procedure TChara.AddCartItem (tc : TChara; Item : TItem);
+var
+  loopCounter : Integer;
+begin
+  for loopCounter := Low(tc.Cart.Item) to High(tc.Cart.Item) do begin
+    if (GetInventoryIndex(tc.Cart.Item[loopCounter].ID, Item.ID, Item.Equip) = True) then begin
+      AddItem(tc.Cart.Item, loopCounter, Item);
+      break;
+    end;
+  end;
+end;
+
+procedure TPlayer.AddStorageItem (tp : TPlayer; Item : TItem);
+var
+  loopCounter : Integer;
+begin
+  for loopCounter := Low(tp.Kafra.Item) to High(tp.Kafra.Item) do begin
+    if (GetInventoryIndex(tp.Kafra.Item[loopCounter].ID, Item.ID, Item.Equip) = True) then begin
+      AddItem(tp.Kafra.Item, loopCounter, Item);
+      break;
+    end;
+  end;
 end;
 
 

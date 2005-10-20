@@ -7,8 +7,16 @@ uses
 
     procedure adodb_load_account(UID : String = '*');
 
+    // Loads login table.  Returns account_id
     function adodb_load_login(UID : String = '*') : Integer;
-    procedure adodb_load_char(UID : String = '*');
+    procedure adodb_load_storage(account_id : Integer = 0);
+
+    // Loads char table.
+    procedure adodb_load_char(account_id : Integer = 0);
+    procedure adodb_load_memo(account_id : Integer = 0);
+    procedure adodb_load_skill(account_id : Integer = 0);
+    procedure adodb_load_inventory(account_id : Integer = 0);
+    procedure adodb_load_cart(account_id : Integer = 0);
 
 implementation
 
@@ -16,18 +24,27 @@ uses
     Main;
 
     procedure adodb_load_account(UID : String = '*');
+    var
+      account_id : Integer;
+      char_id : Integer;
     begin
 
-
-
       SetPriorityClass(GetCurrentProcess(), $4000);
-      debugout.Lines.Add('Loading eAthena SQL login table');
-      adodb_load_login(UID);
-      debugout.Lines.Add('Loading eAthena SQL char table');
-      adodb_load_char(UID);
+
+      account_id := adodb_load_login(UID);
+      adodb_load_char(account_id);
+
+      // Load these only when a user logs in.
+      adodb_load_storage(account_id);
+      //adodb_load_memo(account_id);
+      //adodb_load_skill(account_id);
+      //adodb_load_inventory(account_id);
+      //adodb_load_cart(account_id);
+
       SetPriorityClass(GetCurrentProcess(), $20);
 
     end;
+
 
     // -------------------------------------------------------------------------
     // Loads data from SQL login table
@@ -36,6 +53,7 @@ uses
     var
       sql : String;
       tp : TPlayer;
+      sl : TStringList;
     begin
 
       // -----------------------------------------------------------------------
@@ -74,9 +92,6 @@ uses
 
           PlayerName.AddObject(tp.Name, tp);
           Player.AddObject(tp.ID, tp);
-
-          //tp := Player.Objects[Player.IndexOf(frmMain.ADODataSet1.FieldByName('account_id').CurValue)] as TPlayer;
-          //debugout.Lines.Add(tp.Name);
         end;
         
         frmMain.ADODataSet1.Next;
@@ -84,26 +99,32 @@ uses
 
       frmMain.ADODataSet1.Close;
 
-      //Result := tp.ID;
+      if (UID = '*') then Result := 0
+      else Result := tp.ID;
     end;
 
+
     // -------------------------------------------------------------------------
-    // Loads data from SQL char table
+    // Loads data from SQL storage table
     // -------------------------------------------------------------------------
-    procedure adodb_load_char(UID : String = '*');
+    procedure adodb_load_storage(account_id : Integer = 0);
     var
       sql : String;
-      tc : TChara;
+      tp : TPlayer;
+      loopCounter : Integer;
+      Item : TItem;
     begin
 
+      // Initialize Variables
+      Item := TItem.Create;
+
       // -----------------------------------------------------------------------
-      // If UID = *, load all login, else load login where userid = UID
+      // If account_id = 0, load all login, else load login where account_id
       // -----------------------------------------------------------------------
-      if (UID = '*') then begin
-        //sql := 'select `char`.char_id, `char`.account_id, `char`.char_num, `char`.name, `char`.class, `char`.base_level, `char`.job_level, `char`.base_exp, `char`.job_exp, `char`.zeny, `char`.str, `char`.agi, `char`.vit, `char`.int, `char`.dex, `char`.luk, `char`.hp, `char`.sp, `char`.status_point, `char`.skill_point, `char`.option, `char`.karma, `char`.manner, `char`.party_id, `char`.guild_id, `char`.pet_id, `char`.hair, `char`.hair_color, `char`.clothes_color, `char`.weapon, `char`.shield, `char`.head_top, `char`.head_mid, `char`.head_bottom, `char`.last_map, `char`.last_x, `char`.last_y, `char`.save_map, `char`.save_x, `char`.save_y from `char`;';
-        sql := 'select `char`.* from `char`;';
+      if (account_id = 0) then begin
+        sql := 'select `storage`.* from `storage`;';
       end else begin
-        //sql := 'select `login`.account_id, `login`.userid, `login`.user_pass, `login`.email, `login`.sex, `login`.level, `login`.ban_until from `login` where `login`.userid = ''' +UID+ ''';';
+        sql := 'select `storage`.* from `storage` where `storage`.account_id = '''+IntToStr(account_id)+''';';
       end;
 
       // -----------------------------------------------------------------------
@@ -117,6 +138,75 @@ uses
       // -----------------------------------------------------------------------
       while not frmMain.ADODataSet1.Eof do begin
 
+        if Player.IndexOf(frmMain.ADODataSet1.FieldByName('account_id').CurValue) = -1 then begin
+          frmMain.ADODataSet1.Next;
+          Continue;
+
+        end else begin
+          tp := Player.Objects[Player.IndexOf(frmMain.ADODataSet1.FieldByName('account_id').CurValue)] as TPlayer;
+
+          if ItemDB.IndexOf(frmMain.ADODataSet1.FieldByName('nameid').CurValue) = -1 then begin
+            frmMain.ADODataSet1.Next;
+            Continue;
+
+          end else begin
+            Item.ID := frmMain.ADODataSet1.FieldByName('nameid').CurValue;
+            Item.Amount := frmMain.ADODataSet1.FieldByName('amount').CurValue;
+            Item.Equip := frmMain.ADODataSet1.FieldByName('equip').CurValue;
+            Item.Identify := frmMain.ADODataSet1.FieldByName('identify').CurValue;
+            Item.Refine := frmMain.ADODataSet1.FieldByName('refine').CurValue;
+            Item.Attr := frmMain.ADODataSet1.FieldByName('attribute').CurValue;
+            Item.Card[0] := frmMain.ADODataSet1.FieldByName('card0').CurValue;
+            Item.Card[1] := frmMain.ADODataSet1.FieldByName('card1').CurValue;
+            Item.Card[2] := frmMain.ADODataSet1.FieldByName('card2').CurValue;
+            Item.Card[3] := frmMain.ADODataSet1.FieldByName('card3').CurValue;
+            Item.Data := ItemDB.Objects[ItemDB.IndexOf(Item.ID)] as TItemDB;
+
+            tp.AddStorageItem(tp, Item);
+            Item.ZeroItem;
+
+            frmMain.ADODataSet1.Next;
+            
+          end;
+
+        end;
+  
+      end;
+
+      frmMain.ADODataSet1.Close;
+      
+    end;
+
+
+    // -------------------------------------------------------------------------
+    // Loads data from SQL char table
+    // -------------------------------------------------------------------------
+    procedure adodb_load_char(account_id : Integer = 0);
+    var
+      sql : String;
+      tc : TChara;
+      loopCounter : Integer;
+    begin
+
+      // -----------------------------------------------------------------------
+      // If account_id = 0, load all login, else load login where account_id
+      // -----------------------------------------------------------------------
+      if (account_id = 0) then begin
+        sql := 'select `char`.* from `char`;';
+      end else begin
+        sql := 'select `char`.* from `char` where `char`.account_id = '''+IntToStr(account_id)+'''';
+      end;
+
+      // -----------------------------------------------------------------------
+      // Set and execute SQL
+      // -----------------------------------------------------------------------
+      frmMain.ADODataSet1.CommandText := sql;
+      frmMain.ADODataSet1.Open;
+
+      // -----------------------------------------------------------------------
+      // Loop through results and assign data to variables
+      // -----------------------------------------------------------------------
+      while not frmMain.ADODataSet1.Eof do begin
         tc := TChara.Create;
 
         tc.CID := frmMain.ADODataSet1.FieldByName('char_id').CurValue;
@@ -178,11 +268,29 @@ uses
         tc.PLv := retrieve_data(43, datafile, path, 1);
         }
 
+
+        // ---------------------------------------------------------------------
+        // Loop through and reset all the assigned skills
+        // ---------------------------------------------------------------------
+        //for loopCounter := 0 to MAX_SKILL_NUMBER do begin
+        //  if SkillDB.IndexOf(loopCounter) <> -1 then begin
+        //    tc.Skill[loopCounter].Data := SkillDB.IndexOfObject(loopCounter) as TSkillDB;
+        //    tc.Skill[loopCounter].Lv := 0;
+        //  end;
+        //end;
+        
+        //if (tc.Plag <> 0) then tc.Skill[tc.Plag].Plag := True;
+
+        // ---------------------------------------------------------------------
+        // Loop through and reset the inventory
+        // ---------------------------------------------------------------------
+        //for loopCounter := 0 to 99 do begin
+        //  tc.Item[loopCounter].ZeroItem;
+        //end;
+
+
         CharaName.AddObject(tc.Name, tc);
         Chara.AddObject(tc.CID, tc);
-
-        //tc := Chara.Objects[Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue)] as TChara;
-        //debugout.Lines.Add(tc.Name);
 
         frmMain.ADODataSet1.Next;
       end;
@@ -190,6 +298,257 @@ uses
       frmMain.ADODataSet1.Close;
       
     end;
+
+
+    // -------------------------------------------------------------------------
+    // Loads data from SQL memo table
+    // -------------------------------------------------------------------------
+    procedure adodb_load_memo(account_id : Integer = 0);
+    var
+      sql : String;
+      tc : TChara;
+      loopCounter : Integer;
+    begin
+
+      // -----------------------------------------------------------------------
+      // If account_id = 0, load all login, else load login where account_id
+      // -----------------------------------------------------------------------
+      if (account_id = 0) then begin
+        sql := 'select `memo`.* from `memo`;';
+      end else begin
+        sql := 'select `memo`.*, `char`.account_id from `memo` inner join `char` on `memo`.char_id = `char`.char_id where `char`.account_id = '''+IntToStr(account_id)+''';';
+      end;
+
+      // -----------------------------------------------------------------------
+      // Set and execute SQL
+      // -----------------------------------------------------------------------
+      frmMain.ADODataSet1.CommandText := sql;
+      frmMain.ADODataSet1.Open;
+
+      // -----------------------------------------------------------------------
+      // Loop through results and assign data to variables
+      // -----------------------------------------------------------------------
+      while not frmMain.ADODataSet1.Eof do begin
+
+        if Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue) = -1 then Continue;
+        tc := Chara.Objects[Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue)] as TChara;
+
+        for loopCounter := 0 to 2 do begin
+          if (tc.MemoMap[loopCounter] = '') then begin
+            tc.MemoMap[loopCounter] := frmMain.ADODataSet1.FieldByName('map').CurValue;
+            tc.MemoPoint[loopCounter].X := frmMain.ADODataSet1.FieldByName('x').CurValue;
+            tc.MemoPoint[loopCounter].Y := frmMain.ADODataSet1.FieldByName('y').CurValue;
+          end;
+        end;
+
+        frmMain.ADODataSet1.Next;
+      end;
+
+      frmMain.ADODataSet1.Close;
+      
+    end;
+
+
+    // -------------------------------------------------------------------------
+    // Loads data from SQL skill table
+    // -------------------------------------------------------------------------
+    procedure adodb_load_skill(account_id : Integer = 0);
+    var
+      sql : String;
+      tc : TChara;
+      loopCounter : Integer;
+    begin
+
+      // -----------------------------------------------------------------------
+      // If account_id = 0, load all login, else load login where account_id
+      // -----------------------------------------------------------------------
+      if (account_id = 0) then begin
+        sql := 'select `skill`.* from `skill`;';
+      end else begin
+        sql := 'select `skill`.*, `char`.account_id from `skill` inner join `char` on `skill`.char_id = `char`.char_id where `char`.account_id = '''+IntToStr(account_id)+''';';
+      end;
+
+      // -----------------------------------------------------------------------
+      // Set and execute SQL
+      // -----------------------------------------------------------------------
+      frmMain.ADODataSet1.CommandText := sql;
+      frmMain.ADODataSet1.Open;
+
+      // -----------------------------------------------------------------------
+      // Loop through results and assign data to variables
+      // -----------------------------------------------------------------------
+      while not frmMain.ADODataSet1.Eof do begin
+
+        if Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue) = -1 then begin
+          frmMain.ADODataSet1.Next;
+          Continue;
+          
+        end else begin
+          tc := Chara.Objects[Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue)] as TChara;
+
+          if (SkillDB.IndexOf(frmMain.ADODataSet1.FieldByName('id').CurValue) <> -1) then begin
+            tc.Skill[StrToInt(frmMain.ADODataSet1.FieldByName('id').CurValue)].Lv := frmMain.ADODataSet1.FieldByName('lv').CurValue;
+            tc.Skill[StrToInt(frmMain.ADODataSet1.FieldByName('id').CurValue)].Card := False;
+            tc.Skill[StrToInt(frmMain.ADODataSet1.FieldByName('id').CurValue)].Plag := False;
+          end;
+
+          frmMain.ADODataSet1.Next;
+        end;
+  
+      end;
+      
+      frmMain.ADODataSet1.Close;
+      
+    end;
+
+    
+    // -------------------------------------------------------------------------
+    // Loads data from SQL inventory table
+    // -------------------------------------------------------------------------
+    procedure adodb_load_inventory(account_id : Integer = 0);
+    var
+      sql : String;
+      tc : TChara;
+      loopCounter : Integer;
+      Item : TItem;
+    begin
+
+      // Initialize Variables
+      Item := TItem.Create;
+
+      // -----------------------------------------------------------------------
+      // If account_id = 0, load all login, else load login where account_id
+      // -----------------------------------------------------------------------
+      if (account_id = 0) then begin
+        sql := 'select `inventory`.* from `inventory` where char_id = 150003;';
+      end else begin
+        sql := 'select `inventory`.*, `char`.account_id from `inventory` inner join `char` on `inventory`.char_id = `char`.char_id where `char`.account_id = '''+IntToStr(account_id)+''';';
+      end;
+
+      // -----------------------------------------------------------------------
+      // Set and execute SQL
+      // -----------------------------------------------------------------------
+      frmMain.ADODataSet1.CommandText := sql;
+      frmMain.ADODataSet1.Open;
+
+      // -----------------------------------------------------------------------
+      // Loop through results and assign data to variables
+      // -----------------------------------------------------------------------
+      while not frmMain.ADODataSet1.Eof do begin
+
+        if Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue) = -1 then begin
+          frmMain.ADODataSet1.Next;
+          Continue;
+
+        end else begin
+          tc := Chara.Objects[Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue)] as TChara;
+
+          if ItemDB.IndexOf(frmMain.ADODataSet1.FieldByName('nameid').CurValue) = -1 then begin
+            frmMain.ADODataSet1.Next;
+            Continue;
+
+          end else begin
+            Item.ID := frmMain.ADODataSet1.FieldByName('nameid').CurValue;
+            Item.Amount := frmMain.ADODataSet1.FieldByName('amount').CurValue;
+            Item.Equip := frmMain.ADODataSet1.FieldByName('equip').CurValue;
+            Item.Identify := frmMain.ADODataSet1.FieldByName('identify').CurValue;
+            Item.Refine := frmMain.ADODataSet1.FieldByName('refine').CurValue;
+            Item.Attr := frmMain.ADODataSet1.FieldByName('attribute').CurValue;
+            Item.Card[0] := frmMain.ADODataSet1.FieldByName('card0').CurValue;
+            Item.Card[1] := frmMain.ADODataSet1.FieldByName('card1').CurValue;
+            Item.Card[2] := frmMain.ADODataSet1.FieldByName('card2').CurValue;
+            Item.Card[3] := frmMain.ADODataSet1.FieldByName('card3').CurValue;
+            Item.Data := ItemDB.Objects[ItemDB.IndexOf(Item.ID)] as TItemDB;
+
+            tc.AddInventoryItem(tc, Item);
+            Item.ZeroItem;
+
+            frmMain.ADODataSet1.Next;
+            
+          end;
+
+        end;
+  
+      end;
+
+      frmMain.ADODataSet1.Close;
+      
+    end;
+
+
+    // -------------------------------------------------------------------------
+    // Loads data from SQL cart_inventory table
+    // -------------------------------------------------------------------------
+    procedure adodb_load_cart(account_id : Integer = 0);
+    var
+      sql : String;
+      tc : TChara;
+      loopCounter : Integer;
+      Item : TItem;
+    begin
+
+      // Initialize Variables
+      Item := TItem.Create;
+
+      // -----------------------------------------------------------------------
+      // If account_id = 0, load all login, else load login where account_id
+      // -----------------------------------------------------------------------
+      if (account_id = 0) then begin
+        sql := 'select `cart_inventory`.* from `cart_inventory`;';
+      end else begin
+        sql := 'select `cart_inventory`.*, `char`.account_id from `cart_inventory` inner join `char` on `cart_inventory`.char_id = `char`.char_id where `char`.account_id = '''+IntToStr(account_id)+''';';
+      end;
+
+      // -----------------------------------------------------------------------
+      // Set and execute SQL
+      // -----------------------------------------------------------------------
+      frmMain.ADODataSet1.CommandText := sql;
+      frmMain.ADODataSet1.Open;
+
+      // -----------------------------------------------------------------------
+      // Loop through results and assign data to variables
+      // -----------------------------------------------------------------------
+      while not frmMain.ADODataSet1.Eof do begin
+
+        if Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue) = -1 then begin
+          frmMain.ADODataSet1.Next;
+          Continue;
+
+        end else begin
+          tc := Chara.Objects[Chara.IndexOf(frmMain.ADODataSet1.FieldByName('char_id').CurValue)] as TChara;
+
+          if ItemDB.IndexOf(frmMain.ADODataSet1.FieldByName('nameid').CurValue) = -1 then begin
+            frmMain.ADODataSet1.Next;
+            Continue;
+
+          end else begin
+            Item.ID := frmMain.ADODataSet1.FieldByName('nameid').CurValue;
+            Item.Amount := frmMain.ADODataSet1.FieldByName('amount').CurValue;
+            Item.Equip := frmMain.ADODataSet1.FieldByName('equip').CurValue;
+            Item.Identify := frmMain.ADODataSet1.FieldByName('identify').CurValue;
+            Item.Refine := frmMain.ADODataSet1.FieldByName('refine').CurValue;
+            Item.Attr := frmMain.ADODataSet1.FieldByName('attribute').CurValue;
+            Item.Card[0] := frmMain.ADODataSet1.FieldByName('card0').CurValue;
+            Item.Card[1] := frmMain.ADODataSet1.FieldByName('card1').CurValue;
+            Item.Card[2] := frmMain.ADODataSet1.FieldByName('card2').CurValue;
+            Item.Card[3] := frmMain.ADODataSet1.FieldByName('card3').CurValue;
+            Item.Data := ItemDB.Objects[ItemDB.IndexOf(Item.ID)] as TItemDB;
+
+            tc.AddCartItem(tc, Item);
+            Item.ZeroItem;
+
+            frmMain.ADODataSet1.Next;
+            
+          end;
+
+        end;
+  
+      end;
+
+      frmMain.ADODataSet1.Close;
+      
+    end;
+
 
     
 end.
